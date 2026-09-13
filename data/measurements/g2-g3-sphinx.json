@@ -1,13 +1,160 @@
 [
-  { "key": "g2.base.side.mean",  "structure": "g2", "quantity": "length", "value": 215.25, "unit": "m", "source": "lehner-1997", "method": "tabulated" },
-  { "key": "g2.height.original", "structure": "g2", "quantity": "length", "value": 143.5,  "unit": "m", "source": "lehner-1997", "method": "tabulated" },
-  { "key": "g2.face.angle",      "structure": "g2", "quantity": "angle",  "value": 53.1667, "unit": "deg", "source": "lehner-1997", "method": "tabulated", "note": "53°10′; seked 5¼." },
-  { "key": "g3.base.side.mean",  "structure": "g3", "quantity": "length", "value": 103.4,  "unit": "m", "source": "lehner-1997", "method": "tabulated", "note": "Mean of 102.2 m (north–south) and 104.6 m (east–west)." },
-  { "key": "g3.base.side.ns",    "structure": "g3", "quantity": "length", "value": 102.2,  "unit": "m", "source": "lehner-1997", "method": "tabulated" },
-  { "key": "g3.base.side.ew",    "structure": "g3", "quantity": "length", "value": 104.6,  "unit": "m", "source": "lehner-1997", "method": "tabulated" },
-  { "key": "g3.height.original", "structure": "g3", "quantity": "length", "value": 65.0,   "unit": "m", "source": "lehner-1997", "method": "tabulated" },
-  { "key": "g3.face.angle",      "structure": "g3", "quantity": "angle",  "value": 51.3403, "unit": "deg", "source": "lehner-1997", "method": "tabulated", "note": "51°20′25″." },
-  { "key": "sphinx.length", "structure": "sphinx", "quantity": "length", "value": 73.0, "unit": "m", "source": "arce-sphinx-1991", "method": "survey", "note": "Lehner gives 72.55 m in places; verify." },
-  { "key": "sphinx.height", "structure": "sphinx", "quantity": "length", "value": 20.2, "unit": "m", "source": "arce-sphinx-1991", "method": "survey" },
-  { "key": "sphinx.width",  "structure": "sphinx", "quantity": "length", "value": 19.1, "unit": "m", "source": "arce-sphinx-1991", "method": "survey" }
+  {
+    "key": "g2.base.side.mean",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 215.25,
+    "unit": "m",
+    "source": "lehner-1997",
+    "method": "tabulated"
+  },
+  {
+    "key": "g2.height.original",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 143.5,
+    "unit": "m",
+    "source": "lehner-1997",
+    "method": "tabulated"
+  },
+  {
+    "key": "g2.face.angle",
+    "structure": "g2",
+    "quantity": "angle",
+    "value": 53.1667,
+    "unit": "deg",
+    "source": "lehner-1997",
+    "method": "tabulated",
+    "note": "53°10′; seked 5¼."
+  },
+  {
+    "key": "g3.base.side.mean",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 103.4,
+    "unit": "m",
+    "source": "lehner-1997",
+    "method": "tabulated",
+    "note": "Mean of 102.2 m (north–south) and 104.6 m (east–west)."
+  },
+  {
+    "key": "g3.base.side.ns",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 102.2,
+    "unit": "m",
+    "source": "lehner-1997",
+    "method": "tabulated"
+  },
+  {
+    "key": "g3.base.side.ew",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 104.6,
+    "unit": "m",
+    "source": "lehner-1997",
+    "method": "tabulated"
+  },
+  {
+    "key": "g3.height.original",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 65.0,
+    "unit": "m",
+    "source": "lehner-1997",
+    "method": "tabulated"
+  },
+  {
+    "key": "g3.face.angle",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 51.3403,
+    "unit": "deg",
+    "source": "lehner-1997",
+    "method": "tabulated",
+    "note": "51°20′25″."
+  },
+  {
+    "key": "sphinx.length",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 73.0,
+    "unit": "m",
+    "source": "arce-sphinx-1991",
+    "method": "survey",
+    "note": "Lehner gives 72.55 m in places; verify."
+  },
+  {
+    "key": "sphinx.height",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 20.2,
+    "unit": "m",
+    "source": "arce-sphinx-1991",
+    "method": "survey"
+  },
+  {
+    "key": "sphinx.width",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 19.1,
+    "unit": "m",
+    "source": "arce-sphinx-1991",
+    "method": "survey"
+  },
+  {
+    "key": "g2.centre.offset.south",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 353.86,
+    "unit": "m",
+    "sigma": 0.5,
+    "source": "petrie-1883",
+    "method": "triangulation",
+    "note": "13931.6 in south of the Great Pyramid's centre; verify in Petrie's chapter on the relative positions."
+  },
+  {
+    "key": "g2.centre.offset.west",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 334.41,
+    "unit": "m",
+    "sigma": 0.5,
+    "source": "petrie-1883",
+    "method": "triangulation",
+    "note": "13165.8 in west; verify."
+  },
+  {
+    "key": "g2.base.elevation.relative",
+    "structure": "g2",
+    "quantity": "elevation",
+    "value": 10.0,
+    "unit": "m",
+    "sigma": 3,
+    "source": "lehner-1997",
+    "method": "tabulated",
+    "note": "Khafre's base is about 10 m higher than Khufu's; replace with surveyed elevations."
+  },
+  {
+    "key": "g3.centre.offset.south",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 739.19,
+    "unit": "m",
+    "sigma": 1,
+    "source": "petrie-1883",
+    "method": "triangulation",
+    "note": "29102 in south; verify."
+  },
+  {
+    "key": "g3.centre.offset.west",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 574.45,
+    "unit": "m",
+    "sigma": 1,
+    "source": "petrie-1883",
+    "method": "triangulation",
+    "note": "22616 in west; verify."
+  }
 ]
