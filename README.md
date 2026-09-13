@@ -41,13 +41,18 @@ against the cited page. Open decisions are listed at the end of the plan.
 
 ```
 pnpm install
-pnpm test        # 38 tests across units, geometry, data and claims
+pnpm test        # 52 tests across units, geometry, data, claims, sky and the Blender reader
 pnpm dossier     # regenerates docs/dossier.md from data/
+pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
 ```
 
-Next: verify the starting sheet against Petrie, Cole and Dash; then
-`packages/sky` (Vondrák 2011 precession) so the C-group claims compute;
-then the Blender generator and the web viewer.
+`packages/sky` carries Vondrák 2011 long-term precession, tested against
+ERFA's reference values, and enough meridian geometry to solve the shaft
+alignments (claim C2); see `docs/shafts.md`.
+
+Next: verify the starting sheet against Petrie, Cole and Dash; let claims
+call the sky engine so C2, C3 and C4 appear in the dossier; then terrain,
+interiors and materials in Blender, and the web viewer.
 
 ## Layout
 
@@ -62,9 +67,9 @@ packages/
   geometry/    pyramid profile numbers, eight-sided mesh generator, landmarks, expression environment
   data/        zod-validated loader and preset resolver
   claims/      expression parser (no eval), registry, evaluator, dossier renderer
-  sky/         (planned) Vondrák precession, sun, local frame
+  sky/         Vondrák 2011 precession (ERFA-verified), meridian geometry, named stars
 blender/       (planned) bpy generators, terrain import, export, .blend scenes
 apps/web/      (planned) Vite + React + React Three Fiber viewer
-scripts/       dossier generator
-docs/          plan.html, dossier.md
+scripts/       dossier generator, shaft solver
+docs/          plan.html, dossier.md, shafts.md
 ```

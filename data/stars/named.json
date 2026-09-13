@@ -1,0 +1,12 @@
+[
+  { "id": "alnitak", "name": "Alnitak", "bayer": "ζ Ori", "raDeg": 85.18969, "decDeg": -1.94258, "pmRaMasYr": 3.19, "pmDecMasYr": 2.03, "source": "hipparcos-1997", "role": "Orion's Belt, east; King's Chamber south shaft (C2); Orion Correlation (C4)" },
+  { "id": "alnilam", "name": "Alnilam", "bayer": "ε Ori", "raDeg": 84.05334, "decDeg": -1.20192, "pmRaMasYr": 1.44, "pmDecMasYr": -0.78, "source": "hipparcos-1997", "role": "Orion's Belt, centre (C4)" },
+  { "id": "mintaka", "name": "Mintaka", "bayer": "δ Ori", "raDeg": 83.00167, "decDeg": -0.29909, "pmRaMasYr": 0.64, "pmDecMasYr": -0.69, "source": "hipparcos-1997", "role": "Orion's Belt, west (C4)" },
+  { "id": "sirius", "name": "Sirius", "bayer": "α CMa", "raDeg": 101.28716, "decDeg": -16.71612, "pmRaMasYr": -546.01, "pmDecMasYr": -1223.07, "source": "hipparcos-1997", "role": "Queen's Chamber south shaft (C2); large proper motion" },
+  { "id": "thuban", "name": "Thuban", "bayer": "α Dra", "raDeg": 211.09731, "decDeg": 64.37585, "pmRaMasYr": -56.34, "pmDecMasYr": 17.21, "source": "hipparcos-1997", "role": "Pole star c. 2800 BCE; King's Chamber north shaft (C2); descending passage (C3)" },
+  { "id": "kochab", "name": "Kochab", "bayer": "β UMi", "raDeg": 222.67636, "decDeg": 74.15550, "pmRaMasYr": -32.61, "pmDecMasYr": 11.42, "source": "hipparcos-1997", "role": "Queen's Chamber north shaft (C2); Spence's alignment pair (C1)" },
+  { "id": "mizar", "name": "Mizar", "bayer": "ζ UMa", "raDeg": 200.98142, "decDeg": 54.92536, "pmRaMasYr": 121.23, "pmDecMasYr": -22.01, "source": "hipparcos-1997", "role": "Spence's alignment pair (C1)" },
+  { "id": "regulus", "name": "Regulus", "bayer": "α Leo", "raDeg": 152.09296, "decDeg": 11.96721, "pmRaMasYr": -248.73, "pmDecMasYr": 5.59, "source": "hipparcos-1997", "role": "Leo and the Sphinx (C5)" },
+  { "id": "vega", "name": "Vega", "bayer": "α Lyr", "raDeg": 279.23473, "decDeg": 38.78369, "pmRaMasYr": 200.94, "pmDecMasYr": 286.23, "source": "hipparcos-1997", "role": "Pole star c. 12,000 BCE; precession sanity check" },
+  { "id": "polaris", "name": "Polaris", "bayer": "α UMi", "raDeg": 37.95456, "decDeg": 89.26411, "pmRaMasYr": 44.48, "pmDecMasYr": -11.85, "source": "hipparcos-1997", "role": "Today's pole star; precession sanity check" }
+]

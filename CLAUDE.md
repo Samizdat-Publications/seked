@@ -12,6 +12,7 @@ pnpm install        # once
 pnpm test           # vitest, all packages
 pnpm typecheck      # tsc --noEmit
 pnpm dossier        # regenerate docs/dossier.md from data/
+pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 ```
 
 ## Rules that keep the project honest
@@ -37,6 +38,8 @@ pnpm dossier        # regenerate docs/dossier.md from data/
   Y-up for the web.
 - **Blender scripts** (`blender/`) run inside Blender's own Python. Keep them
   dependency-free and have them read `data/` directly.
+- **Precession is Vondrák 2011**, never the IAU 2006 polynomials, for anything
+  before about 1000 BCE. The tests pin the implementation to ERFA's values.
 
 ## Layout
 
@@ -46,6 +49,8 @@ packages/units   cubit, pyramid inch, seked <-> degrees, DMS formatting
 packages/geometry  pyramid profile numbers, mesh generator, landmarks, expression environment
 packages/data    zod-validated loader and preset resolver
 packages/claims  expression parser, claim registry, evaluator, dossier renderer
-scripts/         dossier generator
+packages/sky     Vondrák 2011 precession, meridian geometry, named stars (data/stars/named.json)
+blender/         generate.py (bpy) and seked_data.py (stdlib reader, parity-tested against @seked/data)
+scripts/         dossier and shaft-solver scripts
 docs/            plan, dossier
 ```

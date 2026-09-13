@@ -17,6 +17,9 @@ importers:
       '@seked/geometry':
         specifier: workspace:*
         version: link:packages/geometry
+      '@seked/sky':
+        specifier: workspace:*
+        version: link:packages/sky
       '@seked/units':
         specifier: workspace:*
         version: link:packages/units
@@ -62,6 +65,15 @@ importers:
       '@seked/units':
         specifier: workspace:*
         version: link:../units
+
+  packages/sky:
+    dependencies:
+      '@seked/data':
+        specifier: workspace:*
+        version: link:../data
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.4
 
   packages/units: {}
 

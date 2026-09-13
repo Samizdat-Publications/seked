@@ -331,7 +331,7 @@ Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its north 
 
 **Context:** Gantenbrink, R. (1993 onward). The Upuaut Project: survey of the shafts of the Great Pyramid. · Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
 
-Computable once packages/sky exists: for each shaft, the app solves for the epoch at which the named star's transit altitude equals the shaft angle, and shows how sensitive that date is to the measured angle.
+packages/sky solves this numerically; `pnpm shafts` writes docs/shafts.md with, for each shaft, the epoch at which the named star crossed the meridian at the shaft's altitude and how many years the date moves per arcminute of shaft angle. The dossier will carry it once claims can call the sky engine.
 
 ### C4 · Orion Correlation
 
