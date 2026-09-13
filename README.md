@@ -59,6 +59,8 @@ interiors and materials in Blender, and the web viewer.
 ```
 data/
   sources.json          every source a record or a claim may cite
+  sites.json            sites with body, datum and origin (giza; a cydonia placeholder on Mars)
+  structures.json       every structure with an evidence tier: excavated, instrumented, claimed, legendary
   presets.json          preference orders over sources (canonical, petrie-1883, cole-1925, dash-2015)
   measurements/*.json   one record per measured quantity, metres and degrees, with provenance
   claims/*.yaml         one claim per file: comparisons, tolerance, free choices, sources, overlay

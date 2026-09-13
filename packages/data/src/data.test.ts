@@ -21,6 +21,25 @@ describe('database', () => {
   });
 });
 
+describe('sites and structures', () => {
+  it('registers Giza on Earth and the Cydonia placeholder on Mars', () => {
+    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars']);
+  });
+  it('gives every structure an evidence tier and a known site', () => {
+    const tiers = new Set(db.structures.map((s) => s.evidence));
+    expect([...tiers].sort()).toEqual(['claimed', 'excavated', 'instrumented', 'legendary']);
+    for (const s of db.structures) expect(db.sites.some((site) => site.id === s.site)).toBe(true);
+  });
+  it('keeps the subterranean claims separate from the excavated record', () => {
+    expect(db.structures.find((s) => s.id === 'osiris-shaft')?.evidence).toBe('excavated');
+    expect(db.structures.find((s) => s.id === 'g2.sar-shafts')?.evidence).toBe('claimed');
+    expect(db.structures.find((s) => s.id === 'hall-of-records')?.evidence).toBe('legendary');
+  });
+  it('defaults every measurement to the Giza site', () => {
+    for (const m of db.measurements) expect(m.site).toBe('giza');
+  });
+});
+
 describe('presets', () => {
   it('canonical prefers Lehner, falls back to the surveys', () => {
     const r = resolve(db, 'canonical');

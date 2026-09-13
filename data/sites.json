@@ -1,0 +1,20 @@
+[
+  {
+    "id": "giza",
+    "name": "Giza necropolis",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 29.979167, "longitude": 31.134167, "elevation": 60 },
+    "frame": "East-north-up at the Great Pyramid's base centre; +Z up, so subterranean features have negative Z.",
+    "note": "Origin coordinates are the commonly cited base centre; replace with the Dash/GPMP-tied values. Elevation is approximate."
+  },
+  {
+    "id": "cydonia",
+    "name": "Cydonia Mensae",
+    "body": "mars",
+    "datum": "IAU 2000 Mars, planetocentric, MOLA areoid",
+    "origin": { "latitude": 40.75, "longitude": -9.46, "elevation": 0 },
+    "frame": "East-north-up at the 'Face' mesa. Placeholder: coordinates from memory and unverified; no structures entered.",
+    "note": "Registered only so the model never assumes Earth or Giza. Imagery: Viking 1 frame 035A72 (1976), MGS MOC (2001), HiRISE (2007 onward, with DTMs). A Martian sky needs its own precession model; packages/sky is Earth-only."
+  }
+]

@@ -33,6 +33,12 @@ pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 - **Presets are preference orders over sources.** `resolve(db, presetId)`
   picks, for each key, the record from the earliest source in the preset's
   list. Switching preset regenerates everything downstream.
+- **Sites and evidence tiers.** `data/sites.json` names each site, its body
+  and datum, so nothing assumes Giza or Earth. `data/structures.json` gives
+  every structure an evidence tier: `excavated`, `instrumented` (muon, GPR,
+  seismic, peer reviewed), `claimed` (not peer reviewed) or `legendary`. The
+  viewer renders tiers differently; a claim may reference any tier. Never
+  promote a tier because a claim needs it.
 - **One frame.** Origin at the Great Pyramid's base centre; +X east, +Y
   north, +Z up in data, geometry and Blender. The glTF exporter handles
   Y-up for the web.

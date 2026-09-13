@@ -199,5 +199,43 @@
     "citation": "ERFA: Essential Routines for Fundamental Astronomy (BSD-3), derived from the IAU SOFA library. Long-term precession routines ltpecl, ltpequ, ltp, ltpb and their reference test values.",
     "url": "https://github.com/liberfa/erfa",
     "license": "BSD-3-Clause"
+  },
+  {
+    "id": "hawass-2007",
+    "kind": "paper",
+    "year": 2007,
+    "citation": "Hawass, Z. (2007). The discovery of the Osiris Shaft at Giza. In Z. Hawass & J. Richards (eds.), The Archaeology and Art of Ancient Egypt: Essays in Honor of David B. O'Connor. Cairo: SCA."
+  },
+  {
+    "id": "dobecki-schoch-1992",
+    "kind": "paper",
+    "year": 1992,
+    "citation": "Dobecki, T. L. & Schoch, R. M. (1992). Seismic investigations in the vicinity of the Great Sphinx of Giza, Egypt. Geoarchaeology 7(6), 527–544."
+  },
+  {
+    "id": "khafre-project-2025",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "Malanga, C., Biondi, F. & Mei, A. (2025). Khafre Project: SAR Doppler tomography of the Giza plateau. Press conference, March 2025; not peer reviewed at the time of entry.",
+    "note": "Enter the published preprint or paper reference when one exists, and the specific critiques (radar penetration depth; the antiquities authority's statement)."
+  },
+  {
+    "id": "cayce",
+    "kind": "proponent",
+    "citation": "Cayce, E. Readings on Atlantis and the Hall of Records under the Sphinx (1930s–40s), as compiled by the A.R.E."
+  },
+  {
+    "id": "hoagland-1987",
+    "kind": "proponent",
+    "year": 1987,
+    "citation": "Hoagland, R. C. (1987). The Monuments of Mars: A City on the Edge of Forever. Berkeley: North Atlantic Books.",
+    "note": "Cydonia geometry and the Giza correlation claims."
+  },
+  {
+    "id": "nasa-hirise-cydonia",
+    "kind": "reference",
+    "citation": "NASA/JPL/University of Arizona. HiRISE images and digital terrain models of Cydonia Mensae (2007 onward).",
+    "url": "https://www.uahirise.org/",
+    "license": "Public domain (NASA)"
   }
 ]
