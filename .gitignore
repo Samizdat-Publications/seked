@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+.turbo/
+*.log
+
+# Blender
+*.blend1
+*.blend2
+blender/**/cache/
+
+# Large generated assets are tracked with LFS once the pipeline exists
+*.glb
+*.gltf
+*.ktx2
+*.tif
+*.tiff
+
+# Local
+.env
+.env.*
+.DS_Store

@@ -1,0 +1,721 @@
+<title>Seked Project Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hepta+Slab:wght@300;500;700;900&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  *{box-sizing:border-box}
+  :root{
+    color-scheme:light;
+    --paper:#FBFBF9;
+    --plate:#F1F1EC;
+    --ink:#1F242B;
+    --ink-2:#5A6270;
+    --rule:#CBCEC7;
+    --rule-strong:#9AA09A;
+    --granite:#A3463C;
+    --granite-soft:#F3E1DD;
+    --sky:#2C5282;
+    --sky-soft:#DCE6F2;
+    --code-bg:#ECEDE8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --paper:#0E141D;
+      --plate:#151D28;
+      --ink:#E7E5DE;
+      --ink-2:#A0A8B3;
+      --rule:#2A3441;
+      --rule-strong:#4A5566;
+      --granite:#D4857A;
+      --granite-soft:#3A2521;
+      --sky:#8FB4E3;
+      --sky-soft:#1B2B40;
+      --code-bg:#0A0F16;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --paper:#0E141D;
+    --plate:#151D28;
+    --ink:#E7E5DE;
+    --ink-2:#A0A8B3;
+    --rule:#2A3441;
+    --rule-strong:#4A5566;
+    --granite:#D4857A;
+    --granite-soft:#3A2521;
+    --sky:#8FB4E3;
+    --sky-soft:#1B2B40;
+    --code-bg:#0A0F16;
+  }
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Source Sans 3','Source Sans Pro',system-ui,-apple-system,'Segoe UI',sans-serif;
+    font-size:17px;line-height:1.55;
+    padding-block:0 5rem;padding-inline:clamp(16px,4vw,40px);
+  }
+  a{color:var(--sky)}
+  :focus-visible{outline:2px solid var(--granite);outline-offset:2px}
+  .page{max-width:1120px;margin:0 auto}
+  .masthead{padding-block:3rem 2rem;border-bottom:2px solid var(--ink);display:grid;gap:1.1rem}
+  .eyebrow{font-weight:600;font-size:.75rem;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0}
+  h1{font-family:'Hepta Slab','Rockwell','Roboto Slab',Georgia,serif;font-weight:900;font-size:clamp(3.2rem,9vw,6rem);line-height:.92;margin:0;letter-spacing:-.015em;text-wrap:balance}
+  .dek{font-size:1.3rem;line-height:1.4;max-width:34em;margin:0;text-wrap:balance}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem 2rem;margin:.75rem 0 0;padding:0}
+  .facts div{border-top:1px solid var(--rule);padding-top:.5rem}
+  .facts dt{font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+  .facts dd{margin:.15rem 0 0;font-size:.98rem}
+  .layout{display:grid;grid-template-columns:200px minmax(0,1fr);gap:3rem;padding-top:2rem}
+  @media (max-width:900px){.layout{grid-template-columns:1fr;gap:2rem}}
+  .toc{position:sticky;top:1.5rem;align-self:start;font-size:.9rem}
+  @media (max-width:900px){.toc{position:static}}
+  .toc ol{list-style:none;margin:0;padding:0;display:grid;gap:.3rem}
+  .toc a{color:var(--ink-2);text-decoration:none;border-left:2px solid transparent;padding-left:.6rem;display:block;line-height:1.3}
+  .toc a:hover,.toc a:focus-visible{color:var(--ink);border-color:var(--granite)}
+  main{min-width:0;display:grid;gap:3.75rem}
+  section>h2{font-family:'Hepta Slab','Rockwell','Roboto Slab',Georgia,serif;font-weight:700;font-size:1.9rem;line-height:1.15;margin:0 0 .35rem;text-wrap:balance}
+  section h3{font-family:'Hepta Slab','Rockwell','Roboto Slab',Georgia,serif;font-weight:500;font-size:1.2rem;margin:1.75rem 0 .5rem;text-wrap:balance}
+  .label{font-weight:600;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--granite);margin:0 0 .4rem}
+  p{max-width:68ch;margin:0 0 1rem}
+  ul,ol{max-width:68ch;padding-left:1.25rem;margin:0 0 1rem}
+  li{margin-bottom:.45rem}
+  strong,b{font-weight:600}
+  .rules{list-style:none;padding:0;display:grid;gap:.6rem;max-width:none}
+  .rules li{display:grid;grid-template-columns:2.4rem 1fr;gap:.75rem;align-items:baseline;border-top:1px solid var(--rule);padding-top:.7rem;margin:0}
+  .rules b{font-family:'Hepta Slab',Georgia,serif;font-weight:700;color:var(--granite);font-size:1.05rem}
+  .rules p{margin:0;max-width:none}
+  figure{margin:1.5rem 0;background:var(--plate);border:1px solid var(--rule);padding:1rem}
+  figure svg{width:100%;height:auto;display:block}
+  figcaption{font-size:.86rem;color:var(--ink-2);margin-top:.75rem;line-height:1.5}
+  figcaption .key{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:.78rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.15rem 1.2rem;margin-top:.5rem;list-style:none;padding:0;max-width:none}
+  figcaption .key li{margin:0}
+  figcaption .key b{color:var(--granite);font-weight:500}
+  .plate-svg{color:var(--ink);font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:11px}
+  .plate-svg .ground{stroke:var(--rule-strong);stroke-width:1}
+  .plate-svg .body{fill:var(--paper);stroke:currentColor;stroke-width:1.6}
+  .plate-svg .passage{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .plate-svg .room{fill:var(--plate);stroke:currentColor;stroke-width:1.3}
+  .plate-svg .gallery{fill:var(--plate);stroke:currentColor;stroke-width:1.3}
+  .plate-svg .shaft{stroke:var(--sky);stroke-width:1.6;stroke-linecap:round}
+  .plate-svg .dash{fill:none;stroke:currentColor;stroke-width:1.1;stroke-dasharray:4 3}
+  .plate-svg .dim{fill:none;stroke:var(--ink-2);stroke-width:1}
+  .plate-svg text{fill:currentColor}
+  .plate-svg .lbl{fill:var(--ink-2)}
+  .plate-svg .num{fill:var(--granite);font-weight:500}
+  .arch-svg{color:var(--ink);font-family:'Source Sans 3',system-ui,sans-serif;font-size:12.5px}
+  .arch-svg .box{fill:var(--paper);stroke:currentColor;stroke-width:1.2}
+  .arch-svg .wide{fill:var(--sky-soft);stroke:var(--sky);stroke-width:1.2}
+  .arch-svg .t1{font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:500;fill:currentColor;font-size:12.5px}
+  .arch-svg .t2{fill:var(--ink-2)}
+  .arch-svg .flow{fill:none;stroke:currentColor;stroke-width:1.2}
+  .arch-svg .note{fill:var(--ink-2);font-size:11px}
+  .tbl-wrap{overflow-x:auto;margin:1rem 0 1.5rem}
+  table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:640px}
+  th{text-align:left;font-weight:600;font-size:.7rem;line-height:1.3;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);padding:.5rem .7rem .5rem 0;border-bottom:1px solid var(--ink);vertical-align:bottom}
+  td{padding:.55rem .7rem .55rem 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.45}
+  td:last-child,th:last-child{padding-right:0}
+  .num{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:.83rem;font-variant-numeric:tabular-nums}
+  td.id{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:500;color:var(--granite);white-space:nowrap;font-size:.85rem}
+  td.fit{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .fc{display:inline-block;min-width:1.5em;text-align:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:.78rem;border:1px solid var(--rule-strong);border-radius:2px;padding:0 .3em;color:var(--ink)}
+  pre{background:var(--code-bg);border:1px solid var(--rule);padding:1rem;overflow-x:auto;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:.8rem;line-height:1.5;margin:1rem 0;max-width:100%}
+  code{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:.88em}
+  .deliv{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1rem 0;padding:0;list-style:none;max-width:none}
+  .deliv li{border-top:2px solid var(--ink);padding-top:.6rem;margin:0}
+  .deliv .d{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:.8rem;color:var(--granite);font-weight:500}
+  .deliv h3{margin:.15rem 0 .3rem;font-size:1.1rem}
+  .deliv p{margin:0;font-size:.95rem}
+  .phases{list-style:none;padding:0;max-width:none;display:grid;gap:.5rem}
+  .phases li{display:grid;grid-template-columns:4rem 1fr;gap:1rem;border-top:1px solid var(--rule);padding-top:1rem;margin:0 0 .5rem}
+  @media (max-width:520px){.phases li{grid-template-columns:1fr}}
+  .phases .n{font-family:'Hepta Slab',Georgia,serif;font-weight:900;font-size:2.4rem;line-height:1;color:var(--granite);letter-spacing:-.02em}
+  .phases .n small{display:block;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-top:.4rem}
+  .phases h3{margin:0 0 .3rem}
+  .phases p{margin:0 0 .5rem}
+  .phases .done{font-size:.9rem;color:var(--ink-2);border-left:2px solid var(--sky);padding-left:.7rem;margin:0}
+  .phases .done b{color:var(--sky)}
+  .decisions{list-style:none;padding:0;max-width:none;display:grid;gap:.75rem}
+  .decisions li{border-top:1px solid var(--rule);padding-top:.75rem;margin:0;display:grid;grid-template-columns:2rem 1fr;gap:.6rem}
+  .decisions .q{font-family:'Hepta Slab',Georgia,serif;font-weight:700;color:var(--granite)}
+  .decisions p{margin:0 0 .25rem;max-width:none}
+  .decisions .rec{font-size:.93rem;color:var(--ink-2)}
+  .decisions .rec b{color:var(--sky)}
+  .pending{border:1px dashed var(--rule-strong);padding:1rem 1.25rem;color:var(--ink-2);font-style:italic;max-width:68ch}
+  .refs{font-size:.93rem;columns:2;column-gap:2.5rem;max-width:none;padding-left:1.1rem}
+  @media (max-width:720px){.refs{columns:1}}
+  .refs li{break-inside:avoid}
+  .note{background:var(--granite-soft);border-left:3px solid var(--granite);padding:.75rem 1rem;max-width:68ch;margin:1rem 0}
+  .note p{margin:0}
+  .checklist{list-style:none;padding:0;max-width:68ch}
+  .checklist li{display:grid;grid-template-columns:1.4rem 1fr;gap:.4rem;margin-bottom:.35rem}
+  .checklist li::before{content:"☐";color:var(--ink-2)}
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Project plan · Draft 1 · 13 September 2026</p>
+    <h1>Seked</h1>
+    <p class="dek">A survey-accurate 3D model of the Giza necropolis in which every "encoded mathematics" claim is a live overlay, computed from the same measurements that build the geometry.</p>
+    <dl class="facts">
+      <div><dt>Working name</dt><dd><em>Seked</em>: the Egyptian unit of slope, palms of run per cubit of rise. A seked of 5½ is the whole π-and-φ story. Rename freely.</dd></div>
+      <div><dt>Primary output</dt><dd>Interactive web app (Three.js), plus a Blender scene for cinematic renders and animation.</dd></div>
+      <div><dt>Home</dt><dd>A new repository. Not part of Agent-X; nothing here touches that codebase.</dd></div>
+      <div><dt>Status</dt><dd>Plan for discussion. Open decisions are listed at the end.</dd></div>
+    </dl>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Contents">
+      <ol>
+        <li><a href="#thesis">What this is</a></li>
+        <li><a href="#deliverables">Deliverables</a></li>
+        <li><a href="#site">The site</a></li>
+        <li><a href="#plate">Plate I · Great Pyramid section</a></li>
+        <li><a href="#data">Measurement database</a></li>
+        <li><a href="#claims">Claims registry</a></li>
+        <li><a href="#sky">Sky engine</a></li>
+        <li><a href="#arch">Architecture</a></li>
+        <li><a href="#blender">Blender pipeline</a></li>
+        <li><a href="#phases">Phases</a></li>
+        <li><a href="#risks">Risks and hard parts</a></li>
+        <li><a href="#sourcing">Sourcing check</a></li>
+        <li><a href="#decisions">Decisions to talk through</a></li>
+        <li><a href="#home">First evening at home</a></li>
+        <li><a href="#reading">Reading list</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section id="thesis">
+        <p class="label">Thesis</p>
+        <h2>Numbers first, then the model</h2>
+        <p>There are two ways to build this. The first is to model the pyramids beautifully and paint the claims on afterwards as annotations. The second is to put the numbers first: every dimension lives in a database with its source and its uncertainty, the geometry is generated from those numbers, and each claim is a formula over the same numbers. The second way is what makes the model high fidelity rather than a poster. It is also far more interesting to use. Switch the survey from Petrie 1883 to Dash 2015, nudge the cubit by a millimetre, drag the sky back to 10,500 BCE, and watch each claim's residual move in real time.</p>
+        <p>Five rules follow from that, and every later section is an application of them.</p>
+        <ol class="rules">
+          <li><b>I</b><p><strong>One source of truth.</strong> Every number has provenance: who measured it, when, how, and with what error. Nothing is typed twice.</p></li>
+          <li><b>II</b><p><strong>Claims are data.</strong> A claim is a file: inputs, formula, target, tolerance, sources, and an overlay spec. Adding a claim never touches app code.</p></li>
+          <li><b>III</b><p><strong>Two monuments.</strong> "As built" (reconstructed, with casing and pyramidion, carrying error bars) and "as today" (stripped, 8 m shorter). Claims are about the first; the evidence comes from the second.</p></li>
+          <li><b>IV</b><p><strong>Show the fit.</strong> Each overlay displays measured versus claimed, the residual, and a count of the free choices the claim needed: which base line, which unit, which epoch. The app never says true or false. It shows the number.</p></li>
+          <li><b>V</b><p><strong>One frame.</strong> Origin at the Great Pyramid's base centre, axes east-north-up, georeferenced to WGS84. The Heliopolis line, the shaft alignments and the equinox sun all live in the same coordinates.</p></li>
+        </ol>
+      </section>
+
+      <section id="deliverables">
+        <p class="label">Deliverables</p>
+        <h2>Six things that exist at the end</h2>
+        <ul class="deliv">
+          <li><span class="d">D1</span><h3>Measurement database</h3><p>Versioned JSON with a schema, one record per dimension, provenance on every value, and named survey presets.</p></li>
+          <li><span class="d">D2</span><h3>Claims registry and dossier</h3><p>One YAML file per claim; a generated document (Markdown and PDF) with the maths, the fit and the sources for each.</p></li>
+          <li><span class="d">D3</span><h3>Parametric geometry library</h3><p>TypeScript that turns D1 into meshes, plus a landmarks file naming every point and axis a claim can reference.</p></li>
+          <li><span class="d">D4</span><h3>Blender scene</h3><p>Plateau terrain, all structures, materials, LODs, exported glTF, and the hero renders and animations.</p></li>
+          <li><span class="d">D5</span><h3>Web app</h3><p>Viewer with layer toggles, section cuts, a walk-in interior, a real sky with a time scrubber, and one overlay per claim.</p></li>
+          <li><span class="d">D6</span><h3>Deployment</h3><p>Static build on Cloudflare Pages, with a README and the dossier alongside.</p></li>
+        </ul>
+      </section>
+
+      <section id="site">
+        <p class="label">Scope</p>
+        <h2>The site, in four tiers</h2>
+        <p>The necropolis is enormous. Tiers keep the mastaba fields from eating the schedule while still giving the plateau its real shape.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Tier</th><th>Structures</th><th>Treatment</th></tr></thead>
+            <tbody>
+              <tr><td class="id">1</td><td>Great Pyramid (G1, Khufu)</td><td>Fully parametric exterior with concavity, casing shell, corner sockets and pyramidion. Full interior: descending passage, subterranean chamber, ascending passage, Grand Gallery, Queen's Chamber and shafts, King's Chamber with relieving chambers and shafts, well shaft and grotto, al-Ma'mun's tunnel, the ScanPyramids Big Void and north-face corridor.</td></tr>
+              <tr><td class="id">2</td><td>Khafre (G2), Menkaure (G3)</td><td>Parametric exterior from survey values (G2 keeps its casing cap; G3 its granite lower courses). Interiors as passages and chambers only, from published plans.</td></tr>
+              <tr><td class="id">3</td><td>Queens' pyramids (G1-a, b, c; G3-a, b, c), satellite pyramids, mortuary and valley temples, causeways, Sphinx Temple, boat pits, Wall of the Crow, Khentkawes, the Eastern and Western mastaba fields</td><td>Massed from footprints (Giza Plateau Mapping Project plans, OpenStreetMap) with correct heights. No interiors.</td></tr>
+              <tr><td class="id">4</td><td>The Sphinx</td><td>Sculptural. A Blender sculpt over Lehner's ARCE Sphinx Project plans, with the CC-BY hobbyist scans as reference only; no survey-grade mesh is public.</td></tr>
+              <tr><td class="id">T</td><td>Terrain</td><td>Copernicus GLO-30 DEM as the base, refined with the GPMP contours around the monuments; low-resolution Nile valley and Cairo for context and for the Heliopolis and Delta overlays.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="plate">
+        <p class="label">Plate I</p>
+        <h2>The Great Pyramid in section</h2>
+        <p>Drawn to scale from the survey values below, north on the left. Solid lines are the monument as built. Dashed lines mark today's truncated top and the two ScanPyramids discoveries. Blue lines are the four shafts, the subject of claim C2. This is the thing Tier 1 produces, in outline.</p>
+        <figure>
+          <svg class="plate-svg" viewBox="0 0 720 545" role="img" aria-labelledby="p1t">
+            <title id="p1t">North to south section of the Great Pyramid, to scale</title>
+            <line x1="20" y1="420" x2="700" y2="420" class="ground"/>
+            <text x="26" y="414" class="lbl">N</text>
+            <text x="686" y="414" class="lbl">S</text>
+            <polygon points="62,420 350,53.5 638,420" class="body"/>
+            <line x1="300" y1="73" x2="400" y2="73" class="dash"/>
+            <text x="406" y="76.5" class="lbl">138.75 m today</text>
+            <!-- passages -->
+            <polyline points="95,378 320,493" class="passage"/>
+            <rect x="318" y="490" width="36" height="9" class="room"/>
+            <polyline points="157.5,409 245,366" class="passage"/>
+            <line x1="245" y1="366" x2="343.5" y2="366" class="passage"/>
+            <polygon points="343.5,366 343.5,355 350,350 356.5,355 356.5,366" class="room"/>
+            <polygon points="245,366 350,314.5 350,293.5 245,345" class="gallery"/>
+            <line x1="350" y1="313" x2="363.5" y2="310" class="passage"/>
+            <rect x="363.5" y="298" width="13" height="14.5" class="room"/>
+            <rect x="361" y="290.5" width="18" height="7.5" class="room"/>
+            <rect x="361" y="283" width="18" height="7.5" class="room"/>
+            <rect x="361" y="275.5" width="18" height="7.5" class="room"/>
+            <rect x="361" y="268" width="18" height="7.5" class="room"/>
+            <polygon points="361,268 370,255 379,268" class="room"/>
+            <!-- shafts -->
+            <line x1="376.5" y1="305" x2="473.75" y2="211" class="shaft"/>
+            <line x1="363.5" y1="305" x2="226" y2="211" class="shaft"/>
+            <line x1="356.5" y1="360" x2="465" y2="267.5" class="shaft"/>
+            <line x1="343.5" y1="360" x2="235" y2="267.5" class="shaft"/>
+            <!-- discoveries -->
+            <polygon points="276,292 348,254 356,268 284,306" class="dash"/>
+            <rect x="100" y="366" width="22" height="5" class="dash"/>
+            <!-- keys -->
+            <text x="86" y="372" class="num" text-anchor="end">1</text>
+            <text x="118" y="410" class="num">2</text>
+            <text x="360" y="499" class="num">3</text>
+            <text x="200" y="378" class="num">4</text>
+            <text x="346" y="382" class="num" text-anchor="middle">5</text>
+            <text x="300" y="356" class="num">6</text>
+            <text x="384" y="320" class="num">7</text>
+            <text x="384" y="262" class="num">8</text>
+            <text x="452" y="250" class="num">9</text>
+            <text x="244" y="244" class="num">9</text>
+            <text x="452" y="300" class="num">10</text>
+            <text x="238" y="300" class="num">10</text>
+            <text x="270" y="304" class="num" text-anchor="end">11</text>
+            <text x="126" y="372" class="num">12</text>
+            <!-- dimensions -->
+            <line x1="62" y1="514" x2="638" y2="514" class="dim"/>
+            <line x1="62" y1="509" x2="62" y2="519" class="dim"/>
+            <line x1="638" y1="509" x2="638" y2="519" class="dim"/>
+            <text x="350" y="533" text-anchor="middle">230.33 m · 440 royal cubits</text>
+            <line x1="662" y1="53.5" x2="662" y2="420" class="dim"/>
+            <line x1="657" y1="53.5" x2="667" y2="53.5" class="dim"/>
+            <line x1="657" y1="420" x2="667" y2="420" class="dim"/>
+            <text transform="rotate(-90 678 237)" x="678" y="237" text-anchor="middle">146.59 m · 280 rc</text>
+            <path d="M598,420 A40,40 0 0 1 613.3,388.5" class="dim"/>
+            <text x="600" y="404" text-anchor="end">51°50′40″ · seked 5½</text>
+          </svg>
+          <figcaption>
+            Schematic north–south section through the axis; horizontal and vertical at the same scale.
+            <ul class="key">
+              <li><b>1</b> Entrance, north face, 17 m up</li>
+              <li><b>2</b> Descending passage, 26°31′</li>
+              <li><b>3</b> Subterranean chamber, 30 m below base</li>
+              <li><b>4</b> Ascending passage, 26°02′</li>
+              <li><b>5</b> Queen's Chamber, on the axis</li>
+              <li><b>6</b> Grand Gallery, 46.7 m, seven corbels</li>
+              <li><b>7</b> King's Chamber, 20 × 10 × 11.18 rc</li>
+              <li><b>8</b> Five relieving chambers</li>
+              <li><b>9</b> King's Chamber shafts, 45° S and 32°28′ N</li>
+              <li><b>10</b> Queen's Chamber shafts, 39°36′ S and 39°07′ N, blocked</li>
+              <li><b>11</b> ScanPyramids Big Void (2017), position approximate</li>
+              <li><b>12</b> North-face corridor (2023), 9 m</li>
+            </ul>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section id="data">
+        <p class="label">D1</p>
+        <h2>Measurement database</h2>
+        <p>The most valuable and most tedious deliverable. A few hundred records, each hand-entered from a primary source with its uncertainty. The sources rank as follows, and a record always names which one it came from.</p>
+        <ol>
+          <li><strong>Petrie 1883</strong>, <em>The Pyramids and Temples of Gizeh</em>. The base survey for the interior and the casing angle; public domain; measured in British inches.</li>
+          <li><strong>Cole 1925</strong>, Survey of Egypt Paper 39. The classic base-and-orientation survey of G1, per side.</li>
+          <li><strong>Glen Dash Foundation with AERA, 2012–2018.</strong> Modern total-station survey of the G1 base, corners and orientation.</li>
+          <li><strong>Lehner &amp; Hawass 2017</strong>, <em>Giza and the Pyramids</em>. The canonical rounded values for everything on the plateau; the default preset.</li>
+          <li><strong>Maragioglio &amp; Rinaldi 1965</strong>, vol. IV. Measured drawings of every interior element.</li>
+          <li><strong>Gantenbrink 1993</strong>, the Upuaut robot survey. The only precise geometry of the four shafts, including the bends.</li>
+          <li><strong>ScanPyramids</strong>: Morishima et al. 2017 (Big Void), Procureur et al. 2023 (north-face corridor).</li>
+          <li><strong>Legon 1979</strong> and Dorner's survey for the relative positions of the three pyramids; <strong>Nell &amp; Ruggles 2014</strong> for orientations across the site.</li>
+        </ol>
+
+        <h3>Starting sheet</h3>
+        <p>These are the values I would seed the database with. Every one gets re-verified against its primary source in Phase 0; this table is a starting sheet, not the database.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Quantity</th><th>Value</th><th>Royal cubits</th><th>Source</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td>G1 base, mean side</td><td class="num">230.33 m</td><td class="num">440</td><td>Lehner &amp; Hawass; Cole 1925 gives 230.36; Dash 2015 bounds 230.23–230.48</td><td>Sides differ by up to ~20 cm. Store all four, and store casing edge and socket corner separately.</td></tr>
+              <tr><td>G1 height, original</td><td class="num">146.59 m</td><td class="num">280</td><td>Petrie, projected from the casing angle</td><td>The apex is a projection with error bars. Today's top is 138.75 m.</td></tr>
+              <tr><td>G1 face slope</td><td class="num">51°50′40″</td><td class="num">seked 5½</td><td>Petrie, ±2′</td><td>Seked 5½ is 51°50′34″. See claim A3.</td></tr>
+              <tr><td>G1 orientation</td><td class="num">≈ 3–4′ W of N</td><td>—</td><td>Cole; Dash; Nell &amp; Ruggles</td><td>Per side. The arc-minutes are the point of claim C1.</td></tr>
+              <tr><td>G1 concavity</td><td class="num">≈ 0.9 m</td><td>—</td><td>Petrie; aerial photographs</td><td>Indent at the centre of each base side, measured on the core. Whether the casing followed it is disputed.</td></tr>
+              <tr><td>G1 arris (corner edge) angle</td><td class="num">41°59′</td><td>—</td><td>Derived</td><td>Some claims quote the edge rather than the face. Store both.</td></tr>
+              <tr><td>Royal cubit</td><td class="num">0.5236 m (20.62 in)</td><td class="num">1</td><td>Petrie, from the King's Chamber</td><td>Egypt-wide range 0.523–0.529 m. The single most sensitive parameter in the registry.</td></tr>
+              <tr><td>King's Chamber</td><td class="num">10.47 × 5.24 × 5.84 m</td><td class="num">20 × 10 × 11.18</td><td>Petrie</td><td>Floor 42.9 m above base, slightly south of the axis. Granite.</td></tr>
+              <tr><td>Queen's Chamber</td><td class="num">5.75 × 5.23 m, gable 6.23 m</td><td class="num">11 × 10</td><td>Petrie</td><td>On the central axis, 21 m up.</td></tr>
+              <tr><td>Grand Gallery</td><td class="num">46.7 m long, 8.6 m high, 2.06 m at floor</td><td>—</td><td>Petrie; Maragioglio &amp; Rinaldi</td><td>Seven corbels; slope 26°02′.</td></tr>
+              <tr><td>Descending passage</td><td class="num">26°31′23″, 1.05 × 1.20 m</td><td>—</td><td>Petrie</td><td>105 m to the subterranean chamber.</td></tr>
+              <tr><td>Shafts</td><td class="num">KC-S 45°, KC-N 32°28′, QC-S 39°36′, QC-N 39°07′</td><td>—</td><td>Gantenbrink 1993, Upuaut report (mirror at isida-project.org)</td><td>The Queen's north shaft bends around the gallery. Model from his polylines, re-drawn from the published figures, not from one angle.</td></tr>
+              <tr><td>G2 Khafre</td><td class="num">215.25 m base, 143.5 m high, 53°10′</td><td class="num">411 × 274</td><td>Lehner &amp; Hawass</td><td>Seked 5¼, the 3-4-5 triangle. Sits about 10 m higher on the plateau.</td></tr>
+              <tr><td>G3 Menkaure</td><td class="num">102.2 × 104.6 m base, 65 m high, 51°20′</td><td class="num">≈ 200 × 125</td><td>Lehner &amp; Hawass</td><td>Granite casing on the lower sixteen courses.</td></tr>
+              <tr><td>Sphinx</td><td class="num">73 m long, 20 m high, 19 m wide</td><td>—</td><td>Lehner, ARCE Sphinx Project</td><td>Carved in place; faces due east.</td></tr>
+              <tr><td>G1 position</td><td class="num">29°58′45″ N, 31°08′03″ E, base ≈ 60 m ASL</td><td>—</td><td>Dash; DEM</td><td>The datum matters at the 10 m level. See claim B3.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Record shape</h3>
+        <p>One record per measured quantity. Derived quantities (perimeter, apothem, volume) are never stored; the geometry library computes them so they cannot drift from their inputs.</p>
+<pre>{
+  "id":        "g1.base.side.north",
+  "structure": "g1",
+  "quantity":  "length",
+  "value":     230.253,
+  "unit":      "m",
+  "sigma":     0.02,
+  "source":    "cole-1925",
+  "method":    "casing-edge",
+  "note":      "north side, casing baseline"
+}</pre>
+        <p>Presets bundle a coherent set of records: <code>petrie-1883</code>, <code>cole-1925</code>, <code>dash-2015</code>, and <code>canonical</code> (Lehner &amp; Hawass rounded values, the default). Switching preset regenerates the geometry and re-evaluates every claim. Units are metres internally, with royal cubits, British inches and Smyth's pyramid inch (1.001 in) as display units, because several claims only work in one of them.</p>
+      </section>
+
+      <section id="claims">
+        <p class="label">D2</p>
+        <h2>Claims registry</h2>
+        <p>Each claim is a card with the same six parts: what it claims, what it compares, the fit against the current preset, how many free choices it needed, its sources for and against, and the overlay it draws. Fits below are computed from the starting sheet with a 0.5236 m cubit. The <span class="fc">n</span> column counts free choices: a decision the proponent made that changes the answer, such as picking the socket base over the casing base, an invented unit, or an epoch. Zero means the number falls out of the monument with no help.</p>
+
+        <h3>A · Proportion and geometry of the Great Pyramid</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Claim</th><th>Compares</th><th>Fit</th><th>n</th><th>Overlay</th></tr></thead>
+            <tbody>
+              <tr><td class="id">A1</td><td>π in the profile</td><td>Perimeter ÷ height against 2π</td><td class="fit">6.2850 vs 6.2832 · +0.03 %</td><td><span class="fc">0</span></td><td>Ghost "π pyramid" over the model; maths panel</td></tr>
+              <tr><td class="id">A2</td><td>φ in the face</td><td>Apothem ÷ half-base against φ (the Kepler triangle); Herodotus' "face area = height²"</td><td class="fit">1.6187 vs 1.6180 · +0.04 %</td><td><span class="fc">0</span></td><td>Ghost "φ pyramid"; the face-area square laid flat</td></tr>
+              <tr><td class="id">A3</td><td>Seked 5½ explains both</td><td>Measured 51°50′40″ against seked 5½ (51°50′34″), the π pyramid (51°51′14″) and the φ pyramid (51°49′38″)</td><td class="fit">spread 1′36″, under Petrie's ±2′</td><td><span class="fc">0</span></td><td>Three ghost profiles inside the survey error band; the pyramid cannot tell them apart</td></tr>
+              <tr><td class="id">A4</td><td>King's Chamber 3-4-5</td><td>20 × 10 × 11.18 rc: wall diagonal 15, floor diagonal √500, space diagonal 25</td><td class="fit">height −0.2 % (Petrie)</td><td><span class="fc">1</span></td><td>Wireframe diagonals inside the chamber, walk-in view</td></tr>
+              <tr><td class="id">A5</td><td>The cubit itself</td><td>0.5236 m against π/6 (0.52360) and φ²/5 (0.52361)</td><td class="fit">−0.03 %</td><td><span class="fc">1</span></td><td>Panel. Note that π/6 and φ²/5 agree to 0.002 % with no help from Egypt.</td></tr>
+              <tr><td class="id">A6</td><td>Eight sides</td><td>Concavity of ~0.9 m per face, visible at equinox grazing light</td><td class="fit">measured on the core</td><td><span class="fc">0</span></td><td>Concavity shape key plus the equinox sun</td></tr>
+              <tr><td class="id">A7</td><td>Khafre's 3-4-5</td><td>53°10′ against seked 5¼, which is arctan(4/3) = 53°07′48″</td><td class="fit">+2′</td><td><span class="fc">0</span></td><td>Ghost profile on G2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>B · Earth and cosmos scale</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Claim</th><th>Compares</th><th>Fit</th><th>n</th><th>Overlay</th></tr></thead>
+            <tbody>
+              <tr><td class="id">B1</td><td>1 : 43,200</td><td>Height × 43,200 against the polar radius; perimeter × 43,200 against the equatorial circumference</td><td class="fit">6,333 vs 6,357 km · −0.38 %<br>39,801 vs 40,075 km · −0.68 %</td><td><span class="fc">2</span></td><td>A ghost Earth scaled into the scene; the 72 × 600 precession link as a panel</td></tr>
+              <tr><td class="id">B2</td><td>Height × 10⁹ = Earth–Sun distance</td><td>146.6 Gm against 1 AU (149.6) and against perihelion (147.1)</td><td class="fit">−2.0 % · −0.35 %</td><td><span class="fc">2</span></td><td>Panel</td></tr>
+              <tr><td class="id">B3</td><td>Latitude equals the speed of light</td><td>29.9792458° N against the base centre at 29°58′45″ N</td><td class="fit">≈ 9 m apart, inside the footprint</td><td><span class="fc">3</span></td><td>Map inset with a datum toggle (WGS84, Old Egyptian 1907). The datum shift alone moves the centre further than the residual.</td></tr>
+              <tr><td class="id">B4</td><td>Pyramid inch and the year</td><td>Side = 9,131 P″ = 365.24 × 25, against the casing base (9,069 in) and the socket base (≈ 9,126 in)</td><td class="fit">−0.8 % · −0.2 %</td><td><span class="fc">3</span></td><td>Socket outline versus casing outline on the ground; unit selector</td></tr>
+              <tr><td class="id">B5</td><td>Half a minute of equatorial arc</td><td>Perimeter against 927.7 m</td><td class="fit">−0.68 %</td><td><span class="fc">2</span></td><td>Panel noting this is B1's second half restated: 43,200 = 2 × 21,600</td></tr>
+              <tr><td class="id">B6</td><td>Centre of the land</td><td>G1's meridian and parallel cross more land than any other (Smyth)</td><td class="fit">computed from Natural Earth polygons</td><td><span class="fc">2</span></td><td>Globe inset with the land-crossing curves for every meridian and parallel</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>C · Sky</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Claim</th><th>Compares</th><th>Fit</th><th>n</th><th>Overlay</th></tr></thead>
+            <tbody>
+              <tr><td class="id">C1</td><td>True north</td><td>G1's sides against the meridian, ≈ 3–4′ west; how it was done (Dash: equinox shadow; Spence: simultaneous transit of Mizar and Kochab, which dates it to 2467 BCE)</td><td class="fit">measured</td><td><span class="fc">0</span></td><td>Compass rose at the base; animated star-pair and shadow methods</td></tr>
+              <tr><td class="id">C2</td><td>Shafts point at stars</td><td>KC-S 45° at Alnitak, KC-N 32°28′ at Thuban, QC-S 39°36′ at Sirius, QC-N 39°07′ at Kochab, c. 2450 BCE</td><td class="fit">app solves the best-fit epoch per shaft</td><td><span class="fc">2</span></td><td>Shaft axes extended to the sky dome; chart of each star's transit altitude against epoch, with the shaft angle as a horizontal line</td></tr>
+              <tr><td class="id">C3</td><td>Descending passage and the pole star</td><td>26°31′ against Thuban's lower culmination, c. 2170 BCE</td><td class="fit">app</td><td><span class="fc">1</span></td><td>Passage axis to the sky; Thuban's circumpolar circle</td></tr>
+              <tr><td class="id">C4</td><td>Orion Correlation</td><td>Three pyramids against Alnitak, Alnilam and Mintaka, including Menkaure's offset; belt on the meridian in 10,450 BCE</td><td class="fit">app: belt tilt and transit altitude against epoch</td><td><span class="fc">3</span></td><td>Sky projected onto the plateau with Krupp's inversion toggle; Nile against the Milky Way</td></tr>
+              <tr><td class="id">C5</td><td>Sphinx and Leo</td><td>Due-east gaze against Leo rising before the vernal equinox sunrise in 10,500 BCE</td><td class="fit">app</td><td><span class="fc">2</span></td><td>Sunrise azimuth ribbon across epochs; Leo's figure on the horizon</td></tr>
+              <tr><td class="id">C6</td><td>Solstice akhet</td><td>From the Sphinx, the summer solstice sun sets between G1 and G2, drawing the akhet glyph (Lehner)</td><td class="fit">measured</td><td><span class="fc">0</span></td><td>Sun path from the Sphinx's viewpoint</td></tr>
+              <tr><td class="id">C7</td><td>Cygnus alternative</td><td>Collins' mapping, same engine, different constellation</td><td class="fit">app</td><td><span class="fc">3</span></td><td>Reuses C4's overlay with a constellation selector</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>D · Site plan and geodesy</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Claim</th><th>Compares</th><th>Fit</th><th>n</th><th>Overlay</th></tr></thead>
+            <tbody>
+              <tr><td class="id">D1</td><td>Giza diagonal to Heliopolis</td><td>Line through the pyramids' south-east corners against the bearing to the Senusret I obelisk (≈ 45°)</td><td class="fit">app</td><td><span class="fc">1</span></td><td>Line across the terrain to the obelisk 17 km away</td></tr>
+              <tr><td class="id">D2</td><td>Legon's rectangle</td><td>The three pyramids fit 1000√2 × 1000√3 cubits (1,417.5 × 1,732 rc)</td><td class="fit">app, from Dorner's positions</td><td><span class="fc">1</span></td><td>Rectangle on the ground with corner residuals</td></tr>
+              <tr><td class="id">D3</td><td>Prime meridian and the Delta</td><td>G1's meridian bisects the Nile Delta; G1 sits at the apex of the Delta quadrant (Stecchini)</td><td class="fit">app, with Delta polygons</td><td><span class="fc">2</span></td><td>Meridian and quadrant arcs over the context terrain</td></tr>
+              <tr><td class="id">D4</td><td>Sphinx axis and the temples</td><td>Sphinx east–west axis, Sphinx Temple and Khafre's valley temple alignments</td><td class="fit">measured</td><td><span class="fc">0</span></td><td>Axis lines on the plateau</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>E · Mass and construction, for context</h3>
+        <p>Not claims, but numbers the overlays lean on: volume 2.59 million m³ from b²h/3; about 2.3 million blocks and 6 million tonnes; a 20-year build implies one block placed every three to four minutes of daylight; 203 courses survive, and Petrie measured every one of them, which is what drives the stepped profile in the "today" model.</p>
+
+        <h3>Claim file</h3>
+<pre>id: A1
+title: π in the profile
+group: proportion
+inputs: [g1.base.perimeter, g1.height.original]
+formula: perimeter / height
+target: 2π
+tolerance: 0.5%
+free_choices: []
+overlay:
+  type: ghost-profile
+  slope: atan(4/π)
+sources:
+  for: [smyth-1864, tompkins-1971, hancock-1995]
+  context: [petrie-1883, rossi-2004]</pre>
+        <div class="note"><p>Optional module, cheap once the registry exists: a coincidence explorer that takes any two quantities from the database and searches for ratios and products near famous constants. It shows how many "hits" a monument with this many measurable numbers produces by chance, which is the honest baseline for judging any single claim.</p></div>
+      </section>
+
+      <section id="sky">
+        <p class="label">packages/sky</p>
+        <h2>Sky engine</h2>
+        <p>Half the claims are about the sky, and the interesting epochs are 4,500 and 12,500 years ago. Standard astronomy code is not built for that, so this package needs care.</p>
+        <ul>
+          <li><strong>Catalogue.</strong> HYG 4.2, which merges Hipparcos, the Yale Bright Star Catalogue and Gliese with proper motions and parallax in one CSV (CC BY-SA 4.0). Named subsets for Orion's belt, Sirius, Thuban, Kochab, Mizar and Regulus.</li>
+          <li><strong>Precession.</strong> The Vondrák, Capitaine and Wallace 2011 long-term model, valid for ±200,000 years. The IAU 2006 polynomials most libraries ship are wrong by degrees at 10,500 BCE, which is exactly where the Orion and Leo claims live. The model is a few coefficient tables; implement it in-house if no package does.</li>
+          <li><strong>Proper motion.</strong> Rigorous space motion. Sirius moves about 4.5° in 12,500 years; the belt stars barely move, which is why the belt's shape survives and Sirius' shaft alignment is epoch-sensitive.</li>
+          <li><strong>Frames.</strong> ICRS to mean equator of date (Vondrák), to horizontal altitude and azimuth at 29.9792° N, 31.1342° E through local sidereal time, to scene east-north-up. Refraction of about 34′ at the horizon and a local horizon profile for rising and setting claims.</li>
+          <li><strong>Sun.</strong> VSOP87-based positions from astronomy-engine; equinox and solstice events; ΔT matters for clock times of sunrise, not for its direction.</li>
+          <li><strong>Calendar.</strong> Julian Day numbers throughout, proleptic Julian calendar for BCE dates, astronomical year numbering (10,500 BCE is year −10499).</li>
+          <li><strong>Validation.</strong> Match Stellarium, which also uses Vondrák, for Alnitak's meridian-transit altitude at −2500 and −10500 before any sky overlay ships.</li>
+        </ul>
+      </section>
+
+      <section id="arch">
+        <p class="label">Architecture</p>
+        <h2>One monorepo, one data flow</h2>
+        <p>Everything downstream is generated from the measurement database. Blender and the web app consume the same glTF and the same landmark names, so a chamber centroid means the same point in a cinematic render and in a claim overlay.</p>
+        <figure>
+          <svg class="arch-svg" viewBox="0 0 720 330" role="img" aria-labelledby="archt">
+            <title id="archt">Data flow from the measurement database to Blender and the web app</title>
+            <defs>
+              <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker>
+            </defs>
+            <rect x="20" y="20" width="200" height="64" rx="2" class="box"/>
+            <text x="34" y="46" class="t1">data/</text>
+            <text x="34" y="66" class="t2">measurements · presets · star catalogue</text>
+            <rect x="260" y="20" width="200" height="64" rx="2" class="box"/>
+            <text x="274" y="46" class="t1">packages/geometry</text>
+            <text x="274" y="66" class="t2">parametric builders → meshes</text>
+            <rect x="500" y="20" width="200" height="64" rx="2" class="box"/>
+            <text x="514" y="46" class="t1">glTF + landmarks.json</text>
+            <text x="514" y="66" class="t2">one origin, one unit, named points</text>
+            <rect x="20" y="128" width="200" height="64" rx="2" class="box"/>
+            <text x="34" y="154" class="t1">packages/claims</text>
+            <text x="34" y="174" class="t2">registry · evaluators · overlay specs</text>
+            <rect x="260" y="128" width="200" height="64" rx="2" class="box"/>
+            <text x="274" y="154" class="t1">packages/sky</text>
+            <text x="274" y="174" class="t2">Vondrák precession · sun · ENU frame</text>
+            <rect x="500" y="128" width="200" height="64" rx="2" class="box"/>
+            <text x="514" y="154" class="t1">blender/</text>
+            <text x="514" y="174" class="t2">terrain · Sphinx · materials · renders</text>
+            <rect x="20" y="252" width="680" height="58" rx="2" class="wide"/>
+            <text x="34" y="276" class="t1">apps/web</text>
+            <text x="34" y="296" class="t2">React Three Fiber viewer · layer toggles · section cuts · sky and time scrubber · one overlay per claim · tour mode · dossier</text>
+            <line x1="220" y1="52" x2="258" y2="52" class="flow" marker-end="url(#arr)"/>
+            <line x1="460" y1="52" x2="498" y2="52" class="flow" marker-end="url(#arr)"/>
+            <line x1="120" y1="84" x2="120" y2="126" class="flow" marker-end="url(#arr)"/>
+            <line x1="600" y1="84" x2="600" y2="126" class="flow" marker-end="url(#arr)"/>
+            <text x="608" y="110" class="note">import</text>
+            <line x1="460" y1="160" x2="498" y2="160" class="flow" marker-end="url(#arr)"/>
+            <text x="446" y="150" class="note" text-anchor="end">star positions, baked</text>
+            <line x1="120" y1="192" x2="120" y2="250" class="flow" marker-end="url(#arr)"/>
+            <line x1="360" y1="192" x2="360" y2="250" class="flow" marker-end="url(#arr)"/>
+            <line x1="600" y1="192" x2="600" y2="250" class="flow" marker-end="url(#arr)"/>
+            <text x="608" y="226" class="note">assets</text>
+            <polyline points="700,60 712,60 712,281 702,281" class="flow" marker-end="url(#arr)"/>
+            <text x="694" y="240" class="note" text-anchor="end">load</text>
+          </svg>
+          <figcaption>Solid boxes are packages; the wide bar is the application. Blender is a consumer of the generated geometry, not its author, except for the sculptural and terrain assets it produces itself.</figcaption>
+        </figure>
+
+<pre>seked/
+  data/
+    measurements/      one JSON file per structure
+    presets/           petrie-1883 · cole-1925 · dash-2015 · canonical
+    stars/             BSC5 + Hipparcos subset, as JSON
+    terrain/           DEM references and the local-frame transform
+  packages/
+    units/             cubit · pyramid inch · seked ↔ degrees
+    geometry/          pyramid() · passage() · chamber() · shaft() → buffers + landmarks
+    sky/               vondrak.ts · frames.ts · sun.ts · catalogue.ts
+    claims/            loader · evaluators · overlay descriptors
+  blender/
+    generate.py        bpy: build meshes from data/
+    terrain.py         BlenderGIS import and re-origin
+    export.py          glTF per structure
+    scenes/            .blend files: plateau, sphinx, materials, cinematic
+  apps/web/            Vite + React + R3F
+  docs/
+    dossier/           generated from the registry
+    sources.md · decisions.md</pre>
+
+        <h3>Stack</h3>
+        <ul>
+          <li><strong>Language.</strong> TypeScript everywhere; Python only inside Blender. The geometry library is pure TypeScript so Blender, the web app and the tests all get identical vertices.</li>
+          <li><strong>Tooling.</strong> pnpm workspaces, Vite, Vitest, zod schemas on every data file.</li>
+          <li><strong>3D.</strong> three, @react-three/fiber, @react-three/drei, @react-three/postprocessing. Optional "today" layer via NASA-AMMOS 3d-tiles-renderer streaming Google Photorealistic 3D Tiles.</li>
+          <li><strong>State.</strong> zustand for the layer, preset, time and claim state; URL-encoded so a view is shareable.</li>
+          <li><strong>Astronomy.</strong> astronomy-engine for the Sun and coordinate utilities; in-house Vondrák 2011 precession written from the paper, since no maintained npm package implements it.</li>
+          <li><strong>Geo.</strong> proj4 for WGS84 to local east-north-up; QGIS to prepare the DEM and orthophoto in a projected CRS before Blender sees them.</li>
+          <li><strong>Assets.</strong> Blender 4.2 LTS with BlenderGIS; gltf-transform for Draco and KTX2 after export.</li>
+          <li><strong>Frame conventions.</strong> Origin at the G1 base centre; +X east, +Y north, +Z up in data and Blender; the glTF exporter converts to Y-up for the web. Metres everywhere.</li>
+          <li><strong>Deploy.</strong> Static build to Cloudflare Pages.</li>
+        </ul>
+      </section>
+
+      <section id="blender">
+        <p class="label">D4</p>
+        <h2>Blender pipeline</h2>
+        <p>For when you are home. The rule is that Blender models what only Blender can, and generates the rest.</p>
+        <ul>
+          <li><strong>Generate, don't model.</strong> A bpy script reads the measurement files and builds exact-vertex meshes for G1, G2 and G3. Concavity is a shape key from 0 (flat) to 1 (0.9 m). The casing is a separate shell, so "today" is hide the casing and cap the core at 138.75 m.</li>
+          <li><strong>Real courses.</strong> Geometry Nodes instance the 203 surviving courses with Petrie's measured course heights, so the stripped profile shows the actual thick courses at 35, 44 and 67 rather than a uniform staircase. This is the single cheapest fidelity win in the project.</li>
+          <li><strong>Interior as separate solids.</strong> Chambers, passages, gallery and shafts are their own objects. Section views in the viewer come from clipping planes; a boolean-cut master exists for renders only.</li>
+          <li><strong>Terrain.</strong> BlenderGIS imports the DEM and orthophoto in a projected CRS; re-origin to the G1 base centre; check the base elevations against the survey before anything sits on it.</li>
+          <li><strong>Sphinx.</strong> A sculpt over Lehner's 1:50 plans, with the CC-BY scans open in a reference window. Temples and mastabas are extruded footprints with real heights.</li>
+          <li><strong>Materials.</strong> Tura casing (smooth, near white), nummulitic core (tan, course lines), Aswan granite (King's Chamber, G3's lower courses, G2's bottom course), basalt paving on the temple floors. Keep PBR to base colour, roughness and normal, and bake.</li>
+          <li><strong>Export.</strong> One uncompressed GLB per structure from Blender, then gltf-transform for compression, KTX2 textures and deduplication, since Blender's exporter does not write KTX2. The Z-up to Y-up conversion is the exporter's job; the origin convention is preserved.</li>
+          <li><strong>Renders.</strong> Equinox dawn from the east to show eight faces; the cutaway; and a sky-rollback animation whose star positions are baked from the sky package to CSV, so Blender and the web never disagree about where Alnitak was.</li>
+        </ul>
+      </section>
+
+      <section id="phases">
+        <p class="label">Schedule</p>
+        <h2>Six phases</h2>
+        <p>Durations assume evenings and weekends and are estimates. Each phase ends with a "done when" that can be checked, not felt.</p>
+        <ol class="phases">
+          <li><span class="n">0<small>Weekend 1</small></span><div><h3>Foundation</h3><p>Repo scaffold, the record schema, G1 exterior and interior values from Petrie, claims A1, A2 and B1 in the registry, and unit tests that recompute the perimeter-to-height ratio.</p><p class="done"><b>Done when</b> <code>pnpm test</code> is green and the dossier renders three claim cards from data alone.</p></div></li>
+          <li><span class="n">1<small>Weeks 1–2</small></span><div><h3>Geometry</h3><p>G1 exterior with seked, concavity, casing and core, and truncation. Interior solids. The landmarks file. glTF export and a Blender import that proves the round trip.</p><p class="done"><b>Done when</b> Petrie's derived numbers (apothem, volume, the 41°59′ arris angle) come out of the model, not the database.</p></div></li>
+          <li><span class="n">2<small>Weeks 2–4</small></span><div><h3>Blender</h3><p>Terrain, G2 and G3, Tier 3 masses, the Sphinx, materials, LODs, exports, and the first hero render.</p><p class="done"><b>Done when</b> the whole plateau loads in the viewer under a triangle budget of about 1.5 million at the closest LOD.</p></div></li>
+          <li><span class="n">3<small>Weeks 3–5</small></span><div><h3>Viewer</h3><p>Scene loading, camera modes (orbit, fly, walk the passages), section plane, layer panel, sky dome with sun and a time scrubber from 12,000 BCE to today.</p><p class="done"><b>Done when</b> Alnitak's transit altitude matches Stellarium at −2500 and −10500 to within an arc-minute.</p></div></li>
+          <li><span class="n">4<small>Weeks 5–8</small></span><div><h3>Overlays</h3><p>Group A, then B, then C, then D. Each claim gets its overlay, its maths panel, a sensitivity control and its sources. The preset switch and the cubit slider live here.</p><p class="done"><b>Done when</b> every card in the registry renders in 3D and the dossier regenerates from the same files.</p></div></li>
+          <li><span class="n">5<small>Weeks 8–10</small></span><div><h3>Polish and ship</h3><p>Tour mode as a narrated sequence of views, dossier export, the Blender cinematic, deployment, README.</p><p class="done"><b>Done when</b> a stranger can open the URL, click one claim, and understand what it says and how well it fits.</p></div></li>
+        </ol>
+      </section>
+
+      <section id="risks">
+        <p class="label">Risks</p>
+        <h2>The hard parts, named</h2>
+        <ul>
+          <li><strong>Surveys disagree.</strong> The base differs by up to about 10 cm across Petrie, Cole and Dash, and the original height is projected from a surviving casing angle. Values are ranges, not points, and the overlays show the band.</li>
+          <li><strong>Which base?</strong> Casing edge versus socket corners changes the perimeter by roughly 1.4 m. Several classic claims silently pick whichever fits. Both are first-class in the database.</li>
+          <li><strong>Precession validity.</strong> IAU 2006 is wrong by degrees at 10,500 BCE. Use Vondrák or the Orion overlay is fiction in both directions.</li>
+          <li><strong>Interior geometry.</strong> The shafts are only known from Gantenbrink, and the Queen's north shaft bends. Model from polylines. Treat the ScanPyramids void as a position with error bars.</li>
+          <li><strong>Concavity.</strong> Measured on the core; whether the casing followed it is disputed. Ship both as a toggle and say so.</li>
+          <li><strong>Licensing.</strong> Google 3D Tiles require attribution and forbid extraction; Sketchfab scans are CC-BY but hobbyist grade; Digital Giza offers viewers, not downloads; Gantenbrink's drawings survive only on a mirror with no stated terms. Numbers from papers are facts and free to use.</li>
+          <li><strong>Scope.</strong> The tiers exist so Menkaure's interior and the mastaba fields cannot eat the schedule.</li>
+          <li><strong>Performance.</strong> Forty structures, terrain, 9,000 stars and the shafts. Budget about 1.5 million triangles at the closest LOD, lazy-load per structure, and keep the stars on a single point cloud.</li>
+        </ul>
+      </section>
+
+      <section id="sourcing">
+        <p class="label">Sourcing</p>
+        <h2>Sourcing check</h2>
+        <p>What is actually downloadable, under what terms, checked today. Items marked <em>unverified</em> could not be confirmed from a primary source and need a look from home.</p>
+
+        <h3>Assets and terrain</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Where</th><th>Terms</th><th>Use in this project</th></tr></thead>
+            <tbody>
+              <tr><td>Harvard Digital Giza / Giza 3D</td><td><a href="http://giza.fas.harvard.edu/giza3d/">giza.fas.harvard.edu/giza3d</a></td><td>In-browser viewers only; no download link or reuse licence found (unverified whether any mesh is available on request)</td><td>Reference. Email the project if a survey mesh would change the plan.</td></tr>
+              <tr><td>Sketchfab scans of the <a href="https://sketchfab.com/3d-models/the-great-sphinx-of-giza-egypt-f169dbe7974648babe327179091e0ee3">Sphinx</a> and the <a href="https://sketchfab.com/3d-models/the-great-pyramid-of-giza-egypt-99bb947b9a9f4884ba249aec1be779eb">Great Pyramid</a></td><td>Sketchfab</td><td>CC Attribution; hobbyist photogrammetry, not survey grade</td><td>Reference for the Sphinx sculpt, not geometry for the model.</td></tr>
+              <tr><td>Copernicus GLO-30 DEM</td><td><a href="https://portal.opentopography.org/">OpenTopography</a>, AWS Open Data</td><td>Free with attribution under the Copernicus DEM licence</td><td>Base terrain. No public LiDAR or photogrammetry DEM of the plateau was found, so the ground near the monuments is shaped from the GPMP contours and the surveyed base elevations.</td></tr>
+              <tr><td>Google Photorealistic 3D Tiles</td><td><a href="https://github.com/NASA-AMMOS/3DTilesRendererJS">3d-tiles-renderer</a> (Apache-2.0) with its Google auth plugin and attribution overlay</td><td><a href="https://developers.google.com/maps/documentation/tile/policies">Policies</a>: attribution required; no caching beyond HTTP headers; no extracting, tracing or deriving 3D objects. API key and billing.</td><td>Live "today" layer only, never a Blender source. Optional, Phase 5.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Survey data</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Where</th><th>Terms</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Dash 2015, "The Great Pyramid's Footprint", AERAgram 16(2)</td><td><a href="http://dashfoundation.com/downloads/archaeology/as-published/AERAGRAM16_2_GDash.pdf">dashfoundation.com</a> (down today), also on Academia; <a href="https://www.glendash.com/archaeology/as-published.html">publication index</a></td><td>Published paper; numbers are free to use</td><td>Secondary sources quote 95 % bounds of 230.234–230.483 m for the original side, from 84 baseline points. Per-side lengths, base centre and orientation need to be read from the PDF. Dash 2012 "New Angles on the Great Pyramid" is at <a href="https://aeraweb.org/new-angles-on-the-great-pyramid/">aeraweb.org</a>.</td></tr>
+              <tr><td>Petrie 1883</td><td><a href="https://www.ronaldbirdsall.com/gizeh/petrie/index.htm">Birdsall transcription</a> with tables and plates; <a href="https://archive.org/details/cu31924012038927">archive.org scan</a></td><td>Public domain</td><td>Chapter 5 for coordinates, 6 for the outside, 13 for orientation. The course table is in the plates.</td></tr>
+              <tr><td>Cole 1925, Survey of Egypt Paper 39</td><td><a href="http://library.pyramidal-foundational-information.com/books//Cole%20-%20Determination%20of%20the%20Exact%20Size%20and%20Orientation%20of%20the%20Great%20Pyramid%20of%20Giza.pdf">PDF</a>, also on Scribd</td><td>Egyptian government publication; copyright status unclear; the numbers are free to use</td><td>Per-side base lengths and orientation.</td></tr>
+              <tr><td>Gantenbrink, Upuaut shaft survey</td><td>cheops.org is gone (the domain is now unrelated). Mirror with the report, CAD drawings and photographs at <a href="https://isida-project.org/upuaut-project/index.htm">isida-project.org</a>; try the Wayback Machine for the original</td><td>No terms stated; treat as copyrighted and cite</td><td>Whether the DXF the original site offered is still served is unverified. Plan on re-drawing the shaft polylines from the published figures.</td></tr>
+              <tr><td>Nell &amp; Ruggles 2014, JHA 45(3)</td><td><a href="https://arxiv.org/abs/1302.5622">arXiv preprint</a>, free</td><td>Paper</td><td>Per-structure azimuths for the whole site are in the paper; not yet extracted.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ScanPyramids</h3>
+        <ul>
+          <li><strong>Big Void.</strong> Morishima et al., <em>Nature</em> 552, 386–390 (2017), open access; <a href="https://arxiv.org/pdf/1711.01576">arXiv PDF</a>. Cross-section similar to the Grand Gallery, at least 30 m long, above the gallery. The paper leaves the inclination open, so the model carries it as a position with error bars and an inclination toggle.</li>
+          <li><strong>North-face corridor.</strong> Procureur et al., <em>Nature Communications</em> 14, 1144 (2023), <a href="https://www.nature.com/articles/s41467-023-36351-0">open access, CC BY</a>. About 9 m long, about 2 × 2 m in section, directly behind the chevrons above the original entrance. A 2025 resistivity follow-up in <em>Scientific Reports</em> confirms it.</li>
+        </ul>
+
+        <h3>Astronomy in JavaScript</h3>
+        <ul>
+          <li><strong>astronomy-engine</strong> (MIT) is right for the Sun, Moon and coordinate utilities. Its precession is the IAU 2006 polynomial, so it is not used for star positions at −10500.</li>
+          <li><strong>Vondrák 2011</strong> has no maintained npm package. Implement it from the <a href="https://www.aanda.org/articles/aa/pdf/2011/10/aa17274-11.pdf">paper</a>, which is two coefficient tables; a reference JavaScript snippet exists at astrogreg.com, and a package named falcon-ephemeris claims it (unverified). Stellarium's <code>precession.c</code> is GPL-2, so port it only if the whole package can be GPL.</li>
+          <li><strong>Stellarium</strong> is confirmed to use Vondrák 2011 in its source, so it stands as the validation reference.</li>
+          <li><strong>Star data.</strong> <a href="https://astronexus.com/projects/hyg">HYG 4.2</a> (CC BY-SA 4.0) merges Hipparcos, the Yale catalogue and Gliese with proper motions in one CSV, and is the easiest single file. BSC5 JSON mirrors exist on GitHub; the catalogue itself is public domain, the repositories carry their own licences.</li>
+        </ul>
+
+        <h3>Blender tooling</h3>
+        <ul>
+          <li><strong>BlenderGIS</strong> (GPL-3) is the standard for GeoTIFF and HGT import with a CRS. A third-party site claims Blender 4.x support from v2.2.15; check the <a href="https://github.com/domlysz/BlenderGIS">official releases</a> before installing.</li>
+          <li><strong>glTF.</strong> Blender's exporter does Draco but not KTX2. Export an uncompressed GLB, then run <a href="https://gltf-transform.dev/">gltf-transform</a> for compression and KTX2 textures; three.js loads the result with GLTFLoader plus the Draco and KTX2 loaders. Draco is pointless for the pyramid solids, which are a few hundred polygons; KTX2 matters for the terrain textures.</li>
+        </ul>
+
+        <h3>What this changes in the plan</h3>
+        <ul>
+          <li>The shafts are re-drawn from Gantenbrink's published figures on the mirror, not imported from a DXF, unless the DXF turns up.</li>
+          <li>The Sphinx is a sculpt over Lehner's plans with the CC-BY scan as reference. No survey-grade mesh is available.</li>
+          <li>Vondrák precession is written in-house from the paper. astronomy-engine is used for the Sun only.</li>
+          <li>HYG 4.2 replaces the planned join of the Yale catalogue and Hipparcos.</li>
+          <li>The Google 3D Tiles layer stays optional and live-only, which the terms require anyway.</li>
+        </ul>
+      </section>
+
+      <section id="decisions">
+        <p class="label">Discussion</p>
+        <h2>Decisions to talk through</h2>
+        <ol class="decisions">
+          <li><span class="q">1</span><div><p><strong>Product shape.</strong> Web app plus Blender assets, a Blender-only film, or a game engine build.</p><p class="rec"><b>Recommendation:</b> web app plus Blender. It is the only shape where the claims are interactive, and it is shareable by URL.</p></div></li>
+          <li><span class="q">2</span><div><p><strong>First claim set.</strong> Which claims are in version one.</p><p class="rec"><b>Recommendation:</b> A1–A4, B1–B3 and C1–C4, twelve claims that exercise every overlay type (ghost profile, chamber wireframe, scaled Earth, map inset, sky projection).</p></div></li>
+          <li><span class="q">3</span><div><p><strong>The "today" layer.</strong> Google Photorealistic 3D Tiles (needs an API key and attribution), CC scans, or none.</p><p class="rec"><b>Recommendation:</b> start with none; the "today" model comes from the truncated core and Petrie's courses. Add 3D Tiles in Phase 5 if the terms fit.</p></div></li>
+          <li><span class="q">4</span><div><p><strong>The Sphinx.</strong> Scan, sculpt, or stylised massing.</p><p class="rec"><b>Recommendation:</b> scan if a CC-BY one checks out, otherwise a sculpt. Massing would undercut the word "high fidelity".</p></div></li>
+          <li><span class="q">5</span><div><p><strong>Tone of the copy.</strong> Test bench, advocacy, or debunk. The model is identical in all three; only the words change.</p><p class="rec"><b>Recommendation:</b> test bench. Show measured, claimed, residual and free choices, and let the reader decide. It is the most defensible and the most interesting.</p></div></li>
+          <li><span class="q">6</span><div><p><strong>Interiors for Khafre and Menkaure.</strong> Full or passages only.</p><p class="rec"><b>Recommendation:</b> passages and chambers only, from published plans. No claim depends on their interiors.</p></div></li>
+          <li><span class="q">7</span><div><p><strong>Repository.</strong> New repo, public or private, monorepo as above.</p><p class="rec"><b>Recommendation:</b> new private monorepo named after the working name, made public when the first overlays work.</p></div></li>
+          <li><span class="q">8</span><div><p><strong>Name.</strong> "Seked" is a placeholder that happens to be on-topic.</p><p class="rec"><b>Recommendation:</b> keep it until something better appears; it costs nothing to rename before Phase 1.</p></div></li>
+        </ol>
+      </section>
+
+      <section id="home">
+        <p class="label">Setup</p>
+        <h2>First evening at home</h2>
+        <ul class="checklist">
+          <li>Install Blender 4.2 LTS and BlenderGIS from its official releases page, checking the 4.x compatibility note.</li>
+          <li>Install QGIS.</li>
+          <li>Install Node 22 and pnpm; scaffold the monorepo from the tree above.</li>
+          <li>Download Petrie 1883 (Birdsall's transcription and the archive.org scan) and the Cole 1925 PDF.</li>
+          <li>Download HYG 4.2 and cut it to stars brighter than magnitude 6.5.</li>
+          <li>Download the Copernicus GLO-30 DEM tile N29 E031, which covers the plateau.</li>
+          <li>Install Stellarium, set the location to Giza, and screenshot Alnitak's transit at −2500 for the validation test.</li>
+          <li>Enter the starting sheet into the database, one record at a time, with the page number of its source.</li>
+        </ul>
+      </section>
+
+      <section id="reading">
+        <p class="label">Sources</p>
+        <h2>Reading list</h2>
+        <ol class="refs">
+          <li>Petrie, W. M. F. (1883). <em>The Pyramids and Temples of Gizeh</em>. The base survey; public domain.</li>
+          <li>Cole, J. H. (1925). <em>Determination of the Exact Size and Orientation of the Great Pyramid of Giza</em>. Survey of Egypt Paper 39.</li>
+          <li>Dash, G. (2015–2018). AERAgram and <em>Journal of Ancient Egyptian Architecture</em> papers on the G1 base and orientation.</li>
+          <li>Lehner, M. and Hawass, Z. (2017). <em>Giza and the Pyramids</em>. The modern reference.</li>
+          <li>Lehner, M. (1997). <em>The Complete Pyramids</em>.</li>
+          <li>Maragioglio, V. and Rinaldi, C. (1965). <em>L'Architettura delle Piramidi Menfite</em>, vol. IV. Interior drawings.</li>
+          <li>Gantenbrink, R. (1993 onward). The Upuaut shaft survey; cheops.org is offline, mirrored at isida-project.org.</li>
+          <li>Morishima, K. et al. (2017). <em>Nature</em> 552, 386–390. The Big Void.</li>
+          <li>Procureur, S. et al. (2023). <em>Nature Communications</em> 14. The north-face corridor.</li>
+          <li>Legon, J. A. R. (1979). "The Plan of the Giza Pyramids." <em>Archaeological Reports of the Archaeology Society of Staten Island</em>.</li>
+          <li>Nell, E. and Ruggles, C. (2014). "The orientations of the Giza pyramids and associated structures." <em>Journal for the History of Astronomy</em> 45.</li>
+          <li>Spence, K. (2000). "Ancient Egyptian chronology and the astronomical orientation of pyramids." <em>Nature</em> 408.</li>
+          <li>Rossi, C. (2004). <em>Architecture and Mathematics in Ancient Egypt</em>. The seked explanation.</li>
+          <li>Vondrák, J., Capitaine, N. and Wallace, P. (2011). "New precession expressions, valid for long time intervals." <em>Astronomy &amp; Astrophysics</em> 534, A22.</li>
+          <li>Smyth, C. P. (1864). <em>Our Inheritance in the Great Pyramid</em>. Origin of the pyramid inch and the land-centre claim.</li>
+          <li>Tompkins, P. (1971). <em>Secrets of the Great Pyramid</em>, with Stecchini's appendix on geodesy.</li>
+          <li>Bauval, R. and Gilbert, A. (1994). <em>The Orion Mystery</em>.</li>
+          <li>Hancock, G. (1995). <em>Fingerprints of the Gods</em>; Hancock, G. and Bauval, R. (1996). <em>The Message of the Sphinx</em>; Hancock, G. (2015). <em>Magicians of the Gods</em>.</li>
+          <li>Krupp, E. C. (1997). "Pyramid Marketing Schemes." <em>Sky &amp; Telescope</em>, February. The inversion objection to C4.</li>
+          <li>Collins, A. (2006). <em>The Cygnus Mystery</em>. The alternative in C7.</li>
+          <li>Schoch, R. (1992). "Redating the Great Sphinx of Giza." <em>KMT</em> 3(2). The water-erosion argument behind C5.</li>
+        </ol>
+      </section>
+    </main>
+  </div>
+</div>
