@@ -1,0 +1,14 @@
+[
+  { "key": "cubit.royal", "structure": "units", "quantity": "length", "value": 0.523748, "unit": "m", "sigma": 0.000127, "source": "petrie-1883", "method": "king's-chamber", "note": "20.620 ± 0.005 in, derived from the King's Chamber, §136." },
+  { "key": "cubit.royal", "structure": "units", "quantity": "length", "value": 0.5236, "unit": "m", "source": "lehner-1997", "method": "tabulated", "note": "52.36 cm, the conventional Egyptological value." },
+  { "key": "unit.pyramid_inch", "structure": "units", "quantity": "length", "value": 0.0254254, "unit": "m", "source": "smyth-1864", "method": "defined", "note": "1.001 British inches, a unit invented by Smyth." },
+  { "key": "earth.radius.polar", "structure": "constants", "quantity": "length", "value": 6356752.314, "unit": "m", "source": "wgs84", "method": "defined", "verified": true },
+  { "key": "earth.radius.equatorial", "structure": "constants", "quantity": "length", "value": 6378137.0, "unit": "m", "source": "wgs84", "method": "defined", "verified": true },
+  { "key": "earth.radius.mean", "structure": "constants", "quantity": "length", "value": 6371008.8, "unit": "m", "source": "wgs84", "method": "derived", "note": "(2a + b) / 3.", "verified": true },
+  { "key": "earth.circumference.equatorial", "structure": "constants", "quantity": "length", "value": 40075016.686, "unit": "m", "source": "wgs84", "method": "derived", "note": "2πa.", "verified": true },
+  { "key": "earth.circumference.meridional", "structure": "constants", "quantity": "length", "value": 40007862.917, "unit": "m", "source": "wgs84", "method": "derived", "verified": true },
+  { "key": "au", "structure": "constants", "quantity": "length", "value": 149597870700, "unit": "m", "source": "iau-2012", "method": "defined", "verified": true },
+  { "key": "earth.perihelion", "structure": "constants", "quantity": "length", "value": 147095000000, "unit": "m", "source": "nasa-earth-fact-sheet", "method": "tabulated", "verified": true },
+  { "key": "c", "structure": "constants", "quantity": "speed", "value": 299792458, "unit": "m/s", "source": "si-2019", "method": "defined", "verified": true },
+  { "key": "year.tropical", "structure": "constants", "quantity": "time", "value": 365.24219, "unit": "day", "source": "astronomical-almanac", "method": "tabulated", "verified": true }
+]

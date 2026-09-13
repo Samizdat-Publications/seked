@@ -1,0 +1,25 @@
+id: A5
+title: The cubit itself
+group: proportion
+summary: The royal cubit in metres equals π/6 and also φ²/5.
+comparisons:
+  - label: royal cubit against π/6 metres
+    formula: cubit.royal
+    target: pi / 6
+    unit: m
+  - label: royal cubit against φ²/5 metres
+    formula: cubit.royal
+    target: phi^2 / 5
+    unit: m
+tolerance_pct: 0.1
+free_choices:
+  - the metre, defined in 1793, as the unit of comparison
+overlay:
+  type: panel
+sources:
+  for: [tompkins-1971]
+  context: [petrie-1883]
+notes: >-
+  π/6 = 0.523599 and φ²/5 = 0.523607 agree with each other to 0.002 % with no
+  help from Egypt, so any length near 0.5236 m "encodes" both. The cubit
+  varied between 0.523 and 0.529 m across Egypt and across dynasties.

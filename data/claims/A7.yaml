@@ -1,0 +1,16 @@
+id: A7
+title: Khafre's 3-4-5
+group: proportion
+summary: Khafre's face angle of 53°10′ is the 3-4-5 triangle, which is exactly a seked of 5¼.
+formula: g2.face.angle
+target: atan(4 / 3)
+unit: deg
+tolerance_pct: 0.2
+free_choices: []
+overlay:
+  type: ghost-profile
+  params:
+    structure: g2
+    slope: atan(4 / 3)
+sources:
+  context: [lehner-1997, rossi-2004]

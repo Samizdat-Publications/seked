@@ -1,0 +1,30 @@
+id: B4
+title: Pyramid inch and the year
+group: earth-scale
+summary: >-
+  Measured in pyramid inches, each base side is 9,131 inches, which is 25
+  times the days in the year, so the perimeter is 36,524 inches.
+comparisons:
+  - label: casing base side in pyramid inches against 365.242 × 25
+    formula: g1.base.side.mean / unit.pyramid_inch
+    target: year.tropical * 25
+  - label: socket base side in pyramid inches against 365.242 × 25
+    formula: g1.base.socket.mean / unit.pyramid_inch
+    target: year.tropical * 25
+tolerance_pct: 0.5
+free_choices:
+  - the pyramid inch, a unit invented for the purpose (1.001 British inches)
+  - the socket-corner base line rather than the casing base line
+  - the factor 25
+overlay:
+  type: ground-outlines
+  params:
+    outlines: [casing, socket]
+sources:
+  for: [smyth-1864]
+  context: [petrie-1883]
+  against: [petrie-1883]
+notes: >-
+  Petrie went to Giza to test Smyth and found the casing base 9,069 British
+  inches, not 9,131. The socket base is a different line, about 1.4 m longer
+  per side, and it is the one Smyth's number needs.

@@ -1,0 +1,49 @@
+[
+  { "key": "g1.base.side.north", "structure": "g1", "quantity": "length", "value": 230.253, "unit": "m", "sigma": 0.03, "source": "cole-1925", "method": "casing-edge" },
+  { "key": "g1.base.side.east",  "structure": "g1", "quantity": "length", "value": 230.391, "unit": "m", "sigma": 0.03, "source": "cole-1925", "method": "casing-edge" },
+  { "key": "g1.base.side.south", "structure": "g1", "quantity": "length", "value": 230.454, "unit": "m", "sigma": 0.03, "source": "cole-1925", "method": "casing-edge" },
+  { "key": "g1.base.side.west",  "structure": "g1", "quantity": "length", "value": 230.357, "unit": "m", "sigma": 0.03, "source": "cole-1925", "method": "casing-edge" },
+  { "key": "g1.base.side.mean",  "structure": "g1", "quantity": "length", "value": 230.364, "unit": "m", "sigma": 0.02, "source": "cole-1925", "method": "casing-edge", "note": "Mean of Cole's four sides." },
+
+  { "key": "g1.base.side.north", "structure": "g1", "quantity": "length", "value": 230.3628, "unit": "m", "sigma": 0.02, "source": "petrie-1883", "method": "casing-edge", "note": "9069.4 in, §25." },
+  { "key": "g1.base.side.east",  "structure": "g1", "quantity": "length", "value": 230.3196, "unit": "m", "sigma": 0.02, "source": "petrie-1883", "method": "casing-edge", "note": "9067.7 in, §25." },
+  { "key": "g1.base.side.south", "structure": "g1", "quantity": "length", "value": 230.3653, "unit": "m", "sigma": 0.02, "source": "petrie-1883", "method": "casing-edge", "note": "9069.5 in, §25." },
+  { "key": "g1.base.side.west",  "structure": "g1", "quantity": "length", "value": 230.3424, "unit": "m", "sigma": 0.02, "source": "petrie-1883", "method": "casing-edge", "note": "9068.6 in, §25." },
+  { "key": "g1.base.side.mean",  "structure": "g1", "quantity": "length", "value": 230.3475, "unit": "m", "sigma": 0.013, "source": "petrie-1883", "method": "casing-edge", "note": "9068.8 ± 0.5 in, §25." },
+  { "key": "g1.base.socket.north", "structure": "g1", "quantity": "length", "value": 231.897, "unit": "m", "sigma": 0.03, "source": "petrie-1883", "method": "socket-corner", "note": "9129.8 in between socket corners, §21." },
+  { "key": "g1.base.socket.east",  "structure": "g1", "quantity": "length", "value": 231.922, "unit": "m", "sigma": 0.03, "source": "petrie-1883", "method": "socket-corner", "note": "9130.8 in, §21." },
+  { "key": "g1.base.socket.south", "structure": "g1", "quantity": "length", "value": 231.747, "unit": "m", "sigma": 0.03, "source": "petrie-1883", "method": "socket-corner", "note": "9123.9 in, §21." },
+  { "key": "g1.base.socket.west",  "structure": "g1", "quantity": "length", "value": 231.628, "unit": "m", "sigma": 0.03, "source": "petrie-1883", "method": "socket-corner", "note": "9119.2 in, §21." },
+  { "key": "g1.base.socket.mean",  "structure": "g1", "quantity": "length", "value": 231.798, "unit": "m", "sigma": 0.03, "source": "petrie-1883", "method": "socket-corner", "note": "9125.9 in, mean of the four. Smyth's base line." },
+  { "key": "g1.height.original", "structure": "g1", "quantity": "length", "value": 146.710, "unit": "m", "sigma": 0.18, "source": "petrie-1883", "method": "projected", "note": "5776 ± 7 in, projected from the casing angle." },
+  { "key": "g1.face.angle", "structure": "g1", "quantity": "angle", "value": 51.8667, "unit": "deg", "sigma": 0.0333, "source": "petrie-1883", "method": "casing-stones-in-situ", "note": "51°52′ ± 2′ from the north-face casing." },
+  { "key": "g1.orientation", "structure": "g1", "quantity": "angle", "value": -0.06194, "unit": "deg", "sigma": 0.01, "source": "petrie-1883", "method": "casing-mean", "note": "−3′43″, mean azimuth of the casing sides; negative is west of north." },
+  { "key": "g1.concavity", "structure": "g1", "quantity": "length", "value": 0.94, "unit": "m", "sigma": 0.1, "source": "petrie-1883", "method": "core-face", "note": "Hollowing of the core faces, about 37 in at the base centre. Whether the casing followed it is disputed." },
+
+  { "key": "g1.base.side.mean", "structure": "g1", "quantity": "length", "value": 230.36, "unit": "m", "sigma": 0.06, "source": "dash-2015", "method": "casing-edge", "note": "Midpoint of the published 95 % bounds 230.234–230.483 m. Replace with the paper's stated mean." },
+
+  { "key": "g1.base.side.mean", "structure": "g1", "quantity": "length", "value": 230.33, "unit": "m", "source": "lehner-1997", "method": "tabulated" },
+  { "key": "g1.height.original", "structure": "g1", "quantity": "length", "value": 146.59, "unit": "m", "source": "lehner-1997", "method": "tabulated" },
+  { "key": "g1.height.today", "structure": "g1", "quantity": "length", "value": 138.75, "unit": "m", "source": "lehner-1997", "method": "tabulated" },
+  { "key": "g1.face.angle", "structure": "g1", "quantity": "angle", "value": 51.8444, "unit": "deg", "source": "lehner-1997", "method": "tabulated", "note": "51°50′40″." },
+  { "key": "g1.orientation", "structure": "g1", "quantity": "angle", "value": -0.0517, "unit": "deg", "sigma": 0.01, "source": "cole-1925", "method": "casing-mean", "note": "About −3′06″, mean of the four sides; verify the per-side azimuths." },
+
+  { "key": "g1.center.latitude",  "structure": "g1", "quantity": "latitude",  "value": 29.979167, "unit": "deg", "source": "coords-wgs84-cited", "note": "29°58′45″ N." },
+  { "key": "g1.center.longitude", "structure": "g1", "quantity": "longitude", "value": 31.134167, "unit": "deg", "source": "coords-wgs84-cited", "note": "31°08′03″ E." },
+
+  { "key": "kc.length", "structure": "g1", "quantity": "length", "value": 10.475, "unit": "m", "sigma": 0.003, "source": "petrie-1883", "method": "interior", "note": "King's Chamber, east–west, 412.40 in mean." },
+  { "key": "kc.width",  "structure": "g1", "quantity": "length", "value": 5.2398, "unit": "m", "sigma": 0.003, "source": "petrie-1883", "method": "interior", "note": "North–south, 206.29 in mean." },
+  { "key": "kc.height", "structure": "g1", "quantity": "length", "value": 5.8443, "unit": "m", "sigma": 0.005, "source": "petrie-1883", "method": "interior", "note": "230.09 in mean." },
+  { "key": "kc.floor.elevation", "structure": "g1", "quantity": "length", "value": 42.9, "unit": "m", "source": "lehner-1997", "method": "tabulated", "note": "Floor above the base." },
+  { "key": "qc.length", "structure": "g1", "quantity": "length", "value": 5.7523, "unit": "m", "sigma": 0.005, "source": "petrie-1883", "method": "interior", "note": "Queen's Chamber, east–west, 226.47 in." },
+  { "key": "qc.width",  "structure": "g1", "quantity": "length", "value": 5.2286, "unit": "m", "sigma": 0.005, "source": "petrie-1883", "method": "interior", "note": "North–south, 205.85 in." },
+  { "key": "qc.gable.height", "structure": "g1", "quantity": "length", "value": 6.2255, "unit": "m", "sigma": 0.01, "source": "petrie-1883", "method": "interior", "note": "Floor to gable apex, 245.1 in." },
+  { "key": "gg.length", "structure": "g1", "quantity": "length", "value": 46.7, "unit": "m", "source": "lehner-1997", "method": "tabulated", "note": "Grand Gallery, along the slope." },
+  { "key": "passage.descending.angle", "structure": "g1", "quantity": "angle", "value": 26.5231, "unit": "deg", "sigma": 0.002, "source": "petrie-1883", "method": "interior", "note": "26°31′23″." },
+  { "key": "passage.ascending.angle",  "structure": "g1", "quantity": "angle", "value": 26.0417, "unit": "deg", "sigma": 0.005, "source": "petrie-1883", "method": "interior", "note": "26°02′30″." },
+
+  { "key": "kc.shaft.south.angle", "structure": "g1", "quantity": "angle", "value": 45.00, "unit": "deg", "sigma": 0.05, "source": "gantenbrink-1993", "method": "robot-survey" },
+  { "key": "kc.shaft.north.angle", "structure": "g1", "quantity": "angle", "value": 32.60, "unit": "deg", "sigma": 0.1, "source": "gantenbrink-1993", "method": "robot-survey", "note": "Bauval quotes 32°28′; the report gives about 32°36′. Resolve from the report; the shaft bends around the gallery." },
+  { "key": "qc.shaft.south.angle", "structure": "g1", "quantity": "angle", "value": 39.6078, "unit": "deg", "sigma": 0.05, "source": "gantenbrink-1993", "method": "robot-survey", "note": "39°36′28″." },
+  { "key": "qc.shaft.north.angle", "structure": "g1", "quantity": "angle", "value": 39.1167, "unit": "deg", "sigma": 0.1, "source": "gantenbrink-1993", "method": "robot-survey", "note": "39°07′; bends westward around the Grand Gallery." }
+]

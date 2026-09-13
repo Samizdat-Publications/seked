@@ -1,0 +1,35 @@
+id: A3
+title: Seked 5½ explains both
+group: proportion
+summary: >-
+  The measured face angle is compared with the angle of a seked of 5½ palms
+  per cubit, with the π pyramid and with the φ pyramid. All three lie inside
+  the survey's error band, so the monument cannot discriminate between them,
+  and the seked is the only one attested in Egyptian mathematics.
+comparisons:
+  - label: measured angle against seked 5½
+    formula: g1.face.angle
+    target: atan(7 / 5.5)
+    unit: deg
+  - label: measured angle against the π pyramid
+    formula: g1.face.angle
+    target: atan(4 / pi)
+    unit: deg
+  - label: measured angle against the φ pyramid
+    formula: g1.face.angle
+    target: atan(sqrt(phi))
+    unit: deg
+tolerance_pct: 0.1
+free_choices: []
+overlay:
+  type: ghost-profiles
+  params:
+    slopes: [atan(7 / 5.5), atan(4 / pi), atan(sqrt(phi))]
+    error_band_arcmin: 2
+sources:
+  context: [petrie-1883, rossi-2004]
+notes: >-
+  Petrie's casing angle is 51°52′ ± 2′; Lehner tabulates 51°50′40″. The seked
+  angle is 51°50′34″, the π angle 51°51′14″, the φ angle 51°49′38″. The
+  Rhind papyrus problems 56–60 compute sekeds; nothing in Egyptian
+  mathematics computes π to this precision or knows φ.

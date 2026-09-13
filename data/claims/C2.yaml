@@ -1,0 +1,23 @@
+id: C2
+title: Shafts point at stars
+group: sky
+status: needs-sky
+summary: >-
+  Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its
+  north shaft at Thuban; the Queen's Chamber south shaft pointed at Sirius
+  and its north shaft at Kochab, each at meridian transit.
+free_choices:
+  - the epoch
+  - which star is assigned to each shaft
+overlay:
+  type: shaft-rays
+  params:
+    shafts: [kc.shaft.south, kc.shaft.north, qc.shaft.south, qc.shaft.north]
+    stars: [Alnitak, Thuban, Sirius, Kochab]
+sources:
+  for: [bauval-gilbert-1994]
+  context: [gantenbrink-1993, vondrak-2011]
+notes: >-
+  Computable once packages/sky exists: for each shaft, the app solves for the
+  epoch at which the named star's transit altitude equals the shaft angle,
+  and shows how sensitive that date is to the measured angle.

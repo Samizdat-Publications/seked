@@ -33,18 +33,38 @@ phases and the sourcing check, is in [`docs/plan.html`](docs/plan.html).
 
 ## Status
 
-Planning. Nothing is built yet. Open decisions are listed at the end of the plan.
-
-## Planned layout
+Phase 0 (foundation) is in. The measurement database, the units and geometry
+packages, the claims registry with its expression evaluator, and the dossier
+generator exist and are tested. Nothing has been verified against a primary
+source yet: every record carries `verified: false` until someone checks it
+against the cited page. Open decisions are listed at the end of the plan.
 
 ```
-data/          measurements, survey presets, star catalogue, terrain references
+pnpm install
+pnpm test        # 38 tests across units, geometry, data and claims
+pnpm dossier     # regenerates docs/dossier.md from data/
+```
+
+Next: verify the starting sheet against Petrie, Cole and Dash; then
+`packages/sky` (Vondrák 2011 precession) so the C-group claims compute;
+then the Blender generator and the web viewer.
+
+## Layout
+
+```
+data/
+  sources.json          every source a record or a claim may cite
+  presets.json          preference orders over sources (canonical, petrie-1883, cole-1925, dash-2015)
+  measurements/*.json   one record per measured quantity, metres and degrees, with provenance
+  claims/*.yaml         one claim per file: comparisons, tolerance, free choices, sources, overlay
 packages/
-  units/       cubit, pyramid inch, seked <-> degrees
-  geometry/    parametric builders -> meshes + landmarks
-  sky/         Vondrák precession, sun, local frame
-  claims/      registry, evaluators, overlay descriptors
-blender/       bpy generators, terrain import, export, .blend scenes
-apps/web/      Vite + React + React Three Fiber viewer
-docs/          plan, generated dossier, sources, decisions
+  units/       cubit, pyramid inch, seked <-> degrees, DMS formatting
+  geometry/    pyramid profile numbers, eight-sided mesh generator, landmarks, expression environment
+  data/        zod-validated loader and preset resolver
+  claims/      expression parser (no eval), registry, evaluator, dossier renderer
+  sky/         (planned) Vondrák precession, sun, local frame
+blender/       (planned) bpy generators, terrain import, export, .blend scenes
+apps/web/      (planned) Vite + React + React Three Fiber viewer
+scripts/       dossier generator
+docs/          plan.html, dossier.md
 ```

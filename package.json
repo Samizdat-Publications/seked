@@ -1,0 +1,23 @@
+{
+  "name": "seked",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Survey-accurate 3D model of the Giza necropolis with the encoded-mathematics claims as live overlays",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dossier": "tsx scripts/dossier.ts"
+  },
+  "devDependencies": {
+    "@seked/claims": "workspace:*",
+    "@seked/data": "workspace:*",
+    "@seked/geometry": "workspace:*",
+    "@seked/units": "workspace:*",
+    "@types/node": "^26.5.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}

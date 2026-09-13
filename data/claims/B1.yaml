@@ -1,0 +1,32 @@
+id: B1
+title: "1 : 43,200"
+group: earth-scale
+summary: >-
+  The Great Pyramid is a scale model of the northern hemisphere at 1:43,200:
+  height × 43,200 is the polar radius and perimeter × 43,200 is the equatorial
+  circumference. 43,200 = 600 × 72, and 72 years is one degree of precession.
+comparisons:
+  - label: height × 43,200 against the polar radius
+    formula: g1.height.original * 43200
+    target: earth.radius.polar
+    unit: m
+  - label: perimeter × 43,200 against the equatorial circumference
+    formula: g1.base.perimeter * 43200
+    target: earth.circumference.equatorial
+    unit: m
+tolerance_pct: 1
+free_choices:
+  - the scale factor 43,200
+  - the polar radius (not the mean or equatorial) and the equatorial circumference (not the meridional)
+overlay:
+  type: ghost-earth
+  params:
+    scale: 43200
+sources:
+  for: [hancock-1995, tompkins-1971]
+  context: [wgs84]
+notes: >-
+  Both halves are the π relation of A1 restated at a scale: if perimeter =
+  2π × height, then perimeter × k is the circumference of a circle whose
+  radius is height × k, for any k. The only content beyond A1 is the choice
+  of k, and 43,200 fits the Earth to within 0.4–0.7 %.

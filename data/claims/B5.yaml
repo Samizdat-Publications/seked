@@ -1,0 +1,20 @@
+id: B5
+title: Half a minute of equatorial arc
+group: earth-scale
+summary: The base perimeter is half a minute of arc of the Earth's equator.
+formula: g1.base.perimeter
+target: earth.circumference.equatorial / 21600 / 2
+unit: m
+tolerance_pct: 1
+free_choices:
+  - the arc-minute as the unit
+  - half of it
+overlay:
+  type: panel
+sources:
+  for: [tompkins-1971]
+  context: [wgs84]
+notes: >-
+  Identical to the second half of B1: 43,200 is 2 × 21,600, so "perimeter ×
+  43,200 = circumference" and "perimeter = half a minute of arc" are one
+  claim in two costumes.

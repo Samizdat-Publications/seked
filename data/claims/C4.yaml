@@ -1,0 +1,23 @@
+id: C4
+title: Orion Correlation
+group: sky
+status: needs-sky
+summary: >-
+  The three pyramids are laid out as Orion's Belt (Alnitak, Alnilam,
+  Mintaka), including Menkaure's offset from the diagonal, and the belt's
+  angle to the meridian matched the pyramids' diagonal in 10,450 BCE.
+free_choices:
+  - the epoch
+  - the orientation of the sky map relative to the ground (north–south inversion)
+  - the matching rule (angle, spacing or both)
+overlay:
+  type: sky-projection
+  params:
+    stars: [Alnitak, Alnilam, Mintaka]
+sources:
+  for: [bauval-gilbert-1994, hancock-1995, hancock-bauval-1996]
+  against: [krupp-1997]
+  context: [vondrak-2011]
+notes: >-
+  Needs long-term precession (Vondrák 2011); the IAU 2006 model is wrong by
+  degrees at −10450.

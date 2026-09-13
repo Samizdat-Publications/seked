@@ -1,0 +1,27 @@
+id: A2
+title: φ in the face
+group: proportion
+summary: >-
+  The apothem (slant height at the centre of a face) divided by half the base
+  equals φ, making the cross-section a Kepler triangle. Equivalently, the area
+  of each face equals the square of the height, which is how Herodotus is read.
+comparisons:
+  - label: apothem ÷ half-base against φ
+    formula: g1.apothem / g1.base.half
+    target: phi
+  - label: face area ÷ height² against 1
+    formula: g1.face.area / g1.height.squared
+    target: "1"
+tolerance_pct: 0.5
+free_choices: []
+overlay:
+  type: ghost-profile
+  params:
+    slope: atan(sqrt(phi))
+    face_square: true
+sources:
+  for: [tompkins-1971, hancock-1995]
+  context: [petrie-1883, rossi-2004]
+notes: >-
+  A pyramid cannot be exactly both a π pyramid and a φ pyramid, but the two
+  slopes differ by 1′36″, which is inside the survey error. See A3.

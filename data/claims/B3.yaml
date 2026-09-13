@@ -1,0 +1,25 @@
+id: B3
+title: Latitude equals the speed of light
+group: earth-scale
+summary: >-
+  The Great Pyramid sits at 29.9792458° N, and the speed of light is
+  299,792,458 m/s.
+formula: g1.center.latitude
+target: c / 1e7
+unit: deg
+tolerance_pct: 0.001
+free_choices:
+  - reading degrees of latitude as metres per second, two unrelated units
+  - the geodetic datum, which moves the centre by more than the residual
+  - which point of the 5.3-hectare footprint carries the coordinate
+overlay:
+  type: map-inset
+  params:
+    datums: [WGS84, Old Egyptian 1907]
+sources:
+  context: [coords-wgs84-cited, si-2019]
+notes: >-
+  The commonly cited base centre, 29°58′45″ N, is about 9 m south of the
+  meme's coordinate, well inside a base 230 m on a side. The seventh decimal
+  place of a latitude is a centimetre; no survey of the base centre is that
+  precise, and the answer changes by tens of metres with the datum.

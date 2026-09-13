@@ -1,0 +1,31 @@
+id: A4
+title: King's Chamber 3-4-5
+group: proportion
+summary: >-
+  The King's Chamber measures 20 × 10 cubits with a height of 5√5 cubits, so
+  the end-wall diagonal is 15 cubits and the space diagonal is 25: a 15-20-25
+  triangle, the 3-4-5 scaled by five.
+comparisons:
+  - label: end-wall diagonal in cubits against 15
+    formula: sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)
+    target: "15"
+  - label: space diagonal in cubits against 25
+    formula: sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)
+    target: "25"
+  - label: height in cubits against 5√5
+    formula: kc.height / cubit.royal
+    target: 5 * sqrt(5)
+tolerance_pct: 0.5
+free_choices:
+  - the cubit length used to convert the metric measurements
+overlay:
+  type: chamber-wireframe
+  params:
+    chamber: kc
+    diagonals: [end-wall, floor, space]
+sources:
+  for: [tompkins-1971]
+  context: [petrie-1883, rossi-2004]
+notes: >-
+  Petrie derived his cubit from this very chamber, so the 20 × 10 part is
+  circular by construction; the height relation is the independent claim.

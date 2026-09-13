@@ -1,0 +1,20 @@
+id: A1
+title: π in the profile
+group: proportion
+summary: The perimeter of the base divided by the original height equals 2π.
+formula: g1.base.perimeter / g1.height.original
+target: 2 * pi
+unit: ratio
+tolerance_pct: 0.5
+free_choices: []
+overlay:
+  type: ghost-profile
+  params:
+    slope: atan(4 / pi)
+sources:
+  for: [smyth-1864, tompkins-1971, hancock-1995]
+  context: [petrie-1883, rossi-2004]
+notes: >-
+  A ratio is the same in any unit, so this costs no free choice. It also
+  falls out of a seked of 5½ palms per cubit: the slope carries a 22/7 ratio,
+  and 4 × 11 / 7 = 44/7 ≈ 2π. See A3.

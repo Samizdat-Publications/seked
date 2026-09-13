@@ -1,0 +1,6 @@
+[
+  { "id": "canonical", "label": "Canonical (Lehner)", "sources": ["lehner-hawass-2017", "lehner-1997", "dash-2015", "cole-1925", "petrie-1883", "gantenbrink-1993"], "note": "Default. Rounded reference values, falling back to the surveys for anything Lehner does not tabulate." },
+  { "id": "petrie-1883", "label": "Petrie 1883", "sources": ["petrie-1883", "lehner-1997", "gantenbrink-1993"], "note": "Petrie's own values wherever he measured; Lehner for the rest." },
+  { "id": "cole-1925", "label": "Cole 1925", "sources": ["cole-1925", "petrie-1883", "lehner-1997", "gantenbrink-1993"], "note": "Cole's base and orientation; Petrie for the interior and the height." },
+  { "id": "dash-2015", "label": "Dash 2015", "sources": ["dash-2015", "cole-1925", "lehner-1997", "petrie-1883", "gantenbrink-1993"], "note": "Dash's base; Cole and Lehner for the rest." }
+]

@@ -1,0 +1,22 @@
+id: B2
+title: Height × 10⁹ = Earth–Sun distance
+group: earth-scale
+summary: The original height multiplied by a thousand million is the distance from the Earth to the Sun.
+comparisons:
+  - label: height × 10⁹ against the astronomical unit
+    formula: g1.height.original * 1e9
+    target: au
+    unit: m
+  - label: height × 10⁹ against the perihelion distance
+    formula: g1.height.original * 1e9
+    target: earth.perihelion
+    unit: m
+tolerance_pct: 2.5
+free_choices:
+  - the factor 10⁹
+  - the mean distance or the perihelion distance, whichever fits
+overlay:
+  type: panel
+sources:
+  for: [smyth-1864, tompkins-1971]
+  context: [iau-2012, nasa-earth-fact-sheet]

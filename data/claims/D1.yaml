@@ -1,0 +1,15 @@
+id: D1
+title: Giza diagonal to Heliopolis
+group: site-plan
+status: needs-site
+summary: A line through the south-east corners of the three pyramids points to the obelisk of Senusret I at Heliopolis.
+free_choices:
+  - which corners define the diagonal
+overlay:
+  type: ground-line
+  params:
+    to: heliopolis.obelisk
+sources:
+  for: [hancock-bauval-1996]
+  context: [legon-1979]
+notes: Needs the relative positions of the three pyramids and the georeferenced frame.
