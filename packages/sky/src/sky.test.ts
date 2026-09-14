@@ -78,20 +78,35 @@ describe('the sky over Giza, as the claims describe it', () => {
 describe('the sky flattened into a claim environment', () => {
   const stars = loadNamedStars();
   const GIZA = 29.979167;
-  const KEYS = ['ra', 'dec', 'transit.altitude', 'transit.north', 'lower.altitude'];
+  const KEYS = ['ra', 'dec', 'transit.altitude', 'transit.north', 'lower.altitude', 'rise.azimuth', 'set.azimuth', 'rise.lst', 'set.lst'];
+  // sky.epoch, sun.obliquity, and a rising and a setting azimuth and sidereal
+  // time for each of the equinox and the two solstices.
+  const SKY_AND_SUN_KEYS = 2 + 3 * 4;
 
-  it('gives every named star its five keys, plus the epoch', () => {
+  it('gives every named star its nine keys, plus the epoch and the sun', () => {
     const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });
     expect(env['sky.epoch']).toBe(-2449);
     for (const star of stars) {
       for (const suffix of KEYS) expect(env[`star.${star.id}.${suffix}`], `star.${star.id}.${suffix}`).toBeTypeOf('number');
     }
-    expect(Object.keys(env)).toHaveLength(stars.length * KEYS.length + 1);
+    expect(env['sun.obliquity']).toBeTypeOf('number');
+    expect(Object.keys(env)).toHaveLength(stars.length * KEYS.length + SKY_AND_SUN_KEYS);
   });
 
   it('names them so the claim expression parser can read them', () => {
     const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });
     for (const key of Object.keys(env)) expect(key).toMatch(/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*$/);
+  });
+
+  it('gives a circumpolar star no rising, and Alnitak one south of east', () => {
+    const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });
+    // Kochab did not touch the horizon from Giza in 2450 BCE; Alnitak's
+    // declination was about −4°, so it rose a few degrees south of east.
+    expect(env['star.kochab.rise.azimuth']).toBeNaN();
+    expect(env['star.kochab.rise.lst']).toBeNaN();
+    expect(env['star.alnitak.rise.azimuth'] as number).toBeGreaterThan(90);
+    expect(env['star.alnitak.rise.azimuth'] as number).toBeLessThan(110);
+    expect(env['star.alnitak.set.azimuth'] as number).toBeCloseTo(360 - (env['star.alnitak.rise.azimuth'] as number), 12);
   });
 
   it("puts Alnitak's transit within a degree of 45° in 2450 BCE, south of the zenith", () => {

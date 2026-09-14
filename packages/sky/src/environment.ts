@@ -1,14 +1,15 @@
 /**
- * The star half of the expression environment. A claim names a star the way
+ * The sky half of the expression environment. A claim names a star the way
  * it names a stone: `star.thuban.lower.altitude` is an identifier the claim
  * parser already understands, so a sky claim stays data and no astronomy
- * leaks into the claims package.
+ * leaks into the claims package. The sun arrives the same way, under `sun.`.
  *
- * Everything here is geometry that `frames` and `stars` already do. This
- * module only flattens it into keys.
+ * Everything here is geometry that `frames`, `sun` and `stars` already do.
+ * This module only flattens it into keys.
  */
 import { lowerCulminationAltitude, transitAltitude, transitIsNorth } from './frames';
 import { positionAtEpoch, type Star } from './stars';
+import { risingAzimuth, risingLst, settingAzimuth, settingLst, sunEnvironment } from './sun';
 
 export interface SkyEnvironmentOptions {
   /**
@@ -24,6 +25,15 @@ export interface SkyEnvironmentOptions {
 
 /** The claim expression parser's identifier grammar, kept in step by a test. */
 const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*$/;
+
+/**
+ * The altitude a star's rising and setting are called at. Zero, the geometric
+ * horizon, because an alignment on a star is stated against the horizon
+ * itself; the sun's keys use its upper limb instead, which is half a degree
+ * lower, and `sun.ts` says why. A claim that compares the two carries the
+ * difference as part of what it is claiming.
+ */
+const STAR_HORIZON_ALTITUDE_DEG = 0;
 
 /**
  * The default catalogue, resolved once: the dossier builds an environment per
@@ -57,10 +67,16 @@ export function defaultStars(): Star[] {
 
 /**
  * One epoch, one observer, flattened: for every named star its mean place of
- * date (`.ra`, `.dec`) and its two meridian altitudes (`.transit.altitude`,
- * `.lower.altitude`), plus which side of the zenith the upper culmination
- * falls on (`.transit.north`, 1 or 0, because the expression language has
- * numbers and nothing else) and the epoch itself as `sky.epoch`.
+ * date (`.ra`, `.dec`), its two meridian altitudes (`.transit.altitude`,
+ * `.lower.altitude`), which side of the zenith the upper culmination falls on
+ * (`.transit.north`, 1 or 0, because the expression language has numbers and
+ * nothing else) and where and when it crosses the horizon (`.rise.azimuth`,
+ * `.set.azimuth`, `.rise.lst`, `.set.lst`); then the sun's own keys from
+ * `sunEnvironment`, and the epoch itself as `sky.epoch`.
+ *
+ * A star that never reaches the horizon from this latitude gets NaN for its
+ * four horizon keys rather than a number that would be a fiction: Kochab was
+ * circumpolar over Giza in 2500 BCE and did not rise at all.
  */
 export function skyEnvironment(opts: SkyEnvironmentOptions): Record<string, number> {
   const stars = opts.stars ?? defaultStars();
@@ -69,11 +85,16 @@ export function skyEnvironment(opts: SkyEnvironmentOptions): Record<string, numb
     const prefix = `star.${star.id}`;
     if (!IDENTIFIER.test(prefix)) throw new Error(`star id "${star.id}" cannot be used as a formula identifier`);
     const { raDeg, decDeg } = positionAtEpoch(star, opts.epoch);
+    const alt = STAR_HORIZON_ALTITUDE_DEG;
     env[`${prefix}.ra`] = raDeg;
     env[`${prefix}.dec`] = decDeg;
     env[`${prefix}.transit.altitude`] = transitAltitude(decDeg, opts.latitudeDeg);
     env[`${prefix}.transit.north`] = transitIsNorth(decDeg, opts.latitudeDeg) ? 1 : 0;
     env[`${prefix}.lower.altitude`] = lowerCulminationAltitude(decDeg, opts.latitudeDeg);
+    env[`${prefix}.rise.azimuth`] = risingAzimuth(decDeg, opts.latitudeDeg, alt);
+    env[`${prefix}.set.azimuth`] = settingAzimuth(decDeg, opts.latitudeDeg, alt);
+    env[`${prefix}.rise.lst`] = risingLst(raDeg, decDeg, opts.latitudeDeg, alt);
+    env[`${prefix}.set.lst`] = settingLst(raDeg, decDeg, opts.latitudeDeg, alt);
   }
-  return env;
+  return { ...env, ...sunEnvironment({ epoch: opts.epoch, latitudeDeg: opts.latitudeDeg }) };
 }
