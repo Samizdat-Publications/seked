@@ -5,3 +5,4 @@ export * from './interior';
 export * from './interiors';
 export * from './terrain';
 export * from './environment';
+export * from './datum';

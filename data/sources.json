@@ -88,6 +88,12 @@
     "license": "Public domain"
   },
   {
+    "id": "epsg-1148",
+    "kind": "reference",
+    "citation": "EPSG Geodetic Parameter Dataset, transformation 1148, Egypt 1907 to WGS 84 (1): geocentric translations dX = −130 m, dY = 110 m, dZ = −13 m, derived at 14 stations with accuracies of 3, 6 and 8 m; source U.S. DMA TR8350.2, September 1987. Ellipsoid Helmert 1906 (EPSG 7020): a = 6 378 200 m, 1/f = 298.3.",
+    "url": "https://epsg.io/1148"
+  },
+  {
     "id": "iau-2012",
     "kind": "reference",
     "year": 2012,
