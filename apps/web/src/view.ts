@@ -3,6 +3,8 @@
  * here, so a URL is the whole view: preset, cubit, layers, selected claim and
  * camera. The codec is deliberately lossless and deliberately boring.
  */
+import { TOUR } from './tour';
+
 export const LAYERS = [
   { id: 'pyramids', label: 'Pyramids as built' },
   { id: 'today', label: 'Today (truncated)' },
@@ -77,6 +79,8 @@ export interface View {
   /** Metres per second in fly mode. */
   speed: number;
   section: Section;
+  /** Which tour step is showing, or null when no tour is running. */
+  tour: number | null;
 }
 
 export const CUBIT_MIN = 0.52;
@@ -132,6 +136,7 @@ export const DEFAULT_VIEW: View = {
   mode: 'orbit',
   speed: 40,
   section: { on: false, axis: 'ns', at: 0, ground: false },
+  tour: null,
 };
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
@@ -186,6 +191,13 @@ export function decodeView(search: string, presetIds: string[]): View {
   const cam = numbers(q.get('cam'), 6);
   const mode = q.get('mode');
   const speed = Number(q.get('speed'));
+  const index = q.get('tour') === null ? Number.NaN : Number(q.get('tour'));
+  const tour = Number.isInteger(index) && index >= 0 && index < TOUR.length ? index : null;
+  // A camera in the query string wins over the tour's, so a shared link
+  // reproduces the view its author was looking at rather than the step's
+  // canonical one. A hand-written `?tour=N` carries no camera, and then the
+  // step's own is the sensible fallback rather than the opening view.
+  const framing = (tour === null ? undefined : TOUR[tour]?.camera) ?? DEFAULT_VIEW.camera;
   const layers = { ...DEFAULT_VIEW.layers };
   if (layerList !== null) {
     const on = new Set(layerList.split(',').filter(Boolean));
@@ -200,10 +212,11 @@ export function decodeView(search: string, presetIds: string[]): View {
     claim: q.get('claim'),
     camera: cam
       ? { position: [cam[0] as number, cam[1] as number, cam[2] as number], target: [cam[3] as number, cam[4] as number, cam[5] as number] }
-      : DEFAULT_VIEW.camera,
+      : framing,
     mode: mode === 'fly' || mode === 'orbit' ? mode : DEFAULT_VIEW.mode,
     speed: Number.isFinite(speed) ? clamp(speed, SPEED_MIN, SPEED_MAX) : DEFAULT_VIEW.speed,
     section: decodeSection(q.get('cut')),
+    tour,
   };
 }
 
@@ -225,5 +238,6 @@ export function encodeView(view: View): string {
   q.set('mode', view.mode);
   q.set('speed', round(view.speed, 0));
   q.set('cut', view.section.on ? `${view.section.axis},${round(view.section.at, 1)},${view.section.ground ? '1' : '0'}` : 'off');
+  if (view.tour !== null) q.set('tour', String(view.tour));
   return `?${q.toString()}`;
 }

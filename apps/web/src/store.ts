@@ -4,6 +4,7 @@
  * link and the panel can never disagree.
  */
 import { create } from 'zustand';
+import { TOUR, applyStep } from './tour';
 import {
   CUBIT_MAX,
   CUBIT_MIN,
@@ -46,15 +47,29 @@ export interface ViewStore extends View {
   toggleLayer: (id: LayerId) => void;
   setClaim: (claim: string | null) => void;
   setCamera: (camera: CameraView) => void;
+  /**
+   * Move the camera and have the orbit controls adopt it, which is the part
+   * `setCamera` deliberately leaves out: the controls call that one on every
+   * frame of a drag, and a bump there would fight them.
+   */
+  showCamera: (camera: CameraView) => void;
   setMode: (mode: CameraMode) => void;
   setSpeed: (speed: number) => void;
   setSection: (section: Partial<Section>) => void;
   lookInside: (at: number, camera: CameraView) => void;
+  /** Open the tour at its first step. */
+  startTour: () => void;
+  /** The next step, or the end of the tour when there is no next one. */
+  nextStep: () => void;
+  prevStep: () => void;
+  /** Close the tour and leave the reader with the view the last step set. */
+  endTour: () => void;
+  goToStep: (index: number) => void;
 }
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
-export const useView = create<ViewStore>((set) => ({
+export const useView = create<ViewStore>((set, get) => ({
   ...DEFAULT_VIEW,
   cameraEpoch: 0,
   krupp: true,
@@ -68,6 +83,7 @@ export const useView = create<ViewStore>((set) => ({
   // opening a sky claim snaps the sky to the epoch that claim is stated at.
   setClaim: (claim) => set((s) => ({ claim: s.claim === claim ? null : claim, epoch: null })),
   setCamera: (camera) => set({ camera }),
+  showCamera: (camera) => set((s) => ({ camera, cameraEpoch: s.cameraEpoch + 1 })),
   setMode: (mode) => set({ mode }),
   setSpeed: (speed) => set({ speed: clamp(speed, SPEED_MIN, SPEED_MAX) }),
   setSection: (section) =>
@@ -88,6 +104,29 @@ export const useView = create<ViewStore>((set) => ({
       camera,
       cameraEpoch: s.cameraEpoch + 1,
     })),
+  /**
+   * The tour drives the actions above and adds nothing of its own, so every
+   * step is a state a reader could have reached by hand and the address bar
+   * mirrors it the same way. An index with no step leaves the view alone.
+   */
+  startTour: () => get().goToStep(0),
+  nextStep: () => {
+    const { tour } = get();
+    if (tour === null) return;
+    if (tour + 1 < TOUR.length) get().goToStep(tour + 1);
+    else get().endTour();
+  },
+  prevStep: () => {
+    const { tour } = get();
+    if (tour !== null && tour > 0) get().goToStep(tour - 1);
+  },
+  endTour: () => set({ tour: null }),
+  goToStep: (index) => {
+    const step = TOUR[index];
+    if (!step) return;
+    applyStep(step, get());
+    set({ tour: index });
+  },
 }));
 
 /** Adopt the view in the address bar. Call once, before the first render. */

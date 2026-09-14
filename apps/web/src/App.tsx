@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { brightStarsOf } from './bundle';
 import type { LoadedBundle } from './load';
 import { buildModel } from './model';
@@ -6,6 +6,7 @@ import { overlaySpec, type OverlayContext } from './overlays';
 import { Claims } from './panels/Claims';
 import { CubitSlider, LayerToggles, PresetPicker, SectionControls } from './panels/Controls';
 import { SkyControls } from './panels/Sky';
+import { Tour } from './panels/Tour';
 import { Scene } from './scene/Scene';
 import { domeBuffers, namedOnDome } from './sky';
 import { useView } from './store';
@@ -20,6 +21,21 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const krupp = useView((s) => s.krupp);
   const layers = useView((s) => s.layers);
   const selected = useView((s) => s.claim);
+
+  /**
+   * A tour index in the address bar opens the tour at that step, once, now
+   * that the bundle is in. The rest of the URL was decoded before the first
+   * render, so a link that carries a camera of its own keeps it: the step is
+   * applied and the decoded camera is then put back over the step's. A
+   * hand-written link with no camera at all has already taken the step's own,
+   * which is what `decodeView` falls back to.
+   */
+  useEffect(() => {
+    const { tour, camera, goToStep, showCamera } = useView.getState();
+    if (tour === null) return;
+    goToStep(tour);
+    showCamera(camera);
+  }, []);
 
   const model = useMemo(() => buildModel(bundle, preset, cubit, epochOverride), [bundle, preset, cubit, epochOverride]);
   const header = bundle.terrain.header;
@@ -70,6 +86,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
           <h1>Seked</h1>
           <p>Giza as the measurement database has it, with the claims evaluated live against it.</p>
         </header>
+        <Tour />
         <PresetPicker presets={bundle.presets} />
         <CubitSlider model={model} />
         <SkyControls epoch={epoch} named={named} claim={claim} />
