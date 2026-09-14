@@ -1,0 +1,69 @@
+id: C7
+title: Cygnus alternative
+group: sky
+status: computed
+epoch: -2499
+summary: >-
+  Collins (2006), with Rodney Hale's overlay, matches the three pyramids to the
+  three wing stars of Cygnus, δ Cygni (Fawaris) on the Great Pyramid, Sadr
+  (γ Cygni) on Khafre's and Gienah (ε Cygni, Aljanah in HYG) on Menkaure's, and
+  holds the fit better than Orion's. Deneb, the brightest star, has no pyramid.
+comparisons:
+  - label: wing angle from the meridian against the G1 to G3 diagonal
+    formula: >-
+      atan(abs((atan2(sin(star.aljanah.ra - star.fawaris.ra), cos(star.aljanah.ra - star.fawaris.ra))) * cos(star.sadr.dec)) / abs(star.aljanah.dec - star.fawaris.dec))
+    target: >-
+      atan(g3.centre.offset.west / g3.centre.offset.south)
+    unit: deg
+  - label: Menkaure off the G1 to G2 line against Gienah off the Fawaris to Sadr line
+    formula: >-
+      abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)
+    target: >-
+      abs((star.fawaris.dec - star.sadr.dec) * (atan2(sin(star.aljanah.ra - star.sadr.ra), cos(star.aljanah.ra - star.sadr.ra))) * cos(star.sadr.dec) - (atan2(sin(star.fawaris.ra - star.sadr.ra), cos(star.fawaris.ra - star.sadr.ra))) * cos(star.sadr.dec) * (star.aljanah.dec - star.sadr.dec)) / (((atan2(sin(star.fawaris.ra - star.sadr.ra), cos(star.fawaris.ra - star.sadr.ra))) * cos(star.sadr.dec))^2 + (star.fawaris.dec - star.sadr.dec)^2)
+    unit: ratio
+tolerance_pct: 5
+free_choices:
+  - the epoch
+  - the orientation of the sky map relative to the ground
+  - the constellation, and which three of its stars (Deneb, the brightest, is left unmarked)
+overlay:
+  type: sky-projection
+  params:
+    stars: [Fawaris, Sadr, Aljanah]
+    ground: [g1, g2, g3]
+sources:
+  for: [collins-2006]
+  context: [bauval-gilbert-1994, vondrak-2011]
+notes: >-
+  This is C4's engine with another constellation in it: the same two shape
+  comparisons, the same folding of right-ascension differences into ±180° with
+  atan2(sin, cos), the same unsigned ground offsets from Petrie's §92, and the
+  same 5 % band. What it is not is Collins' own thesis. That thesis is a view,
+  not a plan: the three wing stars setting into their three pyramids as seen
+  from Gebel Gibli, the knoll south-east of the Sphinx, and Deneb rising over
+  Heliopolis. Testing it needs Gebel Gibli's position and the plateau's local
+  horizon, and the database has neither, so only the ground plan is tested
+  here.
+  The wing is a far wider figure than the belt, and the flat sky map pays for
+  it. Fawaris to Aljanah spans 16.2° at this epoch against the belt's 2.7°, so
+  the map C4 uses, x = Δra × cos dec of the middle star and y = Δdec, is
+  stretched where C4's is not: about Sadr it puts the wing's angle to the
+  meridian at 15.30°, where a true tangent plane about the same star puts it at
+  14.27°. That is a full degree of projection error, against the arcminute or
+  two the same approximation costs over Orion's belt. It changes no verdict
+  below, but nothing here should be read to better than a degree.
+  Neither comparison holds, and neither holds as well as Orion's. The wing's
+  angle to the meridian comes out at 15°18′ against the pyramids' diagonal of
+  37°51′, wrong by 22°33′ (−59.6 %), where C4's belt at its own chosen epoch is
+  wrong by 13°01′ (+34.4 %). Menkaure stands off the G1 to G2 line by 0.185 of
+  that line's length and Aljanah stands off the Fawaris to Sadr line by 0.322
+  of it, so the wing is nearly twice as bent as the ground: −42.5 %, against
+  Orion's +25.0 %. The angle is the half of this that an epoch can move. It
+  sweeps about 0.7° a century here, and over the fifteen thousand years from
+  13,000 BCE to now it passes the pyramids' 37°51′ exactly twice, around 11,340
+  BCE and again around 710 CE, neither of them anywhere near the completion of
+  the pyramids that Collins dates the correlation to. The offset ratio barely
+  moves with the epoch at all, so no date rescues the shape. Long-term
+  precession (Vondrák 2011) is what makes any of these dates mean anything;
+  Bauval and Gilbert are cited for context because the method being applied is
+  theirs.
