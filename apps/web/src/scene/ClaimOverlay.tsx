@@ -13,13 +13,14 @@
  * section plane is no overlay at all.
  */
 import { formatValue } from '@seked/claims/browser';
-import { formatDms } from '@seked/units';
+import { DEG, formatDms } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
 import {
   cornerMissWords,
   type ChamberWireframeSpec,
   type CompassRoseSpec,
+  type GhostEarthSpec,
   type GroundBearingsSpec,
   type GroundLineSpec,
   type GroundOutlinesSpec,
@@ -66,6 +67,8 @@ export function ClaimOverlay({
       return <GroundLine spec={overlay.spec} />;
     case 'chamber-wireframe':
       return <ChamberWireframe spec={overlay.spec} />;
+    case 'ghost-earth':
+      return <GhostEarth spec={overlay.spec} />;
   }
 }
 
@@ -90,12 +93,22 @@ function Ray({ points, colour, opacity = 0.9 }: { points: number[][]; colour: st
   );
 }
 
-function Polyline({ points, colour, close = false }: { points: number[][]; colour: string; close?: boolean }): React.JSX.Element {
+function Polyline({
+  points,
+  colour,
+  close = false,
+  opacity = 0.9,
+}: {
+  points: number[][];
+  colour: string;
+  close?: boolean;
+  opacity?: number;
+}): React.JSX.Element {
   const geometry = useMemo(() => polylineGeometry(points, close), [points, close]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <lineSegments geometry={geometry} renderOrder={18} frustumCulled={false}>
-      <lineBasicMaterial color={colour} transparent opacity={0.9} depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
+      <lineBasicMaterial color={colour} transparent opacity={opacity} depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
     </lineSegments>
   );
 }
@@ -490,6 +503,86 @@ function SkyProjection({ spec }: { spec: SkyProjectionSpec }): React.JSX.Element
           )}
         </group>
       ))}
+    </group>
+  );
+}
+
+/**
+ * The ghost Earth's graticule: parallels every fifteen degrees from the
+ * equator to seventy-five, twelve meridians, and enough points up each
+ * meridian that the curve reads as a curve.
+ */
+const GHOST_EARTH_PARALLELS = [0, 15, 30, 45, 60, 75];
+const GHOST_EARTH_MERIDIANS = 12;
+const GHOST_EARTH_STEPS = 18;
+
+/** The graticule is a frame around the two circles that carry the claim, not a globe. */
+const GRATICULE_OPACITY = 0.28;
+
+/**
+ * B1. The northern hemisphere shrunk by 43,200 and stood on the pyramid's
+ * base centre, so the scaled pole falls half a metre above where the apex is
+ * and the scaled equator a metre outside the circle whose circumference is
+ * the measured base perimeter. Those two gaps are the claim's two residuals,
+ * at the size the plateau has rather than in a column of figures.
+ *
+ * The wireframe is an ellipsoid and not a sphere: the horizontal radii come
+ * from the scaled equatorial circumference and the vertical from the scaled
+ * polar radius, which are the two numbers the claim itself uses. Half a metre
+ * of flattening in a hundred and fifty is invisible, and inventing a mean
+ * radius to avoid it would put a third number in the picture that the claim
+ * never mentions.
+ */
+function GhostEarth({ spec }: { spec: GhostEarthSpec }): React.JSX.Element {
+  const [east, north, up] = spec.centre;
+  const equator = spec.equatorRadiusM;
+  const pole = spec.polarRadiusM;
+  const parallels = useMemo(
+    () => GHOST_EARTH_PARALLELS.map((lat) => ringPoints(equator * Math.cos(lat * DEG), pole * Math.sin(lat * DEG), 96)),
+    [equator, pole],
+  );
+  const meridians = useMemo(() => {
+    const lines: number[][][] = [];
+    for (let i = 0; i < GHOST_EARTH_MERIDIANS; i++) {
+      const a = (i / GHOST_EARTH_MERIDIANS) * Math.PI * 2;
+      const line: number[][] = [];
+      for (let step = 0; step <= GHOST_EARTH_STEPS; step++) {
+        const lat = (step / GHOST_EARTH_STEPS) * (Math.PI / 2);
+        line.push([equator * Math.cos(lat) * Math.sin(a), equator * Math.cos(lat) * Math.cos(a), pole * Math.sin(lat)]);
+      }
+      lines.push(line);
+    }
+    return lines;
+  }, [equator, pole]);
+  const perimeter = useMemo(() => ringPoints(spec.perimeterRadiusM, 0, 96), [spec.perimeterRadiusM]);
+  const scale = spec.scale.toLocaleString('en-US');
+
+  return (
+    <group position={[east, north, up]}>
+      {meridians.map((line, i) => (
+        <Polyline key={`meridian-${i}`} points={line} colour={spec.earthColour} opacity={GRATICULE_OPACITY} />
+      ))}
+      {parallels.map((points, i) => (
+        <Polyline
+          key={`parallel-${i}`}
+          points={points}
+          colour={spec.earthColour}
+          opacity={i === 0 ? 0.9 : GRATICULE_OPACITY}
+          close
+        />
+      ))}
+      <Polyline points={perimeter} colour={spec.pyramidColour} close />
+      <Marker position={[0, 0, pole]} colour={spec.earthColour} />
+      <Label
+        text={`polar radius ÷ ${scale} = ${pole.toFixed(2)} m, height ${spec.heightM.toFixed(2)} m`}
+        position={[0, 0, pole + 16]}
+        colour={spec.earthColour}
+      />
+      <Label
+        text={`equatorial circumference ÷ ${scale} = ${equator.toFixed(2)} m of radius, perimeter ÷ 2π = ${spec.perimeterRadiusM.toFixed(2)} m`}
+        position={[equator, 0, 10]}
+        colour={spec.pyramidColour}
+      />
     </group>
   );
 }

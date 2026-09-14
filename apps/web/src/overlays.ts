@@ -46,6 +46,7 @@ export const BUILT_OVERLAYS = new Set([
   'ground-rectangle',
   'ground-line',
   'chamber-wireframe',
+  'ghost-earth',
 ]);
 
 /** Enough colours for the three slopes A3 puts side by side. */
@@ -1079,6 +1080,77 @@ export function chamberWireframeSpec(claim: Claim, ctx: OverlayContext): Chamber
   return diagonals.length === 0 ? undefined : { structure, chamber, edges, diagonals };
 }
 
+// --- B1 the Earth at one part in 43,200 ------------------------------------
+
+export interface GhostEarthSpec {
+  structure: StructureId;
+  /** What the claim divides the Earth by: 43,200, which is 600 × 72. */
+  scale: number;
+  /** The pyramid's base centre, where the scaled Earth's own centre is put. */
+  centre: Point;
+  /** The polar radius at that scale, which is where the scaled north pole falls. */
+  polarRadiusM: number;
+  /** The pyramid's height, which the claim sets against it. */
+  heightM: number;
+  polarResidualPct: number;
+  /** The equatorial circumference at that scale, as a radius. */
+  equatorRadiusM: number;
+  /** The radius of the circle whose circumference is the measured base perimeter. */
+  perimeterRadiusM: number;
+  perimeterResidualPct: number;
+  /** The measured perimeter over the measured height, which A1 sets against 2π. */
+  piRatio: number;
+  earthColour: string;
+  pyramidColour: string;
+}
+
+/**
+ * B1. The northern hemisphere at the claim's own scale, centred on the
+ * pyramid's base centre so the scaled pole falls where the apex would if the
+ * claim held exactly. It falls half a metre higher, and that half metre is
+ * the first comparison drawn at the size of a room.
+ *
+ * The second comparison is the same picture on the pavement: the scaled
+ * equator against the circle whose circumference is the measured base
+ * perimeter, a metre of radius apart. Both are one relation seen twice, which
+ * is why the pole is nearly the apex and the circles are nearly concentric. A
+ * pyramid whose perimeter is 2π times its height is a hemisphere at whatever
+ * scale you please, so the spec carries that ratio too and the panel says so.
+ */
+export function ghostEarthSpec(claim: Claim, ctx: OverlayContext): GhostEarthSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'ghost-earth') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const structure = asString(params.structure) ?? 'g1';
+  const scale = asNumber(params.scale);
+  if (!isStructure(structure) || scale === undefined || scale === 0) return undefined;
+  const placed = structureOf(ctx, structure);
+  const polarRadius = ctx.env['earth.radius.polar'];
+  const circumference = ctx.env['earth.circumference.equatorial'];
+  const heightM = ctx.env[`${structure}.height.original`];
+  const perimeterM = ctx.env[`${structure}.base.perimeter`];
+  if (!placed || polarRadius === undefined || circumference === undefined) return undefined;
+  if (heightM === undefined || perimeterM === undefined) return undefined;
+
+  const polarRadiusM = polarRadius / scale;
+  const equatorRadiusM = circumference / (2 * Math.PI) / scale;
+  const perimeterRadiusM = perimeterM / (2 * Math.PI);
+  return {
+    structure,
+    scale,
+    centre: [placed.offsetEast, placed.offsetNorth, placed.offsetUp],
+    polarRadiusM,
+    heightM,
+    polarResidualPct: ((heightM - polarRadiusM) / polarRadiusM) * 100,
+    equatorRadiusM,
+    perimeterRadiusM,
+    perimeterResidualPct: ((perimeterRadiusM - equatorRadiusM) / equatorRadiusM) * 100,
+    piRatio: perimeterM / heightM,
+    earthColour: RAY_COLOURS[0] as string,
+    pyramidColour: RAY_COLOURS[1] as string,
+  };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -1091,7 +1163,8 @@ export type OverlaySpec =
   | { kind: 'ground-outlines'; spec: GroundOutlinesSpec }
   | { kind: 'ground-rectangle'; spec: GroundRectangleSpec }
   | { kind: 'ground-line'; spec: GroundLineSpec }
-  | { kind: 'chamber-wireframe'; spec: ChamberWireframeSpec };
+  | { kind: 'chamber-wireframe'; spec: ChamberWireframeSpec }
+  | { kind: 'ghost-earth'; spec: GhostEarthSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -1116,6 +1189,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (line) return { kind: 'ground-line', spec: line };
   const wireframe = chamberWireframeSpec(claim, ctx);
   if (wireframe) return { kind: 'chamber-wireframe', spec: wireframe };
+  const earth = ghostEarthSpec(claim, ctx);
+  if (earth) return { kind: 'ghost-earth', spec: earth };
   return undefined;
 }
 
@@ -1172,6 +1247,14 @@ function describe(overlay: OverlaySpec): string {
       const spec = overlay.spec;
       const drawn = spec.diagonals.map((d) => `${d.name} ${ROUND(d.cubits, 2)} rc`).join(', ');
       return `${spec.chamber.toUpperCase()} as a wireframe through the masonry, with the diagonals the claim compares: ${drawn}.`;
+    }
+    case 'ghost-earth': {
+      const spec = overlay.spec;
+      return (
+        `The northern hemisphere at 1:${spec.scale.toLocaleString('en-US')} on ${spec.structure.toUpperCase()}'s base centre: ` +
+        `the scaled pole ${offsetWords(spec.polarRadiusM - spec.heightM, 'above the apex', 'below the apex')}, and the scaled ` +
+        `equator ${offsetWords(spec.equatorRadiusM - spec.perimeterRadiusM, 'outside', 'inside')} the circle of the measured perimeter.`
+      );
     }
   }
 }

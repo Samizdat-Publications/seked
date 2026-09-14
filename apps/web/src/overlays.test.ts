@@ -6,6 +6,7 @@ import { atEpoch, buildModel, type Model } from './model';
 import {
   chamberWireframeSpec,
   cornerMissWords,
+  ghostEarthSpec,
   groundBearingsSpec,
   groundLineSpec,
   groundOutlinesSpec,
@@ -358,5 +359,33 @@ describe('the A4 chamber wireframe', () => {
     // It is the diagonal of a wall and not of the floor, so it rises the full
     // height of the room.
     expect((endWall?.to[2] as number) - (endWall?.from[2] as number)).toBeGreaterThan(5);
+  });
+});
+
+describe('the B1 ghost Earth', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const spec = ghostEarthSpec(claim('B1'), contextFor(model, -2449)) as NonNullable<ReturnType<typeof ghostEarthSpec>>;
+
+  it("draws the Earth the claim compares, divided by the claim's own scale", () => {
+    const comparisons = model.results.get('B1')?.comparisons ?? [];
+    expect(spec.scale).toBe(43200);
+    expect(spec.polarRadiusM * spec.scale).toBeCloseTo(comparisons[0]?.targetValue as number, 6);
+    expect(spec.heightM * spec.scale).toBeCloseTo(comparisons[0]?.value as number, 6);
+    expect(spec.equatorRadiusM * 2 * Math.PI * spec.scale).toBeCloseTo(comparisons[1]?.targetValue as number, 6);
+    expect(spec.perimeterRadiusM * 2 * Math.PI * spec.scale).toBeCloseTo(comparisons[1]?.value as number, 6);
+    expect(spec.polarResidualPct).toBeCloseTo(comparisons[0]?.residualPct as number, 9);
+    expect(spec.perimeterResidualPct).toBeCloseTo(comparisons[1]?.residualPct as number, 9);
+  });
+
+  it("stands the scaled Earth on the pyramid's base centre, pole where the apex nearly is", () => {
+    const placed = model.pyramids.find((p) => p.id === spec.structure);
+    expect(spec.centre).toEqual([placed?.offsetEast, placed?.offsetNorth, placed?.offsetUp]);
+    // Both residuals as the drawing has them: the pole about half a metre
+    // above the apex, the scaled equator about a metre outside the circle of
+    // the measured perimeter. Under one part in a hundred either way, which
+    // is why the claim needs a panel as well as a picture.
+    expect(spec.polarRadiusM - spec.heightM).toBeCloseTo(0.56, 2);
+    expect(spec.equatorRadiusM - spec.perimeterRadiusM).toBeCloseTo(1.01, 2);
+    expect(spec.piRatio).toBeCloseTo(2 * Math.PI, 2);
   });
 });

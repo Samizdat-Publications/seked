@@ -382,6 +382,29 @@ function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Mode
         </ul>
       );
     }
+    case 'ghost-earth': {
+      const spec = overlay.spec;
+      const scale = spec.scale.toLocaleString('en-US');
+      return (
+        <ul className="plain rays">
+          <li>
+            <span className="swatch" style={{ background: spec.earthColour }} />
+            The polar radius at 1:{scale} is {formatValue(spec.polarRadiusM, 'm')}; the pyramid stands{' '}
+            {formatValue(spec.heightM, 'm')}, {percent(spec.polarResidualPct)}
+          </li>
+          <li>
+            <span className="swatch" style={{ background: spec.pyramidColour }} />
+            The equatorial circumference at 1:{scale} is a circle of {formatValue(spec.equatorRadiusM, 'm')} radius; the measured
+            base perimeter draws one of {formatValue(spec.perimeterRadiusM, 'm')}, {percent(spec.perimeterResidualPct)}
+          </li>
+          <li className="note">
+            Both halves are A1's π relation at a scale: the base perimeter is {spec.piRatio.toFixed(4)} times the height against
+            2π = {(2 * Math.PI).toFixed(4)}. The two residuals differ by the Earth's own flattening, because the first takes the
+            polar radius and the second the equatorial circumference.
+          </li>
+        </ul>
+      );
+    }
     case 'ground-bearings': {
       const spec = overlay.spec;
       // The two sight lines, when the claim has them, are the edges of the
