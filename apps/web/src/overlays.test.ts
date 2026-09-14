@@ -162,3 +162,26 @@ describe('the C5 sun ribbon', () => {
     expect(later.bearings[0]?.azimuthDeg).toBe(90);
   });
 });
+
+describe('the generic ground-bearings type', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const c5 = claim('C5');
+  const build = (c: typeof c5, epoch = -10499) =>
+    groundBearingsSpec(c, contextFor(model, epoch)) as NonNullable<ReturnType<typeof groundBearingsSpec>>;
+
+  it('draws what C5 draws for a claim that names the type rather than the picture', () => {
+    const ribbon = build(c5);
+    const generic = build({
+      ...c5,
+      overlay: { type: 'ground-bearings', params: { ...c5.overlay?.params, height_m: 24 } },
+    });
+    expect(generic.type).toBe('ground-bearings');
+    expect(generic.from).toEqual(ribbon.from);
+    expect(generic.bearings.map((b) => b.azimuthDeg)).toEqual(ribbon.bearings.map((b) => b.azimuthDeg));
+    expect(generic.sights.map((s) => s.azimuthDeg)).toEqual(ribbon.sights.map((s) => s.azimuthDeg));
+    // The height is the one new param, and the claims that do not name it
+    // keep the eight metres C5 and C6 are drawn at.
+    expect(generic.height).toBe(24);
+    expect(ribbon.height).toBe(8);
+  });
+});

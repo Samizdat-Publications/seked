@@ -41,6 +41,7 @@ export const BUILT_OVERLAYS = new Set([
   'sky-projection',
   'sun-ribbon',
   'akhet',
+  'ground-bearings',
 ]);
 
 /** Enough colours for the three slopes A3 puts side by side. */
@@ -522,8 +523,19 @@ export interface GroundSight {
   colour: string;
 }
 
+/**
+ * The three overlay types this spec serves. C5 and C6 name the picture they
+ * draw; `ground-bearings` is the same picture under its own name, for a claim
+ * whose bearings are not a ribbon or an akhet.
+ */
+const GROUND_BEARING_TYPES = ['sun-ribbon', 'akhet', 'ground-bearings'] as const;
+type GroundBearingsType = (typeof GROUND_BEARING_TYPES)[number];
+
+const isGroundBearings = (type: string): type is GroundBearingsType =>
+  (GROUND_BEARING_TYPES as readonly string[]).includes(type);
+
 export interface GroundBearingsSpec {
-  type: 'sun-ribbon' | 'akhet';
+  type: GroundBearingsType;
   /** The viewpoint: a structure's centre, east and north in the scene frame. */
   from: [number, number];
   /** Metres above the pavement the lines are drawn at, so they read over the ground. */
@@ -579,7 +591,7 @@ const azimuthTo = (from: readonly number[], to: readonly number[]): number =>
  */
 export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBearingsSpec | undefined {
   const overlay = claim.overlay;
-  if (!overlay || (overlay.type !== 'sun-ribbon' && overlay.type !== 'akhet')) return undefined;
+  if (!overlay || !isGroundBearings(overlay.type)) return undefined;
   const params: Record<string, unknown> = overlay.params ?? {};
   const from = centreOf(ctx.env, asString(params.from) ?? 'sphinx');
   if (!from) return undefined;
@@ -613,7 +625,14 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
     .map((c) => ({ ...c, azimuthDeg: azimuthTo(from, c.at), colour: SIGHT_COLOUR }));
 
   if (bearings.length === 0 && sights.length === 0) return undefined;
-  return { type: overlay.type, from, height: 8, lengthM: asNumber(params.length_m) ?? 1200, bearings, sights };
+  return {
+    type: overlay.type,
+    from,
+    height: asNumber(params.height_m) ?? 8,
+    lengthM: asNumber(params.length_m) ?? 1200,
+    bearings,
+    sights,
+  };
 }
 
 /** The corner sight lines, which are ground and not sky. */
