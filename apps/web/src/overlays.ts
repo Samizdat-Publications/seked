@@ -11,7 +11,7 @@
  * claims, so a new overlay is a spec builder and a component and never a
  * special case in the panel.
  */
-import { evaluate, type Claim } from '@seked/claims/browser';
+import { evaluate, type Claim, type Comparison } from '@seked/claims/browser';
 import type { Environment, Point } from '@seked/geometry';
 import {
   lowerCulminationAltitude,
@@ -558,10 +558,23 @@ function centreOf(env: Environment, id: string): [number, number] | undefined {
   return east === undefined || north === undefined ? undefined : [east, north];
 }
 
-/** `g1.sw`, `g2.ne`: a base corner of a structure, from its centre and half-base. */
-function cornerOf(env: Environment, name: string): { label: string; at: [number, number] } | undefined {
-  const [id, corner] = name.split('.');
-  if (!id || !corner) return undefined;
+/** A corner of a structure's base, named by the claim and placed on the ground. */
+export interface GroundCorner {
+  label: string;
+  /** East and north in the scene frame, metres. */
+  at: [number, number];
+}
+
+/**
+ * `g1.sw`, `g2.ne`, `g3.corner.sw`: a base corner of a structure, from its
+ * centre and its half-base. The claims write the corner both ways, so the
+ * structure is the first segment and the corner the last, whatever is between.
+ */
+function cornerOf(env: Environment, name: string): GroundCorner | undefined {
+  const parts = name.split('.');
+  const id = parts[0];
+  const corner = parts[parts.length - 1];
+  if (!id || !corner || parts.length < 2) return undefined;
   const centre = centreOf(env, id);
   const half = env[`${id}.base.half`];
   if (!centre || half === undefined) return undefined;
@@ -573,6 +586,16 @@ function cornerOf(env: Environment, name: string): { label: string; at: [number,
     label: `${id.toUpperCase()} ${corner.toUpperCase()} corner`,
     at: [centre[0] + east * half, centre[1] + north * half],
   };
+}
+
+/**
+ * The claim's own comparison for one part of an overlay, found by the start of
+ * its label. An overlay that needs a target takes it from the claim rather
+ * than carrying a constant of its own, so the drawing and the dossier cannot
+ * come to hold different numbers.
+ */
+function comparisonFor(claim: Claim, prefix: string): Comparison | undefined {
+  return claim.comparisons.find((c) => c.label.startsWith(prefix));
 }
 
 const azimuthTo = (from: readonly number[], to: readonly number[]): number =>
@@ -621,7 +644,7 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
 
   const sights: GroundSight[] = asStrings(params.corners)
     .map((name) => cornerOf(ctx.env, name))
-    .filter((c): c is { label: string; at: [number, number] } => c !== undefined)
+    .filter((c): c is GroundCorner => c !== undefined)
     .map((c) => ({ ...c, azimuthDeg: azimuthTo(from, c.at), colour: SIGHT_COLOUR }));
 
   if (bearings.length === 0 && sights.length === 0) return undefined;
@@ -637,6 +660,14 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
 
 /** The corner sight lines, which are ground and not sky. */
 export const SIGHT_COLOUR = '#cfd8e3';
+
+/**
+ * "1.7 m west": a signed offset said in words. A miss on the ground has a
+ * direction rather than a sign, and the scene and the panel have to say it
+ * the same way.
+ */
+export const offsetWords = (metres: number, positive: string, negative: string): string =>
+  `${Math.abs(metres).toFixed(1)} m ${metres < 0 ? negative : positive}`;
 
 // --- B4 the base lines, drawn on the ground --------------------------------
 
@@ -725,6 +756,97 @@ export function groundOutlinesSpec(claim: Claim, ctx: OverlayContext): GroundOut
   return outlines.length === 0 ? undefined : { structure, outlines };
 }
 
+// --- D2 Legon's rectangle --------------------------------------------------
+
+export interface GroundRectangleSpec {
+  /** The rectangle's north-east corner, which both rectangles are anchored on. */
+  from: GroundCorner;
+  /** The measured south-west corner, which is Menkaure's. */
+  to: GroundCorner;
+  /** Metres above the datum the two rectangles are drawn at. */
+  height: number;
+  extentEastM: number;
+  extentNorthM: number;
+  extentEastCubits: number;
+  extentNorthCubits: number;
+  claimedEastCubits: number;
+  claimedNorthCubits: number;
+  claimedEastM: number;
+  claimedNorthM: number;
+  /** The expressions the claim writes its two targets as, which are the honest captions. */
+  claimedEastSource: string | undefined;
+  claimedNorthSource: string | undefined;
+  /** Where the claimed rectangle's south-west corner falls, in the scene frame. */
+  claimedSouthWest: [number, number];
+  /** From the claimed corner to the measured one: east and north, metres. */
+  missEastM: number;
+  missNorthM: number;
+  residualEastPct: number;
+  residualNorthPct: number;
+  measuredColour: string;
+  claimedColour: string;
+}
+
+/**
+ * D2. Two rectangles laid over the plateau on the same corner: the one the
+ * three pyramids actually make, from Khufu's north-east corner to Menkaure's
+ * south-west, and the 1000√2 by 1000√3 cubits Legon says was set out.
+ *
+ * Anchoring both on the same corner is the point. A claim about a rectangle
+ * of round numbers is a claim that one corner follows from the other, so the
+ * drawing lets the second corner fall where the arithmetic puts it and marks
+ * how far that is from the corner Menkaure has.
+ */
+export function groundRectangleSpec(claim: Claim, ctx: OverlayContext): GroundRectangleSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'ground-rectangle') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const [from, to] = asStrings(params.corners).map((name) => cornerOf(ctx.env, name));
+  const cubit = ctx.env['cubit.royal'];
+  if (!from || !to || cubit === undefined) return undefined;
+
+  // High enough to clear the highest pavement the rectangle crosses, which is
+  // Khafre's: the plateau rises about ten metres between Khufu and Menkaure.
+  const named = asStrings(params.structures)
+    .filter(isStructure)
+    .map((id) => structureOf(ctx, id))
+    .filter((p): p is PyramidParams => p !== undefined);
+  const height = (named.length === 0 ? 0 : Math.max(...named.map((p) => p.offsetUp))) + 8;
+
+  const extentEastM = from.at[0] - to.at[0];
+  const extentNorthM = from.at[1] - to.at[1];
+  const extentEastCubits = extentEastM / cubit;
+  const extentNorthCubits = extentNorthM / cubit;
+  const claimedEastCubits = 1000 * Math.SQRT2;
+  const claimedNorthCubits = 1000 * Math.sqrt(3);
+  const claimedEastM = claimedEastCubits * cubit;
+  const claimedNorthM = claimedNorthCubits * cubit;
+  const claimedSouthWest: [number, number] = [from.at[0] - claimedEastM, from.at[1] - claimedNorthM];
+
+  return {
+    from,
+    to,
+    height,
+    extentEastM,
+    extentNorthM,
+    extentEastCubits,
+    extentNorthCubits,
+    claimedEastCubits,
+    claimedNorthCubits,
+    claimedEastM,
+    claimedNorthM,
+    claimedEastSource: comparisonFor(claim, 'east-west')?.target,
+    claimedNorthSource: comparisonFor(claim, 'north-south')?.target,
+    claimedSouthWest,
+    missEastM: to.at[0] - claimedSouthWest[0],
+    missNorthM: to.at[1] - claimedSouthWest[1],
+    residualEastPct: ((extentEastCubits - claimedEastCubits) / claimedEastCubits) * 100,
+    residualNorthPct: ((extentNorthCubits - claimedNorthCubits) / claimedNorthCubits) * 100,
+    measuredColour: RAY_COLOURS[0] as string,
+    claimedColour: RAY_COLOURS[1] as string,
+  };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -734,7 +856,8 @@ export type OverlaySpec =
   | { kind: 'compass-rose'; spec: CompassRoseSpec }
   | { kind: 'sky-projection'; spec: SkyProjectionSpec }
   | { kind: 'ground-bearings'; spec: GroundBearingsSpec }
-  | { kind: 'ground-outlines'; spec: GroundOutlinesSpec };
+  | { kind: 'ground-outlines'; spec: GroundOutlinesSpec }
+  | { kind: 'ground-rectangle'; spec: GroundRectangleSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -753,6 +876,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (bearings) return { kind: 'ground-bearings', spec: bearings };
   const outlines = groundOutlinesSpec(claim, ctx);
   if (outlines) return { kind: 'ground-outlines', spec: outlines };
+  const rectangle = groundRectangleSpec(claim, ctx);
+  if (rectangle) return { kind: 'ground-rectangle', spec: rectangle };
   return undefined;
 }
 
@@ -796,6 +921,10 @@ function describe(overlay: OverlaySpec): string {
     case 'ground-outlines': {
       const squares = overlay.spec.outlines.map((o) => `${o.name} at ${ROUND(o.sideM, 2)} m`).join(' and ');
       return `${overlay.spec.structure.toUpperCase()}'s base lines drawn on the pavement, ${squares} a side; the panel carries the difference the picture cannot.`;
+    }
+    case 'ground-rectangle': {
+      const spec = overlay.spec;
+      return `The rectangle the pyramids make, ${ROUND(spec.extentEastCubits)} by ${ROUND(spec.extentNorthCubits)} cubits, against the claimed ${ROUND(spec.claimedEastCubits)} by ${ROUND(spec.claimedNorthCubits)}, both anchored on the ${spec.from.label} so the claimed corner falls where the arithmetic puts it.`;
     }
   }
 }

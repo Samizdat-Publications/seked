@@ -3,7 +3,7 @@ import { sourceById } from '@seked/data/browser';
 import { formatArcminutes, formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
-import { overlayNote, overlaySpec, type OverlayContext, type OverlaySpec } from '../overlays';
+import { offsetWords, overlayNote, overlaySpec, type OverlayContext, type OverlaySpec } from '../overlays';
 import { useView } from '../store';
 import { Fit } from './Claims';
 
@@ -300,6 +300,33 @@ function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Eleme
               shows one line where there are two. The difference lives in this panel.
             </li>
           )}
+        </ul>
+      );
+    }
+    case 'ground-rectangle': {
+      const spec = overlay.spec;
+      return (
+        <ul className="plain rays">
+          <li>
+            <span className="swatch" style={{ background: spec.measuredColour }} />
+            East-west: {formatValue(spec.extentEastM, 'm')}, {spec.extentEastCubits.toFixed(1)} rc against the claimed{' '}
+            {spec.claimedEastCubits.toFixed(1)} rc, {percent(spec.residualEastPct, 2)}
+          </li>
+          <li>
+            <span className="swatch" style={{ background: spec.measuredColour }} />
+            North-south: {formatValue(spec.extentNorthM, 'm')}, {spec.extentNorthCubits.toFixed(1)} rc against the claimed{' '}
+            {spec.claimedNorthCubits.toFixed(1)} rc, {percent(spec.residualNorthPct, 2)}
+          </li>
+          <li>
+            <span className="swatch" style={{ background: spec.claimedColour }} />
+            Set out from the {spec.from.label}, the claimed rectangle stops{' '}
+            {offsetWords(spec.missEastM, 'east', 'west')} and {offsetWords(spec.missNorthM, 'north', 'south')} of the{' '}
+            {spec.to.label}.
+          </li>
+          <li className="note">
+            The cubits are the metres divided by the royal cubit, so the slider above moves them and the residuals with them and
+            leaves the metres where the survey put them.
+          </li>
         </ul>
       );
     }

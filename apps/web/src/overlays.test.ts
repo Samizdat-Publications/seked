@@ -5,6 +5,7 @@ import { atEpoch, buildModel, type Model } from './model';
 import {
   groundBearingsSpec,
   groundOutlinesSpec,
+  groundRectangleSpec,
   passageRaySpec,
   shaftRaysSpec,
   skyProjectionSpec,
@@ -220,5 +221,48 @@ describe('the B4 ground outlines', () => {
       expect(Math.hypot((nw?.[0] as number) - (sw?.[0] as number), (nw?.[1] as number) - (sw?.[1] as number))).toBeCloseTo(outline.sideM, 9);
       for (const corner of outline.corners) expect(corner[2]).toBeCloseTo((placed?.offsetUp as number) + 1, 9);
     }
+  });
+});
+
+describe("the D2 ground rectangle", () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const d2 = claim('D2');
+  const spec = groundRectangleSpec(d2, contextFor(model, -2449)) as NonNullable<ReturnType<typeof groundRectangleSpec>>;
+
+  it('measures the extents the claim measures, corner to corner', () => {
+    const comparisons = model.results.get('D2')?.comparisons ?? [];
+    expect(spec.extentEastCubits).toBeCloseTo(comparisons[0]?.value as number, 9);
+    expect(spec.extentNorthCubits).toBeCloseTo(comparisons[1]?.value as number, 9);
+    expect(spec.claimedEastCubits).toBeCloseTo(comparisons[0]?.targetValue as number, 9);
+    expect(spec.claimedNorthCubits).toBeCloseTo(comparisons[1]?.targetValue as number, 9);
+    expect(spec.residualEastPct).toBeCloseTo(comparisons[0]?.residualPct as number, 9);
+    expect(spec.residualNorthPct).toBeCloseTo(comparisons[1]?.residualPct as number, 9);
+  });
+
+  it("anchors the claimed rectangle on Khufu's corner and lets the other one fall where it falls", () => {
+    expect(spec.from.label).toBe('G1 NE corner');
+    expect(spec.to.label).toBe('G3 SW corner');
+    expect(spec.claimedSouthWest[0]).toBeCloseTo(spec.from.at[0] - spec.claimedEastM, 9);
+    expect(spec.claimedSouthWest[1]).toBeCloseTo(spec.from.at[1] - spec.claimedNorthM, 9);
+    // The two signs are the two residuals: Menkaure's corner is further west
+    // than 1000 root 2 cubits reach and not as far south as 1000 root 3, both
+    // of them by under two metres over three quarters of a kilometre.
+    expect(spec.missEastM).toBeLessThan(0);
+    expect(spec.missNorthM).toBeGreaterThan(0);
+    expect(Math.abs(spec.missEastM)).toBeLessThan(2);
+    expect(Math.abs(spec.missNorthM)).toBeLessThan(2);
+  });
+
+  it('moves the cubits with the cubit slider and leaves the metres alone', () => {
+    const other = buildModel(bundle, 'canonical', 0.525);
+    const moved = groundRectangleSpec(d2, contextFor(other, -2449)) as NonNullable<ReturnType<typeof groundRectangleSpec>>;
+    expect(moved.extentEastM).toBeCloseTo(spec.extentEastM, 9);
+    expect(moved.extentNorthM).toBeCloseTo(spec.extentNorthM, 9);
+    expect(moved.extentEastCubits).not.toBeCloseTo(spec.extentEastCubits, 3);
+    expect(moved.extentNorthCubits).not.toBeCloseTo(spec.extentNorthCubits, 3);
+    // The claimed rectangle is a count of cubits, so it is the drawn metres
+    // that move with the slider and the cubits that stand still.
+    expect(moved.claimedEastCubits).toBeCloseTo(spec.claimedEastCubits, 12);
+    expect(moved.claimedEastM).not.toBeCloseTo(spec.claimedEastM, 3);
   });
 });

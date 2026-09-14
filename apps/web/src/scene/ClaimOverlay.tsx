@@ -1,7 +1,8 @@
 /**
  * The claim overlays that are not ghost profiles: the shaft rays, the
  * descending passage's ray, the compass rose, the Orion projection, the
- * bearings taken along the plateau and the base lines drawn on it.
+ * bearings taken along the plateau, the base lines drawn on it and Legon's
+ * rectangle over the three pyramids.
  *
  * Every one of them is drawn from a spec built in ../overlays.ts out of the
  * claim file's own params, so nothing here knows which claim it is serving.
@@ -18,12 +19,14 @@ import type {
   CompassRoseSpec,
   GroundBearingsSpec,
   GroundOutlinesSpec,
+  GroundRectangleSpec,
   OverlaySpec,
   PassageRaySpec,
   ShaftRaysSpec,
   SkyProjectionSpec,
   StarMark,
 } from '../overlays';
+import { offsetWords } from '../overlays';
 import { DOME_RADIUS } from '../sky';
 import type { PyramidParams } from '../model';
 import { GhostProfiles } from './GhostProfile';
@@ -54,6 +57,8 @@ export function ClaimOverlay({
       return <GroundBearings spec={overlay.spec} />;
     case 'ground-outlines':
       return <GroundOutlines spec={overlay.spec} />;
+    case 'ground-rectangle':
+      return <GroundRectangle spec={overlay.spec} />;
   }
 }
 
@@ -286,6 +291,55 @@ function GroundOutlines({ spec }: { spec: GroundOutlinesSpec }): React.JSX.Eleme
           </group>
         );
       })}
+    </group>
+  );
+}
+
+/** The four corners of an axis-aligned rectangle, north-east first. */
+function rectangle(ne: readonly number[], sw: readonly number[], z: number): Point3[] {
+  const [e1, n1] = [ne[0] as number, ne[1] as number];
+  const [e0, n0] = [sw[0] as number, sw[1] as number];
+  return [[e1, n1, z], [e0, n1, z], [e0, n0, z], [e1, n0, z]];
+}
+
+/**
+ * D2. The rectangle the three pyramids make and the rectangle Legon says was
+ * set out, drawn over each other from the same north-east corner. Nothing is
+ * fitted: the claimed sides are 1000√2 and 1000√3 cubits long, so its far
+ * corner lands where the arithmetic puts it, and the gap to Menkaure's own
+ * corner is the claim's error at the size the plateau has.
+ */
+function GroundRectangle({ spec }: { spec: GroundRectangleSpec }): React.JSX.Element {
+  const z = spec.height;
+  const measured = useMemo(() => rectangle(spec.from.at, spec.to.at, z), [spec.from.at, spec.to.at, z]);
+  const claimed = useMemo(() => rectangle(spec.from.at, spec.claimedSouthWest, z), [spec.from.at, spec.claimedSouthWest, z]);
+  const extent = (measuredRc: number, claimedRc: number, source: string | undefined): string =>
+    `${measuredRc.toFixed(1)} rc measured, ${source === undefined ? '' : `${source} = `}${claimedRc.toFixed(1)} rc claimed`;
+  const [ne, nw, sw] = measured as [Point3, Point3, Point3];
+
+  return (
+    <group>
+      <Polyline points={measured} colour={spec.measuredColour} close />
+      <Polyline points={claimed} colour={spec.claimedColour} close />
+      {measured.map((corner) => (
+        <Marker key={`${corner[0]},${corner[1]}`} position={corner} colour={spec.measuredColour} />
+      ))}
+      <Label
+        text={extent(spec.extentEastCubits, spec.claimedEastCubits, spec.claimedEastSource)}
+        position={[(ne[0] + nw[0]) / 2, ne[1], z + 90]}
+        colour={spec.measuredColour}
+      />
+      <Label
+        text={extent(spec.extentNorthCubits, spec.claimedNorthCubits, spec.claimedNorthSource)}
+        position={[nw[0], (nw[1] + sw[1]) / 2, z + 90]}
+        colour={spec.measuredColour}
+      />
+      <Marker position={[spec.claimedSouthWest[0], spec.claimedSouthWest[1], z]} colour={spec.claimedColour} />
+      <Label
+        text={`${spec.to.label} is ${offsetWords(spec.missEastM, 'east', 'west')} and ${offsetWords(spec.missNorthM, 'north', 'south')} of the claimed corner`}
+        position={[spec.claimedSouthWest[0], spec.claimedSouthWest[1], z + 60]}
+        colour={spec.claimedColour}
+      />
     </group>
   );
 }
