@@ -334,7 +334,7 @@ Residual by survey preset:
 
 **Free choices (0)**: none.
 
-**Overlay:** `compass-rose` {"structure":"g1","methods":["equinox-shadow","simultaneous-transit"],"stars":["Mizar","Kochab"]}
+**Overlay:** `compass-rose` {"structure":"g1","methods":["equinox-shadow","simultaneous-transit"],"stars":["Mizar","Kochab"],"radius_m":190,"exaggeration":120}
 
 **Proponents:** Dash, G. (2015). The Great Pyramid's Footprint: Results from Our 2015 Survey. AERAgram 16(2), 8–14. · Spence, K. (2000). Ancient Egyptian chronology and the astronomical orientation of pyramids. Nature 408, 320–324.
 
@@ -411,8 +411,8 @@ The three pyramids are laid out as Orion's Belt (Alnitak, Alnilam, Mintaka), inc
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°51′40″ | 37°51′07″ | 13°00′33″ (+34.368 %) | no (±5 %) |
-| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.alnitak.dec - star.alnilam.dec) * (star.mintaka.ra - star.alnilam.ra) * cos(star.alnilam.dec) - (star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)` | 0.18527 | 0.148248 | +24.97 % | no (±5 %) |
+| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((atan2(sin(star.mintaka.ra - star.alnitak.ra), cos(star.mintaka.ra - star.alnitak.ra))) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°51′40″ | 37°51′07″ | 13°00′33″ (+34.368 %) | no (±5 %) |
+| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.alnitak.dec - star.alnilam.dec) * (atan2(sin(star.mintaka.ra - star.alnilam.ra), cos(star.mintaka.ra - star.alnilam.ra))) * cos(star.alnilam.dec) - (atan2(sin(star.alnitak.ra - star.alnilam.ra), cos(star.alnitak.ra - star.alnilam.ra))) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((atan2(sin(star.alnitak.ra - star.alnilam.ra), cos(star.alnitak.ra - star.alnilam.ra))) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)` | 0.18527 | 0.148248 | +24.97 % | no (±5 %) |
 
 Residual by survey preset:
 
@@ -434,7 +434,7 @@ Residual by survey preset:
 
 **Critiques:** Krupp, E. C. (1997). Pyramid Marketing Schemes. Sky & Telescope, February 1997, 64–65. · Fairall, A. (1999). Precession and the layout of the ancient Egyptian pyramids. Astronomy & Geophysics 40(4), 4.4.
 
-Both comparisons are unsigned, because the claim is about shape rather than handedness. The sky is taken as seen looking south, with the belt laid on a tangent plane about Alnilam (x = Δra × cos dec, y = Δdec, both in degrees), which is accurate to a few arcminutes over the belt's 2.7°. On the ground the diagonal is Petrie's G1 to G3 centre offsets, measured from the meridian, and Menkaure's offset is his perpendicular distance from the G1 to G2 line divided by the length of that line, so both offsets are scale free. Krupp's objection, that laying the sky on the plateau requires swapping north for south, is recorded here as a free choice and is not modelled: nothing below tests it. Tolerance is 5 %, nearly 2° on a 38° diagonal, a band far looser than any surveyor would accept, chosen so the claim is judged as the visual match it is asserted to be rather than as a survey. Long-term precession (Vondrák 2011) is what makes the epoch meaningful at all; the IAU 2006 model is wrong by degrees at −10449, and the belt's angle sweeps roughly a degree a century, so a claim tied to an epoch is a claim tied to that free choice.
+Right-ascension differences are folded into the range from -180 to 180 degrees with atan2(sin, cos), so the belt reads correctly in the centuries when it straddles zero right ascension (about 5060 to 4820 BCE). Both comparisons are unsigned, because the claim is about shape rather than handedness. The sky is taken as seen looking south, with the belt laid on a tangent plane about Alnilam (x = Δra × cos dec, y = Δdec, both in degrees), which is accurate to a few arcminutes over the belt's 2.7°. On the ground the diagonal is Petrie's G1 to G3 centre offsets, measured from the meridian, and Menkaure's offset is his perpendicular distance from the G1 to G2 line divided by the length of that line, so both offsets are scale free. Krupp's objection, that laying the sky on the plateau requires swapping north for south, is recorded here as a free choice and is not modelled: nothing below tests it. Tolerance is 5 %, nearly 2° on a 38° diagonal, a band far looser than any surveyor would accept, chosen so the claim is judged as the visual match it is asserted to be rather than as a survey. Long-term precession (Vondrák 2011) is what makes the epoch meaningful at all; the IAU 2006 model is wrong by degrees at −10449, and the belt's angle sweeps roughly a degree a century, so a claim tied to an epoch is a claim tied to that free choice.
 
 ## D · Site plan and geodesy
 

@@ -10,7 +10,7 @@ summary: >-
 comparisons:
   - label: belt angle from the meridian against the G1 to G3 diagonal
     formula: >-
-      atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))
+      atan(abs((atan2(sin(star.mintaka.ra - star.alnitak.ra), cos(star.mintaka.ra - star.alnitak.ra))) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))
     target: >-
       atan(g3.centre.offset.west / g3.centre.offset.south)
     unit: deg
@@ -18,7 +18,7 @@ comparisons:
     formula: >-
       abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)
     target: >-
-      abs((star.alnitak.dec - star.alnilam.dec) * (star.mintaka.ra - star.alnilam.ra) * cos(star.alnilam.dec) - (star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)
+      abs((star.alnitak.dec - star.alnilam.dec) * (atan2(sin(star.mintaka.ra - star.alnilam.ra), cos(star.mintaka.ra - star.alnilam.ra))) * cos(star.alnilam.dec) - (atan2(sin(star.alnitak.ra - star.alnilam.ra), cos(star.alnitak.ra - star.alnilam.ra))) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((atan2(sin(star.alnitak.ra - star.alnilam.ra), cos(star.alnitak.ra - star.alnilam.ra))) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)
     unit: ratio
 tolerance_pct: 5
 free_choices:
@@ -35,6 +35,9 @@ sources:
   against: [krupp-1997, fairall-1999]
   context: [vondrak-2011]
 notes: >-
+  Right-ascension differences are folded into the range from -180 to 180
+  degrees with atan2(sin, cos), so the belt reads correctly in the centuries
+  when it straddles zero right ascension (about 5060 to 4820 BCE).
   Both comparisons are unsigned, because the claim is about shape rather
   than handedness. The sky is taken as seen looking south, with the belt
   laid on a tangent plane about Alnilam (x = Δra × cos dec, y = Δdec, both in
