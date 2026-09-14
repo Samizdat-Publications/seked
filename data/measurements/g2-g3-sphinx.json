@@ -166,6 +166,86 @@
     "note": "51°20′25″."
   },
   {
+    "key": "g3.base.side.east",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 105.38968,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "4149.2 in, §80, the E. side at the adopted base level, − 4.4 in from the mean. §80 reduces the data that lie on higher levels to the adopted base level by the angle 51°0′. §79 puts that level one mean granite course, 40.3 ± 1.5 in, below the first joint, the casing having been left in the rough and its true foot nowhere visible. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g3.base.side.south",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 105.60812,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "4157.8 in, §80, the S. side at the adopted base level, + 4.2 in from the mean. §80 reduces the data that lie on higher levels to the adopted base level by the angle 51°0′. §79 puts that level one mean granite course, 40.3 ± 1.5 in, below the first joint, the casing having been left in the rough and its true foot nowhere visible. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g3.base.side.west",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 105.50906,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "4153.9 in, §80, the W. side at the adopted base level, + .3 in from the mean. §80 reduces the data that lie on higher levels to the adopted base level by the angle 51°0′. §79 puts that level one mean granite course, 40.3 ± 1.5 in, below the first joint, the casing having been left in the rough and its true foot nowhere visible. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g3.base.side.mean",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 105.50144,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "4153.6 in, §80, the mean of the E., S. and W. sides, mean difference 3.0 in. The N. end of the W. side could not be reached after several attempts, so §80 states no length for the N. side and no azimuth for the W. one, and the mean is of three sides only. Petrie’s sides do not differ by direction the way Lehner’s tabulated 102.2 by 104.6 m do: his three measured sides span 8.6 in, about 0.2 m. §80 adds three check points, which fall .8, 4.3 and .9 in outside the adopted square. §80 reduces the data that lie on higher levels to the adopted base level by the angle 51°0′. §79 puts that level one mean granite course, 40.3 ± 1.5 in, below the first joint, the casing having been left in the rough and its true foot nowhere visible. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g3.face.angle",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 51,
+    "unit": "deg",
+    "sigma": 0.1667,
+    "source": "petrie-1883",
+    "method": "adopted-mean",
+    "note": "51°0′ ± 10′, §81, Petrie’s best conclusion from the measured angles, which are divergent: 7 measures on finished granite in situ give 50°57′ ± 28″, the 1st and 4th courses in situ at the S.S.W. 50°42′ ± 7″, 6 shifted blocks of granite 51°0′ ± 9″, and 9 pieces of limestone casing brought to England 51°58′ ± 15″. §81 and §82 offer 51°10′30″ ± 1′20″ instead, from the granite casing ceasing at one quarter of the height, and say it might well be adopted.",
+    "verified": true
+  },
+  {
+    "key": "g3.height.original",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 65.1256,
+    "unit": "m",
+    "sigma": 0.381,
+    "source": "petrie-1883",
+    "method": "projected",
+    "note": "2564 ± 15 in, §81, the height following from the mean base of §80 and the adopted angle 51°0′ ± 10′. §82 gives 2580.8 ± 2.0 in instead, four times the 645.2 in at which the granite casing ceases, which Petrie argues is one quarter of the height; that is 65.55 m against the 65.13 m stored here. Petrie measured no height directly.",
+    "verified": true
+  },
+  {
+    "key": "g3.orientation",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 0.234167,
+    "unit": "deg",
+    "sigma": 0.030556,
+    "source": "petrie-1883",
+    "method": "casing-mean",
+    "note": "+ 14′3″, §80, the mean of the three sides whose azimuth could be measured: N. + 16′48″, E. + 12′23″, S. + 12′57″. Positive is east of north, so the Third Pyramid is turned the opposite way from the First and the Second, which lie about 4′ to 5′ west of north. §80 states no probable error, only a mean difference of 1′50″, and sigma is that. §93 sets the Third Pyramid aside as too inferior in work to enter the determination of the pole, and §80 notes that a different base level would change none of these azimuths.",
+    "verified": true
+  },
+  {
     "key": "sphinx.length",
     "structure": "sphinx",
     "quantity": "length",
