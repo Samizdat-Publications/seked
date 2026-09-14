@@ -456,3 +456,15 @@ button.transit {
 button.transit:hover {
   background: var(--paper-sunk);
 }
+
+ul.rays {
+  font-size: 0.85rem;
+}
+
+ul.rays code {
+  font-size: 0.78rem;
+}
+
+ul.rays li {
+  line-height: 1.5;
+}

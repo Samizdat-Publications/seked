@@ -1,9 +1,9 @@
 import { formatEpoch, formatResidual, formatValue, identifiers, type Claim, type ComparisonResult } from '@seked/claims/browser';
 import { sourceById } from '@seked/data/browser';
-import { formatDms } from '@seked/units';
+import { formatArcminutes, formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
-import { ghostProfileSpec, overlayNote } from '../overlays';
+import { overlayNote, overlaySpec, type OverlayContext, type OverlaySpec } from '../overlays';
 import { useView } from '../store';
 import { Fit } from './Claims';
 
@@ -12,9 +12,19 @@ import { Fit } from './Claims';
  * assume, who says so, and which records the numbers came from. The
  * formatters are the dossier's, so the panel and docs/dossier.md read alike.
  */
-export function ClaimDetail({ claim, result, model }: { claim: Claim; result: FailedClaim; model: Model }): React.JSX.Element {
-  const overlay = overlayNote(claim, model.env);
-  const ghosts = ghostProfileSpec(claim, model.env);
+export function ClaimDetail({
+  claim,
+  result,
+  model,
+  context,
+}: {
+  claim: Claim;
+  result: FailedClaim;
+  model: Model;
+  context: OverlayContext;
+}): React.JSX.Element {
+  const overlay = overlayNote(claim, context);
+  const drawn = overlaySpec(claim, context);
   const inputs = useMemo(() => {
     const keys = new Set<string>();
     for (const c of claim.comparisons) for (const id of [...identifiers(c.formula), ...identifiers(c.target)]) keys.add(id);
@@ -58,19 +68,7 @@ export function ClaimDetail({ claim, result, model }: { claim: Claim; result: Fa
 
       <h4>Overlay</h4>
       <p className={overlay.built ? 'note' : 'note pending'}>{overlay.text}</p>
-      {ghosts && (
-        <ul className="plain ghosts">
-          {ghosts.profiles.map((g) => (
-            <li key={g.label}>
-              <span className="swatch" style={{ background: g.colour }} />
-              <code>{g.label}</code> {formatDms(g.slopeDeg)}
-            </li>
-          ))}
-          {ghosts.errorBandArcmin !== undefined && (
-            <li className="note">Survey error band on the measured angle: ±{ghosts.errorBandArcmin}′.</li>
-          )}
-        </ul>
-      )}
+      {drawn && <OverlayControls overlay={drawn} />}
 
       {claim.notes && (
         <>
@@ -174,4 +172,64 @@ function EpochLine({ claim, model }: { claim: Claim; model: Model }): React.JSX.
       </button>
     </p>
   );
+}
+
+/**
+ * The handles an overlay puts in the panel. They are the free choices the
+ * claim lists, made operable: where the sidereal time has to stand for a
+ * shaft's star to be on the meridian, and how far the shaft is from it.
+ */
+function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Element | null {
+  const setLst = useView((s) => s.setLst);
+
+  switch (overlay.kind) {
+    case 'ghost-profile':
+      return (
+        <ul className="plain ghosts">
+          {overlay.spec.profiles.map((g) => (
+            <li key={g.label}>
+              <span className="swatch" style={{ background: g.colour }} />
+              <code>{g.label}</code> {formatDms(g.slopeDeg)}
+            </li>
+          ))}
+          {overlay.spec.errorBandArcmin !== undefined && (
+            <li className="note">Survey error band on the measured angle: ±{overlay.spec.errorBandArcmin}′.</li>
+          )}
+        </ul>
+      );
+    case 'shaft-rays':
+      return (
+        <ul className="plain rays">
+          {overlay.spec.rays.map((ray) => (
+            <li key={ray.key}>
+              <span className="swatch" style={{ background: ray.colour }} />
+              <code>{ray.key}</code> {formatDms(ray.angleDeg)} against {ray.star.name} at {formatDms(ray.star.transitAltitudeDeg)},{' '}
+              {formatArcminutes(ray.residualDeg)} out.{' '}
+              <button type="button" className="link" onClick={() => setLst(ray.star.transitLstDeg)}>
+                put {ray.star.name} on the meridian
+              </button>
+            </li>
+          ))}
+        </ul>
+      );
+    case 'passage-ray': {
+      const spec = overlay.spec;
+      const lst = spec.culmination === 'lower' ? spec.star.lowerLstDeg : spec.star.transitLstDeg;
+      return (
+        <ul className="plain rays">
+          <li>
+            <span className="swatch" style={{ background: spec.colour }} />
+            <code>{spec.passage}</code> {formatDms(spec.angleDeg)} recorded, {formatDms(spec.landmarkAngleDeg)} from the floor landmarks.
+          </li>
+          <li>
+            {spec.star.name} at {spec.culmination} culmination: {formatDms(spec.targetAltitudeDeg)}, {formatArcminutes(spec.residualDeg)}{' '}
+            from the passage.{' '}
+            <button type="button" className="link" onClick={() => setLst(lst)}>
+              put {spec.star.name} there now
+            </button>
+          </li>
+        </ul>
+      );
+    }
+  }
 }

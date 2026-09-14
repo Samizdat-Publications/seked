@@ -2,6 +2,7 @@ import { GROUPS, type Claim, type Group } from '@seked/claims/browser';
 import { formatResidual } from '@seked/claims/browser';
 import { Fragment } from 'react';
 import { worstComparison, type FailedClaim, type Model } from '../model';
+import type { OverlayContext } from '../overlays';
 import { useView } from '../store';
 import { ClaimDetail } from './ClaimDetail';
 
@@ -12,7 +13,7 @@ const GROUP_IDS = Object.keys(GROUPS) as Group[];
  * worst comparison. Selecting one opens the detail pane and, where the
  * overlay exists, draws it in the scene.
  */
-export function Claims({ claims, model }: { claims: Claim[]; model: Model }): React.JSX.Element {
+export function Claims({ claims, model, context }: { claims: Claim[]; model: Model; context: OverlayContext }): React.JSX.Element {
   const selected = useView((s) => s.claim);
   const setClaim = useView((s) => s.setClaim);
   const chosen = claims.find((c) => c.id === selected);
@@ -37,7 +38,12 @@ export function Claims({ claims, model }: { claims: Claim[]; model: Model }): Re
                   />
                   {claim.id === chosen?.id && (
                     <li>
-                      <ClaimDetail claim={claim} result={model.results.get(claim.id) as FailedClaim} model={model} />
+                      <ClaimDetail
+                        claim={claim}
+                        result={model.results.get(claim.id) as FailedClaim}
+                        model={model}
+                        context={context}
+                      />
                     </li>
                   )}
                 </Fragment>

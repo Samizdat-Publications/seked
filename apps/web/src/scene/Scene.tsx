@@ -2,13 +2,13 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import type { Model } from '../model';
-import type { GhostProfileSpec } from '../overlays';
+import type { OverlaySpec } from '../overlays';
 import { sectionPlanes } from '../section';
 import { DOME_RADIUS, type DomeBuffers, type NamedDomeStar } from '../sky';
 import { useView } from '../store';
 import type { LayerId } from '../view';
+import { ClaimOverlay } from './ClaimOverlay';
 import { FlyCamera } from './FlyCamera';
-import { GhostProfiles } from './GhostProfile';
 import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
 import { Pyramids } from './Pyramids';
@@ -28,7 +28,7 @@ export interface SceneProps {
   terrain: TerrainProps;
   layers: Record<LayerId, boolean>;
   /** The overlay of the selected claim, where the viewer can draw it. */
-  ghosts: GhostProfileSpec | undefined;
+  overlay: OverlaySpec | undefined;
   sky: SkyProps | undefined;
 }
 
@@ -59,7 +59,7 @@ const NIGHT = {
  * whole group reconciles them, so no geometry is rewritten and a vertex in
  * the browser is the vertex in Blender.
  */
-export function Scene({ model, terrain, layers, ghosts, sky }: SceneProps): React.JSX.Element {
+export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): React.JSX.Element {
   const start = useRef(useView.getState().camera).current;
   const mode = useView((s) => s.mode);
   const section = useView((s) => s.section);
@@ -85,7 +85,7 @@ export function Scene({ model, terrain, layers, ghosts, sky }: SceneProps): Reac
         {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} clippingPlanes={planes} />}
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
         {layers.north && <NorthArrow />}
-        {layers.overlay && ghosts && <GhostProfiles spec={ghosts} pyramids={model.pyramids} clippingPlanes={planes} />}
+        {layers.overlay && overlay && <ClaimOverlay overlay={overlay} pyramids={model.pyramids} clippingPlanes={planes} />}
       </group>
 
       {mode === 'fly' ? <FlyCamera /> : <Controls />}

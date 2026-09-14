@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { brightStarsOf } from './bundle';
 import type { LoadedBundle } from './load';
 import { buildModel } from './model';
-import { ghostProfileSpec } from './overlays';
+import { overlaySpec, type OverlayContext } from './overlays';
 import { Claims } from './panels/Claims';
 import { CubitSlider, LayerToggles, PresetPicker, SectionControls } from './panels/Controls';
 import { SkyControls } from './panels/Sky';
@@ -44,12 +44,24 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const buffers = useMemo(() => (layers.sky ? domeBuffers(catalogue, epoch) : undefined), [layers.sky, catalogue, epoch]);
   const sky = buffers ? { buffers, named, latitudeDeg: model.latitudeDeg, lstDeg: lst } : undefined;
 
-  const ghosts = useMemo(() => (claim ? ghostProfileSpec(claim, model.env) : undefined), [claim, model.env]);
+  const overlayContext = useMemo<OverlayContext>(
+    () => ({
+      env: model.env,
+      pyramids: model.pyramids,
+      interiors: model.interiors,
+      stars: bundle.stars,
+      epoch,
+      lstDeg: lst,
+      latitudeDeg: model.latitudeDeg,
+    }),
+    [model, bundle.stars, epoch, lst],
+  );
+  const overlay = useMemo(() => overlaySpec(claim, overlayContext), [claim, overlayContext]);
 
   return (
     <div className="app">
       <main className="stage">
-        <Scene model={model} terrain={terrain} layers={layers} ghosts={ghosts} sky={sky} />
+        <Scene model={model} terrain={terrain} layers={layers} overlay={overlay} sky={sky} />
       </main>
       <aside className="panel">
         <header className="masthead">
@@ -61,7 +73,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
         <SkyControls epoch={epoch} named={named} claim={claim} />
         <LayerToggles />
         <SectionControls model={model} />
-        <Claims claims={bundle.claims} model={model} />
+        <Claims claims={bundle.claims} model={model} context={overlayContext} />
       </aside>
     </div>
   );
