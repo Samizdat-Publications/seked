@@ -128,7 +128,8 @@ stands exactly as high as its courses add up to, that each structure's
 holds exactly the solids `interior_solids` builds for it under the preset
 stamped on the objects, that the Sphinx's box is the size and in the place
 `seked_data` puts it and says it is a placeholder, that the terrain object is
-present and hidden and is the size its header says, that every object and every glTF node carries its
+present and hidden and is the size its header says and the far ring is visible
+and is the ring the two headers work out, that every object and every glTF node carries its
 provenance, and that the `Concavity` shape keys survive the export as morph
 targets. It
 prints one line per check and exits 1 on any failure. Pass
@@ -181,13 +182,25 @@ as anything more than a box.
 
 ## Ground and renders
 
-The generator writes two terrain grids from `data/terrain/giza-glo30.f32`:
+The generator writes three terrain objects. Two of them come from
+`data/terrain/giza-glo30.f32`, the six kilometre grid at 20 m:
 `Terrain (GLO-30 context)`, the surface model exactly as delivered and hidden
 because its editing mask turns the monuments into smooth mounds, and
 `Terrain (ground)`, the same grid with the ground under each pyramid set to
 its surveyed base level within 40 m of the footprint and blended back into
 the model over the next 260 m. The ground is a stand-in until the GPMP
-contours are entered; `check.py` verifies both grids.
+contours are entered.
+
+The third is `Terrain (far context)`, cut from `data/terrain/giza-glo30-far.f32`,
+the same product resampled out to twelve kilometres at 60 m. It is a ring, not
+a second surface: the faces the near grid already draws are left out, so the
+two meet along the near grid's outer edge rather than lying on top of each
+other, where they would z-fight. That only works because the far spacing is
+three times the near one and the two origins are a whole number of far steps
+apart, so the grids share their sample points; the generator checks both
+before it builds anything. Nothing out there is flattened, since the pyramids
+are all inside the near grid. `check.py` verifies all three, and derives the
+ring's face count from the two headers rather than remembering it.
 
 The flattening itself is `ground_height` in `seked_data.py`, which mirrors
 `groundHeight` in `@seked/geometry`; a parity test pins the two to each other
@@ -314,10 +327,12 @@ checked against 5.1 by rendering a wall of known height and counting bands.
   0.4 exponent to 0.32: the catalogue spans a factor of four hundred in flux
   and a linear image exposed for Sirius would lose everything at magnitude 6.
   The positions are not compressed and not chosen.
-- **The horizon past three kilometres is the sky texture's own ground.** The
-  terrain grid is six kilometres across, so in the `dawn` and `cutaway` views a
-  thin dark band shows between the far edge of the real heightfield and the
-  true horizon. No ground albedo fixes it; it is where the data stops.
+- **The horizon past twelve kilometres is the sky texture's own ground.** The
+  far ring carries the real heightfield out to twelve kilometres, which is
+  past the horizon in the `dawn` and `cutaway` views and put an end to the dark
+  band that used to show where the six kilometre grid stopped. Beyond the ring
+  it is still the sky texture's ground, and no ground albedo fixes that; it is
+  where the data stops.
 - **Cycles runs on the CPU here.** This machine offers no GPU compute backend,
   so the four views at 1600 × 900 and 128 samples take between 12 s and 64 s
   each rather than the seconds a card would take.
