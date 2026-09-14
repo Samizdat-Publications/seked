@@ -33,8 +33,10 @@ jobs:
       - run: pnpm test
       - run: pnpm typecheck
       - run: pnpm site
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - if: vars.PAGES_ENABLED == 'true'
+        uses: actions/configure-pages@v5
+      - if: vars.PAGES_ENABLED == 'true'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
