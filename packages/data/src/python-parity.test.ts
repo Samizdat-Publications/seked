@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { chamber, extrudedSection, meshVolume, passage, pyramidMesh } from '@seked/geometry';
+import { buildEnvironment, chamber, extrudedSection, interiorSolids, meshVolume, passage, pyramidMesh } from '@seked/geometry';
 import type { Point, SectionPair, Solid } from '@seked/geometry';
 import { loadDatabase, REPO_ROOT, resolve } from './index';
 
@@ -128,6 +128,39 @@ describe.skipIf(!py)('blender/seked_data.py builds the same interior solids as @
       }
       const oursVolume = meshVolume(mine);
       expect(Math.abs(oursVolume - shape.volume) / shape.volume, 'volume').toBeLessThan(1e-5);
+    });
+  }
+});
+
+interface PyInterior { name: string; keys: string[]; verts: [number, number, number][]; faces: number[][]; volume: number }
+
+describe.skipIf(!py)("blender/seked_data.py builds the same G1 interior as @seked/geometry", () => {
+  const db = loadDatabase();
+  const ours = interiorSolids(buildEnvironment(resolve(db, 'canonical').values));
+  // seked_data.py is append-only, so its first CLI block prints the resolved
+  // values and the interior JSON is the last line.
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--interior'], { encoding: 'utf8' });
+  const lines = out.trim().split(/\r?\n/);
+  const theirs = JSON.parse(lines[lines.length - 1] as string) as PyInterior[];
+
+  it('builds the same solids in the same order', () => {
+    expect(theirs.map((s) => s.name)).toEqual(Object.keys(ours));
+    expect(theirs.length).toBeGreaterThanOrEqual(10);
+  });
+
+  for (const solid of theirs) {
+    it(`${solid.name}: every vertex and the enclosed volume agree`, () => {
+      const mine = ours[solid.name];
+      if (!mine) throw new Error(`@seked/geometry skipped ${solid.name}`);
+      expect(solid.verts.length, 'vertex count').toBe(mine.vertexCount);
+      for (let i = 0; i < solid.verts.length; i++) {
+        for (let axis = 0; axis < 3; axis++) {
+          // Our positions are float32, so metres agree to well under a millimetre.
+          expect(mine.positions[i * 3 + axis], `vertex ${i} axis ${axis}`).toBeCloseTo((solid.verts[i] as number[])[axis] as number, 3);
+        }
+      }
+      const oursVolume = meshVolume(mine);
+      expect(Math.abs(oursVolume - solid.volume) / solid.volume, 'volume').toBeLessThan(1e-5);
     });
   }
 });
