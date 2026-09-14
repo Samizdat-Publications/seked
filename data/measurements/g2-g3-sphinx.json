@@ -353,5 +353,40 @@
     "method": "triangulation",
     "note": "22616.0 in, §92, E column of the table of relative positions (centre of the First to centre of the Third Pyramid); 574.45 m at 0.0254 m/inch. Petrie heads the columns N and E, but the Third Pyramid lies south and west of the First, so this is stored as a westward offset. His parallels are inclined −5′ to true north, the mean azimuth of the First and Second Pyramids, whereas this repo's frame is east-north-up on true north; at this distance 5′ is a cross-track shift of 0.84 m. Petrie's figure is kept unrotated, and he states no error for these distances, so sigma is that shift rounded up.",
     "verified": true
+  },
+  {
+    "key": "g3.casing.granite.height",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 16.38808,
+    "unit": "m",
+    "sigma": 0.0127,
+    "source": "petrie-1883",
+    "method": "course-table",
+    "note": "645.2 in, §82, the level at which the granite casing ceases, the top of the 16th course in the N.E. course table reduced to the adopted base level: “The granite is here marked as ceasing at 645.2, i.e., including the lower 16 courses.” Petrie’s evidence is that the highest remaining fragments of granite, the back ends of casing stones, stand at the same level on every side; that the 17th course is thicker than any other course of the whole Pyramid, as if a fresh start were made there, and is followed by one thinner than any below it; and that Diodorus has the casing of black stone to the 15th course. He remarks that the granite just covered one quarter of the height, and takes 645.2 × 4 = 2580.8 ± 2 as a determination of the original height. Sigma is his “± .5 (?) for uncertainty of paving”. Petrie also notes, §79, that the granite was left undressed over most of the faces.",
+    "verified": true
+  },
+  {
+    "key": "g3.casing.granite.courses",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 16,
+    "unit": "count",
+    "source": "petrie-1883",
+    "method": "course-table",
+    "note": "“including the lower 16 courses”, §82, the courses of the N.E. table that the granite casing covers, its top at 645.2 in. See g3.casing.granite.height for Petrie’s three reasons.",
+    "verified": true
+  },
+  {
+    "key": "g2.casing.granite.height",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 1.054608,
+    "unit": "m",
+    "sigma": 0.00127,
+    "source": "petrie-1883",
+    "method": "direct",
+    "note": "41.52 ± .05 in, §68: “The lowest course of casing was of granite, and is 41.52 ± .05 high, vertically, from the top to the base of its slope, and its vertical face below that 11 high, as measured at the S.W.” §65 says the lowest two courses of the casing are of granite, with Petrie’s own footnote: “I have seen but one course; Vyse reports finding two courses.” Only the course Petrie measured is entered; if Vyse is right the granite reaches the top of the second course, which the S.W. column of the §68 course table puts at 86.5 in. The upper part was cased in Mokattam limestone, §68.",
+    "verified": true
   }
 ]
