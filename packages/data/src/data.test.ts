@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadDatabase, resolve } from './index';
+import { MeasurementSchema, loadDatabase, resolve } from './index';
 
 const db = loadDatabase();
 
@@ -13,11 +13,14 @@ describe('database', () => {
     const keys = db.measurements.map((m) => m.key);
     for (const banned of ['g1.base.perimeter', 'g1.apothem', 'g1.volume']) expect(keys).not.toContain(banned);
   });
-  it('marks the starting sheet as unverified except defined constants', () => {
-    const unverified = db.measurements.filter((m) => !m.verified);
-    expect(unverified.length).toBeGreaterThan(40);
-    const c = db.measurements.find((m) => m.key === 'c');
-    expect(c?.verified).toBe(true);
+  it('treats verified as opt-in and makes verified survey records cite a section', () => {
+    const bare = MeasurementSchema.parse({ key: 'x', structure: 'g1', quantity: 'length', value: 1, unit: 'm', source: 'petrie-1883' });
+    expect(bare.verified).toBe(false);
+    expect(db.measurements.find((m) => m.key === 'c')?.verified).toBe(true);
+    const kind = new Map(db.sources.map((s) => [s.id, s.kind]));
+    for (const m of db.measurements.filter((m) => m.verified && kind.get(m.source) === 'survey')) {
+      expect(m.note, `${m.key} from ${m.source} is verified without a section reference`).toMatch(/§\d+/);
+    }
   });
 });
 
