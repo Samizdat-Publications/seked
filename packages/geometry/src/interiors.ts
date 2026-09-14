@@ -315,7 +315,10 @@ const BUILDERS: readonly Builder[] = [
 // structure's half-base. A passage with no `floor.begin` of its own starts at
 // the structure's entrance, `<id>.entrance.<name>.floor.begin` if one is named
 // for it and `<id>.entrance.floor.begin` for the descending passage, which is
-// how G1's entrance passage is stored. Anything incomplete is skipped.
+// how G1's entrance passage is stored. An entrance that records a level and an
+// east offset but no north coordinate is put on the north face, which is where
+// every entrance at Giza is, from `<id>.face.angle` and the half base.
+// Anything incomplete is skipped.
 
 /** A passage shorter than this is a rounding artefact, not a passage. */
 const MIN_RUN = 1e-6;
@@ -446,11 +449,50 @@ function memberNames(env: Environment, prefix: string, kind: string): string[] {
   return [...found].sort();
 }
 
+/**
+ * The north coordinate of a point in the pyramid's north face, taken from the
+ * face instead of read off a record. Every entrance at Giza is in the north
+ * face, and a face is a plane, so a point on it at height `up` stands
+ * `up / tan(face angle)` south of the north base edge: a survey that recorded
+ * the threshold's height recorded its plan position along with it, and the
+ * setback is the face's own geometry rather than a second measurement. That
+ * makes it a derived quantity, which belongs here and not in the database.
+ *
+ * The face angle is the resolved `<id>.face.angle`, so it moves with the
+ * preset, and it is named among the records because it is what does the work.
+ * The half base converts as it does for `from_north_base` and goes unnamed
+ * for the same reason. A preset carrying no face angle, or no base to halve,
+ * leaves the point unmade and the passage unbuilt, exactly as before.
+ */
+function faceNorth(env: Environment, base: string, structure: string, half: number | undefined): Coordinate | undefined {
+  const up = numberAt(env, `${base}.up`);
+  const key = `${structure}.face.angle`;
+  const angle = numberAt(env, key);
+  if (up === undefined || half === undefined || angle === undefined) return undefined;
+  if (angle <= 0 || angle >= 90) return undefined;
+  return { value: half - up / Math.tan((angle * Math.PI) / 180), key };
+}
+
+/**
+ * An entrance point: the stored point if all three coordinates are recorded,
+ * and otherwise the same point with its north coordinate taken from the north
+ * face, which is where every entrance at Giza is.
+ */
+function entrancePoint(env: Environment, base: string, structure: string, half: number | undefined): { point: Point; keys: string[] } | undefined {
+  const stored = storedPoint(env, base, half);
+  if (stored) return stored;
+  const north = faceNorth(env, base, structure, half);
+  const east = coordinate(env, base, 'east', half);
+  const up = coordinate(env, base, 'up', half);
+  if (!north || !east || !up) return undefined;
+  return { point: [east.value, north.value, up.value], keys: [north.key, east.key, up.key] };
+}
+
 /** Where a passage begins when it records no floor.begin of its own. */
-function entranceBegin(env: Environment, prefix: string, name: string, half: number | undefined): { point: Point; keys: string[] } | undefined {
-  const named = storedPoint(env, `${prefix}entrance.${name}.floor.begin`, half);
+function entranceBegin(env: Environment, structure: string, prefix: string, name: string, half: number | undefined): { point: Point; keys: string[] } | undefined {
+  const named = entrancePoint(env, `${prefix}entrance.${name}.floor.begin`, structure, half);
   if (named) return named;
-  return name === 'descending' ? storedPoint(env, `${prefix}entrance.floor.begin`, half) : undefined;
+  return name === 'descending' ? entrancePoint(env, `${prefix}entrance.floor.begin`, structure, half) : undefined;
 }
 
 /**
@@ -482,9 +524,9 @@ function endFromRun(env: Environment, base: string, from: Point): { point: Point
   };
 }
 
-function passageBuilder(env: Environment, prefix: string, name: string, half: number | undefined): Builder | undefined {
+function passageBuilder(env: Environment, structure: string, prefix: string, name: string, half: number | undefined): Builder | undefined {
   const base = `${prefix}passage.${name}`;
-  const from = storedPoint(env, `${base}.floor.begin`, half) ?? entranceBegin(env, prefix, name, half);
+  const from = storedPoint(env, `${base}.floor.begin`, half) ?? entranceBegin(env, structure, prefix, name, half);
   const width = numberAt(env, `${base}.width`);
   const height = numberAt(env, `${base}.height`);
   if (!from || width === undefined || height === undefined || width <= 0 || height <= 0) return undefined;
@@ -560,7 +602,7 @@ function discover(env: Environment, structure: string): Builder[] {
   const half = halfBase(env, structure);
   const out: Builder[] = [];
   for (const name of memberNames(env, prefix, 'passage')) {
-    const builder = passageBuilder(env, prefix, name, half);
+    const builder = passageBuilder(env, structure, prefix, name, half);
     if (builder) out.push(builder);
   }
   for (const name of memberNames(env, prefix, 'chamber')) {

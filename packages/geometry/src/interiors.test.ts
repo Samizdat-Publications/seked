@@ -301,6 +301,69 @@ describe('a passage recorded as a length along its floor and a slope', () => {
   });
 });
 
+/**
+ * An entrance that records its level and its offset from the axis but not how
+ * far south of the base edge it stands. It is in the north face, and the face
+ * is a plane, so the setback is the face's own geometry. The pyramid below is
+ * invented: a 200 m base and a 50 degree face, chosen so the arithmetic can be
+ * followed by eye.
+ */
+describe('an entrance placed on the north face', () => {
+  const FACE: Record<string, number> = {
+    'g2.base.side.mean': 200,
+    'g2.height.original': 120,
+    'g2.face.angle': 50,
+
+    'g2.entrance.floor.begin.east': 3,
+    'g2.entrance.floor.begin.up': 10,
+    'g2.passage.descending.length': 50,
+    'g2.passage.descending.angle': -26,
+    'g2.passage.descending.width': 1,
+    'g2.passage.descending.height': 2,
+  };
+  const face = buildEnvironment(FACE);
+  const g2face = { structure: 'g2' };
+  const setback = 100 - 10 / Math.tan((50 * Math.PI) / 180);
+
+  it('stands the entrance back from the base edge by its height over the face slope', () => {
+    const begin = interiorSolids(face, g2face)['g2.passage.descending']?.landmarks['g2.passage.descending.floor.begin'];
+    expect(begin?.[0]).toBeCloseTo(3, 9);
+    expect(begin?.[1]).toBeCloseTo(setback, 9);
+    expect(begin?.[2]).toBeCloseTo(10, 9);
+  });
+
+  it('names the face angle as the record that placed it', () => {
+    expect(interiorSolidInputs(face, g2face)['g2.passage.descending']).toEqual([
+      'g2.face.angle',
+      'g2.entrance.floor.begin.east',
+      'g2.entrance.floor.begin.up',
+      'g2.passage.descending.length',
+      'g2.passage.descending.angle',
+      'g2.passage.descending.width',
+      'g2.passage.descending.height',
+    ]);
+  });
+
+  it('prefers a recorded north coordinate over the face', () => {
+    const recorded = buildEnvironment({ ...FACE, 'g2.entrance.floor.begin.from_north_base': 4 });
+    const begin = interiorSolids(recorded, g2face)['g2.passage.descending']?.landmarks['g2.passage.descending.floor.begin'];
+    expect(begin?.[1]).toBeCloseTo(96, 9);
+    expect(interiorSolidInputs(recorded, g2face)['g2.passage.descending']?.[0]).toBe('g2.entrance.floor.begin.from_north_base');
+  });
+
+  it('leaves the passage unbuilt when the preset carries no face angle', () => {
+    const angleless = { ...FACE };
+    delete angleless['g2.face.angle'];
+    expect(Object.keys(interiorSolids(buildEnvironment(angleless), g2face))).toEqual([]);
+  });
+
+  it('leaves it unbuilt when there is no base to halve either', () => {
+    const baseless = { ...FACE };
+    delete baseless['g2.base.side.mean'];
+    expect(Object.keys(interiorSolids(buildEnvironment(baseless), g2face))).toEqual([]);
+  });
+});
+
 describe('a discovered chamber roof', () => {
   const gabled = (ridgeHeight: number): Record<string, number> =>
     buildEnvironment({ ...SYNTHETIC, 'g2.chamber.burial.gable.height': ridgeHeight });

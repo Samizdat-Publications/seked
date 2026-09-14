@@ -107,3 +107,51 @@ describe('interiorSolids on the canonical preset', () => {
     expect(Object.keys(built)).toEqual(EXPECTED.filter((name) => name !== 'kc'));
   });
 });
+
+/**
+ * Khafre and Menkaure, whose interiors are discovered from their records
+ * rather than written out. Maragioglio and Rinaldi give Khafre's entrance a
+ * level and an offset from the axis, his descending corridor a length and a
+ * slope, and his crypt a floor and a south wall, which is enough for both.
+ * Menkaure's chapter gives no angle of slope for his descending corridor and
+ * no level for any of his chambers, so nothing of his is placed yet.
+ */
+describe('the discovered interiors on the canonical preset', () => {
+  it("builds Khafre's entrance passage and his burial chamber", () => {
+    expect(Object.keys(interiorSolids(env, { structure: 'g2' }))).toEqual([
+      'g2.passage.descending',
+      'g2.chamber.great',
+    ]);
+  });
+
+  it("puts Khafre's entrance in the north face at the level Maragioglio and Rinaldi restore", () => {
+    const point = interiorSolids(env, { structure: 'g2' })['g2.passage.descending']
+      ?.landmarks['g2.passage.descending.floor.begin'] as number[];
+    const [east, north, up] = point as [number, number, number];
+    const half = env['g2.base.half'] as number;
+    const angle = env['g2.face.angle'] as number;
+    expect(up).toBeCloseTo(env['g2.entrance.floor.begin.up'] as number, 9);
+    expect(east).toBeCloseTo(env['g2.entrance.floor.begin.east'] as number, 9);
+    expect(north).toBeCloseTo(half - up / Math.tan((angle * Math.PI) / 180), 9);
+    // Inside the base, and well north of the centre.
+    expect(north).toBeGreaterThan(0);
+    expect(north).toBeLessThan(half);
+  });
+
+  it("carries Khafre's descending corridor its recorded length down its recorded slope", () => {
+    const solid = interiorSolids(env, { structure: 'g2' })['g2.passage.descending'];
+    const [bx, by, bz] = solid?.landmarks['g2.passage.descending.floor.begin'] as [number, number, number];
+    const [ex, ey, ez] = solid?.landmarks['g2.passage.descending.floor.end'] as [number, number, number];
+    expect(Math.hypot(ex - bx, ey - by, ez - bz)).toBeCloseTo(env['g2.passage.descending.length'] as number, 6);
+    // Due south, since no bearing is recorded for it, and falling.
+    expect(ex).toBeCloseTo(bx, 6);
+    expect(ey).toBeLessThan(by);
+    expect(ez).toBeLessThan(0);
+  });
+
+  it("leaves Menkaure's interior unplaced, for want of a slope and a level", () => {
+    expect(interiorSolids(env, { structure: 'g3' })).toEqual({});
+    expect(env['g3.passage.descending.length']).toBeDefined();
+    expect(env['g3.passage.descending.angle']).toBeUndefined();
+  });
+});

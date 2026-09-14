@@ -629,7 +629,10 @@ INTERIOR_BUILDERS = [
 # distance south of the north base edge, and an east one as
 # "<point>.from_east_side", a distance west of the east base edge; both are
 # converted here with the half-base. A passage with no floor.begin of its own
-# starts at the structure's entrance. Anything incomplete is skipped.
+# starts at the structure's entrance. An entrance that records a level and an
+# east offset but no north coordinate is put on the north face, which is where
+# every entrance at Giza is, from "<id>.face.angle" and the half base.
+# Anything incomplete is skipped.
 
 INTERIOR_STRUCTURES = ("g1", "g2", "g3")
 
@@ -770,13 +773,58 @@ def _half_base(values, structure):
     return None if base is None else base / 2.0
 
 
-def _entrance_begin(values, prefix, name, half):
+def _face_north(values, base, structure, half):
+    """
+    The north coordinate of a point in the pyramid's north face, taken from
+    the face instead of read off a record.
+
+    Every entrance at Giza is in the north face, and a face is a plane, so a
+    point on it at height up stands up / tan(face angle) south of the north
+    base edge: a survey that recorded the threshold's height recorded its plan
+    position along with it, and the setback is the face's own geometry rather
+    than a second measurement. That makes it a derived quantity, which belongs
+    here and not in the database.
+
+    The face angle is the resolved "<id>.face.angle", so it moves with the
+    preset, and it is named among the records because it is what does the
+    work. The half base converts as it does for from_north_base and goes
+    unnamed for the same reason. A preset carrying no face angle, or no base
+    to halve, leaves the point unmade and the passage unbuilt, as before.
+    """
+    up = _number_at(values, base + ".up")
+    key = structure + ".face.angle"
+    angle = _number_at(values, key)
+    if up is None or half is None or angle is None:
+        return None
+    if angle <= 0 or angle >= 90:
+        return None
+    return (half - up / math.tan(math.radians(angle)), key)
+
+
+def _entrance_point(values, base, structure, half):
+    """
+    An entrance point: the stored point if all three coordinates are recorded,
+    and otherwise the same point with its north coordinate taken from the
+    north face, which is where every entrance at Giza is.
+    """
+    stored = _stored_point(values, base, half)
+    if stored is not None:
+        return stored
+    north = _face_north(values, base, structure, half)
+    east = _coordinate(values, base, "east", half)
+    up = _coordinate(values, base, "up", half)
+    if north is None or east is None or up is None:
+        return None
+    return ((east[0], north[0], up[0]), [north[1], east[1], up[1]])
+
+
+def _entrance_begin(values, structure, prefix, name, half):
     """Where a passage begins when it records no floor.begin of its own."""
-    named = _stored_point(values, prefix + "entrance." + name + ".floor.begin", half)
+    named = _entrance_point(values, prefix + "entrance." + name + ".floor.begin", structure, half)
     if named is not None:
         return named
     if name == "descending":
-        return _stored_point(values, prefix + "entrance.floor.begin", half)
+        return _entrance_point(values, prefix + "entrance.floor.begin", structure, half)
     return None
 
 
@@ -808,11 +856,11 @@ def _end_from_run(values, base, start):
     return (end, keys)
 
 
-def _passage_builder(values, prefix, name, half):
+def _passage_builder(values, structure, prefix, name, half):
     base = prefix + "passage." + name
     begin = _stored_point(values, base + ".floor.begin", half)
     if begin is None:
-        begin = _entrance_begin(values, prefix, name, half)
+        begin = _entrance_begin(values, structure, prefix, name, half)
     width = _number_at(values, base + ".width")
     height = _number_at(values, base + ".height")
     if begin is None or width is None or height is None or width <= 0 or height <= 0:
@@ -867,7 +915,7 @@ def _discover_builders(values, structure):
     half = _half_base(values, structure)
     out = []
     for name in _member_names(values, prefix, "passage"):
-        built = _passage_builder(values, prefix, name, half)
+        built = _passage_builder(values, structure, prefix, name, half)
         if built is not None:
             out.append(built)
     for name in _member_names(values, prefix, "chamber"):
@@ -965,6 +1013,15 @@ INTERIOR_DISCOVERY_CASE = {
     "g2.passage.lower_descending.angle": -30.0,
     "g2.passage.lower_descending.width": 1.0,
     "g2.passage.lower_descending.height": 2.0,
+    # An entrance with a level and an east offset but no north coordinate, put
+    # on the north face from the face angle and the half base.
+    "g2.face.angle": 50.0,
+    "g2.entrance.upper.floor.begin.east": 2.0,
+    "g2.entrance.upper.floor.begin.up": 10.0,
+    "g2.passage.upper.length": 30.0,
+    "g2.passage.upper.angle": -26.0,
+    "g2.passage.upper.width": 1.0,
+    "g2.passage.upper.height": 2.0,
     # The same, with a recorded bearing that is not due south.
     "g2.passage.well.floor.begin.north": -26.0,
     "g2.passage.well.floor.begin.east": 5.0,

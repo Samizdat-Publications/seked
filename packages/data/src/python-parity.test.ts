@@ -215,6 +215,15 @@ const DISCOVERY_CASE: Record<string, number> = {
   'g2.passage.lower_descending.angle': -30,
   'g2.passage.lower_descending.width': 1,
   'g2.passage.lower_descending.height': 2,
+  // An entrance with a level and an east offset but no north coordinate, put
+  // on the north face from the face angle and the half base.
+  'g2.face.angle': 50,
+  'g2.entrance.upper.floor.begin.east': 2,
+  'g2.entrance.upper.floor.begin.up': 10,
+  'g2.passage.upper.length': 30,
+  'g2.passage.upper.angle': -26,
+  'g2.passage.upper.width': 1,
+  'g2.passage.upper.height': 2,
   // The same, with a recorded bearing that is not due south.
   'g2.passage.well.floor.begin.north': -26,
   'g2.passage.well.floor.begin.east': 5,
@@ -253,6 +262,7 @@ describe.skipIf(!py)('blender/seked_data.py discovers a prefixed interior the sa
       'g2.passage.descending',
       'g2.passage.horizontal',
       'g2.passage.lower_descending',
+      'g2.passage.upper',
       'g2.passage.well',
       'g2.chamber.burial',
       'g2.chamber.rock',
