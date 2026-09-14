@@ -12,6 +12,7 @@
     "dev:web": "pnpm bundle && pnpm --filter @seked/web dev",
     "build:web": "pnpm bundle && pnpm --filter @seked/web build",
     "site": "pnpm build:web && tsx scripts/site.ts",
+    "courses": "tsx scripts/courses.ts",
     "dossier": "tsx scripts/dossier.ts",
     "shafts": "tsx scripts/shafts.ts",
     "sky-bake": "tsx scripts/sky-bake.ts",

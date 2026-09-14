@@ -17,6 +17,14 @@
     "url": "http://library.pyramidal-foundational-information.com/books//Cole%20-%20Determination%20of%20the%20Exact%20Size%20and%20Orientation%20of%20the%20Great%20Pyramid%20of%20Giza.pdf"
   },
   {
+    "id": "goyon-1978",
+    "kind": "survey",
+    "year": 1978,
+    "citation": "Goyon, G. (1978). Les rangs d'assises de la Grande Pyramide. Bulletin de l'Institut français d'archéologie orientale 78, 405–413.",
+    "url": "https://www.ifao.egnet.net/bifao/078/23/",
+    "note": "Goyon's own 1978 resurvey of the north-east arris, independent of Petrie's Plate VIII. The course table on pp. 410–413 is headed \"Hauteur successive en centimètres de toutes les assises de la Grande Pyramide, prises sur l'angle Nord-Est en partant du bas (au-dessus du socle)\": 201 courses from the bottom, the 201st the summit platform, courses 1 and 2 counted by the French Expedition rather than by Goyon, each reading good to 0.5 cm, totalling 138.745 m at a mean course of 0.690 m. Every page of the IFAO scan is stamped \"© IFAO\", so the PDF is not kept in the repository and only the numbers are here. The scan is an image and cannot be read by machine, so scripts/courses.ts imports the table from the transcription on French Wikipedia, \"Mesure des rangs d'assises de la pyramide de Khéops\" (https://fr.wikipedia.org/wiki/Mesure_des_rangs_d%27assises_de_la_pyramide_de_Kh%C3%A9ops), revision 230669445, whose wikitext has sha256 9d3f16b06b04c7cdb52ea837d726a46d7a47cad3dd170f6890faac87674600cc. That transcription is CC BY-SA 4.0, https://creativecommons.org/licenses/by-sa/4.0/; the 201 heights themselves are Goyon's measurements and are cited to him. It was checked against the scan course by course for courses 1 to 48 and in samples beyond, and the import re-checks Goyon's own two totals on every run."
+  },
+  {
     "id": "dash-2015",
     "kind": "survey",
     "year": 2015,
