@@ -4,6 +4,7 @@ import { formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
 import { ghostProfileSpec, overlayNote } from '../overlays';
+import { useView } from '../store';
 import { Fit } from './Claims';
 
 /**
@@ -27,7 +28,7 @@ export function ClaimDetail({ claim, result, model }: { claim: Claim; result: Fa
           {claim.id} · {claim.title} <Fit result={result} />
         </h3>
         <p className="note">{claim.summary}</p>
-        {claim.epoch !== undefined && <p className="note">Evaluated at epoch {formatEpoch(claim.epoch)}.</p>}
+        {claim.epoch !== undefined && <EpochLine claim={claim} model={model} />}
       </header>
 
       {result.error && <p className="warning">This preset cannot evaluate the claim: {result.error}</p>}
@@ -149,6 +150,28 @@ function Citations({ label, ids, model }: { label: string; ids: string[]; model:
           }
         })
         .join(' · ')}
+    </p>
+  );
+}
+
+/**
+ * Which epoch this claim was actually evaluated at, and the way back. A dated
+ * claim under an override is a different claim from the one its author
+ * stated, and the panel has to say so rather than quietly showing another
+ * year's numbers under the same title.
+ */
+function EpochLine({ claim, model }: { claim: Claim; model: Model }): React.JSX.Element {
+  const setEpoch = useView((s) => s.setEpoch);
+  const override = model.epochOverride;
+  if (override === null || claim.epoch === undefined) {
+    return <p className="note">Evaluated at epoch {formatEpoch(claim.epoch as number)}, the epoch the claim is stated at.</p>;
+  }
+  return (
+    <p className="note">
+      Evaluated at epoch {formatEpoch(override)}, not at the {formatEpoch(claim.epoch)} the claim is stated at.{' '}
+      <button type="button" className="link" onClick={() => setEpoch(null)}>
+        back to the claim's epoch
+      </button>
     </p>
   );
 }

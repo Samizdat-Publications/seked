@@ -20,7 +20,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const layers = useView((s) => s.layers);
   const selected = useView((s) => s.claim);
 
-  const model = useMemo(() => buildModel(bundle, preset, cubit), [bundle, preset, cubit]);
+  const model = useMemo(() => buildModel(bundle, preset, cubit, epochOverride), [bundle, preset, cubit, epochOverride]);
   const header = bundle.terrain.header;
   const datum = bundle.sites.find((s) => s.id === header.site)?.origin.elevation ?? 0;
   // The ground grid is flattened under whatever pyramids the preset places, so
@@ -42,7 +42,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const catalogue = useMemo(() => brightStarsOf(bundle), [bundle]);
   const named = useMemo(() => namedOnDome(bundle.stars, epoch), [bundle.stars, epoch]);
   const buffers = useMemo(() => (layers.sky ? domeBuffers(catalogue, epoch) : undefined), [layers.sky, catalogue, epoch]);
-  const sky = buffers ? { buffers, named, latitudeDeg: model.env['g1.center.latitude'] ?? 0, lstDeg: lst } : undefined;
+  const sky = buffers ? { buffers, named, latitudeDeg: model.latitudeDeg, lstDeg: lst } : undefined;
 
   const ghosts = useMemo(() => (claim ? ghostProfileSpec(claim, model.env) : undefined), [claim, model.env]);
 

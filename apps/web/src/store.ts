@@ -54,7 +54,9 @@ export const useView = create<ViewStore>((set) => ({
   setEpoch: (epoch) => set({ epoch: epoch === null ? null : clamp(epoch, EPOCH_MIN, EPOCH_MAX) }),
   setLst: (lst) => set({ lst: normaliseLst(lst) }),
   toggleLayer: (id) => set((s) => ({ layers: { ...s.layers, [id]: !s.layers[id] } })),
-  setClaim: (claim) => set((s) => ({ claim: s.claim === claim ? null : claim })),
+  // Changing which claim is open gives the epoch back to the claims, so
+  // opening a sky claim snaps the sky to the epoch that claim is stated at.
+  setClaim: (claim) => set((s) => ({ claim: s.claim === claim ? null : claim, epoch: null })),
   setCamera: (camera) => set({ camera }),
   setMode: (mode) => set({ mode }),
   setSpeed: (speed) => set({ speed: clamp(speed, SPEED_MIN, SPEED_MAX) }),

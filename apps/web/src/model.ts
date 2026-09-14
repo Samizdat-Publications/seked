@@ -79,13 +79,29 @@ export interface Model {
   results: Map<string, ClaimResult>;
   /** The measured royal cubit under this preset, which the slider starts from. */
   measuredCubit: number;
+  /** The epoch override every dated claim above was evaluated at, or null for each claim's own. */
+  epochOverride: number | null;
+  /** The observer every sky claim and the dome itself are seen from. */
+  latitudeDeg: number;
 }
 
 /**
- * Resolve a preset, optionally override the royal cubit, derive the
- * environment and evaluate every claim against it.
+ * The claim as the reader's epoch override has it. A claim with no epoch of
+ * its own never sees the sky and is handed back untouched, so overriding the
+ * epoch moves exactly the claims the sky slider is about.
  */
-export function buildModel(bundle: SekedBundle, presetId: string, cubit: number | null): Model {
+export function atEpoch(claim: Claim, epoch: number | null): Claim {
+  return epoch === null || claim.epoch === undefined ? claim : { ...claim, epoch };
+}
+
+/**
+ * Resolve a preset, optionally override the royal cubit and the epoch, derive
+ * the environment and evaluate every claim against it. The epoch override is
+ * the cubit slider's move applied to time: a dated claim is evaluated at the
+ * epoch the reader is looking at rather than at the one its author chose, so
+ * the panel's residuals move as the sky is dragged.
+ */
+export function buildModel(bundle: SekedBundle, presetId: string, cubit: number | null, epoch: number | null = null): Model {
   const db = databaseOf(bundle);
   const resolved = resolve(db, presetId);
   const measuredCubit = resolved.values['cubit.royal'] ?? 0.5236;
@@ -96,8 +112,19 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
     .map((params) => ({ params, solids: interiorSolids(env, { structure: params.id }) }))
     .filter((interior) => Object.keys(interior.solids).length > 0);
   const results = new Map<string, ClaimResult>();
-  for (const claim of bundle.claims) results.set(claim.id, evaluateClaimSafely(claim, env));
-  return { db, resolved, values, env, pyramids, interiors, results, measuredCubit };
+  for (const claim of bundle.claims) results.set(claim.id, evaluateClaimSafely(atEpoch(claim, epoch), env));
+  return {
+    db,
+    resolved,
+    values,
+    env,
+    pyramids,
+    interiors,
+    results,
+    measuredCubit,
+    epochOverride: epoch,
+    latitudeDeg: env['g1.center.latitude'] ?? 0,
+  };
 }
 
 /**
