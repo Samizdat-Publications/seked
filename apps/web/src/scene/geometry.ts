@@ -4,7 +4,7 @@
  * same function, so what you orbit is the measurement database and not a
  * snapshot of it.
  */
-import { pyramidMesh, type Mesh, type PyramidMeshOptions } from '@seked/geometry';
+import { pyramidMesh, steppedPyramidMesh, type Mesh, type PyramidMeshOptions, type SteppedPyramidOptions } from '@seked/geometry';
 import { BufferAttribute, BufferGeometry } from 'three';
 
 /** Flat-shaded, because a pyramid's faces are flat and share their base ring. */
@@ -21,6 +21,16 @@ export function meshGeometry(mesh: Mesh): BufferGeometry {
 
 export function pyramidGeometry(options: PyramidMeshOptions): BufferGeometry {
   return meshGeometry(pyramidMesh(options));
+}
+
+/**
+ * The pyramid as it stands, one square slab per course. Flat-shaded like the
+ * smooth pyramid, and for the same reason: every wall and every step's ledge
+ * is a flat face, and smoothing the normals across a step would round off the
+ * only thing this mesh is here to show.
+ */
+export function steppedPyramidGeometry(options: SteppedPyramidOptions): BufferGeometry {
+  return meshGeometry(steppedPyramidMesh(options));
 }
 
 /**

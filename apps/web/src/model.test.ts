@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
-import { SPHINX_MASSING_LABEL, buildModel, massingParams, type Model } from './model';
+import { SPHINX_MASSING_LABEL, buildModel, massingParams, pyramidParams, type Model, type PyramidParams } from './model';
 
 /**
  * The epoch override is the cubit slider's move applied to time, and the
@@ -36,6 +36,36 @@ describe('the epoch override', () => {
   it('records which epoch it used, so the panel can say so', () => {
     expect(buildModel(bundle, 'canonical', null, null).epochOverride).toBeNull();
     expect(buildModel(bundle, 'canonical', null, -9000).epochOverride).toBe(-9000);
+  });
+});
+
+describe('the pyramid as it stands', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const g1 = model.pyramids.find((p) => p.id === 'g1') as PyramidParams;
+  const courses = g1.courses as number[];
+
+  it("carries the Great Pyramid's courses, bottom up, and none for the other two", () => {
+    expect(courses).toHaveLength(201);
+    // Goyon's thickest course is his first, and it is the one at the bottom.
+    expect(courses[0]).toBe(1.5);
+    expect(Math.max(...courses)).toBe(courses[0]);
+    expect(model.pyramids.find((p) => p.id === 'g2')?.courses).toBeUndefined();
+    expect(model.pyramids.find((p) => p.id === 'g3')?.courses).toBeUndefined();
+  });
+
+  it('stands within a centimetre of the height the database tabulates on its own', () => {
+    // Two sources that were never compared until they were both in here:
+    // Goyon's 201 courses add up to 138.745 m and Lehner tabulates the
+    // surviving height as 138.75 m, five millimetres apart.
+    const top = courses.reduce((sum, h) => sum + h, 0);
+    expect(top).toBeCloseTo(138.745, 6);
+    expect(Math.abs(top - (g1.heightToday as number))).toBeLessThan(0.01);
+  });
+
+  it('is left undefined rather than empty for a preset with no courses at all', () => {
+    const bare = pyramidParams({ 'g1.base.side.mean': 230.33, 'g1.height.original': 146.59 }, 'g1');
+    expect(bare?.courses).toBeUndefined();
+    expect(bare?.heightToday).toBeUndefined();
   });
 });
 
