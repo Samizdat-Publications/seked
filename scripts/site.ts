@@ -24,13 +24,13 @@ interface Row { id: string; file: string; alt: string; date: string; caption: st
 const rows: Row[] = [];
 for (const line of readFileSync(join(progressDir, 'README.md'), 'utf8').split(/\r?\n/)) {
   const m = /^\|\s*(\d{4})\s*\|\s*!\[([^\]]*)\]\(([^)]+)\)\s*\|\s*([^|]+?)\s*\|\s*(.+?)\s*\|$/.exec(line);
-  if (m) rows.push({ id: m[1] as string, alt: m[2] as string, file: m[3] as string, date: m[4] as string, caption: m[5] as string });
+  if (m && /^[\w.-]+\.png$/.test(m[3] as string)) rows.push({ id: m[1] as string, alt: m[2] as string, file: m[3] as string, date: m[4] as string, caption: m[5] as string });
 }
-const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const cards = rows.map((r) => `
       <figure>
-        <a href="${r.file}"><img src="${r.file}" alt="${escape(r.alt)}" loading="lazy"></a>
-        <figcaption><strong>${r.id}</strong> <time>${escape(r.date)}</time><br>${escape(r.caption)}</figcaption>
+        <a href="${escape(r.file)}"><img src="${escape(r.file)}" alt="${escape(r.alt)}" loading="lazy"></a>
+        <figcaption><strong>${escape(r.id)}</strong> <time>${escape(r.date)}</time><br>${escape(r.caption)}</figcaption>
       </figure>`).join('\n');
 writeFileSync(join(outProgress, 'index.html'), `<!doctype html>
 <html lang="en">
