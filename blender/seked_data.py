@@ -81,23 +81,28 @@ def pyramid_params(values, structure):
     }
 
 
-def course_heights(values, structure):
+def course_keys(values, structure):
     """
-    The course heights a preset carries for one structure, bottom up, in
-    metres. Mirrors courseHeights in packages/geometry: the keys are
-    `<id>.course.<n>.height` and they are read in numeric order rather than in
-    whatever order the resolver put them in.
+    The `<id>.course.<n>.height` keys a preset carries for one structure, in
+    course order rather than in whatever order the resolver put them in. The
+    generator asks for these so it can stamp the courses' source on the object
+    it stacks from them.
     """
     prefix, suffix = f"{structure}.course.", ".height"
     numbered = []
-    for key, value in values.items():
+    for key in values:
         if not key.startswith(prefix) or not key.endswith(suffix):
             continue
         middle = key[len(prefix):-len(suffix)]
         if middle.isdigit():
-            numbered.append((int(middle), value))
+            numbered.append((int(middle), key))
     numbered.sort()
-    return [height for _, height in numbered]
+    return [key for _, key in numbered]
+
+
+def course_heights(values, structure):
+    """Those courses' heights, bottom up, in metres. Mirrors courseHeights in packages/geometry."""
+    return [values[key] for key in course_keys(values, structure)]
 
 
 def _ring(half, indent, z):
