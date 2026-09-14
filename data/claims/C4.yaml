@@ -32,7 +32,7 @@ overlay:
     ground: [g1, g2, g3]
 sources:
   for: [bauval-gilbert-1994, hancock-1995, hancock-bauval-1996]
-  against: [krupp-1997]
+  against: [krupp-1997, fairall-1999]
   context: [vondrak-2011]
 notes: >-
   Both comparisons are unsigned, because the claim is about shape rather

@@ -144,6 +144,13 @@
     "note": "The seked explanation of the π and φ ratios."
   },
   {
+    "id": "fairall-1999",
+    "kind": "critique",
+    "year": 1999,
+    "citation": "Fairall, A. (1999). Precession and the layout of the ancient Egyptian pyramids. Astronomy & Geophysics 40(4), 4.4.",
+    "note": "Computes the belt's angle to the meridian at about 10,500 BCE as roughly 50° against the pyramids' 38°, so the layout would match nearer 12,000 BCE. Claim C4 reproduces this; the figures are to be checked against the article."
+  },
+  {
     "id": "krupp-1997",
     "kind": "critique",
     "year": 1997,

@@ -406,7 +406,7 @@ Residual by survey preset:
 
 **Context:** Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
 
-**Critiques:** Krupp, E. C. (1997). Pyramid Marketing Schemes. Sky & Telescope, February 1997, 64–65.
+**Critiques:** Krupp, E. C. (1997). Pyramid Marketing Schemes. Sky & Telescope, February 1997, 64–65. · Fairall, A. (1999). Precession and the layout of the ancient Egyptian pyramids. Astronomy & Geophysics 40(4), 4.4.
 
 Both comparisons are unsigned, because the claim is about shape rather than handedness. The sky is taken as seen looking south, with the belt laid on a tangent plane about Alnilam (x = Δra × cos dec, y = Δdec, both in degrees), which is accurate to a few arcminutes over the belt's 2.7°. On the ground the diagonal is Petrie's G1 to G3 centre offsets, measured from the meridian, and Menkaure's offset is his perpendicular distance from the G1 to G2 line divided by the length of that line, so both offsets are scale free. Krupp's objection, that laying the sky on the plateau requires swapping north for south, is recorded here as a free choice and is not modelled: nothing below tests it. Tolerance is 5 %, nearly 2° on a 38° diagonal, a band far looser than any surveyor would accept, chosen so the claim is judged as the visual match it is asserted to be rather than as a survey. Long-term precession (Vondrák 2011) is what makes the epoch meaningful at all; the IAU 2006 model is wrong by degrees at −10449, and the belt's angle sweeps roughly a degree a century, so a claim tied to an epoch is a claim tied to that free choice.
 
