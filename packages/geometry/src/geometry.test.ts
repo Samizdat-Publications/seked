@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatDms } from '@seked/units';
-import { buildEnvironment, frustumVolume, meshVolume, pyramidLandmarks, pyramidMesh, squarePyramid } from './index';
+import { buildEnvironment, frustumVolume, meshVolume, pyramidLandmarks, pyramidMesh, recordsBehind, squarePyramid } from './index';
 
 const G1 = { base: 230.33, height: 146.59 };
 
@@ -66,6 +66,24 @@ describe('environment', () => {
     const env = buildEnvironment({ 'g1.base.socket.north': 1, 'g1.base.socket.east': 2, 'g1.base.socket.south': 3, 'g1.base.socket.west': 4 });
     expect(env['g1.base.socket.mean']).toBe(2.5);
     expect(env['g1.base.socket.perimeter']).toBe(10);
+  });
+  it('names the records behind each derived key, and nothing behind a record or a computed sky key', () => {
+    const measured = { 'g1.base.side.mean': 230.33, 'g1.height.original': 146.59 };
+    expect(recordsBehind('g1.base.perimeter', measured)).toEqual(['g1.base.side.mean']);
+    expect(recordsBehind('g1.height.squared', measured)).toEqual(['g1.height.original']);
+    expect(recordsBehind('g2.apothem', measured)).toEqual(['g2.base.side.mean', 'g2.height.original']);
+    expect(recordsBehind('g1.base.side.mean', measured)).toEqual([]);
+    expect(recordsBehind('star.alnitak.transit.altitude', measured)).toEqual([]);
+    // Whether the socket mean is a record or a mean of four sides depends on the preset.
+    expect(recordsBehind('g1.base.socket.perimeter', { 'g1.base.socket.mean': 231 })).toEqual(['g1.base.socket.mean']);
+    expect(recordsBehind('g1.base.socket.perimeter', { 'g1.base.socket.north': 1 })).toEqual(
+      ['g1.base.socket.north', 'g1.base.socket.east', 'g1.base.socket.south', 'g1.base.socket.west'],
+    );
+    // A surveyed offset is a record; a converted one names the coordinates and the radius it came from.
+    expect(recordsBehind('g2.centre.offset.west', { 'g2.centre.offset.west': 13.2 })).toEqual([]);
+    expect(recordsBehind('sphinx.centre.offset.east', {})).toEqual([
+      'sphinx.center.latitude', 'sphinx.center.longitude', 'g1.center.latitude', 'g1.center.longitude', 'earth.radius.mean',
+    ]);
   });
 });
 

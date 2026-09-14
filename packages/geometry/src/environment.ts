@@ -96,3 +96,47 @@ export function buildEnvironment(measured: Record<string, number>): Environment 
 
   return env;
 }
+
+/** What each derived quantity of a structure is computed from, by the suffix after its id. */
+const PROFILE_INPUTS: Record<string, readonly string[]> = {
+  'base.half': ['base.side.mean'],
+  'base.perimeter': ['base.side.mean'],
+  'base.area': ['base.side.mean'],
+  'height.squared': ['height.original'],
+  apothem: ['base.side.mean', 'height.original'],
+  'face.angle.derived': ['base.side.mean', 'height.original'],
+  'arris.length': ['base.side.mean', 'height.original'],
+  'arris.angle': ['base.side.mean', 'height.original'],
+  volume: ['base.side.mean', 'height.original'],
+  'face.area': ['base.side.mean', 'height.original'],
+  'lateral.area': ['base.side.mean', 'height.original'],
+};
+
+/**
+ * The measurement keys a derived key was computed from, so a document that
+ * lists a claim's inputs can list the records behind `g1.base.perimeter`
+ * rather than skip it. A key that is itself a record, or that nothing here
+ * derives, gets an empty list; `measured` says which keys are records, and
+ * is needed because `g1.base.socket.mean` is a record under one preset and
+ * a mean of four sides under another, and a centre offset is a survey under
+ * one and a conversion of a coordinate under another.
+ */
+export function recordsBehind(key: string, measured: Record<string, number>): string[] {
+  if (key in measured) return [];
+  const profile = /^(g[123])\.(.+)$/.exec(key);
+  if (profile) {
+    const [, structure, suffix] = profile as unknown as [string, string, string];
+    const inputs = PROFILE_INPUTS[suffix];
+    if (inputs) return inputs.map((s) => `${structure}.${s}`);
+  }
+  if (key === 'g1.base.socket.mean') return ['north', 'east', 'south', 'west'].map((d) => `g1.base.socket.${d}`);
+  if (key === 'g1.base.socket.perimeter') {
+    return 'g1.base.socket.mean' in measured ? ['g1.base.socket.mean'] : recordsBehind('g1.base.socket.mean', measured);
+  }
+  const offset = /^(.+)\.centre\.offset\.(east|north)$/.exec(key);
+  if (offset) {
+    const structure = offset[1] as string;
+    return [`${structure}.center.latitude`, `${structure}.center.longitude`, 'g1.center.latitude', 'g1.center.longitude', 'earth.radius.mean'];
+  }
+  return [];
+}

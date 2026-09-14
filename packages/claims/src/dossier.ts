@@ -1,6 +1,6 @@
 import type { Database } from '@seked/data/browser';
 import { resolve, sourceById } from '@seked/data/browser';
-import { buildEnvironment } from '@seked/geometry';
+import { buildEnvironment, recordsBehind } from '@seked/geometry';
 import { formatArcminutes, formatArcseconds, formatDms } from '@seked/units';
 import { comparisonSize, evaluateClaim, type ClaimResult, type ComparisonResult } from './evaluate';
 import { GROUPS, type Claim, type Group } from './schema';
@@ -143,13 +143,20 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
   out.push('## Inputs', '');
   out.push(`Values resolved under the **${presetId}** preset (${db.presets.find((p) => p.id === presetId)?.label}). Unverified records were entered from memory or secondary sources and still need checking against the cited page.`, '');
   const resolved = resolve(db, presetId);
+  // Every identifier a comparison names, and behind each derived one the
+  // records it was computed from, so a claim about the perimeter lists the
+  // side it came from. Sky and landmark keys are computed from the catalogue
+  // and the geometry rather than from a record, and have nothing to list.
   const used = new Set<string>();
-  for (const c of claims) for (const cr of c.comparisons) for (const id of identifiersOf(cr)) used.add(id);
+  for (const c of claims) for (const cr of c.comparisons) for (const id of identifiersOf(cr)) {
+    used.add(id);
+    for (const behind of recordsBehind(id, resolved.values)) used.add(behind);
+  }
   out.push('| Key | Value | Unit | Source | Method | Verified |');
   out.push('|---|---:|---|---|---|:---:|');
   for (const key of [...used].sort()) {
     const m = resolved.records.get(key);
-    if (!m) continue; // derived
+    if (!m) continue; // computed, not recorded
     out.push(`| ${key} | ${m.value} | ${m.unit} | ${m.source} | ${m.method ?? ''} | ${m.verified ? 'yes' : 'no'} |`);
   }
   out.push('');
