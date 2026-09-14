@@ -3,7 +3,9 @@
  * descending passage's ray, the compass rose, the Orion projection, the
  * bearings taken along the plateau, the base lines drawn on it, Legon's
  * rectangle over the three pyramids, the corner line carried off the plateau
- * towards Heliopolis and the King's Chamber as a wireframe.
+ * towards Heliopolis, the King's Chamber as a wireframe, the Earth shrunk by
+ * 43,200 and stood on the base centre, and the parallels of latitude laid
+ * across the base.
  *
  * Every one of them is drawn from a spec built in ../overlays.ts out of the
  * claim file's own params, so nothing here knows which claim it is serving.

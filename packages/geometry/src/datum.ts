@@ -117,9 +117,9 @@ export function wgs84Ellipsoid(env: Environment): Ellipsoid | undefined {
  * survey of the plateau ran on.
  *
  * EPSG 1148 publishes the translation in the other direction, from Egypt 1907
- * to WGS84, so the way back subtracts it. Returns nothing when the preset in
- * force carries none of the records, which is a preset that cannot answer the
- * question rather than an error.
+ * to WGS84, so the way back subtracts it. Returns nothing when any of the
+ * records is missing, which is a preset that cannot answer the question
+ * rather than an error.
  */
 export function egypt1907FromWgs84(env: Environment, point: GeodeticPoint): GeodeticPoint | undefined {
   const wgs84 = wgs84Ellipsoid(env);

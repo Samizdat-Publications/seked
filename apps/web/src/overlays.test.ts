@@ -14,8 +14,8 @@ import {
   groundRectangleSpec,
   mapInsetSpec,
   overlaySpec,
-  passageRaySpec,
   PANEL_ONLY,
+  passageRaySpec,
   shaftRaysSpec,
   skyProjectionSpec,
   type OverlayContext,
@@ -465,7 +465,8 @@ describe('every overlay a claim declares is built', () => {
   it('leaves unbuilt only the type that says there is no picture', () => {
     const types = declared.map((c) => c.overlay?.type as string);
     expect([...new Set(types.filter((t) => !BUILT_OVERLAYS.has(t)))]).toEqual([PANEL_ONLY]);
-    // And that type is still a claim's own word for it, not an omission.
-    expect(types.filter((t) => t === PANEL_ONLY)).toHaveLength(3);
+    // The three that declare it are each arithmetic on two numbers, which is
+    // a claim with nothing in the scene rather than an overlay left undone.
+    expect(declared.filter((c) => c.overlay?.type === PANEL_ONLY).map((c) => c.id)).toEqual(['A5', 'B2', 'B5']);
   });
 });
