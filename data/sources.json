@@ -244,5 +244,14 @@
     "citation": "NASA/JPL/University of Arizona. HiRISE images and digital terrain models of Cydonia Mensae (2007 onward).",
     "url": "https://www.uahirise.org/",
     "license": "Public domain (NASA)"
+  },
+  {
+    "id": "copernicus-glo30",
+    "kind": "reference",
+    "year": 2020,
+    "citation": "Copernicus DEM GLO-30: global 30 m digital surface model, instance COP-DEM-GLO-30-F. European Space Agency and Airbus Defence and Space. Tiles Copernicus_DSM_COG_10_N29_00_E031_00_DEM and Copernicus_DSM_COG_10_N30_00_E031_00_DEM, edition of 2020-11-11.",
+    "url": "https://copernicus-dem-30m.s3.amazonaws.com/",
+    "license": "Free, full and open licence for the Copernicus WorldDEM-30 (the eula_F.pdf beside each tile, under INFO/). Attribution required by Article 6(a): © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. Article 6(b) asks derived products, such as this repository's resampled window, to carry: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved.",
+    "note": "One arc-second grid, pixel-is-point, heights orthometric on EGM2008. The bucket has no LICENSE or README object next to the tile, so the licence text above was read from INFO/eula_F.pdf in the tile's own prefix. The tiles are gitignored; data/terrain/giza-glo30.json and .f32 are the 6 km window around the origin cut by scripts/terrain.py. The monuments are edited in the product: AUXFILES/*_EDM.tif marks their footprints with value 2, and the Great Pyramid comes through as a mound peaking near 94 m."
   }
 ]
