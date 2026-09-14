@@ -98,6 +98,18 @@ describe('the calendar date back out of a Julian Day', () => {
       expect(julianDay(year, month, day), `JD ${jd}`).toBe(jd);
     }
   });
+
+  it('round trips a year of negative Julian Days, which Meeus warns his own method will not', () => {
+    // His warning is about an INT that truncates towards zero. Every integer
+    // part here is a floor, and 10,500 BCE is two million days before the zero
+    // of the count, so the difference is the whole of whether this works.
+    const start = julianDay(-10499, 1, 1.0);
+    expect(start).toBeLessThan(0);
+    for (let jd = start; jd < start + 365; jd += 1) {
+      const { year, month, day } = calendarDate(jd);
+      expect(julianDay(year, month, day), `JD ${jd}`).toBe(jd);
+    }
+  });
 });
 
 describe('the Julian epoch the rest of the package counts in', () => {
