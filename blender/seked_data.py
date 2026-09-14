@@ -591,9 +591,183 @@ INTERIOR_BUILDERS = [
 ]
 
 
-def interior_solids(values):
+# --- Structures whose plan is discovered from their records ----------------
+# Mirrors the second half of packages/geometry/src/interiors.ts. G1's rooms are
+# written out above because Petrie stores each of them differently; every other
+# structure carries its id on the front of every key and is read rather than
+# written, so entering Khafre's or Menkaure's records is enough to make their
+# interiors appear. The shapes looked for under "<id>." are:
+#
+#   passage.<name>.floor.begin.{north,east,up}   floor centre line
+#   passage.<name>.floor.end.{north,east,up}
+#   passage.<name>.{width,height}                rectangular section
+#   passage.<name>.angle                         optional, provenance only
+#
+#   chamber.<name>.wall.{north,south}.north      wall positions
+#   chamber.<name>.wall.{east,west}.east
+#   chamber.<name>.{floor,ceiling}.up            levels
+#   chamber.<name>.gable.height                  optional pitched roof
+#
+# A north coordinate may instead be given as "<point>.from_north_base", a
+# distance south of the north base edge, converted here with the half-base. A
+# passage with no floor.begin of its own starts at the structure's entrance.
+# Anything incomplete is skipped.
+
+INTERIOR_STRUCTURES = ("g1", "g2", "g3")
+
+# A passage shorter than this is a rounding artefact, not a passage.
+_MIN_RUN = 1e-6
+
+
+def interior_key_prefix(structure):
+    """G1's interior records are unprefixed; every other structure's carry its id."""
+    return "" if structure == "g1" else structure + "."
+
+
+def _number_at(values, key):
+    v = values.get(key)
+    if v is None or isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+        return None
+    return float(v)
+
+
+def _coordinate(values, base, axis, half):
     """
-    The Great Pyramid's interior as named solids, built from resolved values.
+    One coordinate of a stored point, with the record it came from.
+
+    "<base>.north" is the frame coordinate; "<base>.from_north_base" is the
+    same point as a distance south of the north base edge, so it needs the
+    half-base to convert. There is no such alternative for east or up.
+    """
+    key = base + "." + axis
+    direct = _number_at(values, key)
+    if direct is not None:
+        return (direct, key)
+    if axis != "north" or half is None:
+        return None
+    from_base = base + ".from_north_base"
+    south = _number_at(values, from_base)
+    return None if south is None else (half - south, from_base)
+
+
+def _stored_point(values, base, half):
+    """A stored point as (east, north, up), with its records in north, east, up order."""
+    north = _coordinate(values, base, "north", half)
+    east = _coordinate(values, base, "east", half)
+    up = _coordinate(values, base, "up", half)
+    if north is None or east is None or up is None:
+        return None
+    return ((east[0], north[0], up[0]), [north[1], east[1], up[1]])
+
+
+def _member_names(values, prefix, kind):
+    """Every <name> under "<prefix><kind>.", sorted, so the plan comes out of the data."""
+    head = prefix + kind + "."
+    found = set()
+    for key in values:
+        if not key.startswith(head):
+            continue
+        rest = key[len(head):]
+        dot = rest.find(".")
+        if dot > 0:
+            found.add(rest[:dot])
+    return sorted(found)
+
+
+def _half_base(values, structure):
+    """
+    Half the base, which from_north_base is converted with. buildEnvironment
+    derives it on the TypeScript side; here the measured side stands in, since
+    the generator resolves the database without that step.
+    """
+    half = _number_at(values, structure + ".base.half")
+    if half is not None:
+        return half
+    base = _number_at(values, structure + ".base.side.mean")
+    return None if base is None else base / 2.0
+
+
+def _entrance_begin(values, prefix, name, half):
+    """Where a passage begins when it records no floor.begin of its own."""
+    named = _stored_point(values, prefix + "entrance." + name + ".floor.begin", half)
+    if named is not None:
+        return named
+    if name == "descending":
+        return _stored_point(values, prefix + "entrance.floor.begin", half)
+    return None
+
+
+def _passage_builder(values, prefix, name, half):
+    base = prefix + "passage." + name
+    begin = _stored_point(values, base + ".floor.begin", half)
+    if begin is None:
+        begin = _entrance_begin(values, prefix, name, half)
+    end = _stored_point(values, base + ".floor.end", half)
+    width = _number_at(values, base + ".width")
+    height = _number_at(values, base + ".height")
+    if begin is None or end is None or width is None or height is None or width <= 0 or height <= 0:
+        return None
+    start, start_keys = begin
+    finish, finish_keys = end
+    if math.sqrt(sum((finish[i] - start[i]) ** 2 for i in range(3))) < _MIN_RUN:
+        return None
+    keys = start_keys + finish_keys + [base + ".width", base + ".height"]
+    # The recorded slope is not needed to build a passage whose two ends are
+    # known, but it is part of the provenance when the database carries it.
+    if _number_at(values, base + ".angle") is not None:
+        keys.append(base + ".angle")
+    return (base, keys, lambda v: passage(start, finish, width, height))
+
+
+def _chamber_builder(values, prefix, name, half):
+    base = prefix + "chamber." + name
+    north = _coordinate(values, base + ".wall.north", "north", half)
+    south = _coordinate(values, base + ".wall.south", "north", half)
+    east = _coordinate(values, base + ".wall.east", "east", half)
+    west = _coordinate(values, base + ".wall.west", "east", half)
+    floor = _coordinate(values, base + ".floor", "up", half)
+    ceiling = _coordinate(values, base + ".ceiling", "up", half)
+    if north is None or south is None or east is None or west is None or floor is None or ceiling is None:
+        return None
+    mn, mx = _box((west[0], south[0], floor[0]), (east[0], north[0], ceiling[0]))
+    span = (mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2])
+    if span[0] <= 0 or span[1] <= 0 or span[2] <= 0:
+        return None
+    keys = [north[1], south[1], east[1], west[1], floor[1], ceiling[1]]
+    # A gable is optional, and only a ridge above the wall tops is one: it runs
+    # along the chamber's longer horizontal axis, which is how every gabled
+    # chamber at Giza is roofed, G1's Queen's Chamber included.
+    ridge = _number_at(values, base + ".gable.height")
+    gable = None
+    if ridge is not None and ridge > span[2]:
+        keys.append(base + ".gable.height")
+        gable = {"ridge_height": ridge, "axis": "x" if span[0] >= span[1] else "y"}
+    return (base, keys, lambda v: chamber(mn, mx, gable))
+
+
+def _discover_builders(values, structure):
+    """Passages first and then chambers, each group in name order."""
+    prefix = interior_key_prefix(structure)
+    half = _half_base(values, structure)
+    out = []
+    for name in _member_names(values, prefix, "passage"):
+        built = _passage_builder(values, prefix, name, half)
+        if built is not None:
+            out.append(built)
+    for name in _member_names(values, prefix, "chamber"):
+        built = _chamber_builder(values, prefix, name, half)
+        if built is not None:
+            out.append(built)
+    return out
+
+
+def _builders_for(values, structure):
+    return INTERIOR_BUILDERS if structure == "g1" else _discover_builders(values, structure)
+
+
+def interior_solids(values, structure="g1"):
+    """
+    One structure's interior as named solids, built from resolved values.
 
     Returns a list of {"name", "keys", "verts", "faces", "volume"} in the same
     order as interiorSolids in packages/geometry, skipping any solid whose
@@ -601,7 +775,7 @@ def interior_solids(values):
     better than an invented one.
     """
     out = []
-    for name, keys, build in INTERIOR_BUILDERS:
+    for name, keys, build in _builders_for(values, structure):
         if any(values.get(k) is None for k in keys):
             continue
         verts, faces = build(values)
@@ -609,6 +783,13 @@ def interior_solids(values):
                     "verts": [list(v) for v in verts], "faces": [list(f) for f in faces],
                     "volume": polyhedron_volume(verts, faces)})
     return out
+
+
+def interior_structures(values, ids=INTERIOR_STRUCTURES):
+    """Which of `ids` the resolved values carry an interior for, in the order given."""
+    return [i for i in ids
+            if any(all(values.get(k) is not None for k in keys)
+                   for _, keys, _ in _builders_for(values, i))]
 
 
 def load_sites(data_dir=DATA_DIR):
@@ -627,6 +808,46 @@ def site_origin_elevation(site_id="giza", data_dir=DATA_DIR):
 if __name__ == "__main__" and "--interior" in sys.argv:
     # Appended, like the terrain block, so this file only ever grows. The block
     # above has already printed the resolved values, so the interior JSON is the
-    # last line.
+    # last line. One entry per structure the preset carries an interior for.
     _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
-    print(json.dumps(interior_solids(resolve(load_database(), _preset)["values"])))
+    _values = resolve(load_database(), _preset)["values"]
+    print(json.dumps({_s: interior_solids(_values, _s) for _s in interior_structures(_values)}))
+
+
+# --- A discovered interior, for the parity test in packages/data ------------
+# The pyramid below is invented and its numbers are round. It is here so the
+# discovery above can be compared with the TypeScript one before any real
+# records for G2 or G3 exist; it reads nothing from data/ and is not a
+# measurement of anything.
+
+INTERIOR_DISCOVERY_CASE = {
+    "g2.base.half": 100.0,
+    "g2.entrance.floor.begin.from_north_base": 20.0,
+    "g2.entrance.floor.begin.east": 5.0,
+    "g2.entrance.floor.begin.up": 30.0,
+    "g2.passage.descending.floor.end.north": 0.0,
+    "g2.passage.descending.floor.end.east": 5.0,
+    "g2.passage.descending.floor.end.up": 0.0,
+    "g2.passage.descending.width": 1.0,
+    "g2.passage.descending.height": 2.0,
+    "g2.passage.descending.angle": 20.556,
+    "g2.passage.horizontal.floor.begin.north": 0.0,
+    "g2.passage.horizontal.floor.begin.east": 5.0,
+    "g2.passage.horizontal.floor.begin.up": 0.0,
+    "g2.passage.horizontal.floor.end.north": -20.0,
+    "g2.passage.horizontal.floor.end.east": 5.0,
+    "g2.passage.horizontal.floor.end.up": 0.0,
+    "g2.passage.horizontal.width": 1.0,
+    "g2.passage.horizontal.height": 2.0,
+    "g2.chamber.burial.wall.north.north": -20.0,
+    "g2.chamber.burial.wall.south.north": -26.0,
+    "g2.chamber.burial.wall.east.east": 11.0,
+    "g2.chamber.burial.wall.west.east": -1.0,
+    "g2.chamber.burial.floor.up": 0.0,
+    "g2.chamber.burial.ceiling.up": 5.0,
+    "g2.chamber.burial.gable.height": 8.0,
+}
+
+if __name__ == "__main__" and "--interior-case" in sys.argv:
+    # Appended, so the file only ever grows; this is the last line printed.
+    print(json.dumps(interior_solids(INTERIOR_DISCOVERY_CASE, "g2")))

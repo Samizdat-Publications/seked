@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildEnvironment, chamber, extrudedSection, interiorSolids, meshVolume, passage, pyramidMesh } from '@seked/geometry';
+import { buildEnvironment, chamber, extrudedSection, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh } from '@seked/geometry';
 import type { Point, SectionPair, Solid } from '@seked/geometry';
 import { loadDatabase, REPO_ROOT, resolve } from './index';
 
@@ -134,33 +134,98 @@ describe.skipIf(!py)('blender/seked_data.py builds the same interior solids as @
 
 interface PyInterior { name: string; keys: string[]; verts: [number, number, number][]; faces: number[][]; volume: number }
 
-describe.skipIf(!py)("blender/seked_data.py builds the same G1 interior as @seked/geometry", () => {
-  const db = loadDatabase();
-  const ours = interiorSolids(buildEnvironment(resolve(db, 'canonical').values));
-  // seked_data.py is append-only, so its first CLI block prints the resolved
-  // values and the interior JSON is the last line.
-  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--interior'], { encoding: 'utf8' });
+/** The last line of an append-only CLI run, the earlier blocks having printed first. */
+function lastLine(out: string): string {
   const lines = out.trim().split(/\r?\n/);
-  const theirs = JSON.parse(lines[lines.length - 1] as string) as PyInterior[];
+  return lines[lines.length - 1] as string;
+}
 
-  it('builds the same solids in the same order', () => {
-    expect(theirs.map((s) => s.name)).toEqual(Object.keys(ours));
-    expect(theirs.length).toBeGreaterThanOrEqual(10);
+/** Compare one structure's solids vertex by vertex against the Python build of it. */
+function expectSameSolids(theirs: PyInterior[], ours: Record<string, Solid>): void {
+  expect(theirs.map((s) => s.name)).toEqual(Object.keys(ours));
+  for (const solid of theirs) {
+    const mine = ours[solid.name];
+    if (!mine) throw new Error(`@seked/geometry skipped ${solid.name}`);
+    expect(solid.verts.length, `${solid.name} vertex count`).toBe(mine.vertexCount);
+    for (let i = 0; i < solid.verts.length; i++) {
+      for (let axis = 0; axis < 3; axis++) {
+        // Our positions are float32, so metres agree to well under a millimetre.
+        expect(mine.positions[i * 3 + axis], `${solid.name} vertex ${i} axis ${axis}`).toBeCloseTo((solid.verts[i] as number[])[axis] as number, 3);
+      }
+    }
+    const oursVolume = meshVolume(mine);
+    expect(Math.abs(oursVolume - solid.volume) / solid.volume, `${solid.name} volume`).toBeLessThan(1e-5);
+  }
+}
+
+describe.skipIf(!py)('blender/seked_data.py builds the same interiors as @seked/geometry', () => {
+  const db = loadDatabase();
+  const env = buildEnvironment(resolve(db, 'canonical').values);
+  // seked_data.py is append-only, so its first CLI block prints the resolved
+  // values and the interior JSON is the last line. It holds one entry per
+  // structure the preset carries an interior for, so G2 and G3 join the
+  // comparison the moment their records are entered.
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--interior'], { encoding: 'utf8' });
+  const theirs = JSON.parse(lastLine(out)) as Record<string, PyInterior[]>;
+
+  it('covers the same structures', () => {
+    expect(Object.keys(theirs)).toEqual(interiorStructures(env));
+    expect(Object.keys(theirs)).toContain('g1');
   });
 
-  for (const solid of theirs) {
-    it(`${solid.name}: every vertex and the enclosed volume agree`, () => {
-      const mine = ours[solid.name];
-      if (!mine) throw new Error(`@seked/geometry skipped ${solid.name}`);
-      expect(solid.verts.length, 'vertex count').toBe(mine.vertexCount);
-      for (let i = 0; i < solid.verts.length; i++) {
-        for (let axis = 0; axis < 3; axis++) {
-          // Our positions are float32, so metres agree to well under a millimetre.
-          expect(mine.positions[i * 3 + axis], `vertex ${i} axis ${axis}`).toBeCloseTo((solid.verts[i] as number[])[axis] as number, 3);
-        }
-      }
-      const oursVolume = meshVolume(mine);
-      expect(Math.abs(oursVolume - solid.volume) / solid.volume, 'volume').toBeLessThan(1e-5);
+  for (const [structure, solids] of Object.entries(theirs)) {
+    it(`${structure}: the same solids, in the same order, vertex for vertex`, () => {
+      if (structure === 'g1') expect(solids.length).toBeGreaterThanOrEqual(10);
+      expectSameSolids(solids, interiorSolids(env, { structure }));
     });
   }
+});
+
+/**
+ * The discovery path, on a pyramid that is not in the database at all. Its
+ * numbers are literal on both sides so the two readers can be compared before
+ * any real record for G2 or G3 exists; nothing here is a measurement.
+ */
+const DISCOVERY_CASE: Record<string, number> = {
+  'g2.base.half': 100,
+  'g2.entrance.floor.begin.from_north_base': 20,
+  'g2.entrance.floor.begin.east': 5,
+  'g2.entrance.floor.begin.up': 30,
+  'g2.passage.descending.floor.end.north': 0,
+  'g2.passage.descending.floor.end.east': 5,
+  'g2.passage.descending.floor.end.up': 0,
+  'g2.passage.descending.width': 1,
+  'g2.passage.descending.height': 2,
+  'g2.passage.descending.angle': 20.556,
+  'g2.passage.horizontal.floor.begin.north': 0,
+  'g2.passage.horizontal.floor.begin.east': 5,
+  'g2.passage.horizontal.floor.begin.up': 0,
+  'g2.passage.horizontal.floor.end.north': -20,
+  'g2.passage.horizontal.floor.end.east': 5,
+  'g2.passage.horizontal.floor.end.up': 0,
+  'g2.passage.horizontal.width': 1,
+  'g2.passage.horizontal.height': 2,
+  'g2.chamber.burial.wall.north.north': -20,
+  'g2.chamber.burial.wall.south.north': -26,
+  'g2.chamber.burial.wall.east.east': 11,
+  'g2.chamber.burial.wall.west.east': -1,
+  'g2.chamber.burial.floor.up': 0,
+  'g2.chamber.burial.ceiling.up': 5,
+  'g2.chamber.burial.gable.height': 8,
+};
+
+describe.skipIf(!py)('blender/seked_data.py discovers a prefixed interior the same way', () => {
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--interior-case'], { encoding: 'utf8' });
+  const theirs = JSON.parse(lastLine(out)) as PyInterior[];
+  const ours = interiorSolids(DISCOVERY_CASE, { structure: 'g2' });
+
+  it('finds the same solids and names the same records for each', () => {
+    expect(theirs.map((s) => s.name)).toEqual(['g2.passage.descending', 'g2.passage.horizontal', 'g2.chamber.burial']);
+    const inputs = interiorSolidInputs(DISCOVERY_CASE, { structure: 'g2' });
+    for (const solid of theirs) expect(solid.keys, `${solid.name} records`).toEqual(inputs[solid.name]);
+  });
+
+  it('builds them vertex for vertex', () => {
+    expectSameSolids(theirs, ours);
+  });
 });

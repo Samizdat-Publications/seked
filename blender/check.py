@@ -24,10 +24,12 @@ if HERE not in sys.path:
 
 import bpy  # noqa: E402  (only available inside Blender)
 
-from seked_data import interior_solids, load_database, load_terrain, resolve  # noqa: E402
+from seked_data import interior_solids, interior_structures, load_database, load_terrain, resolve  # noqa: E402
 
 ROOT_NAME = "Seked"
 INTERIOR_NAME = "Interior"
+# Same labels the generator uses, so the collection names can be recomputed here.
+STRUCTURE_LABELS = {"g1": "G1 Khufu", "g2": "G2 Khafre", "g3": "G3 Menkaure"}
 TERRAIN_NAME = "Terrain (GLO-30 context)"
 GROUND_NAME = "Terrain (ground)"
 CONCAVITY = "Concavity"
@@ -73,6 +75,13 @@ def read_gltf_json(path):
     return json.loads(raw[20:20 + length].decode("utf-8"))
 
 
+def interior_collection_name(structure):
+    """Mirrors blender/generate.py: the Great Pyramid's keeps the plain name."""
+    if structure == "g1":
+        return INTERIOR_NAME
+    return f"{INTERIOR_NAME} ({STRUCTURE_LABELS.get(structure, structure)})"
+
+
 def collection_tree(coll):
     """Every object under a collection and its children."""
     out = list(coll.objects)
@@ -104,17 +113,25 @@ def main():
     check(len(presets) == 1, f"one preset built the whole file: {presets}")
     preset = presets[0] if presets else "canonical"
 
-    interior = bpy.data.collections.get(INTERIOR_NAME)
-    if check(interior is not None and INTERIOR_NAME in [c.name for c in root.children],
-             f'"{INTERIOR_NAME}" is a child collection of "{ROOT_NAME}"'):
-        expected = [s["name"] for s in interior_solids(resolve(load_database(), preset)["values"])]
+    values = resolve(load_database(), preset)["values"]
+    structures = interior_structures(values)
+    check("g1" in structures, f"the database carries an interior for {structures or 'nothing'}")
+    for structure in structures:
+        name = interior_collection_name(structure)
+        interior = bpy.data.collections.get(name)
+        if not check(interior is not None and name in [c.name for c in root.children],
+                     f'"{name}" is a child collection of "{ROOT_NAME}"'):
+            continue
+        expected = [s["name"] for s in interior_solids(values, structure)]
         got = [o.name for o in interior.objects]
         check(sorted(got) == sorted(expected),
-              f"the interior holds the {len(expected)} solids the database builds: {sorted(expected)}")
+              f"{name} holds the {len(expected)} solids the database builds: {sorted(expected)}")
         empty = [o.name for o in interior.objects if len(o.data.polygons) == 0]
-        check(not empty, f"every interior solid has faces: {empty or 'none empty'}")
+        check(not empty, f"every solid in {name} has faces: {empty or 'none empty'}")
         sourceless = [o.name for o in interior.objects if not o.get("seked_sources")]
-        check(not sourceless, f"every interior solid names its sources: {sourceless or 'none missing'}")
+        check(not sourceless, f"every solid in {name} names its sources: {sourceless or 'none missing'}")
+        wrong = [o.name for o in interior.objects if o.get("seked_structure") != structure]
+        check(not wrong, f"every solid in {name} is stamped {structure}: {wrong or 'none wrong'}")
 
     terrain = bpy.data.objects.get(TERRAIN_NAME)
     if check(terrain is not None, f'"{TERRAIN_NAME}" is present'):

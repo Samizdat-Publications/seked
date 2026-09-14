@@ -1,5 +1,5 @@
 /**
- * The Great Pyramid's interior, wired to the measurement database.
+ * The pyramids' interiors, wired to the measurement database.
  *
  * `interior.ts` holds the shape builders and knows nothing but metres.
  * This file names the solids and says which records fix each one, so the
@@ -8,15 +8,45 @@
  * looked up in the resolved environment, and a solid whose records the preset
  * does not carry is skipped rather than guessed at.
  *
- * The frame is the project frame: origin at the base centre, +X east,
- * +Y north, +Z up, metres. A stored point is three records, `<point>.north`,
- * `.east` and `.up`, so `point()` puts them back in x, y, z order.
+ * The frame is the structure's own frame: origin at its base centre, +X east,
+ * +Y north, +Z up, metres. Placing an interior beside its pyramid is the
+ * caller's job and uses the same centre offsets, base elevation and
+ * orientation the pyramid object uses. A stored point is three records,
+ * `<point>.north`, `.east` and `.up`, so `point()` puts them back in x, y, z
+ * order.
+ *
+ * The Great Pyramid's records are unprefixed (`kc.*`, `qc.*`, `gg.*`,
+ * `passage.*`, `entrance.*`, `chamber.subterranean.*`, `antechamber.*`) and
+ * are read by the hand-written builders below, which name Petrie's rooms one
+ * by one because his survey stores each of them differently. Every other
+ * structure carries its id on the front of every key (`g2.entrance.floor
+ * .begin.north`, `g2.passage.descending.width`, `g2.chamber.burial.wall.north
+ * .north`) and is discovered from those keys instead: adding Khafre's or
+ * Menkaure's records is enough to make their interiors appear, and no code
+ * here knows what either plan looks like.
  */
 
 import type { Environment } from './environment';
 import { chamber, extrudedSection, passage } from './interior';
-import type { SectionPair, Solid } from './interior';
+import type { Gable, SectionPair, Solid } from './interior';
 import type { Point } from './landmarks';
+
+/** The structures whose interiors are looked for, when a caller names none. */
+export const INTERIOR_STRUCTURES = ['g1', 'g2', 'g3'] as const;
+
+export interface InteriorOptions {
+  /** Which structure's interior to build. The Great Pyramid is the default. */
+  structure?: string;
+}
+
+/**
+ * What a structure's interior records are prefixed with. The Great Pyramid's
+ * are unprefixed, being the ones Petrie's survey filled first; everything
+ * else carries its structure id, so `g2.chamber.burial.floor.up` is Khafre's.
+ */
+export function interiorKeyPrefix(structure: string): string {
+  return structure === 'g1' ? '' : `${structure}.`;
+}
 
 /** The records that fix one stored point. */
 function pointKeys(base: string): string[] {
@@ -245,20 +275,201 @@ const BUILDERS: readonly Builder[] = [
   },
 ];
 
-/** Every record each solid is built from, for provenance in the .blend and the GLB. */
+// --- Structures whose plan is discovered from their records ----------------
+//
+// A structure other than G1 is read rather than written out. Every key it owns
+// begins with its id, and two shapes are looked for under it:
+//
+//   <id>.passage.<name>.floor.begin.{north,east,up}   floor centre line
+//   <id>.passage.<name>.floor.end.{north,east,up}
+//   <id>.passage.<name>.{width,height}                rectangular section
+//   <id>.passage.<name>.angle                         optional, provenance only
+//
+//   <id>.chamber.<name>.wall.{north,south}.north      wall positions
+//   <id>.chamber.<name>.wall.{east,west}.east
+//   <id>.chamber.<name>.{floor,ceiling}.up            levels
+//   <id>.chamber.<name>.gable.height                  optional pitched roof
+//
+// A north coordinate may instead be recorded as a distance south of the north
+// base edge, `<point>.from_north_base`, which is how a survey that measured
+// from the casing states it; it is converted here with the structure's
+// half-base. A passage with no `floor.begin` of its own starts at the
+// structure's entrance, `<id>.entrance.<name>.floor.begin` if one is named for
+// it and `<id>.entrance.floor.begin` for the descending passage, which is how
+// G1's entrance passage is stored. Anything incomplete is skipped.
+
+/** A passage shorter than this is a rounding artefact, not a passage. */
+const MIN_RUN = 1e-6;
+
+/** A resolved coordinate and the record it actually came from. */
+interface Coordinate {
+  value: number;
+  key: string;
+}
+
+function numberAt(env: Environment, key: string): number | undefined {
+  const v = env[key];
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+}
+
+/**
+ * One coordinate of a stored point. `<base>.north` is the frame coordinate;
+ * `<base>.from_north_base` is the same point given as a distance south of the
+ * structure's north base edge, so it needs the half-base to convert. There is
+ * no such alternative for east or up.
+ */
+function coordinate(env: Environment, base: string, axis: 'north' | 'east' | 'up', half: number | undefined): Coordinate | undefined {
+  const key = `${base}.${axis}`;
+  const direct = numberAt(env, key);
+  if (direct !== undefined) return { value: direct, key };
+  if (axis !== 'north' || half === undefined) return undefined;
+  const fromBase = `${base}.from_north_base`;
+  const south = numberAt(env, fromBase);
+  return south === undefined ? undefined : { value: half - south, key: fromBase };
+}
+
+/** A stored point as x, y, z, with its records in the north, east, up order G1 uses. */
+function storedPoint(env: Environment, base: string, half: number | undefined): { point: Point; keys: string[] } | undefined {
+  const north = coordinate(env, base, 'north', half);
+  const east = coordinate(env, base, 'east', half);
+  const up = coordinate(env, base, 'up', half);
+  if (!north || !east || !up) return undefined;
+  return { point: [east.value, north.value, up.value], keys: [north.key, east.key, up.key] };
+}
+
+/** Every `<name>` present under `<prefix><kind>.`, sorted, so the plan comes out of the data. */
+function memberNames(env: Environment, prefix: string, kind: string): string[] {
+  const head = `${prefix}${kind}.`;
+  const found = new Set<string>();
+  for (const key of Object.keys(env)) {
+    if (!key.startsWith(head)) continue;
+    const rest = key.slice(head.length);
+    const dot = rest.indexOf('.');
+    if (dot > 0) found.add(rest.slice(0, dot));
+  }
+  return [...found].sort();
+}
+
+/** Where a passage begins when it records no floor.begin of its own. */
+function entranceBegin(env: Environment, prefix: string, name: string, half: number | undefined): { point: Point; keys: string[] } | undefined {
+  const named = storedPoint(env, `${prefix}entrance.${name}.floor.begin`, half);
+  if (named) return named;
+  return name === 'descending' ? storedPoint(env, `${prefix}entrance.floor.begin`, half) : undefined;
+}
+
+function passageBuilder(env: Environment, prefix: string, name: string, half: number | undefined): Builder | undefined {
+  const base = `${prefix}passage.${name}`;
+  const from = storedPoint(env, `${base}.floor.begin`, half) ?? entranceBegin(env, prefix, name, half);
+  const to = storedPoint(env, `${base}.floor.end`, half);
+  const width = numberAt(env, `${base}.width`);
+  const height = numberAt(env, `${base}.height`);
+  if (!from || !to || width === undefined || height === undefined || width <= 0 || height <= 0) return undefined;
+  const run = Math.hypot(to.point[0] - from.point[0], to.point[1] - from.point[1], to.point[2] - from.point[2]);
+  if (run < MIN_RUN) return undefined;
+
+  const keys = [...from.keys, ...to.keys, `${base}.width`, `${base}.height`];
+  // The recorded slope is not needed to build a passage whose two ends are
+  // known, but it is part of the provenance when the database carries it.
+  if (numberAt(env, `${base}.angle`) !== undefined) keys.push(`${base}.angle`);
+  return {
+    name: base,
+    keys,
+    build: () => passage({ from: from.point, to: to.point, width, height, prefix: base }),
+  };
+}
+
+function chamberBuilder(env: Environment, prefix: string, name: string, half: number | undefined): Builder | undefined {
+  const base = `${prefix}chamber.${name}`;
+  const north = coordinate(env, `${base}.wall.north`, 'north', half);
+  const south = coordinate(env, `${base}.wall.south`, 'north', half);
+  const east = coordinate(env, `${base}.wall.east`, 'east', half);
+  const west = coordinate(env, `${base}.wall.west`, 'east', half);
+  const floor = coordinate(env, `${base}.floor`, 'up', half);
+  const ceiling = coordinate(env, `${base}.ceiling`, 'up', half);
+  if (!north || !south || !east || !west || !floor || !ceiling) return undefined;
+
+  const { min, max } = box([west.value, south.value, floor.value], [east.value, north.value, ceiling.value]);
+  const span: Point = [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
+  if (span[0] <= 0 || span[1] <= 0 || span[2] <= 0) return undefined;
+
+  const keys = [north.key, south.key, east.key, west.key, floor.key, ceiling.key];
+  // A gable is optional, and only a ridge above the wall tops is one: the
+  // ridge runs along the chamber's longer horizontal axis, which is how every
+  // gabled chamber at Giza is roofed, G1's Queen's Chamber included.
+  const ridgeHeight = numberAt(env, `${base}.gable.height`);
+  let gable: Gable | undefined;
+  if (ridgeHeight !== undefined && ridgeHeight > span[2]) {
+    keys.push(`${base}.gable.height`);
+    gable = { ridgeHeight, axis: span[0] >= span[1] ? 'x' : 'y' };
+  }
+  return {
+    name: base,
+    keys,
+    build: () => (gable ? chamber({ min, max, gable, prefix: base }) : chamber({ min, max, prefix: base })),
+  };
+}
+
+/**
+ * Half the base, which `from_north_base` is converted with. `buildEnvironment`
+ * derives it, but the Blender generator resolves the database without that
+ * step, so the measured side stands in for it.
+ */
+function halfBase(env: Environment, structure: string): number | undefined {
+  const half = numberAt(env, `${structure}.base.half`);
+  if (half !== undefined) return half;
+  const base = numberAt(env, `${structure}.base.side.mean`);
+  return base === undefined ? undefined : base / 2;
+}
+
+/**
+ * The builders a structure's own records describe, passages first and then
+ * chambers, each group in name order so the list is the same on every run and
+ * in the Python mirror.
+ */
+function discover(env: Environment, structure: string): Builder[] {
+  const prefix = interiorKeyPrefix(structure);
+  const half = halfBase(env, structure);
+  const out: Builder[] = [];
+  for (const name of memberNames(env, prefix, 'passage')) {
+    const builder = passageBuilder(env, prefix, name, half);
+    if (builder) out.push(builder);
+  }
+  for (const name of memberNames(env, prefix, 'chamber')) {
+    const builder = chamberBuilder(env, prefix, name, half);
+    if (builder) out.push(builder);
+  }
+  return out;
+}
+
+function buildersFor(env: Environment, structure: string): readonly Builder[] {
+  return structure === 'g1' ? BUILDERS : discover(env, structure);
+}
+
+/** Every record each of the Great Pyramid's solids is built from, for provenance. */
 export const INTERIOR_SOLID_INPUTS: Record<string, readonly string[]> =
   Object.fromEntries(BUILDERS.map((b) => [b.name, b.keys]));
 
+/** The records behind each solid a structure's interior actually builds. */
+export function interiorSolidInputs(env: Environment, options: InteriorOptions = {}): Record<string, readonly string[]> {
+  return Object.fromEntries(buildersFor(env, options.structure ?? 'g1').map((b) => [b.name, b.keys]));
+}
+
 /**
- * The Great Pyramid's interior as named solids, in order from the entrance
- * down and then up. A solid whose records the environment does not carry is
- * left out: presets differ, and a missing room is better than an invented one.
+ * One structure's interior as named solids, in the Great Pyramid's case in
+ * order from the entrance down and then up. A solid whose records the
+ * environment does not carry is left out: presets differ, and a missing room
+ * is better than an invented one.
  */
-export function interiorSolids(env: Environment): Record<string, Solid> {
+export function interiorSolids(env: Environment, options: InteriorOptions = {}): Record<string, Solid> {
   const out: Record<string, Solid> = {};
-  for (const builder of BUILDERS) {
+  for (const builder of buildersFor(env, options.structure ?? 'g1')) {
     if (!builder.keys.every((key) => Number.isFinite(env[key]))) continue;
     out[builder.name] = builder.build(env);
   }
   return out;
+}
+
+/** Which of `ids` the environment carries an interior for, in the order given. */
+export function interiorStructures(env: Environment, ids: readonly string[] = INTERIOR_STRUCTURES): string[] {
+  return ids.filter((id) => buildersFor(env, id).some((b) => b.keys.every((key) => Number.isFinite(env[key]))));
 }

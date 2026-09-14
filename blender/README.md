@@ -13,14 +13,43 @@ has a base and a height for, an "(as built)" object and a hidden "(today)"
 object truncated at the surviving height. The Great Pyramid's concavity is
 the `Concavity` shape key on both.
 
-Inside it, an `Interior` child collection holds the Great Pyramid's passages
-and chambers, one object per solid: the entrance passage, the three
+Inside it, each pyramid whose interior the preset carries records for gets a
+child collection of its own: `Interior` for the Great Pyramid, and
+`Interior (G2 Khafre)` or `Interior (G3 Menkaure)` for the others. The Great
+Pyramid's holds one object per solid: the entrance passage, the three
 subterranean pieces, the ascending passage, the passage to the Queen's
 Chamber, the Queen's Chamber, the Grand Gallery, the Antechamber and the
 King's Chamber. They are separate solids rather than a boolean cut out of the
 masonry, so a section view is a matter of clipping them or hiding the whole
 collection, and a claim overlay can name a point on one. A solid whose records
-the preset does not carry is left out rather than guessed at.
+the preset does not carry is left out rather than guessed at, and a structure
+with no interior records at all gets no collection.
+
+Nothing in the generator knows what Khafre's or Menkaure's plan looks like.
+G1's rooms are named one by one in `interior_solids` because Petrie stores each
+of them differently; every other structure is read out of its own records,
+which all begin with its id:
+
+```
+g2.passage.<name>.floor.begin.{north,east,up}   floor centre line
+g2.passage.<name>.floor.end.{north,east,up}
+g2.passage.<name>.{width,height}                rectangular section
+g2.passage.<name>.angle                         optional, provenance only
+
+g2.chamber.<name>.wall.{north,south}.north      wall positions
+g2.chamber.<name>.wall.{east,west}.east
+g2.chamber.<name>.{floor,ceiling}.up            levels
+g2.chamber.<name>.gable.height                  optional pitched roof
+```
+
+A north coordinate may be recorded instead as `<point>.from_north_base`, a
+distance south of the north base edge, which is converted with the structure's
+half-base. A passage with no `floor.begin` of its own starts at the
+structure's entrance, `g2.entrance.<name>.floor.begin` if one is named for it
+and `g2.entrance.floor.begin` for the descending passage, which is how G1's
+entrance passage is stored. Anything incomplete is skipped. Interiors are
+built in their own structure's frame and placed with the same centre offsets,
+base elevation and orientation as the pyramid objects.
 
 `Terrain (GLO-30 context)` is the Copernicus heightfield as one grid in the
 project frame, with the site's origin elevation from `data/sites.json` taken
@@ -46,11 +75,12 @@ blender -b build/seked.blend -P blender/check.py
 ```
 
 `check.py` asserts the saved file and the GLB beside it: that nothing but
-generated objects is in the scene, that the `Interior` collection holds
-exactly the solids `interior_solids` builds for the preset stamped on the
-objects, that the terrain object is present and hidden and is the size its
-header says, that every object and every glTF node carries its provenance,
-and that the `Concavity` shape keys survive the export as morph targets. It
+generated objects is in the scene, that each structure's `Interior` collection
+holds exactly the solids `interior_solids` builds for it under the preset
+stamped on the objects, that the terrain object is present and hidden and is
+the size its header says, that every object and every glTF node carries its
+provenance, and that the `Concavity` shape keys survive the export as morph
+targets. It
 prints one line per check and exits 1 on any failure. Pass
 `-- --gltf <path>` if the GLB is not beside the .blend.
 
@@ -77,11 +107,14 @@ TypeScript builders. It reads nothing from `data/`, so it runs on its own:
 python3 blender/seked_data.py --shapes
 ```
 
-`--interior` prints the solids the generator actually builds for a preset,
-each with the records it came from, and `--terrain` prints the heightfield's
-identity and a fixed set of probes. Both are checked against the TypeScript
-side by the parity tests. The file is append-only, so these two print after
-the resolved values: take the last line.
+`--interior` prints the solids the generator actually builds for a preset, one
+entry per structure that has any, each solid with the records it came from;
+`--interior-case` prints the same for an invented prefixed pyramid, so the
+discovery can be compared with the TypeScript one before G2's or G3's records
+exist; and `--terrain` prints the heightfield's identity and a fixed set of
+probes. All three are checked against the TypeScript side by the parity tests.
+The file is append-only, so they print after the resolved values: take the
+last line.
 
 ```
 python3 blender/seked_data.py canonical --interior

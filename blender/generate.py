@@ -11,9 +11,12 @@ the provenance survives inside the .blend file and, as glTF extras, in the GLB. 
 Pyramid is a shape key ("Concavity", 0 = flat faces, 1 = the measured
 hollowing), and each pyramid gets an "as built" and a "today" object.
 
-The Great Pyramid's interior is a child collection, "Interior", holding one
-object per solid rather than a boolean cut out of the masonry, so a section
-view is a matter of hiding or showing that collection. The plateau arrives as
+Each pyramid whose interior the preset carries records for gets a child
+collection of its own, "Interior" for the Great Pyramid and "Interior (label)"
+for the rest, holding one object per solid rather than a boolean cut out of the
+pyramid, so a section view is a matter of hiding or showing that collection.
+Nothing here knows what any interior looks like: seked_data reads the plan out
+of the records. The plateau arrives as
 a hidden "Terrain (GLO-30 context)" grid and a visible "Terrain (ground)" grid; read their notes before treating
 anything near a monument as ground.
 
@@ -31,6 +34,7 @@ import bpy  # noqa: E402  (only available inside Blender)
 
 from seked_data import (  # noqa: E402
     interior_solids,
+    interior_structures,
     load_database,
     load_terrain,
     pyramid_geometry,
@@ -104,27 +108,44 @@ def add_concavity_shape_key(obj, base, height, truncate_at, concavity):
     key.value = 1.0
 
 
+def interior_collection_name(structure):
+    """The Great Pyramid's interior keeps the plain name; the others are labelled."""
+    if structure == "g1":
+        return INTERIOR_NAME
+    return f"{INTERIOR_NAME} ({dict(STRUCTURES).get(structure, structure)})"
+
+
 def build_interior(parent, preset_id, resolved):
     """
-    The Great Pyramid's passages and chambers, one object each in an "Interior"
+    Each pyramid's passages and chambers, one object each in its own "Interior"
     child collection. They are separate solids, not a boolean cut, so the
     section views clip or hide them and a claim can name a point on one.
+
+    Which structures appear is a question for the database: a structure whose
+    interior records the preset carries is built, and one whose records are not
+    there yet is not mentioned.
     """
-    interior = get_child_collection(parent, INTERIOR_NAME)
     records = resolved["records"]
-    solids = interior_solids(resolved["values"])
-    for solid in solids:
-        sources = sorted({records[k]["source"] for k in solid["keys"] if k in records})
-        make_object(solid["name"], solid["verts"], solid["faces"], interior, {
-            "seked_preset": preset_id,
-            "seked_structure": "g1",
-            "seked_solid": solid["name"],
-            "seked_sources": ", ".join(sources),
-            "seked_records": ", ".join(solid["keys"]),
-        })
-    names = ", ".join(s["name"] for s in solids)
-    print(f"{INTERIOR_NAME}: {len(solids)} solids ({names})")
-    return solids
+    built = {}
+    for structure in interior_structures(resolved["values"]):
+        name = interior_collection_name(structure)
+        collection = get_child_collection(parent, name)
+        solids = interior_solids(resolved["values"], structure)
+        for solid in solids:
+            sources = sorted({records[k]["source"] for k in solid["keys"] if k in records})
+            make_object(solid["name"], solid["verts"], solid["faces"], collection, {
+                "seked_preset": preset_id,
+                "seked_structure": structure,
+                "seked_solid": solid["name"],
+                "seked_sources": ", ".join(sources),
+                "seked_records": ", ".join(solid["keys"]),
+            })
+        built[structure] = solids
+        names = ", ".join(s["name"] for s in solids)
+        print(f"{name}: {len(solids)} solids ({names})")
+    if not built:
+        print(f"no {INTERIOR_NAME}: the preset carries no interior records")
+    return built
 
 
 def ground_height(x, y, z_surface, pyramids):
