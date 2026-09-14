@@ -216,6 +216,14 @@ const FROM_MEMORY: Record<string, [number, number, number, number]> = {
   polaris: [37.95456, 89.26411, 44.48, -11.85],
 };
 
+/**
+ * The four wing stars of Cygnus that claim C7 names. They are deliberately
+ * not in FROM_MEMORY: they were never entered from memory at all, but came
+ * straight out of the HYG 4.2 import, so there is no remembered value for
+ * them to be checked against and nothing below tries to check one.
+ */
+const CYGNUS = ['fawaris', 'sadr', 'aljanah', 'deneb'];
+
 /** Worst difference actually seen is Mizar at 0.455 arcseconds. */
 const POSITION_TOLERANCE_ARCSEC = 0.5;
 /** Worst difference actually seen is Mintaka at 1.25 milliarcseconds per year. */
@@ -232,21 +240,25 @@ function separationArcsec(a: { raDeg: number; decDeg: number }, b: { raDeg: numb
 
 describe('the named stars, against the values that were entered from memory', () => {
   const stars = loadNamedStars();
+  /** The ten of the catalogue that the remembered sheet has something to say about. */
+  const fromMemory = stars.filter((s) => FROM_MEMORY[s.id] !== undefined);
 
-  it('is the same ten stars, now cited to HYG 4.2', () => {
-    expect(stars.map((s) => s.id).sort()).toEqual(Object.keys(FROM_MEMORY).sort());
+  it('still holds the remembered ten, adds the four Cygnus stars and nothing else, and cites HYG 4.2 throughout', () => {
+    const ids = stars.map((s) => s.id);
+    for (const id of Object.keys(FROM_MEMORY)) expect(ids, id).toContain(id);
+    expect(ids.filter((id) => FROM_MEMORY[id] === undefined).sort()).toEqual([...CYGNUS].sort());
     for (const star of stars) expect(star.source, star.id).toBe('hyg-4.2');
   });
 
   it(`has every position within ${POSITION_TOLERANCE_ARCSEC}" of the remembered one`, () => {
-    for (const star of stars) {
+    for (const star of fromMemory) {
       const [raDeg, decDeg] = FROM_MEMORY[star.id] as [number, number, number, number];
       expect(separationArcsec(star, { raDeg, decDeg }), star.id).toBeLessThan(POSITION_TOLERANCE_ARCSEC);
     }
   });
 
   it(`has every proper motion within ${PROPER_MOTION_TOLERANCE_MAS_YR} mas/yr of the remembered one`, () => {
-    for (const star of stars) {
+    for (const star of fromMemory) {
       const [, , pmRa, pmDec] = FROM_MEMORY[star.id] as [number, number, number, number];
       expect(Math.abs(star.pmRaMasYr - pmRa), `${star.id} pmRA`).toBeLessThan(PROPER_MOTION_TOLERANCE_MAS_YR);
       expect(Math.abs(star.pmDecMasYr - pmDec), `${star.id} pmDec`).toBeLessThan(PROPER_MOTION_TOLERANCE_MAS_YR);
@@ -254,7 +266,7 @@ describe('the named stars, against the values that were entered from memory', ()
   });
 
   it('moves no star far enough to matter: the worst is Mintaka, 7.2\" at 2450 BCE and 20.2\" at 10,500 BCE', () => {
-    for (const star of stars) {
+    for (const star of fromMemory) {
       const [raDeg, decDeg, pmRa, pmDec] = FROM_MEMORY[star.id] as [number, number, number, number];
       const remembered = { raDeg, decDeg, pmRaMasYr: pmRa, pmDecMasYr: pmDec };
       // Proper motion is what the differences are made of, so they grow with the epoch.
@@ -283,7 +295,7 @@ describe('the HYG 4.2 bright catalogue', () => {
     expect(new Set(stars.map((s) => s.id)).size).toBe(stars.length);
   });
 
-  it('holds the ten named stars, at exactly the numbers named.json has', () => {
+  it('holds every named star, at exactly the numbers named.json has', () => {
     const byName = new Map(stars.filter((s) => s.name).map((s) => [s.name as string, s]));
     for (const star of named) {
       const bright = byName.get(star.name);
