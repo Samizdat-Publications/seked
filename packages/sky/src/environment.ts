@@ -8,6 +8,7 @@
  * This module only flattens it into keys.
  */
 import { lowerCulminationAltitude, transitAltitude, transitIsNorth } from './frames';
+import { datedSunEnvironment } from './solar';
 import { positionAtEpoch, type Star } from './stars';
 import { risingAzimuth, risingLst, settingAzimuth, settingLst, sunEnvironment } from './sun';
 
@@ -19,6 +20,8 @@ export interface SkyEnvironmentOptions {
   epoch: number;
   /** The observer's latitude in degrees, north positive. */
   latitudeDeg: number;
+  /** The observer's longitude in degrees, east positive; Greenwich when the caller has none. */
+  longitudeDeg?: number;
   /** Defaults to whatever `setDefaultStars` or `setDefaultStarsLoader` registered. */
   stars?: Star[];
 }
@@ -72,7 +75,8 @@ export function defaultStars(): Star[] {
  * (`.transit.north`, 1 or 0, because the expression language has numbers and
  * nothing else) and where and when it crosses the horizon (`.rise.azimuth`,
  * `.set.azimuth`, `.rise.lst`, `.set.lst`); then the sun's own keys from
- * `sunEnvironment`, and the epoch itself as `sky.epoch`.
+ * `sunEnvironment` and the dated ones from `datedSunEnvironment`, and the
+ * epoch itself as `sky.epoch`.
  *
  * A star that never reaches the horizon from this latitude gets NaN for its
  * four horizon keys rather than a number that would be a fiction: Kochab was
@@ -96,5 +100,6 @@ export function skyEnvironment(opts: SkyEnvironmentOptions): Record<string, numb
     env[`${prefix}.rise.lst`] = risingLst(raDeg, decDeg, opts.latitudeDeg, alt);
     env[`${prefix}.set.lst`] = settingLst(raDeg, decDeg, opts.latitudeDeg, alt);
   }
-  return { ...env, ...sunEnvironment({ epoch: opts.epoch, latitudeDeg: opts.latitudeDeg }) };
+  const observer = { epoch: opts.epoch, latitudeDeg: opts.latitudeDeg, longitudeDeg: opts.longitudeDeg };
+  return { ...env, ...sunEnvironment(observer), ...datedSunEnvironment(observer) };
 }

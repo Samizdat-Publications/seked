@@ -79,9 +79,11 @@ describe('the sky flattened into a claim environment', () => {
   const stars = loadNamedStars();
   const GIZA = 29.979167;
   const KEYS = ['ra', 'dec', 'transit.altitude', 'transit.north', 'lower.altitude', 'rise.azimuth', 'set.azimuth', 'rise.lst', 'set.lst'];
-  // sky.epoch, sun.obliquity, and a rising and a setting azimuth and sidereal
-  // time for each of the equinox and the two solstices.
-  const SKY_AND_SUN_KEYS = 2 + 3 * 4;
+  // sky.epoch, sun.obliquity, a rising and a setting azimuth and sidereal
+  // time for each of the equinox and the two solstices, and for each of the
+  // four dated seasonal events its instant, its equation of time and the
+  // local mean times of its sunrise and its sunset.
+  const SKY_AND_SUN_KEYS = 2 + 3 * 4 + 4 * 4;
 
   it('gives every named star its nine keys, plus the epoch and the sun', () => {
     const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });

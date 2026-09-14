@@ -74,10 +74,16 @@ blender -b build/seked.blend -P blender/render.py -- --view dawn --out build/her
 
 `packages/sky` carries Vondrák 2011 long-term precession, tested against
 ERFA's reference values, the horizon frame, the equinox and solstice sun
-from the obliquity of date, and enough meridian geometry to solve the shaft
-alignments; see `docs/shafts.md`. `skyEnvironment` flattens it into
-`star.<id>.ra`, `.dec`, `.transit.altitude`, `.rise.azimuth`, `sun.*` and
-similar keys, so a claim that names an `epoch` can reach the sky from its
+from the obliquity of date, a calendar to put a date on it (Julian Days in
+the proleptic Julian and Gregorian calendars, ΔT from the Stephenson,
+Morrison and Hohenkerk long-term parabola, sidereal time, Meeus's
+low-precision solar position, the equation of time and the instants of the
+four seasons, all checked against his own worked examples), and enough
+meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
+`skyEnvironment` flattens it into `star.<id>.ra`, `.dec`,
+`.transit.altitude`, `.rise.azimuth`, `sun.*` and similar keys, among them
+`sun.june_solstice.jd` and the local mean times of that morning's sunrise
+and sunset, so a claim that names an `epoch` can reach the sky from its
 YAML without the claims package learning any astronomy.
 
 Next: verify Cole 1925 once the paper is to hand; positions for Khafre's and

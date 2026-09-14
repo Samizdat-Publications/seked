@@ -127,6 +127,13 @@ export interface SunEnvironmentOptions {
   epoch: number;
   /** The observer's latitude in degrees, north positive. */
   latitudeDeg: number;
+  /**
+   * The observer's longitude in degrees, east positive, which is the meridian
+   * a dated event's clock time is reckoned on. The site's origin longitude
+   * where the caller has one; Greenwich when it has none, since a longitude
+   * that has not been said is not a longitude worth guessing at.
+   */
+  longitudeDeg?: number;
 }
 
 /**

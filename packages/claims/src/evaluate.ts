@@ -54,7 +54,10 @@ export function scopeFor(claim: Claim, env: Environment): Environment {
   if (claim.epoch === undefined) return env;
   const latitudeDeg = env['g1.center.latitude'];
   if (latitudeDeg === undefined) throw new Error(`${claim.id} has an epoch but the environment carries no g1.center.latitude`);
-  return { ...env, ...skyEnvironment({ epoch: claim.epoch, latitudeDeg }) };
+  // The longitude is not demanded the way the latitude is. It decides only
+  // which local day the dated sun's clock times belong to, no claim names one
+  // of those keys yet, and `skyEnvironment` falls back to Greenwich without it.
+  return { ...env, ...skyEnvironment({ epoch: claim.epoch, latitudeDeg, longitudeDeg: env['g1.center.longitude'] }) };
 }
 
 export function evaluateClaim(claim: Claim, env: Environment): ClaimResult {
