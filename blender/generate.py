@@ -10,6 +10,14 @@ carries custom properties naming the preset and the source of each value, so
 the provenance survives inside the .blend file and, as glTF extras, in the GLB. The concavity of the Great
 Pyramid is a shape key ("Concavity", 0 = flat faces, 1 = the measured
 hollowing), and each pyramid gets an "as built" and a "today" object.
+
+The Great Pyramid's interior is a child collection, "Interior", holding one
+object per solid rather than a boolean cut out of the masonry, so a section
+view is a matter of hiding or showing that collection. The plateau arrives as
+a single hidden "Terrain (GLO-30 context)" grid; read its note before treating
+anything near a monument as ground.
+
+`blender/check.py` asserts what this script produced; run it after a save.
 """
 import math
 import os
@@ -21,9 +29,19 @@ if HERE not in sys.path:
 
 import bpy  # noqa: E402  (only available inside Blender)
 
-from seked_data import load_database, pyramid_geometry, pyramid_params, resolve  # noqa: E402
+from seked_data import (  # noqa: E402
+    interior_solids,
+    load_database,
+    load_terrain,
+    pyramid_geometry,
+    pyramid_params,
+    resolve,
+    site_origin_elevation,
+)
 
 STRUCTURES = [("g1", "G1 Khufu"), ("g2", "G2 Khafre"), ("g3", "G3 Menkaure")]
+TERRAIN_NAME = "Terrain (GLO-30 context)"
+INTERIOR_NAME = "Interior"
 
 
 def parse_args():
@@ -48,6 +66,16 @@ def get_collection(name):
     return coll
 
 
+def get_child_collection(parent, name):
+    """A child collection of `parent`, so the viewer can hide a whole layer at once."""
+    coll = bpy.data.collections.get(name)
+    if coll is None:
+        coll = bpy.data.collections.new(name)
+    if coll.name not in parent.children:
+        parent.children.link(coll)
+    return coll
+
+
 def make_object(name, verts, faces, collection, props):
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(verts, [], faces)
@@ -69,6 +97,76 @@ def add_concavity_shape_key(obj, base, height, truncate_at, concavity):
     for i, co in enumerate(hollow_verts):
         key.data[i].co = co
     key.value = 1.0
+
+
+def build_interior(parent, preset_id, resolved):
+    """
+    The Great Pyramid's passages and chambers, one object each in an "Interior"
+    child collection. They are separate solids, not a boolean cut, so the
+    section views clip or hide them and a claim can name a point on one.
+    """
+    interior = get_child_collection(parent, INTERIOR_NAME)
+    records = resolved["records"]
+    solids = interior_solids(resolved["values"])
+    for solid in solids:
+        sources = sorted({records[k]["source"] for k in solid["keys"] if k in records})
+        make_object(solid["name"], solid["verts"], solid["faces"], interior, {
+            "seked_preset": preset_id,
+            "seked_structure": "g1",
+            "seked_solid": solid["name"],
+            "seked_sources": ", ".join(sources),
+            "seked_records": ", ".join(solid["keys"]),
+        })
+    names = ", ".join(s["name"] for s in solids)
+    print(f"{INTERIOR_NAME}: {len(solids)} solids ({names})")
+    return solids
+
+
+def build_terrain(parent, preset_id):
+    """
+    The Copernicus GLO-30 heightfield as one grid in the project frame, with
+    the site's origin elevation taken off so z is height above the Great
+    Pyramid's base. Hidden by default: it is a surface model whose monument
+    footprints are edited, so the mound at the origin is neither the ground
+    under Khufu nor the built surface of Khufu.
+    """
+    header, heights = load_terrain()
+    elevation = site_origin_elevation(header["site"])
+    nx, ny, spacing = header["nx"], header["ny"], header["spacing"]
+    x0, y0 = header["x0"], header["y0"]
+
+    verts = []
+    for j in range(ny):
+        y = y0 + j * spacing
+        row = j * nx
+        for i in range(nx):
+            verts.append((x0 + i * spacing, y, heights[row + i] - elevation))
+    faces = []
+    for j in range(ny - 1):
+        for i in range(nx - 1):
+            a = j * nx + i
+            # Counter-clockwise seen from above, so the surface faces up.
+            faces.append((a, a + 1, a + nx + 1, a + nx))
+
+    obj = make_object(TERRAIN_NAME, verts, faces, parent, {
+        "seked_preset": preset_id,
+        "seked_structure": "terrain",
+        "seked_site": header["site"],
+        "seked_sources": header["source"],
+        "seked_terrain_sha256": header["sha256"],
+        "seked_terrain_datum": header["verticalDatum"],
+        "seked_origin_elevation_m": float(elevation),
+        "seked_note": (
+            "Copernicus GLO-30 is a surface model and its editing mask marks the monument "
+            "footprints, so the pyramids arrive as smooth mounds. The sample at the origin is "
+            "neither the ground under Khufu nor the built surface of Khufu. Heights are "
+            "orthometric on EGM2008, less the site origin elevation from data/sites.json."
+        ),
+    })
+    obj.hide_set(True)
+    obj.hide_render = True
+    print(f"{TERRAIN_NAME}: {nx} x {ny} at {spacing} m, origin elevation {elevation} m, hidden")
+    return obj
 
 
 def build(preset_id):
@@ -111,6 +209,9 @@ def build(preset_id):
 
         print(f"{label}: base {p['base']} m, height {p['height']} m, concavity {p['concavity']} m, "
               f"orientation {p['orientation_deg'] * 60:.1f}', at {location}")
+
+    build_interior(coll, preset_id, resolved)
+    build_terrain(coll, preset_id)
 
 
 def main():
