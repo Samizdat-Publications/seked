@@ -132,11 +132,29 @@ def square_pyramid_volume(base, height):
     return base * base * height / 3.0
 
 
+def geometry_variants(values, structure):
+    """Every mesh the generator builds for one pyramid, for parity tests against packages/geometry."""
+    p = pyramid_params(values, structure)
+    if p is None:
+        return []
+    specs = [("as_built_flat", None, 0.0), ("as_built", None, p["concavity"])]
+    if p["height_today"]:
+        specs += [("today_flat", p["height_today"], 0.0), ("today", p["height_today"], p["concavity"])]
+    out = []
+    for name, truncate_at, concavity in specs:
+        verts, faces = pyramid_geometry(p["base"], p["height"], truncate_at=truncate_at, concavity=concavity)
+        out.append({"name": name, "truncate_at": truncate_at, "concavity": concavity, "verts": verts,
+                    "faces": [list(f) for f in faces], "volume": polyhedron_volume(verts, faces)})
+    return out
+
+
 if __name__ == "__main__":
     preset = sys.argv[1] if len(sys.argv) > 1 else "canonical"
     db = load_database()
     r = resolve(db, preset)
-    if "--check" in sys.argv:
+    if "--geometry" in sys.argv:
+        print(json.dumps({s: geometry_variants(r["values"], s) for s in ("g1", "g2", "g3")}))
+    elif "--check" in sys.argv:
         p = pyramid_params(r["values"], "g1")
         v, f = pyramid_geometry(p["base"], p["height"], concavity=0.0)
         got, want = polyhedron_volume(v, f), square_pyramid_volume(p["base"], p["height"])

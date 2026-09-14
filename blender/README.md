@@ -29,4 +29,8 @@ geometry:
 python3 blender/seked_data.py canonical --check
 ```
 
+`--geometry` prints every mesh the generator would build (as built and today,
+flat and hollowed) as JSON; a test in packages/data compares those vertices
+and volumes with `@seked/geometry`, so the two mesh builders cannot drift.
+
 Not here yet: terrain (BlenderGIS), interiors, the Sphinx, materials.
