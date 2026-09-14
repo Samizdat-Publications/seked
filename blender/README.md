@@ -89,3 +89,23 @@ python3 blender/seked_data.py canonical --interior
 
 Not here yet: the shafts, the GPMP contours under the monuments, the Sphinx,
 materials.
+
+## Ground and renders
+
+The generator writes two terrain grids from `data/terrain/giza-glo30.f32`:
+`Terrain (GLO-30 context)`, the surface model exactly as delivered and hidden
+because its editing mask turns the monuments into smooth mounds, and
+`Terrain (ground)`, the same grid with the ground under each pyramid set to
+its surveyed base level within 40 m of the footprint and blended back into
+the model over the next 260 m. The ground is a stand-in until the GPMP
+contours are entered; `check.py` verifies both grids.
+
+`render.py` renders a still headless, with the plan's materials and the
+first hero view (equinox dawn from the north-east, sun 6 degrees up in the
+east):
+
+```
+blender -b build/seked.blend -P blender/render.py -- --out build/hero.png --width 1600 --height 900 --samples 64
+```
+
+Progress snapshots rendered this way live in `docs/progress/`.

@@ -14,7 +14,7 @@ hollowing), and each pyramid gets an "as built" and a "today" object.
 The Great Pyramid's interior is a child collection, "Interior", holding one
 object per solid rather than a boolean cut out of the masonry, so a section
 view is a matter of hiding or showing that collection. The plateau arrives as
-a single hidden "Terrain (GLO-30 context)" grid; read its note before treating
+a hidden "Terrain (GLO-30 context)" grid and a visible "Terrain (ground)" grid; read their notes before treating
 anything near a monument as ground.
 
 `blender/check.py` asserts what this script produced; run it after a save.
@@ -41,6 +41,11 @@ from seked_data import (  # noqa: E402
 
 STRUCTURES = [("g1", "G1 Khufu"), ("g2", "G2 Khafre"), ("g3", "G3 Menkaure")]
 TERRAIN_NAME = "Terrain (GLO-30 context)"
+GROUND_NAME = "Terrain (ground)"
+# Metres beyond a pyramid's footprint over which the ground sits at its surveyed base level,
+# and the further distance over which that level blends back into the surface model.
+GROUND_FLAT_MARGIN = 40.0
+GROUND_BLEND_DISTANCE = 260.0
 INTERIOR_NAME = "Interior"
 
 
@@ -122,7 +127,25 @@ def build_interior(parent, preset_id, resolved):
     return solids
 
 
-def build_terrain(parent, preset_id):
+def ground_height(x, y, z_surface, pyramids):
+    """
+    The surface model with each pyramid's footprint (plus a margin) set to the
+    pyramid's surveyed base level and blended smoothly back into the model
+    beyond it. The square footprint ignores the few arcminutes of orientation.
+    """
+    z = z_surface
+    for p in pyramids:
+        d = max(abs(x - p["offset_east"]), abs(y - p["offset_north"])) - p["base"] / 2.0
+        if d <= GROUND_FLAT_MARGIN:
+            return p["offset_up"]
+        if d < GROUND_FLAT_MARGIN + GROUND_BLEND_DISTANCE:
+            t = (d - GROUND_FLAT_MARGIN) / GROUND_BLEND_DISTANCE
+            s = t * t * (3.0 - 2.0 * t)
+            z = min(z, p["offset_up"] + (z_surface - p["offset_up"]) * s)
+    return z
+
+
+def build_terrain(parent, preset_id, pyramids=()):
     """
     The Copernicus GLO-30 heightfield as one grid in the project frame, with
     the site's origin elevation taken off so z is height above the Great
@@ -135,12 +158,14 @@ def build_terrain(parent, preset_id):
     nx, ny, spacing = header["nx"], header["ny"], header["spacing"]
     x0, y0 = header["x0"], header["y0"]
 
-    verts = []
+    verts, ground = [], []
     for j in range(ny):
         y = y0 + j * spacing
         row = j * nx
         for i in range(nx):
-            verts.append((x0 + i * spacing, y, heights[row + i] - elevation))
+            x, z = x0 + i * spacing, heights[row + i] - elevation
+            verts.append((x, y, z))
+            ground.append((x, y, ground_height(x, y, z, pyramids)))
     faces = []
     for j in range(ny - 1):
         for i in range(nx - 1):
@@ -166,6 +191,25 @@ def build_terrain(parent, preset_id):
     obj.hide_set(True)
     obj.hide_render = True
     print(f"{TERRAIN_NAME}: {nx} x {ny} at {spacing} m, origin elevation {elevation} m, hidden")
+    build_ground(parent, preset_id, header, ground, faces, elevation)
+    return obj
+
+
+def build_ground(parent, preset_id, header, ground, faces, elevation):
+    obj = make_object(GROUND_NAME, ground, faces, parent, {
+        "seked_preset": preset_id,
+        "seked_structure": "terrain",
+        "seked_site": header["site"],
+        "seked_sources": header["source"],
+        "seked_terrain_sha256": header["sha256"],
+        "seked_origin_elevation_m": float(elevation),
+        "seked_note": (
+            "The GLO-30 heightfield with the ground under each pyramid set to its surveyed base "
+            f"level within {GROUND_FLAT_MARGIN:.0f} m of the footprint and blended back into the model over "
+            f"the next {GROUND_BLEND_DISTANCE:.0f} m. A stand-in until the GPMP contours are entered."
+        ),
+    })
+    print(f"{GROUND_NAME}: footprints flattened to the surveyed base levels")
     return obj
 
 
@@ -178,11 +222,13 @@ def build(preset_id):
     scene.unit_settings.length_unit = "METERS"
     coll = get_collection("Seked")
 
+    placed = []
     for structure, label in STRUCTURES:
         p = pyramid_params(values, structure)
         if p is None:
             print(f"skip {structure}: no base or height in preset {preset_id}")
             continue
+        placed.append(p)
         provenance = {
             "seked_preset": preset_id,
             "seked_structure": structure,
@@ -211,7 +257,7 @@ def build(preset_id):
               f"orientation {p['orientation_deg'] * 60:.1f}', at {location}")
 
     build_interior(coll, preset_id, resolved)
-    build_terrain(coll, preset_id)
+    build_terrain(coll, preset_id, placed)
 
 
 def main():

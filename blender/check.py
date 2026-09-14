@@ -29,6 +29,7 @@ from seked_data import interior_solids, load_database, load_terrain, resolve  # 
 ROOT_NAME = "Seked"
 INTERIOR_NAME = "Interior"
 TERRAIN_NAME = "Terrain (GLO-30 context)"
+GROUND_NAME = "Terrain (ground)"
 CONCAVITY = "Concavity"
 
 failures = []
@@ -125,6 +126,14 @@ def main():
               "the terrain says its monument footprints are edited")
 
     path = gltf_path()
+    ground = bpy.data.objects.get(GROUND_NAME)
+    if check(ground is not None, f'"{GROUND_NAME}" is present'):
+        check(not ground.hide_get() and not ground.hide_render, "the ground is visible and renders")
+        check(terrain is not None and len(ground.data.vertices) == len(terrain.data.vertices),
+              "the ground has the same grid as the context terrain")
+        nearest = min(ground.data.vertices, key=lambda v: v.co.x * v.co.x + v.co.y * v.co.y)
+        check(abs(nearest.co.z) < 1e-6, f"the ground under the Great Pyramid sits at its base level: z = {nearest.co.z:.6f}")
+
     if check(os.path.exists(path), f"the GLB is beside the .blend: {path}"):
         gltf = read_gltf_json(path)
         meshes = {m.get("name"): m for m in gltf.get("meshes", [])}
