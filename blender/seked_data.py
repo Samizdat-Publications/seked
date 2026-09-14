@@ -990,3 +990,110 @@ if __name__ == "__main__" and "--ground" in sys.argv:
         {"x": x, "y": y, "surface": z, "ground": ground_height(x, y, z, GROUND_CASE_PYRAMIDS)}
         for x, y, z in GROUND_PROBES
     ]))
+
+
+# --- Where a structure stands, when the database gives it a coordinate -----
+# Mirrors deriveCentreOffsets in packages/geometry/src/environment.ts, and a
+# parity test in packages/data pins the two to each other. Petrie triangulated
+# G2 and G3 from G1 and those offsets are stored as metres south and west; the
+# Sphinx has only a latitude and a longitude, so this turns the second kind
+# into the first. The conversion is the flat one claim D1 uses: north is the
+# difference in latitude and east the difference in longitude times the cosine
+# of the origin's latitude, both scaled by the mean Earth radius. It ignores
+# the ellipsoid, which costs under 1.5 m over the 450 m out to the Sphinx
+# against the 55 m the cited coordinates themselves are worth. A structure the
+# survey already placed keeps the survey's offsets and nothing is derived for
+# it.
+
+OFFSET_DIRECTIONS = ("east", "north", "west", "south")
+
+
+def centre_offsets(values):
+    """Derived east and north offsets, in metres, keyed as the environment keys them."""
+    lat0 = values.get("g1.center.latitude")
+    lon0 = values.get("g1.center.longitude")
+    radius = values.get("earth.radius.mean")
+    derived = {}
+    if lat0 is None or lon0 is None or radius is None:
+        return derived
+    metres_per_degree = radius * math.pi / 180.0
+    for key in list(values):
+        if not key.endswith(".center.latitude"):
+            continue
+        structure = key[: -len(".center.latitude")]
+        longitude = values.get(structure + ".center.longitude")
+        if longitude is None:
+            continue
+        if any(values.get("%s.centre.offset.%s" % (structure, d)) is not None for d in OFFSET_DIRECTIONS):
+            continue
+        derived[structure + ".centre.offset.east"] = (
+            (longitude - lon0) * math.cos(lat0 * math.pi / 180.0) * metres_per_degree
+        )
+        derived[structure + ".centre.offset.north"] = (values[key] - lat0) * metres_per_degree
+    return derived
+
+
+# The Sphinx as a box: the massing placeholder the generator builds until the
+# Tier 4 sculpt exists. Length runs east-west and the front face is the east
+# one, which is the direction the statue looks. There is no base elevation for
+# the Sphinx in the database, so the box sits on the frame's datum plane, the
+# Great Pyramid's base level, and its height is a size and not a position.
+SPHINX_MASSING_NAME = "Sphinx (massing placeholder)"
+SPHINX_MASSING_NOTE = (
+    "Placeholder massing, not a model of the Sphinx: an axis-aligned box of the ARCE survey's "
+    "length, width and height, centred on a commonly cited latitude and longitude that are "
+    "unverified and worth about 55 m, sitting on the frame's datum plane because no base "
+    "elevation for the Sphinx is in the database. It stands in for the Tier 4 sculpt over "
+    "Lehner's plans. Its front face is the east one."
+)
+
+
+def sphinx_params(values, structure="sphinx"):
+    """The massing box's three sizes and its place in the frame, or None."""
+    offsets = centre_offsets(values)
+    length = values.get(structure + ".length")
+    width = values.get(structure + ".width")
+    height = values.get(structure + ".height")
+    east = offsets.get(structure + ".centre.offset.east")
+    north = offsets.get(structure + ".centre.offset.north")
+    if None in (length, width, height, east, north):
+        return None
+    return {
+        "length": length,
+        "width": width,
+        "height": height,
+        "offset_east": east,
+        "offset_north": north,
+    }
+
+
+def massing_geometry(params):
+    """
+    Vertices and faces for the massing box, in the project frame: length
+    east-west, width north-south, sitting on z = 0. Faces wind
+    counter-clockwise seen from outside, as pyramid_geometry's do.
+    """
+    x0 = params["offset_east"] - params["length"] / 2.0
+    x1 = params["offset_east"] + params["length"] / 2.0
+    y0 = params["offset_north"] - params["width"] / 2.0
+    y1 = params["offset_north"] + params["width"] / 2.0
+    z1 = params["height"]
+    verts = [
+        (x0, y0, 0.0), (x1, y0, 0.0), (x1, y1, 0.0), (x0, y1, 0.0),
+        (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1),
+    ]
+    faces = [
+        (3, 2, 1, 0),  # floor, clockwise from above so it faces down
+        (4, 5, 6, 7),  # roof
+        (0, 1, 5, 4),  # south
+        (1, 2, 6, 5),  # east, the face the statue looks out of
+        (2, 3, 7, 6),  # north
+        (3, 0, 4, 7),  # west
+    ]
+    return verts, faces
+
+
+if __name__ == "__main__" and "--offsets" in sys.argv:
+    # Appended, so the file only ever grows; this is the last line printed.
+    _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
+    print(json.dumps(centre_offsets(resolve(load_database(), _preset)["values"])))

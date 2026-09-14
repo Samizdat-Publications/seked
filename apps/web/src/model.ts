@@ -58,6 +58,42 @@ export function pyramidParams(values: Record<string, number>, id: StructureId): 
 }
 
 /**
+ * The Sphinx as the viewer draws it: a box, not a statue.
+ *
+ * The same placeholder blender/generate.py builds, from the same keys, so the
+ * .blend, the GLB and the browser stand it in the same place. The sizes are
+ * the ARCE survey's; the position is `sphinx.center.latitude` and
+ * `.longitude`, a commonly cited pair worth about 55 m, turned into offsets by
+ * `buildEnvironment`. There is no base elevation for the Sphinx in the
+ * database, so the box sits on the frame's datum plane, the Great Pyramid's
+ * base level.
+ */
+export const SPHINX_MASSING_LABEL = 'Sphinx (massing placeholder)';
+
+export interface MassingParams {
+  id: string;
+  label: string;
+  /** East-west, which is the way the statue lies; its front face is the east one. */
+  length: number;
+  /** North-south. */
+  width: number;
+  height: number;
+  offsetEast: number;
+  offsetNorth: number;
+}
+
+export function massingParams(values: Record<string, number>, id: string, label: string): MassingParams | undefined {
+  const length = values[`${id}.length`];
+  const width = values[`${id}.width`];
+  const height = values[`${id}.height`];
+  const offsetEast = values[`${id}.centre.offset.east`];
+  const offsetNorth = values[`${id}.centre.offset.north`];
+  if (length === undefined || width === undefined || height === undefined) return undefined;
+  if (offsetEast === undefined || offsetNorth === undefined) return undefined;
+  return { id, label, length, width, height, offsetEast, offsetNorth };
+}
+
+/**
  * One structure's interior, in its own frame, beside what it takes to place it.
  * Which structures are here is the database's answer, not the viewer's: a
  * structure whose interior records the preset carries gets one.
@@ -75,6 +111,8 @@ export interface Model {
   values: Record<string, number>;
   env: Environment;
   pyramids: PyramidParams[];
+  /** The Sphinx's box, when the preset carries the size and the position for it. */
+  massings: MassingParams[];
   interiors: StructureInterior[];
   results: Map<string, ClaimResult>;
   /** The measured royal cubit under this preset, which the slider starts from. */
@@ -108,6 +146,10 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
   const values = cubit === null ? resolved.values : { ...resolved.values, 'cubit.royal': cubit };
   const env = buildEnvironment(values);
   const pyramids = STRUCTURES.map((id) => pyramidParams(values, id)).filter((p): p is PyramidParams => p !== undefined);
+  // The offsets the box is placed by are derived, so it reads `env` and not
+  // the resolved values: `buildEnvironment` is where a coordinate becomes a
+  // position in the frame.
+  const massings = [massingParams(env, 'sphinx', SPHINX_MASSING_LABEL)].filter((m): m is MassingParams => m !== undefined);
   const interiors = pyramids
     .map((params) => ({ params, solids: interiorSolids(env, { structure: params.id }) }))
     .filter((interior) => Object.keys(interior.solids).length > 0);
@@ -119,6 +161,7 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
     values,
     env,
     pyramids,
+    massings,
     interiors,
     results,
     measuredCubit,

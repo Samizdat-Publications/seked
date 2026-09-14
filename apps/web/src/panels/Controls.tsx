@@ -1,5 +1,5 @@
 import type { Preset } from '@seked/data/browser';
-import type { Model } from '../model';
+import { SPHINX_MASSING_LABEL, type Model } from '../model';
 import { useView } from '../store';
 import {
   CAMERA_MODES,
@@ -231,7 +231,10 @@ export function LayerToggles(): React.JSX.Element {
       <p className="note">
         The terrain is Copernicus GLO-30 at 20 m. Its editing mask smooths the monuments out, so it is context for the plateau and not a
         measurement of anything on it. The ground is that same grid with each footprint set to the surveyed base level and blended back over
-        260 m, which is why the monuments sit on it rather than in its mounds. The interior shows where the section cut opens it.
+        260 m, which is why the monuments sit on it rather than in its mounds. The interior shows where the section cut opens it. The
+        pyramids layer also carries the {SPHINX_MASSING_LABEL}: a box of the ARCE survey's length, width and height on a commonly cited
+        latitude and longitude worth about 55 m, standing on the Great Pyramid's base level because no elevation for the Sphinx is in the
+        database. It is a volume in the right place, not a model of the statue.
       </p>
     </section>
   );

@@ -1,7 +1,7 @@
 import { DEG } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import { DoubleSide, FrontSide, type Plane } from 'three';
-import type { PyramidParams } from '../model';
+import type { MassingParams, PyramidParams } from '../model';
 import { pyramidGeometry } from './geometry';
 
 /**
@@ -11,10 +11,12 @@ import { pyramidGeometry } from './geometry';
  */
 export function Pyramids({
   pyramids,
+  massings,
   today,
   clippingPlanes,
 }: {
   pyramids: PyramidParams[];
+  massings: MassingParams[];
   today: boolean;
   clippingPlanes: Plane[];
 }): React.JSX.Element {
@@ -23,7 +25,26 @@ export function Pyramids({
       {pyramids.map((params) => (
         <Pyramid key={params.id} params={params} today={today} clippingPlanes={clippingPlanes} />
       ))}
+      {massings.map((params) => (
+        <Massing key={params.id} params={params} clippingPlanes={clippingPlanes} />
+      ))}
     </>
+  );
+}
+
+/**
+ * A massing placeholder: the Sphinx as a box of the surveyed length, width
+ * and height, sitting on the frame's datum plane at the offsets derived from
+ * its cited coordinates. The same box blender/generate.py builds, and drawn
+ * flat and dull on purpose, because it is a volume and not a statue.
+ */
+function Massing({ params, clippingPlanes }: { params: MassingParams; clippingPlanes: Plane[] }): React.JSX.Element {
+  const { length, width, height, offsetEast, offsetNorth } = params;
+  return (
+    <mesh position={[offsetEast, offsetNorth, height / 2]}>
+      <boxGeometry args={[length, width, height]} />
+      <meshStandardMaterial color="#9c9078" roughness={0.97} metalness={0} flatShading clippingPlanes={clippingPlanes} />
+    </mesh>
   );
 }
 

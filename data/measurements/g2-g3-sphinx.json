@@ -274,6 +274,28 @@
     "method": "survey"
   },
   {
+    "key": "sphinx.center.latitude",
+    "structure": "sphinx",
+    "quantity": "latitude",
+    "value": 29.975278,
+    "unit": "deg",
+    "sigma": 0.0005,
+    "source": "coords-sphinx-cited",
+    "method": "cited",
+    "note": "29°58′31″ N, the commonly cited position of the monument. Sigma of 0.0005°, about 55 m, covers the spread between citations and the fact that no point of the statue is named. Unverified placeholder; replace with an ARCE or GPMP position."
+  },
+  {
+    "key": "sphinx.center.longitude",
+    "structure": "sphinx",
+    "quantity": "longitude",
+    "value": 31.137778,
+    "unit": "deg",
+    "sigma": 0.0005,
+    "source": "coords-sphinx-cited",
+    "method": "cited",
+    "note": "31°08′16″ E, the commonly cited position of the monument. Sigma of 0.0005°, about 48 m at this latitude. Unverified placeholder. No azimuth for the Sphinx's own east-west axis is entered: none of the sources in data/sources.json states one here, so claim C5 takes due east from the plan's wording and says so."
+  },
+  {
     "key": "g2.centre.offset.south",
     "structure": "g2",
     "quantity": "length",

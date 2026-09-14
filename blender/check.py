@@ -24,7 +24,16 @@ if HERE not in sys.path:
 
 import bpy  # noqa: E402  (only available inside Blender)
 
-from seked_data import interior_solids, interior_structures, load_database, load_terrain, resolve  # noqa: E402
+from seked_data import (  # noqa: E402
+    SPHINX_MASSING_NAME,
+    interior_solids,
+    interior_structures,
+    load_database,
+    load_terrain,
+    massing_geometry,
+    resolve,
+    sphinx_params,
+)
 
 ROOT_NAME = "Seked"
 INTERIOR_NAME = "Interior"
@@ -132,6 +141,26 @@ def main():
         check(not sourceless, f"every solid in {name} names its sources: {sourceless or 'none missing'}")
         wrong = [o.name for o in interior.objects if o.get("seked_structure") != structure]
         check(not wrong, f"every solid in {name} is stamped {structure}: {wrong or 'none wrong'}")
+
+    sphinx = sphinx_params(values)
+    if check(sphinx is not None, "the database carries the Sphinx's size and position"):
+        obj = bpy.data.objects.get(SPHINX_MASSING_NAME)
+        if check(obj is not None, f'"{SPHINX_MASSING_NAME}" is present'):
+            check(str(obj.get("seked_placeholder", "")).lower().startswith("placeholder"),
+                  "the Sphinx box says it is a placeholder and not a model of the statue")
+            verts, _ = massing_geometry(sphinx)
+            check(len(obj.data.vertices) == 8, f"the Sphinx box is a box: {len(obj.data.vertices)} vertices")
+            # Blender stores vertices in single precision, so a coordinate
+            # 350 m out is only good to about 30 micrometres.
+            got = sorted(tuple(v.co) for v in obj.data.vertices)
+            want = sorted(tuple(v) for v in verts)
+            worst = max(abs(a - b) for g, w in zip(got, want) for a, b in zip(g, w))
+            check(worst < 1e-3, f"the Sphinx box is where seked_data puts it, vertex for vertex: worst {worst:.2e} m")
+            # Length east-west, width north-south, and the front face east.
+            size = [max(v[i] for v in verts) - min(v[i] for v in verts) for i in range(3)]
+            check(abs(size[0] - sphinx["length"]) < 1e-9 and abs(size[1] - sphinx["width"]) < 1e-9
+                  and abs(size[2] - sphinx["height"]) < 1e-9,
+                  f"the Sphinx box measures length by width by height east-north-up: {[round(v, 2) for v in size]}")
 
     terrain = bpy.data.objects.get(TERRAIN_NAME)
     if check(terrain is not None, f'"{TERRAIN_NAME}" is present'):

@@ -277,3 +277,29 @@ describe.skipIf(!py)('blender/seked_data.py flattens the ground exactly like @se
     });
   }
 });
+/**
+ * The other half of the placement: G2 and G3 are where Petrie's triangulation
+ * put them, and the Sphinx is where a latitude and a longitude put it. Both
+ * readers have to agree about the second kind too, or the .blend, the GLB and
+ * the viewer would stand the Sphinx in different places.
+ */
+describe.skipIf(!py)('blender/seked_data.py derives the same centre offsets as @seked/geometry', () => {
+  const db = loadDatabase();
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--offsets'], { encoding: 'utf8' });
+  const theirs = JSON.parse(lastLine(out)) as Record<string, number>;
+  const env = buildEnvironment(resolve(db, 'canonical').values);
+
+  it('derives the same keys', () => {
+    expect(Object.keys(theirs).sort()).toEqual(['g1.centre.offset.east', 'g1.centre.offset.north', 'sphinx.centre.offset.east', 'sphinx.centre.offset.north']);
+  });
+
+  it('agrees on every one of them to the micrometre', () => {
+    for (const [key, value] of Object.entries(theirs)) expect(env[key], key).toBeCloseTo(value, 6);
+  });
+
+  it('leaves the surveyed offsets alone: G2 and G3 keep their south and west', () => {
+    expect(theirs['g2.centre.offset.east']).toBeUndefined();
+    expect(env['g2.centre.offset.east']).toBeUndefined();
+    expect(env['g2.centre.offset.west']).toBe(resolve(db, 'canonical').values['g2.centre.offset.west']);
+  });
+});

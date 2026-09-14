@@ -16,7 +16,8 @@ collection of its own, "Interior" for the Great Pyramid and "Interior (label)"
 for the rest, holding one object per solid rather than a boolean cut out of the
 pyramid, so a section view is a matter of hiding or showing that collection.
 Nothing here knows what any interior looks like: seked_data reads the plan out
-of the records. The plateau arrives as
+of the records. The Sphinx is a box: an axis-aligned massing placeholder on a cited position,
+standing in for the sculpt, and it says so in a custom property. The plateau arrives as
 a hidden "Terrain (GLO-30 context)" grid and a visible "Terrain (ground)" grid; read their notes before treating
 anything near a monument as ground.
 
@@ -35,7 +36,10 @@ import bpy  # noqa: E402  (only available inside Blender)
 from seked_data import (  # noqa: E402
     GROUND_BLEND_DISTANCE,
     GROUND_FLAT_MARGIN,
+    SPHINX_MASSING_NAME,
+    SPHINX_MASSING_NOTE,
     ground_height,
+    massing_geometry,
     interior_solids,
     interior_structures,
     load_database,
@@ -44,6 +48,7 @@ from seked_data import (  # noqa: E402
     pyramid_params,
     resolve,
     site_origin_elevation,
+    sphinx_params,
 )
 
 STRUCTURES = [("g1", "G1 Khufu"), ("g2", "G2 Khafre"), ("g3", "G3 Menkaure")]
@@ -145,6 +150,36 @@ def build_interior(parent, preset_id, resolved):
     if not built:
         print(f"no {INTERIOR_NAME}: the preset carries no interior records")
     return built
+
+
+def build_sphinx(parent, preset_id, resolved):
+    """
+    The Sphinx as a box, until the sculpt exists.
+
+    It is placed from `sphinx.center.latitude` and `.longitude`, which are a
+    commonly cited position and not a survey, and sized from the ARCE survey's
+    length, width and height. Nothing about it is a model of the statue, so it
+    says so in a custom property rather than only in this comment, and
+    check.py reads that property back.
+    """
+    values, records = resolved["values"], resolved["records"]
+    p = sphinx_params(values)
+    if p is None:
+        print(f"no {SPHINX_MASSING_NAME}: the preset carries no size or position for it")
+        return None
+    verts, faces = massing_geometry(p)
+    keys = ["sphinx.length", "sphinx.width", "sphinx.height", "sphinx.center.latitude", "sphinx.center.longitude"]
+    sources = sorted({records[k]["source"] for k in keys if k in records})
+    obj = make_object(SPHINX_MASSING_NAME, verts, faces, parent, {
+        "seked_preset": preset_id,
+        "seked_structure": "sphinx",
+        "seked_placeholder": SPHINX_MASSING_NOTE,
+        "seked_sources": ", ".join(sources),
+        "seked_records": ", ".join(keys),
+    })
+    print(f"{SPHINX_MASSING_NAME}: {p['length']} x {p['width']} x {p['height']} m at "
+          f"({p['offset_east']:.1f}, {p['offset_north']:.1f}), front face east")
+    return obj
 
 
 def build_terrain(parent, preset_id, pyramids=()):
@@ -259,6 +294,7 @@ def build(preset_id):
               f"orientation {p['orientation_deg'] * 60:.1f}', at {location}")
 
     build_interior(coll, preset_id, resolved)
+    build_sphinx(coll, preset_id, resolved)
     build_terrain(coll, preset_id, placed)
 
 

@@ -69,6 +69,12 @@
     "note": "Placeholder until a surveyed position is entered; the obelisk is the only standing monument of the Heliopolis temple."
   },
   {
+    "id": "coords-sphinx-cited",
+    "kind": "reference",
+    "citation": "Commonly cited WGS84 coordinates of the Great Sphinx of Giza: 29°58′31″ N, 31°08′16″ E.",
+    "note": "Placeholder until a position tied to the ARCE Sphinx Project or the GPMP grid is entered. The figure is what gazetteers and map services give for the monument as a whole rather than a surveyed point on it, and none of them states which point of the statue it is or, in most cases, which datum. The Sphinx is about 450 m from the Great Pyramid's base centre, so at this accuracy the bearing from it to anything on the plateau is good to a degree or so and no better."
+  },
+  {
     "id": "wgs84",
     "kind": "reference",
     "year": 1984,

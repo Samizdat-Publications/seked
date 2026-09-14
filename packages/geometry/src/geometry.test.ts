@@ -68,3 +68,62 @@ describe('environment', () => {
     expect(env['g1.base.socket.perimeter']).toBe(10);
   });
 });
+
+/**
+ * The site origin, a structure a kilometre north-east of it and one placed by
+ * a survey instead. The coordinates are round numbers chosen so the answers
+ * can be checked by hand; they are not measurements of anything.
+ */
+const ORIGIN = {
+  'g1.center.latitude': 30,
+  'g1.center.longitude': 31,
+  'earth.radius.mean': 6371008.8,
+};
+const METRES_PER_DEGREE = (6371008.8 * Math.PI) / 180;
+
+describe('placing a structure that the database gives a coordinate for', () => {
+  it('puts the site origin itself at the origin of the frame', () => {
+    const env = buildEnvironment(ORIGIN);
+    expect(env['g1.centre.offset.east']).toBe(0);
+    expect(env['g1.centre.offset.north']).toBe(0);
+  });
+
+  it('turns a latitude and a longitude into metres east and north', () => {
+    const env = buildEnvironment({
+      ...ORIGIN,
+      'sphinx.center.latitude': 30.01,
+      'sphinx.center.longitude': 31.02,
+    });
+    expect(env['sphinx.centre.offset.north']).toBeCloseTo(0.01 * METRES_PER_DEGREE, 9);
+    expect(env['sphinx.centre.offset.east']).toBeCloseTo(0.02 * Math.cos((30 * Math.PI) / 180) * METRES_PER_DEGREE, 9);
+    // A tenth of a degree of latitude is 11.1 km, so a hundredth is 1.1 km.
+    expect(env['sphinx.centre.offset.north'] as number).toBeCloseTo(1112, 0);
+  });
+
+  it('leaves a structure the survey already placed exactly where the survey put it', () => {
+    const env = buildEnvironment({
+      ...ORIGIN,
+      'g2.center.latitude': 29.99,
+      'g2.center.longitude': 30.99,
+      'g2.centre.offset.west': 334.41,
+      'g2.centre.offset.south': 353.86,
+    });
+    expect(env['g2.centre.offset.east']).toBeUndefined();
+    expect(env['g2.centre.offset.north']).toBeUndefined();
+    expect(env['g2.centre.offset.west']).toBe(334.41);
+  });
+
+  it('derives nothing at all without an origin and a radius to scale by', () => {
+    const env = buildEnvironment({ 'sphinx.center.latitude': 30.01, 'sphinx.center.longitude': 31.02 });
+    expect(env['sphinx.centre.offset.east']).toBeUndefined();
+    const half = buildEnvironment({ ...ORIGIN, 'sphinx.center.latitude': 30.01 });
+    expect(half['sphinx.centre.offset.east']).toBeUndefined();
+  });
+
+  it('places the Sphinx south-east of the Great Pyramid, a few hundred metres out', () => {
+    const env = buildEnvironment({ ...ORIGIN, 'g1.center.latitude': 29.979167, 'g1.center.longitude': 31.134167, 'sphinx.center.latitude': 29.975278, 'sphinx.center.longitude': 31.137778 });
+    expect(env['sphinx.centre.offset.east'] as number).toBeGreaterThan(300);
+    expect(env['sphinx.centre.offset.north'] as number).toBeLessThan(-400);
+    expect(Math.hypot(env['sphinx.centre.offset.east'] as number, env['sphinx.centre.offset.north'] as number)).toBeCloseTo(555, 0);
+  });
+});

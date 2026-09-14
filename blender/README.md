@@ -93,8 +93,9 @@ blender -b build/seked.blend -P blender/check.py
 `check.py` asserts the saved file and the GLB beside it: that nothing but
 generated objects is in the scene, that each structure's `Interior` collection
 holds exactly the solids `interior_solids` builds for it under the preset
-stamped on the objects, that the terrain object is present and hidden and is
-the size its header says, that every object and every glTF node carries its
+stamped on the objects, that the Sphinx's box is the size and in the place
+`seked_data` puts it and says it is a placeholder, that the terrain object is
+present and hidden and is the size its header says, that every object and every glTF node carries its
 provenance, and that the `Concavity` shape keys survive the export as morph
 targets. It
 prints one line per check and exits 1 on any failure. Pass
