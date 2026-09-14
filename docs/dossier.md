@@ -22,6 +22,7 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | C3 | Descending passage and the pole star | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | yes | 1 |
 | C4 | Orion Correlation | +19.14 % | 12°57′28″ (+34.233 %) | no | 3 |
 | D1 | Giza diagonal to Heliopolis | - | - | pending (needs-site) | 1 |
+| D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
 
@@ -453,6 +454,33 @@ A line through the south-east corners of the three pyramids points to the obelis
 **Context:** Legon, J. A. R. (1979). The Plan of the Giza Pyramids. Archaeological Reports of the Archaeology Society of Staten Island 10(1).
 
 Needs the relative positions of the three pyramids and the georeferenced frame.
+
+### D2 · Legon's rectangle
+
+The three pyramids sit inside a rectangle bounded by the east and north faces of the Great Pyramid and the west and south faces of Menkaure's, measuring 1000 root 2 by 1000 root 3 royal cubits (1414.2 by 1732.1).
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| east-west extent in cubits against 1000 root 2 | `(g1.base.half + g3.centre.offset.west + g3.base.half) / cubit.royal` vs `1000 * sqrt(2)` | 1415.8 | 1414.21 | +0.11 % | yes (±0.5 %) |
+| north-south extent in cubits against 1000 root 3 | `(g1.base.half + g3.centre.offset.south + g3.base.half) / cubit.royal` vs `1000 * sqrt(3)` | 1730.43 | 1732.05 | −0.09 % | yes (±0.5 %) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| east-west extent in cubits against 1000 root 2 | +0.11 % | +0.09 % | +0.09 % | +0.11 % |
+| north-south extent in cubits against 1000 root 3 | −0.09 % | −0.12 % | −0.12 % | −0.09 % |
+
+**Free choices (1)**:
+- the cubit length used to convert the metric extents
+
+**Overlay:** `ground-rectangle` {"corners":["g1.corner.ne","g3.corner.sw"],"structures":["g1","g2","g3"]}
+
+**Proponents:** Legon, J. A. R. (1979). The Plan of the Giza Pyramids. Archaeological Reports of the Archaeology Society of Staten Island 10(1).
+
+**Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer. · Lehner, M. (1997). The Complete Pyramids. London: Thames & Hudson.
+
+Legon quotes 1417.5 by 1732 cubits from Petrie's survey. Here the extents are built from Petrie's centre-to-centre offsets (section 92) and the mean half-bases of G1 and G3, so Menkaure's slightly rectangular base (102.2 by 104.6 m in Lehner) enters as its mean side; that is worth about 1.2 m, or 0.16 percent, on the shorter extent. Petrie found no exact relation between the centres and no evidence the layout was planned as a whole.
 
 ## Inputs
 
