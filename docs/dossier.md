@@ -1,6 +1,6 @@
 # Seked claims dossier
 
-Generated 2026-09-13 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
+Generated 2026-09-14 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
 
 ## Summary
 
@@ -9,7 +9,7 @@ Generated 2026-09-13 from `data/` with the **canonical** preset. Every number be
 | A1 | π in the profile | +0.03 % | +0.03 % | yes | 0 |
 | A2 | φ in the face | +0.04 % | −0.09 % | yes | 0 |
 | A3 | Seked 5½ explains both | 5.9″ (+0.003 %) | 1.0′ (+0.033 %) | yes | 0 |
-| A4 | King's Chamber 3-4-5 | −0.003 % | −0.17 % | yes | 1 |
+| A4 | King's Chamber 3-4-5 | −0.04 % | −0.17 % | yes | 1 |
 | A5 | The cubit itself | +1 µm (+0.000 %) | −7 µm (−0.001 %) | yes | 1 |
 | A7 | Khafre's 3-4-5 | 2.2′ (+0.069 %) | 2.2′ (+0.069 %) | yes | 0 |
 | B1 | 1 : 43,200 | −24.1 km (−0.38 %) | −274.0 km (−0.68 %) | yes | 2 |
@@ -61,7 +61,7 @@ Residual by survey preset:
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
 | apothem ÷ half-base against φ | +0.04 % | +0.09 % | +0.08 % | +0.03 % |
-| face area ÷ height² against 1 | −0.09 % | −0.19 % | −0.18 % | −0.07 % |
+| face area ÷ height² against 1 | −0.09 % | −0.20 % | −0.19 % | −0.07 % |
 
 **Free choices (0)**: none.
 
@@ -105,16 +105,16 @@ The King's Chamber measures 20 × 10 cubits with a height of 5√5 cubits, so th
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.991 | 15 | −0.06 % | yes (±0.5 %) |
-| space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9992 | 25 | −0.003 % | yes (±0.5 %) |
+| end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.9854 | 15 | −0.10 % | yes (±0.5 %) |
+| space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9896 | 25 | −0.04 % | yes (±0.5 %) |
 | height in cubits against 5√5 | `kc.height / cubit.royal` vs `5 * sqrt(5)` | 11.1618 | 11.1803 | −0.17 % | yes (±0.5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| end-wall diagonal in cubits against 15 | −0.06 % | −0.09 % | −0.09 % | −0.06 % |
-| space diagonal in cubits against 25 | −0.003 % | −0.03 % | −0.03 % | −0.003 % |
+| end-wall diagonal in cubits against 15 | −0.10 % | −0.13 % | −0.13 % | −0.10 % |
+| space diagonal in cubits against 25 | −0.04 % | −0.07 % | −0.07 % | −0.04 % |
 | height in cubits against 5√5 | −0.17 % | −0.19 % | −0.19 % | −0.17 % |
 
 **Free choices (1)**:
@@ -218,8 +218,8 @@ Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| height × 10⁹ against the astronomical unit | −3,007,870.7 km (−2.01 %) | −2,887,870.7 km (−1.93 %) | −2,887,870.7 km (−1.93 %) | −3,007,870.7 km (−2.01 %) |
-| height × 10⁹ against the perihelion distance | −505,000.0 km (−0.34 %) | −385,000.0 km (−0.26 %) | −385,000.0 km (−0.26 %) | −505,000.0 km (−0.34 %) |
+| height × 10⁹ against the astronomical unit | −3,007,870.7 km (−2.01 %) | −2,887,470.7 km (−1.93 %) | −2,887,470.7 km (−1.93 %) | −3,007,870.7 km (−2.01 %) |
+| height × 10⁹ against the perihelion distance | −505,000.0 km (−0.34 %) | −384,600.0 km (−0.26 %) | −384,600.0 km (−0.26 %) | −505,000.0 km (−0.34 %) |
 
 **Free choices (2)**:
 - the factor 10⁹
@@ -386,13 +386,13 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | earth.perihelion | 147095000000 | m | nasa-earth-fact-sheet | tabulated | yes |
 | earth.radius.polar | 6356752.314 | m | wgs84 | defined | yes |
 | g1.base.side.mean | 230.33 | m | lehner-1997 | tabulated | no |
-| g1.base.socket.mean | 231.798 | m | petrie-1883 | socket-corner | no |
+| g1.base.socket.mean | 231.798 | m | petrie-1883 | socket-corner | yes |
 | g1.center.latitude | 29.979167 | deg | coords-wgs84-cited |  | no |
 | g1.face.angle | 51.8444 | deg | lehner-1997 | tabulated | no |
 | g1.height.original | 146.59 | m | lehner-1997 | tabulated | no |
 | g2.face.angle | 53.1667 | deg | lehner-1997 | tabulated | no |
-| kc.height | 5.8443 | m | petrie-1883 | interior | no |
-| kc.length | 10.475 | m | petrie-1883 | interior | no |
-| kc.width | 5.2398 | m | petrie-1883 | interior | no |
+| kc.height | 5.8443 | m | petrie-1883 | interior | yes |
+| kc.length | 10.4709 | m | petrie-1883 | interior | yes |
+| kc.width | 5.2354 | m | petrie-1883 | interior | yes |
 | unit.pyramid_inch | 0.0254254 | m | smyth-1864 | defined | no |
 | year.tropical | 365.24219 | day | astronomical-almanac | tabulated | yes |
