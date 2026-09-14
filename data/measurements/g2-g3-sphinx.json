@@ -108,10 +108,11 @@
     "quantity": "length",
     "value": 353.86,
     "unit": "m",
-    "sigma": 0.5,
+    "sigma": 0.52,
     "source": "petrie-1883",
     "method": "triangulation",
-    "note": "13931.6 in south of the Great Pyramid's centre; verify in Petrie's chapter on the relative positions."
+    "note": "13931.6 in, §92, N column of the table of relative positions (centre of the First to centre of the Second Pyramid); 353.86 m at 0.0254 m/inch. Petrie heads the columns N and E, but the Second Pyramid lies south and west of the First, so this is stored as a southward offset. His parallels are inclined −5′ to true north, the mean azimuth of the First and Second Pyramids, whereas this repo's frame is east-north-up on true north; at this distance 5′ is a cross-track shift of 0.51 m. Petrie's figure is kept unrotated, and he states no error for these distances, so sigma is that shift rounded up.",
+    "verified": true
   },
   {
     "key": "g2.centre.offset.west",
@@ -119,10 +120,11 @@
     "quantity": "length",
     "value": 334.41,
     "unit": "m",
-    "sigma": 0.5,
+    "sigma": 0.49,
     "source": "petrie-1883",
     "method": "triangulation",
-    "note": "13165.8 in west; verify."
+    "note": "13165.8 in, §92, E column of the table of relative positions (centre of the First to centre of the Second Pyramid); 334.41 m at 0.0254 m/inch. Petrie heads the columns N and E, but the Second Pyramid lies south and west of the First, so this is stored as a westward offset. His parallels are inclined −5′ to true north, the mean azimuth of the First and Second Pyramids, whereas this repo's frame is east-north-up on true north; at this distance 5′ is a cross-track shift of 0.49 m. Petrie's figure is kept unrotated, and he states no error for these distances, so sigma is that shift rounded up.",
+    "verified": true
   },
   {
     "key": "g2.base.elevation.relative",
@@ -141,10 +143,11 @@
     "quantity": "length",
     "value": 739.19,
     "unit": "m",
-    "sigma": 1,
+    "sigma": 1.08,
     "source": "petrie-1883",
     "method": "triangulation",
-    "note": "29102 in south; verify."
+    "note": "29102.0 in, §92, N column of the table of relative positions (centre of the First to centre of the Third Pyramid); 739.19 m at 0.0254 m/inch. Petrie heads the columns N and E, but the Third Pyramid lies south and west of the First, so this is stored as a southward offset. His parallels are inclined −5′ to true north, the mean azimuth of the First and Second Pyramids, whereas this repo's frame is east-north-up on true north; at this distance 5′ is a cross-track shift of 1.08 m. Petrie's figure is kept unrotated, and he states no error for these distances, so sigma is that shift rounded up.",
+    "verified": true
   },
   {
     "key": "g3.centre.offset.west",
@@ -152,9 +155,10 @@
     "quantity": "length",
     "value": 574.45,
     "unit": "m",
-    "sigma": 1,
+    "sigma": 0.84,
     "source": "petrie-1883",
     "method": "triangulation",
-    "note": "22616 in west; verify."
+    "note": "22616.0 in, §92, E column of the table of relative positions (centre of the First to centre of the Third Pyramid); 574.45 m at 0.0254 m/inch. Petrie heads the columns N and E, but the Third Pyramid lies south and west of the First, so this is stored as a westward offset. His parallels are inclined −5′ to true north, the mean azimuth of the First and Second Pyramids, whereas this repo's frame is east-north-up on true north; at this distance 5′ is a cross-track shift of 0.84 m. Petrie's figure is kept unrotated, and he states no error for these distances, so sigma is that shift rounded up.",
+    "verified": true
   }
 ]
