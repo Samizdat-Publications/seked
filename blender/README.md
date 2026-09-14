@@ -42,14 +42,30 @@ g2.chamber.<name>.{floor,ceiling}.up            levels
 g2.chamber.<name>.gable.height                  optional pitched roof
 ```
 
+A chamber's three extents are each read on their own, because a survey records
+what it could reach. East to west is both side walls if both were located, else
+one of them and the chamber's `length` (whole, or the mean of `length.north`
+and `length.south` as Petrie measures it), else `centre` and that length; north
+to south is the same with the two end walls and `width`. The vertical is
+`floor.up` with either `ceiling.up` or `wall.height`. A wall bounds its own
+side, so a length hung off `wall.west.east` runs east and one hung off
+`wall.east.east` runs west.
+
 A north coordinate may be recorded instead as `<point>.from_north_base`, a
-distance south of the north base edge, which is converted with the structure's
-half-base. A passage with no `floor.begin` of its own starts at the
-structure's entrance, `g2.entrance.<name>.floor.begin` if one is named for it
-and `g2.entrance.floor.begin` for the descending passage, which is how G1's
-entrance passage is stored. Anything incomplete is skipped. Interiors are
-built in their own structure's frame and placed with the same centre offsets,
-base elevation and orientation as the pyramid objects.
+distance south of the north base edge, and an east one as
+`<point>.from_east_side`, a distance west of the east base edge; both are
+converted with the structure's half-base. A passage with no `floor.begin` of
+its own starts at the structure's entrance, `g2.entrance.<name>.floor.begin` if
+one is named for it and `g2.entrance.floor.begin` for the descending passage,
+which is how G1's entrance passage is stored. Anything incomplete is skipped.
+Interiors are built in their own structure's frame and placed with the same
+centre offsets, base elevation and orientation as the pyramid objects.
+
+As entered today, G2's and G3's sheets are dimension sheets: Petrie gives the
+lengths, widths and heights but not a position in the pyramid's frame, so every
+one of their rooms is skipped. G2's great chamber is the closest: it has its
+lengths, its widths, its wall and gable heights and a located west wall, and
+wants only a north position and a `floor.up` to build.
 
 `Terrain (GLO-30 context)` is the Copernicus heightfield as one grid in the
 project frame, with the site's origin elevation from `data/sites.json` taken

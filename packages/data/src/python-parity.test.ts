@@ -212,6 +212,16 @@ const DISCOVERY_CASE: Record<string, number> = {
   'g2.chamber.burial.floor.up': 0,
   'g2.chamber.burial.ceiling.up': 5,
   'g2.chamber.burial.gable.height': 8,
+  // A second chamber in the other shape a survey records: one located wall,
+  // the lengths and widths it was measured on, a floor and a wall height.
+  'g2.chamber.rock.wall.west.east': -1,
+  'g2.chamber.rock.length.north': 12,
+  'g2.chamber.rock.length.south': 12.4,
+  'g2.chamber.rock.centre.from_north_base': 140,
+  'g2.chamber.rock.width.east': 6,
+  'g2.chamber.rock.width.west': 6.2,
+  'g2.chamber.rock.floor.up': -20,
+  'g2.chamber.rock.wall.height': 4,
 };
 
 describe.skipIf(!py)('blender/seked_data.py discovers a prefixed interior the same way', () => {
@@ -220,7 +230,12 @@ describe.skipIf(!py)('blender/seked_data.py discovers a prefixed interior the sa
   const ours = interiorSolids(DISCOVERY_CASE, { structure: 'g2' });
 
   it('finds the same solids and names the same records for each', () => {
-    expect(theirs.map((s) => s.name)).toEqual(['g2.passage.descending', 'g2.passage.horizontal', 'g2.chamber.burial']);
+    expect(theirs.map((s) => s.name)).toEqual([
+      'g2.passage.descending',
+      'g2.passage.horizontal',
+      'g2.chamber.burial',
+      'g2.chamber.rock',
+    ]);
     const inputs = interiorSolidInputs(DISCOVERY_CASE, { structure: 'g2' });
     for (const solid of theirs) expect(solid.keys, `${solid.name} records`).toEqual(inputs[solid.name]);
   });

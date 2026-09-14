@@ -608,10 +608,19 @@ INTERIOR_BUILDERS = [
 #   chamber.<name>.{floor,ceiling}.up            levels
 #   chamber.<name>.gable.height                  optional pitched roof
 #
+# A chamber's three extents are each read on their own, because a survey
+# records what it could reach. East to west is both side walls if both were
+# located, else one of them and the chamber's length (whole, or the mean of
+# length.north and length.south), else centre and that length; north to south
+# is the same with the two end walls and width. The vertical is floor.up with
+# either ceiling.up or wall.height. A wall bounds its own side, so a length
+# hung off wall.west.east runs east and one hung off wall.east.east runs west.
+#
 # A north coordinate may instead be given as "<point>.from_north_base", a
-# distance south of the north base edge, converted here with the half-base. A
-# passage with no floor.begin of its own starts at the structure's entrance.
-# Anything incomplete is skipped.
+# distance south of the north base edge, and an east one as
+# "<point>.from_east_side", a distance west of the east base edge; both are
+# converted here with the half-base. A passage with no floor.begin of its own
+# starts at the structure's entrance. Anything incomplete is skipped.
 
 INTERIOR_STRUCTURES = ("g1", "g2", "g3")
 
@@ -631,23 +640,82 @@ def _number_at(values, key):
     return float(v)
 
 
+# The distance-from-the-casing spelling of each horizontal axis.
+_FROM_EDGE = {"north": "from_north_base", "east": "from_east_side"}
+
+
 def _coordinate(values, base, axis, half):
     """
     One coordinate of a stored point, with the record it came from.
 
     "<base>.north" is the frame coordinate; "<base>.from_north_base" is the
-    same point as a distance south of the north base edge, so it needs the
-    half-base to convert. There is no such alternative for east or up.
+    same point as a distance south of the north base edge, and
+    "<base>.from_east_side" a distance west of the east base edge, so both need
+    the half-base to convert. There is no such alternative for up.
     """
     key = base + "." + axis
     direct = _number_at(values, key)
     if direct is not None:
         return (direct, key)
-    if axis != "north" or half is None:
+    edge = _FROM_EDGE.get(axis)
+    if edge is None or half is None:
         return None
-    from_base = base + ".from_north_base"
-    south = _number_at(values, from_base)
-    return None if south is None else (half - south, from_base)
+    from_edge = base + "." + edge
+    inward = _number_at(values, from_edge)
+    return None if inward is None else (half - inward, from_edge)
+
+
+def _dimension(values, base, sides):
+    """
+    A measured dimension, whole or as the sides a survey took it on: "length",
+    or the mean of "length.north" and "length.south". Whichever sides are
+    present are averaged, which is what G1's subterranean chamber does.
+    """
+    whole = _number_at(values, base)
+    if whole is not None:
+        return (whole, [base])
+    found = [(base + "." + side, _number_at(values, base + "." + side)) for side in sides]
+    found = [(k, v) for k, v in found if v is not None]
+    if not found:
+        return None
+    return (sum(v for _, v in found) / len(found), [k for k, _ in found])
+
+
+def _extent(values, base, axis, half, low, high, size, sides):
+    """
+    One horizontal extent as (lo, hi, keys): both bounding walls, or one of
+    them and the measured dimension, or the centre and the dimension. `high` is
+    the north or east wall, `low` the south or west one.
+    """
+    lo = _coordinate(values, base + "." + low, axis, half)
+    hi = _coordinate(values, base + "." + high, axis, half)
+    if lo is not None and hi is not None:
+        return (min(lo[0], hi[0]), max(lo[0], hi[0]), [hi[1], lo[1]])
+    span = _dimension(values, base + "." + size, sides)
+    if span is None or span[0] <= 0:
+        return None
+    if lo is not None:
+        return (lo[0], lo[0] + span[0], [lo[1]] + span[1])
+    if hi is not None:
+        return (hi[0] - span[0], hi[0], [hi[1]] + span[1])
+    centre = _coordinate(values, base + ".centre", axis, half)
+    if centre is None:
+        return None
+    return (centre[0] - span[0] / 2.0, centre[0] + span[0] / 2.0, [centre[1]] + span[1])
+
+
+def _vertical_extent(values, base):
+    """The vertical extent: the floor, and either the ceiling or the wall height."""
+    floor = _number_at(values, base + ".floor.up")
+    if floor is None:
+        return None
+    ceiling = _number_at(values, base + ".ceiling.up")
+    if ceiling is not None and ceiling > floor:
+        return (floor, ceiling, [base + ".floor.up", base + ".ceiling.up"])
+    walls = _number_at(values, base + ".wall.height")
+    if walls is not None and walls > 0:
+        return (floor, floor + walls, [base + ".floor.up", base + ".wall.height"])
+    return None
 
 
 def _stored_point(values, base, half):
@@ -721,19 +789,17 @@ def _passage_builder(values, prefix, name, half):
 
 def _chamber_builder(values, prefix, name, half):
     base = prefix + "chamber." + name
-    north = _coordinate(values, base + ".wall.north", "north", half)
-    south = _coordinate(values, base + ".wall.south", "north", half)
-    east = _coordinate(values, base + ".wall.east", "east", half)
-    west = _coordinate(values, base + ".wall.west", "east", half)
-    floor = _coordinate(values, base + ".floor", "up", half)
-    ceiling = _coordinate(values, base + ".ceiling", "up", half)
-    if north is None or south is None or east is None or west is None or floor is None or ceiling is None:
+    north_south = _extent(values, base, "north", half, "wall.south", "wall.north", "width", ("east", "west"))
+    east_west = _extent(values, base, "east", half, "wall.west", "wall.east", "length", ("north", "south"))
+    up_down = _vertical_extent(values, base)
+    if north_south is None or east_west is None or up_down is None:
         return None
-    mn, mx = _box((west[0], south[0], floor[0]), (east[0], north[0], ceiling[0]))
+    mn = (east_west[0], north_south[0], up_down[0])
+    mx = (east_west[1], north_south[1], up_down[1])
     span = (mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2])
     if span[0] <= 0 or span[1] <= 0 or span[2] <= 0:
         return None
-    keys = [north[1], south[1], east[1], west[1], floor[1], ceiling[1]]
+    keys = list(north_south[2]) + list(east_west[2]) + list(up_down[2])
     # A gable is optional, and only a ridge above the wall tops is one: it runs
     # along the chamber's longer horizontal axis, which is how every gabled
     # chamber at Giza is roofed, G1's Queen's Chamber included.
@@ -846,6 +912,16 @@ INTERIOR_DISCOVERY_CASE = {
     "g2.chamber.burial.floor.up": 0.0,
     "g2.chamber.burial.ceiling.up": 5.0,
     "g2.chamber.burial.gable.height": 8.0,
+    # A second chamber in the other shape a survey records: one located wall,
+    # the lengths and widths it was measured on, a floor and a wall height.
+    "g2.chamber.rock.wall.west.east": -1.0,
+    "g2.chamber.rock.length.north": 12.0,
+    "g2.chamber.rock.length.south": 12.4,
+    "g2.chamber.rock.centre.from_north_base": 140.0,
+    "g2.chamber.rock.width.east": 6.0,
+    "g2.chamber.rock.width.west": 6.2,
+    "g2.chamber.rock.floor.up": -20.0,
+    "g2.chamber.rock.wall.height": 4.0,
 }
 
 if __name__ == "__main__" and "--interior-case" in sys.argv:

@@ -238,6 +238,121 @@ describe('the Great Pyramid stays hand-written', () => {
   });
 });
 
+/**
+ * Petrie does not record a chamber the same way twice: sometimes both walls
+ * are located, sometimes one wall and the length he measured along each side,
+ * sometimes only a centre. The three extents are read one at a time so any
+ * mixture of those works, and a wall bounds its own side, so a length hung off
+ * the west wall runs east.
+ */
+describe('the shapes a chamber can be recorded in', () => {
+  const chamber = (fields: Record<string, number>): Record<string, number> => {
+    const thin = { ...SYNTHETIC };
+    for (const key of Object.keys(thin)) if (key.startsWith('g2.chamber.')) delete thin[key];
+    return buildEnvironment({ ...thin, ...fields });
+  };
+  const built = (fields: Record<string, number>) => interiorSolids(chamber(fields), g2)['g2.chamber.burial'];
+
+  it('hangs the measured length east of a located west wall', () => {
+    const solid = built({
+      'g2.chamber.burial.wall.west.east': -1,
+      'g2.chamber.burial.length.north': 12,
+      'g2.chamber.burial.length.south': 12.4,
+      'g2.chamber.burial.wall.north.north': -20,
+      'g2.chamber.burial.wall.south.north': -26,
+      'g2.chamber.burial.floor.up': 0,
+      'g2.chamber.burial.wall.height': 5,
+    });
+    // The mean of the two measured lengths, running east from the west wall.
+    expect(solid?.landmarks['g2.chamber.burial.corner.NE.floor']).toEqual([11.2, -20, 0]);
+    expect(solid?.landmarks['g2.chamber.burial.corner.SW.floor']).toEqual([-1, -26, 0]);
+    expect(meshVolume(solid as Mesh)).toBeCloseTo(12.2 * 6 * 5, 2);
+  });
+
+  it('hangs it west of a located east wall instead', () => {
+    const solid = built({
+      'g2.chamber.burial.wall.east.east': 11,
+      'g2.chamber.burial.length': 12,
+      'g2.chamber.burial.wall.north.north': -20,
+      'g2.chamber.burial.width': 6,
+      'g2.chamber.burial.floor.up': 0,
+      'g2.chamber.burial.ceiling.up': 5,
+    });
+    expect(solid?.landmarks['g2.chamber.burial.corner.NE.floor']).toEqual([11, -20, 0]);
+    expect(solid?.landmarks['g2.chamber.burial.corner.SW.floor']).toEqual([-1, -26, 0]);
+  });
+
+  it('centres the dimensions on a recorded centre, from the casing or not', () => {
+    const solid = built({
+      'g2.chamber.burial.centre.east': 5,
+      'g2.chamber.burial.centre.from_north_base': 123,
+      'g2.chamber.burial.length': 12,
+      'g2.chamber.burial.width': 6,
+      'g2.chamber.burial.floor.up': 0,
+      'g2.chamber.burial.wall.height': 5,
+    });
+    // 123 m south of a north base edge 100 m from the centre is y = -23.
+    expect(solid?.landmarks['g2.chamber.burial.floor.centre']).toEqual([5, -23, 0]);
+    expect(solid?.landmarks['g2.chamber.burial.corner.NE.floor']).toEqual([11, -20, 0]);
+  });
+
+  it('reads an east coordinate given as a distance west of the east base edge', () => {
+    const solid = built({
+      'g2.chamber.burial.wall.east.from_east_side': 89,
+      'g2.chamber.burial.length': 12,
+      'g2.chamber.burial.centre.north': -23,
+      'g2.chamber.burial.width': 6,
+      'g2.chamber.burial.floor.up': 0,
+      'g2.chamber.burial.wall.height': 5,
+    });
+    // 89 m west of an east base edge 100 m from the centre is x = +11.
+    expect(solid?.landmarks['g2.chamber.burial.corner.NE.floor']).toEqual([11, -20, 0]);
+  });
+
+  it('takes the wall height when there is no ceiling level', () => {
+    const withCeiling = built({
+      'g2.chamber.burial.centre.east': 5,
+      'g2.chamber.burial.centre.north': -23,
+      'g2.chamber.burial.length': 12,
+      'g2.chamber.burial.width': 6,
+      'g2.chamber.burial.floor.up': 40,
+      'g2.chamber.burial.ceiling.up': 45,
+      'g2.chamber.burial.wall.height': 99,
+    });
+    // A measured ceiling wins: the wall height is Petrie's mean, not a level.
+    expect(withCeiling?.landmarks['g2.chamber.burial.corner.NE.ceiling']).toEqual([11, -20, 45]);
+  });
+
+  it('skips a chamber with dimensions but nothing to place them on', () => {
+    expect(
+      interiorSolids(
+        chamber({
+          'g2.chamber.burial.length': 12,
+          'g2.chamber.burial.width': 6,
+          'g2.chamber.burial.floor.up': 0,
+          'g2.chamber.burial.wall.height': 5,
+        }),
+        g2,
+      )['g2.chamber.burial'],
+    ).toBeUndefined();
+  });
+
+  it('skips a chamber with a place but no vertical extent', () => {
+    expect(
+      interiorSolids(
+        chamber({
+          'g2.chamber.burial.centre.east': 5,
+          'g2.chamber.burial.centre.north': -23,
+          'g2.chamber.burial.length': 12,
+          'g2.chamber.burial.width': 6,
+          'g2.chamber.burial.ceiling.up': 5,
+        }),
+        g2,
+      )['g2.chamber.burial'],
+    ).toBeUndefined();
+  });
+});
+
 describe('interiorStructures', () => {
   it('reports only the structures the environment can actually build', () => {
     expect(interiorStructures(env)).toEqual(['g2']);

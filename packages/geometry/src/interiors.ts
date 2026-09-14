@@ -290,13 +290,23 @@ const BUILDERS: readonly Builder[] = [
 //   <id>.chamber.<name>.{floor,ceiling}.up            levels
 //   <id>.chamber.<name>.gable.height                  optional pitched roof
 //
+// A chamber's three extents are each read on their own, because a survey
+// records what it could reach. East to west is both side walls if both were
+// located, else one of them and the chamber's `length` (whole, or the mean of
+// the `length.north` and `length.south` Petrie measures), else `centre` and
+// that length; north to south is the same with the two end walls and `width`.
+// The vertical is `floor.up` with either `ceiling.up` or `wall.height`. A wall
+// bounds its own side, so a length hung off `wall.west.east` runs east and one
+// hung off `wall.east.east` runs west; nothing there is a choice.
+//
 // A north coordinate may instead be recorded as a distance south of the north
-// base edge, `<point>.from_north_base`, which is how a survey that measured
-// from the casing states it; it is converted here with the structure's
-// half-base. A passage with no `floor.begin` of its own starts at the
-// structure's entrance, `<id>.entrance.<name>.floor.begin` if one is named for
-// it and `<id>.entrance.floor.begin` for the descending passage, which is how
-// G1's entrance passage is stored. Anything incomplete is skipped.
+// base edge, `<point>.from_north_base`, and an east one as a distance west of
+// the east base edge, `<point>.from_east_side`, which is how a survey that
+// measured from the casing states them; both are converted here with the
+// structure's half-base. A passage with no `floor.begin` of its own starts at
+// the structure's entrance, `<id>.entrance.<name>.floor.begin` if one is named
+// for it and `<id>.entrance.floor.begin` for the descending passage, which is
+// how G1's entrance passage is stored. Anything incomplete is skipped.
 
 /** A passage shorter than this is a rounding artefact, not a passage. */
 const MIN_RUN = 1e-6;
@@ -312,20 +322,89 @@ function numberAt(env: Environment, key: string): number | undefined {
   return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 }
 
+/** The distance-from-the-casing spelling of each horizontal axis. */
+const FROM_EDGE: Record<string, string> = { north: 'from_north_base', east: 'from_east_side' };
+
 /**
  * One coordinate of a stored point. `<base>.north` is the frame coordinate;
  * `<base>.from_north_base` is the same point given as a distance south of the
- * structure's north base edge, so it needs the half-base to convert. There is
- * no such alternative for east or up.
+ * structure's north base edge, and `<base>.from_east_side` a distance west of
+ * its east base edge, so both need the half-base to convert. There is no such
+ * alternative for up, which is measured from the pavement either way.
  */
 function coordinate(env: Environment, base: string, axis: 'north' | 'east' | 'up', half: number | undefined): Coordinate | undefined {
   const key = `${base}.${axis}`;
   const direct = numberAt(env, key);
   if (direct !== undefined) return { value: direct, key };
-  if (axis !== 'north' || half === undefined) return undefined;
-  const fromBase = `${base}.from_north_base`;
-  const south = numberAt(env, fromBase);
-  return south === undefined ? undefined : { value: half - south, key: fromBase };
+  const edge = FROM_EDGE[axis];
+  if (edge === undefined || half === undefined) return undefined;
+  const fromEdge = `${base}.${edge}`;
+  const inward = numberAt(env, fromEdge);
+  return inward === undefined ? undefined : { value: half - inward, key: fromEdge };
+}
+
+/** One extent of a chamber, and the records that fixed it. */
+interface Extent {
+  lo: number;
+  hi: number;
+  keys: string[];
+}
+
+/**
+ * A measured dimension, either whole or as the sides a survey took it on:
+ * `length` or the mean of `length.north` and `length.south`. Whichever sides
+ * are present are averaged, which is what G1's subterranean chamber does.
+ */
+function dimension(env: Environment, base: string, sides: readonly string[]): { value: number; keys: string[] } | undefined {
+  const whole = numberAt(env, base);
+  if (whole !== undefined) return { value: whole, keys: [base] };
+  const found = sides
+    .map((side) => ({ key: `${base}.${side}`, value: numberAt(env, `${base}.${side}`) }))
+    .filter((p): p is { key: string; value: number } => p.value !== undefined);
+  if (found.length === 0) return undefined;
+  return { value: found.reduce((a, p) => a + p.value, 0) / found.length, keys: found.map((p) => p.key) };
+}
+
+/**
+ * One horizontal extent: both bounding walls, or one of them and the measured
+ * dimension, or the centre and the dimension. `high` is the north or east
+ * wall, `low` the south or west one.
+ */
+function extent(
+  env: Environment,
+  base: string,
+  axis: 'north' | 'east',
+  half: number | undefined,
+  low: string,
+  high: string,
+  size: string,
+  sides: readonly string[],
+): Extent | undefined {
+  const lo = coordinate(env, `${base}.${low}`, axis, half);
+  const hi = coordinate(env, `${base}.${high}`, axis, half);
+  if (lo && hi) {
+    return { lo: Math.min(lo.value, hi.value), hi: Math.max(lo.value, hi.value), keys: [hi.key, lo.key] };
+  }
+  const span = dimension(env, `${base}.${size}`, sides);
+  if (!span || span.value <= 0) return undefined;
+  if (lo) return { lo: lo.value, hi: lo.value + span.value, keys: [lo.key, ...span.keys] };
+  if (hi) return { lo: hi.value - span.value, hi: hi.value, keys: [hi.key, ...span.keys] };
+  const centre = coordinate(env, `${base}.centre`, axis, half);
+  if (!centre) return undefined;
+  return { lo: centre.value - span.value / 2, hi: centre.value + span.value / 2, keys: [centre.key, ...span.keys] };
+}
+
+/** The vertical extent: the floor, and either the ceiling or the wall height. */
+function verticalExtent(env: Environment, base: string): Extent | undefined {
+  const floor = numberAt(env, `${base}.floor.up`);
+  if (floor === undefined) return undefined;
+  const ceiling = numberAt(env, `${base}.ceiling.up`);
+  if (ceiling !== undefined && ceiling > floor) {
+    return { lo: floor, hi: ceiling, keys: [`${base}.floor.up`, `${base}.ceiling.up`] };
+  }
+  const walls = numberAt(env, `${base}.wall.height`);
+  if (walls !== undefined && walls > 0) return { lo: floor, hi: floor + walls, keys: [`${base}.floor.up`, `${base}.wall.height`] };
+  return undefined;
 }
 
 /** A stored point as x, y, z, with its records in the north, east, up order G1 uses. */
@@ -380,19 +459,17 @@ function passageBuilder(env: Environment, prefix: string, name: string, half: nu
 
 function chamberBuilder(env: Environment, prefix: string, name: string, half: number | undefined): Builder | undefined {
   const base = `${prefix}chamber.${name}`;
-  const north = coordinate(env, `${base}.wall.north`, 'north', half);
-  const south = coordinate(env, `${base}.wall.south`, 'north', half);
-  const east = coordinate(env, `${base}.wall.east`, 'east', half);
-  const west = coordinate(env, `${base}.wall.west`, 'east', half);
-  const floor = coordinate(env, `${base}.floor`, 'up', half);
-  const ceiling = coordinate(env, `${base}.ceiling`, 'up', half);
-  if (!north || !south || !east || !west || !floor || !ceiling) return undefined;
+  const northSouth = extent(env, base, 'north', half, 'wall.south', 'wall.north', 'width', ['east', 'west']);
+  const eastWest = extent(env, base, 'east', half, 'wall.west', 'wall.east', 'length', ['north', 'south']);
+  const upDown = verticalExtent(env, base);
+  if (!northSouth || !eastWest || !upDown) return undefined;
 
-  const { min, max } = box([west.value, south.value, floor.value], [east.value, north.value, ceiling.value]);
+  const min: Point = [eastWest.lo, northSouth.lo, upDown.lo];
+  const max: Point = [eastWest.hi, northSouth.hi, upDown.hi];
   const span: Point = [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
   if (span[0] <= 0 || span[1] <= 0 || span[2] <= 0) return undefined;
 
-  const keys = [north.key, south.key, east.key, west.key, floor.key, ceiling.key];
+  const keys = [...northSouth.keys, ...eastWest.keys, ...upDown.keys];
   // A gable is optional, and only a ridge above the wall tops is one: the
   // ridge runs along the chamber's longer horizontal axis, which is how every
   // gabled chamber at Giza is roofed, G1's Queen's Chamber included.
