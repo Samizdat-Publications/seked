@@ -33,4 +33,13 @@ python3 blender/seked_data.py canonical --check
 flat and hollowed) as JSON; a test in packages/data compares those vertices
 and volumes with `@seked/geometry`, so the two mesh builders cannot drift.
 
+`--shapes` does the same for the interior solids: it prints a fixed list of
+literal passages, chambers and a corbelled gallery built by `extruded_section`,
+`passage` and `chamber`, and the same parity test checks them against the
+TypeScript builders. It reads nothing from `data/`, so it runs on its own:
+
+```
+python3 blender/seked_data.py --shapes
+```
+
 Not here yet: terrain (BlenderGIS), interiors, the Sphinx, materials.
