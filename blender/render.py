@@ -1,11 +1,13 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/hero.png [--width 1600 --height 900 --samples 64]
+    blender -b build/seked.blend -P blender/render.py -- --out build/hero.png [--view dawn|cutaway] [--width 1600 --height 900 --samples 64]
 
-The default view is the plan's first hero shot: equinox dawn, the sun low in
-the east, seen from the north-east so the grazing light picks out the
-Great Pyramid's eight faces. Materials follow the plan (Tura casing, core
+The default view, "dawn", is the plan's first hero shot: equinox dawn, the
+sun low in the east, seen from the north-east so the grazing light picks
+out the Great Pyramid's eight faces. "cutaway" makes the Great Pyramid's
+casing translucent and looks in from the east, so the passages and chambers
+built from Petrie's positions show in place. Materials follow the plan (Tura casing, core
 limestone, Aswan granite for the interior, sand for the terrain) and are
 created here if the scene has none, so generate.py stays material-free.
 """
@@ -18,7 +20,7 @@ import bpy  # noqa: E402  (only available inside Blender)
 
 def parse_args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    opts = {"out": "build/hero.png", "width": "1600", "height": "900", "samples": "64", "engine": ""}
+    opts = {"out": "build/hero.png", "width": "1600", "height": "900", "samples": "64", "engine": "", "view": "dawn"}
     i = 0
     while i < len(argv):
         key = argv[i].lstrip("-")
@@ -67,16 +69,45 @@ def look_at(obj, target):
     obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
 
 
-def setup_view(scene):
+VIEWS = {
+    # camera location, look-at target, lens, sun elevation and azimuth in degrees
+    "dawn": {"location": (760.0, 700.0, 150.0), "target": (-220.0, -320.0, 60.0), "lens": 45.0, "sun": (6.0, 90.0)},
+    "cutaway": {"location": (430.0, 170.0, 130.0), "target": (-15.0, -5.0, 50.0), "lens": 40.0, "sun": (35.0, 135.0)},
+}
+
+
+def make_translucent(obj, alpha):
+    """Keep the casing visible as a shell while the interior shows through it."""
+    mat = obj.data.materials[0].copy()
+    mat.name = f"{mat.name} (translucent)"
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    bsdf.inputs["Alpha"].default_value = alpha
+    for attr, value in (("surface_render_method", "BLENDED"), ("blend_method", "BLEND")):
+        if hasattr(mat, attr):
+            try:
+                setattr(mat, attr, value)
+            except TypeError:
+                pass
+    if hasattr(mat, "use_backface_culling"):
+        mat.use_backface_culling = True
+    obj.data.materials[0] = mat
+
+
+def setup_view(scene, view):
     from mathutils import Vector
+    v = VIEWS[view]
     cam_data = bpy.data.cameras.new("Hero camera")
-    cam_data.lens = 45.0
+    cam_data.lens = v["lens"]
     cam_data.clip_end = 20000.0
     cam = bpy.data.objects.new("Hero camera", cam_data)
     scene.collection.objects.link(cam)
-    cam.location = Vector((760.0, 700.0, 150.0))
-    look_at(cam, Vector((-220.0, -320.0, 60.0)))
+    cam.location = Vector(v["location"])
+    look_at(cam, Vector(v["target"]))
     scene.camera = cam
+    if view == "cutaway":
+        g1 = bpy.data.objects.get("G1 Khufu (as built)")
+        if g1 is not None:
+            make_translucent(g1, 0.22)
 
     sun_data = bpy.data.lights.new("Dawn sun", "SUN")
     sun_data.energy = 5.0
@@ -86,7 +117,7 @@ def setup_view(scene):
     scene.collection.objects.link(sun)
     # Sun on the equinox, 6 degrees up, bearing due east: a track-to rotation
     # pointing the lamp's -Z along the light direction (from the sun towards the ground).
-    elevation, azimuth = math.radians(6.0), math.radians(90.0)
+    elevation, azimuth = (math.radians(a) for a in v["sun"])
     light_dir = Vector((-math.cos(elevation) * math.sin(azimuth), -math.cos(elevation) * math.cos(azimuth), -math.sin(elevation)))
     sun.rotation_euler = light_dir.to_track_quat("-Z", "Y").to_euler()
 
@@ -122,7 +153,9 @@ def main():
             if ground:
                 for poly in obj.data.polygons:
                     poly.use_smooth = True
-    setup_view(scene)
+    if opts["view"] not in VIEWS:
+        raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
+    setup_view(scene, opts["view"])
     engine = choose_engine(scene, opts["engine"])
     samples = int(opts["samples"])
     if engine.startswith("BLENDER_EEVEE"):
