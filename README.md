@@ -33,26 +33,33 @@ phases and the sourcing check, is in [`docs/plan.html`](docs/plan.html).
 
 ## Status
 
-Phases 0 and 1 are done and Phases 2 and 3 are well under way. Every
-Petrie 1883 record for all three pyramids and the Dash 2015 records are
-verified against the source page; the Cole 1925 records wait for a copy of
-the paper. The Great Pyramid's interior is generated from Petrie's positions
-in both the Blender scene and the browser; Khafre's and Menkaure's sheets
-carry Petrie's dimensions but he gives no positions, so their interiors wait
-on published plans. The terrain is cut from Copernicus GLO-30 with the ground
-under each pyramid set to its surveyed base level. Nineteen claims compute,
-including all of group C through the Vondrák precession model, the HYG 4.2
-star catalogue and an equinox-and-solstice sun; C7, D3 and D4 remain rows in
-the plan. The web viewer builds the same meshes in the browser, with live
-preset, cubit and epoch controls, a section cut, a fly camera, a star dome
-at any epoch and sidereal time, and overlays for the sky claims and the
-ghost profiles. Milestone renders and screenshots are collected in
+Phases 0 and 1 are done, Phase 4 is closed, and Phases 2, 3 and 5 are
+under way. Every Petrie 1883 record for all three pyramids and the Dash
+2015 records are verified against the source page; the Cole 1925 records
+wait for a copy of the paper. The Great Pyramid's interior is generated
+from Petrie's positions in both the Blender scene and the browser; Khafre's
+and Menkaure's sheets carry Petrie's dimensions but he gives no positions,
+so their interiors wait on published plans. The terrain is cut from
+Copernicus GLO-30 with the ground under each pyramid set to its surveyed
+base level. All twenty-two claims of the plan's table compute, C7 on the
+Orion engine with Collins's Cygnus stars, D3 against cited positions for
+the Delta, D4 from Nell and Ruggles's 2014 survey of the temples at the
+Sphinx's feet. Every overlay a claim declares now draws, and a test says
+so: the ghost profiles, the King's Chamber wireframe, the casing and socket
+outlines, the compass rose, the shaft and passage rays, the Orion and
+Cygnus projections, the bearings from the Sphinx and from the Great
+Pyramid, Legon's rectangle, the Heliopolis line, the ghost Earth, and B3's
+three parallels with the Egypt 1907 datum shift beside the WGS84 one. The
+web viewer builds the same meshes in the browser, with live preset, cubit
+and epoch controls, a section cut, a fly camera, a star dome at any epoch
+and sidereal time, a dated sun, and a twelve-step narrated tour. Milestone
+renders and screenshots are collected in
 [`docs/progress/`](docs/progress/README.md), and a GitHub Pages workflow
 assembles the viewer, the snapshots and the documents into one site.
 
 ```
 pnpm install
-pnpm test        # 276 tests across units, geometry, data, claims, sky, the web bundle and the Blender reader
+pnpm test        # 360 tests across units, geometry, data, claims, sky, the viewer and the Blender reader
 pnpm typecheck   # the packages, the scripts and the viewer
 pnpm dossier     # regenerates docs/dossier.md from data/
 pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
@@ -88,11 +95,13 @@ YAML without the claims package learning any astronomy.
 
 Next: verify Cole 1925 once the paper is to hand; positions for Khafre's and
 Menkaure's interiors from published plans; the GPMP contours for the ground;
-the Sphinx sculpt in place of the massing placeholder; claims C7, D3 and D4;
-the remaining overlays (A4's chamber wireframe, B1's ghost Earth, B3's map
-inset, B4's socket outline, D1's line and D2's rectangle); tour mode; a
-calendar for the Sun (UT1 and delta T) so dated events get clock times; and
-the Stellarium check of Alnitak's transit at 2500 and 10,500 BCE.
+the Stellarium check of Alnitak's transit at 2500 and 10,500 BCE; and then
+the Blender work the plan's hero renders need, which is where the project's
+visual weight lands: the Sphinx sculpt in place of the massing placeholder,
+materials (Tura casing, nummulitic core with Petrie's measured courses,
+Aswan granite, basalt paving), lighting and atmosphere at the dated events,
+the equinox-dawn and cutaway renders, and the sky-rollback cinematic with
+star positions baked from `packages/sky`.
 
 ## Layout
 
