@@ -13,6 +13,10 @@ has a base and a height for, an "(as built)" object and a hidden "(today)"
 object truncated at the surviving height. The Great Pyramid's concavity is
 the `Concavity` shape key on both.
 
+Headless, the script starts from an empty file, so the saved .blend and the
+GLB contain only the generated objects. In the Text Editor it adds the
+collection to whatever is open.
+
 Object custom properties record the preset and the source of the base and
 height, so the provenance travels with the .blend file.
 

@@ -115,6 +115,12 @@ def build(preset_id):
 
 def main():
     opts = parse_args()
+    if bpy.app.background and not bpy.data.filepath:
+        # Headless with no .blend on the command line: Blender has loaded its
+        # startup file (a cube, a light and a camera) before running us. Start
+        # from an empty file so the saved scene and the glTF hold nothing the
+        # database did not generate.
+        bpy.ops.wm.read_homefile(use_empty=True)
     build(opts["preset"])
     if opts["save"]:
         path = os.path.abspath(opts["save"])

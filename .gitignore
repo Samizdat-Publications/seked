@@ -8,6 +8,8 @@ dist/
 *.blend1
 *.blend2
 blender/**/cache/
+__pycache__/
+build/
 
 # Large generated assets are tracked with LFS once the pipeline exists
 *.glb
