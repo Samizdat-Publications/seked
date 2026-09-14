@@ -1,0 +1,31 @@
+{
+  "site": "giza",
+  "origin": {
+    "latitude": 29.979167,
+    "longitude": 31.134167
+  },
+  "frame": "East-north-up at the Great Pyramid's base centre; +X east, +Y north, +Z up, metres.",
+  "horizontalDatum": "WGS84",
+  "verticalDatum": "EGM2008",
+  "heights": "giza-glo30-far.f32",
+  "dtype": "float32",
+  "byteOrder": "little-endian",
+  "layout": "row-major",
+  "rowOrder": "south-to-north",
+  "columnOrder": "west-to-east",
+  "spacing": 60.0,
+  "nx": 401,
+  "ny": 401,
+  "x0": -12000.0,
+  "y0": -12000.0,
+  "resampling": "bilinear",
+  "projection": "Local tangent plane at the origin: east = (longitude - origin) * cos(origin latitude) * N * pi / 180, north = (latitude - origin) * M * pi / 180, with M the meridional and N the prime-vertical WGS84 radius of curvature at the origin latitude (a and b from earth.radius.equatorial and earth.radius.polar).",
+  "source": "copernicus-glo30",
+  "tiles": [
+    "Copernicus_DSM_COG_10_N29_00_E031_00_DEM.tif",
+    "Copernicus_DSM_COG_10_N30_00_E031_00_DEM.tif"
+  ],
+  "script": "scripts/terrain.py",
+  "sha256": "8874a7e6b1ea6ba3c8f46e8b1dff16870b257efd19fb974f475c5857d648ebae",
+  "note": "Heights are orthometric on EGM2008, as Copernicus delivers them. GLO-30 is a surface model, so the monuments are in it, but their footprints are edited: the product's editing mask (AUXFILES/*_EDM.tif) marks them with value 2 and the Great Pyramid comes through as a smooth mound peaking near 94 m rather than an apex near 200 m. The sample at the origin is therefore neither the ground under Khufu nor the built surface of Khufu. The ground beneath each pyramid must come from the surveyed base elevations and the GPMP contours, and the monuments themselves from the measurement database, in a later step."
+}
