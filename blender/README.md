@@ -138,8 +138,7 @@ take the last line.
 python3 blender/seked_data.py canonical --interior
 ```
 
-Not here yet: the shafts, the GPMP contours under the monuments, the Sphinx,
-materials.
+Not here yet: the shafts, the GPMP contours under the monuments, the Sphinx.
 
 ## Ground and renders
 
@@ -156,12 +155,130 @@ The flattening itself is `ground_height` in `seked_data.py`, which mirrors
 on a fixed set of samples, so the .blend, the GLB and the web viewer cannot
 disagree about where the ground is.
 
-`render.py` renders a still headless, with the plan's materials and the
-first hero view (equinox dawn from the north-east, sun 6 degrees up in the
-east):
+`render.py` renders a still headless, in Cycles, with the plan's materials
+and one of four views. It needs the sky bake first:
 
 ```
-blender -b build/seked.blend -P blender/render.py -- --out build/hero.png --width 1600 --height 900 --samples 64
+pnpm sky-bake
+blender -b build/seked.blend -P blender/render.py -- --view dawn    --out build/dawn.png    --width 1600 --height 900 --samples 128
+blender -b build/seked.blend -P blender/render.py -- --view cutaway --out build/cutaway.png --width 1600 --height 900 --samples 128
+blender -b build/seked.blend -P blender/render.py -- --view akhet   --out build/akhet.png   --width 1600 --height 900 --samples 128
+blender -b build/seked.blend -P blender/render.py -- --view night   --out build/night.png   --width 1600 --height 900 --samples 128
 ```
 
 Progress snapshots rendered this way live in `docs/progress/`.
+
+### The sky bake
+
+Nothing about the sun or the stars is computed in a Blender script, and
+nothing about them is typed into one. `pnpm sky-bake` runs `scripts/sky-bake.ts`,
+which asks `@seked/sky` and the canonical preset's observer (the Great
+Pyramid's cited latitude and longitude) for four moments and writes
+`build/sky-bake.json`:
+
+| moment | epoch | what it is |
+|---|---:|---|
+| `equinox-sunrise` | −2499 | the vernal equinox sun's upper limb on the horizon, `sun.equinox.rise.azimuth` |
+| `equinox-sunrise-plus-hour` | −2499 | the same sun an hour of hour angle later, from `sun.equinox.rise.lst + 15°` |
+| `solstice-summer-sunset` | −2499 | C6's summer solstice sunset, `sun.solstice.summer.set.azimuth` |
+| `alnitak-transit` | −2449 | Alnitak on the meridian, under the December solstice sun that season puts 37.7° below the horizon |
+
+Each moment carries the epoch it was computed at and the name of the key or
+the call its numbers came out of, so a figure in a render can be traced to
+the function that produced it without opening a Blender file. A sun that is
+up carries two altitudes: the geometric one, which is what a claim asserts,
+and the refracted one from `apparentAltitude`, which is where the disc is
+seen. At the standard sunset altitude those differ by 47′, which is the
+difference between a picture with a sun in it and one without.
+
+The `alnitak-transit` moment brings the whole bright catalogue with it: 8,920
+stars to magnitude 6.5, precessed to the epoch with one shared matrix and
+turned into altitude and azimuth at the sidereal time Alnitak transits at,
+with each star's magnitude and colour index beside it. The render script
+draws 4,441 of them, the ones above the horizon.
+
+Without the file `render.py` prints a warning and falls back to the
+placeholder angles in `VIEWS`, which are lighting and not astronomy.
+
+### The four views
+
+| view | moment | sun altitude, azimuth | what it shows |
+|---|---|---:|---|
+| `dawn` | equinox-sunrise-plus-hour | 12.129°, 97.122° | the three pyramids from the east-north-east, the light grazing the Great Pyramid's north face so its two halves separate |
+| `cutaway` | equinox-sunrise-plus-hour | 12.129°, 97.122° | the same light, the casing at 15 % alpha, the passages and chambers in place inside it |
+| `akhet` | solstice-summer-sunset | −0.833°, 298.523° | the solstice sun setting into the gap between Khufu and Khafre, seen from in front of the Sphinx: claim C6 as a photograph |
+| `night` | alnitak-transit | −37.686°, 261.548° | the bright catalogue over the pyramids, Alnitak on the meridian and Orion standing over Khufu's apex |
+
+Each view is a camera position, a target, a lens and an exposure in the
+project frame, and the script prints all of them along with the sun it used
+and where that sun came from. The akhet camera is taken off the Sphinx's own
+box rather than written down, so it follows the cited coordinates: a bearing,
+a distance and a height from the box's centre.
+
+The sky is Blender's Sky Texture in its multiple-scattering model, which is
+what 5.1 calls the half of Nishita worth rendering a low sun under, in dry
+desert air: standard Rayleigh density, thin dust, and a subtropical ozone
+column. Its `sun_rotation` needs no conversion at all. An equirectangular
+probe of 5.1 puts the sun in +Y at rotation 0 and +X at rotation 90, and in
+this project's frame +Y is north and +X is east, so the rotation is the
+azimuth itself, measured from north through east.
+
+The texture goes into the world twice, mixed on `Is Camera Ray`: with its sun
+disc for what the camera sees, without it for what anything is lit by, and
+the sun lamp is hidden from camera rays. So the sun is drawn once and
+delivered once. The lamp's colour is Beer's law through Kasten and Young's
+(1989) air mass with a Rayleigh optical depth per channel, which is what
+turns the solstice sun to (1.000, 0.270, 0.009) at air mass 38 without anyone
+choosing a colour, and its strength is the solar constant on the sky
+texture's own measured scale. The drawn disc is at the texture's physical
+radiance and comes out white with a warm surround, which is what a photograph
+of a sun on the horizon does.
+
+### Materials
+
+Four materials, base colour and roughness and a bump and nothing else, as the
+plan says. They are built in `render.py` so `generate.py` stays material-free,
+and they are assigned by what an object is.
+
+- **Tura casing**, on every "(as built)" pyramid: near white, smooth, with a
+  large-scale noise in roughness so a face is not one flat plane.
+- **Core limestone**, on the Sphinx's box and on any "(today)" object: warmer
+  and coarser, banded into courses.
+- **Aswan granite**, on the interior solids: dark red-brown with a fine grain.
+- **Plateau sand**, on the terrain: pale, rough, drifting softly over tens of
+  metres. The sky texture's ground albedo is the luminance of that same sand,
+  so the two agree about what the plateau reflects.
+
+The courses are the one number in the materials that comes out of the
+database. A wave texture bands the object's own Z with a period of
+`g1.height.original / 203`, which is 0.7221 m under the canonical preset: the
+height is resolved through `seked_data` at render time and the 203 is the
+number of courses Petrie counted (§26). Blender's banded wave runs its sine
+over `20 · scale · z`, so the scale is `pi / (10 · course)`; that relation was
+checked against 5.1 by rendering a wall of known height and counting bands.
+
+### What is still a placeholder
+
+- **The Sphinx is a box.** `generate.py` builds an axis-aligned massing box on
+  a cited position and says so in its custom properties. In the akhet view it
+  is the striped slab in the foreground, and it is half sunk, because its base
+  is the Great Pyramid's base level while the ground model around it is
+  higher: the real Sphinx sits in a quarried hollow the terrain does not have.
+- **The courses are a mean, not the table.** Petrie measured all 203 course
+  thicknesses and none of them is in `data/` yet. The real courses thin upward
+  from about a metre and a half at the base and a few conspicuously thick ones
+  interrupt the run; the bands here know none of that.
+- **The night view's fill is not a light.** A moonless sky is not black and
+  neither a sun 37° down nor the star dome will light a pyramid, so a flat,
+  faint blue is added to the world to stand in for airglow. It is an exposure
+  decision, and so is the compression of the star magnitudes from the physical
+  0.4 exponent to 0.32: the catalogue spans a factor of four hundred in flux
+  and a linear image exposed for Sirius would lose everything at magnitude 6.
+  The positions are not compressed and not chosen.
+- **The horizon past three kilometres is the sky texture's own ground.** The
+  terrain grid is six kilometres across, so in the `dawn` and `cutaway` views a
+  thin dark band shows between the far edge of the real heightfield and the
+  true horizon. No ground albedo fixes it; it is where the data stops.
+- **Cycles runs on the CPU here.** This machine offers no GPU compute backend,
+  so the four views at 1600 × 900 and 128 samples take between 12 s and 64 s
+  each rather than the seconds a card would take.
