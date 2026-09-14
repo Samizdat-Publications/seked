@@ -18,6 +18,7 @@ import {
   meridianAngle,
   placeOnDome,
   positionsAtEpoch,
+  skyEnvironment,
   tangentOffset,
   transitAltitude,
   transitIsNorth,
@@ -38,6 +39,8 @@ export const BUILT_OVERLAYS = new Set([
   'passage-ray',
   'compass-rose',
   'sky-projection',
+  'sun-ribbon',
+  'akhet',
 ]);
 
 /** Enough colours for the three slopes A3 puts side by side. */
@@ -498,6 +501,124 @@ export function skyProjectionSpec(claim: Claim, ctx: OverlayContext): SkyProject
   };
 }
 
+// --- C5 and C6: bearings drawn on the plateau ------------------------------
+
+/** A direction from the viewpoint, drawn as a line along the ground. */
+export interface GroundBearing {
+  label: string;
+  /** The expression the claim file writes, which is the honest caption for the line. */
+  source: string;
+  azimuthDeg: number;
+  colour: string;
+}
+
+/** A place on the plateau the viewpoint is sighted on, such as a pyramid's corner. */
+export interface GroundSight {
+  label: string;
+  /** East and north in the scene frame, metres. */
+  at: [number, number];
+  /** The bearing to it, which is what the claim's target is made of. */
+  azimuthDeg: number;
+  colour: string;
+}
+
+export interface GroundBearingsSpec {
+  type: 'sun-ribbon' | 'akhet';
+  /** The viewpoint: a structure's centre, east and north in the scene frame. */
+  from: [number, number];
+  /** Metres above the pavement the lines are drawn at, so they read over the ground. */
+  height: number;
+  lengthM: number;
+  bearings: GroundBearing[];
+  sights: GroundSight[];
+}
+
+/**
+ * A structure's centre in the scene frame, whichever way the database places
+ * it: the derived east and north offsets for a structure placed by a
+ * coordinate, and Petrie's south and west for the two he triangulated.
+ */
+function centreOf(env: Environment, id: string): [number, number] | undefined {
+  const west = env[`${id}.centre.offset.west`];
+  const south = env[`${id}.centre.offset.south`];
+  const east = env[`${id}.centre.offset.east`] ?? (west === undefined ? undefined : -west);
+  const north = env[`${id}.centre.offset.north`] ?? (south === undefined ? undefined : -south);
+  return east === undefined || north === undefined ? undefined : [east, north];
+}
+
+/** `g1.sw`, `g2.ne`: a base corner of a structure, from its centre and half-base. */
+function cornerOf(env: Environment, name: string): { label: string; at: [number, number] } | undefined {
+  const [id, corner] = name.split('.');
+  if (!id || !corner) return undefined;
+  const centre = centreOf(env, id);
+  const half = env[`${id}.base.half`];
+  if (!centre || half === undefined) return undefined;
+  const lower = corner.toLowerCase();
+  const north = lower.includes('n') ? 1 : lower.includes('s') ? -1 : 0;
+  const east = lower.includes('e') ? 1 : lower.includes('w') ? -1 : 0;
+  if (north === 0 || east === 0) return undefined;
+  return {
+    label: `${id.toUpperCase()} ${corner.toUpperCase()} corner`,
+    at: [centre[0] + east * half, centre[1] + north * half],
+  };
+}
+
+const azimuthTo = (from: readonly number[], to: readonly number[]): number =>
+  (Math.atan2((to[0] as number) - (from[0] as number), (to[1] as number) - (from[1] as number)) / DEG + 360) % 360;
+
+/**
+ * C5 and C6. Both claims are a bearing taken from a place on the ground: a
+ * star and the sun rising over the eastern horizon seen from the Sphinx, and
+ * the summer solstice sun setting into the gap between two pyramids seen from
+ * the same spot. So both are drawn the same way, as lines along the plateau
+ * from the viewpoint, and the claim file says which lines.
+ *
+ * Every azimuth is an expression in the claim's own language evaluated in the
+ * environment of the scene's epoch, so a line and the residual in the panel
+ * cannot disagree, and dragging the sky moves both.
+ */
+export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBearingsSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || (overlay.type !== 'sun-ribbon' && overlay.type !== 'akhet')) return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const from = centreOf(ctx.env, asString(params.from) ?? 'sphinx');
+  if (!from) return undefined;
+
+  // The same scope the claim evaluator builds: the measured and derived keys,
+  // plus the stars and the sun of this epoch.
+  const scope: Environment = {
+    ...ctx.env,
+    ...skyEnvironment({ epoch: ctx.epoch, latitudeDeg: ctx.latitudeDeg, stars: ctx.stars }),
+  };
+
+  const bearings: GroundBearing[] = [];
+  for (const entry of Array.isArray(params.bearings) ? params.bearings : []) {
+    if (typeof entry !== 'object' || entry === null) continue;
+    const row = entry as Record<string, unknown>;
+    const label = asString(row.label);
+    const source = asString(row.azimuth);
+    if (!label || !source) continue;
+    try {
+      const azimuthDeg = evaluate(source, scope);
+      if (!Number.isFinite(azimuthDeg)) continue;
+      bearings.push({ label, source, azimuthDeg, colour: RAY_COLOURS[bearings.length % RAY_COLOURS.length] as string });
+    } catch {
+      // A bearing the environment cannot evaluate is simply not drawn.
+    }
+  }
+
+  const sights: GroundSight[] = asStrings(params.corners)
+    .map((name) => cornerOf(ctx.env, name))
+    .filter((c): c is { label: string; at: [number, number] } => c !== undefined)
+    .map((c) => ({ ...c, azimuthDeg: azimuthTo(from, c.at), colour: SIGHT_COLOUR }));
+
+  if (bearings.length === 0 && sights.length === 0) return undefined;
+  return { type: overlay.type, from, height: 8, lengthM: asNumber(params.length_m) ?? 1200, bearings, sights };
+}
+
+/** The corner sight lines, which are ground and not sky. */
+export const SIGHT_COLOUR = '#cfd8e3';
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -505,7 +626,8 @@ export type OverlaySpec =
   | { kind: 'shaft-rays'; spec: ShaftRaysSpec }
   | { kind: 'passage-ray'; spec: PassageRaySpec }
   | { kind: 'compass-rose'; spec: CompassRoseSpec }
-  | { kind: 'sky-projection'; spec: SkyProjectionSpec };
+  | { kind: 'sky-projection'; spec: SkyProjectionSpec }
+  | { kind: 'ground-bearings'; spec: GroundBearingsSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -520,6 +642,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (rose) return { kind: 'compass-rose', spec: rose };
   const projection = skyProjectionSpec(claim, ctx);
   if (projection) return { kind: 'sky-projection', spec: projection };
+  const bearings = groundBearingsSpec(claim, ctx);
+  if (bearings) return { kind: 'ground-bearings', spec: bearings };
   return undefined;
 }
 
@@ -555,5 +679,10 @@ function describe(overlay: OverlaySpec): string {
       return `A rose on ${overlay.spec.structure.toUpperCase()}'s base: true north against the measured side azimuth, drawn ${ROUND(overlay.spec.exaggeration, 0)} times wide of the truth so ${ROUND(Math.abs(overlay.spec.arcminutes), 1)}′ can be seen.`;
     case 'sky-projection':
       return `The belt at this epoch laid on the plateau, ${ROUND(overlay.spec.scale, 0)} m per degree, ${overlay.spec.inverted ? 'with north and south swapped' : 'north to north'}.`;
+    case 'ground-bearings': {
+      const lines = overlay.spec.bearings.map((b) => `${b.label} at ${ROUND(b.azimuthDeg, 2)}°`).join(', ');
+      const sighted = overlay.spec.sights.map((s) => `${s.label} at ${ROUND(s.azimuthDeg, 2)}°`).join(' and ');
+      return `Lines along the plateau from the viewpoint: ${lines}${sighted ? `, sighted on ${sighted}` : ''}.`;
+    }
   }
 }

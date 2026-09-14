@@ -2,7 +2,7 @@ import { evaluate, scopeFor } from '@seked/claims/browser';
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
 import { atEpoch, buildModel, type Model } from './model';
-import { passageRaySpec, shaftRaysSpec, skyProjectionSpec, type OverlayContext } from './overlays';
+import { groundBearingsSpec, passageRaySpec, shaftRaysSpec, skyProjectionSpec, type OverlayContext } from './overlays';
 
 /**
  * The overlays are the claims drawn, so the two have to say the same thing.
@@ -126,5 +126,39 @@ describe('the C4 sky projection', () => {
       expect(other.at[0]).toBeCloseTo(star.at[0], 9);
       expect(other.at[1] - anchor).toBeCloseTo(-(star.at[1] - anchor), 9);
     });
+  });
+});
+
+describe('the C5 sun ribbon', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const c5 = claim('C5');
+  const spec = groundBearingsSpec(c5, contextFor(model, -10499)) as NonNullable<ReturnType<typeof groundBearingsSpec>>;
+
+  it('draws its lines from the Sphinx, at the azimuths the claim computes', () => {
+    expect(spec.type).toBe('sun-ribbon');
+    expect(spec.from[0]).toBeCloseTo(model.env['sphinx.centre.offset.east'] as number, 9);
+    expect(spec.from[1]).toBeCloseTo(model.env['sphinx.centre.offset.north'] as number, 9);
+    expect(spec.bearings.map((b) => b.label)).toEqual(['due east', 'equinox sunrise', 'Regulus rising']);
+    const scope = scopeFor(atEpoch(c5, -10499), model.env);
+    for (const bearing of spec.bearings) {
+      expect(bearing.azimuthDeg, bearing.label).toBeCloseTo(evaluate(bearing.source, scope), 12);
+    }
+  });
+
+  it("puts Regulus's line at the value the claim's first comparison holds", () => {
+    const comparison = model.results.get('C5')?.comparisons[0];
+    const regulus = spec.bearings.find((b) => b.label === 'Regulus rising');
+    expect(regulus?.azimuthDeg).toBeCloseTo(comparison?.value as number, 12);
+    // South of due east, which is the residual drawn.
+    expect(regulus?.azimuthDeg as number).toBeGreaterThan(90);
+  });
+
+  it('follows the epoch the scene is drawn at, not the one the claim names', () => {
+    const later = groundBearingsSpec(c5, contextFor(model, -2499)) as NonNullable<ReturnType<typeof groundBearingsSpec>>;
+    const then = spec.bearings.find((b) => b.label === 'Regulus rising')?.azimuthDeg as number;
+    const now = later.bearings.find((b) => b.label === 'Regulus rising')?.azimuthDeg as number;
+    expect(Math.abs(now - then)).toBeGreaterThan(30);
+    // Due east is a constant and must not move with it.
+    expect(later.bearings[0]?.azimuthDeg).toBe(90);
   });
 });

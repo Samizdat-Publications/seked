@@ -275,5 +275,34 @@ function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Eleme
         </>
       );
     }
+    case 'ground-bearings': {
+      const spec = overlay.spec;
+      // The two sight lines, when the claim has them, are the edges of the
+      // gap, so the width between them is the band the claim is judged on.
+      const [first, last] = [spec.sights[0], spec.sights[spec.sights.length - 1]];
+      const gap = first && last && first !== last ? Math.abs(first.azimuthDeg - last.azimuthDeg) : undefined;
+      return (
+        <ul className="plain rays">
+          {spec.bearings.map((b) => (
+            <li key={b.label}>
+              <span className="swatch" style={{ background: b.colour }} />
+              {b.label} at {b.azimuthDeg.toFixed(2)}° · <code>{b.source}</code>
+            </li>
+          ))}
+          {spec.sights.map((s) => (
+            <li key={s.label}>
+              <span className="swatch" style={{ background: s.colour }} />
+              {s.label} at {s.azimuthDeg.toFixed(2)}°
+            </li>
+          ))}
+          {gap !== undefined && (
+            <li className="note">The two corners subtend {gap.toFixed(2)}° from here, which is the gap the sun is asked to set into.</li>
+          )}
+          <li className="note">
+            Azimuths run from north through east, on a flat horizon: no local skyline is modelled, and the plateau has one.
+          </li>
+        </ul>
+      );
+    }
   }
 }

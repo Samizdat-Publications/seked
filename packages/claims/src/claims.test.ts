@@ -154,6 +154,38 @@ describe('C · sky claims, evaluated at the epoch each claim names', () => {
     expect(r.fits).toBe(false);
     expect(r.freeChoices).toBe(3);
   });
+
+  it('C5: Regulus rose ten degrees south of east in 10,500 BCE, so the gaze comparison fails', () => {
+    const r = byId('C5');
+    expect(r.status).toBe('computed');
+    expect(r.comparisons).toHaveLength(2);
+    const [gaze] = r.comparisons as [ComparisonResult, ComparisonResult];
+    expect(gaze.targetValue).toBe(90);
+    expect(gaze.unit).toBe('deg');
+    expect(gaze.absolute).toBeGreaterThan(9);
+    expect(gaze.absolute).toBeLessThan(12);
+    expect(gaze.toleranceAbs).toBe(5);
+    expect(gaze.within).toBe(false);
+    expect(r.fits).toBe(false);
+    expect(r.freeChoices).toBe(3);
+  });
+
+  it('C5: but it did rise before the equinox sun, by about fifty minutes of sidereal time', () => {
+    const before = byId('C5').comparisons[1] as ComparisonResult;
+    expect(before.targetValue).toBe(0);
+    // Negative is Regulus first, which is the sign the claim needs. Twelve and
+    // a half degrees of sidereal time is fifty minutes.
+    expect(before.absolute).toBeLessThan(-10);
+    expect(before.absolute).toBeGreaterThan(-15);
+    expect(before.within).toBe(true);
+  });
+
+  it('C5: the epoch is doing the work: today Regulus rises nowhere near the equinox sun', () => {
+    const c5 = claims.find((c) => c.id === 'C5') as (typeof claims)[number];
+    const now = evaluateClaim({ ...c5, epoch: 2000 }, env).comparisons[1] as ComparisonResult;
+    expect(now.absolute).toBeGreaterThan(0);
+    expect(now.within).toBe(false);
+  });
 });
 
 describe('formatResidual', () => {

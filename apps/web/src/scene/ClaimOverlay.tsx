@@ -14,6 +14,7 @@ import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
 import type {
   CompassRoseSpec,
+  GroundBearingsSpec,
   OverlaySpec,
   PassageRaySpec,
   ShaftRaysSpec,
@@ -46,6 +47,8 @@ export function ClaimOverlay({
       return <CompassRose spec={overlay.spec} />;
     case 'sky-projection':
       return <SkyProjection spec={overlay.spec} />;
+    case 'ground-bearings':
+      return <GroundBearings spec={overlay.spec} />;
   }
 }
 
@@ -203,6 +206,48 @@ function StarPair({ stars }: { stars: StarMark[] }): React.JSX.Element | null {
       <Polyline points={points} colour="#b9a6ff" />
       {shown.map((star) => (
         <TargetStar key={star.id} star={star} note={`${star.name} ${formatDms(star.altDeg)} high`} />
+      ))}
+    </group>
+  );
+}
+
+/**
+ * C5 and C6. The claim as a set of lines drawn along the plateau from the
+ * viewpoint: one per bearing the claim file names, at the azimuth its own
+ * expression evaluates to, and one to each corner the claim sights on, which
+ * is what "between the pyramids" means when it is drawn rather than said.
+ *
+ * The lines lie flat a few metres above the pavement, so the picture is the
+ * plan the claim's arithmetic is: what the eye compares is the angle between
+ * the sun's line and the ones on either side of it.
+ */
+function GroundBearings({ spec }: { spec: GroundBearingsSpec }): React.JSX.Element {
+  const [east, north] = spec.from;
+  const z = spec.height;
+  const at = (azimuthDeg: number, distance: number): Point3 => [
+    east + Math.sin(azimuthDeg * Math.PI / 180) * distance,
+    north + Math.cos(azimuthDeg * Math.PI / 180) * distance,
+    z,
+  ];
+  return (
+    <group>
+      <Marker position={[east, north, z]} colour={MEASURED} />
+      {spec.sights.map((sight) => (
+        <group key={sight.label}>
+          <Ray points={[[east, north, z], [sight.at[0], sight.at[1], z]]} colour={sight.colour} opacity={0.75} />
+          <Marker position={[sight.at[0], sight.at[1], z]} colour={sight.colour} />
+          <Label text={`${sight.label} ${sight.azimuthDeg.toFixed(2)}°`} position={[sight.at[0], sight.at[1], z + 60]} colour={sight.colour} />
+        </group>
+      ))}
+      {spec.bearings.map((bearing) => (
+        <group key={bearing.label}>
+          <Ray points={[[east, north, z], at(bearing.azimuthDeg, spec.lengthM)]} colour={bearing.colour} />
+          <Label
+            text={`${bearing.label} ${bearing.azimuthDeg.toFixed(2)}°`}
+            position={at(bearing.azimuthDeg, spec.lengthM * 0.85)}
+            colour={bearing.colour}
+          />
+        </group>
       ))}
     </group>
   );

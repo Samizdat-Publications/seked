@@ -1,0 +1,75 @@
+id: C5
+title: Sphinx and Leo
+group: sky
+status: computed
+epoch: -10499
+summary: >-
+  The Sphinx is a lion and it looks due east. Hancock and Bauval read it as a
+  marker of the vernal equinox of 10,500 BCE, when Leo rose in the east
+  immediately before the sun and the monument would have faced its own image
+  in the sky.
+comparisons:
+  - label: Regulus's rising azimuth against due east
+    formula: star.regulus.rise.azimuth
+    target: "90"
+    unit: deg
+    tolerance_abs: 5
+  - label: Regulus's rising against the equinox sun's, in degrees of sidereal time
+    formula: >-
+      atan2(sin(star.regulus.rise.lst - sun.equinox.rise.lst), cos(star.regulus.rise.lst - sun.equinox.rise.lst))
+    target: "0"
+    unit: deg
+    tolerance_abs: 30
+free_choices:
+  - the epoch, which is chosen for the sky and not read off the monument
+  - Regulus standing for the whole of Leo
+  - due east as the Sphinx's gaze, no surveyed axis for it being in the database
+overlay:
+  type: sun-ribbon
+  params:
+    from: sphinx
+    length_m: 1400
+    bearings:
+      - label: due east
+        azimuth: "90"
+      - label: equinox sunrise
+        azimuth: sun.equinox.rise.azimuth
+      - label: Regulus rising
+        azimuth: star.regulus.rise.azimuth
+sources:
+  for: [hancock-bauval-1996]
+  against: [krupp-1997]
+  context: [vondrak-2011, arce-sphinx-1991, coords-sphinx-cited]
+notes: >-
+  Two things are being asked. The first is whether Leo rose due east, and the
+  answer is that at this epoch Regulus rose about ten degrees south of it: its
+  declination had precessed to about −8.9°, and at Giza's latitude that puts
+  its rising point ten degrees round the horizon. The tolerance is 5°, which
+  is a deliberately generous band, about four degrees of declination at this
+  latitude, and it is a choice rather than a measurement: the Sphinx's own
+  east–west axis is not in the database, because none of the cited sources
+  states an azimuth for it, so "due east" comes from the plan's wording and
+  has no error bar to inherit. The residual is twice the band.
+  The second is whether Leo rose before the sun. Sidereal time is the hour
+  angle of the equinox, so a body's rising sidereal time is its right
+  ascension less its rising hour angle, and two of them subtract directly; the
+  difference is folded into ±180° with atan2(sin, cos) the way C4 folds a
+  right-ascension difference. Negative means Regulus reached the horizon
+  first, which is what the claim needs, and it comes out at about −12.6°, some
+  fifty minutes of sidereal time ahead of the sun. The target is zero, the two
+  rising together, and the tolerance of 30° is two hours: further ahead than
+  that and Leo is a constellation of the night rather than of the dawn.
+  The two risings are not on quite the same convention. A star's rising here
+  is the geometric horizon, altitude zero, and the sun's is its upper limb at
+  −0.833°, refraction plus semidiameter; putting Regulus on the same
+  convention would move it about one degree of sidereal time earlier, four
+  minutes, which changes nothing that matters. No local skyline is modelled at
+  all, and the plateau's own horizon is worth more than that.
+  Regulus's proper motion is a quarter of a degree over 12,500 years, applied
+  linearly, which is the last quarter degree of the rising azimuth and not
+  more. Vondrák 2011 is what makes the epoch mean anything: the IAU 2006
+  polynomials are wrong by degrees this far back. Krupp is cited against as
+  the standard astronomical objection to the 10,500 BCE Giza thesis that this
+  claim shares with C4; the particular argument his article makes, that laying
+  the sky on the plateau needs north and south swapped, is C4's and is not
+  what either comparison here tests.
