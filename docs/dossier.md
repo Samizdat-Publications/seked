@@ -21,13 +21,13 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | C2 | Shafts point at stars | −12.2′ (−0.450 %) | 39.5′ (+2.060 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | yes | 1 |
 | C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
-| C5 | Sphinx and Leo | 10°14′04″ (+11.372 %) | −12°33′53″ | no | 3 |
+| C5 | Sphinx and Leo | −12°33′53″ | 10°14′04″ (+11.372 %) | no | 3 |
 | C6 | Solstice akhet | 2°38′15″ (+0.891 %) | 2°38′15″ (+0.891 %) | yes | 0 |
 | C7 | Cygnus alternative | −42.45 % | −22°33′24″ (−59.591 %) | no | 3 |
 | D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
 | D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
 | D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −6°31′41″ (−14.507 %) | no | 2 |
-| D4 | Sphinx axis and the temples | −1.2′ | 5.0′ | yes | 1 |
+| D4 | Sphinx axis and the temples | −1.2′ | 22.0′ | yes | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
 
@@ -262,7 +262,7 @@ Residual by survey preset:
 
 **Overlay:** `map-inset` {"datums":["WGS84","Old Egyptian 1907"]}
 
-**Context:** Commonly cited WGS84 coordinates of the Great Pyramid's base centre (29°58′45″ N, 31°08′03″ E). · BIPM (2019). The International System of Units, 9th edition. c = 299 792 458 m/s exactly.
+**Context:** Commonly cited WGS84 coordinates of the Great Pyramid's base centre (29°58′45″ N, 31°08′03″ E). · BIPM (2019). The International System of Units, 9th edition. c = 299 792 458 m/s exactly. · EPSG Geodetic Parameter Dataset, transformation 1148, Egypt 1907 to WGS 84 (1): geocentric translations dX = −130 m, dY = 110 m, dZ = −13 m, derived at 14 stations with accuracies of 3, 6 and 8 m; source U.S. DMA TR8350.2, September 1987. Ellipsoid Helmert 1906 (EPSG 7020): a = 6 378 200 m, 1/f = 298.3.
 
 The commonly cited base centre, 29°58′45″ N, is about 9 m south of the meme's coordinate, well inside a base 230 m on a side. The seventh decimal place of a latitude is a centimetre; no survey of the base centre is that precise, and the answer changes by tens of metres with the datum. Read on Old Egyptian 1907, the datum Egypt's own survey of the plateau ran on, that same base centre falls 18.4 m south of its WGS84 parallel, twice the 9 m the coincidence rests on and in the other direction. That shift is the EPSG 1148 geocentric translation applied on the Helmert 1906 ellipsoid, computed by the overlay from the records rather than quoted.
 
