@@ -28,6 +28,97 @@
     "note": "53°10′; seked 5¼."
   },
   {
+    "key": "g2.base.side.north",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 215.18626,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "8471.9 in, §66, the N. side of the raised square of rock that carried the casing foot, − 3.0 in from the mean. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g2.base.side.east",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 215.27008,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "8475.2 in, §66, the E. side of the raised square of rock that carried the casing foot, + 0.3 in from the mean. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g2.base.side.south",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 215.31326,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "8476.9 in, §66, the S. side of the raised square of rock that carried the casing foot, + 2.0 in from the mean. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g2.base.side.west",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 215.2777,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "8475.5 in, §66, the W. side of the raised square of rock that carried the casing foot, + 0.6 in from the mean. No probable error is stated for the sides.",
+    "verified": true
+  },
+  {
+    "key": "g2.base.side.mean",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 215.26246,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "casing-edge",
+    "note": "8474.9 in, §66, the mean of the four sides of the raised square of rock, mean difference 1.5 in. §65 explains the square: the builders cut the rock higher under the casing than under the pavement, so the raised square outlives the casing and marks the original extent of the Pyramid. Petrie fixed twelve points on it and adopted the four corners as probably the most accurately executed; the other fixed points differ from the adopted square by .9 in on average, and no probable error is stated. §66 checks the square against the lowest corners of the casing still standing high on the Pyramid, observed in the triangulation: they lie + 1.7, + .6, + .6 and + .3 in outside the diagonals of the raised square, mean + .7 in, so the casing planes were skewed round by + 1′40″ going up.",
+    "verified": true
+  },
+  {
+    "key": "g2.face.angle",
+    "structure": "g2",
+    "quantity": "angle",
+    "value": 53.1667,
+    "unit": "deg",
+    "sigma": 0.0667,
+    "source": "petrie-1883",
+    "method": "adopted-mean",
+    "note": "53°10′ ± 4′, §67, Petrie’s best statement of the angle of slope. The direct goniometer and level measures on the granite in situ give 53°12′ ± 2′, and 53°2′ from a plumb line, the block having been slightly shifted; 24 blocks of granite and limestone lying around the Pyramid give 53°14′ ± 5′, on the assumption that their courses were horizontal.",
+    "verified": true
+  },
+  {
+    "key": "g2.height.original",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 143.8656,
+    "unit": "m",
+    "sigma": 0.3302,
+    "source": "petrie-1883",
+    "method": "projected",
+    "note": "5664 ± 13 in, §67, the height following from the adopted angle 53°10′ ± 4′ and the mean base of §66. Petrie measured no height directly.",
+    "verified": true
+  },
+  {
+    "key": "g2.orientation",
+    "structure": "g2",
+    "quantity": "angle",
+    "value": -0.090556,
+    "unit": "deg",
+    "sigma": 0.004444,
+    "source": "petrie-1883",
+    "method": "casing-mean",
+    "note": "−5′26″ ± 16″, §93, the azimuth of the Second Pyramid’s casing sides. §66 reaches the same mean from the four sides of the raised square, N. −5′31″, E. −6′13″, S. −5′40″, W. −4′21″, with a mean difference of 33″ and no probable error. Negative is west of north.",
+    "verified": true
+  },
+  {
     "key": "g3.base.side.mean",
     "structure": "g3",
     "quantity": "length",
