@@ -468,3 +468,64 @@ ul.rays code {
 ul.rays li {
   line-height: 1.5;
 }
+
+/* Tour */
+
+.tour h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.tour h2 span {
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.tour h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.tour-buttons {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+}
+
+.tour-buttons .link {
+  margin-left: auto;
+}
+
+button.step {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.step:hover:not(:disabled) {
+  background: var(--paper-sunk);
+}
+
+button.step:disabled {
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+button.step.is-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+}
+
+button.step.is-primary:hover {
+  background: #1a5e85;
+}
