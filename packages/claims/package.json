@@ -9,6 +9,7 @@
   "dependencies": {
     "@seked/data": "workspace:*",
     "@seked/geometry": "workspace:*",
+    "@seked/sky": "workspace:*",
     "@seked/units": "workspace:*",
     "yaml": "^2.5.0",
     "zod": "^4.0.0"

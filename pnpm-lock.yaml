@@ -44,6 +44,9 @@ importers:
       '@seked/geometry':
         specifier: workspace:*
         version: link:../geometry
+      '@seked/sky':
+        specifier: workspace:*
+        version: link:../sky
       '@seked/units':
         specifier: workspace:*
         version: link:../units

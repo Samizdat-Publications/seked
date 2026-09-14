@@ -1,4 +1,5 @@
 import type { Environment } from '@seked/geometry';
+import { skyEnvironment } from '@seked/sky';
 import { evaluate } from './expr';
 import type { Claim, Comparison } from './registry';
 
@@ -40,9 +41,23 @@ export function evaluateComparison(c: Comparison, env: Environment, defaultToler
   };
 }
 
+/**
+ * The environment a claim actually evaluates against: the measured and
+ * derived keys, plus the stars of the claim's epoch when it has one. The
+ * observer is the Great Pyramid's base centre until sites reach the
+ * environment; every sky claim so far is watched from Giza.
+ */
+export function scopeFor(claim: Claim, env: Environment): Environment {
+  if (claim.epoch === undefined) return env;
+  const latitudeDeg = env['g1.center.latitude'];
+  if (latitudeDeg === undefined) throw new Error(`${claim.id} has an epoch but the environment carries no g1.center.latitude`);
+  return { ...env, ...skyEnvironment({ epoch: claim.epoch, latitudeDeg }) };
+}
+
 export function evaluateClaim(claim: Claim, env: Environment): ClaimResult {
+  const scope = scopeFor(claim, env);
   const comparisons = claim.status === 'computed'
-    ? claim.comparisons.map((c) => evaluateComparison(c, env, claim.tolerance_pct))
+    ? claim.comparisons.map((c) => evaluateComparison(c, scope, claim.tolerance_pct))
     : [];
   return {
     id: claim.id,

@@ -30,6 +30,13 @@ export const ClaimSchema = z.object({
   group: z.enum(Object.keys(GROUPS) as [Group, ...Group[]]),
   summary: z.string(),
   status: z.enum(['computed', 'needs-sky', 'needs-site']).default('computed'),
+  /**
+   * Julian epoch the claim is evaluated at, in astronomical year numbering:
+   * 2450 BCE is -2449 and 10,450 BCE is -10449. A claim with an epoch gets
+   * the star keys of that epoch in its environment; a claim without one
+   * never sees the sky.
+   */
+  epoch: z.number().optional(),
   formula: z.string().optional(),
   target: z.string().optional(),
   unit: Unit.optional(),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
+import { skyEnvironment } from '@seked/sky';
 import { evaluateClaim } from './evaluate';
 import { identifiers } from './expr';
 import { loadClaims } from './registry';
@@ -9,6 +10,10 @@ import { renderDossier } from './dossier';
 const db = loadDatabase();
 const claims = loadClaims();
 const env = buildEnvironment(resolve(db, 'canonical').values);
+const LATITUDE = env['g1.center.latitude'] as number;
+/** What a claim with an epoch actually evaluates against. */
+const scopeFor = (epoch: number | undefined) =>
+  epoch === undefined ? env : { ...env, ...skyEnvironment({ epoch, latitudeDeg: LATITUDE }) };
 const byId = (id: string) => {
   const c = claims.find((x) => x.id === id);
   if (!c) throw new Error(`no claim ${id}`);
@@ -22,9 +27,10 @@ describe('registry integrity', () => {
   it('every formula reads only keys that exist in the environment', () => {
     for (const c of claims) {
       if (c.status !== 'computed') continue;
+      const scope = scopeFor(c.epoch);
       for (const cmp of c.comparisons) {
         for (const id of [...identifiers(cmp.formula), ...identifiers(cmp.target)]) {
-          expect(env[id], `${c.id}: ${id}`).toBeTypeOf('number');
+          expect(scope[id], `${c.id}: ${id}`).toBeTypeOf('number');
         }
       }
     }
@@ -76,5 +82,24 @@ describe('dossier', () => {
     for (const c of claims) expect(md).toContain(`### ${c.id} · ${c.title}`);
     expect(md).toContain('Residual by survey preset');
     expect(md).toContain('| petrie-1883 |');
+  });
+});
+
+describe('the sky reaches the claims only through an epoch', () => {
+  const probe = {
+    ...(claims.find((c) => c.id === 'A1') as (typeof claims)[number]),
+    id: 'Z1',
+    comparisons: [{ label: "Thuban's declination", formula: 'star.thuban.dec', target: '1', unit: 'deg' as const }],
+  };
+
+  it('a claim without an epoch gets no star keys at all', () => {
+    expect(() => evaluateClaim({ ...probe, epoch: undefined }, env)).toThrow(/unknown identifier "star.thuban.dec"/);
+  });
+
+  it('a claim with an epoch reads the stars of that epoch', () => {
+    const at2450 = evaluateClaim({ ...probe, epoch: -2449 }, env).comparisons[0]!.value;
+    const today = evaluateClaim({ ...probe, epoch: 2000 }, env).comparisons[0]!.value;
+    expect(at2450).toBeGreaterThan(85);
+    expect(today).toBeLessThan(70);
   });
 });

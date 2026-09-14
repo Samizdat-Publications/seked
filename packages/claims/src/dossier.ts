@@ -23,6 +23,12 @@ export function formatValue(v: number, unit: string): string {
 
 const SIGN = (x: number) => (x < 0 ? '−' : '+');
 
+/** "−2449 (2450 BCE)": the Julian epoch as the claim file writes it, then the calendar year. */
+export function formatEpoch(epj: number): string {
+  const year = epj < 1 ? `${Math.round(1 - epj)} BCE` : `${Math.round(epj)} CE`;
+  return `${epj < 0 ? '−' : ''}${Math.abs(epj)} (${year})`;
+}
+
 /** Signed length at a sensible scale: km above 1 km, mm below 1 cm, µm below 1 mm. */
 export function formatLength(x: number): string {
   const a = Math.abs(x);
@@ -88,6 +94,7 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
       const r = results.get(c.id) as ClaimResult;
       out.push(`### ${c.id} · ${c.title}`, '');
       out.push(c.summary, '');
+      if (c.epoch !== undefined) out.push(`*Evaluated at epoch ${formatEpoch(c.epoch)}.*`, '');
       if (r.status !== 'computed') {
         out.push(`*Not yet computable: ${r.status === 'needs-sky' ? 'waits on the sky engine' : 'waits on the site-plan positions'}.*`, '');
       } else {
