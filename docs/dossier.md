@@ -21,6 +21,8 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | C2 | Shafts point at stars | −12.2′ (−0.450 %) | 39.5′ (+2.060 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | yes | 1 |
 | C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
+| C5 | Sphinx and Leo | 10°14′04″ (+11.372 %) | −12°33′53″ | no | 3 |
+| C6 | Solstice akhet | 2°38′15″ (+0.891 %) | 2°38′15″ (+0.891 %) | yes | 0 |
 | D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
 | D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
 
@@ -435,6 +437,65 @@ Residual by survey preset:
 **Critiques:** Krupp, E. C. (1997). Pyramid Marketing Schemes. Sky & Telescope, February 1997, 64–65. · Fairall, A. (1999). Precession and the layout of the ancient Egyptian pyramids. Astronomy & Geophysics 40(4), 4.4.
 
 Right-ascension differences are folded into the range from -180 to 180 degrees with atan2(sin, cos), so the belt reads correctly in the centuries when it straddles zero right ascension (about 5060 to 4820 BCE). Both comparisons are unsigned, because the claim is about shape rather than handedness. The sky is taken as seen looking south, with the belt laid on a tangent plane about Alnilam (x = Δra × cos dec, y = Δdec, both in degrees), which is accurate to a few arcminutes over the belt's 2.7°. On the ground the diagonal is Petrie's G1 to G3 centre offsets, measured from the meridian, and Menkaure's offset is his perpendicular distance from the G1 to G2 line divided by the length of that line, so both offsets are scale free. Krupp's objection, that laying the sky on the plateau requires swapping north for south, is recorded here as a free choice and is not modelled: nothing below tests it. Tolerance is 5 %, nearly 2° on a 38° diagonal, a band far looser than any surveyor would accept, chosen so the claim is judged as the visual match it is asserted to be rather than as a survey. Long-term precession (Vondrák 2011) is what makes the epoch meaningful at all; the IAU 2006 model is wrong by degrees at −10449, and the belt's angle sweeps roughly a degree a century, so a claim tied to an epoch is a claim tied to that free choice.
+
+### C5 · Sphinx and Leo
+
+The Sphinx is a lion and it looks due east. Hancock and Bauval read it as a marker of the vernal equinox of 10,500 BCE, when Leo rose in the east immediately before the sun and the monument would have faced its own image in the sky.
+
+*Evaluated at epoch −10499 (10500 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| Regulus's rising azimuth against due east | `star.regulus.rise.azimuth` vs `90` | 100°14′04″ | 90°00′00″ | 10°14′04″ (+11.372 %) | no (±5°00′00″) |
+| Regulus's rising against the equinox sun's, in degrees of sidereal time | `atan2(sin(star.regulus.rise.lst - sun.equinox.rise.lst), cos(star.regulus.rise.lst - sun.equinox.rise.lst))` vs `0` | −12°33′53″ | 0°00′00″ | −12°33′53″ | yes (±30°00′00″) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| Regulus's rising azimuth against due east | 10°14′04″ (+11.372 %) | 10°14′04″ (+11.372 %) | 10°14′04″ (+11.372 %) | 10°14′04″ (+11.372 %) |
+| Regulus's rising against the equinox sun's, in degrees of sidereal time | −12°33′53″ | −12°33′53″ | −12°33′53″ | −12°33′53″ |
+
+**Free choices (3)**:
+- the epoch, which is chosen for the sky and not read off the monument
+- Regulus standing for the whole of Leo
+- due east as the Sphinx's gaze, no surveyed axis for it being in the database
+
+**Overlay:** `sun-ribbon` {"from":"sphinx","length_m":1400,"bearings":[{"label":"due east","azimuth":"90"},{"label":"equinox sunrise","azimuth":"sun.equinox.rise.azimuth"},{"label":"Regulus rising","azimuth":"star.regulus.rise.azimuth"}]}
+
+**Proponents:** Hancock, G. & Bauval, R. (1996). Keeper of Genesis (US title: The Message of the Sphinx). London: Heinemann.
+
+**Context:** Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22. · Lehner, M. (1991). Archaeology of an Image: The Great Sphinx of Giza. PhD dissertation, Yale University. ARCE Sphinx Project 1979–83. · Commonly cited WGS84 coordinates of the Great Sphinx of Giza: 29°58′31″ N, 31°08′16″ E.
+
+**Critiques:** Krupp, E. C. (1997). Pyramid Marketing Schemes. Sky & Telescope, February 1997, 64–65.
+
+Two things are being asked. The first is whether Leo rose due east, and the answer is that at this epoch Regulus rose about ten degrees south of it: its declination had precessed to about −8.9°, and at Giza's latitude that puts its rising point ten degrees round the horizon. The tolerance is 5°, which is a deliberately generous band, about four degrees of declination at this latitude, and it is a choice rather than a measurement: the Sphinx's own east–west axis is not in the database, because none of the cited sources states an azimuth for it, so "due east" comes from the plan's wording and has no error bar to inherit. The residual is twice the band. The second is whether Leo rose before the sun. Sidereal time is the hour angle of the equinox, so a body's rising sidereal time is its right ascension less its rising hour angle, and two of them subtract directly; the difference is folded into ±180° with atan2(sin, cos) the way C4 folds a right-ascension difference. Negative means Regulus reached the horizon first, which is what the claim needs, and it comes out at about −12.6°, some fifty minutes of sidereal time ahead of the sun. The target is zero, the two rising together, and the tolerance of 30° is two hours: further ahead than that and Leo is a constellation of the night rather than of the dawn. The two risings are not on quite the same convention. A star's rising here is the geometric horizon, altitude zero, and the sun's is its upper limb at −0.833°, refraction plus semidiameter; putting Regulus on the same convention would move it about one degree of sidereal time earlier, four minutes, which changes nothing that matters. No local skyline is modelled at all, and the plateau's own horizon is worth more than that. Regulus's proper motion is a quarter of a degree over 12,500 years, applied linearly, which is the last quarter degree of the rising azimuth and not more. Vondrák 2011 is what makes the epoch mean anything: the IAU 2006 polynomials are wrong by degrees this far back. Krupp is cited against as the standard astronomical objection to the 10,500 BCE Giza thesis that this claim shares with C4; the particular argument his article makes, that laying the sky on the plateau needs north and south swapped, is C4's and is not what either comparison here tests.
+
+### C6 · Solstice akhet
+
+Seen from the Sphinx, the summer solstice sun sets in the gap between the Great Pyramid and Khafre's. The two pyramids as the hills and the disc between them draw akhet, the horizon hieroglyph, which is Lehner's reading of the whole plateau as a single image.
+
+*Evaluated at epoch −2499 (2500 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | `sun.solstice.summer.set.azimuth` vs `atan2((g1.centre.offset.east - g1.base.half + g2.base.half - g2.centre.offset.west) / 2 - sphinx.centre.offset.east, (g1.centre.offset.north - g1.base.half + g2.base.half - g2.centre.offset.south) / 2 - sphinx.centre.offset.north) + 360` | 298°31′21″ | 295°53′06″ | 2°38′15″ (+0.891 %) | yes (±8°00′00″) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | 2°38′15″ (+0.891 %) | 2°38′16″ (+0.891 %) | 2°38′18″ (+0.892 %) | 2°38′19″ (+0.892 %) |
+
+**Free choices (0)**: none.
+
+**Overlay:** `akhet` {"from":"sphinx","length_m":1400,"corners":["g1.sw","g2.ne"],"bearings":[{"label":"summer solstice sunset","azimuth":"sun.solstice.summer.set.azimuth"}]}
+
+**Proponents:** Lehner, M. (1997). The Complete Pyramids. London: Thames & Hudson. · Lehner, M. & Hawass, Z. (2017). Giza and the Pyramids. Chicago: University of Chicago Press.
+
+**Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer. · Lehner, M. (1991). Archaeology of an Image: The Great Sphinx of Giza. PhD dissertation, Yale University. ARCE Sphinx Project 1979–83. · Commonly cited WGS84 coordinates of the Great Sphinx of Giza: 29°58′31″ N, 31°08′16″ E. · Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
+
+The gap is between the Great Pyramid's south-west corner and Khafre's north-east corner, and the target is the bearing to the point halfway between those two corners. Both come out of the environment: G1 sits at the origin of the frame, Khafre is Petrie's centre offsets south and west, and the corners are those centres and the half-bases. The Sphinx's own position is a commonly cited latitude and longitude turned into east and north by the same flat conversion D1 uses for Heliopolis. atan2 is written the way D1 writes it, east over north, and 360 is added because the gap lies north of west from the Sphinx and the arctangent comes back negative there while an azimuth does not. The tolerance is 8°, which is not a precision but the claim's own width: the two corners subtend about 16.5° from the Sphinx, so the sun setting anywhere inside the gap is within half of that of its middle. Judged that way the claim holds, and the residual of about +2.6° says the sun sets in the northern half of the gap, nearer the Great Pyramid's flank than Khafre's. A tighter band would be testing something Lehner does not assert: what he describes is a picture, and a picture is as wide as the gap. Nothing here is a free choice, but three things are approximations. The sunset azimuth is the upper limb at −0.833°, refraction plus semidiameter, on a flat sea-level horizon; the plateau rises westward towards the pyramids, which makes the real sun set earlier and further south than this, and no local skyline is modelled. The Sphinx's coordinates are worth about 55 m, which is a degree or so of bearing at this range and the largest uncertainty in the target. And the two pyramids stand on different ground: Khafre's base is some 10 m above Khufu's, so the corner that bounds the gap on that side is higher than this plan view knows. The epoch barely enters, the obliquity moving the solstice azimuth about a fifth of a degree per thousand years, so unlike C5 this claim is not a claim about a date.
 
 ## D · Site plan and geodesy
 

@@ -3,7 +3,7 @@ import { loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
 import { skyEnvironment } from '@seked/sky';
 import { evaluateClaim, type ComparisonResult } from './evaluate';
-import { identifiers } from './expr';
+import { evaluate, identifiers } from './expr';
 import { loadClaims } from './registry';
 import { formatResidual, renderDossier } from './dossier';
 
@@ -185,6 +185,50 @@ describe('C · sky claims, evaluated at the epoch each claim names', () => {
     const now = evaluateClaim({ ...c5, epoch: 2000 }, env).comparisons[1] as ComparisonResult;
     expect(now.absolute).toBeGreaterThan(0);
     expect(now.within).toBe(false);
+  });
+
+  it('C6: the summer solstice sun sets in the gap between G1 and G2, seen from the Sphinx', () => {
+    const r = byId('C6');
+    expect(r.status).toBe('computed');
+    expect(r.comparisons).toHaveLength(1);
+    const c = r.comparisons[0] as ComparisonResult;
+    expect(c.unit).toBe('deg');
+    // North-west of the Sphinx, both of them, and the sun a couple of degrees
+    // north of the middle of the gap.
+    expect(c.value).toBeGreaterThan(290);
+    expect(c.value).toBeLessThan(305);
+    expect(c.targetValue).toBeGreaterThan(290);
+    expect(c.targetValue).toBeLessThan(305);
+    expect(c.absolute).toBeGreaterThan(2);
+    expect(c.absolute).toBeLessThan(3.5);
+    expect(c.toleranceAbs).toBe(8);
+    expect(c.within).toBe(true);
+    expect(r.fits).toBe(true);
+    expect(r.freeChoices).toBe(0);
+  });
+
+  it('C6: the sun really is between the corners, not merely near their midpoint', () => {
+    const scope = scopeFor(-2499);
+    const corner = (formula: string) => evaluate(formula, scope);
+    // The same two corners the target is the midpoint of, as bearings from the
+    // Sphinx: the Great Pyramid's south-west and Khafre's north-east.
+    const sw = corner('atan2(g1.centre.offset.east - g1.base.half - sphinx.centre.offset.east, g1.centre.offset.north - g1.base.half - sphinx.centre.offset.north) + 360');
+    const ne = corner('atan2(g2.base.half - g2.centre.offset.west - sphinx.centre.offset.east, g2.base.half - g2.centre.offset.south - sphinx.centre.offset.north) + 360');
+    const sunset = byId('C6').comparisons[0]?.value as number;
+    expect(ne).toBeLessThan(sunset);
+    expect(sunset).toBeLessThan(sw);
+    // And the tolerance is half the gap, which is what "in the gap" means.
+    expect((sw - ne) / 2).toBeCloseTo(8.2, 1);
+  });
+
+  it('C6: it is a claim about a place and not about a date', () => {
+    const c6 = claims.find((c) => c.id === 'C6') as (typeof claims)[number];
+    const stated = evaluateClaim(c6, env).comparisons[0] as ComparisonResult;
+    const millenniumEarlier = evaluateClaim({ ...c6, epoch: -3499 }, env).comparisons[0] as ComparisonResult;
+    // The obliquity moves the solstice azimuth about a fifth of a degree per
+    // thousand years, so the residual barely notices.
+    expect(Math.abs(millenniumEarlier.absolute - stated.absolute)).toBeLessThan(0.3);
+    expect(millenniumEarlier.within).toBe(true);
   });
 });
 

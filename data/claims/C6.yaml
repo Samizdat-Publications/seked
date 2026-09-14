@@ -1,0 +1,59 @@
+id: C6
+title: Solstice akhet
+group: sky
+status: computed
+epoch: -2499
+summary: >-
+  Seen from the Sphinx, the summer solstice sun sets in the gap between the
+  Great Pyramid and Khafre's. The two pyramids as the hills and the disc
+  between them draw akhet, the horizon hieroglyph, which is Lehner's reading
+  of the whole plateau as a single image.
+comparisons:
+  - label: summer solstice sunset azimuth against the middle of the gap, from the Sphinx
+    formula: sun.solstice.summer.set.azimuth
+    target: >-
+      atan2((g1.centre.offset.east - g1.base.half + g2.base.half - g2.centre.offset.west) / 2 - sphinx.centre.offset.east, (g1.centre.offset.north - g1.base.half + g2.base.half - g2.centre.offset.south) / 2 - sphinx.centre.offset.north) + 360
+    unit: deg
+    tolerance_abs: 8
+free_choices: []
+overlay:
+  type: akhet
+  params:
+    from: sphinx
+    length_m: 1400
+    corners: [g1.sw, g2.ne]
+    bearings:
+      - label: summer solstice sunset
+        azimuth: sun.solstice.summer.set.azimuth
+sources:
+  for: [lehner-1997, lehner-hawass-2017]
+  context: [petrie-1883, arce-sphinx-1991, coords-sphinx-cited, vondrak-2011]
+notes: >-
+  The gap is between the Great Pyramid's south-west corner and Khafre's
+  north-east corner, and the target is the bearing to the point halfway
+  between those two corners. Both come out of the environment: G1 sits at the
+  origin of the frame, Khafre is Petrie's centre offsets south and west, and
+  the corners are those centres and the half-bases. The Sphinx's own position
+  is a commonly cited latitude and longitude turned into east and north by the
+  same flat conversion D1 uses for Heliopolis. atan2 is written the way D1
+  writes it, east over north, and 360 is added because the gap lies north of
+  west from the Sphinx and the arctangent comes back negative there while an
+  azimuth does not.
+  The tolerance is 8°, which is not a precision but the claim's own width: the
+  two corners subtend about 16.5° from the Sphinx, so the sun setting anywhere
+  inside the gap is within half of that of its middle. Judged that way the
+  claim holds, and the residual of about +2.6° says the sun sets in the
+  northern half of the gap, nearer the Great Pyramid's flank than Khafre's.
+  A tighter band would be testing something Lehner does not assert: what he
+  describes is a picture, and a picture is as wide as the gap.
+  Nothing here is a free choice, but three things are approximations. The
+  sunset azimuth is the upper limb at −0.833°, refraction plus semidiameter,
+  on a flat sea-level horizon; the plateau rises westward towards the
+  pyramids, which makes the real sun set earlier and further south than this,
+  and no local skyline is modelled. The Sphinx's coordinates are worth about
+  55 m, which is a degree or so of bearing at this range and the largest
+  uncertainty in the target. And the two pyramids stand on different ground:
+  Khafre's base is some 10 m above Khufu's, so the corner that bounds the gap
+  on that side is higher than this plan view knows. The epoch barely enters,
+  the obliquity moving the solstice azimuth about a fifth of a degree per
+  thousand years, so unlike C5 this claim is not a claim about a date.
