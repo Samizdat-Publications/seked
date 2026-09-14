@@ -1,0 +1,79 @@
+id: D4
+title: Sphinx axis and the temples
+group: site-plan
+status: computed
+summary: >-
+  The Sphinx looks due east, and the Sphinx Temple in front of its paws and
+  Khafre's valley temple beside it are laid out on the cardinal directions
+  with it.
+comparisons:
+  - label: Sphinx Temple north-south axis (east wall) against the meridian
+    formula: sphinx_temple.wall.east.dfc
+    target: "0"
+    unit: deg
+    tolerance_abs: 0.25
+  - label: Sphinx Temple east-west axis (north wall) against due east
+    formula: sphinx_temple.wall.north.dfc
+    target: "0"
+    unit: deg
+    tolerance_abs: 0.5
+  - label: Khafre's valley temple mean north-south axis against the meridian
+    formula: >-
+      (khafre_valley_temple.wall.east.dfc + khafre_valley_temple.wall.west.dfc) / 2
+    target: "0"
+    unit: deg
+    tolerance_abs: 0.25
+free_choices:
+  - the Sphinx's own axis is not surveyed in the database, so the Sphinx Temple's east-west axis stands for it (C5 records the same gap as a free choice)
+overlay:
+  type: ground-bearings
+  params:
+    from: sphinx
+    length_m: 500
+    bearings:
+      - label: Sphinx Temple axis
+        azimuth: sphinx_temple.wall.east.dfc
+      - label: Sphinx Temple east-west
+        azimuth: 90 + sphinx_temple.wall.north.dfc
+      - label: valley temple axis
+        azimuth: >-
+          (khafre_valley_temple.wall.east.dfc + khafre_valley_temple.wall.west.dfc) / 2
+      - label: due east
+        azimuth: "90"
+      - label: Khafre's causeway
+        azimuth: khafre_causeway.edge.north.azimuth + 180
+sources:
+  for: [lehner-1997]
+  context: [nell-ruggles-2014, arce-sphinx-1991, coords-sphinx-cited]
+notes: >-
+  Every number here is a deviation from cardinality in Nell and Ruggles' sense:
+  the angle between a wall and the cardinal direction it was meant to hold,
+  positive clockwise, so a positive north wall runs south of east at its far
+  end and a positive east wall runs east of north. The targets are all zero,
+  which is why these comparisons carry an absolute tolerance rather than a
+  percentage: a residual against zero has no percentage at all.
+  All three hold. The Sphinx Temple's east wall, the nine-point line the
+  surveyors themselves take for the temple's axis because no reading could be
+  got from the west wall, is −0°01′12″ off the meridian, which is about the
+  accuracy they claim for a line of that length. Its north wall is +0°22′ off
+  due east. Khafre's valley temple leans anticlockwise on its east side and
+  clockwise on its west, −0°23′ against +0°33′, so the building is a little
+  narrower at its northern end; the mean of the two, which is the nearest thing
+  the survey offers to an axis for it, is +0°05′. The bands are 15′ on the two
+  meridian comparisons and 30′ on the east-west one, the looser band going to
+  the one line here that is standing in for something else.
+  Neither temple has a position in the database. The Sphinx alone carries a
+  latitude and a longitude, and that is the cited placeholder worth about 55 m
+  that C5 and C6 also use, so the overlay draws all five bearings from the
+  Sphinx's centre. They are directions and not walls, and the buildings they
+  belong to are not where the lines begin. The causeway is drawn as its reverse
+  azimuth, 283°26′, because it runs west-north-west from the valley temple up
+  to Khafre's pyramid and so leaves the Sphinx that way.
+  Two lines in the same few hundred metres are nowhere near cardinal, and this
+  claim does not count either of them against the temples. The passage between
+  the two buildings, measured along the Sphinx Temple's south wall, is +4°33′,
+  and Khafre's causeway is +13°26′. Nell and Ruggles remark that the passage is
+  skewed in the same sense as the causeway, which reads as topography rather
+  than as a failed alignment: both run with the slope up to the plateau. What
+  this claim tests is the walls that were meant to be cardinal, and those are
+  cardinal to a few arcminutes.

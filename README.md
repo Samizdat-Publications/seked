@@ -98,7 +98,7 @@ data/
   presets.json          preference orders over sources (canonical, petrie-1883, cole-1925, dash-2015)
   measurements/*.json   one record per measured quantity, metres and degrees, with provenance
   claims/*.yaml         one claim per file: comparisons, tolerance, free choices, sources, overlay
-  stars/                the ten named stars and the HYG 4.2 catalogue to magnitude 6.5 (imported, never typed)
+  stars/                the fourteen named stars and the HYG 4.2 catalogue to magnitude 6.5 (imported, never typed)
   terrain/              the GLO-30 heightfield around Giza in the project frame (the tiles are not tracked)
 packages/
   units/       cubit, pyramid inch, seked <-> degrees, DMS formatting

@@ -1,0 +1,105 @@
+id: D3
+title: Prime meridian and the Delta
+group: site-plan
+status: computed
+summary: >-
+  Stecchini's claim, as Tompkins gives it in his appendix: the Great Pyramid
+  was sited as the geodetic centre of Egypt. Its meridian bisects the Nile
+  Delta, and the pyramid stands at the apex of a quadrant whose sides, its own
+  base diagonals extended north-east and north-west, enclose the Delta.
+comparisons:
+  - label: the meridian against the Delta's apex
+    formula: g1.center.longitude
+    target: delta.apex.center.longitude
+    unit: deg
+    tolerance_abs: 0.05
+  - label: the meridian against the middle of the coast, Alexandria to Port Said
+    formula: g1.center.longitude
+    target: >-
+      (delta.west.center.longitude + delta.east.center.longitude) / 2
+    unit: deg
+    tolerance_abs: 0.05
+  - label: bearing to the north-east corner against the base diagonal, 45°
+    formula: >-
+      atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)
+    target: "45"
+    unit: deg
+    tolerance_pct: 5
+  - label: bearing to the north-west corner against the base diagonal, 45° west
+    formula: >-
+      abs(atan2(delta.west.centre.offset.east, delta.west.centre.offset.north))
+    target: "45"
+    unit: deg
+    tolerance_pct: 5
+free_choices:
+  - which places stand for the Delta's corners (Alexandria and Port Said here)
+  - reading the base diagonals as bearings from the base centre
+overlay:
+  type: ground-bearings
+  params:
+    from: g1
+    length_m: 4000
+    bearings:
+      - label: meridian
+        azimuth: "0"
+      - label: north-east diagonal
+        azimuth: "45"
+      - label: north-west diagonal
+        azimuth: "-45"
+      - label: to the Delta apex
+        azimuth: >-
+          atan2(delta.apex.centre.offset.east, delta.apex.centre.offset.north)
+      - label: to Port Said
+        azimuth: >-
+          atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)
+      - label: to Alexandria
+        azimuth: >-
+          atan2(delta.west.centre.offset.east, delta.west.centre.offset.north)
+sources:
+  for: [tompkins-1971]
+  context: [coords-delta-cited, coords-wgs84-cited]
+notes: >-
+  What is entered here is not Stecchini. His own figures, an axis of Egypt at
+  31°14′ E and a Delta apex at 30°06′ N, reach this project only through
+  Tompkins' appendix and the accounts that repeat it, and a number from a
+  secondary account of a number is not a measurement. What is entered instead
+  is three commonly cited positions, the same kind of placeholder as the
+  Heliopolis obelisk that D1 points at: the modern barrage at El-Qanater
+  el-Khayreya for the head of the Delta, and Alexandria and Port Said for its
+  western and eastern corners. Each is a town or a dam standing for an ancient
+  mouth or a river fork, each is quoted only to the arcminute, and each carries
+  a sigma of 0.02°, about 2 km.
+  The bearings are taken in the flat east-north frame that buildEnvironment
+  derives from those coordinates, the same frame D1 uses for Heliopolis: north
+  from the difference in latitude, east from the difference in longitude times
+  the cosine of the origin's latitude. Over the 180 km to the coast it is worth
+  about half a degree of bearing. Measured against the initial azimuth of the
+  great circle, the flat bearing to Port Said is 0.48° further from the
+  meridian than the true one, and Alexandria's is 0.48° further on the other
+  side. Two effects of about that size make it up: half the convergence of the
+  meridians, Δλ sin φ / 2, is 0.30°, and holding the cosine of the latitude at
+  the origin's value, when it has shrunk by 1.3 % by the time it reaches the
+  coast, supplies most of the rest. The error flatters the claim, the true
+  azimuths lying further from 45° still, and at half a degree it decides
+  nothing below either way.
+  The meridian half of the claim holds twice over. The Great Pyramid's cited
+  longitude is 3.1″ east of the barrage, 84 m on the ground, where the
+  arcminute the barrage's own position is quoted to is 1.6 km here: the apex
+  sits on the meridian to a twentieth of the precision of the citation, and
+  could not be shown to miss it if it did. Against the middle of the coast the
+  meridian runs 1.5′ east, about 2.5 km, which is not quite twice the
+  uncertainty the two towns carry between them and well inside the 3′ band.
+  The quadrant does not. Port Said lies at 38°28′ from the pyramid and
+  Alexandria at 40°49′ on the other side, so the two arms open 79°18′ where the
+  base diagonals open 90°, and the corners fall short of their diagonals by
+  6°32′ and 4°11′. The diagonals are taken as exactly 45°, which the Great
+  Pyramid's own orientation justifies to the 3′ its sides are off cardinal.
+  What does survive of the figure is that the two corners come out at almost
+  the same range, 180.5 km and 179.4 km, a kilometre apart in a hundred and
+  eighty: the pyramid is very nearly equidistant from the two ends of the
+  Delta's coast, which is a weaker and quite different statement from standing
+  at the apex of a right angle that encloses it. Which towns stand for those
+  corners is a free choice, and the tolerance is generous rather than the
+  choice being tight: moving a corner by the 2 km its position is worth turns
+  its bearing by two-thirds of a degree, but moving it to a different mouth of
+  the ancient river would turn it by several.

@@ -23,8 +23,11 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
 | C5 | Sphinx and Leo | 10°14′04″ (+11.372 %) | −12°33′53″ | no | 3 |
 | C6 | Solstice akhet | 2°38′15″ (+0.891 %) | 2°38′15″ (+0.891 %) | yes | 0 |
+| C7 | Cygnus alternative | −42.45 % | −22°33′24″ (−59.591 %) | no | 3 |
 | D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
 | D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
+| D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −6°31′41″ (−14.507 %) | no | 2 |
+| D4 | Sphinx axis and the temples | −1.2′ | 5.0′ | yes | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
 
@@ -497,6 +500,37 @@ Residual by survey preset:
 
 The gap is between the Great Pyramid's south-west corner and Khafre's north-east corner, and the target is the bearing to the point halfway between those two corners. Both come out of the environment: G1 sits at the origin of the frame, Khafre is Petrie's centre offsets south and west, and the corners are those centres and the half-bases. The Sphinx's own position is a commonly cited latitude and longitude turned into east and north by the same flat conversion D1 uses for Heliopolis. atan2 is written the way D1 writes it, east over north, and 360 is added because the gap lies north of west from the Sphinx and the arctangent comes back negative there while an azimuth does not. The tolerance is 8°, which is not a precision but the claim's own width: the two corners subtend about 16.5° from the Sphinx, so the sun setting anywhere inside the gap is within half of that of its middle. Judged that way the claim holds, and the residual of about +2.6° says the sun sets in the northern half of the gap, nearer the Great Pyramid's flank than Khafre's. A tighter band would be testing something Lehner does not assert: what he describes is a picture, and a picture is as wide as the gap. Nothing here is a free choice, but three things are approximations. The sunset azimuth is the upper limb at −0.833°, refraction plus semidiameter, on a flat sea-level horizon; the plateau rises westward towards the pyramids, which makes the real sun set earlier and further south than this, and no local skyline is modelled. The Sphinx's coordinates are worth about 55 m, which is a degree or so of bearing at this range and the largest uncertainty in the target. And the two pyramids stand on different ground: Khafre's base is some 10 m above Khufu's, so the corner that bounds the gap on that side is higher than this plan view knows. The epoch barely enters, the obliquity moving the solstice azimuth about a fifth of a degree per thousand years, so unlike C5 this claim is not a claim about a date.
 
+### C7 · Cygnus alternative
+
+Collins (2006), with Rodney Hale's overlay, matches the three pyramids to the three wing stars of Cygnus, δ Cygni (Fawaris) on the Great Pyramid, Sadr (γ Cygni) on Khafre's and Gienah (ε Cygni, Aljanah in HYG) on Menkaure's, and holds the fit better than Orion's. Deneb, the brightest star, has no pyramid.
+
+*Evaluated at epoch −2499 (2500 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| wing angle from the meridian against the G1 to G3 diagonal | `atan(abs((atan2(sin(star.aljanah.ra - star.fawaris.ra), cos(star.aljanah.ra - star.fawaris.ra))) * cos(star.sadr.dec)) / abs(star.aljanah.dec - star.fawaris.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 15°17′44″ | 37°51′07″ | −22°33′24″ (−59.591 %) | no (±5 %) |
+| Menkaure off the G1 to G2 line against Gienah off the Fawaris to Sadr line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.fawaris.dec - star.sadr.dec) * (atan2(sin(star.aljanah.ra - star.sadr.ra), cos(star.aljanah.ra - star.sadr.ra))) * cos(star.sadr.dec) - (atan2(sin(star.fawaris.ra - star.sadr.ra), cos(star.fawaris.ra - star.sadr.ra))) * cos(star.sadr.dec) * (star.aljanah.dec - star.sadr.dec)) / (((atan2(sin(star.fawaris.ra - star.sadr.ra), cos(star.fawaris.ra - star.sadr.ra))) * cos(star.sadr.dec))^2 + (star.fawaris.dec - star.sadr.dec)^2)` | 0.18527 | 0.321921 | −42.45 % | no (±5 %) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| wing angle from the meridian against the G1 to G3 diagonal | −22°33′24″ (−59.591 %) | −22°33′24″ (−59.591 %) | −22°33′24″ (−59.591 %) | −22°33′24″ (−59.591 %) |
+| Menkaure off the G1 to G2 line against Gienah off the Fawaris to Sadr line | −42.45 % | −42.45 % | −42.45 % | −42.45 % |
+
+**Free choices (3)**:
+- the epoch
+- the orientation of the sky map relative to the ground
+- the constellation, and which three of its stars (Deneb, the brightest, is left unmarked)
+
+**Overlay:** `sky-projection` {"stars":["Fawaris","Sadr","Aljanah"],"ground":["g1","g2","g3"]}
+
+**Proponents:** Collins, A. (2006). The Cygnus Mystery. London: Watkins.
+
+**Context:** Bauval, R. & Gilbert, A. (1994). The Orion Mystery. London: Heinemann. · Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
+
+This is C4's engine with another constellation in it: the same two shape comparisons, the same folding of right-ascension differences into ±180° with atan2(sin, cos), the same unsigned ground offsets from Petrie's §92, and the same 5 % band. What it is not is Collins' own thesis. That thesis is a view, not a plan: the three wing stars setting into their three pyramids as seen from Gebel Gibli, the knoll south-east of the Sphinx, and Deneb rising over Heliopolis. Testing it needs Gebel Gibli's position and the plateau's local horizon, and the database has neither, so only the ground plan is tested here. The wing is a far wider figure than the belt, and the flat sky map pays for it. Fawaris to Aljanah spans 16.2° at this epoch against the belt's 2.7°, so the map C4 uses, x = Δra × cos dec of the middle star and y = Δdec, is stretched where C4's is not: about Sadr it puts the wing's angle to the meridian at 15.30°, where a true tangent plane about the same star puts it at 14.27°. That is a full degree of projection error, against the arcminute or two the same approximation costs over Orion's belt. It changes no verdict below, but nothing here should be read to better than a degree. Neither comparison holds, and neither holds as well as Orion's. The wing's angle to the meridian comes out at 15°18′ against the pyramids' diagonal of 37°51′, wrong by 22°33′ (−59.6 %), where C4's belt at its own chosen epoch is wrong by 13°01′ (+34.4 %). Menkaure stands off the G1 to G2 line by 0.185 of that line's length and Aljanah stands off the Fawaris to Sadr line by 0.322 of it, so the wing is nearly twice as bent as the ground: −42.5 %, against Orion's +25.0 %. The angle is the half of this that an epoch can move. It sweeps about 0.7° a century here, and over the fifteen thousand years from 13,000 BCE to now it passes the pyramids' 37°51′ exactly twice, around 11,300 BCE and again around 700 CE, neither of them anywhere near the completion of the pyramids that Collins dates the correlation to. The offset ratio barely moves with the epoch at all, so no date rescues the shape. Long-term precession (Vondrák 2011) is what makes any of these dates mean anything; Bauval and Gilbert are cited for context because the method being applied is theirs.
+
 ## D · Site plan and geodesy
 
 ### D1 · Giza diagonal to Heliopolis
@@ -554,6 +588,67 @@ Residual by survey preset:
 
 Legon quotes 1417.5 by 1732 cubits from Petrie's survey. Here the extents are built from Petrie's centre-to-centre offsets (section 92) and the mean half-bases of G1 and G3, so Menkaure's slightly rectangular base (102.2 by 104.6 m in Lehner) enters as its mean side; that is worth about 1.2 m, or 0.16 percent, on the shorter extent. Petrie found no exact relation between the centres and no evidence the layout was planned as a whole.
 
+### D3 · Prime meridian and the Delta
+
+Stecchini's claim, as Tompkins gives it in his appendix: the Great Pyramid was sited as the geodetic centre of Egypt. Its meridian bisects the Nile Delta, and the pyramid stands at the apex of a quadrant whose sides, its own base diagonals extended north-east and north-west, enclose the Delta.
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| the meridian against the Delta's apex | `g1.center.longitude` vs `delta.apex.center.longitude` | 31°08′03″ | 31°08′00″ | 3.1″ (+0.003 %) | yes (±0°03′00″) |
+| the meridian against the middle of the coast, Alexandria to Port Said | `g1.center.longitude` vs `(delta.west.center.longitude + delta.east.center.longitude) / 2` | 31°08′03″ | 31°06′30″ | 1.5′ (+0.083 %) | yes (±0°03′00″) |
+| bearing to the north-east corner against the base diagonal, 45° | `atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)` vs `45` | 38°28′19″ | 45°00′00″ | −6°31′41″ (−14.507 %) | no (±5 %) |
+| bearing to the north-west corner against the base diagonal, 45° west | `abs(atan2(delta.west.centre.offset.east, delta.west.centre.offset.north))` vs `45` | 40°49′16″ | 45°00′00″ | −4°10′44″ (−9.287 %) | no (±5 %) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| the meridian against the Delta's apex | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) |
+| the meridian against the middle of the coast, Alexandria to Port Said | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) |
+| bearing to the north-east corner against the base diagonal, 45° | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) |
+| bearing to the north-west corner against the base diagonal, 45° west | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) |
+
+**Free choices (2)**:
+- which places stand for the Delta's corners (Alexandria and Port Said here)
+- reading the base diagonals as bearings from the base centre
+
+**Overlay:** `ground-bearings` {"from":"g1","length_m":4000,"bearings":[{"label":"meridian","azimuth":"0"},{"label":"north-east diagonal","azimuth":"45"},{"label":"north-west diagonal","azimuth":"-45"},{"label":"to the Delta apex","azimuth":"atan2(delta.apex.centre.offset.east, delta.apex.centre.offset.north)"},{"label":"to Port Said","azimuth":"atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)"},{"label":"to Alexandria","azimuth":"atan2(delta.west.centre.offset.east, delta.west.centre.offset.north)"}]}
+
+**Proponents:** Tompkins, P. (1971). Secrets of the Great Pyramid. New York: Harper & Row. Appendix by L. C. Stecchini.
+
+**Context:** Commonly cited WGS84 coordinates of three points on the Nile Delta: the Delta Barrage at El-Qanater el-Khayreya, where the river divides (30°11′ N, 31°08′ E); Alexandria (31°12′ N, 29°55′ E); and Port Said (31°15′ N, 32°18′ E). · Commonly cited WGS84 coordinates of the Great Pyramid's base centre (29°58′45″ N, 31°08′03″ E).
+
+What is entered here is not Stecchini. His own figures, an axis of Egypt at 31°14′ E and a Delta apex at 30°06′ N, reach this project only through Tompkins' appendix and the accounts that repeat it, and a number from a secondary account of a number is not a measurement. What is entered instead is three commonly cited positions, the same kind of placeholder as the Heliopolis obelisk that D1 points at: the modern barrage at El-Qanater el-Khayreya for the head of the Delta, and Alexandria and Port Said for its western and eastern corners. Each is a town or a dam standing for an ancient mouth or a river fork, each is quoted only to the arcminute, and each carries a sigma of 0.02°, about 2 km. The bearings are taken in the flat east-north frame that buildEnvironment derives from those coordinates, the same frame D1 uses for Heliopolis: north from the difference in latitude, east from the difference in longitude times the cosine of the origin's latitude. Over the 180 km to the coast it is worth about half a degree of bearing. Measured against the initial azimuth of the great circle, the flat bearing to Port Said is 0.48° further from the meridian than the true one, and Alexandria's is 0.48° further on the other side. Two effects of about that size make it up: half the convergence of the meridians, Δλ sin φ / 2, is 0.30°, and holding the cosine of the latitude at the origin's value, when it has shrunk by 1.3 % by the time it reaches the coast, supplies most of the rest. The error flatters the claim, the true azimuths lying further from 45° still, and at half a degree it decides nothing below either way. The meridian half of the claim holds twice over. The Great Pyramid's cited longitude is 3.1″ east of the barrage, 84 m on the ground, where the arcminute the barrage's own position is quoted to is 1.6 km here: the apex sits on the meridian to a twentieth of the precision of the citation, and could not be shown to miss it if it did. Against the middle of the coast the meridian runs 1.5′ east, about 2.5 km, which is not quite twice the uncertainty the two towns carry between them and well inside the 3′ band. The quadrant does not. Port Said lies at 38°28′ from the pyramid and Alexandria at 40°49′ on the other side, so the two arms open 79°18′ where the base diagonals open 90°, and the corners fall short of their diagonals by 6°32′ and 4°11′. The diagonals are taken as exactly 45°, which the Great Pyramid's own orientation justifies to the 3′ its sides are off cardinal. What does survive of the figure is that the two corners come out at almost the same range, 180.5 km and 179.4 km, a kilometre apart in a hundred and eighty: the pyramid is very nearly equidistant from the two ends of the Delta's coast, which is a weaker and quite different statement from standing at the apex of a right angle that encloses it. Which towns stand for those corners is a free choice, and the tolerance is generous rather than the choice being tight: moving a corner by the 2 km its position is worth turns its bearing by two-thirds of a degree, but moving it to a different mouth of the ancient river would turn it by several.
+
+### D4 · Sphinx axis and the temples
+
+The Sphinx looks due east, and the Sphinx Temple in front of its paws and Khafre's valley temple beside it are laid out on the cardinal directions with it.
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| Sphinx Temple north-south axis (east wall) against the meridian | `sphinx_temple.wall.east.dfc` vs `0` | −0°01′12″ | 0°00′00″ | −1.2′ | yes (±0°15′00″) |
+| Sphinx Temple east-west axis (north wall) against due east | `sphinx_temple.wall.north.dfc` vs `0` | 0°22′00″ | 0°00′00″ | 22.0′ | yes (±0°30′00″) |
+| Khafre's valley temple mean north-south axis against the meridian | `(khafre_valley_temple.wall.east.dfc + khafre_valley_temple.wall.west.dfc) / 2` vs `0` | 0°05′00″ | 0°00′00″ | 5.0′ | yes (±0°15′00″) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| Sphinx Temple north-south axis (east wall) against the meridian | −1.2′ | −1.2′ | −1.2′ | −1.2′ |
+| Sphinx Temple east-west axis (north wall) against due east | 22.0′ | 22.0′ | 22.0′ | 22.0′ |
+| Khafre's valley temple mean north-south axis against the meridian | 5.0′ | 5.0′ | 5.0′ | 5.0′ |
+
+**Free choices (1)**:
+- the Sphinx's own axis is not surveyed in the database, so the Sphinx Temple's east-west axis stands for it (C5 records the same gap as a free choice)
+
+**Overlay:** `ground-bearings` {"from":"sphinx","length_m":500,"bearings":[{"label":"Sphinx Temple axis","azimuth":"sphinx_temple.wall.east.dfc"},{"label":"Sphinx Temple east-west","azimuth":"90 + sphinx_temple.wall.north.dfc"},{"label":"valley temple axis","azimuth":"(khafre_valley_temple.wall.east.dfc + khafre_valley_temple.wall.west.dfc) / 2"},{"label":"due east","azimuth":"90"},{"label":"Khafre's causeway","azimuth":"khafre_causeway.edge.north.azimuth + 180"}]}
+
+**Proponents:** Lehner, M. (1997). The Complete Pyramids. London: Thames & Hudson.
+
+**Context:** Nell, E. & Ruggles, C. (2014). The Orientations of the Giza Pyramids and Associated Structures. Journal for the History of Astronomy 45(3), 304–360. · Lehner, M. (1991). Archaeology of an Image: The Great Sphinx of Giza. PhD dissertation, Yale University. ARCE Sphinx Project 1979–83. · Commonly cited WGS84 coordinates of the Great Sphinx of Giza: 29°58′31″ N, 31°08′16″ E.
+
+Every number here is a deviation from cardinality in Nell and Ruggles' sense: the angle between a wall and the cardinal direction it was meant to hold, positive clockwise, so a positive north wall runs south of east at its far end and a positive east wall runs east of north. The targets are all zero, which is why these comparisons carry an absolute tolerance rather than a percentage: a residual against zero has no percentage at all. All three hold. The Sphinx Temple's east wall, the nine-point line the surveyors themselves take for the temple's axis because no reading could be got from the west wall, is −0°01′12″ off the meridian, which is about the accuracy they claim for a line of that length. Its north wall is +0°22′ off due east. Khafre's valley temple leans anticlockwise on its east side and clockwise on its west, −0°23′ against +0°33′, so the building is a little narrower at its northern end; the mean of the two, which is the nearest thing the survey offers to an axis for it, is +0°05′. The bands are 15′ on the two meridian comparisons and 30′ on the east-west one, the looser band going to the one line here that is standing in for something else. Neither temple has a position in the database. The Sphinx alone carries a latitude and a longitude, and that is the cited placeholder worth about 55 m that C5 and C6 also use, so the overlay draws all five bearings from the Sphinx's centre. They are directions and not walls, and the buildings they belong to are not where the lines begin. The causeway is drawn as its reverse azimuth, 283°26′, because it runs west-north-west from the valley temple up to Khafre's pyramid and so leaves the Sphinx that way. Two lines in the same few hundred metres are nowhere near cardinal, and this claim does not count either of them against the temples. The passage between the two buildings, measured along the Sphinx Temple's south wall, is +4°33′, and Khafre's causeway is +13°26′. Nell and Ruggles remark that the passage is skewed in the same sense as the causeway, which reads as topography rather than as a failed alignment: both run with the slope up to the plateau. What this claim tests is the walls that were meant to be cardinal, and those are cardinal to a few arcminutes.
+
 ## Inputs
 
 Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified records were entered from memory or secondary sources and still need checking against the cited page.
@@ -563,6 +658,9 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | au | 149597870700 | m | iau-2012 | defined | yes |
 | c | 299792458 | m/s | si-2019 | defined | yes |
 | cubit.royal | 0.5236 | m | lehner-1997 | tabulated | no |
+| delta.apex.center.longitude | 31.1333 | deg | coords-delta-cited | cited | no |
+| delta.east.center.longitude | 32.3 | deg | coords-delta-cited | cited | no |
+| delta.west.center.longitude | 29.9167 | deg | coords-delta-cited | cited | no |
 | earth.circumference.equatorial | 40075016.686 | m | wgs84 | derived | yes |
 | earth.perihelion | 147095000000 | m | nasa-earth-fact-sheet | tabulated | yes |
 | earth.radius.polar | 6356752.314 | m | wgs84 | defined | yes |
@@ -585,8 +683,12 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | kc.shaft.north.angle | 32.6 | deg | gantenbrink-1993 | robot-survey | no |
 | kc.shaft.south.angle | 45 | deg | gantenbrink-1993 | robot-survey | no |
 | kc.width | 5.2354 | m | petrie-1883 | interior | yes |
+| khafre_valley_temple.wall.east.dfc | -0.383333 | deg | nell-ruggles-2014 | total-station | yes |
+| khafre_valley_temple.wall.west.dfc | 0.55 | deg | nell-ruggles-2014 | total-station | yes |
 | passage.descending.angle | 26.5231 | deg | petrie-1883 | interior | yes |
 | qc.shaft.north.angle | 39.1167 | deg | gantenbrink-1993 | robot-survey | no |
 | qc.shaft.south.angle | 39.6078 | deg | gantenbrink-1993 | robot-survey | no |
+| sphinx_temple.wall.east.dfc | -0.02 | deg | nell-ruggles-2014 | total-station | yes |
+| sphinx_temple.wall.north.dfc | 0.366667 | deg | nell-ruggles-2014 | total-station | yes |
 | unit.pyramid_inch | 0.0254254 | m | smyth-1864 | defined | no |
 | year.tropical | 365.24219 | day | astronomical-almanac | tabulated | yes |

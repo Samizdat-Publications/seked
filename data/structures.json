@@ -94,5 +94,53 @@
     "evidence": "excavated",
     "source": "coords-heliopolis-cited",
     "note": "About 17 km north-east of Giza, in the same WGS84 datum and the Giza frame; the target of claim D1."
+  },
+  {
+    "id": "sphinx-temple",
+    "site": "giza",
+    "name": "Sphinx Temple",
+    "evidence": "excavated",
+    "source": "nell-ruggles-2014",
+    "note": "The temple directly in front of the Sphinx's paws, surveyed by Nell and Ruggles in 2006; its measurement keys carry the prefix sphinx_temple, a key having no hyphens in it."
+  },
+  {
+    "id": "khafre-valley-temple",
+    "site": "giza",
+    "name": "Valley temple of Khafre",
+    "evidence": "excavated",
+    "source": "nell-ruggles-2014",
+    "note": "The temple beside the Sphinx Temple, sharing the passage between the two; its measurement keys carry the prefix khafre_valley_temple."
+  },
+  {
+    "id": "khafre-causeway",
+    "site": "giza",
+    "name": "Causeway of Khafre",
+    "evidence": "excavated",
+    "source": "nell-ruggles-2014",
+    "note": "The 495 m causeway running west-north-west from the valley temple up to Khafre's pyramid; its measurement keys carry the prefix khafre_causeway."
+  },
+  {
+    "id": "delta.apex",
+    "site": "giza",
+    "name": "Head of the Delta, the barrage at El-Qanater el-Khayreya",
+    "evidence": "excavated",
+    "source": "coords-delta-cited",
+    "note": "A place rather than a monument: the point about 20 km north of Giza where the Nile divides, registered so claim D3 has something to take a bearing to."
+  },
+  {
+    "id": "delta.west",
+    "site": "giza",
+    "name": "Western corner of the Delta, Alexandria",
+    "evidence": "excavated",
+    "source": "coords-delta-cited",
+    "note": "A place rather than a monument, and a modern town standing for the Canopic mouth at the Delta's western limit."
+  },
+  {
+    "id": "delta.east",
+    "site": "giza",
+    "name": "Eastern corner of the Delta, Port Said",
+    "evidence": "excavated",
+    "source": "coords-delta-cited",
+    "note": "A place rather than a monument, and a modern town standing for the Pelusiac mouth at the Delta's eastern limit."
   }
 ]

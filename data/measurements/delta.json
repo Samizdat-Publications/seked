@@ -1,0 +1,68 @@
+[
+  {
+    "key": "delta.apex.center.latitude",
+    "structure": "delta.apex",
+    "quantity": "latitude",
+    "value": 30.1833,
+    "unit": "deg",
+    "sigma": 0.02,
+    "source": "coords-delta-cited",
+    "method": "cited",
+    "note": "30°11′ N, the commonly cited position of the barrage at El-Qanater el-Khayreya, where the Nile divides into its two surviving branches. Sigma of 0.02°, about 2 km, is the size of the place rather than the precision of the figure. Unverified placeholder standing for the head of the Delta."
+  },
+  {
+    "key": "delta.apex.center.longitude",
+    "structure": "delta.apex",
+    "quantity": "longitude",
+    "value": 31.1333,
+    "unit": "deg",
+    "sigma": 0.02,
+    "source": "coords-delta-cited",
+    "method": "cited",
+    "note": "31°08′ E, the commonly cited position of the barrage at El-Qanater el-Khayreya. Sigma of 0.02°, about 2 km at this latitude. Unverified placeholder; this is the coordinate claim D3 compares with the Great Pyramid's own meridian, and it is quoted only to the arcminute, which is 1.6 km of longitude here."
+  },
+  {
+    "key": "delta.west.center.latitude",
+    "structure": "delta.west",
+    "quantity": "latitude",
+    "value": 31.2,
+    "unit": "deg",
+    "sigma": 0.02,
+    "source": "coords-delta-cited",
+    "method": "cited",
+    "note": "31°12′ N, the commonly cited position of Alexandria, which stands here for the Canopic mouth at the Delta's western limit. Sigma of 0.02°, about 2 km. Unverified placeholder."
+  },
+  {
+    "key": "delta.west.center.longitude",
+    "structure": "delta.west",
+    "quantity": "longitude",
+    "value": 29.9167,
+    "unit": "deg",
+    "sigma": 0.02,
+    "source": "coords-delta-cited",
+    "method": "cited",
+    "note": "29°55′ E, the commonly cited position of Alexandria. Sigma of 0.02°, about 1.9 km at this latitude. Unverified placeholder."
+  },
+  {
+    "key": "delta.east.center.latitude",
+    "structure": "delta.east",
+    "quantity": "latitude",
+    "value": 31.25,
+    "unit": "deg",
+    "sigma": 0.02,
+    "source": "coords-delta-cited",
+    "method": "cited",
+    "note": "31°15′ N, the commonly cited position of Port Said, which stands here for the Pelusiac mouth at the Delta's eastern limit. Sigma of 0.02°, about 2 km. Unverified placeholder."
+  },
+  {
+    "key": "delta.east.center.longitude",
+    "structure": "delta.east",
+    "quantity": "longitude",
+    "value": 32.3,
+    "unit": "deg",
+    "sigma": 0.02,
+    "source": "coords-delta-cited",
+    "method": "cited",
+    "note": "32°18′ E, the commonly cited position of Port Said. Sigma of 0.02°, about 1.9 km at this latitude. Unverified placeholder."
+  }
+]

@@ -30,7 +30,7 @@ pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnp
   The starting sheet was entered from memory and secondary sources.
 - **Star data is imported, never typed.** Everything in `data/stars/` is
   written by `pnpm run stars` out of one HYG 4.2 CSV: `hyg-bright.json` is the
-  catalogue to magnitude 6.5, `named.json` the ten stars the claims name, cut
+  catalogue to magnitude 6.5, `named.json` the fourteen stars the claims name, cut
   from the same rows so the two cannot disagree. The raw CSV is gitignored and
   `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
   attribution the licence requires.

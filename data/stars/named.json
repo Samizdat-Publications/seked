@@ -8,5 +8,9 @@
   { "id": "mizar", "name": "Mizar", "bayer": "ζ UMa", "raDeg": 200.9812, "decDeg": 54.92536, "pmRaMasYr": 121.23, "pmDecMasYr": -22.01, "source": "hyg-4.2", "role": "Spence's alignment pair (C1)" },
   { "id": "regulus", "name": "Regulus", "bayer": "α Leo", "raDeg": 152.09298, "decDeg": 11.96721, "pmRaMasYr": -249.4, "pmDecMasYr": 4.91, "source": "hyg-4.2", "role": "Leo and the Sphinx (C5)" },
   { "id": "vega", "name": "Vega", "bayer": "α Lyr", "raDeg": 279.2346, "decDeg": 38.78369, "pmRaMasYr": 201.02, "pmDecMasYr": 287.46, "source": "hyg-4.2", "role": "Pole star c. 12,000 BCE; precession sanity check" },
-  { "id": "polaris", "name": "Polaris", "bayer": "α UMi", "raDeg": 37.94625, "decDeg": 89.26411, "pmRaMasYr": 44.22, "pmDecMasYr": -11.74, "source": "hyg-4.2", "role": "Today's pole star; precession sanity check" }
+  { "id": "polaris", "name": "Polaris", "bayer": "α UMi", "raDeg": 37.94625, "decDeg": 89.26411, "pmRaMasYr": 44.22, "pmDecMasYr": -11.74, "source": "hyg-4.2", "role": "Today's pole star; precession sanity check" },
+  { "id": "fawaris", "name": "Fawaris", "bayer": "δ Cyg", "raDeg": 296.24361, "decDeg": 45.13081, "pmRaMasYr": 43.22, "pmDecMasYr": 48.44, "source": "hyg-4.2", "role": "δ Cygni, the wing star Collins lays on the Great Pyramid (C7)" },
+  { "id": "sadr", "name": "Sadr", "bayer": "γ Cyg", "raDeg": 305.5571, "decDeg": 40.25668, "pmRaMasYr": 2.43, "pmDecMasYr": -0.93, "source": "hyg-4.2", "role": "γ Cygni, the wing star Collins lays on Khafre's pyramid (C7)" },
+  { "id": "aljanah", "name": "Aljanah", "bayer": "ε Cyg", "raDeg": 311.55267, "decDeg": 33.97026, "pmRaMasYr": 356.16, "pmDecMasYr": 330.28, "source": "hyg-4.2", "role": "ε Cygni, Gienah in Collins, the wing star he lays on Menkaure's pyramid (C7)" },
+  { "id": "deneb", "name": "Deneb", "bayer": "α Cyg", "raDeg": 310.35798, "decDeg": 45.28034, "pmRaMasYr": 1.56, "pmDecMasYr": 1.55, "source": "hyg-4.2", "role": "α Cygni; Collins has it rising over Heliopolis and setting into Khafre's pyramid from Gebel Gibli, neither modelled (C7)" }
 ]
