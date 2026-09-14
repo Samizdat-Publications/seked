@@ -35,8 +35,8 @@ phases and the sourcing check, is in [`docs/plan.html`](docs/plan.html).
 
 Phases 0 and 1 are done, Phase 4 is closed, and Phases 2, 3 and 5 are
 under way. Every Petrie 1883 record for all three pyramids and the Dash
-2015 records are verified against the source page; the Cole 1925 records
-wait for a copy of the paper. The Great Pyramid's interior is generated
+2015 records are verified against the source page, and so are Cole's 1925
+sides and azimuths, read from a scan of the Survey of Egypt paper. The Great Pyramid's interior is generated
 from Petrie's positions in both the Blender scene and the browser; Khafre's
 and Menkaure's sheets carry Petrie's dimensions but he gives no positions,
 so their interiors wait on published plans. The terrain is cut from
@@ -93,8 +93,7 @@ meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
 and sunset, so a claim that names an `epoch` can reach the sky from its
 YAML without the claims package learning any astronomy.
 
-Next: verify Cole 1925 once the paper is to hand; positions for Khafre's and
-Menkaure's interiors from published plans; the GPMP contours for the ground;
+Next: positions for Khafre's and Menkaure's interiors from published plans; the GPMP contours for the ground;
 the Stellarium check of Alnitak's transit at 2500 and 10,500 BCE; and then
 the Blender work the plan's hero renders need, which is where the project's
 visual weight lands: the Sphinx sculpt in place of the massing placeholder,
