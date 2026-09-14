@@ -167,3 +167,19 @@ describe('formatResidual', () => {
     expect(formatResidual({ ...base, absolute: 0.001, residualPct: 0.001 })).toMatch(/″ /);
   });
 });
+
+describe('C1 true north', () => {
+  const c1 = claims.find((c) => c.id === 'C1');
+  it('compares the orientation against zero with an absolute tolerance', () => {
+    expect(c1).toBeDefined();
+    const r = evaluateClaim(c1 as NonNullable<typeof c1>, env);
+    const cmp = r.comparisons[0] as ComparisonResult;
+    expect(cmp.targetValue).toBe(0);
+    expect(Number.isNaN(cmp.residualPct)).toBe(true);
+    expect(cmp.toleranceAbs).toBeCloseTo(0.0833, 4);
+    expect(cmp.absolute).toBeLessThan(0); // west of north
+    expect(Math.abs(cmp.absolute)).toBeLessThan(0.1); // under 6 arcminutes
+    expect(cmp.within).toBe(true);
+    expect(formatResidual(cmp)).toMatch(/^−\d+\.\d′$/); // arcminutes, no percentage
+  });
+});

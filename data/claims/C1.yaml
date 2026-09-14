@@ -1,0 +1,31 @@
+id: C1
+title: True north
+group: sky
+summary: >-
+  The Great Pyramid's sides run within a few arcminutes of true north. The
+  question is not whether but how: Dash argues for an equinox shadow, Spence
+  for a simultaneous transit of Mizar and Kochab, which would also date the
+  layout to about 2467 BCE.
+comparisons:
+  - label: mean casing azimuth against true north
+    formula: g1.orientation
+    target: "0"
+    unit: deg
+    tolerance_abs: 0.0833
+free_choices: []
+overlay:
+  type: compass-rose
+  params:
+    structure: g1
+    methods: [equinox-shadow, simultaneous-transit]
+    stars: [Mizar, Kochab]
+sources:
+  for: [dash-2015, spence-2000]
+  context: [petrie-1883, cole-1925, nell-ruggles-2014]
+notes: >-
+  The residual is the orientation itself, so a percentage is undefined and
+  the fit uses an absolute tolerance of 5 arcminutes (0.0833 degrees).
+  Petrie's casing mean is -3'43" plus or minus 6" (section 93), Cole's about
+  -3'06", Dash's -3'54" plus or minus 44" (Table 3): all west of north, and
+  the canonical preset resolves to Dash. Which method set it out is an
+  overlay for the app; it does not change this number.

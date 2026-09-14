@@ -21,6 +21,8 @@ export const ComparisonSchema = z.object({
   target: z.string(),
   unit: Unit.default('ratio'),
   tolerance_pct: z.number().positive().optional(),
+  /** Absolute tolerance in the comparison's unit, for targets of zero where a percentage is undefined. */
+  tolerance_abs: z.number().positive().optional(),
 });
 export type Comparison = z.infer<typeof ComparisonSchema>;
 

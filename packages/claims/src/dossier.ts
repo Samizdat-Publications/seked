@@ -41,15 +41,16 @@ export function formatLength(x: number): string {
 
 export function formatResidual(r: ComparisonResult): string {
   const digits = r.unit === 'deg' || Math.abs(r.residualPct) < 0.01 ? 3 : 2;
-  const pct = `${SIGN(r.residualPct)}${Math.abs(r.residualPct).toFixed(digits)} %`;
+  const pct = Number.isFinite(r.residualPct) ? `${SIGN(r.residualPct)}${Math.abs(r.residualPct).toFixed(digits)} %` : undefined;
+  const withPct = (s: string) => (pct === undefined ? s : `${s} (${pct})`);
   if (r.unit === 'deg') {
     const abs = Math.abs(r.absolute) >= 1
       ? `${r.absolute < 0 ? '−' : ''}${formatDms(Math.abs(r.absolute))}`
       : Math.abs(r.absolute) < 1 / 60 ? formatArcseconds(r.absolute) : formatArcminutes(r.absolute);
-    return `${abs} (${pct})`;
+    return withPct(abs);
   }
-  if (r.unit === 'm') return `${formatLength(r.absolute)} (${pct})`;
-  return pct;
+  if (r.unit === 'm') return withPct(formatLength(r.absolute));
+  return pct ?? `${SIGN(r.absolute)}${Math.abs(r.absolute)}`;
 }
 
 export interface DossierOptions {
@@ -81,7 +82,8 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
       out.push(`| ${c.id} | ${c.title} | - | - | pending (${r.status}) | ${r.freeChoices} |`);
       continue;
     }
-    const sorted = [...r.comparisons].sort((a, b) => Math.abs(a.residualPct) - Math.abs(b.residualPct));
+    const size = (x: ComparisonResult) => (Number.isFinite(x.residualPct) ? Math.abs(x.residualPct) : Number.POSITIVE_INFINITY);
+    const sorted = [...r.comparisons].sort((a, b) => size(a) - size(b));
     const best = sorted[0] as ComparisonResult;
     const worst = sorted[sorted.length - 1] as ComparisonResult;
     out.push(`| ${c.id} | ${c.title} | ${formatResidual(best)} | ${formatResidual(worst)} | ${r.fits ? 'yes' : 'no'} | ${r.freeChoices} |`);
@@ -103,7 +105,7 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
         out.push('| Comparison | Formula | Value | Target | Residual | Within |');
         out.push('|---|---|---:|---:|---:|:---:|');
         for (const cr of r.comparisons) {
-          out.push(`| ${cr.label} | \`${cr.formula}\` vs \`${cr.target}\` | ${formatValue(cr.value, cr.unit)} | ${formatValue(cr.targetValue, cr.unit)} | ${formatResidual(cr)} | ${cr.within ? 'yes' : 'no'} (±${cr.tolerancePct} %) |`);
+          out.push(`| ${cr.label} | \`${cr.formula}\` vs \`${cr.target}\` | ${formatValue(cr.value, cr.unit)} | ${formatValue(cr.targetValue, cr.unit)} | ${formatResidual(cr)} | ${cr.within ? 'yes' : 'no'} (${cr.toleranceAbs !== undefined ? `±${formatValue(cr.toleranceAbs, cr.unit)}` : `±${cr.tolerancePct} %`}) |`);
         }
         out.push('');
         if (compare.length > 1) {

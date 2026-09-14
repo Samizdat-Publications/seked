@@ -11,6 +11,8 @@ export interface ComparisonResult extends Comparison {
   /** value − target, in the comparison's unit. */
   absolute: number;
   tolerancePct: number;
+  /** Set when the comparison declares tolerance_abs; the fit then ignores the percentage. */
+  toleranceAbs?: number;
   within: boolean;
 }
 
@@ -28,7 +30,7 @@ export interface ClaimResult {
 export function evaluateComparison(c: Comparison, env: Environment, defaultTolerancePct: number): ComparisonResult {
   const value = evaluate(c.formula, env);
   const targetValue = evaluate(c.target, env);
-  const residualPct = ((value - targetValue) / targetValue) * 100;
+  const residualPct = targetValue === 0 ? Number.NaN : ((value - targetValue) / targetValue) * 100;
   const tolerancePct = c.tolerance_pct ?? defaultTolerancePct;
   return {
     ...c,
@@ -37,7 +39,8 @@ export function evaluateComparison(c: Comparison, env: Environment, defaultToler
     residualPct,
     absolute: value - targetValue,
     tolerancePct,
-    within: Math.abs(residualPct) <= tolerancePct,
+    toleranceAbs: c.tolerance_abs,
+    within: c.tolerance_abs !== undefined ? Math.abs(value - targetValue) <= c.tolerance_abs : Math.abs(residualPct) <= tolerancePct,
   };
 }
 

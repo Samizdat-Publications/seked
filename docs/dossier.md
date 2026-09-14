@@ -17,6 +17,7 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | B3 | Latitude equals the speed of light | −0.3″ (−0.000 %) | −0.3″ (−0.000 %) | yes | 3 |
 | B4 | Pyramid inch and the year | −0.16 % | −0.79 % | no | 3 |
 | B5 | Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.34 m (−0.68 %) | yes | 2 |
+| C1 | True north | −3.9′ | −3.9′ | yes | 0 |
 | C2 | Shafts point at stars | −12.2′ (−0.452 %) | 39.5′ (+2.061 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | yes | 1 |
 | C4 | Orion Correlation | +19.14 % | 12°57′28″ (+34.233 %) | no | 3 |
@@ -316,6 +317,30 @@ Identical to the second half of B1: 43,200 is 2 × 21,600, so "perimeter × 43,2
 
 ## C · Sky
 
+### C1 · True north
+
+The Great Pyramid's sides run within a few arcminutes of true north. The question is not whether but how: Dash argues for an equinox shadow, Spence for a simultaneous transit of Mizar and Kochab, which would also date the layout to about 2467 BCE.
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| mean casing azimuth against true north | `g1.orientation` vs `0` | −0°03′54″ | 0°00′00″ | −3.9′ | yes (±0°05′00″) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| mean casing azimuth against true north | −3.9′ | −3.7′ | −3.1′ | −3.9′ |
+
+**Free choices (0)**: none.
+
+**Overlay:** `compass-rose` {"structure":"g1","methods":["equinox-shadow","simultaneous-transit"],"stars":["Mizar","Kochab"]}
+
+**Proponents:** Dash, G. (2015). The Great Pyramid's Footprint: Results from Our 2015 Survey. AERAgram 16(2), 8–14. · Spence, K. (2000). Ancient Egyptian chronology and the astronomical orientation of pyramids. Nature 408, 320–324.
+
+**Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer. · Cole, J. H. (1925). Determination of the Exact Size and Orientation of the Great Pyramid of Giza. Survey of Egypt Paper 39. Cairo: Government Press. · Nell, E. & Ruggles, C. (2014). The Orientations of the Giza Pyramids and Associated Structures. Journal for the History of Astronomy 45(3), 304–360.
+
+The residual is the orientation itself, so a percentage is undefined and the fit uses an absolute tolerance of 5 arcminutes (0.0833 degrees). Petrie's casing mean is -3'43" plus or minus 6" (section 93), Cole's about -3'06", Dash's -3'54" plus or minus 44" (Table 3): all west of north, and the canonical preset resolves to Dash. Which method set it out is an overlay for the app; it does not change this number.
+
 ### C2 · Shafts point at stars
 
 Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its north shaft at Thuban; the Queen's Chamber south shaft pointed at Sirius and its north shaft at Kochab, each at meridian transit.
@@ -446,6 +471,7 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | g1.center.latitude | 29.979167 | deg | coords-wgs84-cited |  | no |
 | g1.face.angle | 51.8444 | deg | lehner-1997 | tabulated | no |
 | g1.height.original | 146.59 | m | lehner-1997 | tabulated | no |
+| g1.orientation | -0.065 | deg | dash-2015 | casing-mean | yes |
 | g2.centre.offset.south | 353.86 | m | petrie-1883 | triangulation | yes |
 | g2.centre.offset.west | 334.41 | m | petrie-1883 | triangulation | yes |
 | g2.face.angle | 53.1667 | deg | lehner-1997 | tabulated | no |
