@@ -9,7 +9,7 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | A1 | π in the profile | +0.03 % | +0.03 % | yes | 0 |
 | A2 | φ in the face | +0.04 % | −0.09 % | yes | 0 |
 | A3 | Seked 5½ explains both | 5.9″ (+0.003 %) | 1.0′ (+0.033 %) | yes | 0 |
-| A4 | King's Chamber 3-4-5 | −0.04 % | −0.17 % | yes | 1 |
+| A4 | King's Chamber 3-4-5 | −0.01 % | −0.17 % | yes | 1 |
 | A5 | The cubit itself | +1 µm (+0.000 %) | −7 µm (−0.001 %) | yes | 1 |
 | A7 | Khafre's 3-4-5 | 2.2′ (+0.069 %) | 2.2′ (+0.069 %) | yes | 0 |
 | B1 | 1 : 43,200 | −24.1 km (−0.38 %) | −274.0 km (−0.68 %) | yes | 2 |
@@ -114,6 +114,7 @@ The King's Chamber measures 20 × 10 cubits with a height of 5√5 cubits, so th
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
 | end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.9854 | 15 | −0.10 % | yes (±0.5 %) |
+| floor diagonal in cubits against √500 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2)` vs `sqrt(500)` | 22.3583 | 22.3607 | −0.01 % | yes (±0.5 %) |
 | space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9896 | 25 | −0.04 % | yes (±0.5 %) |
 | height in cubits against 5√5 | `kc.height / cubit.royal` vs `5 * sqrt(5)` | 11.1618 | 11.1803 | −0.17 % | yes (±0.5 %) |
 
@@ -122,6 +123,7 @@ Residual by survey preset:
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
 | end-wall diagonal in cubits against 15 | −0.10 % | −0.13 % | −0.13 % | −0.10 % |
+| floor diagonal in cubits against √500 | −0.01 % | −0.04 % | −0.04 % | −0.01 % |
 | space diagonal in cubits against 25 | −0.04 % | −0.07 % | −0.07 % | −0.04 % |
 | height in cubits against 5√5 | −0.17 % | −0.19 % | −0.19 % | −0.17 % |
 
@@ -539,7 +541,7 @@ A line through the south-east corners of the three pyramids runs at 45 degrees a
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2((heliopolis.obelisk.longitude - g1.center.longitude) * cos(g1.center.latitude), heliopolis.obelisk.latitude - g1.center.latitude)` | 43°21′05″ | 44°59′57″ | −1°38′52″ (−3.662 %) | no (±2 %) |
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2(heliopolis.obelisk.centre.offset.east, heliopolis.obelisk.centre.offset.north)` | 43°21′05″ | 44°59′57″ | −1°38′52″ (−3.662 %) | no (±2 %) |
 | bearing of the corner line against 45 degrees | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `45` | 43°21′05″ | 45°00′00″ | −1°38′55″ (−3.664 %) | no (±2 %) |
 
 Residual by survey preset:
@@ -559,7 +561,7 @@ Residual by survey preset:
 
 **Context:** Legon, J. A. R. (1979). The Plan of the Giza Pyramids. Archaeological Reports of the Archaeology Society of Staten Island 10(1). · Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer.
 
-The corner line is built from Petrie's G1 to G3 centre offsets (section 92) and the mean half-bases, so Menkaure's slightly rectangular base enters as its mean side. The bearing to the obelisk is taken in the local east-north frame with the longitude difference scaled by the cosine of the latitude; at 17 km that approximation is good to about 0.1 degrees, which is far inside the 2 percent (0.9 degree) tolerance. The obelisk's position is a commonly cited value, unverified, and its sigma of 50 m moves the bearing by 0.2 degrees at most. Petrie found no exact relation between the corners of the three pyramids (section 92).
+The corner line is built from Petrie's G1 to G3 centre offsets (section 92) and the mean half-bases, so Menkaure's slightly rectangular base enters as its mean side. The bearing to the obelisk is taken in the local east-north frame with the longitude difference scaled by the cosine of the latitude; at 17 km that approximation is good to about 0.1 degrees, which is far inside the 2 percent (0.9 degree) tolerance. The bearing is now taken from the obelisk's derived offsets from the frame's origin, which are built in that same cosine-of-latitude flat frame, so the number is unchanged and the site plan and the claim read one position. The obelisk's position is a commonly cited value, unverified, and its sigma of 50 m moves the bearing by 0.2 degrees at most. Petrie found no exact relation between the corners of the three pyramids (section 92).
 
 ### D2 · Legon's rectangle
 
@@ -676,8 +678,6 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | g2.face.angle | 53.1667 | deg | lehner-1997 | tabulated | no |
 | g3.centre.offset.south | 739.19 | m | petrie-1883 | triangulation | yes |
 | g3.centre.offset.west | 574.45 | m | petrie-1883 | triangulation | yes |
-| heliopolis.obelisk.latitude | 30.1294 | deg | coords-heliopolis-cited | cited | no |
-| heliopolis.obelisk.longitude | 31.3076 | deg | coords-heliopolis-cited | cited | no |
 | kc.height | 5.8443 | m | petrie-1883 | interior | yes |
 | kc.length | 10.4709 | m | petrie-1883 | interior | yes |
 | kc.shaft.north.angle | 32.6 | deg | gantenbrink-1993 | robot-survey | no |
