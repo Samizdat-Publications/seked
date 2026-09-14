@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { calendarDate, jdToJulianEpoch, julianDay } from './calendar';
+import { calendarDate, calendarYearOfEpoch, deltaT, jdToJulianEpoch, julianDay } from './calendar';
 import { normalizeDeg } from './horizon';
-import { SEASON_EVENTS, equationOfTime, seasonInstant, solarDeclinationAndRa, solarLongitude } from './solar';
+import { SEASON_EVENTS, datedSunEnvironment, equationOfTime, seasonInstant, solarDeclinationAndRa, solarLongitude } from './solar';
 import { obliquityOfDate } from './sun';
 
 const D2R = Math.PI / 180;
 /** Meeus's worked date through chapters 25 and 28: 1992 October 13.0 TD. */
 const MEEUS_JDE = 2448908.5;
 const arcsec = (deg: number): number => deg * 3600;
+/** The Great Pyramid's base centre, from data/sites.json. */
+const GIZA_LATITUDE = 29.979167;
+const GIZA_LONGITUDE = 31.134167;
 
 /**
  * Meeus's low-accuracy equation of time, equation 28.3, after Smart: the same
@@ -180,5 +183,99 @@ describe('the instants of the seasons', () => {
     expect(date.year).toBe(-2449);
     expect(date.month).toBe(7);
     expect(Math.floor(date.day)).toBe(15);
+  });
+});
+
+describe('the dated sun in the claim environment', () => {
+  const giza = { latitudeDeg: GIZA_LATITUDE, longitudeDeg: GIZA_LONGITUDE };
+  const env = datedSunEnvironment({ epoch: -2449, ...giza });
+
+  it('gives each of the four events four keys the expression parser can read', () => {
+    expect(Object.keys(env)).toHaveLength(SEASON_EVENTS.length * 4);
+    for (const key of Object.keys(env)) expect(key).toMatch(/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*$/);
+    for (const event of ['march_equinox', 'june_solstice', 'september_equinox', 'december_solstice']) {
+      for (const suffix of ['jd', 'equation_of_time', 'rise.local_mean_time', 'set.local_mean_time']) {
+        expect(env[`sun.${event}.${suffix}`], `sun.${event}.${suffix}`).toBeTypeOf('number');
+      }
+    }
+  });
+
+  it("dates the events in the epoch's calendar year and nothing else", () => {
+    expect(calendarYearOfEpoch(-2449)).toBe(-2449);
+    for (const event of SEASON_EVENTS) {
+      expect(env[`sun.${event.replace('-', '_')}.jd`], event).toBe(seasonInstant(-2449, event));
+    }
+  });
+
+  it('puts the June solstice of 2450 BCE on 14 July at Giza, sunrise 04:49 and sunset 18:56', () => {
+    // The instant is 15 July in TT; sixteen hours of ΔT and two of longitude
+    // put it on the evening of the 14th where the observer stands.
+    const local = calendarDate((env['sun.june_solstice.jd'] as number) - deltaT(-2449) / 86400 + GIZA_LONGITUDE / 360);
+    expect(local.year).toBe(-2449);
+    expect(local.month).toBe(7);
+    expect(Math.floor(local.day)).toBe(14);
+    expect((local.day % 1) * 24).toBeCloseTo(17.55, 1);
+    expect((env['sun.june_solstice.rise.local_mean_time'] as number) * 60).toBeCloseTo(4 * 60 + 48.6, 0);
+    expect((env['sun.june_solstice.set.local_mean_time'] as number) * 60).toBeCloseTo(18 * 60 + 56.0, 0);
+  });
+
+  it('hangs sunrise and sunset symmetrically about noon, displaced by the equation of time', () => {
+    for (const event of SEASON_EVENTS) {
+      const prefix = `sun.${event.replace('-', '_')}`;
+      const rise = env[`${prefix}.rise.local_mean_time`] as number;
+      const set = env[`${prefix}.set.local_mean_time`] as number;
+      const minutes = env[`${prefix}.equation_of_time`] as number;
+      expect(Math.abs(minutes), event).toBeLessThan(17);
+      expect(rise + set, event).toBeCloseTo(24 - (2 * minutes) / 60, 9);
+    }
+  });
+
+  it('makes the June solstice the longest day at Giza and the December one the shortest', () => {
+    const length = (event: string): number =>
+      (env[`sun.${event}.set.local_mean_time`] as number) - (env[`sun.${event}.rise.local_mean_time`] as number);
+    expect(length('june_solstice')).toBeCloseTo(14.13, 1);
+    expect(length('december_solstice')).toBeCloseTo(10.16, 1);
+    // The equinoxes give a little over twelve hours, not exactly twelve: the
+    // event called is the upper limb on a refracted horizon, half a degree
+    // before and after the centre would cross it.
+    expect(length('march_equinox')).toBeGreaterThan(12);
+    expect(length('march_equinox')).toBeLessThan(12.25);
+    expect(length('september_equinox')).toBeCloseTo(length('march_equinox'), 1);
+  });
+
+  it('moves with the longitude, because local noon is a different instant on another meridian', () => {
+    const greenwich = datedSunEnvironment({ epoch: -2449, latitudeDeg: GIZA_LATITUDE });
+    for (const event of SEASON_EVENTS) {
+      const prefix = `sun.${event.replace('-', '_')}`;
+      // The instant is in TT and belongs to no meridian.
+      expect(greenwich[`${prefix}.jd`], event).toBe(env[`${prefix}.jd`]);
+      const moved = Math.abs((greenwich[`${prefix}.rise.local_mean_time`] as number) - (env[`${prefix}.rise.local_mean_time`] as number));
+      expect(moved, event).toBeGreaterThan(0);
+      expect(moved * 60, event).toBeLessThan(1);
+    }
+    // Far enough round and the event falls on another local day altogether,
+    // which is a whole day of the sun's motion rather than two hours of it.
+    const antipodes = datedSunEnvironment({ epoch: 2026, latitudeDeg: GIZA_LATITUDE, longitudeDeg: 179 });
+    const here = datedSunEnvironment({ epoch: 2026, latitudeDeg: GIZA_LATITUDE });
+    const apart = Math.abs((antipodes['sun.december_solstice.equation_of_time'] as number) - (here['sun.december_solstice.equation_of_time'] as number));
+    expect(apart).toBeGreaterThan(0.1);
+  });
+
+  it('has nothing to say where the sun does not rise or set that day', () => {
+    const svalbard = datedSunEnvironment({ epoch: 2026, latitudeDeg: 78, longitudeDeg: 15 });
+    expect(svalbard['sun.june_solstice.rise.local_mean_time']).toBeNaN();
+    expect(svalbard['sun.december_solstice.set.local_mean_time']).toBeNaN();
+    expect(Number.isNaN(svalbard['sun.march_equinox.rise.local_mean_time'])).toBe(false);
+  });
+
+  it('carries 10,500 BCE too, five days of ΔT and all', () => {
+    const ancient = datedSunEnvironment({ epoch: -10499, ...giza });
+    expect(deltaT(-10499) / 86400).toBeCloseTo(5.709, 3);
+    const local = calendarDate((ancient['sun.june_solstice.jd'] as number) - deltaT(-10499) / 86400 + GIZA_LONGITUDE / 360);
+    // Late August in the proleptic Julian calendar, which is where a quartic
+    // fitted between 1000 BCE and 1000 CE puts it eight thousand years early.
+    expect(local.year).toBe(-10499);
+    expect(local.month).toBe(8);
+    expect(ancient['sun.june_solstice.rise.local_mean_time'] as number).toBeCloseTo(4.95, 1);
   });
 });

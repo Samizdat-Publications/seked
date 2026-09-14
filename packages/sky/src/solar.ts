@@ -28,10 +28,10 @@
  * into a time of day is `deltaT` and the calendar in `calendar.ts`. Angles
  * are degrees.
  */
-import { jdToJulianEpoch } from './calendar';
+import { calendarYearOfEpoch, deltaT, jdToJulianEpoch } from './calendar';
 import { normalizeDeg } from './horizon';
 import type { Equatorial } from './stars';
-import { obliquityOfDate } from './sun';
+import { SUN_STANDARD_ALTITUDE_DEG, hourAngleAtAltitude, obliquityOfDate, type SunEnvironmentOptions } from './sun';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -204,4 +204,57 @@ export function seasonInstant(year: number, event: SeasonEvent): number {
     s += amplitude * Math.cos((phaseDeg + rateDegPerCentury * t) * D2R);
   }
   return jde0 + (0.00001 * s) / rateOfLongitude;
+}
+
+/**
+ * The event's own name as the claim language spells identifiers: the four ids
+ * with their hyphens turned into underscores. They are `march_equinox` and
+ * `june_solstice` rather than the `sun.equinox` and `sun.solstice.summer`
+ * that `sunEnvironment` already carries, because those three are named for a
+ * northern observer's seasons and these four are named for nothing but the
+ * month, which is the only description that survives being read at Giza, in
+ * the southern hemisphere, or ten thousand years ago.
+ */
+const eventKey = (event: SeasonEvent): string => `sun.${event.replace('-', '_')}`;
+
+/**
+ * The sun's keys that need a calendar, for the four seasonal events of the
+ * epoch's calendar year: `sun.june_solstice.jd`, the instant as a Julian Day
+ * in TT; `.equation_of_time` in minutes; and `.rise.local_mean_time` and
+ * `.set.local_mean_time` in decimal hours of local mean solar time on the
+ * observer's own meridian.
+ *
+ * Sunrise is the sun's upper limb at `SUN_STANDARD_ALTITUDE_DEG`, the same
+ * convention the azimuths in `sun.ts` are on, so the pair say where and when
+ * the same event happened. Local apparent time of sunrise is 12h less the
+ * hour angle; mean time is that less the equation of time, and it is mean
+ * solar time on this meridian and not any civil clock: no time zone, no
+ * summer time, and a flat horizon rather than the plateau's own skyline.
+ *
+ * The declination and the equation of time are read at local mean noon of
+ * the day the event falls on where the observer stands, which is what the
+ * longitude is for and is not the day it falls on in TT: ΔT alone is sixteen
+ * hours at 2450 BCE and five days at 10,500 BCE.
+ *
+ * A latitude where the sun does not reach the standard altitude that day gets
+ * NaN for the two times, as everything else in the package does rather than
+ * inventing a number.
+ */
+export function datedSunEnvironment({ epoch, latitudeDeg, longitudeDeg = 0 }: SunEnvironmentOptions): Record<string, number> {
+  const year = calendarYearOfEpoch(epoch);
+  const drift = deltaT(year) / 86400;
+  const meridian = longitudeDeg / 360;
+  const env: Record<string, number> = {};
+  for (const event of SEASON_EVENTS) {
+    const jde = seasonInstant(year, event);
+    const noon = Math.floor(jde - drift + meridian + 0.5) - meridian + drift;
+    const minutes = equationOfTime(noon);
+    const hourAngleDeg = hourAngleAtAltitude(solarDeclinationAndRa(noon).decDeg, latitudeDeg, SUN_STANDARD_ALTITUDE_DEG);
+    const prefix = eventKey(event);
+    env[`${prefix}.jd`] = jde;
+    env[`${prefix}.equation_of_time`] = minutes;
+    env[`${prefix}.rise.local_mean_time`] = 12 - hourAngleDeg / 15 - minutes / 60;
+    env[`${prefix}.set.local_mean_time`] = 12 + hourAngleDeg / 15 - minutes / 60;
+  }
+  return env;
 }
