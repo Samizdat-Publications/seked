@@ -818,6 +818,27 @@ def setup_view(scene, name, view, bake):
     print(f"  bearing {bearing:.1f} deg, pitch {pitch:+.1f} deg, {view['lens']:.0f} mm, exposure {scene.view_settings.exposure:+.1f} stops")
 
 
+def show_ground_only():
+    """
+    Of the three terrain objects the generator writes, render the two that are
+    ground: "Terrain (ground)", the near grid flattened under the pyramids, and
+    "Terrain (far context)", the coarse ring that carries the horizon out to
+    twelve kilometres. The raw GLO-30 grid stays hidden, because it lies under
+    the flattened one and turns the monuments into mounds. Both are shaded
+    smooth: a grid this coarse is a sampled landscape, not a field of facets.
+    """
+    shown = ("Terrain (ground)", "Terrain (far context)")
+    for obj in bpy.data.objects:
+        if not obj.name.startswith("Terrain"):
+            continue
+        visible = obj.name in shown
+        obj.hide_set(not visible)
+        obj.hide_render = not visible
+        if visible:
+            for poly in obj.data.polygons:
+                poly.use_smooth = True
+
+
 def choose_engine(scene, requested):
     """
     Cycles, because the sky texture, the sun's penumbra and eight thousand
@@ -842,15 +863,7 @@ def main():
     view = VIEWS[opts["view"]]
 
     assign_materials()
-    for obj in bpy.data.objects:
-        if obj.name.startswith("Terrain"):
-            ground = obj.name == "Terrain (ground)"
-            obj.hide_set(not ground)
-            obj.hide_render = not ground
-            if ground:
-                for poly in obj.data.polygons:
-                    poly.use_smooth = True
-
+    show_ground_only()
     setup_view(scene, opts["view"], view, load_bake(opts["bake"]))
     engine = choose_engine(scene, opts["engine"])
     samples = int(opts["samples"])
