@@ -3,8 +3,8 @@
  * reads a file: the catalogues on disk are `./catalogue`, which the Node entry
  * exports and the browser entry leaves out.
  *
- * Two shapes of record live here. A `Star` is one of the ten the claims name,
- * carrying the role it plays in a claim. A `BrightCatalogue` is the whole of
+ * Two shapes of record live here. A `Star` is one of the stars a claim names,
+ * carrying the role it plays in that claim. A `BrightCatalogue` is the whole of
  * HYG to magnitude 6.5, stored column-wise because eight thousand objects with
  * spelled-out keys would be twice the bytes for nothing.
  */

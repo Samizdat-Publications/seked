@@ -336,14 +336,16 @@ function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Mode
           {spec.diagonals.map((d) => (
             <li key={d.name}>
               <span className="swatch" style={{ background: d.colour }} />
-              {d.name}: {formatValue(d.lengthM, 'm')}, {formatValue(d.cubits, 'rc')} rc
+              {d.name}: drawn {d.drawnM.toFixed(2)} m, claimed {d.lengthM.toFixed(2)} m, {formatValue(d.cubits, 'rc')} rc
               {d.target === undefined ? '' : ` against ${formatValue(d.target, 'rc')}`}
               {d.residualPct === undefined ? '' : `, ${percent(d.residualPct)}`}
             </li>
           ))}
           <li className="note">
             The box is the four measured wall positions and the two measured levels; the cubits beside each diagonal are the
-            claim's own, which are Petrie's means of the wall faces. The two differ by a centimetre or two.
+            claim's own, which are Petrie's means of the wall faces. Those are not the same records, and under a preset that
+            takes the floor from one survey and the ceiling from another the drawn line and its label part by the better part of
+            a decimetre, which is why both lengths are printed.
           </li>
         </ul>
       );

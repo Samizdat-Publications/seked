@@ -647,10 +647,18 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
   if (!from) return undefined;
 
   // The same scope the claim evaluator builds: the measured and derived keys,
-  // plus the stars and the sun of this epoch.
+  // plus the stars and the sun of this epoch. The longitude is read from the
+  // environment under the key `scopeFor` reads it under, because it decides
+  // which local day the dated sun's clock times belong to and a line drawn
+  // from a Greenwich day would not be the line the panel's residual is about.
   const scope: Environment = {
     ...ctx.env,
-    ...skyEnvironment({ epoch: ctx.epoch, latitudeDeg: ctx.latitudeDeg, stars: ctx.stars }),
+    ...skyEnvironment({
+      epoch: ctx.epoch,
+      latitudeDeg: ctx.latitudeDeg,
+      longitudeDeg: ctx.env['g1.center.longitude'],
+      stars: ctx.stars,
+    }),
   };
 
   const bearings: GroundBearing[] = [];
@@ -988,6 +996,8 @@ export interface ChamberDiagonal {
   /** Its two ends in the scene frame. */
   from: Point;
   to: Point;
+  /** The length of the line that is actually drawn, from those two ends. */
+  drawnM: number;
   /** `cubits` back in metres, so the two always say the same length. */
   lengthM: number;
   /** The claim's own value for this diagonal, or the drawn length when it has none. */
@@ -1073,11 +1083,13 @@ export function chamberWireframeSpec(claim: Claim, ctx: OverlayContext): Chamber
     const comparison = comparisonFor(claim, name);
     const claimed = comparison === undefined ? undefined : tryEvaluate(comparison.formula, ctx.env);
     const target = comparison === undefined ? undefined : tryEvaluate(comparison.target, ctx.env);
-    const cubits = claimed ?? Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]) / cubit;
+    const drawnM = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
+    const cubits = claimed ?? drawnM / cubit;
     diagonals.push({
       name,
       from,
       to,
+      drawnM,
       lengthM: cubits * cubit,
       cubits,
       target,

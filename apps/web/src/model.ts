@@ -4,7 +4,7 @@
  * evaluator are the same functions the dossier runs, so a slider that changes
  * one number re-evaluates every claim the way a regenerated dossier would.
  */
-import { evaluateClaim, type Claim, type ClaimResult, type ComparisonResult } from '@seked/claims/browser';
+import { evaluateClaim, type Claim, type ClaimResult } from '@seked/claims/browser';
 import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
 import { buildEnvironment, interiorSolids, type Environment, type Solid } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
@@ -194,13 +194,6 @@ function evaluateClaimSafely(claim: Claim, env: Environment): FailedClaim {
       error: e instanceof Error ? e.message : String(e),
     };
   }
-}
-
-const size = (c: ComparisonResult): number => (Number.isFinite(c.residualPct) ? Math.abs(c.residualPct) : Number.POSITIVE_INFINITY);
-
-/** The comparison that fits worst, which is how the dossier grades a claim. */
-export function worstComparison(result: ClaimResult): ComparisonResult | undefined {
-  return [...result.comparisons].sort((a, b) => size(a) - size(b)).pop();
 }
 
 /** The records behind a claim's formulas, for the detail pane's provenance. */

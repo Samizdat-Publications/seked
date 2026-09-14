@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
 import { skyEnvironment } from '@seked/sky';
-import { evaluateClaim, type ComparisonResult } from './evaluate';
+import { evaluateClaim, worstComparison, type ComparisonResult } from './evaluate';
 import { evaluate, identifiers } from './expr';
 import { loadClaims } from './registry';
 import { formatResidual, renderDossier } from './dossier';
@@ -76,6 +76,25 @@ describe('the classic ratios, from data alone', () => {
     expect(casing!.within).toBe(false);
     expect(socket!.within).toBe(true);
     expect(r.fits).toBe(false);
+  });
+});
+
+describe('grading a claim by its worst comparison', () => {
+  // D4's three targets are all zero, so none of its comparisons has a
+  // percentage residual to be ranked by. They are ranked by the share of
+  // their absolute tolerance they spend instead, which puts the north wall's
+  // 22′ against a 30′ band above the two meridian lines.
+  it("D4: the worst comparison is the Sphinx Temple's east-west axis", () => {
+    const r = byId('D4');
+    for (const c of r.comparisons) expect(Number.isFinite(c.residualPct), c.label).toBe(false);
+    const worst = worstComparison(r) as ComparisonResult;
+    expect(worst.label).toContain('east-west axis');
+    expect(Math.abs(worst.absolute) * 60).toBeCloseTo(22.0, 1);
+  });
+  it('D4: the summary table prints that comparison as the worst residual', () => {
+    const md = renderDossier(db, claims, { generatedAt: new Date('2026-09-13') });
+    const row = md.split('\n').find((l) => l.startsWith('| D4 |')) as string;
+    expect(row).toContain('22.0′');
   });
 });
 

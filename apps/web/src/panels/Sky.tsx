@@ -15,7 +15,7 @@ function siderealClock(deg: number): string {
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-/** Decimal hours as a clock reading; a dash where the sun never crossed the horizon that day. */
+/** Decimal hours as a clock reading; the word "never" where the sun never crossed the horizon that day. */
 function meanTimeClock(hours: number): string {
   if (!Number.isFinite(hours)) return 'never';
   const minutes = Math.round(((hours % 24) + 24) % 24 * 60) % 1440;

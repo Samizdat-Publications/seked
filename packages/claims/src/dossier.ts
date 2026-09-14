@@ -2,7 +2,7 @@ import type { Database } from '@seked/data/browser';
 import { resolve, sourceById } from '@seked/data/browser';
 import { buildEnvironment } from '@seked/geometry';
 import { formatArcminutes, formatArcseconds, formatDms } from '@seked/units';
-import { evaluateClaim, type ClaimResult, type ComparisonResult } from './evaluate';
+import { comparisonSize, evaluateClaim, type ClaimResult, type ComparisonResult } from './evaluate';
 import { GROUPS, type Claim, type Group } from './schema';
 
 function trimZeros(s: string): string {
@@ -82,8 +82,9 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
       out.push(`| ${c.id} | ${c.title} | - | - | pending (${r.status}) | ${r.freeChoices} |`);
       continue;
     }
-    const size = (x: ComparisonResult) => (Number.isFinite(x.residualPct) ? Math.abs(x.residualPct) : Number.POSITIVE_INFINITY);
-    const sorted = [...r.comparisons].sort((a, b) => size(a) - size(b));
+    // `comparisonSize` is what the viewer's claim list grades by as well, so
+    // the best and worst named here are the ones the panel names.
+    const sorted = [...r.comparisons].sort((a, b) => comparisonSize(a) - comparisonSize(b));
     const best = sorted[0] as ComparisonResult;
     const worst = sorted[sorted.length - 1] as ComparisonResult;
     out.push(`| ${c.id} | ${c.title} | ${formatResidual(best)} | ${formatResidual(worst)} | ${r.fits ? 'yes' : 'no'} | ${r.freeChoices} |`);

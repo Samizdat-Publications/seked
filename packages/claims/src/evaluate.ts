@@ -45,6 +45,25 @@ export function evaluateComparison(c: Comparison, env: Environment, defaultToler
 }
 
 /**
+ * How badly a comparison misses, on one scale, so that the comparisons of a
+ * claim can be ranked against each other. A target of zero has no percentage
+ * to give, so a comparison whose residual is not finite is sized by how much
+ * of its absolute tolerance it spends, and by the bare miss when it declares
+ * no absolute tolerance either. Sizing those at infinity instead would tie
+ * every comparison of a claim whose targets are all zero and leave file order
+ * to decide which one is the worst.
+ */
+export function comparisonSize(c: ComparisonResult): number {
+  if (Number.isFinite(c.residualPct)) return Math.abs(c.residualPct);
+  return c.toleranceAbs === undefined ? Math.abs(c.absolute) : Math.abs(c.absolute) / c.toleranceAbs;
+}
+
+/** The comparison of a claim that misses worst, which is how it is graded. */
+export function worstComparison(result: ClaimResult): ComparisonResult | undefined {
+  return [...result.comparisons].sort((a, b) => comparisonSize(a) - comparisonSize(b)).pop();
+}
+
+/**
  * The environment a claim actually evaluates against: the measured and
  * derived keys, plus the stars of the claim's epoch when it has one. The
  * observer is the Great Pyramid's base centre until sites reach the

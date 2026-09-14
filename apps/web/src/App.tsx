@@ -54,8 +54,9 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
 
   // The catalogue is expanded once; the dome is rebuilt when the epoch moves
   // and only then, because sidereal time turns it rather than moving its
-  // stars. The named ten are cheap enough to keep even with the layer off,
-  // since the transit buttons in the panel read their right ascensions.
+  // stars. The handful the claims name is cheap enough to keep even with the
+  // layer off, since the transit buttons in the panel read their right
+  // ascensions.
   const catalogue = useMemo(() => brightStarsOf(bundle), [bundle]);
   const named = useMemo(() => namedOnDome(bundle.stars, epoch), [bundle.stars, epoch]);
   const buffers = useMemo(() => (layers.sky ? domeBuffers(catalogue, epoch) : undefined), [layers.sky, catalogue, epoch]);
@@ -71,8 +72,9 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
       lstDeg: lst,
       latitudeDeg: model.latitudeDeg,
       krupp,
+      elevationM: datum,
     }),
-    [model, bundle.stars, epoch, lst, krupp],
+    [model, bundle.stars, epoch, lst, krupp, datum],
   );
   const overlay = useMemo(() => overlaySpec(claim, overlayContext), [claim, overlayContext]);
 

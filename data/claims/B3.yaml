@@ -17,7 +17,7 @@ overlay:
   params:
     datums: [WGS84, Old Egyptian 1907]
 sources:
-  context: [coords-wgs84-cited, si-2019]
+  context: [coords-wgs84-cited, si-2019, epsg-1148]
 notes: >-
   The commonly cited base centre, 29°58′45″ N, is about 9 m south of the
   meme's coordinate, well inside a base 230 m on a side. The seventh decimal

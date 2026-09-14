@@ -177,8 +177,13 @@ describe('the instants of the seasons', () => {
 
   it('puts the June solstice of 2450 BCE in July, where the Julian calendar drifts it to', () => {
     // A calendar year of 365.25 days is 11 minutes longer than the sun's, so
-    // the solstice walks forward through the proleptic Julian calendar at
-    // about three days a century going back: 1962's June 21 becomes July 15.
+    // the solstice walks forward through the proleptic Julian calendar going
+    // back, by about 0.78 of a day a century, which is one day in 128 years.
+    // In that calendar the solstice of 1962 falls on 8 June and the solstice
+    // of 2450 BCE on 15 July, about 36 days over the 44 centuries between
+    // them. `calendarDate` reports dates after 1582 in the Gregorian calendar,
+    // where the first of those two is 21 June, so it is only the older date
+    // this test can ask it for.
     const date = calendarDate(seasonInstant(-2449, 'june-solstice'));
     expect(date.year).toBe(-2449);
     expect(date.month).toBe(7);

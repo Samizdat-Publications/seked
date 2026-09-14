@@ -170,8 +170,8 @@ export const TOUR: TourStep[] = [
     text:
       'The belt is projected down onto the ground from high enough to read both at once, at the epoch the claim is stated at. The ' +
       'comparisons are about angle and spacing and not about a picture: one residual for the belt against the diagonal from Khufu to ' +
-      "Menkaure, one for Menkaure's offset from it. Krupp's objection is the north-south inversion toggle in the pane below; turn it " +
-      'and watch both residuals.',
+      "Menkaure, one for Menkaure's offset from the line from Khufu to Khafre. Krupp's objection is the north-south inversion " +
+      'toggle in the pane below; turn it and watch both residuals.',
     claim: 'C4',
     layers: { pyramids: true, overlay: true, sky: true },
     camera: cameraFrom(THREE, 135, 55, 1800),

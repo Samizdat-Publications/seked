@@ -369,6 +369,23 @@ describe('the A4 chamber wireframe', () => {
     // height of the room.
     expect((endWall?.to[2] as number) - (endWall?.from[2] as number)).toBeGreaterThan(5);
   });
+
+  // The box stands on the four wall positions and the two floor and ceiling
+  // levels; the labels are the claim's own cubits, which come from Petrie's
+  // means of the wall faces. Under the canonical preset those two sets of
+  // records are not even from one survey, the floor being Lehner's and the
+  // ceiling Petrie's, and the end-wall diagonal parts from its label by seven
+  // centimetres. Under petrie-1883 one surveyor supplies both and the worst
+  // of the three parts by fourteen millimetres.
+  it('draws a diagonal within 0.15 m of its label under the canonical preset', () => {
+    for (const d of spec.diagonals) expect(Math.abs(d.drawnM - d.lengthM), d.name).toBeLessThan(0.15);
+  });
+
+  it('draws it within 0.02 m of its label under the petrie-1883 preset', () => {
+    const petrie = buildModel(bundle, 'petrie-1883', null, null);
+    const only = chamberWireframeSpec(a4, contextFor(petrie, -2449)) as NonNullable<ReturnType<typeof chamberWireframeSpec>>;
+    for (const d of only.diagonals) expect(Math.abs(d.drawnM - d.lengthM), d.name).toBeLessThan(0.02);
+  });
 });
 
 describe('the B1 ghost Earth', () => {

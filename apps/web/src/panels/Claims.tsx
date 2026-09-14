@@ -1,7 +1,7 @@
 import { GROUPS, type Claim, type Group } from '@seked/claims/browser';
-import { formatResidual } from '@seked/claims/browser';
+import { formatResidual, worstComparison } from '@seked/claims/browser';
 import { Fragment } from 'react';
-import { worstComparison, type FailedClaim, type Model } from '../model';
+import type { FailedClaim, Model } from '../model';
 import type { OverlayContext } from '../overlays';
 import { useView } from '../store';
 import { ClaimDetail } from './ClaimDetail';

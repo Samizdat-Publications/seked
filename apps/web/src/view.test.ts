@@ -55,6 +55,12 @@ describe('encodeView and decodeView', () => {
     expect(decoded.preset).toBe('canonical');
   });
 
+  // A missing key is not a slow camera: `Number(null)` is a finite zero, and
+  // a zero speed would clamp to the bottom of the range and stay there.
+  it('leaves the speed at its default when the query names no speed', () => {
+    expect(decodeView('?preset=canonical', PRESETS).speed).toBe(DEFAULT_VIEW.speed);
+  });
+
   it('clamps a cut and a speed from outside their ranges', () => {
     expect(decodeView('?cut=ns,99999,0', PRESETS).section.at).toBe(SECTION_MAX);
     expect(decodeView('?cut=ns,-99999,0', PRESETS).section.at).toBe(SECTION_MIN);

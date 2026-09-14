@@ -1,7 +1,7 @@
 /**
  * The sky over the plateau: the bundled catalogue as one point cloud, a
- * horizon ring with the four cardinal points, and the ten stars the claims
- * name picked out and labelled.
+ * horizon ring with the four cardinal points, and the stars the claims name
+ * picked out and labelled.
  *
  * The cloud is built in equatorial coordinates of date (see ../sky.ts) and
  * placed by a single rotation, so dragging the sidereal-time slider turns one

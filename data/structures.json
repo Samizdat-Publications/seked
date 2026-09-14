@@ -93,7 +93,7 @@
     "name": "Obelisk of Senusret I, Heliopolis",
     "evidence": "excavated",
     "source": "coords-heliopolis-cited",
-    "note": "About 17 km north-east of Giza, in the same WGS84 datum and the Giza frame; the target of claim D1."
+    "note": "About 24 km north-east of Giza, which is 16.7 km east and 16.7 km north, in the same WGS84 datum and the Giza frame; the target of claim D1."
   },
   {
     "id": "sphinx-temple",
@@ -125,7 +125,7 @@
     "name": "Head of the Delta, the barrage at El-Qanater el-Khayreya",
     "evidence": "excavated",
     "source": "coords-delta-cited",
-    "note": "A place rather than a monument: the point about 20 km north of Giza where the Nile divides, registered so claim D3 has something to take a bearing to."
+    "note": "A place rather than a monument: the point about 23 km north of Giza where the Nile divides, registered so claim D3 has something to take a bearing to."
   },
   {
     "id": "delta.west",

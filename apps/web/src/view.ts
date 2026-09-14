@@ -186,11 +186,14 @@ export function decodeView(search: string, presetIds: string[]): View {
   const preset = q.get('preset');
   const cubit = q.get('cubit') === null ? Number.NaN : Number(q.get('cubit'));
   const epoch = q.get('epoch') === null ? Number.NaN : Number(q.get('epoch'));
-  const lst = Number(q.get('lst'));
+  // A missing key has to decode to NaN and not to the zero `Number(null)`
+  // gives, because zero is a value each of these fields would then clamp and
+  // keep instead of falling back to its default.
+  const lst = q.get('lst') === null ? Number.NaN : Number(q.get('lst'));
   const layerList = q.get('layers');
   const cam = numbers(q.get('cam'), 6);
   const mode = q.get('mode');
-  const speed = Number(q.get('speed'));
+  const speed = q.get('speed') === null ? Number.NaN : Number(q.get('speed'));
   const index = q.get('tour') === null ? Number.NaN : Number(q.get('tour'));
   const tour = Number.isInteger(index) && index >= 0 && index < TOUR.length ? index : null;
   // A camera in the query string wins over the tour's, so a shared link

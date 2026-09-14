@@ -446,8 +446,10 @@ const WIREFRAME = '#8fa6bd';
  *
  * The lengths written at the middle of each diagonal are the claim's own,
  * which are Petrie's means of the wall faces and not the four wall positions
- * the box is built from. The two differ by a centimetre or two, far less than
- * the lines are thick.
+ * and two levels the box is built from. Those are different records, and a
+ * preset that takes the floor from one survey and the ceiling from another
+ * parts the drawn line from its label by the better part of a decimetre; the
+ * panel prints both lengths so the difference is never only in the drawing.
  */
 function ChamberWireframe({ spec }: { spec: ChamberWireframeSpec }): React.JSX.Element {
   return (
