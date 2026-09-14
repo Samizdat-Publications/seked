@@ -1,9 +1,9 @@
-import type { Database } from '@seked/data';
-import { resolve, sourceById } from '@seked/data';
+import type { Database } from '@seked/data/browser';
+import { resolve, sourceById } from '@seked/data/browser';
 import { buildEnvironment } from '@seked/geometry';
 import { formatArcminutes, formatArcseconds, formatDms } from '@seked/units';
 import { evaluateClaim, type ClaimResult, type ComparisonResult } from './evaluate';
-import { GROUPS, type Claim, type Group } from './registry';
+import { GROUPS, type Claim, type Group } from './schema';
 
 function trimZeros(s: string): string {
   return s.includes('.') ? s.replace(/\.?0+$/, '') : s;

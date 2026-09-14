@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { skyEnvironment } from './environment';
 import { isCircumpolar, transitAltitude } from './frames';
-import { loadNamedStars, positionAtEpoch, starById } from './stars';
+import { loadNamedStars } from './catalogue';
+import { positionAtEpoch, starById } from './stars';
 import { ltp, ltpb, ltpecl, ltpequ, precessIcrsToDate } from './vondrak';
 
 const close = (got: number, want: number, tol = 1e-13) => expect(Math.abs(got - want)).toBeLessThan(tol);

@@ -8,7 +8,7 @@
  * module only flattens it into keys.
  */
 import { lowerCulminationAltitude, transitAltitude, transitIsNorth } from './frames';
-import { loadNamedStars, positionAtEpoch, type Star } from './stars';
+import { positionAtEpoch, type Star } from './stars';
 
 export interface SkyEnvironmentOptions {
   /**
@@ -18,15 +18,42 @@ export interface SkyEnvironmentOptions {
   epoch: number;
   /** The observer's latitude in degrees, north positive. */
   latitudeDeg: number;
-  /** Defaults to the named stars in data/stars/named.json. */
+  /** Defaults to whatever `setDefaultStars` or `setDefaultStarsLoader` registered. */
   stars?: Star[];
 }
 
 /** The claim expression parser's identifier grammar, kept in step by a test. */
 const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*$/;
 
-/** The default catalogue, read once: the dossier builds an environment per claim per preset. */
-let defaultStars: Star[] | undefined;
+/**
+ * The default catalogue, resolved once: the dossier builds an environment per
+ * claim per preset. Node registers the loader that reads
+ * data/stars/named.json (see `./catalogue`); the browser hands over the stars
+ * from its bundle. Neither is baked in here, so this module stays pure.
+ */
+let cachedStars: Star[] | undefined;
+let starsLoader: (() => Star[]) | undefined;
+
+/** Use this catalogue whenever `skyEnvironment` is called without one. */
+export function setDefaultStars(stars: Star[]): void {
+  cachedStars = stars;
+  starsLoader = undefined;
+}
+
+/** As `setDefaultStars`, but the catalogue is only read when it is first needed. */
+export function setDefaultStarsLoader(load: () => Star[]): void {
+  starsLoader = load;
+  cachedStars = undefined;
+}
+
+export function defaultStars(): Star[] {
+  if (cachedStars) return cachedStars;
+  if (!starsLoader) {
+    throw new Error('no default star catalogue: pass `stars`, or register one with setDefaultStars (@seked/sky registers the one in data/stars/named.json)');
+  }
+  cachedStars = starsLoader();
+  return cachedStars;
+}
 
 /**
  * One epoch, one observer, flattened: for every named star its mean place of
@@ -36,7 +63,7 @@ let defaultStars: Star[] | undefined;
  * numbers and nothing else) and the epoch itself as `sky.epoch`.
  */
 export function skyEnvironment(opts: SkyEnvironmentOptions): Record<string, number> {
-  const stars = opts.stars ?? (defaultStars ??= loadNamedStars());
+  const stars = opts.stars ?? defaultStars();
   const env: Record<string, number> = { 'sky.epoch': opts.epoch };
   for (const star of stars) {
     const prefix = `star.${star.id}`;

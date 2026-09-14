@@ -18,6 +18,10 @@ build/
 *.tif
 *.tiff
 
+# Written by `pnpm bundle` from data/
+apps/web/public/seked.json
+apps/web/public/terrain/
+
 # Local
 .env
 .env.*

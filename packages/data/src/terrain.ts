@@ -1,42 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { z } from 'zod';
+import { TerrainHeaderSchema, type TerrainHeader } from './core';
 import { DATA_DIR } from './index';
-
-/**
- * The heightfield cut from the Copernicus GLO-30 DEM by scripts/terrain.py.
- * The header describes the grid and cites the source; the heights live beside
- * it in a flat binary so the numbers stay out of the JSON.
- */
-export const TerrainHeaderSchema = z.object({
-  site: z.string(),
-  origin: z.object({ latitude: z.number(), longitude: z.number() }),
-  frame: z.string(),
-  horizontalDatum: z.string(),
-  verticalDatum: z.string(),
-  /** File name of the binary, beside the header. */
-  heights: z.string(),
-  dtype: z.literal('float32'),
-  byteOrder: z.literal('little-endian'),
-  layout: z.literal('row-major'),
-  rowOrder: z.literal('south-to-north'),
-  columnOrder: z.literal('west-to-east'),
-  /** Grid spacing in metres. */
-  spacing: z.number().positive(),
-  nx: z.number().int().min(2),
-  ny: z.number().int().min(2),
-  /** East and north coordinate of the first sample, in metres from the origin. */
-  x0: z.number(),
-  y0: z.number(),
-  resampling: z.string(),
-  projection: z.string(),
-  source: z.string(),
-  tiles: z.array(z.string()).min(1),
-  script: z.string(),
-  sha256: z.string().regex(/^[0-9a-f]{64}$/),
-  note: z.string(),
-});
-export type TerrainHeader = z.infer<typeof TerrainHeaderSchema>;
 
 export interface Terrain {
   header: TerrainHeader;

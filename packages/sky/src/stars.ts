@@ -1,7 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+/**
+ * Star records and the geometry that moves them through time. Nothing here
+ * reads a file: the catalogue on disk is `./catalogue`, which the Node entry
+ * exports and the browser entry leaves out.
+ */
 import { z } from 'zod';
-import { DATA_DIR } from '@seked/data';
 import { precessIcrsToDate } from './vondrak';
 
 export const StarSchema = z.object({
@@ -18,10 +20,6 @@ export const StarSchema = z.object({
   role: z.string().optional(),
 });
 export type Star = z.infer<typeof StarSchema>;
-
-export function loadNamedStars(path = join(DATA_DIR, 'stars', 'named.json')): Star[] {
-  return z.array(StarSchema).parse(JSON.parse(readFileSync(path, 'utf8')));
-}
 
 export function starById(stars: Star[], id: string): Star {
   const s = stars.find((x) => x.id === id);

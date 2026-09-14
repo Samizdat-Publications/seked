@@ -2,81 +2,14 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+import { MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, type Database, type Measurement } from './core';
 
 export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 export const DATA_DIR = join(REPO_ROOT, 'data');
 
-export const SourceSchema = z.object({
-  id: z.string(),
-  kind: z.enum(['survey', 'reference', 'paper', 'proponent', 'critique']),
-  year: z.number().optional(),
-  citation: z.string(),
-  url: z.string().optional(),
-  license: z.string().optional(),
-  note: z.string().optional(),
-});
-export type Source = z.infer<typeof SourceSchema>;
-
-export const MeasurementSchema = z.object({
-  key: z.string().regex(/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$/, 'keys are dotted lower-case identifiers'),
-  structure: z.string(),
-  quantity: z.enum(['length', 'angle', 'latitude', 'longitude', 'elevation', 'count', 'ratio', 'speed', 'time']),
-  value: z.number(),
-  unit: z.enum(['m', 'deg', 'count', 'ratio', 'm/s', 'day']),
-  sigma: z.number().nonnegative().optional(),
-  source: z.string(),
-  method: z.string().optional(),
-  note: z.string().optional(),
-  verified: z.boolean().default(false),
-  /** Which site the record belongs to; `units` and `constants` records are site-free. */
-  site: z.string().default('giza'),
-});
-export type Measurement = z.infer<typeof MeasurementSchema> & { file: string; order: number };
-
-export const SiteSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  /** The observer's body. The sky package is Earth-only for now; a Martian sky needs its own precession. */
-  body: z.enum(['earth', 'mars']),
-  datum: z.string(),
-  origin: z.object({ latitude: z.number(), longitude: z.number(), elevation: z.number() }),
-  frame: z.string(),
-  note: z.string().optional(),
-});
-export type Site = z.infer<typeof SiteSchema>;
-
-/**
- * How we know a structure exists. The viewer renders each tier differently
- * and a claim may reference any tier, so a legendary chamber and an excavated
- * one can share the scene without sharing credibility.
- */
-export const EVIDENCE_TIERS = ['excavated', 'instrumented', 'claimed', 'legendary'] as const;
-export const StructureSchema = z.object({
-  id: z.string(),
-  site: z.string(),
-  name: z.string(),
-  evidence: z.enum(EVIDENCE_TIERS),
-  source: z.string().optional(),
-  note: z.string().optional(),
-});
-export type Structure = z.infer<typeof StructureSchema>;
-
-export const PresetSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  /** Sources in order of preference. Sources not listed rank last, in file order. */
-  sources: z.array(z.string()).min(1),
-  note: z.string().optional(),
-});
-export type Preset = z.infer<typeof PresetSchema>;
-
-export interface Database {
-  sources: Source[];
-  sites: Site[];
-  structures: Structure[];
-  measurements: Measurement[];
-  presets: Preset[];
-}
+// The schemas, the types and the preset resolver are browser-safe and live in
+// their own module, so `@seked/data/browser` can offer them without node:fs.
+export * from './core';
 
 /** Structure ids that are not physical structures and need no registry entry. */
 const SITE_FREE_STRUCTURES = new Set(['units', 'constants']);
@@ -131,42 +64,6 @@ export function loadDatabase(dataDir = DATA_DIR): Database {
     seen.add(k);
   }
   return { sources, sites, structures, measurements, presets };
-}
-
-export interface Resolved {
-  preset: Preset;
-  /** The winning record for each key. */
-  records: Map<string, Measurement>;
-  /** key → value, in the database's units (metres, degrees). */
-  values: Record<string, number>;
-}
-
-/**
- * Pick one record per key: the one whose source appears earliest in the
- * preset's list. Sources the preset does not mention rank after all listed
- * ones, so a key measured by only one source is never lost.
- */
-export function resolve(db: Database, presetId: string): Resolved {
-  const preset = db.presets.find((p) => p.id === presetId);
-  if (!preset) throw new Error(`unknown preset "${presetId}"`);
-  const rank = (source: string): number => {
-    const i = preset.sources.indexOf(source);
-    return i === -1 ? preset.sources.length : i;
-  };
-  const records = new Map<string, Measurement>();
-  for (const m of db.measurements) {
-    const current = records.get(m.key);
-    if (!current || rank(m.source) < rank(current.source)) records.set(m.key, m);
-  }
-  const values: Record<string, number> = {};
-  for (const [key, m] of records) values[key] = m.value;
-  return { preset, records, values };
-}
-
-export function sourceById(db: Database, id: string): Source {
-  const s = db.sources.find((x) => x.id === id);
-  if (!s) throw new Error(`unknown source "${id}"`);
-  return s;
 }
 
 // The terrain heightfield reader lives in its own module; re-exported so `@seked/data` stays one import.

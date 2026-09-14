@@ -1,7 +1,7 @@
 import type { Environment } from '@seked/geometry';
-import { skyEnvironment } from '@seked/sky';
+import { skyEnvironment } from '@seked/sky/browser';
 import { evaluate } from './expr';
-import type { Claim, Comparison } from './registry';
+import type { Claim, Comparison } from './schema';
 
 export interface ComparisonResult extends Comparison {
   value: number;
