@@ -76,7 +76,7 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
   for (const c of claims) {
     const r = results.get(c.id) as ClaimResult;
     if (r.status !== 'computed') {
-      out.push(`| ${c.id} | ${c.title} | — | — | pending (${r.status}) | ${r.freeChoices} |`);
+      out.push(`| ${c.id} | ${c.title} | - | - | pending (${r.status}) | ${r.freeChoices} |`);
       continue;
     }
     const sorted = [...r.comparisons].sort((a, b) => Math.abs(a.residualPct) - Math.abs(b.residualPct));
@@ -115,7 +115,7 @@ export function renderDossier(db: Database, claims: Claim[], opts: DossierOption
                 const res = evaluateClaim({ ...c, comparisons: [cr] }, e).comparisons[0] as ComparisonResult;
                 return formatResidual(res);
               } catch {
-                return '—';
+                return '-';
               }
             });
             out.push(`| ${cr.label} | ${cells.join(' | ')} |`);

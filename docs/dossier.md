@@ -20,7 +20,7 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | C2 | Shafts point at stars | −12.2′ (−0.452 %) | 39.5′ (+2.061 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | yes | 1 |
 | C4 | Orion Correlation | +19.14 % | 777.5′ (+34.233 %) | no | 3 |
-| D1 | Giza diagonal to Heliopolis | — | — | pending (needs-site) | 1 |
+| D1 | Giza diagonal to Heliopolis | - | - | pending (needs-site) | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
 

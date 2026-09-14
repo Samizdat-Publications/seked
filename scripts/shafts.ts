@@ -65,7 +65,7 @@ for (const s of SHAFTS) {
   const sols = solve(s.star, s.side, angle);
   const star = starById(stars, s.star);
   if (sols.length === 0) {
-    lines.push(`| ${s.label} | ${formatDms(angle)} (${src}) | ${star.name} | — | no solution 6000 BCE – 1 CE | — |`);
+    lines.push(`| ${s.label} | ${formatDms(angle)} (${src}) | ${star.name} | - | no solution 6000 BCE – 1 CE | - |`);
     console.log(`${s.label.padEnd(24)} ${formatDms(angle)}  ${star.name.padEnd(8)} no solution between 6000 BCE and 1 CE`);
     continue;
   }
