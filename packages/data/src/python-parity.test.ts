@@ -205,6 +205,25 @@ const DISCOVERY_CASE: Record<string, number> = {
   'g2.passage.horizontal.floor.end.up': 0,
   'g2.passage.horizontal.width': 1,
   'g2.passage.horizontal.height': 2,
+  // A passage stated the way a published plan states one: where it begins, a
+  // length along the floor and a slope, with no far end written down. This
+  // one takes the default bearing, due south.
+  'g2.passage.lower_descending.floor.begin.north': -20,
+  'g2.passage.lower_descending.floor.begin.east': 5,
+  'g2.passage.lower_descending.floor.begin.up': 0,
+  'g2.passage.lower_descending.length': 20,
+  'g2.passage.lower_descending.angle': -30,
+  'g2.passage.lower_descending.width': 1,
+  'g2.passage.lower_descending.height': 2,
+  // The same, with a recorded bearing that is not due south.
+  'g2.passage.well.floor.begin.north': -26,
+  'g2.passage.well.floor.begin.east': 5,
+  'g2.passage.well.floor.begin.up': -10,
+  'g2.passage.well.length': 8,
+  'g2.passage.well.angle': 0,
+  'g2.passage.well.direction': 90,
+  'g2.passage.well.width': 1,
+  'g2.passage.well.height': 2,
   'g2.chamber.burial.wall.north.north': -20,
   'g2.chamber.burial.wall.south.north': -26,
   'g2.chamber.burial.wall.east.east': 11,
@@ -233,6 +252,8 @@ describe.skipIf(!py)('blender/seked_data.py discovers a prefixed interior the sa
     expect(theirs.map((s) => s.name)).toEqual([
       'g2.passage.descending',
       'g2.passage.horizontal',
+      'g2.passage.lower_descending',
+      'g2.passage.well',
       'g2.chamber.burial',
       'g2.chamber.rock',
     ]);

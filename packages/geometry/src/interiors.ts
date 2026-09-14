@@ -281,9 +281,18 @@ const BUILDERS: readonly Builder[] = [
 // begins with its id, and two shapes are looked for under it:
 //
 //   <id>.passage.<name>.floor.begin.{north,east,up}   floor centre line
-//   <id>.passage.<name>.floor.end.{north,east,up}
+//   <id>.passage.<name>.floor.end.{north,east,up}     the far end, if measured
+//   <id>.passage.<name>.length                        else metres along the floor
+//   <id>.passage.<name>.angle                         and the slope in degrees
+//   <id>.passage.<name>.direction                     optional bearing, azimuth
 //   <id>.passage.<name>.{width,height}                rectangular section
-//   <id>.passage.<name>.angle                         optional, provenance only
+//
+// A passage that records both ends is drawn between them and its `angle`, if
+// there is one, is provenance. A passage that records only where it begins is
+// drawn from `length` and `angle`, the slope being positive for a passage
+// that rises going away from its beginning, along `direction` if a record
+// gives one and due south otherwise. That is how a published plan states a
+// passage, and computing the far end keeps it out of the database.
 //
 //   <id>.chamber.<name>.wall.{north,south}.north      wall positions
 //   <id>.chamber.<name>.wall.{east,west}.east
@@ -310,6 +319,14 @@ const BUILDERS: readonly Builder[] = [
 
 /** A passage shorter than this is a rounding artefact, not a passage. */
 const MIN_RUN = 1e-6;
+
+/**
+ * The bearing a passage takes when no record gives it one. Every entrance
+ * passage at Giza runs south into its pyramid from the north face, so a
+ * published plan that states a length and a slope and nothing else is stating
+ * a run due south.
+ */
+const DUE_SOUTH = 180;
 
 /** A resolved coordinate and the record it actually came from. */
 interface Coordinate {
@@ -436,20 +453,55 @@ function entranceBegin(env: Environment, prefix: string, name: string, half: num
   return name === 'descending' ? storedPoint(env, `${prefix}entrance.floor.begin`, half) : undefined;
 }
 
+/**
+ * The far end of a passage whose source states it as a run rather than as a
+ * second point. `<base>.length` is metres measured along the floor and
+ * `<base>.angle` the slope in degrees, positive for a passage that rises
+ * going away from its beginning and negative for one that descends. The
+ * bearing is `<base>.direction` when a record gives it as an azimuth in
+ * degrees, and `DUE_SOUTH` otherwise. The end point itself is never stored:
+ * it is a derived quantity, so it is computed here from the three records.
+ */
+function endFromRun(env: Environment, base: string, from: Point): { point: Point; keys: string[] } | undefined {
+  const length = numberAt(env, `${base}.length`);
+  const angle = numberAt(env, `${base}.angle`);
+  if (length === undefined || angle === undefined || length <= 0) return undefined;
+  const keys = [`${base}.length`, `${base}.angle`];
+  const direction = numberAt(env, `${base}.direction`);
+  if (direction !== undefined) keys.push(`${base}.direction`);
+  const azimuth = ((direction ?? DUE_SOUTH) * Math.PI) / 180;
+  const slope = (angle * Math.PI) / 180;
+  const flat = length * Math.cos(slope);
+  return {
+    point: [
+      from[0] + flat * Math.sin(azimuth),
+      from[1] + flat * Math.cos(azimuth),
+      from[2] + length * Math.sin(slope),
+    ],
+    keys,
+  };
+}
+
 function passageBuilder(env: Environment, prefix: string, name: string, half: number | undefined): Builder | undefined {
   const base = `${prefix}passage.${name}`;
   const from = storedPoint(env, `${base}.floor.begin`, half) ?? entranceBegin(env, prefix, name, half);
-  const to = storedPoint(env, `${base}.floor.end`, half);
   const width = numberAt(env, `${base}.width`);
   const height = numberAt(env, `${base}.height`);
-  if (!from || !to || width === undefined || height === undefined || width <= 0 || height <= 0) return undefined;
+  if (!from || width === undefined || height === undefined || width <= 0 || height <= 0) return undefined;
+  // A survey that could reach both ends leaves two points. A published plan
+  // states a length along the floor and a slope instead, and the far end is
+  // worked out from them rather than written down anywhere.
+  const stored = storedPoint(env, `${base}.floor.end`, half);
+  const to = stored ?? endFromRun(env, base, from.point);
+  if (!to) return undefined;
   const run = Math.hypot(to.point[0] - from.point[0], to.point[1] - from.point[1], to.point[2] - from.point[2]);
   if (run < MIN_RUN) return undefined;
 
   const keys = [...from.keys, ...to.keys, `${base}.width`, `${base}.height`];
   // The recorded slope is not needed to build a passage whose two ends are
-  // known, but it is part of the provenance when the database carries it.
-  if (numberAt(env, `${base}.angle`) !== undefined) keys.push(`${base}.angle`);
+  // known, but it is part of the provenance when the database carries it. On
+  // the other path it is load-bearing and `endFromRun` has already named it.
+  if (stored && numberAt(env, `${base}.angle`) !== undefined) keys.push(`${base}.angle`);
   return {
     name: base,
     keys,

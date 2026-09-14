@@ -599,9 +599,18 @@ INTERIOR_BUILDERS = [
 # interiors appear. The shapes looked for under "<id>." are:
 #
 #   passage.<name>.floor.begin.{north,east,up}   floor centre line
-#   passage.<name>.floor.end.{north,east,up}
+#   passage.<name>.floor.end.{north,east,up}     the far end, if measured
+#   passage.<name>.length                        else metres along the floor
+#   passage.<name>.angle                         and the slope in degrees
+#   passage.<name>.direction                     optional bearing, azimuth
 #   passage.<name>.{width,height}                rectangular section
-#   passage.<name>.angle                         optional, provenance only
+#
+# A passage that records both ends is drawn between them and its angle, if
+# there is one, is provenance. A passage that records only where it begins is
+# drawn from length and angle, the slope being positive for a passage that
+# rises going away from its beginning, along direction if a record gives one
+# and due south otherwise. That is how a published plan states a passage, and
+# computing the far end keeps it out of the database.
 #
 #   chamber.<name>.wall.{north,south}.north      wall positions
 #   chamber.<name>.wall.{east,west}.east
@@ -626,6 +635,12 @@ INTERIOR_STRUCTURES = ("g1", "g2", "g3")
 
 # A passage shorter than this is a rounding artefact, not a passage.
 _MIN_RUN = 1e-6
+
+# The bearing a passage takes when no record gives it one. Every entrance
+# passage at Giza runs south into its pyramid from the north face, so a
+# published plan that states a length and a slope and nothing else is stating
+# a run due south.
+_DUE_SOUTH = 180.0
 
 
 def interior_key_prefix(structure):
@@ -765,24 +780,59 @@ def _entrance_begin(values, prefix, name, half):
     return None
 
 
+def _end_from_run(values, base, start):
+    """
+    The far end of a passage whose source states it as a run, not as a point.
+
+    "<base>.length" is metres measured along the floor and "<base>.angle" the
+    slope in degrees, positive for a passage that rises going away from its
+    beginning and negative for one that descends. The bearing is
+    "<base>.direction" when a record gives it as an azimuth in degrees, and
+    _DUE_SOUTH otherwise. The end point itself is never stored: it is a
+    derived quantity, so it is computed here from the three records.
+    """
+    length = _number_at(values, base + ".length")
+    angle = _number_at(values, base + ".angle")
+    if length is None or angle is None or length <= 0:
+        return None
+    keys = [base + ".length", base + ".angle"]
+    direction = _number_at(values, base + ".direction")
+    if direction is not None:
+        keys.append(base + ".direction")
+    azimuth = math.radians(_DUE_SOUTH if direction is None else direction)
+    slope = math.radians(angle)
+    flat = length * math.cos(slope)
+    end = (start[0] + flat * math.sin(azimuth),
+           start[1] + flat * math.cos(azimuth),
+           start[2] + length * math.sin(slope))
+    return (end, keys)
+
+
 def _passage_builder(values, prefix, name, half):
     base = prefix + "passage." + name
     begin = _stored_point(values, base + ".floor.begin", half)
     if begin is None:
         begin = _entrance_begin(values, prefix, name, half)
-    end = _stored_point(values, base + ".floor.end", half)
     width = _number_at(values, base + ".width")
     height = _number_at(values, base + ".height")
-    if begin is None or end is None or width is None or height is None or width <= 0 or height <= 0:
+    if begin is None or width is None or height is None or width <= 0 or height <= 0:
         return None
     start, start_keys = begin
+    # A survey that could reach both ends leaves two points. A published plan
+    # states a length along the floor and a slope instead, and the far end is
+    # worked out from them rather than written down anywhere.
+    stored = _stored_point(values, base + ".floor.end", half)
+    end = stored if stored is not None else _end_from_run(values, base, start)
+    if end is None:
+        return None
     finish, finish_keys = end
     if math.sqrt(sum((finish[i] - start[i]) ** 2 for i in range(3))) < _MIN_RUN:
         return None
     keys = start_keys + finish_keys + [base + ".width", base + ".height"]
     # The recorded slope is not needed to build a passage whose two ends are
-    # known, but it is part of the provenance when the database carries it.
-    if _number_at(values, base + ".angle") is not None:
+    # known, but it is part of the provenance when the database carries it. On
+    # the other path it is load-bearing and _end_from_run has already named it.
+    if stored is not None and _number_at(values, base + ".angle") is not None:
         keys.append(base + ".angle")
     return (base, keys, lambda v: passage(start, finish, width, height))
 
@@ -905,6 +955,25 @@ INTERIOR_DISCOVERY_CASE = {
     "g2.passage.horizontal.floor.end.up": 0.0,
     "g2.passage.horizontal.width": 1.0,
     "g2.passage.horizontal.height": 2.0,
+    # A passage stated the way a published plan states one: where it begins, a
+    # length along the floor and a slope, with no far end written down. This
+    # one takes the default bearing, due south.
+    "g2.passage.lower_descending.floor.begin.north": -20.0,
+    "g2.passage.lower_descending.floor.begin.east": 5.0,
+    "g2.passage.lower_descending.floor.begin.up": 0.0,
+    "g2.passage.lower_descending.length": 20.0,
+    "g2.passage.lower_descending.angle": -30.0,
+    "g2.passage.lower_descending.width": 1.0,
+    "g2.passage.lower_descending.height": 2.0,
+    # The same, with a recorded bearing that is not due south.
+    "g2.passage.well.floor.begin.north": -26.0,
+    "g2.passage.well.floor.begin.east": 5.0,
+    "g2.passage.well.floor.begin.up": -10.0,
+    "g2.passage.well.length": 8.0,
+    "g2.passage.well.angle": 0.0,
+    "g2.passage.well.direction": 90.0,
+    "g2.passage.well.width": 1.0,
+    "g2.passage.well.height": 2.0,
     "g2.chamber.burial.wall.north.north": -20.0,
     "g2.chamber.burial.wall.south.north": -26.0,
     "g2.chamber.burial.wall.east.east": 11.0,

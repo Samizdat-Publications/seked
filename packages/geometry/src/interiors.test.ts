@@ -186,6 +186,121 @@ describe('interiorSolids on a structure discovered from its records', () => {
   });
 });
 
+/**
+ * The second way a passage arrives. A survey that could reach both ends
+ * leaves two points; a published plan states where the passage begins, how
+ * long its floor is and how steeply it falls, and the far end is worked out
+ * rather than written down. The pyramid below is invented and its numbers are
+ * round; nothing here is a measurement of anything.
+ */
+describe('a passage recorded as a length along its floor and a slope', () => {
+  const RUN: Record<string, number> = {
+    'g3.base.side.mean': 200,
+    'g3.height.original': 120,
+
+    // A descending passage with no floor.end: 100 m of floor falling 30
+    // degrees from a beginning 60 m above the base, taking the default
+    // bearing. Due south of a beginning at y = +80 that lands at
+    // y = 80 - 100 cos 30 and z = 60 - 100 sin 30.
+    'g3.entrance.floor.begin.north': 80,
+    'g3.entrance.floor.begin.east': 0,
+    'g3.entrance.floor.begin.up': 60,
+    'g3.passage.descending.length': 100,
+    'g3.passage.descending.angle': -30,
+    'g3.passage.descending.width': 1,
+    'g3.passage.descending.height': 2,
+
+    // A level passage with a recorded bearing, running due east instead.
+    'g3.passage.side.floor.begin.north': 0,
+    'g3.passage.side.floor.begin.east': 0,
+    'g3.passage.side.floor.begin.up': 10,
+    'g3.passage.side.length': 40,
+    'g3.passage.side.angle': 0,
+    'g3.passage.side.direction': 90,
+    'g3.passage.side.width': 1,
+    'g3.passage.side.height': 2,
+  };
+  const run = buildEnvironment(RUN);
+  const g3 = { structure: 'g3' };
+
+  it('lays the far end out due south and down the slope', () => {
+    const end = interiorSolids(run, g3)['g3.passage.descending']?.landmarks['g3.passage.descending.floor.end'];
+    expect(end?.[0]).toBeCloseTo(0, 9);
+    expect(end?.[1]).toBeCloseTo(80 - 100 * Math.cos(Math.PI / 6), 9);
+    expect(end?.[2]).toBeCloseTo(60 - 100 * 0.5, 9);
+  });
+
+  it('follows a recorded bearing when there is one', () => {
+    const end = interiorSolids(run, g3)['g3.passage.side']?.landmarks['g3.passage.side.floor.end'];
+    expect(end?.[0]).toBeCloseTo(40, 9);
+    expect(end?.[1]).toBeCloseTo(0, 9);
+    expect(end?.[2]).toBeCloseTo(10, 9);
+  });
+
+  it('encloses the section times the length, the length being along the floor', () => {
+    expect(meshVolume(interiorSolids(run, g3)['g3.passage.descending'] as Mesh)).toBeCloseTo(2 * 100, 3);
+    expect(meshVolume(interiorSolids(run, g3)['g3.passage.side'] as Mesh)).toBeCloseTo(2 * 40, 3);
+  });
+
+  it('names the length, the slope and the bearing among the records it used', () => {
+    const inputs = interiorSolidInputs(run, g3);
+    expect(inputs['g3.passage.descending']).toEqual([
+      'g3.entrance.floor.begin.north',
+      'g3.entrance.floor.begin.east',
+      'g3.entrance.floor.begin.up',
+      'g3.passage.descending.length',
+      'g3.passage.descending.angle',
+      'g3.passage.descending.width',
+      'g3.passage.descending.height',
+    ]);
+    expect(inputs['g3.passage.side']).toEqual([
+      'g3.passage.side.floor.begin.north',
+      'g3.passage.side.floor.begin.east',
+      'g3.passage.side.floor.begin.up',
+      'g3.passage.side.length',
+      'g3.passage.side.angle',
+      'g3.passage.side.direction',
+      'g3.passage.side.width',
+      'g3.passage.side.height',
+    ]);
+  });
+
+  it('prefers the two measured ends when the database carries them', () => {
+    const both = buildEnvironment({
+      ...RUN,
+      'g3.passage.side.floor.end.north': 0,
+      'g3.passage.side.floor.end.east': -25,
+      'g3.passage.side.floor.end.up': 10,
+    });
+    const end = interiorSolids(both, g3)['g3.passage.side']?.landmarks['g3.passage.side.floor.end'];
+    expect(end).toEqual([-25, 0, 10]);
+    // The slope falls back to provenance, and the length and bearing are not
+    // read at all, because nothing was computed from them.
+    expect(interiorSolidInputs(both, g3)['g3.passage.side']).toEqual([
+      'g3.passage.side.floor.begin.north',
+      'g3.passage.side.floor.begin.east',
+      'g3.passage.side.floor.begin.up',
+      'g3.passage.side.floor.end.north',
+      'g3.passage.side.floor.end.east',
+      'g3.passage.side.floor.end.up',
+      'g3.passage.side.width',
+      'g3.passage.side.height',
+      'g3.passage.side.angle',
+    ]);
+  });
+
+  it('skips a passage that records a slope but no length', () => {
+    const thin = { ...RUN };
+    delete thin['g3.passage.descending.length'];
+    expect(Object.keys(interiorSolids(buildEnvironment(thin), g3))).toEqual(['g3.passage.side']);
+  });
+
+  it('skips a passage whose recorded length is zero', () => {
+    const flat = buildEnvironment({ ...RUN, 'g3.passage.side.length': 0 });
+    expect(Object.keys(interiorSolids(flat, g3))).toEqual(['g3.passage.descending']);
+  });
+});
+
 describe('a discovered chamber roof', () => {
   const gabled = (ridgeHeight: number): Record<string, number> =>
     buildEnvironment({ ...SYNTHETIC, 'g2.chamber.burial.gable.height': ridgeHeight });
