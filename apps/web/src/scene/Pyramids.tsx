@@ -2,7 +2,7 @@ import { DEG } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import { DoubleSide, FrontSide, type Plane } from 'three';
 import type { MassingParams, PyramidParams } from '../model';
-import { pyramidGeometry } from './geometry';
+import { pyramidGeometry, steppedPyramidGeometry } from './geometry';
 
 /**
  * The three pyramids, placed exactly as blender/generate.py places them: the
@@ -57,11 +57,19 @@ function Pyramid({
   today: boolean;
   clippingPlanes: Plane[];
 }): React.JSX.Element {
-  const { base, height, heightToday, concavity, orientationDeg } = params;
-  const truncated = today && heightToday !== undefined;
+  const { base, height, heightToday, courses, concavity, orientationDeg } = params;
+  // The pyramid as it stands is drawn course by course where the database has
+  // the courses and as a flat truncation where it does not, which is the same
+  // choice blender/generate.py makes for its "(today)" object.
+  const stepped = today && courses !== undefined;
+  const truncated = today && courses === undefined && heightToday !== undefined;
+  const standing = stepped || truncated;
   const geometry = useMemo(
-    () => pyramidGeometry({ base, height, concavity, truncateAt: truncated ? heightToday : undefined }),
-    [base, height, concavity, truncated, heightToday],
+    () =>
+      stepped
+        ? steppedPyramidGeometry({ base, height, courses: courses as number[] })
+        : pyramidGeometry({ base, height, concavity, truncateAt: truncated ? heightToday : undefined }),
+    [base, height, concavity, stepped, courses, truncated, heightToday],
   );
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -72,7 +80,7 @@ function Pyramid({
   return (
     <mesh geometry={geometry} position={[params.offsetEast, params.offsetNorth, params.offsetUp]} rotation={[0, 0, orientationDeg * DEG]}>
       <meshStandardMaterial
-        color={truncated ? '#b3a789' : '#d6c49c'}
+        color={standing ? '#b3a789' : '#d6c49c'}
         roughness={0.94}
         metalness={0}
         flatShading

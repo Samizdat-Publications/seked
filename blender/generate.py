@@ -9,7 +9,9 @@ Every object is generated from data/; nothing is modelled by hand. Each object
 carries custom properties naming the preset and the source of each value, so
 the provenance survives inside the .blend file and, as glTF extras, in the GLB. The concavity of the Great
 Pyramid is a shape key ("Concavity", 0 = flat faces, 1 = the measured
-hollowing), and each pyramid gets an "as built" and a "today" object.
+hollowing), and each pyramid gets an "as built" and a "today" object. The
+"today" object is stacked course by course where the database carries the
+courses and is the flat truncation at the surviving height where it does not.
 
 Each pyramid whose interior the preset carries records for gets a child
 collection of its own, "Interior" for the Great Pyramid and "Interior (label)"
@@ -38,6 +40,8 @@ from seked_data import (  # noqa: E402
     GROUND_FLAT_MARGIN,
     SPHINX_MASSING_NAME,
     SPHINX_MASSING_NOTE,
+    course_keys,
+    course_levels,
     ground_height,
     massing_geometry,
     interior_solids,
@@ -49,6 +53,7 @@ from seked_data import (  # noqa: E402
     resolve,
     site_origin_elevation,
     sphinx_params,
+    stepped_pyramid_geometry,
 )
 
 STRUCTURES = [("g1", "G1 Khufu"), ("g2", "G2 Khafre"), ("g3", "G3 Menkaure")]
@@ -110,6 +115,43 @@ def add_concavity_shape_key(obj, base, height, truncate_at, concavity):
     for i, co in enumerate(hollow_verts):
         key.data[i].co = co
     key.value = 1.0
+
+
+def build_today(collection, structure, label, params, provenance, records):
+    """
+    The pyramid as it stands, as one object named "<label> (today)".
+
+    Where the preset carries course heights, the object is stacked slab by
+    slab: a stepped core is what is actually standing there, and it is the
+    cheapest thing the model can do that looks like the photographs. It says
+    how many courses it is and whose in its own custom properties, so the
+    provenance survives in the .blend and in the GLB's extras. Where the
+    preset has no courses the object is the flat truncation at the surviving
+    height it has always been, with the concavity as a shape key. It is one
+    object either way, so nothing downstream has to choose between two models
+    of the same pyramid; a structure with neither courses nor a surviving
+    height gets no today object at all.
+    """
+    courses = params["courses"]
+    if courses:
+        verts, faces = stepped_pyramid_geometry(params["base"], params["height"], courses)
+        sources = sorted({records[k]["source"] for k in course_keys(records, structure)})
+        top = course_levels(courses)[-1]
+        props = dict(provenance)
+        props["seked_courses"] = len(courses)
+        props["seked_courses_source"] = ", ".join(sources)
+        props["seked_courses_top_m"] = float(top)
+        obj = make_object(f"{label} (today)", verts, faces, collection, props)
+        print(f"{label} (today): {len(courses)} courses from {props['seked_courses_source']}, "
+              f"standing {top:.3f} m in {len(verts)} vertices")
+        return obj
+    if params["height_today"]:
+        verts, faces = pyramid_geometry(params["base"], params["height"], truncate_at=params["height_today"], concavity=0.0)
+        obj = make_object(f"{label} (today)", verts, faces, collection, provenance)
+        add_concavity_shape_key(obj, params["base"], params["height"], params["height_today"], params["concavity"])
+        print(f"{label} (today): flat truncation at {params['height_today']} m, the preset carrying no courses")
+        return obj
+    return None
 
 
 def interior_collection_name(structure):
@@ -281,12 +323,14 @@ def build(preset_id):
         built.location, built.rotation_euler = location, rotation
         add_concavity_shape_key(built, p["base"], p["height"], None, p["concavity"])
 
-        # Today: truncated at the surviving height, if the database has one.
-        if p["height_today"]:
-            verts, faces = pyramid_geometry(p["base"], p["height"], truncate_at=p["height_today"], concavity=0.0)
-            today = make_object(f"{label} (today)", verts, faces, coll, provenance)
+        # Today: the pyramid as it stands. Course by course where the database
+        # has the courses, because a stack of slabs is what is standing there;
+        # a flat truncation at the surviving height where it does not. One
+        # object either way, so nothing has to choose between two models of the
+        # same pyramid.
+        today = build_today(coll, structure, label, p, provenance, records)
+        if today is not None:
             today.location, today.rotation_euler = location, rotation
-            add_concavity_shape_key(today, p["base"], p["height"], p["height_today"], p["concavity"])
             today.hide_set(True)
             today.hide_render = True
 

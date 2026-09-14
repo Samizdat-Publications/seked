@@ -10,8 +10,37 @@ blender -b -P blender/generate.py -- --preset canonical --save build/seked.blend
 or open Blender, load `blender/generate.py` in the Text Editor, and press
 Run Script. You get a `Seked` collection with, for each pyramid the preset
 has a base and a height for, an "(as built)" object and a hidden "(today)"
-object truncated at the surviving height. The Great Pyramid's concavity is
-the `Concavity` shape key on both.
+object. The Great Pyramid's concavity is the `Concavity` shape key on the
+"(as built)" object.
+
+## The pyramid as it stands
+
+There is one "(today)" object per pyramid, not two, and what it is made of
+depends on what the preset carries:
+
+- **Course by course** where the database has course heights. The Great
+  Pyramid has 201 of them under every preset, Goyon's 1978 measurements on the
+  north-east arris, so its "(today)" object is a stack of 201 square slabs
+  standing 138.745 m in 1,608 vertices. Each course is full width from its bed
+  to its top at the casing face line taken at its bed, so the steps hang on the
+  same face the "(as built)" pyramid has. The casing's own thickness is not in
+  the database course by course, so the slabs read a metre or so too wide, and
+  the concavity is left off because it belongs to faces that are gone and is
+  about the size of one step. The object's `seked_courses` and
+  `seked_courses_source` say how many courses it is and whose.
+- **A flat truncation** at `<id>.height.today` where the preset carries no
+  courses, with the concavity as a shape key, which is what every "(today)"
+  object used to be.
+- **Nothing at all** where the preset carries neither. Khafre and Menkaure
+  have no surviving height and no courses in the database, so they have no
+  "(today)" object.
+
+The stepped stack replaces the flat truncation rather than standing beside it:
+they are two models of the same pyramid and the stepped one is the better,
+so nothing downstream has to choose between them. The web viewer draws the
+same stack from the same course records through `steppedPyramidMesh`, and a
+parity test compares all 1,608 vertices and the enclosed volume between
+`seked_data.py` and `@seked/geometry`.
 
 Inside it, each pyramid whose interior the preset carries records for gets a
 child collection of its own: `Interior` for the Great Pyramid, and
@@ -91,7 +120,11 @@ blender -b build/seked.blend -P blender/check.py
 ```
 
 `check.py` asserts the saved file and the GLB beside it: that nothing but
-generated objects is in the scene, that each structure's `Interior` collection
+generated objects is in the scene, that each pyramid's "(today)" object is
+whichever of the three the preset calls for, and where it is the stepped stack
+that it is eight vertices a course, names the courses and their source, and
+stands exactly as high as its courses add up to, that each structure's
+`Interior` collection
 holds exactly the solids `interior_solids` builds for it under the preset
 stamped on the objects, that the Sphinx's box is the size and in the place
 `seked_data` puts it and says it is a placeholder, that the terrain object is
@@ -111,9 +144,11 @@ geometry:
 python3 blender/seked_data.py canonical --check
 ```
 
-`--geometry` prints every mesh the generator would build (as built and today,
-flat and hollowed) as JSON; a test in packages/data compares those vertices
-and volumes with `@seked/geometry`, so the two mesh builders cannot drift.
+`--geometry` prints the eight-sided pyramid in each of its variants (as built
+and truncated, flat and hollowed) as JSON; a test in packages/data compares
+those vertices and volumes with `@seked/geometry`, so the two mesh builders
+cannot drift. `--courses` below does the same for the stepped stack the
+"(today)" object is actually built from.
 
 `--shapes` does the same for the interior builders: it prints a fixed list of
 literal passages, chambers and a corbelled gallery built by `extruded_section`,
@@ -129,16 +164,20 @@ entry per structure that has any, each solid with the records it came from;
 `--interior-case` prints the same for an invented prefixed pyramid, so the
 discovery can be compared with the TypeScript one before G2's or G3's records
 exist; `--terrain` prints the heightfield's identity and a fixed set of probes;
-and `--ground` prints the flattened height at a fixed set of samples around two
-literal pyramids. All four are checked against the TypeScript side by the
-parity tests. The file is append-only, so they print after the resolved values:
-take the last line.
+`--ground` prints the flattened height at a fixed set of samples around two
+literal pyramids; and `--courses` prints the stepped pyramid the generator
+would stack for every structure the preset carries course heights for, with
+its vertices, its faces, its volume and the height its courses add up to. All
+five are checked against the TypeScript side by the parity tests. The file is
+append-only, so they print after the resolved values: take the last line.
 
 ```
 python3 blender/seked_data.py canonical --interior
+python3 blender/seked_data.py canonical --courses
 ```
 
-Not here yet: the shafts, the GPMP contours under the monuments, the Sphinx.
+Not here yet: the shafts, the GPMP contours under the monuments, the Sphinx
+as anything more than a box.
 
 ## Ground and renders
 

@@ -63,7 +63,7 @@ def resolve(db, preset_id):
 
 
 def pyramid_params(values, structure):
-    """Base, height, today's height, concavity and orientation for one pyramid, or None."""
+    """Base, height, today's height, courses, concavity and orientation for one pyramid, or None."""
     base = values.get(f"{structure}.base.side.mean")
     height = values.get(f"{structure}.height.original")
     if base is None or height is None:
@@ -72,12 +72,37 @@ def pyramid_params(values, structure):
         "base": base,
         "height": height,
         "height_today": values.get(f"{structure}.height.today"),
+        "courses": course_heights(values, structure),
         "concavity": values.get(f"{structure}.concavity", 0.0),
         "orientation_deg": values.get(f"{structure}.orientation", 0.0),
         "offset_east": -values.get(f"{structure}.centre.offset.west", 0.0),
         "offset_north": -values.get(f"{structure}.centre.offset.south", 0.0),
         "offset_up": values.get(f"{structure}.base.elevation.relative", 0.0),
     }
+
+
+def course_keys(values, structure):
+    """
+    The `<id>.course.<n>.height` keys a preset carries for one structure, in
+    course order rather than in whatever order the resolver put them in. The
+    generator asks for these so it can stamp the courses' source on the object
+    it stacks from them.
+    """
+    prefix, suffix = f"{structure}.course.", ".height"
+    numbered = []
+    for key in values:
+        if not key.startswith(prefix) or not key.endswith(suffix):
+            continue
+        middle = key[len(prefix):-len(suffix)]
+        if middle.isdigit():
+            numbered.append((int(middle), key))
+    numbered.sort()
+    return [key for _, key in numbered]
+
+
+def course_heights(values, structure):
+    """Those courses' heights, bottom up, in metres. Mirrors courseHeights in packages/geometry."""
+    return [values[key] for key in course_keys(values, structure)]
 
 
 def _ring(half, indent, z):
@@ -110,6 +135,66 @@ def pyramid_geometry(base, height, truncate_at=None, concavity=0.0):
         for i in range(8):
             faces.append((i, (i + 1) % 8, 8))
     faces.append(tuple(range(7, -1, -1)))                     # base cap, CW from above so it faces down
+    return verts, faces
+
+
+def _corners(half, z):
+    # The same ring as _ring, without the face midpoints: a stepped course is four-sided.
+    return [(half, half, z), (-half, half, z), (-half, -half, z), (half, -half, z)]
+
+
+def course_levels(courses):
+    """
+    The bed of each course in metres above the base, with the top of the last
+    one on the end, so this has one more entry than there are courses and its
+    last entry is the height of the pyramid as it stands. Mirrors courseLevels
+    in packages/geometry.
+    """
+    levels = [0.0]
+    z = 0.0
+    for h in courses:
+        z += h
+        levels.append(z)
+    return levels
+
+
+def stepped_pyramid_geometry(base, height, courses):
+    """
+    The pyramid as it stands: one square slab per course, in the project frame
+    and wound counter-clockwise seen from outside, as pyramid_geometry's faces
+    are. Mirrors steppedPyramidMesh in packages/geometry, which carries the
+    reasoning; in short, each course is full width from its bed to its top at
+    the casing face line taken at its bed, half * (1 - z / height), the
+    casing's own thickness is not in the database and so is ignored, and the
+    concavity is left off because it belongs to faces that are gone and is
+    about the size of one step.
+
+    Eight vertices a course, the bottom course's bed ring first.
+    """
+    if not courses:
+        raise ValueError("a stepped pyramid needs at least one course")
+    half_base = base / 2.0
+    verts, faces = [], []
+    z = 0.0
+    for h in courses:
+        if z >= height:
+            raise ValueError(f"the courses reach {z:.3f} m, which is the whole {height} m of the pyramid")
+        half = half_base * (1.0 - z / height)
+        bed = len(verts)
+        verts.extend(_corners(half, z))
+        verts.extend(_corners(half, z + h))
+        for i in range(4):
+            j = (i + 1) % 4
+            faces.append((bed + i, bed + j, bed + 4 + j, bed + 4 + i))
+        z += h
+    faces.append((3, 2, 1, 0))                                # base cap, CW from above so it faces down
+    for k in range(len(courses) - 1):
+        above, following = k * 8 + 4, (k + 1) * 8
+        for i in range(4):
+            j = (i + 1) % 4
+            faces.append((above + i, above + j, following + j, following + i))   # the step's ledge, facing up
+    summit = (len(courses) - 1) * 8 + 4
+    faces.append((summit, summit + 1, summit + 2, summit + 3))
     return verts, faces
 
 
@@ -1223,3 +1308,36 @@ if __name__ == "__main__" and "--offsets" in sys.argv:
     # Appended, so the file only ever grows; this is the last line printed.
     _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
     print(json.dumps(centre_offsets(resolve(load_database(), _preset)["values"])))
+
+
+# --- The pyramid as it stands, course by course ----------------------------
+# stepped_pyramid_geometry needs a structure's courses beside its base and its
+# height, which is all pyramid_params already carries, so this is the whole of
+# what the generator and the parity test in packages/data ask of it. A
+# structure the preset holds no course records for is not mentioned, the same
+# way a structure with no interior records is not mentioned.
+
+
+def stepped_variants(values, structures=("g1", "g2", "g3")):
+    """Every stepped pyramid the generator would build, for the parity test in packages/data."""
+    out = {}
+    for structure in structures:
+        p = pyramid_params(values, structure)
+        if p is None or not p["courses"]:
+            continue
+        verts, faces = stepped_pyramid_geometry(p["base"], p["height"], p["courses"])
+        out[structure] = {
+            "name": "today_stepped",
+            "courses": len(p["courses"]),
+            "top": course_levels(p["courses"])[-1],
+            "verts": verts,
+            "faces": [list(f) for f in faces],
+            "volume": polyhedron_volume(verts, faces),
+        }
+    return out
+
+
+if __name__ == "__main__" and "--courses" in sys.argv:
+    # Appended, so the file only ever grows; this is the last line printed.
+    _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
+    print(json.dumps(stepped_variants(resolve(load_database(), _preset)["values"])))

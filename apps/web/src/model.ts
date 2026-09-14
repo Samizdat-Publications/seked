@@ -6,7 +6,7 @@
  */
 import { evaluateClaim, type Claim, type ClaimResult } from '@seked/claims/browser';
 import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
-import { buildEnvironment, interiorSolids, type Environment, type Solid } from '@seked/geometry';
+import { buildEnvironment, courseHeights, interiorSolids, type Environment, type Solid } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
 
 export const STRUCTURES = ['g1', 'g2', 'g3'] as const;
@@ -30,6 +30,12 @@ export interface PyramidParams {
   height: number;
   /** Today's truncated height, where the database has one. */
   heightToday: number | undefined;
+  /**
+   * The course heights the database has for it, bottom up and in metres,
+   * where it has any. They are what the pyramid as it stands is drawn from,
+   * and a pyramid without them falls back to the flat truncation.
+   */
+  courses: number[] | undefined;
   /** Inward indent of each face's centre line at the base. */
   concavity: number;
   /** Degrees east of north; a few arcminutes at Giza. */
@@ -43,12 +49,14 @@ export function pyramidParams(values: Record<string, number>, id: StructureId): 
   const base = values[`${id}.base.side.mean`];
   const height = values[`${id}.height.original`];
   if (base === undefined || height === undefined) return undefined;
+  const courses = courseHeights(values, id);
   return {
     id,
     label: STRUCTURE_LABELS[id],
     base,
     height,
     heightToday: values[`${id}.height.today`],
+    courses: courses.length > 0 ? courses : undefined,
     concavity: values[`${id}.concavity`] ?? 0,
     orientationDeg: values[`${id}.orientation`] ?? 0,
     offsetEast: -(values[`${id}.centre.offset.west`] ?? 0),

@@ -26,11 +26,14 @@ import bpy  # noqa: E402  (only available inside Blender)
 
 from seked_data import (  # noqa: E402
     SPHINX_MASSING_NAME,
+    course_heights,
+    course_levels,
     interior_solids,
     interior_structures,
     load_database,
     load_terrain,
     massing_geometry,
+    pyramid_params,
     resolve,
     sphinx_params,
 )
@@ -91,6 +94,49 @@ def interior_collection_name(structure):
     return f"{INTERIOR_NAME} ({STRUCTURE_LABELS.get(structure, structure)})"
 
 
+def check_today(values):
+    """
+    The "(today)" object of each pyramid, against what the preset says it
+    should be.
+
+    Where the preset carries course heights the object has to be the stepped
+    stack the generator builds from them: eight vertices a course, the count
+    and the source of the courses stamped on it, and a summit exactly as high
+    as the courses add up to. Where it carries none, the flat truncation at
+    the surviving height has to be there in its place, two rings of eight.
+    Where it carries neither there should be no such object at all.
+    """
+    for structure, label in STRUCTURE_LABELS.items():
+        p = pyramid_params(values, structure)
+        if p is None:
+            continue
+        name = f"{label} (today)"
+        obj = bpy.data.objects.get(name)
+        courses = p["courses"]
+        if not courses and not p["height_today"]:
+            check(obj is None, f'no "{name}": the preset gives {structure} neither courses nor a surviving height')
+            continue
+        if not check(obj is not None, f'"{name}" is present'):
+            continue
+        top = max(v.co.z for v in obj.data.vertices)
+        if not courses:
+            check(len(obj.data.vertices) == 16,
+                  f'"{name}" is the flat truncation, two rings of eight: {len(obj.data.vertices)} vertices')
+            check(abs(top - p["height_today"]) < 1e-3,
+                  f'"{name}" is truncated at the surviving height {p["height_today"]} m: top at {top:.3f} m')
+            continue
+        check(len(obj.data.vertices) == 8 * len(courses),
+              f'"{name}" is {len(courses)} courses of eight vertices: {len(obj.data.vertices)} vertices')
+        check(obj.get("seked_courses") == len(courses),
+              f'"{name}" says how many courses it is: {obj.get("seked_courses")}')
+        check(bool(obj.get("seked_courses_source")),
+              f'"{name}" names whose courses they are: {obj.get("seked_courses_source") or "nothing"}')
+        # Blender stores vertices in single precision, so 139 m is good to about ten micrometres.
+        expected = course_levels(course_heights(values, structure))[-1]
+        check(abs(top - expected) < 1e-3,
+              f'"{name}" stands exactly as high as its courses add up to: {top:.4f} m against {expected:.4f} m')
+
+
 def collection_tree(coll):
     """Every object under a collection and its children."""
     out = list(coll.objects)
@@ -123,6 +169,7 @@ def main():
     preset = presets[0] if presets else "canonical"
 
     values = resolve(load_database(), preset)["values"]
+    check_today(values)
     structures = interior_structures(values)
     check("g1" in structures, f"the database carries an interior for {structures or 'nothing'}")
     for structure in structures:
