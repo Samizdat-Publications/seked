@@ -33,26 +33,34 @@ phases and the sourcing check, is in [`docs/plan.html`](docs/plan.html).
 
 ## Status
 
-Phase 0 is done and Phase 1 is in. Every Petrie 1883 record and the Dash
-2015 records are verified against the source page; the Cole 1925 records
-wait for a copy of the paper. The Great Pyramid's interior is generated from
-Petrie's positions, the terrain is cut from Copernicus GLO-30, and the
-Blender scene has a check script and a headless renderer. All seventeen
-claims compute, including the sky claims C1 to C4 through the Vondrák
-precession model and Legon's rectangle (D2); D1 still waits on a
-georeferenced obelisk. The web viewer builds the same meshes in the browser
-with live preset and cubit controls and the first overlay. Milestone renders
-and screenshots are collected in [`docs/progress/`](docs/progress/README.md).
+Phases 0 and 1 are done and Phases 2 and 3 are well under way. Every
+Petrie 1883 record for all three pyramids and the Dash 2015 records are
+verified against the source page; the Cole 1925 records wait for a copy of
+the paper. The Great Pyramid's interior is generated from Petrie's positions
+in both the Blender scene and the browser; Khafre's and Menkaure's sheets
+carry Petrie's dimensions but he gives no positions, so their interiors wait
+on published plans. The terrain is cut from Copernicus GLO-30 with the ground
+under each pyramid set to its surveyed base level. Nineteen claims compute,
+including all of group C through the Vondrák precession model, the HYG 4.2
+star catalogue and an equinox-and-solstice sun; C7, D3 and D4 remain rows in
+the plan. The web viewer builds the same meshes in the browser, with live
+preset, cubit and epoch controls, a section cut, a fly camera, a star dome
+at any epoch and sidereal time, and overlays for the sky claims and the
+ghost profiles. Milestone renders and screenshots are collected in
+[`docs/progress/`](docs/progress/README.md), and a GitHub Pages workflow
+assembles the viewer, the snapshots and the documents into one site.
 
 ```
 pnpm install
-pnpm test        # 145 tests across units, geometry, data, claims, sky, the web bundle and the Blender reader
+pnpm test        # 276 tests across units, geometry, data, claims, sky, the web bundle and the Blender reader
 pnpm typecheck   # the packages, the scripts and the viewer
 pnpm dossier     # regenerates docs/dossier.md from data/
 pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
+pnpm run stars   # rebuilds data/stars/ from the HYG 4.2 catalogue (run, not a bare pnpm stars)
 pnpm bundle      # writes apps/web/public/seked.json for the viewer
 pnpm dev:web     # the viewer on a Vite dev server
 pnpm build:web   # static site in apps/web/dist
+pnpm site        # the Pages site: viewer, progress snapshots and documents, in site/
 ```
 
 Blender is driven headless (5.1, usually not on PATH; see
@@ -65,18 +73,20 @@ blender -b build/seked.blend -P blender/render.py -- --view dawn --out build/her
 ```
 
 `packages/sky` carries Vondrák 2011 long-term precession, tested against
-ERFA's reference values, and enough meridian geometry to solve the shaft
+ERFA's reference values, the horizon frame, the equinox and solstice sun
+from the obliquity of date, and enough meridian geometry to solve the shaft
 alignments; see `docs/shafts.md`. `skyEnvironment` flattens it into
-`star.<id>.ra`, `.dec`, `.transit.altitude` and `.lower.altitude` keys, so a
-claim that names an `epoch` can reach the stars from its YAML without the
-claims package learning any astronomy.
+`star.<id>.ra`, `.dec`, `.transit.altitude`, `.rise.azimuth`, `sun.*` and
+similar keys, so a claim that names an `epoch` can reach the sky from its
+YAML without the claims package learning any astronomy.
 
-Next: verify Cole 1925 once the paper is to hand; enter the subterranean
-passages' own section and the gallery's corbel heights from Petrie; replace
-the ground under the monuments with the GPMP contours; interiors for Khafre
-and Menkaure from published plans, and the Sphinx; the remaining overlays,
-the sky dome and its time scrubber in the viewer; claims C5 to C7, D1, D3 and
-D4; and the Stellarium check of Alnitak's transit at 2500 and 10,500 BCE.
+Next: verify Cole 1925 once the paper is to hand; positions for Khafre's and
+Menkaure's interiors from published plans; the GPMP contours for the ground;
+the Sphinx sculpt in place of the massing placeholder; claims C7, D3 and D4;
+the remaining overlays (A4's chamber wireframe, B1's ghost Earth, B3's map
+inset, B4's socket outline, D1's line and D2's rectangle); tour mode; a
+calendar for the Sun (UT1 and delta T) so dated events get clock times; and
+the Stellarium check of Alnitak's transit at 2500 and 10,500 BCE.
 
 ## Layout
 
@@ -88,16 +98,17 @@ data/
   presets.json          preference orders over sources (canonical, petrie-1883, cole-1925, dash-2015)
   measurements/*.json   one record per measured quantity, metres and degrees, with provenance
   claims/*.yaml         one claim per file: comparisons, tolerance, free choices, sources, overlay
-  stars/named.json      the named stars the sky claims use
+  stars/                the ten named stars and the HYG 4.2 catalogue to magnitude 6.5 (imported, never typed)
   terrain/              the GLO-30 heightfield around Giza in the project frame (the tiles are not tracked)
 packages/
   units/       cubit, pyramid inch, seked <-> degrees, DMS formatting
-  geometry/    pyramid profile numbers, eight-sided mesh generator, interior solids, landmarks, expression environment
+  geometry/    pyramid profile numbers, eight-sided mesh generator, interior solids, ground, landmarks, expression environment
   data/        zod-validated loader, preset resolver, terrain reader, Blender parity tests
   claims/      expression parser (no eval), registry, evaluator, dossier renderer
-  sky/         Vondrák 2011 precession (ERFA-verified), meridian geometry, named stars, claim environment
+  sky/         Vondrák 2011 precession (ERFA-verified), horizon frame, sun, star dome, named stars, claim environment
 blender/       generate.py (the scene from data/), seked_data.py (stdlib reader and mesh mirrors), check.py, render.py
 apps/web/      Vite + React + React Three Fiber viewer
-scripts/       dossier generator, shaft solver, web bundle, terrain cutter
+scripts/       dossier generator, shaft solver, star import, web bundle, terrain cutter, site assembly
 docs/          plan.html, dossier.md, shafts.md, progress/
+.github/       the Pages workflow: tests, typecheck, site assembly, deploy when PAGES_ENABLED is true
 ```
