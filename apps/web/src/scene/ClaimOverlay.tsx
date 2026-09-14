@@ -1,6 +1,6 @@
 /**
- * The claim overlays that are not ghost profiles: the shaft rays and the
- * descending passage's ray, with the rest to follow.
+ * The claim overlays that are not ghost profiles: the shaft rays, the
+ * descending passage's ray, the compass rose and the Orion projection.
  *
  * Every one of them is drawn from a spec built in ../overlays.ts out of the
  * claim file's own params, so nothing here knows which claim it is serving.
@@ -12,11 +12,18 @@
 import { formatDms } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
-import type { OverlaySpec, PassageRaySpec, ShaftRaysSpec, StarMark } from '../overlays';
+import type {
+  CompassRoseSpec,
+  OverlaySpec,
+  PassageRaySpec,
+  ShaftRaysSpec,
+  SkyProjectionSpec,
+  StarMark,
+} from '../overlays';
 import { DOME_RADIUS } from '../sky';
 import type { PyramidParams } from '../model';
 import { GhostProfiles } from './GhostProfile';
-import { lineGeometry } from './geometry';
+import { lineGeometry, polylineGeometry, ringPoints } from './geometry';
 import { Label, Marker } from './Label';
 
 export function ClaimOverlay({
@@ -35,6 +42,10 @@ export function ClaimOverlay({
       return <ShaftRays spec={overlay.spec} />;
     case 'passage-ray':
       return <PassageRay spec={overlay.spec} />;
+    case 'compass-rose':
+      return <CompassRose spec={overlay.spec} />;
+    case 'sky-projection':
+      return <SkyProjection spec={overlay.spec} />;
   }
 }
 
@@ -55,6 +66,16 @@ function Ray({ points, colour, opacity = 0.9 }: { points: number[][]; colour: st
   return (
     <lineSegments geometry={geometry} renderOrder={18} frustumCulled={false}>
       <lineBasicMaterial color={colour} transparent opacity={opacity} depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
+    </lineSegments>
+  );
+}
+
+function Polyline({ points, colour, close = false }: { points: number[][]; colour: string; close?: boolean }): React.JSX.Element {
+  const geometry = useMemo(() => polylineGeometry(points, close), [points, close]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return (
+    <lineSegments geometry={geometry} renderOrder={18} frustumCulled={false}>
+      <lineBasicMaterial color={colour} transparent opacity={0.9} depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
     </lineSegments>
   );
 }
@@ -119,6 +140,122 @@ function PassageRay({ spec }: { spec: PassageRaySpec }): React.JSX.Element {
         star={spec.star}
         note={`${spec.star.name}: ${culmination} ${formatDms(spec.targetAltitudeDeg)} against ${formatDms(spec.angleDeg)}`}
       />
+    </group>
+  );
+}
+
+const TRUE_NORTH = '#7fd1ff';
+const MEASURED = '#ffcf70';
+
+/**
+ * C1. True north and the pyramid's own north, with the few arcminutes between
+ * them drawn many times wider than they are. The factor comes from the claim
+ * file and is written into the label, because a picture that lies about a
+ * scale has to say so.
+ */
+function CompassRose({ spec }: { spec: CompassRoseSpec }): React.JSX.Element {
+  const [east, north, up] = spec.centre;
+  const z = up + 1.5;
+  const r = spec.radiusM;
+  const drawn = spec.azimuthDeg * spec.exaggeration;
+  const a = (drawn * Math.PI) / 180;
+  const ring = useMemo(() => ringPoints(r, 0, 120), [r]);
+  const quarters = useMemo(() => {
+    const points: number[][] = [];
+    for (let i = 0; i < 4; i++) {
+      const t = (i * Math.PI) / 2;
+      points.push([r * 0.94 * Math.sin(t), r * 0.94 * Math.cos(t), 0], [r * Math.sin(t), r * Math.cos(t), 0]);
+    }
+    return points;
+  }, [r]);
+  const minutes = Math.abs(spec.arcminutes);
+  const side = spec.arcminutes < 0 ? 'west' : 'east';
+
+  return (
+    <group>
+      <group position={[east, north, z]}>
+        <Polyline points={ring} colour="#4f6478" close />
+        <Ray points={quarters} colour="#4f6478" opacity={0.7} />
+        <Ray points={[[0, -r, 0], [0, r, 0]]} colour={TRUE_NORTH} />
+        <Ray points={[[-r * Math.sin(a), -r * Math.cos(a), 0], [r * Math.sin(a), r * Math.cos(a), 0]]} colour={MEASURED} />
+        <Label text="true north" position={[0, r * 1.08, 24]} size={26} colour={TRUE_NORTH} />
+        <Label
+          text={`measured ${minutes.toFixed(1)}′ ${side} of north, drawn ${spec.exaggeration.toFixed(0)}× wide`}
+          position={[r * Math.sin(a) * 1.15, r * Math.cos(a) * 1.15, 60]}
+          size={26}
+          colour={MEASURED}
+        />
+      </group>
+      {/* The dome is about the observer, not about the rose, so the star pair
+          sits outside the rose's own placement. */}
+      {spec.stars.length > 1 && <StarPair stars={spec.stars} />}
+    </group>
+  );
+}
+
+/**
+ * Spence's pair, joined on the dome. Her method reads north off the line
+ * between two circumpolar stars when it stands vertical, so the line is the
+ * thing worth drawing; whether it is vertical now is the reader's to see.
+ */
+function StarPair({ stars }: { stars: StarMark[] }): React.JSX.Element | null {
+  const shown = stars.filter((s) => s.altDeg > -2);
+  if (shown.length < 2) return null;
+  const points = shown.map((s) => onDome(s.direction));
+  return (
+    <group>
+      <Polyline points={points} colour="#b9a6ff" />
+      {shown.map((star) => (
+        <TargetStar key={star.id} star={star} note={`${star.name} ${formatDms(star.altDeg)} high`} />
+      ))}
+    </group>
+  );
+}
+
+const BELT = '#ffcf70';
+const DIAGONAL = '#cfd8e3';
+
+/**
+ * C4. The belt at this epoch, scaled and laid on the plateau beside the line
+ * through the three pyramid centres. Both lines start at the same point, so
+ * what the eye compares is the angle and the spacing, which is what the claim
+ * compares too.
+ */
+function SkyProjection({ spec }: { spec: SkyProjectionSpec }): React.JSX.Element {
+  const z = spec.height;
+  const ground = useMemo(() => spec.ground.map((g) => [g.at[0], g.at[1], z]), [spec.ground, z]);
+  const belt = useMemo(() => spec.belt.map((s) => [s.at[0], s.at[1], z + 6]), [spec.belt, z]);
+  return (
+    <group>
+      <Polyline points={ground} colour={DIAGONAL} />
+      <Polyline points={belt} colour={BELT} />
+      {spec.ground.map((g, i) => (
+        <group key={g.id}>
+          <Marker position={[g.at[0], g.at[1], z]} size={70} colour={DIAGONAL} />
+          {i === spec.ground.length - 1 && (
+            <Label
+              text={`centres ${spec.groundAngleDeg.toFixed(2)}° from the meridian`}
+              position={[g.at[0], g.at[1] - 120, z + 90]}
+              size={34}
+              colour={DIAGONAL}
+            />
+          )}
+        </group>
+      ))}
+      {spec.belt.map((star, i) => (
+        <group key={star.id}>
+          <Marker position={[star.at[0], star.at[1], z + 6]} size={70} colour={BELT} />
+          <Label text={star.name} position={[star.at[0], star.at[1], z + 70]} size={34} colour={BELT} />
+          {i === spec.belt.length - 1 && (
+            <Label
+              text={`belt ${spec.beltAngleDeg.toFixed(2)}° from the meridian, ${spec.inverted ? 'north and south swapped' : 'north to north'}`}
+              position={[star.at[0], star.at[1] + 120, z + 150]}
+              size={34}
+              colour={BELT}
+            />
+          )}
+        </group>
+      ))}
     </group>
   );
 }

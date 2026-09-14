@@ -31,10 +31,18 @@ export interface ViewStore extends View {
    * one they produced themselves.
    */
   cameraEpoch: number;
+  /**
+   * C4's free choice: whether the sky is laid on the plateau north to north
+   * or with north and south swapped, which is Krupp's objection to the Orion
+   * Correlation. It is a property of one overlay rather than of the view, so
+   * it is not in the URL.
+   */
+  krupp: boolean;
   setPreset: (preset: string) => void;
   setCubit: (cubit: number | null) => void;
   setEpoch: (epoch: number | null) => void;
   setLst: (lst: number) => void;
+  toggleKrupp: () => void;
   toggleLayer: (id: LayerId) => void;
   setClaim: (claim: string | null) => void;
   setCamera: (camera: CameraView) => void;
@@ -49,10 +57,12 @@ const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.m
 export const useView = create<ViewStore>((set) => ({
   ...DEFAULT_VIEW,
   cameraEpoch: 0,
+  krupp: true,
   setPreset: (preset) => set({ preset }),
   setCubit: (cubit) => set({ cubit: cubit === null ? null : clamp(cubit, CUBIT_MIN, CUBIT_MAX) }),
   setEpoch: (epoch) => set({ epoch: epoch === null ? null : clamp(epoch, EPOCH_MIN, EPOCH_MAX) }),
   setLst: (lst) => set({ lst: normaliseLst(lst) }),
+  toggleKrupp: () => set((s) => ({ krupp: !s.krupp })),
   toggleLayer: (id) => set((s) => ({ layers: { ...s.layers, [id]: !s.layers[id] } })),
   // Changing which claim is open gives the epoch back to the claims, so
   // opening a sky claim snaps the sky to the epoch that claim is stated at.

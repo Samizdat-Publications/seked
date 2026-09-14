@@ -19,6 +19,12 @@ overlay:
     structure: g1
     methods: [equinox-shadow, simultaneous-transit]
     stars: [Mizar, Kochab]
+    # The rose is drawn on the pavement, a little wider than the base.
+    radius_m: 190
+    # Three arcminutes over that rose is a fifth of a millimetre, so the
+    # measured line is drawn this many times wide of the truth to be seen at
+    # all. The viewer states the factor and labels the true value.
+    exaggeration: 120
 sources:
   for: [dash-2015, spence-2000]
   context: [petrie-1883, cole-1925, nell-ruggles-2014]

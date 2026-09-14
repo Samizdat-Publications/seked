@@ -1,7 +1,8 @@
+import { evaluate, scopeFor } from '@seked/claims/browser';
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
-import { buildModel, type Model } from './model';
-import { passageRaySpec, shaftRaysSpec, type OverlayContext } from './overlays';
+import { atEpoch, buildModel, type Model } from './model';
+import { passageRaySpec, shaftRaysSpec, skyProjectionSpec, type OverlayContext } from './overlays';
 
 /**
  * The overlays are the claims drawn, so the two have to say the same thing.
@@ -12,7 +13,7 @@ import { passageRaySpec, shaftRaysSpec, type OverlayContext } from './overlays';
 const bundle = buildBundle();
 const claim = (id: string) => bundle.claims.find((c) => c.id === id) as NonNullable<(typeof bundle.claims)[number]>;
 
-function contextFor(model: Model, epoch: number): OverlayContext {
+function contextFor(model: Model, epoch: number, krupp = true): OverlayContext {
   return {
     env: model.env,
     pyramids: model.pyramids,
@@ -21,6 +22,7 @@ function contextFor(model: Model, epoch: number): OverlayContext {
     epoch,
     lstDeg: 0,
     latitudeDeg: model.latitudeDeg,
+    krupp,
   };
 }
 
@@ -75,5 +77,54 @@ describe('the C3 passage ray', () => {
     expect(spec?.culmination).toBe('lower');
     expect(spec?.targetAltitudeDeg).toBeCloseTo(comparison?.targetValue as number, 9);
     expect(spec?.star.lowerLstDeg).toBeCloseTo(((spec?.star.raDeg as number) + 180) % 360, 9);
+  });
+});
+
+// The window where the belt straddles right ascension 0 is avoided below on
+// purpose. The claim file subtracts right ascensions without folding the
+// difference, so between about 5063 and 4821 BCE its formula reads the belt's
+// 3 degree spread as 357 degrees, while the overlay, which folds, does not.
+// Outside those 243 years the two agree to the last digit.
+const EPOCHS = [-10449, -12000, -6000, -2449, 0, 2000];
+
+describe('the C4 sky projection', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const c4 = claim('C4');
+  const project = (epoch: number, krupp = true) =>
+    skyProjectionSpec(c4, contextFor(model, epoch, krupp)) as NonNullable<ReturnType<typeof skyProjectionSpec>>;
+
+  it("lays the belt at the angle the claim's own formula gives, at every epoch", () => {
+    const formula = c4.comparisons[0]?.formula as string;
+    for (const epoch of EPOCHS) {
+      const scope = scopeFor(atEpoch(c4, epoch), model.env);
+      expect(project(epoch).beltAngleDeg, `epoch ${epoch}`).toBeCloseTo(evaluate(formula, scope), 2);
+    }
+  });
+
+  it('scales the first two stars onto the first two pyramid centres', () => {
+    const spec = project(-10449);
+    const [alnitak, alnilam] = spec.belt;
+    const [g1, g2] = spec.ground;
+    const sky = Math.hypot(
+      (alnilam?.at[0] as number) - (alnitak?.at[0] as number),
+      (alnilam?.at[1] as number) - (alnitak?.at[1] as number),
+    );
+    const ground = Math.hypot((g2?.at[0] as number) - (g1?.at[0] as number), (g2?.at[1] as number) - (g1?.at[1] as number));
+    expect(sky).toBeCloseTo(ground, 6);
+    // Anchored on the first pyramid, so the two lines start together.
+    expect(alnitak?.at[0]).toBeCloseTo(g1?.at[0] as number, 9);
+    expect(alnitak?.at[1]).toBeCloseTo(g1?.at[1] as number, 9);
+  });
+
+  it('swaps north for south and nothing else when the inversion is turned off', () => {
+    const on = project(-10449, true);
+    const off = project(-10449, false);
+    expect(off.beltAngleDeg).toBeCloseTo(on.beltAngleDeg, 12);
+    const anchor = (on.ground[0] as (typeof on.ground)[number]).at[1];
+    on.belt.forEach((star, i) => {
+      const other = off.belt[i] as (typeof off.belt)[number];
+      expect(other.at[0]).toBeCloseTo(star.at[0], 9);
+      expect(other.at[1] - anchor).toBeCloseTo(-(star.at[1] - anchor), 9);
+    });
   });
 });

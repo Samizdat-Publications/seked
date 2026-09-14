@@ -177,10 +177,13 @@ function EpochLine({ claim, model }: { claim: Claim; model: Model }): React.JSX.
 /**
  * The handles an overlay puts in the panel. They are the free choices the
  * claim lists, made operable: where the sidereal time has to stand for a
- * shaft's star to be on the meridian, and how far the shaft is from it.
+ * shaft's star to be on the meridian, and which way up the sky is laid on the
+ * ground.
  */
 function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Element | null {
   const setLst = useView((s) => s.setLst);
+  const krupp = useView((s) => s.krupp);
+  const toggleKrupp = useView((s) => s.toggleKrupp);
 
   switch (overlay.kind) {
     case 'ghost-profile':
@@ -229,6 +232,47 @@ function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Eleme
             </button>
           </li>
         </ul>
+      );
+    }
+    case 'compass-rose': {
+      const spec = overlay.spec;
+      return (
+        <ul className="plain rays">
+          <li>
+            The measured azimuth is {formatArcminutes(spec.azimuthDeg)}, drawn {spec.exaggeration.toFixed(0)} times wide of the truth. At
+            this rose's {spec.radiusM.toFixed(0)} m the true line would miss true north by{' '}
+            {(Math.abs(Math.tan((spec.azimuthDeg * Math.PI) / 180) * spec.radiusM) * 1000).toFixed(0)} mm.
+          </li>
+          {spec.methods.length > 0 && <li className="note">Methods proposed: {spec.methods.join(', ')}.</li>}
+          {spec.stars.length > 0 && (
+            <li className="note">
+              {spec.stars.map((s) => `${s.name} ${formatDms(s.altDeg)} high`).join(' · ')}, joined on the dome as Spence's pair.
+            </li>
+          )}
+        </ul>
+      );
+    }
+    case 'sky-projection': {
+      const spec = overlay.spec;
+      return (
+        <>
+          <ul className="toggles">
+            <li>
+              <label>
+                <input type="checkbox" checked={krupp} onChange={() => toggleKrupp()} />
+                Krupp inversion: lay the sky with north and south swapped
+              </label>
+            </li>
+          </ul>
+          <p className="note">
+            The belt is {spec.beltAngleDeg.toFixed(2)}° from the meridian at this epoch; the line through the pyramid centres is{' '}
+            {spec.groundAngleDeg.toFixed(2)}°. The projection is scaled at {spec.scale.toFixed(0)} m per degree, which is the
+            Alnitak-to-Alnilam separation set against the G1-to-G2 centre distance, and it is not rotated to fit.{' '}
+            {spec.inverted
+              ? 'With the inversion on, the belt runs the way the plateau does, which is the correlation as its authors draw it.'
+              : "With the inversion off, the sky is laid north to north, and the belt runs the other way from the pyramids. That is Krupp's objection, drawn."}
+          </p>
+        </>
       );
     }
   }

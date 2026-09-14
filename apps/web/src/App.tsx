@@ -17,6 +17,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const cubit = useView((s) => s.cubit);
   const epochOverride = useView((s) => s.epoch);
   const lst = useView((s) => s.lst);
+  const krupp = useView((s) => s.krupp);
   const layers = useView((s) => s.layers);
   const selected = useView((s) => s.claim);
 
@@ -53,8 +54,9 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
       epoch,
       lstDeg: lst,
       latitudeDeg: model.latitudeDeg,
+      krupp,
     }),
-    [model, bundle.stars, epoch, lst],
+    [model, bundle.stars, epoch, lst, krupp],
   );
   const overlay = useMemo(() => overlaySpec(claim, overlayContext), [claim, overlayContext]);
 

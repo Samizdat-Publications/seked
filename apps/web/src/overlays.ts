@@ -15,18 +15,30 @@ import { evaluate, type Claim } from '@seked/claims/browser';
 import type { Environment, Point } from '@seked/geometry';
 import {
   lowerCulminationAltitude,
+  meridianAngle,
   placeOnDome,
+  positionsAtEpoch,
+  tangentOffset,
   transitAltitude,
   transitIsNorth,
   transitLst,
+  type Equatorial,
   type Star,
+  type TangentPoint,
   type Vec3,
 } from '@seked/sky/browser';
 import { DEG } from '@seked/units';
 import { STRUCTURES, type PyramidParams, type StructureId, type StructureInterior } from './model';
 import { starByName } from './sky';
 
-export const BUILT_OVERLAYS = new Set(['ghost-profile', 'ghost-profiles', 'shaft-rays', 'passage-ray']);
+export const BUILT_OVERLAYS = new Set([
+  'ghost-profile',
+  'ghost-profiles',
+  'shaft-rays',
+  'passage-ray',
+  'compass-rose',
+  'sky-projection',
+]);
 
 /** Enough colours for the three slopes A3 puts side by side. */
 const GHOST_COLOURS = ['#7fd1ff', '#ffcf70', '#ff9bc2'];
@@ -95,6 +107,8 @@ export interface OverlayContext {
   /** Local apparent sidereal time as an angle. */
   lstDeg: number;
   latitudeDeg: number;
+  /** C4's free choice: lay the sky on the plateau with north and south swapped. */
+  krupp: boolean;
 }
 
 /** One star, everything an overlay wants to draw or label it with. */
@@ -326,12 +340,172 @@ export function passageRaySpec(claim: Claim, ctx: OverlayContext): PassageRaySpe
   };
 }
 
+// --- C1 compass rose -------------------------------------------------------
+
+export interface CompassRoseSpec {
+  structure: StructureId;
+  /** The pyramid's base centre in the scene frame. */
+  centre: Point;
+  radiusM: number;
+  /** The measured azimuth of the sides, degrees east of north; a few arcminutes. */
+  azimuthDeg: number;
+  arcminutes: number;
+  /**
+   * What the drawn line is multiplied by. Three arcminutes over a rose of a
+   * couple of hundred metres is a fifth of a millimetre, which is nothing at
+   * all, so the line is drawn wide of the truth on purpose and says so.
+   */
+  exaggeration: number;
+  /** The methods the claim's sources propose, and the stars Spence's needs. */
+  methods: string[];
+  stars: StarMark[];
+}
+
+/**
+ * C1. True north and the pyramid's own north on the same rose, with the
+ * difference exaggerated so it can be seen at all. The exaggeration is a
+ * number in the claim file, so the drawing's one lie is declared in data
+ * rather than buried in a component.
+ */
+export function compassRoseSpec(claim: Claim, ctx: OverlayContext): CompassRoseSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'compass-rose') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const structure = asString(params.structure) ?? 'g1';
+  if (!isStructure(structure)) return undefined;
+  const placed = structureOf(ctx, structure);
+  if (!placed) return undefined;
+
+  const stars = asStrings(params.stars)
+    .map((name, i) => {
+      const star = starByName(ctx.stars, name);
+      return star ? markStar(star, ctx, RAY_COLOURS[i % RAY_COLOURS.length] as string) : undefined;
+    })
+    .filter((s): s is StarMark => s !== undefined);
+
+  return {
+    structure,
+    centre: [placed.offsetEast, placed.offsetNorth, placed.offsetUp],
+    radiusM: asNumber(params.radius_m) ?? placed.base * 0.8,
+    azimuthDeg: placed.orientationDeg,
+    arcminutes: placed.orientationDeg * 60,
+    exaggeration: asNumber(params.exaggeration) ?? 1,
+    methods: asStrings(params.methods),
+    stars,
+  };
+}
+
+// --- C4 sky projection -----------------------------------------------------
+
+export interface ProjectedStar {
+  id: string;
+  name: string;
+  /** Where the star lands on the plateau: east and north in the scene frame, metres. */
+  at: [number, number];
+  /** Its place on the tangent plane about the centre star, degrees. */
+  tangent: TangentPoint;
+}
+
+export interface GroundPoint {
+  id: StructureId;
+  at: [number, number];
+}
+
+export interface SkyProjectionSpec {
+  /** The pyramid centres the belt is laid against, in the claim file's order. */
+  ground: GroundPoint[];
+  belt: ProjectedStar[];
+  /** Metres on the plateau per degree on the tangent plane. */
+  scale: number;
+  /** The belt's angle from the meridian, degrees; C4's first comparison. */
+  beltAngleDeg: number;
+  /** The same angle for the ground line the claim compares it with. */
+  groundAngleDeg: number;
+  /** North and south swapped, which is what Krupp says the correlation needs. */
+  inverted: boolean;
+  /** How high above the pavement the projection is drawn, so it reads over the ground. */
+  height: number;
+}
+
+/**
+ * C4. The belt at the scene's epoch, laid on the plateau about the pyramids.
+ *
+ * The construction is the claim's own: a tangent plane about the middle star
+ * of the three, x the difference in right ascension times the cosine of that
+ * star's declination and y the difference in declination, both in degrees.
+ * The plane is then scaled so the first two stars are as far apart as the
+ * first two pyramid centres, and laid down with x along east and y along
+ * north, anchored on the first pyramid. Nothing is rotated to fit: the belt's
+ * angle from the meridian is what the claim's first comparison measures, and
+ * it comes out of this picture unchanged, which a test pins.
+ *
+ * The one choice is the sign of north, because laying a map of the sky on the
+ * ground can be done either way up. That is Krupp's objection and C4's second
+ * free choice, and it is a toggle rather than a constant.
+ */
+export function skyProjectionSpec(claim: Claim, ctx: OverlayContext): SkyProjectionSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'sky-projection') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+
+  const stars = asStrings(params.stars)
+    .map((name) => starByName(ctx.stars, name))
+    .filter((s): s is Star => s !== undefined);
+  const ground = asStrings(params.ground)
+    .filter(isStructure)
+    .map((id) => structureOf(ctx, id))
+    .filter((p): p is PyramidParams => p !== undefined)
+    .map((p) => ({ id: p.id, at: [p.offsetEast, p.offsetNorth] as [number, number] }));
+  if (stars.length < 2 || ground.length < 2) return undefined;
+
+  // The tangent plane is about the middle star, which is what C4's formulas
+  // take the cosine of; with two stars there is no middle and the first serves.
+  const places = positionsAtEpoch(stars, ctx.epoch);
+  const centre = places[Math.floor((stars.length - 1) / 2)] as Equatorial;
+  const tangents = places.map((p) => tangentOffset(p, centre));
+
+  const first = tangents[0] as TangentPoint;
+  const second = tangents[1] as TangentPoint;
+  const skySeparation = Math.hypot(second.x - first.x, second.y - first.y);
+  const g0 = ground[0] as GroundPoint;
+  const g1 = ground[1] as GroundPoint;
+  const groundSeparation = Math.hypot(g1.at[0] - g0.at[0], g1.at[1] - g0.at[1]);
+  if (skySeparation === 0 || groundSeparation === 0) return undefined;
+  const scale = groundSeparation / skySeparation;
+  const northward = ctx.krupp ? -1 : 1;
+
+  const belt: ProjectedStar[] = stars.map((star, i) => {
+    const t = tangents[i] as TangentPoint;
+    return {
+      id: star.id,
+      name: star.name,
+      tangent: t,
+      at: [g0.at[0] + (t.x - first.x) * scale, g0.at[1] + northward * (t.y - first.y) * scale],
+    };
+  });
+
+  const last = tangents[tangents.length - 1] as TangentPoint;
+  const lastGround = ground[ground.length - 1] as GroundPoint;
+  return {
+    ground,
+    belt,
+    scale,
+    beltAngleDeg: meridianAngle(first, last),
+    groundAngleDeg:
+      Math.atan2(Math.abs(lastGround.at[0] - g0.at[0]), Math.abs(lastGround.at[1] - g0.at[1])) / DEG,
+    inverted: ctx.krupp,
+    height: 12,
+  };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
   | { kind: 'ghost-profile'; spec: GhostProfileSpec }
   | { kind: 'shaft-rays'; spec: ShaftRaysSpec }
-  | { kind: 'passage-ray'; spec: PassageRaySpec };
+  | { kind: 'passage-ray'; spec: PassageRaySpec }
+  | { kind: 'compass-rose'; spec: CompassRoseSpec }
+  | { kind: 'sky-projection'; spec: SkyProjectionSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -342,6 +516,10 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (shafts) return { kind: 'shaft-rays', spec: shafts };
   const passage = passageRaySpec(claim, ctx);
   if (passage) return { kind: 'passage-ray', spec: passage };
+  const rose = compassRoseSpec(claim, ctx);
+  if (rose) return { kind: 'compass-rose', spec: rose };
+  const projection = skyProjectionSpec(claim, ctx);
+  if (projection) return { kind: 'sky-projection', spec: projection };
   return undefined;
 }
 
@@ -373,5 +551,9 @@ function describe(overlay: OverlaySpec): string {
       return `${overlay.spec.rays.length} rays from the chamber centres at the measured shaft angles, each carried to the dome with its star marked where it stands now.`;
     case 'passage-ray':
       return `The ${overlay.spec.passage.split('.').pop()} passage axis carried out of its mouth to the dome, with ${overlay.spec.star.name} marked at ${ROUND(overlay.spec.star.altDeg)}°.`;
+    case 'compass-rose':
+      return `A rose on ${overlay.spec.structure.toUpperCase()}'s base: true north against the measured side azimuth, drawn ${ROUND(overlay.spec.exaggeration, 0)} times wide of the truth so ${ROUND(Math.abs(overlay.spec.arcminutes), 1)}′ can be seen.`;
+    case 'sky-projection':
+      return `The belt at this epoch laid on the plateau, ${ROUND(overlay.spec.scale, 0)} m per degree, ${overlay.spec.inverted ? 'with north and south swapped' : 'north to north'}.`;
   }
 }
