@@ -202,7 +202,7 @@ describe('the B4 ground outlines', () => {
   const spec = groundOutlinesSpec(claim('B4'), contextFor(model, -2449)) as NonNullable<ReturnType<typeof groundOutlinesSpec>>;
 
   it('draws the two base lines the claim compares, at the sides it compares them by', () => {
-    const comparisons = model.results.get('B4')?.comparisons as NonNullable<ReturnType<typeof model.results.get>>['comparisons'];
+    const comparisons = model.results.get('B4')?.comparisons ?? [];
     expect(spec.outlines.map((o) => o.name)).toEqual(['casing', 'socket']);
     const [casing, socket] = spec.outlines;
     expect(casing?.sideInches).toBeCloseTo(comparisons[0]?.value as number, 9);

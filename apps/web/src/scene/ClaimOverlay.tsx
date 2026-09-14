@@ -16,20 +16,20 @@ import { formatValue } from '@seked/claims/browser';
 import { formatDms } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
-import type {
-  ChamberWireframeSpec,
-  CompassRoseSpec,
-  GroundBearingsSpec,
-  GroundLineSpec,
-  GroundOutlinesSpec,
-  GroundRectangleSpec,
-  OverlaySpec,
-  PassageRaySpec,
-  ShaftRaysSpec,
-  SkyProjectionSpec,
-  StarMark,
+import {
+  offsetWords,
+  type ChamberWireframeSpec,
+  type CompassRoseSpec,
+  type GroundBearingsSpec,
+  type GroundLineSpec,
+  type GroundOutlinesSpec,
+  type GroundRectangleSpec,
+  type OverlaySpec,
+  type PassageRaySpec,
+  type ShaftRaysSpec,
+  type SkyProjectionSpec,
+  type StarMark,
 } from '../overlays';
-import { offsetWords } from '../overlays';
 import { DOME_RADIUS } from '../sky';
 import type { PyramidParams } from '../model';
 import { GhostProfiles } from './GhostProfile';
@@ -322,7 +322,7 @@ function GroundRectangle({ spec }: { spec: GroundRectangleSpec }): React.JSX.Ele
   const claimed = useMemo(() => rectangle(spec.from.at, spec.claimedSouthWest, z), [spec.from.at, spec.claimedSouthWest, z]);
   const extent = (measuredRc: number, claimedRc: number, source: string | undefined): string =>
     `${measuredRc.toFixed(1)} rc measured, ${source === undefined ? '' : `${source} = `}${claimedRc.toFixed(1)} rc claimed`;
-  const [ne, nw, sw] = measured as [Point3, Point3, Point3];
+  const [ne, nw, sw] = measured as [Point3, Point3, Point3, Point3];
 
   return (
     <group>

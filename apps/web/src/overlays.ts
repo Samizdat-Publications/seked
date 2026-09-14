@@ -602,6 +602,20 @@ function comparisonFor(claim: Claim, prefix: string): Comparison | undefined {
   return claim.comparisons.find((c) => c.label.startsWith(prefix));
 }
 
+/**
+ * An expression evaluated in the environment, or nothing when this preset
+ * cannot evaluate it. An overlay drops the part it cannot draw rather than
+ * taking the whole claim down with it.
+ */
+function tryEvaluate(source: string, env: Environment): number | undefined {
+  try {
+    const value = evaluate(source, env);
+    return Number.isFinite(value) ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const azimuthTo = (from: readonly number[], to: readonly number[]): number =>
   (Math.atan2((to[0] as number) - (from[0] as number), (to[1] as number) - (from[1] as number)) / DEG + 360) % 360;
 
@@ -740,10 +754,11 @@ export function groundOutlinesSpec(claim: Claim, ctx: OverlayContext): GroundOut
   const outlines: GroundOutline[] = [];
   for (const name of asStrings(params.outlines)) {
     const line = BASE_LINES[name];
-    const sideM = line === undefined ? undefined : ctx.env[`${structure}.${line.key}`];
+    if (line === undefined) continue;
     // A preset that does not carry the socket sides has no socket line, and
     // the casing square is drawn on its own rather than nothing at all.
-    if (line === undefined || sideM === undefined) continue;
+    const sideM = ctx.env[`${structure}.${line.key}`];
+    if (sideM === undefined) continue;
     const sideInches = sideM / inch;
     outlines.push({
       name,
@@ -919,14 +934,7 @@ export function groundLineSpec(claim: Claim, ctx: OverlayContext): GroundLineSpe
   // The second comparison is the round number the claim also states, which
   // the drawing carries as a third line rather than as a constant of its own.
   const reference = claim.comparisons[1];
-  let referenceBearingDeg: number | undefined;
-  if (reference) {
-    try {
-      referenceBearingDeg = evaluate(reference.target, ctx.env);
-    } catch {
-      // A reference the environment cannot evaluate is simply not drawn.
-    }
-  }
+  const referenceBearingDeg = reference === undefined ? undefined : tryEvaluate(reference.target, ctx.env);
 
   const cornerBearingDeg = azimuthTo(from.at, through.at);
   const targetBearingDeg = azimuthTo([0, 0], at);
@@ -1035,14 +1043,16 @@ export function chamberWireframeSpec(claim: Claim, ctx: OverlayContext): Chamber
   const diagonals: ChamberDiagonal[] = [];
   for (const name of asStrings(params.diagonals)) {
     const ends = CHAMBER_DIAGONALS[name];
-    const from = ends === undefined ? undefined : corner(ends[0]);
-    const to = ends === undefined ? undefined : corner(ends[1]);
+    if (ends === undefined) continue;
+    const from = corner(ends[0]);
+    const to = corner(ends[1]);
     if (!from || !to) continue;
-    const comparison = comparisonFor(claim, name);
     // With a comparison the diagonal carries the claim's own arithmetic; with
     // none it carries the length of the line that is drawn, and no target.
-    const cubits = comparison ? evaluate(comparison.formula, ctx.env) : Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]) / cubit;
-    const target = comparison ? evaluate(comparison.target, ctx.env) : undefined;
+    const comparison = comparisonFor(claim, name);
+    const claimed = comparison === undefined ? undefined : tryEvaluate(comparison.formula, ctx.env);
+    const target = comparison === undefined ? undefined : tryEvaluate(comparison.target, ctx.env);
+    const cubits = claimed ?? Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]) / cubit;
     diagonals.push({
       name,
       from,
