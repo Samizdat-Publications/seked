@@ -342,3 +342,65 @@ if __name__ == "__main__":
         print(f"ok: g1 base {p['base']} m, height {p['height']} m, volume {want:,.0f} m³, {len(v)} verts")
     else:
         print(json.dumps(r["values"], sort_keys=True))
+
+
+def load_terrain(data_dir=DATA_DIR, name="giza-glo30"):
+    """
+    The local heightfield cut from the Copernicus GLO-30 DEM by scripts/terrain.py.
+
+    Returns (header, heights): the header dict and a flat list of metres,
+    row-major, rows south to north and columns west to east, so the sample at
+    column i of row j is heights[j * header["nx"] + i]. Heights are orthometric
+    on EGM2008 and include the monuments, edited: see the header's note before
+    treating anything near a pyramid as ground.
+    """
+    import array   # imported here so this function can be appended without touching the imports above
+
+    header = _read(os.path.join(data_dir, "terrain", name + ".json"))
+    path = os.path.join(data_dir, "terrain", header["heights"])
+    with open(path, "rb") as f:
+        raw = f.read()
+    count = header["nx"] * header["ny"]
+    if header["dtype"] != "float32" or header["layout"] != "row-major":
+        raise ValueError(f'{path}: expected row-major float32, got {header["dtype"]} {header["layout"]}')
+    if len(raw) != count * 4:
+        raise ValueError(f"{path}: {len(raw)} bytes for {count} samples of float32")
+    heights = array.array("f")
+    heights.frombytes(raw)
+    if sys.byteorder != header["byteOrder"].split("-")[0]:
+        heights.byteswap()
+    return header, list(heights)
+
+
+def terrain_sample(header, heights, x, y):
+    """Height at local east x and north y, in metres, by bilinear interpolation."""
+    nx, ny, spacing = header["nx"], header["ny"], header["spacing"]
+    fx = (x - header["x0"]) / spacing
+    fy = (y - header["y0"]) / spacing
+    if not (0.0 <= fx <= nx - 1 and 0.0 <= fy <= ny - 1):
+        raise ValueError(f"({x}, {y}) is outside the heightfield")
+    ix = min(int(math.floor(fx)), nx - 2)
+    iy = min(int(math.floor(fy)), ny - 2)
+    tx, ty = fx - ix, fy - iy
+    bottom = heights[iy * nx + ix] * (1 - tx) + heights[iy * nx + ix + 1] * tx
+    top = heights[(iy + 1) * nx + ix] * (1 - tx) + heights[(iy + 1) * nx + ix + 1] * tx
+    return bottom * (1 - ty) + top * ty
+
+
+# A few fixed points, on and between grid nodes, for the parity test in packages/data.
+TERRAIN_PROBES = [
+    (0.0, 0.0), (-3000.0, -3000.0), (3000.0, 3000.0), (-3000.0, 3000.0), (3000.0, -3000.0),
+    (-334.41, -353.86), (-574.45, -739.19), (1414.21, 1414.21),
+    (-1234.5, 987.25), (17.3, -42.8), (625.5, -1375.25), (-2999.75, 2999.75),
+]
+
+if __name__ == "__main__" and "--terrain" in sys.argv:
+    # Appended rather than folded into the main block above, so this file only ever grows.
+    # The block above has already printed the resolved values, so the terrain JSON is the last line.
+    _header, _heights = load_terrain()
+    print(json.dumps({
+        "file": _header["heights"],
+        "sha256": _header["sha256"],
+        "count": len(_heights),
+        "samples": [{"x": x, "y": y, "h": terrain_sample(_header, _heights, x, y)} for x, y in TERRAIN_PROBES],
+    }))

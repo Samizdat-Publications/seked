@@ -168,3 +168,6 @@ export function sourceById(db: Database, id: string): Source {
   if (!s) throw new Error(`unknown source "${id}"`);
   return s;
 }
+
+// The terrain heightfield reader lives in its own module; re-exported so `@seked/data` stays one import.
+export * from './terrain';
