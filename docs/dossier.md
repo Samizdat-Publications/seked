@@ -340,7 +340,7 @@ Residual by survey preset:
 
 **Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer. · Cole, J. H. (1925). Determination of the Exact Size and Orientation of the Great Pyramid of Giza. Survey of Egypt Paper 39. Cairo: Government Press. · Nell, E. & Ruggles, C. (2014). The Orientations of the Giza Pyramids and Associated Structures. Journal for the History of Astronomy 45(3), 304–360.
 
-The residual is the orientation itself, so a percentage is undefined and the fit uses an absolute tolerance of 5 arcminutes (0.0833 degrees). Petrie's casing mean is -3'43" plus or minus 6" (section 93), Cole's about -3'06", Dash's -3'54" plus or minus 44" (Table 3): all west of north, and the canonical preset resolves to Dash. Which method set it out is an overlay for the app; it does not change this number.
+The residual is the orientation itself, so a percentage is undefined and the fit uses an absolute tolerance of 5 arcminutes (0.0833 degrees). Petrie's casing mean is −3′43″ ± 6″ (§93), Cole's about −3′06″, Dash's −3′54″ ± 44″ (Table 3): all west of north, and the canonical preset resolves to Dash. Which method set it out is an overlay for the app; it does not change this number.
 
 ### C2 · Shafts point at stars
 

@@ -22,3 +22,7 @@ build/
 .env
 .env.*
 .DS_Store
+
+# Plugin scratch data and agent worktrees
+.claude/data/
+.claude/worktrees/
