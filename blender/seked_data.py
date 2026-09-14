@@ -176,9 +176,11 @@ def stepped_pyramid_geometry(base, height, courses):
     half_base = base / 2.0
     verts, faces = [], []
     z = 0.0
-    for h in courses:
-        if z >= height:
-            raise ValueError(f"the courses reach {z:.3f} m, which is the whole {height} m of the pyramid")
+    for k, h in enumerate(courses):
+        if not h > 0:
+            raise ValueError(f"course {k + 1} is {h} m high; a course is a positive height")
+        if z + h > height:
+            raise ValueError(f"course {k + 1} tops out at {z + h:.3f} m, past the whole {height} m of the pyramid")
         half = half_base * (1.0 - z / height)
         bed = len(verts)
         verts.extend(_corners(half, z))

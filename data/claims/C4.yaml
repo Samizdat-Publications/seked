@@ -53,4 +53,8 @@ notes: >-
   survey. Long-term precession (Vondrák 2011) is what makes the epoch
   meaningful at all; the IAU 2006 model is wrong by degrees at −10449, and
   the belt's angle sweeps roughly a degree a century, so a claim tied to an
-  epoch is a claim tied to that free choice.
+  epoch is a claim tied to that free choice. The second comparison is also
+  tied to the star catalogue: between this package's HYG proper motions and
+  Stellarium's own catalogue (docs/stellarium.md) Mintaka's offset ratio
+  moves by 4.66 %, most of the 5 % band, so its verdict is a property of the
+  proper motions as much as of the plateau.

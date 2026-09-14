@@ -78,8 +78,9 @@ export function steppedPyramidMesh({ base, height, courses }: SteppedPyramidOpti
   };
 
   let z = 0;
-  for (const h of courses) {
-    if (z >= height) throw new Error(`the courses reach ${z.toFixed(3)} m, which is the whole ${height} m of the pyramid`);
+  for (const [k, h] of courses.entries()) {
+    if (!(h > 0)) throw new Error(`course ${k + 1} is ${h} m high; a course is a positive height`);
+    if (z + h > height) throw new Error(`course ${k + 1} tops out at ${(z + h).toFixed(3)} m, past the whole ${height} m of the pyramid`);
     const half = halfBase * (1 - z / height);
     const bed = verts.length;
     for (const v of corners(half, z)) verts.push(v);

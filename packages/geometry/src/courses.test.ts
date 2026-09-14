@@ -38,7 +38,11 @@ describe('the stepped profile', () => {
 
   it('refuses a pyramid with no courses, and one the courses stand taller than', () => {
     expect(() => steppedPyramidMesh({ ...TOY, courses: [] })).toThrow(/at least one course/);
-    expect(() => steppedPyramidMesh({ ...TOY, courses: [60, 60, 60] })).toThrow(/the whole 100 m/);
+    expect(() => steppedPyramidMesh({ ...TOY, courses: [60, 60, 60] })).toThrow(/course 2 tops out at 120.000 m, past the whole 100 m/);
+    // The guard is on a course's top, not its bed: one course that overshoots on its own is refused too.
+    expect(() => steppedPyramidMesh({ ...TOY, courses: [101] })).toThrow(/course 1 tops out/);
+    expect(() => steppedPyramidMesh({ ...TOY, courses: [10, 0, 10] })).toThrow(/course 2 is 0 m high/);
+    expect(() => steppedPyramidMesh({ ...TOY, courses: [10, -1] })).toThrow(/course 2 is -1 m high/);
   });
 });
 

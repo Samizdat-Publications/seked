@@ -52,8 +52,9 @@ const TOTAL_M = 138.745;
 
 /**
  * How far the imported total may stand from Goyon's printed one before the
- * import is refused. One centimetre is a fifth of a single reading's stated
- * precision, so anything the parser dropped or doubled trips it.
+ * import is refused. One centimetre is twice a single reading's stated
+ * precision of half a centimetre, so a rounding in the printed total passes
+ * and anything the parser dropped or doubled trips it.
  */
 const TOTAL_TOLERANCE_M = 0.01;
 

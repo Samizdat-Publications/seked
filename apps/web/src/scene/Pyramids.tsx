@@ -64,12 +64,16 @@ function Pyramid({
   const stepped = today && courses !== undefined;
   const truncated = today && courses === undefined && heightToday !== undefined;
   const standing = stepped || truncated;
+  // The params are rebuilt on every store change, so the courses arrive as a
+  // fresh array each time even when not one height has moved; the stack is
+  // keyed on their values so a slider tick elsewhere does not rebuild it.
+  const coursesKey = courses?.join(' ');
   const geometry = useMemo(
     () =>
       stepped
-        ? steppedPyramidGeometry({ base, height, courses: courses as number[] })
+        ? steppedPyramidGeometry({ base, height, courses: coursesKey!.split(' ').map(Number) })
         : pyramidGeometry({ base, height, concavity, truncateAt: truncated ? heightToday : undefined }),
-    [base, height, concavity, stepped, courses, truncated, heightToday],
+    [base, height, concavity, stepped, coursesKey, truncated, heightToday],
   );
   useEffect(() => () => geometry.dispose(), [geometry]);
 
