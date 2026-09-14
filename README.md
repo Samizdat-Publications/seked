@@ -39,9 +39,19 @@ under way. Every Petrie 1883 record for all three pyramids and the Dash
 sides and azimuths, read from a scan of the Survey of Egypt paper. The Great Pyramid's interior is generated
 from Petrie's positions in both the Blender scene and the browser; Khafre's
 and Menkaure's sheets carry Petrie's dimensions but he gives no positions,
-so their interiors wait on published plans. The terrain is cut from
-Copernicus GLO-30 with the ground under each pyramid set to its surveyed
-base level. All twenty-two claims of the plan's table compute, C7 on the
+so Khafre's descending corridor and burial chamber are placed from
+Maragioglio and Rinaldi's published lengths, slope and levels, while
+Menkaure's wait on a citable slope. The Great Pyramid as it stands is
+built course by course from Goyon's 1978 survey of its 201 courses, in
+Blender and in the browser alike. The terrain is cut from Copernicus
+GLO-30 with the ground under each pyramid set to its surveyed base level.
+The sky package is checked against Stellarium 26.2: transit altitudes
+agree to within 25 arcseconds for five stars at 2500, 2450 and 10,500
+BCE, and the one disagreement, Sirius, is a proper-motion difference
+between catalogues that the test states rather than hides
+(see [`docs/stellarium.md`](docs/stellarium.md)). Blender renders are lit
+from the same package: a script bakes the sun and the star dome, and the
+render script lights four views from it under a physical sky. All twenty-two claims of the plan's table compute, C7 on the
 Orion engine with Collins's Cygnus stars, D3 against cited positions for
 the Delta, D4 from Nell and Ruggles's 2014 survey of the temples at the
 Sphinx's feet. Every overlay a claim declares now draws, and a test says
@@ -59,11 +69,13 @@ assembles the viewer, the snapshots and the documents into one site.
 
 ```
 pnpm install
-pnpm test        # 360 tests across units, geometry, data, claims, sky, the viewer and the Blender reader
+pnpm test        # 441 tests across units, geometry, data, claims, sky, the viewer, the scripts and the Blender reader
 pnpm typecheck   # the packages, the scripts and the viewer
 pnpm dossier     # regenerates docs/dossier.md from data/
 pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
 pnpm run stars   # rebuilds data/stars/ from the HYG 4.2 catalogue (run, not a bare pnpm stars)
+pnpm run courses # rebuilds data/measurements/g1-courses.json from Goyon 1978's transcription
+pnpm sky-bake    # writes build/sky-bake.json, the sun and the stars for Blender
 pnpm bundle      # writes apps/web/public/seked.json for the viewer
 pnpm dev:web     # the viewer on a Vite dev server
 pnpm build:web   # static site in apps/web/dist
@@ -93,14 +105,13 @@ meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
 and sunset, so a claim that names an `epoch` can reach the sky from its
 YAML without the claims package learning any astronomy.
 
-Next: positions for Khafre's and Menkaure's interiors from published plans; the GPMP contours for the ground;
-the Stellarium check of Alnitak's transit at 2500 and 10,500 BCE; and then
-the Blender work the plan's hero renders need, which is where the project's
-visual weight lands: the Sphinx sculpt in place of the massing placeholder,
-materials (Tura casing, nummulitic core with Petrie's measured courses,
-Aswan granite, basalt paving), lighting and atmosphere at the dated events,
-the equinox-dawn and cutaway renders, and the sky-rollback cinematic with
-star positions baked from `packages/sky`.
+Next: a citable slope for Menkaure's descending corridor so his interior
+can build; the GPMP contours for the ground; and the Blender work the
+plan's hero renders need, which is where the project's visual weight
+lands: the Sphinx sculpt in place of the massing placeholder, richer
+materials on the cased faces and the exposed courses, the horizon beyond
+the 6 km grid, the night render's exposure, and the sky-rollback cinematic
+with star positions baked from `packages/sky`.
 
 ## Layout
 
