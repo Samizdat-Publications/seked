@@ -19,7 +19,7 @@ describe('database', () => {
     expect(db.measurements.find((m) => m.key === 'c')?.verified).toBe(true);
     const kind = new Map(db.sources.map((s) => [s.id, s.kind]));
     for (const m of db.measurements.filter((m) => m.verified && kind.get(m.source) === 'survey')) {
-      expect(m.note, `${m.key} from ${m.source} is verified without a section reference`).toMatch(/§\d+/);
+      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+/);
     }
   });
 });
@@ -48,13 +48,13 @@ describe('presets', () => {
     const r = resolve(db, 'canonical');
     expect(r.values['g1.base.side.mean']).toBe(230.33);
     expect(r.records.get('g1.base.side.mean')?.source).toBe('lehner-1997');
-    expect(r.records.get('g1.base.side.north')?.source).toBe('cole-1925');
+    expect(r.records.get('g1.base.side.north')?.source).toBe('dash-2015');
     expect(r.records.get('kc.height')?.source).toBe('petrie-1883');
   });
   it('each survey preset puts its own base first', () => {
     expect(resolve(db, 'petrie-1883').values['g1.base.side.mean']).toBeCloseTo(230.3475, 4);
     expect(resolve(db, 'cole-1925').values['g1.base.side.mean']).toBe(230.364);
-    expect(resolve(db, 'dash-2015').values['g1.base.side.mean']).toBe(230.36);
+    expect(resolve(db, 'dash-2015').values['g1.base.side.mean']).toBe(230.363);
   });
   it('a key with a single source survives every preset', () => {
     for (const p of db.presets) expect(resolve(db, p.id).values['earth.radius.polar']).toBe(6356752.314);

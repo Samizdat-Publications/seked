@@ -21,7 +21,7 @@
     "year": 2015,
     "citation": "Dash, G. (2015). The Great Pyramid's Footprint: Results from Our 2015 Survey. AERAgram 16(2), 8–14.",
     "url": "http://dashfoundation.com/downloads/archaeology/as-published/AERAGRAM16_2_GDash.pdf",
-    "note": "Per-side values and the base-centre coordinates are to be read from the PDF."
+    "note": "Casing side lengths (Table 1), platform side lengths (Table 2) and the azimuths of both (Tables 3 and 4) are all on p. 11; the mean casing side is also stated in the text on p. 10. Every bound the paper quotes is a 95 % confidence bound on a linear-regression best-fit line, p. 10. The base centre is given on p. 11 as GPMP N100,000.023, E499,999.987 ± 4.9 cm, a grid coordinate and not a geodetic one. The centrefold corner plans on pp. 12–13 are scanned images, so the corner coordinates are not machine readable. Corrections are posted at DashFoundation.org/Aeragram-16-2-erratta.pdf, footnote 2."
   },
   {
     "id": "lehner-1997",
