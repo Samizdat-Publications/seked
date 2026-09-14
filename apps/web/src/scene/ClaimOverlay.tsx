@@ -1,6 +1,7 @@
 /**
  * The claim overlays that are not ghost profiles: the shaft rays, the
- * descending passage's ray, the compass rose and the Orion projection.
+ * descending passage's ray, the compass rose, the Orion projection, the
+ * bearings taken along the plateau and the base lines drawn on it.
  *
  * Every one of them is drawn from a spec built in ../overlays.ts out of the
  * claim file's own params, so nothing here knows which claim it is serving.
@@ -9,12 +10,14 @@
  * solid masonry, and an overlay that is invisible until the reader finds the
  * section plane is no overlay at all.
  */
+import { formatValue } from '@seked/claims/browser';
 import { formatDms } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
 import type {
   CompassRoseSpec,
   GroundBearingsSpec,
+  GroundOutlinesSpec,
   OverlaySpec,
   PassageRaySpec,
   ShaftRaysSpec,
@@ -49,6 +52,8 @@ export function ClaimOverlay({
       return <SkyProjection spec={overlay.spec} />;
     case 'ground-bearings':
       return <GroundBearings spec={overlay.spec} />;
+    case 'ground-outlines':
+      return <GroundOutlines spec={overlay.spec} />;
   }
 }
 
@@ -249,6 +254,38 @@ function GroundBearings({ spec }: { spec: GroundBearingsSpec }): React.JSX.Eleme
           />
         </group>
       ))}
+    </group>
+  );
+}
+
+/**
+ * B4. The casing base line and the socket base line as two squares on the
+ * pavement, one inside the other. They are 0.7 m apart and the pyramid is
+ * 230 m across, so at any distance that shows both squares the two are one
+ * line: what is drawn is where each line runs, and the sides in metres and in
+ * pyramid inches are written beside them because that is where the claim is
+ * won or lost.
+ */
+function GroundOutlines({ spec }: { spec: GroundOutlinesSpec }): React.JSX.Element {
+  return (
+    <group>
+      {spec.outlines.map((outline, i) => {
+        const [east, north, up] = outline.corners[0] as Point3;
+        return (
+          <group key={outline.name}>
+            <Polyline points={outline.corners} colour={outline.colour} close />
+            {outline.markCorners &&
+              outline.corners.map((corner) => (
+                <Marker key={`${corner[0]},${corner[1]}`} position={corner} colour={outline.colour} />
+              ))}
+            <Label
+              text={`${outline.name} ${formatValue(outline.sideM, 'm')} = ${outline.sideInches.toFixed(1)} P″`}
+              position={[east, north, up + 24 + i * 36]}
+              colour={outline.colour}
+            />
+          </group>
+        );
+      })}
     </group>
   );
 }

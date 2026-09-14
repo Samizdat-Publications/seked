@@ -638,6 +638,93 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
 /** The corner sight lines, which are ground and not sky. */
 export const SIGHT_COLOUR = '#cfd8e3';
 
+// --- B4 the base lines, drawn on the ground --------------------------------
+
+/** One square on the pavement: a base line the claim measures a side of. */
+export interface GroundOutline {
+  /** The line as the claim file names it, `casing` or `socket`. */
+  name: string;
+  label: string;
+  sideM: number;
+  /** The side in Smyth's pyramid inches, which is the number the claim compares. */
+  sideInches: number;
+  /** Days in the tropical year times twenty-five, which is what he compares it with. */
+  targetInches: number;
+  residualPct: number;
+  /**
+   * Petrie's sockets are cut holes at the four corners, so the socket line has
+   * points on the ground to mark; the casing line is an edge and has none.
+   */
+  markCorners: boolean;
+  /** The four corners in the scene frame, north-east first, then anticlockwise. */
+  corners: Point[];
+  colour: string;
+}
+
+export interface GroundOutlinesSpec {
+  structure: StructureId;
+  outlines: GroundOutline[];
+}
+
+/** Which measured side each named base line is, and how it is drawn. */
+const BASE_LINES: Record<string, { key: string; label: string; markCorners: boolean }> = {
+  casing: { key: 'base.side.mean', label: 'casing base line', markCorners: false },
+  socket: { key: 'base.socket.mean', label: 'socket base line', markCorners: true },
+};
+
+/** A square of this side about the structure's centre, turned with the structure. */
+function outlineCorners(sideM: number, placed: PyramidParams): Point[] {
+  const half = sideM / 2;
+  const ring: ReadonlyArray<readonly [number, number]> = [[1, 1], [-1, 1], [-1, -1], [1, -1]];
+  return ring.map(([east, north]) => placePoint([east * half, north * half, 1], placed));
+}
+
+/**
+ * B4. The two base lines the claim's argument is actually about, drawn as two
+ * squares on the pavement: the casing edge Petrie measured and the line
+ * through Petrie's socket corners, which is the one Smyth's number needs.
+ *
+ * The whole dispute is 0.7 m of ground, so the picture cannot carry it and
+ * does not pretend to: the squares say where the two lines are and the panel
+ * beside them says how far each is from Smyth's 9,131 inches.
+ */
+export function groundOutlinesSpec(claim: Claim, ctx: OverlayContext): GroundOutlinesSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'ground-outlines') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const structure = asString(params.structure) ?? 'g1';
+  if (!isStructure(structure)) return undefined;
+  const placed = structureOf(ctx, structure);
+  if (!placed) return undefined;
+
+  const inch = ctx.env['unit.pyramid_inch'];
+  const year = ctx.env['year.tropical'];
+  if (inch === undefined || year === undefined) return undefined;
+  const targetInches = year * 25;
+
+  const outlines: GroundOutline[] = [];
+  for (const name of asStrings(params.outlines)) {
+    const line = BASE_LINES[name];
+    const sideM = line === undefined ? undefined : ctx.env[`${structure}.${line.key}`];
+    // A preset that does not carry the socket sides has no socket line, and
+    // the casing square is drawn on its own rather than nothing at all.
+    if (line === undefined || sideM === undefined) continue;
+    const sideInches = sideM / inch;
+    outlines.push({
+      name,
+      label: line.label,
+      sideM,
+      sideInches,
+      targetInches,
+      residualPct: ((sideInches - targetInches) / targetInches) * 100,
+      markCorners: line.markCorners,
+      corners: outlineCorners(sideM, placed),
+      colour: RAY_COLOURS[outlines.length % RAY_COLOURS.length] as string,
+    });
+  }
+  return outlines.length === 0 ? undefined : { structure, outlines };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -646,7 +733,8 @@ export type OverlaySpec =
   | { kind: 'passage-ray'; spec: PassageRaySpec }
   | { kind: 'compass-rose'; spec: CompassRoseSpec }
   | { kind: 'sky-projection'; spec: SkyProjectionSpec }
-  | { kind: 'ground-bearings'; spec: GroundBearingsSpec };
+  | { kind: 'ground-bearings'; spec: GroundBearingsSpec }
+  | { kind: 'ground-outlines'; spec: GroundOutlinesSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -663,6 +751,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (projection) return { kind: 'sky-projection', spec: projection };
   const bearings = groundBearingsSpec(claim, ctx);
   if (bearings) return { kind: 'ground-bearings', spec: bearings };
+  const outlines = groundOutlinesSpec(claim, ctx);
+  if (outlines) return { kind: 'ground-outlines', spec: outlines };
   return undefined;
 }
 
@@ -702,6 +792,10 @@ function describe(overlay: OverlaySpec): string {
       const lines = overlay.spec.bearings.map((b) => `${b.label} at ${ROUND(b.azimuthDeg, 2)}°`).join(', ');
       const sighted = overlay.spec.sights.map((s) => `${s.label} at ${ROUND(s.azimuthDeg, 2)}°`).join(' and ');
       return `Lines along the plateau from the viewpoint: ${lines}${sighted ? `, sighted on ${sighted}` : ''}.`;
+    }
+    case 'ground-outlines': {
+      const squares = overlay.spec.outlines.map((o) => `${o.name} at ${ROUND(o.sideM, 2)} m`).join(' and ');
+      return `${overlay.spec.structure.toUpperCase()}'s base lines drawn on the pavement, ${squares} a side; the panel carries the difference the picture cannot.`;
     }
   }
 }

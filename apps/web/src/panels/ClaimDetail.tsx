@@ -105,6 +105,9 @@ export function ClaimDetail({
   );
 }
 
+/** A residual in percent, signed and spaced the way the dossier signs one. */
+const percent = (v: number, digits = 3): string => `${v < 0 ? '−' : '+'}${Math.abs(v).toFixed(digits)} %`;
+
 function Comparison({ c }: { c: ComparisonResult }): React.JSX.Element {
   const tolerance = c.toleranceAbs !== undefined ? `±${formatValue(c.toleranceAbs, c.unit)}` : `±${c.tolerancePct} %`;
   return (
@@ -273,6 +276,31 @@ function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Eleme
               : "With the inversion off, the sky is laid north to north, and the belt runs the other way from the pyramids. That is Krupp's objection, drawn."}
           </p>
         </>
+      );
+    }
+    case 'ground-outlines': {
+      const outlines = overlay.spec.outlines;
+      // Half the difference between the two sides is how far apart the lines
+      // run on the ground, which is the whole of what the picture cannot say.
+      const first = outlines[0];
+      const last = outlines[outlines.length - 1];
+      const apartM = first && last && first !== last ? Math.abs(last.sideM - first.sideM) / 2 : undefined;
+      return (
+        <ul className="plain rays">
+          {outlines.map((o) => (
+            <li key={o.name}>
+              <span className="swatch" style={{ background: o.colour }} />
+              {o.label}: {formatValue(o.sideM, 'm')}, {o.sideInches.toFixed(1)} P″ against {o.targetInches.toFixed(2)} P″,{' '}
+              {percent(o.residualPct)}
+            </li>
+          ))}
+          {apartM !== undefined && (
+            <li className="note">
+              The two squares run {apartM.toFixed(2)} m apart on a side {formatValue(first?.sideM as number, 'm')} long, so the picture
+              shows one line where there are two. The difference lives in this panel.
+            </li>
+          )}
+        </ul>
       );
     }
     case 'ground-bearings': {

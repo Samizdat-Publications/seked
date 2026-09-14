@@ -2,7 +2,14 @@ import { evaluate, scopeFor } from '@seked/claims/browser';
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
 import { atEpoch, buildModel, type Model } from './model';
-import { groundBearingsSpec, passageRaySpec, shaftRaysSpec, skyProjectionSpec, type OverlayContext } from './overlays';
+import {
+  groundBearingsSpec,
+  groundOutlinesSpec,
+  passageRaySpec,
+  shaftRaysSpec,
+  skyProjectionSpec,
+  type OverlayContext,
+} from './overlays';
 
 /**
  * The overlays are the claims drawn, so the two have to say the same thing.
@@ -183,5 +190,35 @@ describe('the generic ground-bearings type', () => {
     // keep the eight metres C5 and C6 are drawn at.
     expect(generic.height).toBe(24);
     expect(ribbon.height).toBe(8);
+  });
+});
+
+describe('the B4 ground outlines', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const spec = groundOutlinesSpec(claim('B4'), contextFor(model, -2449)) as NonNullable<ReturnType<typeof groundOutlinesSpec>>;
+
+  it('draws the two base lines the claim compares, at the sides it compares them by', () => {
+    const comparisons = model.results.get('B4')?.comparisons as NonNullable<ReturnType<typeof model.results.get>>['comparisons'];
+    expect(spec.outlines.map((o) => o.name)).toEqual(['casing', 'socket']);
+    const [casing, socket] = spec.outlines;
+    expect(casing?.sideInches).toBeCloseTo(comparisons[0]?.value as number, 9);
+    expect(socket?.sideInches).toBeCloseTo(comparisons[1]?.value as number, 9);
+    expect(casing?.targetInches).toBeCloseTo(comparisons[0]?.targetValue as number, 9);
+    expect(socket?.targetInches).toBeCloseTo(comparisons[1]?.targetValue as number, 9);
+    expect(casing?.residualPct).toBeCloseTo(comparisons[0]?.residualPct as number, 9);
+    // The socket line is the longer of the two, which is the whole of Smyth's
+    // advantage: about 0.7 m further out on each side.
+    expect((socket?.sideM as number) - (casing?.sideM as number)).toBeGreaterThan(1.4);
+  });
+
+  it('squares each outline on the structure it belongs to, a metre over its pavement', () => {
+    const placed = model.pyramids.find((p) => p.id === spec.structure);
+    for (const outline of spec.outlines) {
+      expect(outline.corners).toHaveLength(4);
+      const [ne, nw, sw] = outline.corners;
+      expect(Math.hypot((ne?.[0] as number) - (nw?.[0] as number), (ne?.[1] as number) - (nw?.[1] as number))).toBeCloseTo(outline.sideM, 9);
+      expect(Math.hypot((nw?.[0] as number) - (sw?.[0] as number), (nw?.[1] as number) - (sw?.[1] as number))).toBeCloseTo(outline.sideM, 9);
+      for (const corner of outline.corners) expect(corner[2]).toBeCloseTo((placed?.offsetUp as number) + 1, 9);
+    }
   });
 });
