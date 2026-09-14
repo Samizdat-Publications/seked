@@ -51,7 +51,14 @@ BCE, and the one disagreement, Sirius, is a proper-motion difference
 between catalogues that the test states rather than hides
 (see [`docs/stellarium.md`](docs/stellarium.md)). Blender renders are lit
 from the same package: a script bakes the sun and the star dome, and the
-render script lights four views from it under a physical sky. All twenty-two claims of the plan's table compute, C7 on the
+render script lights four views from it under a physical sky. A second bake
+writes every bright star's place at each of the 480 frames of the plan's
+sky-rollback cinematic, and a Blender script films it: the sky from 2000 CE
+back to 10,500 BCE with Alnitak held on the meridian, the King's Chamber's
+south shaft drawn out of the pyramid at its measured angle, and the star
+sliding into its line of sight at 2450 BCE, which is claim C2 as a film.
+Menkaure's lowest sixteen courses and the foot of Khafre's render as granite
+from two verified Petrie records. All twenty-two claims of the plan's table compute, C7 on the
 Orion engine with Collins's Cygnus stars, D3 against cited positions for
 the Delta, D4 from Nell and Ruggles's 2014 survey of the temples at the
 Sphinx's feet. Every overlay a claim declares now draws, and a test says
@@ -76,6 +83,7 @@ pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
 pnpm run stars   # rebuilds data/stars/ from the HYG 4.2 catalogue (run, not a bare pnpm stars)
 pnpm run courses # rebuilds data/measurements/g1-courses.json from Goyon 1978's transcription
 pnpm sky-bake    # writes build/sky-bake.json, the sun and the stars for Blender
+pnpm sky-rollback # writes build/sky-rollback.json and .f32, the stars frame by frame for the cinematic
 pnpm bundle      # writes apps/web/public/seked.json for the viewer
 pnpm dev:web     # the viewer on a Vite dev server
 pnpm build:web   # static site in apps/web/dist
@@ -89,6 +97,7 @@ Blender is driven headless (5.1, usually not on PATH; see
 blender -b -P blender/generate.py -- --preset canonical --save build/seked.blend --gltf build/seked.glb
 blender -b build/seked.blend -P blender/check.py
 blender -b build/seked.blend -P blender/render.py -- --view dawn --out build/hero.png
+blender -b build/seked.blend -P blender/rollback.py -- --out build/rollback --mp4 build/rollback.mp4
 ```
 
 `packages/sky` carries Vondrák 2011 long-term precession, tested against

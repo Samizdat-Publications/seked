@@ -203,7 +203,14 @@ blender -b build/seked.blend -P blender/render.py -- --view dawn    --out build/
 blender -b build/seked.blend -P blender/render.py -- --view cutaway --out build/cutaway.png --width 1600 --height 900 --samples 128
 blender -b build/seked.blend -P blender/render.py -- --view akhet   --out build/akhet.png   --width 1600 --height 900 --samples 128
 blender -b build/seked.blend -P blender/render.py -- --view night   --out build/night.png   --width 1600 --height 900 --samples 128
+pnpm sky-rollback
+blender -b build/seked.blend -P blender/rollback.py -- --out build/rollback --mp4 build/rollback.mp4 --width 1280 --height 720 --samples 64
 ```
+
+The render code is three modules: `render_materials.py` builds and assigns
+the materials, `render_sky.py` reads the bakes and builds the world, the sun
+lamp and the star dome, and `render.py` is the four views. `rollback.py`
+films the cinematic out of the same modules.
 
 Progress snapshots rendered this way live in `docs/progress/`.
 
@@ -273,28 +280,93 @@ texture's own measured scale. The drawn disc is at the texture's physical
 radiance and comes out white with a warm surround, which is what a photograph
 of a sun on the horizon does.
 
+### The cinematic
+
+The plan's sky-rollback animation: the sky run back from the catalogue's own
+epoch to 10,500 BCE with Alnitak held on the meridian, so claim C2 can be
+watched rather than read. `pnpm sky-rollback` runs `scripts/sky-rollback.ts`,
+which computes every bright star's altitude and azimuth at every one of the
+film's frames, by the same `positionsAtEpoch` and `altAz` the claims are
+judged with, and writes `build/sky-rollback.json`, the header, with
+`build/sky-rollback.f32` beside it: 8,920 stars by 480 frames by two angles as
+little-endian float32, 34 MB, which is why they are not in the JSON. The
+header carries the schedule, the sidereal time and Alnitak's transit altitude
+at each frame, the magnitudes and colours once, the shaft angle the film
+draws with its source, and a sentence for each saying which call it came out
+of. Nothing is interpolated in Blender.
+
+The schedule is composition and the epochs are the claims': twenty seconds at
+24 frames a second, opening on 2000 CE, easing back to Bauval and Gilbert's
+2450 BCE and holding there, then on to Hancock and Bauval's 10,500 BCE and
+holding again. Between the holds the epoch eases in and out so the sky does
+not lurch.
+
+`rollback.py` films it. The camera stands 700 m north of the Great Pyramid on
+its meridian, looking south and up through a 16 mm lens, far enough back that
+the apex stands below nine degrees, which is where Alnitak transits at the
+last epoch, so the star is never hidden by the pyramid; it drifts forward
+sixty metres over the film. Each frame it puts the baked azimuths and
+altitudes on a dome centred on the camera (200 km out, forty times the still
+views', for the reason below), gives the stars below the horizon no radius,
+moves the label and presses the shutter. Three annotations are drawn, all of
+them seen by the camera and lit by nothing, because an emissive prism two
+hundred kilometres long would otherwise light the plateau like a second sun:
+the King's Chamber's south shaft as a line of sight from the chamber's centre
+(off the solid `generate.py` built) south and up at `kc.shaft.south.angle` to
+the dome, the shafts being in the database as angles and not as geometry; an
+orange ring on the dome where a star aligned with that shaft would stand; and
+a smaller blue ring that follows Alnitak, so the eye can watch the one slide
+into the other. The dome is wide because the ray starts seven hundred metres
+from the camera and its far end has to land where the camera sees that
+direction: on a 200 km sphere it lands within a fifth of a degree of the ring,
+on a 5 km one it would miss it by eight.
+
+There is no sun in the film. Each frame is the sidereal sky at the sidereal
+time Alnitak transits, which at any one epoch is a different night of the
+year, so the sky texture is given a sun forty degrees down, which is what a
+moonless night is to it, and the stars and the night fill are the light. The
+script re-resolves the shaft angle from the database and refuses to run if
+the bake disagrees with it. Frames are rendered one at a time to PNGs so a
+run can be stopped and resumed, and `--mp4` encodes them with Blender's own
+sequencer at the end; a frame at 1280 by 720 and 64 samples takes about six
+seconds on this CPU, the whole film under an hour. `--frames 0,263,479` renders
+a proof of three.
+
 ### Materials
 
-Four materials, base colour and roughness and a bump and nothing else, as the
-plan says. They are built in `render.py` so `generate.py` stays material-free,
-and they are assigned by what an object is.
+Base colour and roughness and a bump and nothing else, as the plan says. They
+are built in `render_materials.py` so `generate.py` stays material-free, and
+they are assigned by what an object is.
 
 - **Tura casing**, on every "(as built)" pyramid: near white, smooth, with a
   large-scale noise in roughness so a face is not one flat plane.
-- **Core limestone**, on the Sphinx's box and on any "(today)" object: warmer
-  and coarser, banded into courses.
+- **Tura casing over Aswan granite**, on an "(as built)" pyramid whose
+  database carries `<id>.casing.granite.height`: granite up to that height
+  above the base and Tura above it, switched on the object's own Z. Menkaure's
+  is 16.388 m, Petrie's 645.2 in at the top of the sixteenth course (§82, with
+  his three reasons for stopping there); Khafre's is the one granite course he
+  measured, 41.52 in (§68), with his footnote that Vyse saw two.
+- **Core limestone**, on a "(today)" object whose courses are its geometry:
+  warmer and coarser than the casing, its colour wandering block by block and
+  its surface pitted, and no bands, because the steps are the courses.
+- **Core limestone (banded)**, on the Sphinx's box and on any flat truncation:
+  the same stone banded into courses by a wave texture on the object's own Z.
+  The period is the mean of the course table the preset carries for the Great
+  Pyramid, 0.6903 m over Goyon's 201, and only where a preset carries no table
+  does it fall back to `g1.height.original / 203`, Petrie's count (§26).
+  Blender's banded wave runs its sine over `20 · scale · z`, so the scale is
+  `pi / (10 · course)`; that relation was checked against 5.1 by rendering a
+  wall of known height and counting bands.
 - **Aswan granite**, on the interior solids: dark red-brown with a fine grain.
 - **Plateau sand**, on the terrain: pale, rough, drifting softly over tens of
   metres. The sky texture's ground albedo is the luminance of that same sand,
   so the two agree about what the plateau reflects.
 
-The courses are the one number in the materials that comes out of the
-database. A wave texture bands the object's own Z with a period of
-`g1.height.original / 203`, which is 0.7221 m under the canonical preset: the
-height is resolved through `seked_data` at render time and the 203 is the
-number of courses Petrie counted (§26). Blender's banded wave runs its sine
-over `20 · scale · z`, so the scale is `pi / (10 · course)`; that relation was
-checked against 5.1 by rendering a wall of known height and counting bands.
+The sun lamp's colour is the transmitted triple over its brightest channel and
+its strength the zenith irradiance times that brightest channel, so what
+Blender multiplies out is the irradiance times the transmission in every
+channel. An earlier version scaled the strength by the triple's luminance as
+well and so counted the beam's own dimming twice.
 
 ### What is still a placeholder
 
@@ -303,17 +375,19 @@ checked against 5.1 by rendering a wall of known height and counting bands.
   is the striped slab in the foreground, and it is half sunk, because its base
   is the Great Pyramid's base level while the ground model around it is
   higher: the real Sphinx sits in a quarried hollow the terrain does not have.
-- **The courses are a mean, not the table.** Petrie measured all 203 course
-  thicknesses and none of them is in `data/` yet. The real courses thin upward
-  from about a metre and a half at the base and a few conspicuously thick ones
-  interrupt the run; the bands here know none of that.
-- **The night view's fill is not a light.** A moonless sky is not black and
-  neither a sun 37° down nor the star dome will light a pyramid, so a flat,
-  faint blue is added to the world to stand in for airglow. It is an exposure
-  decision, and so is the compression of the star magnitudes from the physical
-  0.4 exponent to 0.32: the catalogue spans a factor of four hundred in flux
-  and a linear image exposed for Sirius would lose everything at magnitude 6.
-  The positions are not compressed and not chosen.
+- **The Sphinx's box wears painted courses.** Its bands are the Great
+  Pyramid's mean course, because the box has no courses of its own; the statue
+  is carved rock and has none either.
+- **The night's fill is not a light.** A moonless sky is not black and
+  neither a sun tens of degrees down nor the star dome will light a pyramid,
+  so a flat, faint blue is added to the world to stand in for airglow, at
+  0.002 on the sky texture's scale under an exposure of six and a half stops.
+  It is an exposure decision, and so is the compression of the star
+  magnitudes from the physical 0.4 exponent to 0.32: the catalogue spans a
+  factor of four hundred in flux and a linear image exposed for Sirius would
+  lose everything at magnitude 6. The positions are not compressed and not
+  chosen. The pyramids in the night view and the film are silhouettes, which
+  is what they are on a moonless night.
 - **The horizon past three kilometres is the sky texture's own ground.** The
   terrain grid is six kilometres across, so in the `dawn` and `cutaway` views a
   thin dark band shows between the far edge of the real heightfield and the

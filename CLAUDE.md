@@ -14,6 +14,8 @@ pnpm typecheck      # tsc --noEmit
 pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
+pnpm sky-bake       # bake the sun and the star dome into build/ for blender/render.py
+pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for blender/rollback.py
 ```
 
 ## Rules that keep the project honest

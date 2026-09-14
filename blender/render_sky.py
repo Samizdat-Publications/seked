@@ -390,13 +390,18 @@ def star_radius(magnitude, radius):
     return faint_radius + (bright_radius - faint_radius) * fraction
 
 
-def star_radiance(magnitude, radius):
+def star_radiance(magnitude, radius, dome_radius):
     """
     Magnitudes are a logarithmic scale of flux. The drawn radius is spread out
     for legibility rather than physically, so it is divided back out of the
-    radiance and what a star puts into the frame stays its own.
+    radiance and what a star puts into the frame stays its own. The division
+    is by the radius the star would have on the reference dome, because what
+    reaches a pixel is radiance times the star's solid angle, and a dome ten
+    times wider with stars ten times wider is the same solid angle: divided
+    by the metres instead, every star on it would be a hundred times fainter.
     """
-    return STAR_FLUX * 10.0 ** (-STAR_MAGNITUDE_EXPONENT * magnitude) / (radius * radius)
+    reference = radius * DOME_RADIUS_M / dome_radius
+    return STAR_FLUX * 10.0 ** (-STAR_MAGNITUDE_EXPONENT * magnitude) / (reference * reference)
 
 
 def make_star_cloud(name, magnitudes, colour_indices, radius, provenance):
@@ -411,7 +416,7 @@ def make_star_cloud(name, magnitudes, colour_indices, radius, provenance):
     cloud.resize(count)
     radii = [star_radius(m, radius) for m in magnitudes]
     cloud.attributes.new(STAR_FLUX_ATTRIBUTE, "FLOAT", "POINT").data.foreach_set(
-        "value", [star_radiance(m, r) for m, r in zip(magnitudes, radii)])
+        "value", [star_radiance(m, r, radius) for m, r in zip(magnitudes, radii)])
     cloud.attributes.new(STAR_TEMPERATURE_ATTRIBUTE, "FLOAT", "POINT").data.foreach_set(
         "value", [blackbody_temperature(ci) for ci in colour_indices])
     cloud.materials.append(starlight_material())

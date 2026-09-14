@@ -150,11 +150,11 @@ def sphinx_viewpoint(name, fallback):
     ))
 
 
-def make_camera(scene, location, target, lens, name="Hero camera"):
+def make_camera(scene, location, target, lens, name="Hero camera", clip_end=4.0 * DOME_RADIUS_M):
     """A camera at a place, looking at a point, with a far clip past the star dome."""
     cam_data = bpy.data.cameras.new(name)
     cam_data.lens = lens
-    cam_data.clip_end = 4.0 * DOME_RADIUS_M
+    cam_data.clip_end = clip_end
     cam = bpy.data.objects.new(name, cam_data)
     scene.collection.objects.link(cam)
     cam.location = location
