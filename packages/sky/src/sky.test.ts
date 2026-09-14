@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { skyEnvironment } from './environment';
 import { isCircumpolar, transitAltitude } from './frames';
 import { loadNamedStars, positionAtEpoch, starById } from './stars';
 import { ltp, ltpb, ltpecl, ltpequ, precessIcrsToDate } from './vondrak';
@@ -69,5 +70,42 @@ describe('the sky over Giza, as the claims describe it', () => {
   });
   it('Kochab was circumpolar from Giza in 2500 BCE', () => {
     expect(isCircumpolar(positionAtEpoch(starById(stars, 'kochab'), -2499).decDeg, GIZA)).toBe(true);
+  });
+});
+
+describe('the sky flattened into a claim environment', () => {
+  const stars = loadNamedStars();
+  const GIZA = 29.979167;
+  const KEYS = ['ra', 'dec', 'transit.altitude', 'transit.north', 'lower.altitude'];
+
+  it('gives every named star its five keys, plus the epoch', () => {
+    const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });
+    expect(env['sky.epoch']).toBe(-2449);
+    for (const star of stars) {
+      for (const suffix of KEYS) expect(env[`star.${star.id}.${suffix}`], `star.${star.id}.${suffix}`).toBeTypeOf('number');
+    }
+    expect(Object.keys(env)).toHaveLength(stars.length * KEYS.length + 1);
+  });
+
+  it('names them so the claim expression parser can read them', () => {
+    const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });
+    for (const key of Object.keys(env)) expect(key).toMatch(/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*$/);
+  });
+
+  it("puts Alnitak's transit within a degree of 45° in 2450 BCE, south of the zenith", () => {
+    const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars });
+    expect(Math.abs((env['star.alnitak.transit.altitude'] as number) - 45)).toBeLessThan(1);
+    expect(env['star.alnitak.transit.north']).toBe(0);
+    expect(env['star.thuban.transit.north']).toBe(1);
+  });
+
+  it("puts Thuban's lower culmination within 1.5° of 26.5° in 2170 BCE", () => {
+    const env = skyEnvironment({ epoch: -2169, latitudeDeg: GIZA, stars });
+    expect(Math.abs((env['star.thuban.lower.altitude'] as number) - 26.5)).toBeLessThan(1.5);
+  });
+
+  it('loads the named stars itself when it is not given any', () => {
+    const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA });
+    expect(env['star.kochab.transit.altitude']).toBeCloseTo(skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars })['star.kochab.transit.altitude'] as number, 12);
   });
 });
