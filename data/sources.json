@@ -311,5 +311,14 @@
     "url": "https://copernicus-dem-30m.s3.amazonaws.com/",
     "license": "Free, full and open licence for the Copernicus WorldDEM-30 (the eula_F.pdf beside each tile, under INFO/). Attribution required by Article 6(a): © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. Article 6(b) asks derived products, such as this repository's resampled window, to carry: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved.",
     "note": "One arc-second grid, pixel-is-point, heights orthometric on EGM2008. The bucket has no LICENSE or README object next to the tile, so the licence text above was read from INFO/eula_F.pdf in the tile's own prefix. The tiles are gitignored; data/terrain/giza-glo30.json and .f32 are the 6 km window around the origin cut by scripts/terrain.py. The monuments are edited in the product: AUXFILES/*_EDM.tif marks their footprints with value 2, and the Great Pyramid comes through as a mound peaking near 94 m."
+  },
+  {
+    "id": "vyse-1840",
+    "kind": "survey",
+    "year": 1840,
+    "citation": "Vyse, H. (1840). Operations Carried on at the Pyramids of Gizeh in 1837, with an Account of a Voyage into Upper Egypt, vol. II. London: James Fraser.",
+    "url": "https://archive.org/details/operationscarrie02howa",
+    "license": "Public domain",
+    "note": "Perring's measurements as Vyse printed them. The Third Pyramid's Table of Dimensions is in the Appendix, pp. 120 to 122, read from the archive.org OCR of this scan on 2026-09-14. The OCR sets the table's column of feet and inches apart from its labels, so a figure has to be paired with its line by order; an angle is printed inline with its label and needs no pairing."
   }
 ]

@@ -90,11 +90,16 @@ which is how G1's entrance passage is stored. Anything incomplete is skipped.
 Interiors are built in their own structure's frame and placed with the same
 centre offsets, base elevation and orientation as the pyramid objects.
 
-As entered today, G2's and G3's sheets are dimension sheets: Petrie gives the
-lengths, widths and heights but not a position in the pyramid's frame, so every
-one of their rooms is skipped. G2's great chamber is the closest: it has its
-lengths, its widths, its wall and gable heights and a located west wall, and
-wants only a north position and a `floor.up` to build.
+Petrie's sheets for G2 and G3 are dimension sheets: lengths, widths and heights
+but no position in the pyramid's frame. What positions them is Maragioglio and
+Rinaldi: Khafre's entrance has a level and an offset from the axis, his
+descending corridor a length and a slope, and his crypt a floor and a south
+wall, so both build. Menkaure's descending corridor has their length and, for
+its slope, the 26° 2′ Perring measured for Vyse's 1840 table, so it builds
+from Petrie's entrance; no source yet gives a level for any of his chambers,
+and Petrie's first chamber, which "opens just beyond the foot of the slope",
+would need a builder rule that hangs a chamber off a passage's end before it
+could be placed from that sentence.
 
 `Terrain (GLO-30 context)` is the Copernicus heightfield as one grid in the
 project frame, with the site's origin elevation from `data/sites.json` taken

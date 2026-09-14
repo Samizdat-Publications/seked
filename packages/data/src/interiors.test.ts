@@ -113,8 +113,10 @@ describe('interiorSolids on the canonical preset', () => {
  * rather than written out. Maragioglio and Rinaldi give Khafre's entrance a
  * level and an offset from the axis, his descending corridor a length and a
  * slope, and his crypt a floor and a south wall, which is enough for both.
- * Menkaure's chapter gives no angle of slope for his descending corridor and
- * no level for any of his chambers, so nothing of his is placed yet.
+ * Menkaure's chapter gives his descending corridor a length but no slope;
+ * the slope is Perring's, in Vyse's Appendix table, and with it the corridor
+ * builds from Petrie's entrance. No source yet gives a level for any of his
+ * chambers, so nothing else of his is placed.
  */
 describe('the discovered interiors on the canonical preset', () => {
   it("builds Khafre's entrance passage and his burial chamber", () => {
@@ -149,9 +151,24 @@ describe('the discovered interiors on the canonical preset', () => {
     expect(ez).toBeLessThan(0);
   });
 
-  it("leaves Menkaure's interior unplaced, for want of a slope and a level", () => {
-    expect(interiorSolids(env, { structure: 'g3' })).toEqual({});
-    expect(env['g3.passage.descending.length']).toBeDefined();
-    expect(env['g3.passage.descending.angle']).toBeUndefined();
+  it("builds Menkaure's descending corridor from Petrie's entrance, Maragioglio and Rinaldi's length and Vyse's slope, and nothing else", () => {
+    const built = interiorSolids(env, { structure: 'g3' });
+    expect(Object.keys(built)).toEqual(['g3.passage.descending']);
+    const solid = built['g3.passage.descending'];
+    const [bx, by, bz] = solid?.landmarks['g3.passage.descending.floor.begin'] as [number, number, number];
+    const [ex, ey, ez] = solid?.landmarks['g3.passage.descending.floor.end'] as [number, number, number];
+    const half = env['g3.base.half'] as number;
+    const angle = env['g3.face.angle'] as number;
+    // The mouth: Petrie's centre of the entrance from the east side, Maragioglio and Rinaldi's sill, on the north face.
+    expect(bz).toBeCloseTo(env['g3.entrance.floor.begin.up'] as number, 9);
+    expect(bx).toBeCloseTo(half - (env['g3.entrance.floor.begin.from_east_side'] as number), 9);
+    expect(by).toBeCloseTo(half - bz / Math.tan((angle * Math.PI) / 180), 9);
+    // The run: the recorded length down the recorded slope, due south, ending under the base.
+    expect(Math.hypot(ex - bx, ey - by, ez - bz)).toBeCloseTo(env['g3.passage.descending.length'] as number, 6);
+    expect(ez - bz).toBeCloseTo((env['g3.passage.descending.length'] as number) * Math.sin(((env['g3.passage.descending.angle'] as number) * Math.PI) / 180), 6);
+    expect(env['g3.passage.descending.angle']).toBeLessThan(0);
+    expect(ex).toBeCloseTo(bx, 6);
+    expect(ey).toBeLessThan(by);
+    expect(ez).toBeLessThan(0);
   });
 });

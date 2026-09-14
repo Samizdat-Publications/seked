@@ -40,8 +40,10 @@ sides and azimuths, read from a scan of the Survey of Egypt paper. The Great Pyr
 from Petrie's positions in both the Blender scene and the browser; Khafre's
 and Menkaure's sheets carry Petrie's dimensions but he gives no positions,
 so Khafre's descending corridor and burial chamber are placed from
-Maragioglio and Rinaldi's published lengths, slope and levels, while
-Menkaure's wait on a citable slope. The Great Pyramid as it stands is
+Maragioglio and Rinaldi's published lengths, slope and levels, and
+Menkaure's descending corridor from Petrie's entrance, their length and the
+slope Perring measured for Vyse's 1840 table; his chambers wait on a level.
+The Great Pyramid as it stands is
 built course by course from Goyon's 1978 survey of its 201 courses, in
 Blender and in the browser alike. The terrain is cut from Copernicus
 GLO-30 with the ground under each pyramid set to its surveyed base level.
@@ -114,13 +116,15 @@ meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
 and sunset, so a claim that names an `epoch` can reach the sky from its
 YAML without the claims package learning any astronomy.
 
-Next: a citable slope for Menkaure's descending corridor so his interior
-can build; the GPMP contours for the ground; and the Blender work the
-plan's hero renders need, which is where the project's visual weight
-lands: the Sphinx sculpt in place of the massing placeholder, richer
-materials on the cased faces and the exposed courses, the horizon beyond
-the 6 km grid, the night render's exposure, and the sky-rollback cinematic
-with star positions baked from `packages/sky`.
+Next: a citable level for Menkaure's chambers so the rest of his interior
+can build, and a way to hang a chamber off the foot of a passage where a
+source places it there and nowhere else; the GPMP contours for the ground;
+the Tier 3 masses (the queens' pyramids, the temples and causeways) from a
+source that gives their footprints, which Petrie's chapter 12 does not; and
+the Blender work the plan's hero renders still need, which is where the
+project's visual weight lands: the Sphinx sculpt in place of the massing
+placeholder, and the cinematic rendered at hero quality once the plateau
+under it is finished.
 
 ## Layout
 
