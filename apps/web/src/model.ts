@@ -5,7 +5,7 @@
  * one number re-evaluates every claim the way a regenerated dossier would.
  */
 import { evaluateClaim, type Claim, type ClaimResult, type ComparisonResult } from '@seked/claims/browser';
-import { resolve, type Measurement, type Resolved } from '@seked/data/browser';
+import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
 import { buildEnvironment, type Environment } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
 
@@ -58,6 +58,8 @@ export function pyramidParams(values: Record<string, number>, id: StructureId): 
 }
 
 export interface Model {
+  /** The bundle's own records, in the shape resolve() and sourceById() want. */
+  db: Database;
   resolved: Resolved;
   /** The resolved values with the cubit override applied, before derivation. */
   values: Record<string, number>;
@@ -73,14 +75,15 @@ export interface Model {
  * environment and evaluate every claim against it.
  */
 export function buildModel(bundle: SekedBundle, presetId: string, cubit: number | null): Model {
-  const resolved = resolve(databaseOf(bundle), presetId);
+  const db = databaseOf(bundle);
+  const resolved = resolve(db, presetId);
   const measuredCubit = resolved.values['cubit.royal'] ?? 0.5236;
   const values = cubit === null ? resolved.values : { ...resolved.values, 'cubit.royal': cubit };
   const env = buildEnvironment(values);
   const pyramids = STRUCTURES.map((id) => pyramidParams(values, id)).filter((p): p is PyramidParams => p !== undefined);
   const results = new Map<string, ClaimResult>();
   for (const claim of bundle.claims) results.set(claim.id, evaluateClaimSafely(claim, env));
-  return { resolved, values, env, pyramids, results, measuredCubit };
+  return { db, resolved, values, env, pyramids, results, measuredCubit };
 }
 
 /**
