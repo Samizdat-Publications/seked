@@ -41,18 +41,23 @@ against the cited page. Open decisions are listed at the end of the plan.
 
 ```
 pnpm install
-pnpm test        # 52 tests across units, geometry, data, claims, sky and the Blender reader
+pnpm test        # 71 tests across units, geometry, data, claims, sky and the Blender reader
 pnpm dossier     # regenerates docs/dossier.md from data/
 pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
 ```
 
 `packages/sky` carries Vondrák 2011 long-term precession, tested against
 ERFA's reference values, and enough meridian geometry to solve the shaft
-alignments (claim C2); see `docs/shafts.md`.
+alignments; see `docs/shafts.md`. `skyEnvironment` flattens it into
+`star.<id>.ra`, `.dec`, `.transit.altitude` and `.lower.altitude` keys, so a
+claim that names an `epoch` can reach the stars from its YAML without the
+claims package learning any astronomy. C2, C3 and C4 now compute in the
+dossier rather than sitting there as pending.
 
-Next: verify the starting sheet against Petrie, Cole and Dash; let claims
-call the sky engine so C2, C3 and C4 appear in the dossier; then terrain,
-interiors and materials in Blender, and the web viewer.
+Next: verify the starting sheet against Petrie, Cole and Dash; write the sky
+claims that are still only rows in the plan (C1, C5, C6, C7); give D1 the
+georeferenced positions it waits on; then terrain, interiors and materials in
+Blender, and the web viewer.
 
 ## Layout
 
@@ -69,7 +74,7 @@ packages/
   geometry/    pyramid profile numbers, eight-sided mesh generator, landmarks, expression environment
   data/        zod-validated loader and preset resolver
   claims/      expression parser (no eval), registry, evaluator, dossier renderer
-  sky/         Vondrák 2011 precession (ERFA-verified), meridian geometry, named stars
+  sky/         Vondrák 2011 precession (ERFA-verified), meridian geometry, named stars, claim environment
 blender/       (planned) bpy generators, terrain import, export, .blend scenes
 apps/web/      (planned) Vite + React + React Three Fiber viewer
 scripts/       dossier generator, shaft solver

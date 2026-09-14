@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
 import { skyEnvironment } from '@seked/sky';
-import { evaluateClaim } from './evaluate';
+import { evaluateClaim, type ComparisonResult } from './evaluate';
 import { identifiers } from './expr';
 import { loadClaims } from './registry';
 import { renderDossier } from './dossier';
@@ -34,6 +34,9 @@ describe('registry integrity', () => {
         }
       }
     }
+  });
+  it('no claim is still waiting on the sky engine', () => {
+    for (const c of claims) expect(c.status, c.id).not.toBe('needs-sky');
   });
   it('every cited source exists', () => {
     const ids = new Set(db.sources.map((s) => s.id));
@@ -132,5 +135,23 @@ describe('C · sky claims, evaluated at the epoch each claim names', () => {
     expect(Math.abs(c.absolute) * 60).toBeLessThan(10);
     expect(r.fits).toBe(true);
     expect(r.freeChoices).toBe(1);
+  });
+
+  it('C4: both Orion comparisons compute at 10,450 BCE, and neither lands', () => {
+    const r = byId('C4');
+    expect(r.status).toBe('computed');
+    expect(r.comparisons).toHaveLength(2);
+    const [angle, offset] = r.comparisons as [ComparisonResult, ComparisonResult];
+    expect(angle.unit).toBe('deg');
+    expect(offset.unit).toBe('ratio');
+    for (const c of r.comparisons) expect(Number.isFinite(c.residualPct), c.label).toBe(true);
+    // The belt stands far steeper than the diagonal at this epoch, and Mintaka
+    // sits closer to its base line than Menkaure does to his.
+    expect(angle.residualPct).toBeGreaterThan(25);
+    expect(angle.residualPct).toBeLessThan(45);
+    expect(offset.residualPct).toBeGreaterThan(10);
+    expect(offset.residualPct).toBeLessThan(30);
+    expect(r.fits).toBe(false);
+    expect(r.freeChoices).toBe(3);
   });
 });

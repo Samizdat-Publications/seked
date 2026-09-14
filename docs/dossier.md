@@ -17,8 +17,9 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | B3 | Latitude equals the speed of light | −0.3″ (−0.000 %) | −0.3″ (−0.000 %) | yes | 3 |
 | B4 | Pyramid inch and the year | −0.16 % | −0.79 % | no | 3 |
 | B5 | Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.34 m (−0.68 %) | yes | 2 |
-| C2 | Shafts point at stars | — | — | pending (needs-sky) | 2 |
-| C4 | Orion Correlation | — | — | pending (needs-sky) | 3 |
+| C2 | Shafts point at stars | −12.2′ (−0.452 %) | 39.5′ (+2.061 %) | no | 2 |
+| C3 | Descending passage and the pole star | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | yes | 1 |
+| C4 | Orion Correlation | +19.14 % | 777.5′ (+34.233 %) | no | 3 |
 | D1 | Giza diagonal to Heliopolis | — | — | pending (needs-site) | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
@@ -191,7 +192,7 @@ Residual by survey preset:
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
 | height × 43,200 against the polar radius | −24.1 km (−0.38 %) | −18.9 km (−0.30 %) | −18.9 km (−0.30 %) | −24.1 km (−0.38 %) |
-| perimeter × 43,200 against the equatorial circumference | −274.0 km (−0.68 %) | −271.0 km (−0.68 %) | −268.1 km (−0.67 %) | −268.8 km (−0.67 %) |
+| perimeter × 43,200 against the equatorial circumference | −274.0 km (−0.68 %) | −271.0 km (−0.68 %) | −268.1 km (−0.67 %) | −268.3 km (−0.67 %) |
 
 **Free choices (2)**:
 - the scale factor 43,200
@@ -269,7 +270,7 @@ Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| casing base side in pyramid inches against 365.242 × 25 | −0.79 % | −0.78 % | −0.77 % | −0.78 % |
+| casing base side in pyramid inches against 365.242 × 25 | −0.79 % | −0.78 % | −0.77 % | −0.77 % |
 | socket base side in pyramid inches against 365.242 × 25 | −0.16 % | −0.16 % | −0.16 % | −0.16 % |
 
 **Free choices (3)**:
@@ -299,7 +300,7 @@ Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.27 m (−0.68 %) | −6.21 m (−0.67 %) | −6.22 m (−0.67 %) |
+| Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.27 m (−0.68 %) | −6.21 m (−0.67 %) | −6.21 m (−0.67 %) |
 
 **Free choices (2)**:
 - the arc-minute as the unit
@@ -319,7 +320,23 @@ Identical to the second half of B1: 43,200 is 2 × 21,600, so "perimeter × 43,2
 
 Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its north shaft at Thuban; the Queen's Chamber south shaft pointed at Sirius and its north shaft at Kochab, each at meridian transit.
 
-*Not yet computable: waits on the sky engine.*
+*Evaluated at epoch −2449 (2450 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| King's Chamber south shaft against Alnitak | `kc.shaft.south.angle` vs `star.alnitak.transit.altitude` | 45°00′00″ | 45°12′15″ | −12.2′ (−0.452 %) | yes (±1 %) |
+| King's Chamber north shaft against Thuban | `kc.shaft.north.angle` vs `star.thuban.transit.altitude` | 32°36′00″ | 31°56′30″ | 39.5′ (+2.061 %) | no (±1 %) |
+| Queen's Chamber south shaft against Sirius | `qc.shaft.south.angle` vs `star.sirius.transit.altitude` | 39°36′28″ | 39°21′32″ | 14.9′ (+0.633 %) | yes (±1 %) |
+| Queen's Chamber north shaft against Kochab | `qc.shaft.north.angle` vs `star.kochab.transit.altitude` | 39°07′00″ | 39°21′21″ | −14.3′ (−0.608 %) | yes (±1 %) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| King's Chamber south shaft against Alnitak | −12.2′ (−0.452 %) | −12.2′ (−0.452 %) | −12.2′ (−0.452 %) | −12.2′ (−0.452 %) |
+| King's Chamber north shaft against Thuban | 39.5′ (+2.061 %) | 39.5′ (+2.061 %) | 39.5′ (+2.061 %) | 39.5′ (+2.061 %) |
+| Queen's Chamber south shaft against Sirius | 14.9′ (+0.633 %) | 14.9′ (+0.633 %) | 14.9′ (+0.633 %) | 14.9′ (+0.633 %) |
+| Queen's Chamber north shaft against Kochab | −14.3′ (−0.608 %) | −14.3′ (−0.608 %) | −14.3′ (−0.608 %) | −14.3′ (−0.608 %) |
 
 **Free choices (2)**:
 - the epoch
@@ -331,20 +348,59 @@ Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its north 
 
 **Context:** Gantenbrink, R. (1993 onward). The Upuaut Project: survey of the shafts of the Great Pyramid. · Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
 
-packages/sky solves this numerically; `pnpm shafts` writes docs/shafts.md with, for each shaft, the epoch at which the named star crossed the meridian at the shaft's altitude and how many years the date moves per arcminute of shaft angle. The dossier will carry it once claims can call the sky engine.
+Tolerance is 1 %, which on a 40° shaft is about 24′. The shaft angles are unverified Gantenbrink values, the bores are not straight, and the assignment of a star to a shaft is itself a free choice, so a tighter band would be false precision. The epoch is fixed here at Bauval and Gilbert's 2450 BCE for all four shafts, which is the claim as made; each shaft on its own prefers a different date. packages/sky solves that inverse problem numerically: `pnpm shafts` writes docs/shafts.md with, for each shaft, the epoch at which the named star crossed the meridian at the shaft's altitude and how many years the date moves per arcminute of shaft angle.
+
+### C3 · Descending passage and the pole star
+
+The descending passage was bored at 26°31′ so that an observer looking up it, north and below the pole, saw Thuban at its lower culmination around 2170 BCE.
+
+*Evaluated at epoch −2169 (2170 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| descending passage angle against Thuban's lower culmination | `passage.descending.angle` vs `star.thuban.lower.altitude` | 26°31′23″ | 26°26′27″ | 4.9′ (+0.311 %) | yes (±1 %) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| descending passage angle against Thuban's lower culmination | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) |
+
+**Free choices (1)**:
+- the epoch
+
+**Overlay:** `passage-ray` {"passage":"passage.descending.angle","star":"Thuban","culmination":"lower"}
+
+**Proponents:** Smyth, C. P. (1864). Our Inheritance in the Great Pyramid. London: Strahan.
+
+**Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer. · Spence, K. (2000). Ancient Egyptian chronology and the astronomical orientation of pyramids. Nature 408, 320–324. · Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
+
+Thuban's lower culmination climbs to about 29°53′ near 2800 BCE and falls away on either side, so the passage angle is reached twice: near 3409 BCE on the way up and near 2185 BCE on the way down. Choosing which crossing to call the alignment is this claim's one free choice, and it is not a small one, since the two dates are twelve centuries apart. Tolerance is 1 %, about 16′ at this angle, the same band as C2. There is a mundane reading as well: the measured 26°31′ is within 3′ of atan(1/2), a rise of one on a run of two, which is a seked of 14 palms per cubit and needs no star at all, and the ascending passage sits within 32′ of the same slope. See A3.
 
 ### C4 · Orion Correlation
 
 The three pyramids are laid out as Orion's Belt (Alnitak, Alnilam, Mintaka), including Menkaure's offset from the diagonal, and the belt's angle to the meridian matched the pyramids' diagonal in 10,450 BCE.
 
-*Not yet computable: waits on the sky engine.*
+*Evaluated at epoch −10449 (10450 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°48′35″ | 37°51′07″ | 777.5′ (+34.233 %) | no (±5 %) |
+| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.alnitak.dec - star.alnilam.dec) * (star.mintaka.ra - star.alnilam.ra) * cos(star.alnilam.dec) - (star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)` | 0.18527 | 0.155505 | +19.14 % | no (±5 %) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| belt angle from the meridian against the G1 to G3 diagonal | 777.5′ (+34.233 %) | 777.5′ (+34.233 %) | 777.5′ (+34.233 %) | 777.5′ (+34.233 %) |
+| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | +19.14 % | +19.14 % | +19.14 % | +19.14 % |
 
 **Free choices (3)**:
 - the epoch
 - the orientation of the sky map relative to the ground (north–south inversion)
 - the matching rule (angle, spacing or both)
 
-**Overlay:** `sky-projection` {"stars":["Alnitak","Alnilam","Mintaka"]}
+**Overlay:** `sky-projection` {"stars":["Alnitak","Alnilam","Mintaka"],"ground":["g1","g2","g3"]}
 
 **Proponents:** Bauval, R. & Gilbert, A. (1994). The Orion Mystery. London: Heinemann. · Hancock, G. (1995). Fingerprints of the Gods. London: Heinemann. · Hancock, G. & Bauval, R. (1996). Keeper of Genesis (US title: The Message of the Sphinx). London: Heinemann.
 
@@ -352,7 +408,7 @@ The three pyramids are laid out as Orion's Belt (Alnitak, Alnilam, Mintaka), inc
 
 **Critiques:** Krupp, E. C. (1997). Pyramid Marketing Schemes. Sky & Telescope, February 1997, 64–65.
 
-Needs long-term precession (Vondrák 2011); the IAU 2006 model is wrong by degrees at −10450.
+Both comparisons are unsigned, because the claim is about shape rather than handedness. The sky is taken as seen looking south, with the belt laid on a tangent plane about Alnilam (x = Δra × cos dec, y = Δdec, both in degrees), which is accurate to a few arcminutes over the belt's 2.7°. On the ground the diagonal is Petrie's G1 to G3 centre offsets, measured from the meridian, and Menkaure's offset is his perpendicular distance from the G1 to G2 line divided by the length of that line, so both offsets are scale free. Krupp's objection, that laying the sky on the plateau requires swapping north for south, is recorded here as a free choice and is not modelled: nothing below tests it. Tolerance is 5 %, nearly 2° on a 38° diagonal, a band far looser than any surveyor would accept, chosen so the claim is judged as the visual match it is asserted to be rather than as a survey. Long-term precession (Vondrák 2011) is what makes the epoch meaningful at all; the IAU 2006 model is wrong by degrees at −10449, and the belt's angle sweeps roughly a degree a century, so a claim tied to an epoch is a claim tied to that free choice.
 
 ## D · Site plan and geodesy
 
@@ -390,9 +446,18 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | g1.center.latitude | 29.979167 | deg | coords-wgs84-cited |  | no |
 | g1.face.angle | 51.8444 | deg | lehner-1997 | tabulated | no |
 | g1.height.original | 146.59 | m | lehner-1997 | tabulated | no |
+| g2.centre.offset.south | 353.86 | m | petrie-1883 | triangulation | yes |
+| g2.centre.offset.west | 334.41 | m | petrie-1883 | triangulation | yes |
 | g2.face.angle | 53.1667 | deg | lehner-1997 | tabulated | no |
+| g3.centre.offset.south | 739.19 | m | petrie-1883 | triangulation | yes |
+| g3.centre.offset.west | 574.45 | m | petrie-1883 | triangulation | yes |
 | kc.height | 5.8443 | m | petrie-1883 | interior | yes |
 | kc.length | 10.4709 | m | petrie-1883 | interior | yes |
+| kc.shaft.north.angle | 32.6 | deg | gantenbrink-1993 | robot-survey | no |
+| kc.shaft.south.angle | 45 | deg | gantenbrink-1993 | robot-survey | no |
 | kc.width | 5.2354 | m | petrie-1883 | interior | yes |
+| passage.descending.angle | 26.5231 | deg | petrie-1883 | interior | yes |
+| qc.shaft.north.angle | 39.1167 | deg | gantenbrink-1993 | robot-survey | no |
+| qc.shaft.south.angle | 39.6078 | deg | gantenbrink-1993 | robot-survey | no |
 | unit.pyramid_inch | 0.0254254 | m | smyth-1864 | defined | no |
 | year.tropical | 365.24219 | day | astronomical-almanac | tabulated | yes |
