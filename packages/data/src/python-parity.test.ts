@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildEnvironment, chamber, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh } from '@seked/geometry';
+import { buildEnvironment, chamber, courseHeights, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh, steppedPyramidMesh } from '@seked/geometry';
 import type { GroundPyramid, Point, SectionPair, Solid } from '@seked/geometry';
 import { loadDatabase, REPO_ROOT, resolve } from './index';
 
@@ -346,5 +346,58 @@ describe.skipIf(!py)('blender/seked_data.py derives the same centre offsets as @
     expect(theirs['g2.centre.offset.east']).toBeUndefined();
     expect(env['g2.centre.offset.east']).toBeUndefined();
     expect(env['g2.centre.offset.west']).toBe(resolve(db, 'canonical').values['g2.centre.offset.west']);
+  });
+});
+
+interface PyStepped {
+  name: string;
+  courses: number;
+  top: number;
+  verts: [number, number, number][];
+  faces: number[][];
+  volume: number;
+}
+
+/**
+ * The stepped pyramid is 1,608 vertices, far too many to name one at a time,
+ * so this compares them the way check.py compares the Sphinx's box: the worst
+ * difference over the whole stack, in metres. Our positions are float32, so a
+ * coordinate 139 m up is only good to about ten micrometres.
+ */
+describe.skipIf(!py)('blender/seked_data.py stacks the same courses as @seked/geometry', () => {
+  const db = loadDatabase();
+  const { values } = resolve(db, 'canonical');
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--courses'], { encoding: 'utf8' });
+  const theirs = JSON.parse(lastLine(out)) as Record<string, PyStepped>;
+
+  it('builds one for every structure the preset carries courses for, and no others', () => {
+    expect(Object.keys(theirs)).toEqual(['g1']);
+    expect(theirs['g1']?.courses).toBe(courseHeights(values, 'g1').length);
+    expect(courseHeights(values, 'g2')).toEqual([]);
+  });
+
+  it('g1: the same vertices, the same volume, and a top at the courses added up', () => {
+    const stepped = theirs['g1'] as PyStepped;
+    const courses = courseHeights(values, 'g1');
+    const ours = steppedPyramidMesh({
+      base: values['g1.base.side.mean'] as number,
+      height: values['g1.height.original'] as number,
+      courses,
+    });
+    expect(stepped.verts.length, 'vertex count').toBe(ours.vertexCount);
+    let worst = 0;
+    let where = '';
+    for (let i = 0; i < stepped.verts.length; i++) {
+      for (let axis = 0; axis < 3; axis++) {
+        const difference = Math.abs((ours.positions[i * 3 + axis] as number) - ((stepped.verts[i] as number[])[axis] as number));
+        if (difference > worst) {
+          worst = difference;
+          where = `vertex ${i} axis ${axis}`;
+        }
+      }
+    }
+    expect(worst, `worst at ${where || 'nowhere'}`).toBeLessThan(1e-3);
+    expect(Math.abs(meshVolume(ours) - stepped.volume) / stepped.volume, 'volume').toBeLessThan(1e-5);
+    expect(stepped.top).toBeCloseTo(courses.reduce((sum, h) => sum + h, 0), 9);
   });
 });
