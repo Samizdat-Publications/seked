@@ -1,0 +1,109 @@
+import { describe, expect, it } from 'vitest';
+import { INTERIOR_SOLID_INPUTS, buildEnvironment, interiorSolids, meshVolume } from '@seked/geometry';
+import type { Mesh } from '@seked/geometry';
+import { loadDatabase, resolve } from './index';
+
+/**
+ * The interior builders live in @seked/geometry, which knows nothing about the
+ * database, so their test lives here, where a preset can be resolved. Every
+ * number below comes out of `data/`; none is typed in.
+ */
+const db = loadDatabase();
+const { values } = resolve(db, 'canonical');
+const env = buildEnvironment(values);
+const solids = interiorSolids(env);
+
+/** The Great Pyramid's interior, north to south and then bottom to top. */
+const EXPECTED = [
+  'passage.descending',
+  'passage.subterranean_north',
+  'chamber.subterranean',
+  'passage.subterranean_south',
+  'passage.ascending',
+  'passage.queens_chamber',
+  'qc',
+  'gg',
+  'antechamber',
+  'kc',
+];
+
+/** A closed surface uses every directed edge once, and its neighbour uses the reverse. */
+function unpairedEdges(mesh: Mesh): string[] {
+  const seen = new Set<string>();
+  for (let i = 0; i < mesh.indices.length; i += 3) {
+    for (let k = 0; k < 3; k++) {
+      const a = mesh.indices[i + k] as number;
+      const b = mesh.indices[i + ((k + 1) % 3)] as number;
+      if (seen.has(`${a}>${b}`)) return [`used twice: ${a}>${b}`];
+      seen.add(`${a}>${b}`);
+    }
+  }
+  return [...seen].filter((key) => {
+    const [a, b] = key.split('>');
+    return !seen.has(`${b}>${a}`);
+  });
+}
+
+describe('interiorSolids on the canonical preset', () => {
+  it('builds every solid the preset carries the records for', () => {
+    expect(Object.keys(solids)).toEqual(EXPECTED);
+  });
+
+  it('encloses a positive volume with every solid', () => {
+    for (const [name, solid] of Object.entries(solids)) {
+      expect(meshVolume(solid), `${name} volume`).toBeGreaterThan(0);
+    }
+  });
+
+  it('closes every solid', () => {
+    for (const [name, solid] of Object.entries(solids)) {
+      expect(unpairedEdges(solid), `${name} edges`).toEqual([]);
+    }
+  });
+
+  it("matches Petrie's King's Chamber dimensions to within 2 %", () => {
+    const want = (values['kc.length'] as number) * (values['kc.width'] as number) * (values['kc.height'] as number);
+    const got = meshVolume(solids['kc'] as Mesh);
+    expect(Math.abs(got - want) / want).toBeLessThan(0.02);
+  });
+
+  it('slopes the descending passage at the measured angle', () => {
+    const solid = solids['passage.descending'];
+    if (!solid) throw new Error('the descending passage was skipped');
+    const from = solid.landmarks['passage.descending.floor.begin'] as [number, number, number];
+    const to = solid.landmarks['passage.descending.floor.end'] as [number, number, number];
+    const run = Math.hypot(to[0] - from[0], to[1] - from[1]);
+    const slope = (Math.atan2(from[2] - to[2], run) * 180) / Math.PI;
+    expect(slope).toBeCloseTo(values['passage.descending.angle'] as number, 1);
+    expect(Math.abs(slope - (values['passage.descending.angle'] as number))).toBeLessThan(0.1);
+  });
+
+  it("puts the Queen's Chamber ridge on the Pyramid's east-west axis", () => {
+    const ridge = solids['qc']?.landmarks['qc.ridge.mid'];
+    if (!ridge) throw new Error('the Queen’s Chamber was skipped or has no ridge');
+    expect(Math.abs(ridge[1])).toBeLessThan(0.1);
+  });
+
+  it('prefixes every landmark with the name of its solid', () => {
+    for (const [name, solid] of Object.entries(solids)) {
+      for (const key of Object.keys(solid.landmarks)) {
+        expect(key.startsWith(`${name}.`), `${key} is not prefixed with ${name}`).toBe(true);
+      }
+    }
+  });
+
+  it('names only records that exist in the database', () => {
+    const keys = new Set(db.measurements.map((m) => m.key));
+    for (const [name, inputs] of Object.entries(INTERIOR_SOLID_INPUTS)) {
+      expect(inputs.length, `${name} inputs`).toBeGreaterThan(0);
+      for (const key of inputs) expect(keys.has(key), `${name} wants ${key}`).toBe(true);
+    }
+  });
+
+  it('skips a solid whose inputs a preset does not carry, and keeps the rest', () => {
+    const thin = { ...env };
+    delete thin['kc.ceiling.up'];
+    const built = interiorSolids(thin);
+    expect(Object.keys(built)).toEqual(EXPECTED.filter((name) => name !== 'kc'));
+  });
+});
