@@ -17,7 +17,7 @@ import { formatDms } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
 import {
-  offsetWords,
+  cornerMissWords,
   type ChamberWireframeSpec,
   type CompassRoseSpec,
   type GroundBearingsSpec,
@@ -343,7 +343,7 @@ function GroundRectangle({ spec }: { spec: GroundRectangleSpec }): React.JSX.Ele
       />
       <Marker position={[spec.claimedSouthWest[0], spec.claimedSouthWest[1], z]} colour={spec.claimedColour} />
       <Label
-        text={`${spec.to.label} is ${offsetWords(spec.missEastM, 'east', 'west')} and ${offsetWords(spec.missNorthM, 'north', 'south')} of the claimed corner`}
+        text={cornerMissWords(spec)}
         position={[spec.claimedSouthWest[0], spec.claimedSouthWest[1], z + 60]}
         colour={spec.claimedColour}
       />

@@ -3,7 +3,7 @@ import { sourceById } from '@seked/data/browser';
 import { formatArcminutes, formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
-import { offsetWords, overlayNote, overlaySpec, type OverlayContext, type OverlaySpec } from '../overlays';
+import { cornerMissWords, overlayNote, overlaySpec, type OverlayContext, type OverlaySpec } from '../overlays';
 import { useView } from '../store';
 import { Fit } from './Claims';
 
@@ -319,9 +319,8 @@ function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Mode
           </li>
           <li>
             <span className="swatch" style={{ background: spec.claimedColour }} />
-            Set out from the {spec.from.label}, the claimed rectangle stops{' '}
-            {offsetWords(spec.missEastM, 'east', 'west')} and {offsetWords(spec.missNorthM, 'north', 'south')} of the{' '}
-            {spec.to.label}.
+            The claimed rectangle is set out from the {spec.from.label}, so its far corner falls where the arithmetic puts it:{' '}
+            {cornerMissWords(spec)}.
           </li>
           <li className="note">
             The cubits are the metres divided by the royal cubit, so the slider above moves them and the residuals with them and
@@ -365,13 +364,13 @@ function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Mode
           <li>
             <span className="swatch" style={{ background: spec.targetColour }} />
             Base centre to the {spec.to.label}, {(spec.to.distanceM / 1000).toFixed(1)} km off:{' '}
-            {spec.targetBearingDeg.toFixed(2)}°. The corner line misses it by {spec.residualToTargetDeg.toFixed(2)}°.
+            {spec.targetBearingDeg.toFixed(2)}°. The corner line misses it by {Math.abs(spec.residualToTargetDeg).toFixed(2)}°.
           </li>
           {spec.referenceBearingDeg !== undefined && spec.residualToReferenceDeg !== undefined && (
             <li>
               <span className="swatch" style={{ background: spec.referenceColour }} />
               The round {spec.referenceBearingDeg.toFixed(2)}° the claim also states: the corner line is{' '}
-              {spec.residualToReferenceDeg.toFixed(2)}° off it.
+              {Math.abs(spec.residualToReferenceDeg).toFixed(2)}° off it.
             </li>
           )}
           {cited && (

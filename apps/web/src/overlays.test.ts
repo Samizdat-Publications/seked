@@ -5,6 +5,7 @@ import { buildBundle } from '../../../scripts/bundle';
 import { atEpoch, buildModel, type Model } from './model';
 import {
   chamberWireframeSpec,
+  cornerMissWords,
   groundBearingsSpec,
   groundLineSpec,
   groundOutlinesSpec,
@@ -254,6 +255,19 @@ describe("the D2 ground rectangle", () => {
     expect(spec.missNorthM).toBeGreaterThan(0);
     expect(Math.abs(spec.missEastM)).toBeLessThan(2);
     expect(Math.abs(spec.missNorthM)).toBeLessThan(2);
+  });
+
+  // The scene label and the panel row both read this sentence, so the sign
+  // convention is pinned once here in the words a reader actually sees: the
+  // miss runs from the claimed corner to the measured one, which makes the
+  // measured corner the subject.
+  it('says the corner miss with the measured corner as its subject, whichever way it falls', () => {
+    expect(cornerMissWords(spec)).toBe(
+      `${spec.to.label} is ${Math.abs(spec.missEastM).toFixed(1)} m west and ${Math.abs(spec.missNorthM).toFixed(1)} m north of the claimed corner`,
+    );
+    expect(cornerMissWords({ ...spec, missEastM: 2.5, missNorthM: -3.2 })).toBe(
+      'G3 SW corner is 2.5 m east and 3.2 m south of the claimed corner',
+    );
   });
 
   it('moves the cubits with the cubit slider and leaves the metres alone', () => {

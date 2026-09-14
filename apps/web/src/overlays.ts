@@ -679,12 +679,8 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
 /** The corner sight lines, which are ground and not sky. */
 export const SIGHT_COLOUR = '#cfd8e3';
 
-/**
- * "1.7 m west": a signed offset said in words. A miss on the ground has a
- * direction rather than a sign, and the scene and the panel have to say it
- * the same way.
- */
-export const offsetWords = (metres: number, positive: string, negative: string): string =>
+/** "1.7 m west": a signed offset said as a distance and a direction. */
+const offsetWords = (metres: number, positive: string, negative: string): string =>
   `${Math.abs(metres).toFixed(1)} m ${metres < 0 ? negative : positive}`;
 
 // --- B4 the base lines, drawn on the ground --------------------------------
@@ -866,6 +862,20 @@ export function groundRectangleSpec(claim: Claim, ctx: OverlayContext): GroundRe
   };
 }
 
+/**
+ * The corner miss said in words. `missEastM` and `missNorthM` run from the
+ * claimed corner to the measured one, so the measured corner is the subject
+ * of the sentence and the direction words follow the signs. The scene label
+ * and the panel row both read it from here, because a picture and a panel
+ * that put the same two numbers the opposite way round is worse than either
+ * of them alone.
+ */
+export function cornerMissWords(spec: GroundRectangleSpec): string {
+  const east = offsetWords(spec.missEastM, 'east', 'west');
+  const north = offsetWords(spec.missNorthM, 'north', 'south');
+  return `${spec.to.label} is ${east} and ${north} of the claimed corner`;
+}
+
 // --- D1 the corner line, carried off the plateau ---------------------------
 
 /** Somewhere off the plateau a line is aimed at, placed from its coordinates. */
@@ -969,7 +979,9 @@ export interface ChamberDiagonal {
   /** Its two ends in the scene frame. */
   from: Point;
   to: Point;
+  /** `cubits` back in metres, so the two always say the same length. */
   lengthM: number;
+  /** The claim's own value for this diagonal, or the drawn length when it has none. */
   cubits: number;
   /** What the claim's matching comparison asks for, when it has one. */
   target: number | undefined;
