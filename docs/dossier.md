@@ -19,7 +19,7 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | B5 | Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.34 m (−0.68 %) | yes | 2 |
 | C2 | Shafts point at stars | −12.2′ (−0.452 %) | 39.5′ (+2.061 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | yes | 1 |
-| C4 | Orion Correlation | +19.14 % | 777.5′ (+34.233 %) | no | 3 |
+| C4 | Orion Correlation | +19.14 % | 12°57′28″ (+34.233 %) | no | 3 |
 | D1 | Giza diagonal to Heliopolis | - | - | pending (needs-site) | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
@@ -385,14 +385,14 @@ The three pyramids are laid out as Orion's Belt (Alnitak, Alnilam, Mintaka), inc
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°48′35″ | 37°51′07″ | 777.5′ (+34.233 %) | no (±5 %) |
+| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°48′35″ | 37°51′07″ | 12°57′28″ (+34.233 %) | no (±5 %) |
 | Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.alnitak.dec - star.alnilam.dec) * (star.mintaka.ra - star.alnilam.ra) * cos(star.alnilam.dec) - (star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)` | 0.18527 | 0.155505 | +19.14 % | no (±5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| belt angle from the meridian against the G1 to G3 diagonal | 777.5′ (+34.233 %) | 777.5′ (+34.233 %) | 777.5′ (+34.233 %) | 777.5′ (+34.233 %) |
+| belt angle from the meridian against the G1 to G3 diagonal | 12°57′28″ (+34.233 %) | 12°57′28″ (+34.233 %) | 12°57′28″ (+34.233 %) | 12°57′28″ (+34.233 %) |
 | Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | +19.14 % | +19.14 % | +19.14 % | +19.14 % |
 
 **Free choices (3)**:

@@ -5,7 +5,7 @@ import { skyEnvironment } from '@seked/sky';
 import { evaluateClaim, type ComparisonResult } from './evaluate';
 import { identifiers } from './expr';
 import { loadClaims } from './registry';
-import { renderDossier } from './dossier';
+import { formatResidual, renderDossier } from './dossier';
 
 const db = loadDatabase();
 const claims = loadClaims();
@@ -153,5 +153,17 @@ describe('C · sky claims, evaluated at the epoch each claim names', () => {
     expect(offset.residualPct).toBeLessThan(30);
     expect(r.fits).toBe(false);
     expect(r.freeChoices).toBe(3);
+  });
+});
+
+describe('formatResidual', () => {
+  const base = { label: 'x', formula: 'a', target: 'b', unit: 'deg' as const, value: 0, targetValue: 0, tolerancePct: 1, within: false };
+  it('prints residuals of a degree or more in degrees, minutes and seconds', () => {
+    expect(formatResidual({ ...base, absolute: 12.958333, residualPct: 34.2 })).toMatch(/^12°57′30″ \(\+34\.200 %\)$/);
+    expect(formatResidual({ ...base, absolute: -1.5, residualPct: -4 })).toMatch(/^−1°30′00″ /);
+  });
+  it('keeps arcminutes below a degree and arcseconds below a minute', () => {
+    expect(formatResidual({ ...base, absolute: 0.2, residualPct: 0.5 })).toMatch(/^12\.0′ /);
+    expect(formatResidual({ ...base, absolute: 0.001, residualPct: 0.001 })).toMatch(/″ /);
   });
 });

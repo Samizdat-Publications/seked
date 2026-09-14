@@ -43,7 +43,9 @@ export function formatResidual(r: ComparisonResult): string {
   const digits = r.unit === 'deg' || Math.abs(r.residualPct) < 0.01 ? 3 : 2;
   const pct = `${SIGN(r.residualPct)}${Math.abs(r.residualPct).toFixed(digits)} %`;
   if (r.unit === 'deg') {
-    const abs = Math.abs(r.absolute) < 1 / 60 ? formatArcseconds(r.absolute) : formatArcminutes(r.absolute);
+    const abs = Math.abs(r.absolute) >= 1
+      ? `${r.absolute < 0 ? '−' : ''}${formatDms(Math.abs(r.absolute))}`
+      : Math.abs(r.absolute) < 1 / 60 ? formatArcseconds(r.absolute) : formatArcminutes(r.absolute);
     return `${abs} (${pct})`;
   }
   if (r.unit === 'm') return `${formatLength(r.absolute)} (${pct})`;
