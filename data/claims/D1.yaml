@@ -1,15 +1,40 @@
 id: D1
 title: Giza diagonal to Heliopolis
 group: site-plan
-status: needs-site
-summary: A line through the south-east corners of the three pyramids points to the obelisk of Senusret I at Heliopolis.
+summary: >-
+  A line through the south-east corners of the three pyramids runs at 45
+  degrees and points at the obelisk of Senusret I at Heliopolis, 17 km to
+  the north-east.
+comparisons:
+  - label: bearing of the G3 to G1 south-east corner line against the bearing to the obelisk
+    formula: atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)
+    target: atan2((heliopolis.obelisk.longitude - g1.center.longitude) * cos(g1.center.latitude), heliopolis.obelisk.latitude - g1.center.latitude)
+    unit: deg
+    tolerance_pct: 2
+  - label: bearing of the corner line against 45 degrees
+    formula: atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)
+    target: "45"
+    unit: deg
+    tolerance_pct: 2
 free_choices:
-  - which corners define the diagonal
+  - which corners define the diagonal (the south-east corners here)
+  - the obelisk as the target rather than the temple's axis or its centre
 overlay:
   type: ground-line
   params:
+    from: g3.corner.se
+    through: g1.corner.se
     to: heliopolis.obelisk
 sources:
   for: [hancock-bauval-1996]
-  context: [legon-1979]
-notes: Needs the relative positions of the three pyramids and the georeferenced frame.
+  context: [legon-1979, petrie-1883]
+notes: >-
+  The corner line is built from Petrie's G1 to G3 centre offsets (section
+  92) and the mean half-bases, so Menkaure's slightly rectangular base
+  enters as its mean side. The bearing to the obelisk is taken in the local
+  east-north frame with the longitude difference scaled by the cosine of
+  the latitude; at 17 km that approximation is good to about 0.1 degrees,
+  which is far inside the 2 percent (0.9 degree) tolerance. The obelisk's
+  position is a commonly cited value, unverified, and its sigma of 50 m
+  moves the bearing by 0.2 degrees at most. Petrie found no exact relation
+  between the corners of the three pyramids (section 92).

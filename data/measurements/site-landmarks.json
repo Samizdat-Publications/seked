@@ -1,0 +1,4 @@
+[
+  { "key": "heliopolis.obelisk.latitude",  "structure": "heliopolis.obelisk", "quantity": "latitude",  "value": 30.1294, "unit": "deg", "sigma": 0.0005, "source": "coords-heliopolis-cited", "method": "cited", "note": "30°07′46″ N, commonly cited; sigma of about 50 m covers the citation spread. Unverified placeholder." },
+  { "key": "heliopolis.obelisk.longitude", "structure": "heliopolis.obelisk", "quantity": "longitude", "value": 31.3076, "unit": "deg", "sigma": 0.0005, "source": "coords-heliopolis-cited", "method": "cited", "note": "31°18′28″ E, commonly cited. Unverified placeholder." }
+]

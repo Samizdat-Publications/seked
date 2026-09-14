@@ -1,14 +1,98 @@
 [
-  { "id": "g1", "site": "giza", "name": "Great Pyramid of Khufu", "evidence": "excavated" },
-  { "id": "g2", "site": "giza", "name": "Pyramid of Khafre", "evidence": "excavated" },
-  { "id": "g3", "site": "giza", "name": "Pyramid of Menkaure", "evidence": "excavated" },
-  { "id": "sphinx", "site": "giza", "name": "Great Sphinx", "evidence": "excavated", "source": "arce-sphinx-1991" },
-  { "id": "sphinx.passages", "site": "giza", "name": "Sphinx rump passage and cavities", "evidence": "excavated", "source": "arce-sphinx-1991", "note": "Mapped by the ARCE Sphinx Project; small, dead-end, documented." },
-  { "id": "osiris-shaft", "site": "giza", "name": "Osiris Shaft", "evidence": "excavated", "source": "hawass-2007", "note": "Three levels to about 30 m below the Khafre causeway, water at the bottom. Real, excavated, and the model's first genuinely subterranean structure." },
-  { "id": "g1.subterranean-chamber", "site": "giza", "name": "Subterranean chamber of the Great Pyramid", "evidence": "excavated", "source": "petrie-1883" },
-  { "id": "g1.big-void", "site": "giza", "name": "ScanPyramids Big Void", "evidence": "instrumented", "source": "morishima-2017", "note": "Muon tomography, peer reviewed; position with error bars, inclination open." },
-  { "id": "g1.north-face-corridor", "site": "giza", "name": "ScanPyramids north-face corridor", "evidence": "instrumented", "source": "procureur-2023", "note": "Muon tomography confirmed by endoscope in 2023." },
-  { "id": "sphinx.paw-cavity", "site": "giza", "name": "Cavity beneath the Sphinx's forepaws", "evidence": "claimed", "source": "dobecki-schoch-1992", "note": "Seismic refraction anomaly interpreted as a possible chamber about 5 m down; never excavated." },
-  { "id": "g2.sar-shafts", "site": "giza", "name": "Khafre Project SAR shafts and complex", "evidence": "claimed", "source": "khafre-project-2025", "note": "Eight vertical shafts to about 648 m with spiral structures and cubic chambers, and a complex to about 1.2 km, announced at a March 2025 press conference from SAR Doppler tomography. Not peer reviewed; radar specialists dispute that SAR can image hundreds of metres into limestone; the Egyptian antiquities authority rejected it. Modelled as a claim, rendered as such." },
-  { "id": "hall-of-records", "site": "giza", "name": "Hall of Records", "evidence": "legendary", "source": "cayce", "note": "Edgar Cayce's readings placed a chamber of Atlantean records under the Sphinx's paw. No physical evidence; registered so the viewer can show what the claim asserts." }
+  {
+    "id": "g1",
+    "site": "giza",
+    "name": "Great Pyramid of Khufu",
+    "evidence": "excavated"
+  },
+  {
+    "id": "g2",
+    "site": "giza",
+    "name": "Pyramid of Khafre",
+    "evidence": "excavated"
+  },
+  {
+    "id": "g3",
+    "site": "giza",
+    "name": "Pyramid of Menkaure",
+    "evidence": "excavated"
+  },
+  {
+    "id": "sphinx",
+    "site": "giza",
+    "name": "Great Sphinx",
+    "evidence": "excavated",
+    "source": "arce-sphinx-1991"
+  },
+  {
+    "id": "sphinx.passages",
+    "site": "giza",
+    "name": "Sphinx rump passage and cavities",
+    "evidence": "excavated",
+    "source": "arce-sphinx-1991",
+    "note": "Mapped by the ARCE Sphinx Project; small, dead-end, documented."
+  },
+  {
+    "id": "osiris-shaft",
+    "site": "giza",
+    "name": "Osiris Shaft",
+    "evidence": "excavated",
+    "source": "hawass-2007",
+    "note": "Three levels to about 30 m below the Khafre causeway, water at the bottom. Real, excavated, and the model's first genuinely subterranean structure."
+  },
+  {
+    "id": "g1.subterranean-chamber",
+    "site": "giza",
+    "name": "Subterranean chamber of the Great Pyramid",
+    "evidence": "excavated",
+    "source": "petrie-1883"
+  },
+  {
+    "id": "g1.big-void",
+    "site": "giza",
+    "name": "ScanPyramids Big Void",
+    "evidence": "instrumented",
+    "source": "morishima-2017",
+    "note": "Muon tomography, peer reviewed; position with error bars, inclination open."
+  },
+  {
+    "id": "g1.north-face-corridor",
+    "site": "giza",
+    "name": "ScanPyramids north-face corridor",
+    "evidence": "instrumented",
+    "source": "procureur-2023",
+    "note": "Muon tomography confirmed by endoscope in 2023."
+  },
+  {
+    "id": "sphinx.paw-cavity",
+    "site": "giza",
+    "name": "Cavity beneath the Sphinx's forepaws",
+    "evidence": "claimed",
+    "source": "dobecki-schoch-1992",
+    "note": "Seismic refraction anomaly interpreted as a possible chamber about 5 m down; never excavated."
+  },
+  {
+    "id": "g2.sar-shafts",
+    "site": "giza",
+    "name": "Khafre Project SAR shafts and complex",
+    "evidence": "claimed",
+    "source": "khafre-project-2025",
+    "note": "Eight vertical shafts to about 648 m with spiral structures and cubic chambers, and a complex to about 1.2 km, announced at a March 2025 press conference from SAR Doppler tomography. Not peer reviewed; radar specialists dispute that SAR can image hundreds of metres into limestone; the Egyptian antiquities authority rejected it. Modelled as a claim, rendered as such."
+  },
+  {
+    "id": "hall-of-records",
+    "site": "giza",
+    "name": "Hall of Records",
+    "evidence": "legendary",
+    "source": "cayce",
+    "note": "Edgar Cayce's readings placed a chamber of Atlantean records under the Sphinx's paw. No physical evidence; registered so the viewer can show what the claim asserts."
+  },
+  {
+    "id": "heliopolis.obelisk",
+    "site": "giza",
+    "name": "Obelisk of Senusret I, Heliopolis",
+    "evidence": "excavated",
+    "source": "coords-heliopolis-cited",
+    "note": "About 17 km north-east of Giza, in the same WGS84 datum and the Giza frame; the target of claim D1."
+  }
 ]

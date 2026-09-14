@@ -21,7 +21,7 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | C2 | Shafts point at stars | −12.2′ (−0.450 %) | 39.5′ (+2.060 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | yes | 1 |
 | C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
-| D1 | Giza diagonal to Heliopolis | - | - | pending (needs-site) | 1 |
+| D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
 | D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
@@ -440,20 +440,31 @@ Both comparisons are unsigned, because the claim is about shape rather than hand
 
 ### D1 · Giza diagonal to Heliopolis
 
-A line through the south-east corners of the three pyramids points to the obelisk of Senusret I at Heliopolis.
+A line through the south-east corners of the three pyramids runs at 45 degrees and points at the obelisk of Senusret I at Heliopolis, 17 km to the north-east.
 
-*Not yet computable: waits on the site-plan positions.*
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2((heliopolis.obelisk.longitude - g1.center.longitude) * cos(g1.center.latitude), heliopolis.obelisk.latitude - g1.center.latitude)` | 43°21′05″ | 44°59′57″ | −1°38′52″ (−3.662 %) | no (±2 %) |
+| bearing of the corner line against 45 degrees | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `45` | 43°21′05″ | 45°00′00″ | −1°38′55″ (−3.664 %) | no (±2 %) |
 
-**Free choices (1)**:
-- which corners define the diagonal
+Residual by survey preset:
 
-**Overlay:** `ground-line` {"to":"heliopolis.obelisk"}
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | −1°38′52″ (−3.662 %) | −1°44′19″ (−3.864 %) | −1°44′17″ (−3.862 %) | −1°38′47″ (−3.659 %) |
+| bearing of the corner line against 45 degrees | −1°38′55″ (−3.664 %) | −1°44′22″ (−3.866 %) | −1°44′20″ (−3.864 %) | −1°38′50″ (−3.661 %) |
+
+**Free choices (2)**:
+- which corners define the diagonal (the south-east corners here)
+- the obelisk as the target rather than the temple's axis or its centre
+
+**Overlay:** `ground-line` {"from":"g3.corner.se","through":"g1.corner.se","to":"heliopolis.obelisk"}
 
 **Proponents:** Hancock, G. & Bauval, R. (1996). Keeper of Genesis (US title: The Message of the Sphinx). London: Heinemann.
 
-**Context:** Legon, J. A. R. (1979). The Plan of the Giza Pyramids. Archaeological Reports of the Archaeology Society of Staten Island 10(1).
+**Context:** Legon, J. A. R. (1979). The Plan of the Giza Pyramids. Archaeological Reports of the Archaeology Society of Staten Island 10(1). · Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer.
 
-Needs the relative positions of the three pyramids and the georeferenced frame.
+The corner line is built from Petrie's G1 to G3 centre offsets (section 92) and the mean half-bases, so Menkaure's slightly rectangular base enters as its mean side. The bearing to the obelisk is taken in the local east-north frame with the longitude difference scaled by the cosine of the latitude; at 17 km that approximation is good to about 0.1 degrees, which is far inside the 2 percent (0.9 degree) tolerance. The obelisk's position is a commonly cited value, unverified, and its sigma of 50 m moves the bearing by 0.2 degrees at most. Petrie found no exact relation between the corners of the three pyramids (section 92).
 
 ### D2 · Legon's rectangle
 
@@ -468,8 +479,8 @@ Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| east-west extent in cubits against 1000 root 2 | +0.11 % | +0.09 % | +0.09 % | +0.11 % |
-| north-south extent in cubits against 1000 root 3 | −0.09 % | −0.12 % | −0.12 % | −0.09 % |
+| east-west extent in cubits against 1000 root 2 | +0.11 % | +0.23 % | +0.23 % | +0.11 % |
+| north-south extent in cubits against 1000 root 3 | −0.09 % | −0.005 % | −0.004 % | −0.09 % |
 
 **Free choices (1)**:
 - the cubit length used to convert the metric extents
@@ -497,6 +508,7 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | g1.base.side.mean | 230.33 | m | lehner-1997 | tabulated | no |
 | g1.base.socket.mean | 231.798 | m | petrie-1883 | socket-corner | yes |
 | g1.center.latitude | 29.979167 | deg | coords-wgs84-cited |  | no |
+| g1.center.longitude | 31.134167 | deg | coords-wgs84-cited |  | no |
 | g1.face.angle | 51.8444 | deg | lehner-1997 | tabulated | no |
 | g1.height.original | 146.59 | m | lehner-1997 | tabulated | no |
 | g1.orientation | -0.065 | deg | dash-2015 | casing-mean | yes |
@@ -505,6 +517,8 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | g2.face.angle | 53.1667 | deg | lehner-1997 | tabulated | no |
 | g3.centre.offset.south | 739.19 | m | petrie-1883 | triangulation | yes |
 | g3.centre.offset.west | 574.45 | m | petrie-1883 | triangulation | yes |
+| heliopolis.obelisk.latitude | 30.1294 | deg | coords-heliopolis-cited | cited | no |
+| heliopolis.obelisk.longitude | 31.3076 | deg | coords-heliopolis-cited | cited | no |
 | kc.height | 5.8443 | m | petrie-1883 | interior | yes |
 | kc.length | 10.4709 | m | petrie-1883 | interior | yes |
 | kc.shaft.north.angle | 32.6 | deg | gantenbrink-1993 | robot-survey | no |

@@ -63,6 +63,12 @@
     "note": "Placeholder until the Dash/GPMP-tied coordinates are entered. The datum matters at the 10 m level."
   },
   {
+    "id": "coords-heliopolis-cited",
+    "kind": "reference",
+    "citation": "Commonly cited WGS84 coordinates of the obelisk of Senusret I at Heliopolis (Al-Matariya, Cairo): 30°07′46″ N, 31°18′28″ E.",
+    "note": "Placeholder until a surveyed position is entered; the obelisk is the only standing monument of the Heliopolis temple."
+  },
+  {
     "id": "wgs84",
     "kind": "reference",
     "year": 1984,
