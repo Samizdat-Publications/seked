@@ -228,7 +228,7 @@ function separationArcsec(a: Star, b: Star): number {
   return (Math.acos(Math.min(1, Math.max(-1, cos))) / d2r) * 3600;
 }
 
-/** What the ten named stars were before the import, so the difference can be printed. */
+/** What the named stars were before this import, so the difference can be printed. */
 function previousNamed(): Map<string, Star> {
   const path = join(STARS_DIR, 'named.json');
   if (!existsSync(path)) return new Map();
