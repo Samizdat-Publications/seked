@@ -61,11 +61,15 @@ differences below would have been noise in the way.
 The transit altitude was not taken from 90 degrees less the distance from the
 declination to the latitude. The script steps the clock until the star's hour
 angle is under a hundred-thousandth of a degree and reads the geometric
-altitude there. It then agrees with that formula, evaluated on Stellarium's own
-declination, to under a thousandth of an arcsecond at every star and epoch,
-which is the last test in the file. The agreement is worth having: it means the
-recorded altitudes test the whole horizon path and not a formula this package
-would otherwise have supplied to both sides of its own comparison.
+altitude there. It then agrees with that formula, evaluated on the declination
+Stellarium read at the same instant, to under a thousandth of an arcsecond at
+every star and epoch, which is the last test in the file. The declination has
+to be that one, recorded as `transitDecOfDateDeg`, and not the one read at the
+epoch instant: the transit is up to half a day away, and half a day of
+precession is a few hundredths of an arcsecond, which is two orders of
+magnitude more than the thing being measured. The agreement is worth having: it
+means the recorded altitudes test the whole horizon path and not a formula this
+package would otherwise have supplied to both sides of its own comparison.
 
 ### Two things that will bite the next person to run it
 
@@ -92,10 +96,17 @@ database's.
 The plan writes 2500 BCE and 10,500 BCE. The claims are computed at the Julian
 epochs −2449 and −10499, which are those two round dates in astronomical year
 numbering; −2499 is recorded as well, because it is the epoch several of the
-claims are argued at. Stellarium's own dates for the three Julian Days are 2500
-December 18, 2450 December 19 and 10500 December 18, all BCE and all proleptic
-Julian: a Julian epoch is 365.25 days to the second and a calendar year is not,
-so the two ways of labelling the same instant drift a fortnight apart.
+claims are argued at. Stellarium's own dates for the three Julian Days are the
+proleptic Julian −2500 December 18.75, −2450 December 19.25 and −10500 December
+18.75, in astronomical year numbering, which is to say 2501, 2451 and 10501
+BCE. Each of them is thirteen days short of the start of the calendar year its
+epoch is named for, and that offset is constant rather than growing: the Julian
+calendar year averages exactly 365.25 days and so does a Julian epoch, so the
+two labels never drift. The thirteen days are inherited from J2000.0 itself,
+which is 2000 January 1.5 in the Gregorian calendar and 1999 December 19.5 in
+the Julian one, and the half day either side of them is the leap-year cycle.
+The recorded dates are the same December date across eight thousand years,
+which is what a constant offset looks like.
 
 Four stars are there because claim C2 hangs the four shafts of the Great
 Pyramid on them: Alnitak, Thuban, Sirius and Kochab. Alnilam and Mintaka are
@@ -121,10 +132,12 @@ three thousandths of an arcsecond, and it reaches the transit altitude at the
 same size.
 
 **The precession.** Both programs cite the same paper and they do not agree.
-The paper offers more than one set of expressions for the same underlying
-long-term solution, and the two programs are evidently not using the same one:
-this package follows ERFA, which builds the rotation from the series for the
-ecliptic and equator poles, as `packages/sky/src/vondrak.ts` records. The
+What this package computes is not in doubt: it follows ERFA, building the
+rotation from the series for the ecliptic and equator poles, and the tests in
+`sky.test.ts` pin `ltpecl`, `ltpequ`, `ltp` and `ltpb` to ERFA's published
+reference values to one part in ten to the thirteenth. What Stellarium builds
+its rotation from could not be established from here, and this check does not
+establish it. All it establishes is that the two are not the same thing. The
 obliquity of date shows the disagreement most cleanly, because no star is
 involved in it at all. Stellarium's figures here are recorded as
 `obliquityProbe`:
@@ -218,7 +231,12 @@ Kochab because both of them culminate north of the zenith from Giza.
 
 And the same comparison with the two star catalogues taken out of it, which is
 this package's precession applied to Stellarium's own place on the J2000 axes.
-What is left is the precession, the clock and the rounded latitude:
+What is left is the precession, the clock, the rounded latitude, and one thing
+more: `ltpb` carries the ICRS frame bias, and it is being handed coordinates
+Stellarium labels J2000, which may or may not have had the same rotation
+applied already. The bias is 0.02 arcseconds, immaterial next to everything
+else in these tables, but it is part of the accounting and the 0.06 arcseconds
+between the two programs at J2000 itself is where it shows.
 
 | star | epoch | Δα·cos δ | Δδ | Δ transit altitude |
 |---|---:|---:|---:|---:|
@@ -302,11 +320,12 @@ why the declination differences are the larger of the two.
 - **The proper motions differ by single-digit milliarcseconds a year for five
   stars and by 145 for Sirius**, and that rate difference accounts for at least
   two thirds of what is seen at every epoch.
-- **Stellarium's recorded observer is the database's, its Julian Days are
-  `julianEpochToJd`'s, its apparent-place corrections were all off, and every
-  star was on the meridian when its altitude was read**, so a record made from
-  the wrong place, the wrong date or the wrong settings cannot be quietly
-  compared against.
+- **Stellarium's recorded observer is the database's, every one of its Julian
+  Days is `julianEpochToJd`'s, its apparent-place corrections were all off,
+  every star was on the meridian when its altitude was read, and the record
+  holds all eighteen star and epoch pairs**, so a record made from the wrong
+  place, the wrong date or the wrong settings cannot be quietly compared
+  against, and an emptied one cannot pass by having nothing left to check.
 
 ## What this leaves open
 

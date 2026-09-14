@@ -1,15 +1,18 @@
 //
 // Name: Seked transit check
 // License: same as the Seked repository
-// Description: Reads four stars' mean places of date and their meridian
+// Description: Reads six stars' mean places of date and their meridian
 // altitudes from Giza at three epochs, so packages/sky can be checked against
 // an independent implementation of the same precession model.
 //
-// This file holds no numbers of its own. scripts/stellarium/run.ts prepends a
-// SEKED object carrying the observer from data/measurements and data/sites.json
-// and the Julian Days from julianEpochToJd, then writes the two halves into
-// Stellarium's own scripts directory and runs them. Everything below is the
-// procedure; everything it is given comes from the database.
+// No observation this file makes is of a number written in it.
+// scripts/stellarium/run.ts prepends a SEKED object carrying the observer from
+// data/measurements and data/sites.json, the Julian Days from julianEpochToJd
+// and the stars' Hipparcos designations from data/stars/hyg-bright.json, then
+// writes the two halves into Stellarium's own scripts directory and runs them.
+// The four constants below are the procedure's own: the length of a sidereal
+// day, how long to wait for a frame, and the two tolerances the loops stop at.
+// Nothing that is compared against packages/sky is among them.
 //
 // Four things about Stellarium's scripting engine govern the shape of this
 // script. The first is that the values it reports are recomputed once per

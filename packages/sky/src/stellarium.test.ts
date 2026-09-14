@@ -30,7 +30,6 @@ import { positionAtEpoch, properMotionAtEpoch, starById } from './stars';
 import { obliquityOfDate } from './sun';
 import { precessIcrsToDate } from './vondrak';
 
-const ARCSECOND = 1 / 3600;
 const ARCMINUTE = 60;
 
 interface StarRecord {
@@ -40,6 +39,8 @@ interface StarRecord {
   decJ2000Deg: number;
   transitAltitudeDeg: number;
   transitHourAngleDeg: number;
+  /** The declination read at the transit instant, which is the one the altitude belongs to. */
+  transitDecOfDateDeg: number;
 }
 interface EpochRecord {
   epoch: number;
@@ -49,6 +50,7 @@ interface EpochRecord {
 }
 interface ProbeRecord {
   epoch: number;
+  jd: number;
   stars: Record<string, { raJ2000Deg: number; decJ2000Deg: number }>;
 }
 interface ObliquityRecord {
@@ -95,9 +97,17 @@ describe('the record is of the run it claims to be', () => {
     expect(Math.abs(record.observerAsSet.longitudeDeg - record.observer.longitudeDeg)).toBeLessThan(1e-5);
   });
 
+  it('holds every star at every epoch, so that an emptied record cannot pass by having nothing to check', () => {
+    expect(record.stars).toHaveLength(6);
+    expect(record.epochs).toHaveLength(3);
+    expect(rows).toHaveLength(18);
+    for (const row of rows) expect(row.at, where(row.id, row.epoch)).toBeDefined();
+  });
+
   it('was made at the Julian Days julianEpochToJd gives for the epochs, and nowhere else', () => {
     for (const epoch of record.epochs) expect(epoch.jd, `J${epoch.epoch}`).toBe(julianEpochToJd(epoch.epoch));
     for (const probe of record.obliquityProbe) expect(probe.jd, `J${probe.epoch}`).toBe(julianEpochToJd(probe.epoch));
+    for (const probe of record.properMotionProbe) expect(probe.jd, `J${probe.epoch}`).toBe(julianEpochToJd(probe.epoch));
     expect(record.properMotionProbe.map((p) => p.epoch)).toEqual([1000, 3000]);
   });
 
@@ -328,9 +338,16 @@ describe('the record agrees with itself', () => {
     // Stellarium was driven to the meridian and asked for its geometric
     // altitude, rather than being asked to evaluate 90 - |lat - dec|. That the
     // two agree is what makes the recorded altitudes worth comparing at all.
+    //
+    // The declination has to be the one read at the transit instant and not
+    // the one read at the epoch instant: the two are up to half a day apart,
+    // which is worth a few hundredths of an arcsecond of precession and would
+    // swamp what this is measuring. Against the transit declination the two
+    // routes to the altitude agree to a ten-thousandth of an arcsecond.
     for (const { id, epoch, at } of rows) {
-      const fromDeclination = transitAltitude(at.decOfDateDeg, record.observerAsSet.latitudeDeg);
-      expect(Math.abs(fromDeclination - at.transitAltitudeDeg), where(id, epoch)).toBeLessThan(ARCSECOND);
+      const fromDeclination = transitAltitude(at.transitDecOfDateDeg, record.observerAsSet.latitudeDeg);
+      const seconds = (fromDeclination - at.transitAltitudeDeg) * 3600;
+      expect(Math.abs(seconds), `${where(id, epoch)} differs by ${seconds.toExponential(2)} arcsec`).toBeLessThan(1e-3);
     }
   });
 });
