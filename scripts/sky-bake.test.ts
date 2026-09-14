@@ -1,0 +1,88 @@
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterAll, describe, expect, it } from 'vitest';
+import { apparentAltitude, expandBrightStars, loadBrightStars, skyEnvironment, transitAltitude, SUN_STANDARD_ALTITUDE_DEG } from '@seked/sky';
+import { STAR_COLUMNS, writeSkyBake, type SkyBake } from './sky-bake';
+
+const dir = mkdtempSync(join(tmpdir(), 'seked-sky-bake-'));
+afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+const out = join(dir, 'sky-bake.json');
+writeSkyBake(out);
+const bake = JSON.parse(readFileSync(out, 'utf8')) as SkyBake;
+const { latitudeDeg, longitudeDeg } = bake.observer;
+
+/** The bake rounds to four decimals, which is a third of an arcsecond. */
+const PLACES = 4;
+
+describe('the sky bake', () => {
+  it('observes from the Great Pyramid, and says which keys that came from', () => {
+    expect(bake.preset).toBe('canonical');
+    expect(bake.observer.keys).toEqual({ latitude: 'g1.center.latitude', longitude: 'g1.center.longitude' });
+    expect(bake.observer.sources.latitude).toBeTruthy();
+    expect(latitudeDeg).toBeCloseTo(29.98, 1);
+    expect(longitudeDeg).toBeCloseTo(31.13, 1);
+  });
+
+  it('bakes the equinox sunrise the environment computes at the same epoch', () => {
+    const moment = bake.moments['equinox-sunrise']!;
+    const env = skyEnvironment({ epoch: moment.epoch, latitudeDeg, longitudeDeg });
+    expect(moment.sun.azimuthDeg).toBeCloseTo(env['sun.equinox.rise.azimuth']!, PLACES);
+    expect(moment.sun.altitudeDeg).toBeCloseTo(SUN_STANDARD_ALTITUDE_DEG, PLACES);
+    expect(moment.from.azimuth).toBe('sun.equinox.rise.azimuth');
+  });
+
+  it('carries the refracted altitude beside the geometric one, so a render can draw the disc where it is seen', () => {
+    const moment = bake.moments['equinox-sunrise']!;
+    expect(moment.sun.apparentAltitudeDeg).toBeCloseTo(apparentAltitude(moment.sun.altitudeDeg), PLACES);
+    expect(moment.sun.apparentAltitudeDeg!).toBeGreaterThan(moment.sun.altitudeDeg);
+    expect(moment.sun.apparentAltitudeDeg!).toBeCloseTo(0, 1); // the disc sits on the horizon, which is what the convention means
+    // A sun tens of degrees down has no disc to draw and no refraction worth stating.
+    expect(bake.moments['alnitak-transit']!.sun.apparentAltitudeDeg).toBeUndefined();
+  });
+
+  it('bakes the solstice sunset C6 is about', () => {
+    const moment = bake.moments['solstice-summer-sunset']!;
+    const env = skyEnvironment({ epoch: moment.epoch, latitudeDeg, longitudeDeg });
+    expect(moment.sun.azimuthDeg).toBeCloseTo(env['sun.solstice.summer.set.azimuth']!, PLACES);
+    expect(moment.sun.azimuthDeg).toBeGreaterThan(270); // it sets north of west, which is the whole point of the claim
+  });
+
+  it('puts the sun an hour after sunrise where the hour angle puts it', () => {
+    const moment = bake.moments['equinox-sunrise-plus-hour']!;
+    expect(moment.sun.altitudeDeg).toBeGreaterThan(SUN_STANDARD_ALTITUDE_DEG);
+    expect(moment.sun.altitudeDeg).toBeLessThan(15); // an hour of a 30-degree latitude's equinox sun
+    const env = skyEnvironment({ epoch: moment.epoch, latitudeDeg, longitudeDeg });
+    expect(moment.sun.azimuthDeg).toBeGreaterThan(env['sun.equinox.rise.azimuth']!); // the sun swings south as it climbs
+  });
+
+  it('puts the night sun below the horizon, so the night view is a night', () => {
+    const moment = bake.moments['alnitak-transit']!;
+    expect(moment.epoch).toBe(bake.stars.epoch);
+    expect(moment.sun.altitudeDeg).toBeLessThan(-18); // past astronomical twilight
+  });
+
+  it('bakes the whole bright catalogue with the meridian star on the meridian', () => {
+    const catalogue = loadBrightStars();
+    expect(bake.stars.catalogue.count).toBe(catalogue.stars.length);
+    expect(bake.stars.stars).toHaveLength(catalogue.stars.length);
+    expect(bake.stars.columns).toEqual([...STAR_COLUMNS]);
+    expect(bake.stars.catalogue.attribution).toContain('CC BY-SA');
+
+    // The catalogue keeps its order, so the meridian star's own row can be
+    // checked against the meridian geometry `frames` gives independently.
+    const index = expandBrightStars(catalogue).findIndex((s) => s.name === bake.stars.meridian.name);
+    expect(index).toBeGreaterThanOrEqual(0);
+    const [azDeg, altDeg] = bake.stars.stars[index]!;
+    expect(azDeg).toBeCloseTo(180, 2); // south of the zenith, because its declination is south of the latitude
+    expect(altDeg).toBeCloseTo(transitAltitude(bake.stars.meridian.decDeg, latitudeDeg), 2);
+    expect(bake.stars.lstDeg).toBeCloseTo(bake.stars.meridian.raDeg, PLACES);
+  });
+
+  it('keeps roughly half the sky up, which is what a dome looks like', () => {
+    const up = bake.stars.stars.filter((row) => row[1]! > 0).length;
+    expect(up).toBeGreaterThan(bake.stars.stars.length * 0.4);
+    expect(up).toBeLessThan(bake.stars.stars.length * 0.6);
+  });
+});

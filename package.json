@@ -14,6 +14,7 @@
     "site": "pnpm build:web && tsx scripts/site.ts",
     "dossier": "tsx scripts/dossier.ts",
     "shafts": "tsx scripts/shafts.ts",
+    "sky-bake": "tsx scripts/sky-bake.ts",
     "stars": "tsx scripts/stars.ts"
   },
   "devDependencies": {
