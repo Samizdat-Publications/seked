@@ -137,7 +137,6 @@ export function SkyDome({ buffers, named, latitudeDeg, lstDeg, radius }: SkyDome
           key={star.id}
           text={star.name}
           position={[at[0] * 0.985, at[1] * 0.985, at[2] * 0.985 + radius * 0.022]}
-          size={radius * 0.028}
           colour="#cfe0f2"
           opacity={0.85}
         />
@@ -180,7 +179,6 @@ function Horizon({ radius }: { radius: number }): React.JSX.Element {
             key={name}
             text={name}
             position={[r * Math.sin(a), r * Math.cos(a), radius * 0.075]}
-            size={radius * 0.04}
             colour="#8fb4d6"
           />
         );

@@ -7,10 +7,11 @@
  * canvas texture the simple answer: one texture per string, disposed with the
  * component.
  */
-import { useEffect, useMemo } from 'react';
-import { CanvasTexture, LinearFilter, SRGBColorSpace, type Texture } from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { CanvasTexture, LinearFilter, PerspectiveCamera, SRGBColorSpace, Sprite, type Texture, Vector3 } from 'three';
 
-/** Pixels per line of drawn text. The sprite's world size is set separately. */
+/** Pixels per line of drawn text on the canvas. The sprite is then scaled to a constant screen size. */
 const FONT_PX = 64;
 const PAD_PX = 18;
 
@@ -47,18 +48,40 @@ function textTexture(text: string, colour: string): { texture: Texture; aspect: 
 export interface LabelProps {
   text: string;
   position: [number, number, number];
-  /** Height of the text in metres. */
-  size: number;
+  /** Height of the text on screen, in CSS pixels, whatever the distance. */
+  px?: number;
   colour?: string;
   opacity?: number;
 }
 
+/**
+ * Keep a sprite the same size on screen: each frame, scale it to the world
+ * height that `px` pixels cover at its distance from the camera. A label that
+ * sits on the dome and one that sits in a chamber then read the same.
+ */
+function useScreenSize(ref: React.RefObject<Sprite | null>, px: number, aspect: number): void {
+  const viewport = useThree((state) => state.size);
+  const world = useMemo(() => new Vector3(), []);
+  useFrame(({ camera }) => {
+    const sprite = ref.current;
+    if (!sprite) return;
+    sprite.getWorldPosition(world);
+    const distance = world.distanceTo(camera.position);
+    const fov = camera instanceof PerspectiveCamera ? camera.fov : 50;
+    const worldPerPixel = (2 * distance * Math.tan((fov * Math.PI) / 360)) / viewport.height;
+    const height = px * worldPerPixel;
+    sprite.scale.set(height * aspect, height, 1);
+  });
+}
+
 /** One line of text, facing the camera, drawn over whatever is behind it. */
-export function Label({ text, position, size, colour = '#e8eef6', opacity = 1 }: LabelProps): React.JSX.Element {
+export function Label({ text, position, px = 14, colour = '#e8eef6', opacity = 1 }: LabelProps): React.JSX.Element {
   const { texture, aspect } = useMemo(() => textTexture(text, colour), [text, colour]);
   useEffect(() => () => texture.dispose(), [texture]);
+  const ref = useRef<Sprite>(null);
+  useScreenSize(ref, px, aspect);
   return (
-    <sprite position={position} scale={[size * aspect, size, 1]} renderOrder={20}>
+    <sprite ref={ref} position={position} renderOrder={20}>
       <spriteMaterial map={texture} transparent opacity={opacity} depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
     </sprite>
   );
@@ -86,17 +109,20 @@ function ringTexture(colour: string): Texture {
 /** A ring around something the overlay is pointing at, such as a claim's target star. */
 export function Marker({
   position,
-  size,
+  px = 24,
   colour = '#ffcf70',
 }: {
   position: [number, number, number];
-  size: number;
+  /** Diameter on screen, in CSS pixels. */
+  px?: number;
   colour?: string;
 }): React.JSX.Element {
   const texture = useMemo(() => ringTexture(colour), [colour]);
   useEffect(() => () => texture.dispose(), [texture]);
+  const ref = useRef<Sprite>(null);
+  useScreenSize(ref, px, 1);
   return (
-    <sprite position={position} scale={[size, size, 1]} renderOrder={19}>
+    <sprite ref={ref} position={position} renderOrder={19}>
       <spriteMaterial map={texture} transparent depthTest={false} depthWrite={false} fog={false} toneMapped={false} />
     </sprite>
   );

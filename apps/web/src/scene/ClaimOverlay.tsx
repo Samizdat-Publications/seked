@@ -86,11 +86,10 @@ function TargetStar({ star, note }: { star: StarMark; note: string }): React.JSX
   const at = onDome(star.direction);
   return (
     <group>
-      <Marker position={at} size={DOME_RADIUS * 0.045} colour={star.colour} />
+      <Marker position={at} colour={star.colour} />
       <Label
         text={note}
         position={[at[0], at[1], at[2] + DOME_RADIUS * 0.05]}
-        size={DOME_RADIUS * 0.026}
         colour={star.colour}
       />
     </group>
@@ -111,7 +110,6 @@ function ShaftRays({ spec }: { spec: ShaftRaysSpec }): React.JSX.Element {
           <Label
             text={`${ray.label} ${formatDms(ray.angleDeg)}`}
             position={along(ray.from, ray.direction, DOME_RADIUS * 0.055)}
-            size={DOME_RADIUS * 0.013}
             colour={ray.colour}
           />
           <TargetStar
@@ -133,7 +131,6 @@ function PassageRay({ spec }: { spec: PassageRaySpec }): React.JSX.Element {
       <Label
         text={`descending passage ${formatDms(spec.angleDeg)}`}
         position={along(spec.from, spec.direction, DOME_RADIUS * 0.06)}
-        size={DOME_RADIUS * 0.013}
         colour={spec.colour}
       />
       <TargetStar
@@ -178,11 +175,10 @@ function CompassRose({ spec }: { spec: CompassRoseSpec }): React.JSX.Element {
         <Ray points={quarters} colour="#4f6478" opacity={0.7} />
         <Ray points={[[0, -r, 0], [0, r, 0]]} colour={TRUE_NORTH} />
         <Ray points={[[-r * Math.sin(a), -r * Math.cos(a), 0], [r * Math.sin(a), r * Math.cos(a), 0]]} colour={MEASURED} />
-        <Label text="true north" position={[0, r * 1.08, 24]} size={26} colour={TRUE_NORTH} />
+        <Label text="true north" position={[0, r * 1.08, 24]} colour={TRUE_NORTH} />
         <Label
           text={`measured ${minutes.toFixed(1)}′ ${side} of north, drawn ${spec.exaggeration.toFixed(0)}× wide`}
           position={[r * Math.sin(a) * 1.15, r * Math.cos(a) * 1.15, 60]}
-          size={26}
           colour={MEASURED}
         />
       </group>
@@ -231,12 +227,11 @@ function SkyProjection({ spec }: { spec: SkyProjectionSpec }): React.JSX.Element
       <Polyline points={belt} colour={BELT} />
       {spec.ground.map((g, i) => (
         <group key={g.id}>
-          <Marker position={[g.at[0], g.at[1], z]} size={70} colour={DIAGONAL} />
+          <Marker position={[g.at[0], g.at[1], z]} colour={DIAGONAL} />
           {i === spec.ground.length - 1 && (
             <Label
               text={`centres ${spec.groundAngleDeg.toFixed(2)}° from the meridian`}
               position={[g.at[0], g.at[1] - 120, z + 90]}
-              size={34}
               colour={DIAGONAL}
             />
           )}
@@ -244,13 +239,12 @@ function SkyProjection({ spec }: { spec: SkyProjectionSpec }): React.JSX.Element
       ))}
       {spec.belt.map((star, i) => (
         <group key={star.id}>
-          <Marker position={[star.at[0], star.at[1], z + 6]} size={70} colour={BELT} />
-          <Label text={star.name} position={[star.at[0], star.at[1], z + 70]} size={34} colour={BELT} />
+          <Marker position={[star.at[0], star.at[1], z + 6]} colour={BELT} />
+          <Label text={star.name} position={[star.at[0], star.at[1], z + 70]} colour={BELT} />
           {i === spec.belt.length - 1 && (
             <Label
               text={`belt ${spec.beltAngleDeg.toFixed(2)}° from the meridian, ${spec.inverted ? 'north and south swapped' : 'north to north'}`}
               position={[star.at[0], star.at[1] + 120, z + 150]}
-              size={34}
               colour={BELT}
             />
           )}
