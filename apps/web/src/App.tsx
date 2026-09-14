@@ -3,7 +3,7 @@ import type { LoadedBundle } from './load';
 import { buildModel } from './model';
 import { ghostProfileSpec } from './overlays';
 import { Claims } from './panels/Claims';
-import { CubitSlider, LayerToggles, PresetPicker } from './panels/Controls';
+import { CubitSlider, LayerToggles, PresetPicker, SectionControls } from './panels/Controls';
 import { Scene } from './scene/Scene';
 import { useView } from './store';
 
@@ -40,6 +40,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
         <PresetPicker presets={bundle.presets} />
         <CubitSlider model={model} />
         <LayerToggles />
+        <SectionControls model={model} />
         <Claims claims={bundle.claims} model={model} />
       </aside>
     </div>

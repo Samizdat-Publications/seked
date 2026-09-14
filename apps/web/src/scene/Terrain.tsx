@@ -1,6 +1,7 @@
 import type { TerrainHeader } from '@seked/data/browser';
 import { terrainGrid, type GroundPyramid } from '@seked/geometry';
 import { useEffect, useMemo } from 'react';
+import type { Plane } from 'three';
 import { gridGeometry } from './geometry';
 
 export interface TerrainProps {
@@ -17,6 +18,8 @@ export interface PlateauProps extends TerrainProps {
   context: boolean;
   /** Draw the same grid with the footprints at their surveyed base levels. */
   ground: boolean;
+  /** The section planes, or the keep-everything plane when the cut spares the ground. */
+  clippingPlanes: Plane[];
 }
 
 /**
@@ -32,7 +35,7 @@ export interface PlateauProps extends TerrainProps {
  * Shown together, the raw model goes over the ground as a wireframe, which is
  * the honest way to see how much of the plateau has been moved.
  */
-export function Plateau({ header, heights, datum, pyramids, context, ground }: PlateauProps): React.JSX.Element {
+export function Plateau({ header, heights, datum, pyramids, context, ground, clippingPlanes }: PlateauProps): React.JSX.Element {
   const grids = useMemo(() => terrainGrid({ header, heights, datum, pyramids }), [header, heights, datum, pyramids]);
   const contextGeometry = useMemo(() => gridGeometry(grids.context), [grids]);
   const groundGeometry = useMemo(() => gridGeometry(grids.ground), [grids]);
@@ -45,12 +48,23 @@ export function Plateau({ header, heights, datum, pyramids, context, ground }: P
     <>
       {ground && (
         <mesh geometry={groundGeometry} renderOrder={-1}>
-          <meshStandardMaterial color="#6a6152" roughness={1} metalness={0} />
+          {/* The flattened footprint is exactly coplanar with a pyramid's base
+              cap, which is the one place two surfaces genuinely share a plane:
+              the offset settles which of them the depth buffer keeps. */}
+          <meshStandardMaterial
+            color="#6a6152"
+            roughness={1}
+            metalness={0}
+            polygonOffset
+            polygonOffsetFactor={1}
+            polygonOffsetUnits={1}
+            clippingPlanes={clippingPlanes}
+          />
         </mesh>
       )}
       {context && (
         <mesh geometry={contextGeometry} renderOrder={-1}>
-          <meshStandardMaterial color="#55503f" roughness={1} metalness={0} wireframe={ground} />
+          <meshStandardMaterial color="#55503f" roughness={1} metalness={0} wireframe={ground} clippingPlanes={clippingPlanes} />
         </mesh>
       )}
     </>

@@ -1,5 +1,6 @@
 import { DEG } from '@seked/units';
 import { useEffect, useMemo } from 'react';
+import type { Plane } from 'three';
 import type { PyramidParams } from '../model';
 import type { GhostProfile as Profile, GhostProfileSpec } from '../overlays';
 import { pyramidGeometry } from './geometry';
@@ -13,19 +14,35 @@ import { pyramidGeometry } from './geometry';
  * testing so they read as an overlay rather than disappearing into the
  * stone; the panel gives the angles, which is where the difference lives.
  */
-export function GhostProfiles({ spec, pyramids }: { spec: GhostProfileSpec; pyramids: PyramidParams[] }): React.JSX.Element | null {
+export function GhostProfiles({
+  spec,
+  pyramids,
+  clippingPlanes,
+}: {
+  spec: GhostProfileSpec;
+  pyramids: PyramidParams[];
+  clippingPlanes: Plane[];
+}): React.JSX.Element | null {
   const params = pyramids.find((p) => p.id === spec.structure);
   if (!params) return null;
   return (
     <>
       {spec.profiles.map((profile) => (
-        <Ghost key={profile.label} params={params} profile={profile} />
+        <Ghost key={profile.label} params={params} profile={profile} clippingPlanes={clippingPlanes} />
       ))}
     </>
   );
 }
 
-function Ghost({ params, profile }: { params: PyramidParams; profile: Profile }): React.JSX.Element {
+function Ghost({
+  params,
+  profile,
+  clippingPlanes,
+}: {
+  params: PyramidParams;
+  profile: Profile;
+  clippingPlanes: Plane[];
+}): React.JSX.Element {
   const height = (params.base / 2) * Math.tan(profile.slopeDeg * DEG);
   const geometry = useMemo(() => pyramidGeometry({ base: params.base, height }), [params.base, height]);
   useEffect(() => () => geometry.dispose(), [geometry]);
@@ -38,10 +55,27 @@ function Ghost({ params, profile }: { params: PyramidParams; profile: Profile })
   return (
     <group {...place}>
       <mesh geometry={geometry} renderOrder={2}>
-        <meshBasicMaterial color={profile.colour} transparent opacity={0.14} depthWrite={false} depthTest={false} toneMapped={false} />
+        <meshBasicMaterial
+          color={profile.colour}
+          transparent
+          opacity={0.14}
+          depthWrite={false}
+          depthTest={false}
+          toneMapped={false}
+          clippingPlanes={clippingPlanes}
+        />
       </mesh>
       <mesh geometry={geometry} renderOrder={3}>
-        <meshBasicMaterial color={profile.colour} wireframe transparent opacity={0.65} depthWrite={false} depthTest={false} toneMapped={false} />
+        <meshBasicMaterial
+          color={profile.colour}
+          wireframe
+          transparent
+          opacity={0.65}
+          depthWrite={false}
+          depthTest={false}
+          toneMapped={false}
+          clippingPlanes={clippingPlanes}
+        />
       </mesh>
     </group>
   );

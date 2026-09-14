@@ -91,6 +91,12 @@ body {
   display: block;
 }
 
+/* Stacked fields, as the section block has, need air between them. */
+.field + .field,
+.toggles + .field {
+  margin-top: 0.85rem;
+}
+
 .field-label {
   display: flex;
   justify-content: space-between;

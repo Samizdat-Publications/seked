@@ -1,10 +1,12 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
-import { useEffect, useRef, type ComponentRef } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import type { Model } from '../model';
 import type { GhostProfileSpec } from '../overlays';
+import { sectionPlanes } from '../section';
 import { useView } from '../store';
 import type { LayerId } from '../view';
+import { FlyCamera } from './FlyCamera';
 import { GhostProfiles } from './GhostProfile';
 import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
@@ -28,6 +30,11 @@ const SKY = '#0f1319';
  */
 export function Scene({ model, terrain, layers, ghosts }: SceneProps): React.JSX.Element {
   const start = useRef(useView.getState().camera).current;
+  const mode = useView((s) => s.mode);
+  const section = useView((s) => s.section);
+  const planes = useMemo(() => sectionPlanes(section), [section]);
+  const groundPlanes = useMemo(() => sectionPlanes(section, section.ground), [section]);
+
   return (
     <Canvas dpr={[1, 2]} camera={{ fov: 45, near: 1, far: 40000, position: start.position }}>
       <color attach="background" args={[SKY]} />
@@ -37,38 +44,56 @@ export function Scene({ model, terrain, layers, ghosts }: SceneProps): React.JSX
       {/* High in the south-west, so the north and east faces separate. */}
       <directionalLight position={[-1400, 1700, 1100]} intensity={2.4} color="#fff3e0" />
 
+      <LocalClipping />
       {layers.grid && <gridHelper args={[6000, 60, '#38475a', '#1d2630']} />}
 
       <group rotation={[-Math.PI / 2, 0, 0]}>
-        <Plateau {...terrain} context={layers.terrain} ground={layers.ground} />
-        {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} />}
-        {layers.interior && <Interiors interiors={model.interiors} />}
+        <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
+        {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} clippingPlanes={planes} />}
+        {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
         {layers.north && <NorthArrow />}
-        {layers.overlay && ghosts && <GhostProfiles spec={ghosts} pyramids={model.pyramids} />}
+        {layers.overlay && ghosts && <GhostProfiles spec={ghosts} pyramids={model.pyramids} clippingPlanes={planes} />}
       </group>
 
-      <Controls />
+      {mode === 'fly' ? <FlyCamera /> : <Controls />}
     </Canvas>
   );
+}
+
+/**
+ * Clipping per material rather than per scene, so the section can take the
+ * masonry and leave the ground standing.
+ */
+function LocalClipping(): null {
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    gl.localClippingEnabled = true;
+  }, [gl]);
+  return null;
 }
 
 function Controls(): React.JSX.Element {
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const setCamera = useView((s) => s.setCamera);
-  const start = useRef(useView.getState().camera).current;
+  const epoch = useView((s) => s.cameraEpoch);
 
+  // On mount, and again whenever the panel moves the camera itself, adopt the
+  // camera in the store. The controls' own changes do not bump the epoch, so
+  // this cannot fight a drag.
   useEffect(() => {
     const c = controls.current;
     if (!c) return;
-    c.target.set(...start.target);
+    const { camera } = useView.getState();
+    c.object.position.set(...camera.position);
+    c.target.set(...camera.target);
     c.update();
-  }, [start]);
+  }, [epoch]);
 
   return (
     <OrbitControls
       ref={controls}
       makeDefault
-      minDistance={40}
+      minDistance={2}
       maxDistance={14000}
       maxPolarAngle={Math.PI * 0.495}
       onChange={() => {

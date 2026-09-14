@@ -1,5 +1,6 @@
 import { DEG } from '@seked/units';
 import { useEffect, useMemo } from 'react';
+import { DoubleSide, type Plane } from 'three';
 import type { StructureInterior } from '../model';
 import { meshGeometry } from './geometry';
 
@@ -18,17 +19,23 @@ const GRANITE = '#9d827b';
  * the section plane opens them; with no cut they sit inside opaque stone and
  * are simply not seen, which is the honest thing for them to do.
  */
-export function Interiors({ interiors }: { interiors: StructureInterior[] }): React.JSX.Element {
+export function Interiors({
+  interiors,
+  clippingPlanes,
+}: {
+  interiors: StructureInterior[];
+  clippingPlanes: Plane[];
+}): React.JSX.Element {
   return (
     <>
       {interiors.map((interior) => (
-        <Interior key={interior.params.id} interior={interior} />
+        <Interior key={interior.params.id} interior={interior} clippingPlanes={clippingPlanes} />
       ))}
     </>
   );
 }
 
-function Interior({ interior }: { interior: StructureInterior }): React.JSX.Element {
+function Interior({ interior, clippingPlanes }: { interior: StructureInterior; clippingPlanes: Plane[] }): React.JSX.Element {
   const { params, solids } = interior;
   const geometries = useMemo(
     () => Object.entries(solids).map(([name, solid]) => ({ name, geometry: meshGeometry(solid) })),
@@ -45,7 +52,9 @@ function Interior({ interior }: { interior: StructureInterior }): React.JSX.Elem
     >
       {geometries.map(({ name, geometry }) => (
         <mesh key={name} geometry={geometry} name={name}>
-          <meshStandardMaterial color={GRANITE} roughness={0.78} metalness={0} flatShading />
+          {/* A room is a solid of the void, so a cut through it shows the far
+              wall from behind: both sides are drawn or the section is empty. */}
+          <meshStandardMaterial color={GRANITE} roughness={0.78} metalness={0} flatShading side={DoubleSide} clippingPlanes={clippingPlanes} />
         </mesh>
       ))}
     </group>

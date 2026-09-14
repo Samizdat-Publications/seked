@@ -4,25 +4,71 @@
  * link and the panel can never disagree.
  */
 import { create } from 'zustand';
-import { CUBIT_MAX, CUBIT_MIN, DEFAULT_VIEW, decodeView, encodeView, type CameraView, type LayerId, type View } from './view';
+import {
+  CUBIT_MAX,
+  CUBIT_MIN,
+  DEFAULT_VIEW,
+  SECTION_MAX,
+  SECTION_MIN,
+  SPEED_MAX,
+  SPEED_MIN,
+  decodeView,
+  encodeView,
+  type CameraMode,
+  type CameraView,
+  type LayerId,
+  type Section,
+  type View,
+} from './view';
 
 export interface ViewStore extends View {
+  /**
+   * Bumped whenever something other than the controls moves the camera, which
+   * is how the orbit controls know to adopt a view the panel set rather than
+   * one they produced themselves.
+   */
+  cameraEpoch: number;
   setPreset: (preset: string) => void;
   setCubit: (cubit: number | null) => void;
   toggleLayer: (id: LayerId) => void;
   setClaim: (claim: string | null) => void;
   setCamera: (camera: CameraView) => void;
+  setMode: (mode: CameraMode) => void;
+  setSpeed: (speed: number) => void;
+  setSection: (section: Partial<Section>) => void;
+  lookInside: (at: number, camera: CameraView) => void;
 }
 
-const clamp = (v: number): number => Math.min(CUBIT_MAX, Math.max(CUBIT_MIN, v));
+const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
 export const useView = create<ViewStore>((set) => ({
   ...DEFAULT_VIEW,
+  cameraEpoch: 0,
   setPreset: (preset) => set({ preset }),
-  setCubit: (cubit) => set({ cubit: cubit === null ? null : clamp(cubit) }),
+  setCubit: (cubit) => set({ cubit: cubit === null ? null : clamp(cubit, CUBIT_MIN, CUBIT_MAX) }),
   toggleLayer: (id) => set((s) => ({ layers: { ...s.layers, [id]: !s.layers[id] } })),
   setClaim: (claim) => set((s) => ({ claim: s.claim === claim ? null : claim })),
   setCamera: (camera) => set({ camera }),
+  setMode: (mode) => set({ mode }),
+  setSpeed: (speed) => set({ speed: clamp(speed, SPEED_MIN, SPEED_MAX) }),
+  setSection: (section) =>
+    set((s) => {
+      const next = { ...s.section, ...section };
+      return { section: { ...next, at: clamp(next.at, SECTION_MIN, SECTION_MAX) } };
+    }),
+  /**
+   * The one compound move: open the Great Pyramid. Cut the north-south plane
+   * through the passages, show the interior, and put the camera east of the
+   * cut looking west, which is the view Petrie draws Plate I from.
+   */
+  lookInside: (at, camera) =>
+    set((s) => ({
+      layers: { ...s.layers, pyramids: true, interior: true, today: false },
+      section: { on: true, axis: 'ns', at: clamp(at, SECTION_MIN, SECTION_MAX), ground: false },
+      mode: 'orbit',
+      camera,
+      cameraEpoch: s.cameraEpoch + 1,
+    })),
 }));
 
 /** Adopt the view in the address bar. Call once, before the first render. */
@@ -32,8 +78,8 @@ export function readUrl(presetIds: string[]): void {
 
 /**
  * Keep the address bar in step. The camera moves every frame while a reader
- * drags, so writes are coalesced; replaceState keeps the back button for
- * leaving the page rather than for undoing an orbit.
+ * drags or flies, so writes are coalesced; replaceState keeps the back button
+ * for leaving the page rather than for undoing an orbit.
  */
 export function mirrorUrl(): () => void {
   let timer: number | undefined;
