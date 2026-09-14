@@ -1,8 +1,9 @@
 import { formatEpoch, formatResidual, formatValue, identifiers, type Claim, type ComparisonResult } from '@seked/claims/browser';
 import { sourceById } from '@seked/data/browser';
+import { formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
-import { overlayNote } from '../overlays';
+import { ghostProfileSpec, overlayNote } from '../overlays';
 import { Fit } from './Claims';
 
 /**
@@ -11,7 +12,8 @@ import { Fit } from './Claims';
  * formatters are the dossier's, so the panel and docs/dossier.md read alike.
  */
 export function ClaimDetail({ claim, result, model }: { claim: Claim; result: FailedClaim; model: Model }): React.JSX.Element {
-  const overlay = overlayNote(claim);
+  const overlay = overlayNote(claim, model.env);
+  const ghosts = ghostProfileSpec(claim, model.env);
   const inputs = useMemo(() => {
     const keys = new Set<string>();
     for (const c of claim.comparisons) for (const id of [...identifiers(c.formula), ...identifiers(c.target)]) keys.add(id);
@@ -55,6 +57,19 @@ export function ClaimDetail({ claim, result, model }: { claim: Claim; result: Fa
 
       <h4>Overlay</h4>
       <p className={overlay.built ? 'note' : 'note pending'}>{overlay.text}</p>
+      {ghosts && (
+        <ul className="plain ghosts">
+          {ghosts.profiles.map((g) => (
+            <li key={g.label}>
+              <span className="swatch" style={{ background: g.colour }} />
+              <code>{g.label}</code> {formatDms(g.slopeDeg)}
+            </li>
+          ))}
+          {ghosts.errorBandArcmin !== undefined && (
+            <li className="note">Survey error band on the measured angle: ±{ghosts.errorBandArcmin}′.</li>
+          )}
+        </ul>
+      )}
 
       {claim.notes && (
         <>

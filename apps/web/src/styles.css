@@ -403,3 +403,16 @@ ul.inputs .note {
   margin: 0;
   font-size: 0.76rem;
 }
+
+.ghosts code {
+  font-size: 0.78rem;
+}
+
+.swatch {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-right: 0.35rem;
+  border-radius: 2px;
+  vertical-align: baseline;
+}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { LoadedBundle } from './load';
 import { buildModel } from './model';
+import { ghostProfileSpec } from './overlays';
 import { Claims } from './panels/Claims';
 import { CubitSlider, LayerToggles, PresetPicker } from './panels/Controls';
 import { Scene } from './scene/Scene';
@@ -11,16 +12,20 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const preset = useView((s) => s.preset);
   const cubit = useView((s) => s.cubit);
   const layers = useView((s) => s.layers);
+  const selected = useView((s) => s.claim);
 
   const model = useMemo(() => buildModel(bundle, preset, cubit), [bundle, preset, cubit]);
   const header = bundle.terrain.header;
   const datum = bundle.sites.find((s) => s.id === header.site)?.origin.elevation ?? 0;
   const terrain = useMemo(() => ({ header, heights, datum }), [header, heights, datum]);
 
+  const claim = bundle.claims.find((c) => c.id === selected);
+  const ghosts = useMemo(() => (claim ? ghostProfileSpec(claim, model.env) : undefined), [claim, model.env]);
+
   return (
     <div className="app">
       <main className="stage">
-        <Scene model={model} terrain={terrain} layers={layers} />
+        <Scene model={model} terrain={terrain} layers={layers} ghosts={ghosts} />
       </main>
       <aside className="panel">
         <header className="masthead">

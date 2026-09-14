@@ -2,8 +2,10 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { useEffect, useRef, type ComponentRef } from 'react';
 import type { Model } from '../model';
+import type { GhostProfileSpec } from '../overlays';
 import { useView } from '../store';
 import type { LayerId } from '../view';
+import { GhostProfiles } from './GhostProfile';
 import { NorthArrow } from './NorthArrow';
 import { Pyramids } from './Pyramids';
 import { Terrain, type TerrainProps } from './Terrain';
@@ -12,6 +14,8 @@ export interface SceneProps {
   model: Model;
   terrain: TerrainProps;
   layers: Record<LayerId, boolean>;
+  /** The overlay of the selected claim, where the viewer can draw it. */
+  ghosts: GhostProfileSpec | undefined;
 }
 
 const SKY = '#0f1319';
@@ -21,7 +25,7 @@ const SKY = '#0f1319';
  * whole group reconciles them, so no geometry is rewritten and a vertex in
  * the browser is the vertex in Blender.
  */
-export function Scene({ model, terrain, layers }: SceneProps): React.JSX.Element {
+export function Scene({ model, terrain, layers, ghosts }: SceneProps): React.JSX.Element {
   const start = useRef(useView.getState().camera).current;
   return (
     <Canvas dpr={[1, 2]} camera={{ fov: 45, near: 1, far: 40000, position: start.position }}>
@@ -38,6 +42,7 @@ export function Scene({ model, terrain, layers }: SceneProps): React.JSX.Element
         {layers.terrain && <Terrain {...terrain} />}
         {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} />}
         {layers.north && <NorthArrow />}
+        {layers.overlay && ghosts && <GhostProfiles spec={ghosts} pyramids={model.pyramids} />}
       </group>
 
       <Controls />
