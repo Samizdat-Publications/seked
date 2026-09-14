@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { skyEnvironment } from './environment';
 import { isCircumpolar, transitAltitude } from './frames';
+import { REFRACTION_LIMIT_DEG, altAz, apparentAltitude, enuDirection, transitLst } from './horizon';
 import { loadNamedStars } from './catalogue';
 import { positionAtEpoch, starById } from './stars';
 import { ltp, ltpb, ltpecl, ltpequ, precessIcrsToDate } from './vondrak';
@@ -108,5 +109,73 @@ describe('the sky flattened into a claim environment', () => {
   it('loads the named stars itself when it is not given any', () => {
     const env = skyEnvironment({ epoch: -2449, latitudeDeg: GIZA });
     expect(env['star.kochab.transit.altitude']).toBeCloseTo(skyEnvironment({ epoch: -2449, latitudeDeg: GIZA, stars })['star.kochab.transit.altitude'] as number, 12);
+  });
+});
+
+describe('the horizon frame the sky dome needs', () => {
+  const stars = loadNamedStars();
+  const GIZA = 29.979167;
+
+  it('puts a star whose declination equals the latitude in the zenith at transit', () => {
+    const raDeg = 123.456;
+    const { altDeg } = altAz({ raDeg, decDeg: GIZA, latDeg: GIZA, lstDeg: transitLst(raDeg) });
+    expect(altDeg).toBeCloseTo(90, 9);
+  });
+
+  it('keeps Polaris within a degree of altitude = latitude at every sidereal time', () => {
+    const { raDeg, decDeg } = positionAtEpoch(starById(stars, 'polaris'), 2026);
+    for (let lstDeg = 0; lstDeg < 360; lstDeg += 1) {
+      const { altDeg } = altAz({ raDeg, decDeg, latDeg: GIZA, lstDeg });
+      expect(Math.abs(altDeg - GIZA), `lst ${lstDeg}`).toBeLessThan(1);
+    }
+  });
+
+  it('reproduces the meridian geometry for Alnitak in 2450 BCE: due south at its transit altitude', () => {
+    const { raDeg, decDeg } = positionAtEpoch(starById(stars, 'alnitak'), -2449);
+    const { altDeg, azDeg } = altAz({ raDeg, decDeg, latDeg: GIZA, lstDeg: transitLst(raDeg) });
+    expect(altDeg).toBeCloseTo(transitAltitude(decDeg, GIZA), 9);
+    expect(azDeg).toBeCloseTo(180, 9);
+  });
+
+  it('points altitude 0, azimuth 90 straight east in the project frame', () => {
+    const [x, y, z] = enuDirection(0, 90);
+    expect(x).toBeCloseTo(1, 12);
+    expect(y).toBeCloseTo(0, 12);
+    expect(z).toBeCloseTo(0, 12);
+  });
+
+  it('builds unit vectors whose azimuths run north, east, south, west', () => {
+    expect(enuDirection(0, 0)[1]).toBeCloseTo(1, 12);
+    expect(enuDirection(0, 180)[1]).toBeCloseTo(-1, 12);
+    expect(enuDirection(0, 270)[0]).toBeCloseTo(-1, 12);
+    expect(enuDirection(90, 42)[2]).toBeCloseTo(1, 12);
+    for (const [alt, az] of [[0, 90], [37, 214], [-8, 350], [89, 12]] as [number, number][]) {
+      const v = enuDirection(alt, az);
+      expect(Math.hypot(...v)).toBeCloseTo(1, 12);
+    }
+  });
+
+  it('agrees with enuDirection about where altAz put the star', () => {
+    const { raDeg, decDeg } = positionAtEpoch(starById(stars, 'sirius'), -2449);
+    const { altDeg, azDeg } = altAz({ raDeg, decDeg, latDeg: GIZA, lstDeg: transitLst(raDeg) });
+    const [east, north, up] = enuDirection(altDeg, azDeg);
+    expect(Math.abs(east)).toBeLessThan(1e-12); // on the meridian
+    expect(north).toBeLessThan(0); // south of the zenith from Giza
+    expect(up).toBeCloseTo(Math.sin((transitAltitude(decDeg, GIZA) * Math.PI) / 180), 12);
+  });
+
+  it('refracts the horizon by about 34 arcminutes and nothing above 15°', () => {
+    expect((apparentAltitude(0) - 0) * 60).toBeGreaterThan(33);
+    expect((apparentAltitude(0) - 0) * 60).toBeLessThan(36);
+    expect(apparentAltitude(15)).toBe(15);
+    expect(apparentAltitude(45)).toBe(45);
+    expect(apparentAltitude(90)).toBe(90);
+  });
+
+  it('meets the identity continuously at 15° and lifts a star below the horizon', () => {
+    expect(apparentAltitude(REFRACTION_LIMIT_DEG - 1e-9)).toBeCloseTo(REFRACTION_LIMIT_DEG, 8);
+    expect(apparentAltitude(-0.5)).toBeGreaterThan(-0.5);
+    expect(apparentAltitude(-0.5)).toBeLessThan(0.3);
+    for (let alt = -1; alt < 20; alt += 0.25) expect(apparentAltitude(alt), `alt ${alt}`).toBeGreaterThanOrEqual(alt);
   });
 });

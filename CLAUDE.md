@@ -55,7 +55,7 @@ packages/units   cubit, pyramid inch, seked <-> degrees, DMS formatting
 packages/geometry  pyramid profile numbers, mesh generator, landmarks, expression environment
 packages/data    zod-validated loader and preset resolver
 packages/claims  expression parser, claim registry, evaluator, dossier renderer
-packages/sky     Vondrák 2011 precession, meridian geometry, named stars (data/stars/named.json)
+packages/sky     Vondrák 2011 precession, meridian and horizon geometry, star catalogue (data/stars/)
 blender/         generate.py (bpy) and seked_data.py (stdlib reader, parity-tested against @seked/data)
 scripts/         dossier and shaft-solver scripts
 docs/            plan, dossier
