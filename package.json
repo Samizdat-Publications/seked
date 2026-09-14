@@ -11,6 +11,7 @@
     "bundle": "tsx scripts/bundle.ts",
     "dev:web": "pnpm bundle && pnpm --filter @seked/web dev",
     "build:web": "pnpm bundle && pnpm --filter @seked/web build",
+    "site": "pnpm build:web && tsx scripts/site.ts",
     "dossier": "tsx scripts/dossier.ts",
     "shafts": "tsx scripts/shafts.ts"
   },

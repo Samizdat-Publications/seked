@@ -31,3 +31,4 @@ apps/web/public/terrain/
 .claude/data/
 .claude/worktrees/
 .playwright-mcp/
+site/
