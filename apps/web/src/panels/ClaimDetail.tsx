@@ -3,7 +3,7 @@ import { sourceById } from '@seked/data/browser';
 import { formatArcminutes, formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
-import { cornerMissWords, overlayNote, overlaySpec, type OverlayContext, type OverlaySpec } from '../overlays';
+import { cornerMissWords, overlayNote, overlaySpec, parallelOffsetWords, type OverlayContext, type OverlaySpec } from '../overlays';
 import { useView } from '../store';
 import { Fit } from './Claims';
 
@@ -379,6 +379,32 @@ function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Mode
               {placement.some((m) => !m.verified) ? ', unverified' : ''}: {cited.note ?? 'a cited coordinate, not a survey'}
             </li>
           )}
+        </ul>
+      );
+    }
+    case 'map-inset': {
+      const spec = overlay.spec;
+      const claimed = spec.parallels.find((p) => p.name === 'claimed');
+      const datum = spec.parallels.find((p) => p.name === 'egypt1907');
+      return (
+        <ul className="plain rays">
+          {spec.parallels.map((p) => (
+            <li key={p.name}>
+              <span className="swatch" style={{ background: p.colour }} />
+              {p.label}: {p.latitudeDeg.toFixed(7)}°, {parallelOffsetWords(p)}
+            </li>
+          ))}
+          {claimed && datum && spec.datumOverResidual !== undefined && (
+            <li className="note">
+              The whole coincidence is {Math.abs(claimed.offsetM).toFixed(1)} m of latitude; changing the ellipsoid under it is
+              worth {Math.abs(datum.offsetM).toFixed(1)} m, or {spec.datumOverResidual.toFixed(1)} times as much, and in the other
+              direction.
+            </li>
+          )}
+          <li className="note">
+            A degree of latitude is {spec.metresPerDegree.toLocaleString('en-US', { maximumFractionDigits: 0 })} m here, so the
+            seventh decimal place the claim is stated to is {(spec.metresPerDegree * 1e-7 * 100).toFixed(1)} cm of ground.
+          </li>
         </ul>
       );
     }

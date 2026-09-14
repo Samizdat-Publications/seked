@@ -12,7 +12,7 @@
  * special case in the panel.
  */
 import { evaluate, type Claim, type Comparison } from '@seked/claims/browser';
-import type { Environment, Point } from '@seked/geometry';
+import { egypt1907FromWgs84, type Environment, type Point } from '@seked/geometry';
 import {
   lowerCulminationAltitude,
   meridianAngle,
@@ -47,6 +47,7 @@ export const BUILT_OVERLAYS = new Set([
   'ground-line',
   'chamber-wireframe',
   'ghost-earth',
+  'map-inset',
 ]);
 
 /** Enough colours for the three slopes A3 puts side by side. */
@@ -118,6 +119,13 @@ export interface OverlayContext {
   latitudeDeg: number;
   /** C4's free choice: lay the sky on the plateau with north and south swapped. */
   krupp: boolean;
+  /**
+   * The site origin's elevation, for the one overlay that changes datum and
+   * so needs a height above the ellipsoid as well as a coordinate. Sixty
+   * metres of it moves B3's datum shift by well under a millimetre, so a
+   * caller without the bundle's sites to hand loses nothing by leaving it out.
+   */
+  elevationM?: number;
 }
 
 /** One star, everything an overlay wants to draw or label it with. */
@@ -1151,6 +1159,125 @@ export function ghostEarthSpec(claim: Claim, ctx: OverlayContext): GhostEarthSpe
   };
 }
 
+// --- B3 the parallels of latitude, drawn on the base -----------------------
+
+/** One parallel of latitude, drawn across the base as a line of constant north. */
+export interface MapParallel {
+  /** Which parallel this is: `measured`, `claimed`, or the datum it is read on. */
+  name: string;
+  label: string;
+  latitudeDeg: number;
+  /** Metres north of the base centre's own parallel, which is the line at zero. */
+  offsetM: number;
+  colour: string;
+}
+
+export interface MapInsetSpec {
+  structure: StructureId;
+  /** The base centre in the scene frame, which the parallels are measured from. */
+  centre: Point;
+  /** Metres north per degree of latitude, in the frame the site plan is built in. */
+  metresPerDegree: number;
+  /** How far east and west of the centre each parallel runs. */
+  halfLengthM: number;
+  /** Metres above the pavement the lines are drawn at, so they read over the ground. */
+  height: number;
+  /** The base outline, drawn dim, so the offsets have the monument for a scale. */
+  outline: Point[];
+  parallels: MapParallel[];
+  /** The datum shift over the residual the claim rests on, when the datum is known. */
+  datumOverResidual: number | undefined;
+}
+
+/** "8.8 m north", or the line the other two are measured from. */
+export function parallelOffsetWords(parallel: MapParallel): string {
+  return parallel.offsetM === 0 ? 'the line the others are measured from' : offsetWords(parallel.offsetM, 'north', 'south');
+}
+
+/**
+ * B3. The claim is a latitude to seven decimal places, so the inset is drawn
+ * where that latitude is: three east-west lines across the Great Pyramid's own
+ * base, with the base outline under them for scale.
+ *
+ * The middle line is the base centre's cited WGS84 latitude, the line the
+ * other two are measured from. The claim's own latitude, the speed of light
+ * with a decimal point moved, is nine metres north of it. The third line is
+ * the same base centre read on Old Egyptian 1907, the datum Egypt's survey of
+ * the plateau actually ran on, and it is twice as far away in the other
+ * direction. That is the claim's second free choice made visible: the answer
+ * moves further when you change your mind about the ellipsoid than the whole
+ * coincidence is worth.
+ *
+ * Metres per degree is the mean radius times a degree in radians, which is
+ * the same flat frame `buildEnvironment` places the Sphinx and the obelisk
+ * in, so the inset and the site plan cannot come to hold different scales.
+ */
+export function mapInsetSpec(claim: Claim, ctx: OverlayContext): MapInsetSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'map-inset') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const structure = asString(params.structure) ?? 'g1';
+  if (!isStructure(structure)) return undefined;
+  const placed = structureOf(ctx, structure);
+  const radius = ctx.env['earth.radius.mean'];
+  // The claim's own two expressions, evaluated here in the environment the
+  // dossier evaluates them in, so the drawn offset is the residual itself.
+  const comparison = claim.comparisons[0];
+  const latitudeDeg = comparison === undefined ? undefined : tryEvaluate(comparison.formula, ctx.env);
+  const claimedDeg = comparison === undefined ? undefined : tryEvaluate(comparison.target, ctx.env);
+  if (!placed || radius === undefined || comparison === undefined) return undefined;
+  if (latitudeDeg === undefined || claimedDeg === undefined) return undefined;
+
+  const metresPerDegree = radius * DEG;
+  const datums = asStrings(params.datums);
+  const parallels: MapParallel[] = [
+    {
+      name: 'measured',
+      label: `base centre, ${datums[0] ?? 'WGS84'}`,
+      latitudeDeg,
+      offsetM: 0,
+      colour: RAY_COLOURS[0] as string,
+    },
+    {
+      name: 'claimed',
+      label: `${comparison.target}, the claim's latitude`,
+      latitudeDeg: claimedDeg,
+      offsetM: (claimedDeg - latitudeDeg) * metresPerDegree,
+      colour: RAY_COLOURS[1] as string,
+    },
+  ];
+
+  // The second datum is drawn only when the preset carries the records the
+  // shift is made of; a claim about a coordinate should not invent one.
+  const longitudeDeg = ctx.env[`${structure}.center.longitude`];
+  const shifted =
+    longitudeDeg === undefined
+      ? undefined
+      : egypt1907FromWgs84(ctx.env, { latDeg: latitudeDeg, lonDeg: longitudeDeg, heightM: ctx.elevationM ?? 0 });
+  if (shifted) {
+    parallels.push({
+      name: 'egypt1907',
+      label: `base centre, ${datums[1] ?? 'Old Egyptian 1907'}`,
+      latitudeDeg: shifted.latDeg,
+      offsetM: (shifted.latDeg - latitudeDeg) * metresPerDegree,
+      colour: RAY_COLOURS[2] as string,
+    });
+  }
+
+  const claimed = parallels[1] as MapParallel;
+  const datum = parallels[2];
+  return {
+    structure,
+    centre: [placed.offsetEast, placed.offsetNorth, placed.offsetUp],
+    metresPerDegree,
+    halfLengthM: placed.base * 0.8,
+    height: placed.offsetUp + 2,
+    outline: outlineCorners(placed.base, placed),
+    parallels,
+    datumOverResidual: datum === undefined || claimed.offsetM === 0 ? undefined : Math.abs(datum.offsetM / claimed.offsetM),
+  };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -1164,7 +1291,8 @@ export type OverlaySpec =
   | { kind: 'ground-rectangle'; spec: GroundRectangleSpec }
   | { kind: 'ground-line'; spec: GroundLineSpec }
   | { kind: 'chamber-wireframe'; spec: ChamberWireframeSpec }
-  | { kind: 'ghost-earth'; spec: GhostEarthSpec };
+  | { kind: 'ghost-earth'; spec: GhostEarthSpec }
+  | { kind: 'map-inset'; spec: MapInsetSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -1191,6 +1319,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (wireframe) return { kind: 'chamber-wireframe', spec: wireframe };
   const earth = ghostEarthSpec(claim, ctx);
   if (earth) return { kind: 'ghost-earth', spec: earth };
+  const inset = mapInsetSpec(claim, ctx);
+  if (inset) return { kind: 'map-inset', spec: inset };
   return undefined;
 }
 
@@ -1247,6 +1377,15 @@ function describe(overlay: OverlaySpec): string {
       const spec = overlay.spec;
       const drawn = spec.diagonals.map((d) => `${d.name} ${ROUND(d.cubits, 2)} rc`).join(', ');
       return `${spec.chamber.toUpperCase()} as a wireframe through the masonry, with the diagonals the claim compares: ${drawn}.`;
+    }
+    case 'map-inset': {
+      const spec = overlay.spec;
+      const lines = spec.parallels.map((p) => `${p.label} at ${p.latitudeDeg.toFixed(7)}°`).join(', ');
+      const datum =
+        spec.datumOverResidual === undefined
+          ? ''
+          : ` The datum moves the centre ${ROUND(spec.datumOverResidual)} times as far as the claim's own residual.`;
+      return `Parallels of latitude across ${spec.structure.toUpperCase()}'s base: ${lines}.${datum}`;
     }
     case 'ghost-earth': {
       const spec = overlay.spec;

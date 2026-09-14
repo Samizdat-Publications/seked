@@ -11,6 +11,7 @@ import {
   groundLineSpec,
   groundOutlinesSpec,
   groundRectangleSpec,
+  mapInsetSpec,
   passageRaySpec,
   shaftRaysSpec,
   skyProjectionSpec,
@@ -387,5 +388,51 @@ describe('the B1 ghost Earth', () => {
     expect(spec.polarRadiusM - spec.heightM).toBeCloseTo(0.56, 2);
     expect(spec.equatorRadiusM - spec.perimeterRadiusM).toBeCloseTo(1.01, 2);
     expect(spec.piRatio).toBeCloseTo(2 * Math.PI, 2);
+  });
+});
+
+describe('the B3 map inset', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  // The height the datum shift is computed at is the site's own origin
+  // elevation, which is what a caller holding the bundle has.
+  const elevationM = bundle.sites.find((s) => s.id === 'giza')?.origin.elevation ?? 0;
+  const spec = mapInsetSpec(claim('B3'), { ...contextFor(model, -2449), elevationM }) as NonNullable<
+    ReturnType<typeof mapInsetSpec>
+  >;
+
+  it("puts the claim's own parallel where its own residual puts it", () => {
+    const comparison = model.results.get('B3')?.comparisons[0];
+    expect(spec.parallels.map((p) => p.name)).toEqual(['measured', 'claimed', 'egypt1907']);
+    const [measured, claimed] = spec.parallels;
+    expect(measured?.latitudeDeg).toBeCloseTo(comparison?.value as number, 12);
+    expect(measured?.offsetM).toBe(0);
+    expect(claimed?.latitudeDeg).toBeCloseTo(comparison?.targetValue as number, 12);
+    expect(claimed?.offsetM).toBeCloseTo(
+      ((comparison?.targetValue as number) - (comparison?.value as number)) * spec.metresPerDegree,
+      9,
+    );
+    // Nine metres north, inside a base 230 m on a side.
+    expect(claimed?.offsetM as number).toBeGreaterThan(0);
+    expect(Math.abs(claimed?.offsetM as number)).toBeLessThan(spec.halfLengthM);
+  });
+
+  it('reads the same base centre on Egypt 1907, which moves it twice as far the other way', () => {
+    const datum = spec.parallels[2];
+    // packages/geometry's datum test gets 18.4 m south at Giza from these
+    // same records; this is that shift taken through the resolved database
+    // and laid on the ground in the frame the site plan uses.
+    expect(datum?.offsetM as number).toBeLessThan(0);
+    expect(Math.abs((datum?.offsetM as number) + 18.4)).toBeLessThan(0.5);
+    expect(spec.datumOverResidual).toBeCloseTo(2.1, 1);
+  });
+
+  it('draws no second datum when the preset carries none of its records', () => {
+    const thin = { ...model.env };
+    delete thin['datum.egypt1907.to_wgs84.dx'];
+    const without = mapInsetSpec(claim('B3'), { ...contextFor(model, -2449), env: thin }) as NonNullable<
+      ReturnType<typeof mapInsetSpec>
+    >;
+    expect(without.parallels.map((p) => p.name)).toEqual(['measured', 'claimed']);
+    expect(without.datumOverResidual).toBeUndefined();
   });
 });

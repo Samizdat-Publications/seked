@@ -3,8 +3,8 @@ title: Giza diagonal to Heliopolis
 group: site-plan
 summary: >-
   A line through the south-east corners of the three pyramids runs at 45
-  degrees and points at the obelisk of Senusret I at Heliopolis, 17 km to
-  the north-east.
+  degrees and points at the obelisk of Senusret I at Heliopolis, about 24 km
+  to the north-east.
 comparisons:
   - label: bearing of the G3 to G1 south-east corner line against the bearing to the obelisk
     formula: atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)
@@ -33,8 +33,11 @@ notes: >-
   92) and the mean half-bases, so Menkaure's slightly rectangular base
   enters as its mean side. The bearing to the obelisk is taken in the local
   east-north frame with the longitude difference scaled by the cosine of
-  the latitude; at 17 km that approximation is good to about 0.1 degrees,
-  which is far inside the 2 percent (0.9 degree) tolerance. The bearing is
+  the latitude; at 24 km that approximation is good to about 0.1 degrees,
+  which is far inside the 2 percent (0.9 degree) tolerance. The 17 km the
+  plan quotes is each leg and not the distance: the obelisk's derived
+  offsets put it 16.7 km east and 16.7 km north of the Great Pyramid's base
+  centre, which is 23.6 km away. The bearing is
   now taken from the obelisk's derived offsets from the frame's origin,
   which are built in that same cosine-of-latitude flat frame, so the number
   is unchanged and the site plan and the claim read one position. The

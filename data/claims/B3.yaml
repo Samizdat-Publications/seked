@@ -22,4 +22,9 @@ notes: >-
   The commonly cited base centre, 29°58′45″ N, is about 9 m south of the
   meme's coordinate, well inside a base 230 m on a side. The seventh decimal
   place of a latitude is a centimetre; no survey of the base centre is that
-  precise, and the answer changes by tens of metres with the datum.
+  precise, and the answer changes by tens of metres with the datum. Read on
+  Old Egyptian 1907, the datum Egypt's own survey of the plateau ran on, that
+  same base centre falls 18.4 m south of its WGS84 parallel, twice the 9 m
+  the coincidence rests on and in the other direction. That shift is the EPSG
+  1148 geocentric translation applied on the Helmert 1906 ellipsoid, computed
+  by the overlay from the records rather than quoted.

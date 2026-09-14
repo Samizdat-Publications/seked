@@ -18,6 +18,7 @@ import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
 import {
   cornerMissWords,
+  parallelOffsetWords,
   type ChamberWireframeSpec,
   type CompassRoseSpec,
   type GhostEarthSpec,
@@ -25,6 +26,7 @@ import {
   type GroundLineSpec,
   type GroundOutlinesSpec,
   type GroundRectangleSpec,
+  type MapInsetSpec,
   type OverlaySpec,
   type PassageRaySpec,
   type ShaftRaysSpec,
@@ -69,6 +71,8 @@ export function ClaimOverlay({
       return <ChamberWireframe spec={overlay.spec} />;
     case 'ghost-earth':
       return <GhostEarth spec={overlay.spec} />;
+    case 'map-inset':
+      return <MapInset spec={overlay.spec} />;
   }
 }
 
@@ -583,6 +587,44 @@ function GhostEarth({ spec }: { spec: GhostEarthSpec }): React.JSX.Element {
         position={[equator, 0, 10]}
         colour={spec.pyramidColour}
       />
+    </group>
+  );
+}
+
+/** The base outline under B3's parallels, the same dim line the compass rose is ringed with. */
+const INSET_OUTLINE = '#4f6478';
+
+/**
+ * B3. Three parallels of latitude drawn across the Great Pyramid's own base,
+ * with the base outline under them.
+ *
+ * The claim is a coincidence in the seventh decimal place of a latitude, so
+ * the only honest picture is one that shows what a decimal place of latitude
+ * is worth on the ground. The cited base centre is the middle line; the speed
+ * of light lands nine metres north of it and the same base centre read on the
+ * datum Egypt surveyed the plateau with lands eighteen metres south. All
+ * three lines sit inside a footprint 230 m on a side.
+ */
+function MapInset({ spec }: { spec: MapInsetSpec }): React.JSX.Element {
+  const [east, north] = spec.centre;
+  const z = spec.height;
+  return (
+    <group>
+      <Polyline points={spec.outline} colour={INSET_OUTLINE} close opacity={0.5} />
+      <Marker position={[east, north, z]} colour={INSET_OUTLINE} />
+      {spec.parallels.map((parallel) => {
+        const y = north + parallel.offsetM;
+        return (
+          <group key={parallel.name}>
+            <Ray points={[[east - spec.halfLengthM, y, z], [east + spec.halfLengthM, y, z]]} colour={parallel.colour} />
+            <Label
+              text={`${parallel.label} ${parallel.latitudeDeg.toFixed(7)}°, ${parallelOffsetWords(parallel)}`}
+              position={[east + spec.halfLengthM * 0.45, y, z + 10]}
+              colour={parallel.colour}
+            />
+          </group>
+        );
+      })}
     </group>
   );
 }
