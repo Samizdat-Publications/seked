@@ -1,6 +1,7 @@
 export * from './vondrak';
 export * from './frames';
 export * from './horizon';
+export * from './calendar';
 export * from './sun';
 export * from './dome';
 export * from './stars';
