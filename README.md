@@ -46,7 +46,9 @@ slope Perring measured for Vyse's 1840 table; his chambers wait on a level.
 The Great Pyramid as it stands is
 built course by course from Goyon's 1978 survey of its 201 courses, in
 Blender and in the browser alike. The terrain is cut from Copernicus
-GLO-30 with the ground under each pyramid set to its surveyed base level.
+GLO-30 with the ground under each pyramid set to its surveyed base level,
+and a coarser ring of the same heightfield carries the horizon out to
+12 km, so the renders no longer stop at the edge of the near grid.
 The sky package is checked against Stellarium 26.2: transit altitudes
 agree to within 25 arcseconds for five stars at 2500, 2450 and 10,500
 BCE, and the one disagreement, Sirius, is a proper-motion difference
