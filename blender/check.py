@@ -14,6 +14,7 @@ imported back into Blender to see what was exported.
 Exits 0 and prints one line per check, or prints every failure and exits 1.
 """
 import json
+import math
 import os
 import struct
 import sys
@@ -44,6 +45,8 @@ INTERIOR_NAME = "Interior"
 STRUCTURE_LABELS = {"g1": "G1 Khufu", "g2": "G2 Khafre", "g3": "G3 Menkaure"}
 TERRAIN_NAME = "Terrain (GLO-30 context)"
 GROUND_NAME = "Terrain (ground)"
+FAR_TERRAIN_NAME = "Terrain (far context)"
+FAR_TERRAIN_GRID = "giza-glo30-far"
 CONCAVITY = "Concavity"
 
 failures = []
@@ -85,6 +88,64 @@ def read_gltf_json(path):
     if kind != 0x4E4F534A:
         raise ValueError(f"{path}: first chunk is not JSON")
     return json.loads(raw[20:20 + length].decode("utf-8"))
+
+
+def cells_covered(far_header, near_header, axis):
+    """
+    How many of the far grid's cells along one axis lie wholly within the near
+    grid's extent, which is how many the generator leaves to the near grid.
+    Computed from the two headers, so the expected face count is derived here
+    rather than copied from the generator.
+    """
+    spacing, lo = far_header["spacing"], far_header[axis + "0"]
+    near_lo = near_header[axis + "0"]
+    near_hi = near_lo + (near_header["n" + axis] - 1) * near_header["spacing"]
+    eps = spacing * 1e-6
+    return sum(1 for i in range(far_header["n" + axis] - 1)
+               if lo + i * spacing >= near_lo - eps and lo + (i + 1) * spacing <= near_hi + eps)
+
+
+def vertex_at(obj, x, y):
+    """The object's vertex nearest a point in the plan, and how far off it is."""
+    v = min(obj.data.vertices, key=lambda v: (v.co.x - x) ** 2 + (v.co.y - y) ** 2)
+    return v, math.hypot(v.co.x - x, v.co.y - y)
+
+
+def check_far_terrain(near_terrain):
+    """
+    The coarse ring that carries the horizon past the near grid: the whole of
+    its own grid in vertices, the ring in faces, and the same ground as the
+    near grid where the two meet.
+    """
+    far = bpy.data.objects.get(FAR_TERRAIN_NAME)
+    if not check(far is not None, f'"{FAR_TERRAIN_NAME}" is present'):
+        return
+    check(not far.hide_get() and not far.hide_render, "the far ring is visible and renders")
+    far_header, _ = load_terrain(name=FAR_TERRAIN_GRID)
+    near_header, _ = load_terrain()
+    check(len(far.data.vertices) == far_header["nx"] * far_header["ny"],
+          f'the far ring keeps every sample of its {far_header["nx"]} x {far_header["ny"]} grid')
+    covered = cells_covered(far_header, near_header, "x") * cells_covered(far_header, near_header, "y")
+    want = (far_header["nx"] - 1) * (far_header["ny"] - 1) - covered
+    check(len(far.data.polygons) == want,
+          f"the far ring is a ring: {len(far.data.polygons)} faces, "
+          f"{(far_header['nx'] - 1) * (far_header['ny'] - 1)} less the {covered} the near grid draws")
+    if near_terrain is None:
+        return
+    x1 = near_header["x0"] + (near_header["nx"] - 1) * near_header["spacing"]
+    y1 = near_header["y0"] + (near_header["ny"] - 1) * near_header["spacing"]
+    worst, where = 0.0, None
+    for x in (near_header["x0"], x1):
+        for y in (near_header["y0"], y1):
+            mine, off_far = vertex_at(far, x, y)
+            theirs, off_near = vertex_at(near_terrain, x, y)
+            if max(off_far, off_near) > 1e-3:
+                check(False, f"both grids have a sample at the near grid's corner ({x:.0f}, {y:.0f})")
+                return
+            if abs(mine.co.z - theirs.co.z) >= worst:
+                worst, where = abs(mine.co.z - theirs.co.z), (x, y)
+    check(worst < 1e-3,
+          f"the far ring meets the near grid at all four of its corners: worst {worst:.2e} m at {where}")
 
 
 def interior_collection_name(structure):
@@ -226,6 +287,8 @@ def main():
               "the ground has the same grid as the context terrain")
         nearest = min(ground.data.vertices, key=lambda v: v.co.x * v.co.x + v.co.y * v.co.y)
         check(abs(nearest.co.z) < 1e-6, f"the ground under the Great Pyramid sits at its base level: z = {nearest.co.z:.6f}")
+
+    check_far_terrain(terrain)
 
     if check(os.path.exists(path), f"the GLB is beside the .blend: {path}"):
         gltf = read_gltf_json(path)
