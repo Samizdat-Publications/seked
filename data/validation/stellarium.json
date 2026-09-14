@@ -1,0 +1,421 @@
+{
+  "note": "Written by scripts/stellarium/run.ts. Every number under \"epochs\" is Stellarium's; everything else says how it was asked.",
+  "program": "Stellarium",
+  "version": "26.2.0",
+  "recorded": "2026-09-14",
+  "script": "scripts/stellarium/transit.ssc",
+  "generator": "scripts/stellarium/run.ts",
+  "observer": {
+    "name": "Giza necropolis",
+    "latitudeDeg": 29.979167,
+    "longitudeDeg": 31.134167,
+    "elevationM": 60,
+    "latitudeSource": "coords-wgs84-cited",
+    "longitudeSource": "coords-wgs84-cited",
+    "elevationSource": "data/sites.json giza.origin.elevation",
+    "preset": "canonical"
+  },
+  "stars": [
+    {
+      "id": "alnitak",
+      "designation": "HIP 26727"
+    },
+    {
+      "id": "thuban",
+      "designation": "HIP 68756"
+    },
+    {
+      "id": "sirius",
+      "designation": "HIP 32349"
+    },
+    {
+      "id": "kochab",
+      "designation": "HIP 72607"
+    },
+    {
+      "id": "alnilam",
+      "designation": "HIP 26311"
+    },
+    {
+      "id": "mintaka",
+      "designation": "HIP 25930"
+    }
+  ],
+  "settings": {
+    "nutation": false,
+    "aberration": false,
+    "topocentric": false,
+    "atmosphere": false,
+    "deltaTAlgorithm": "EspenakMeeusModified"
+  },
+  "observerAsSet": {
+    "latitudeDeg": 29.979167938232422,
+    "longitudeDeg": 31.134166717529297,
+    "elevationM": 60,
+    "planet": "Earth"
+  },
+  "epochs": [
+    {
+      "epoch": -2499,
+      "jd": 808285.25,
+      "date": "-2500-12-18T18:00:00",
+      "deltaTSeconds": 56124.89526441693,
+      "stars": {
+        "alnitak": {
+          "designation": "HIP 26727",
+          "name": "Alnitak",
+          "raOfDateDeg": 30.511663456046747,
+          "decOfDateDeg": -15.05800239325281,
+          "raJ2000Deg": 85.18570312875133,
+          "decJ2000Deg": -1.9451120896222027,
+          "transitJd": 808285.3131773662,
+          "transitHourAngleDeg": -0.0000012000052720395615,
+          "transitAltitudeDeg": 44.96282963963123,
+          "transitAzimuthDeg": 179.99771569485995,
+          "transitDecOfDateDeg": -15.058002393234995
+        },
+        "thuban": {
+          "designation": "HIP 68756",
+          "name": "Thuban",
+          "raOfDateDeg": 185.2191878720206,
+          "decOfDateDeg": 88.3223275870521,
+          "raJ2000Deg": 211.25995714546505,
+          "decJ2000Deg": 64.3603821622672,
+          "transitJd": 808285.7417471069,
+          "transitHourAngleDeg": -0.000009393802429258358,
+          "transitAltitudeDeg": 31.656839337484744,
+          "transitAzimuthDeg": 0.000057582842697532556,
+          "transitDecOfDateDeg": 88.32232860001895
+        },
+        "sirius": {
+          "designation": "HIP 32349",
+          "name": "Sirius",
+          "raOfDateDeg": 52.03447497467281,
+          "decOfDateDeg": -21.023598989041187,
+          "raJ2000Deg": 101.93278265235914,
+          "decJ2000Deg": -15.387900376197093,
+          "transitJd": 808285.372799673,
+          "transitHourAngleDeg": -0.0000020770855826413026,
+          "transitAltitudeDeg": 38.99722822456405,
+          "transitAzimuthDeg": 179.99798994442645,
+          "transitDecOfDateDeg": -21.023603811774965
+        },
+        "kochab": {
+          "designation": "HIP 72607",
+          "name": "Kochab",
+          "raOfDateDeg": 308.30850748373314,
+          "decOfDateDeg": 80.44914691502323,
+          "raJ2000Deg": 222.82580586216125,
+          "decJ2000Deg": 74.14115289006943,
+          "transitJd": 808285.0854587522,
+          "transitHourAngleDeg": 0.000003126326646452071,
+          "transitAltitudeDeg": 39.53002218325632,
+          "transitAzimuthDeg": 0.00035999938388694427,
+          "transitDecOfDateDeg": 80.44914575042219
+        },
+        "alnilam": {
+          "designation": "HIP 26311",
+          "name": "Alnilam",
+          "raOfDateDeg": 29.143123604700296,
+          "decOfDateDeg": -14.757841668757896,
+          "raJ2000Deg": 84.0515881582053,
+          "decJ2000Deg": -1.2009440954737962,
+          "transitJd": 808285.309386261,
+          "transitHourAngleDeg": -0.0000011137553883600049,
+          "transitAltitudeDeg": 45.26299259234565,
+          "transitAzimuthDeg": 179.99770046904558,
+          "transitDecOfDateDeg": -14.75783944032827
+        },
+        "mintaka": {
+          "designation": "HIP 25930",
+          "name": "Mintaka",
+          "raOfDateDeg": 27.802855774169362,
+          "decOfDateDeg": -14.27277948808727,
+          "raJ2000Deg": 83.00085194834787,
+          "decJ2000Deg": -0.2982135474490916,
+          "transitJd": 808285.3056734401,
+          "transitHourAngleDeg": -0.000001061128841683967,
+          "transitAltitudeDeg": 45.74805172973455,
+          "transitAzimuthDeg": 179.99767546043776,
+          "transitDecOfDateDeg": -14.272780302622703
+        }
+      }
+    },
+    {
+      "epoch": -2449,
+      "jd": 826547.75,
+      "date": "-2450-12-19T06:00:00",
+      "deltaTSeconds": 54829.940728359965,
+      "stars": {
+        "alnitak": {
+          "designation": "HIP 26727",
+          "name": "Alnitak",
+          "raOfDateDeg": 31.097626045290465,
+          "decOfDateDeg": -14.814749124636089,
+          "raJ2000Deg": 85.18574749855804,
+          "decJ2000Deg": -1.945083873634131,
+          "transitJd": 826547.3151475256,
+          "transitHourAngleDeg": 0.0000030005229625373886,
+          "transitAltitudeDeg": 45.20608293546583,
+          "transitAzimuthDeg": 179.99974993567176,
+          "transitDecOfDateDeg": -14.814749125957269
+        },
+        "thuban": {
+          "designation": "HIP 68756",
+          "name": "Thuban",
+          "raOfDateDeg": 185.02907715859413,
+          "decOfDateDeg": 88.04085595276447,
+          "raJ2000Deg": 211.25815213412596,
+          "decJ2000Deg": 64.36055512602726,
+          "transitJd": 826547.7415673842,
+          "transitHourAngleDeg": 2.1938831196166575e-8,
+          "transitAltitudeDeg": 31.938318701852587,
+          "transitAzimuthDeg": 0.000007356497282704103,
+          "transitDecOfDateDeg": 88.04084923636968
+        },
+        "sirius": {
+          "designation": "HIP 32349",
+          "name": "Sirius",
+          "raOfDateDeg": 52.57323630616842,
+          "decOfDateDeg": -20.86650907598952,
+          "raJ2000Deg": 101.92575303664896,
+          "decJ2000Deg": -15.402449809274348,
+          "transitJd": 826547.3746391167,
+          "transitHourAngleDeg": 0.0000019845483762992444,
+          "transitAltitudeDeg": 39.154323469915774,
+          "transitAzimuthDeg": 179.9997795065235,
+          "transitDecOfDateDeg": -20.866508591546825
+        },
+        "kochab": {
+          "designation": "HIP 72607",
+          "name": "Kochab",
+          "raOfDateDeg": 307.5964403304331,
+          "decOfDateDeg": 80.6234419899876,
+          "raJ2000Deg": 222.82414345168232,
+          "decJ2000Deg": 74.14131320712305,
+          "transitJd": 826548.0811026299,
+          "transitHourAngleDeg": -0.0000033535809507156955,
+          "transitAltitudeDeg": 39.35572242878539,
+          "transitAzimuthDeg": 0.00003858516333321315,
+          "transitDecOfDateDeg": 80.62344550939362
+        },
+        "alnilam": {
+          "designation": "HIP 26311",
+          "name": "Alnilam",
+          "raOfDateDeg": 29.73143614996225,
+          "decOfDateDeg": -14.51123588650236,
+          "raJ2000Deg": 84.05160817356588,
+          "decJ2000Deg": -1.2009549363218273,
+          "transitJd": 826547.311362886,
+          "transitHourAngleDeg": 0.000002994909408471358,
+          "transitAltitudeDeg": 45.509591717357054,
+          "transitAzimuthDeg": 179.99974821121612,
+          "transitDecOfDateDeg": -14.511240344063618
+        },
+        "mintaka": {
+          "designation": "HIP 25930",
+          "name": "Mintaka",
+          "raOfDateDeg": 28.39384688080047,
+          "decOfDateDeg": -14.023005488159141,
+          "raJ2000Deg": 83.00086085365986,
+          "decJ2000Deg": -0.29822314052715204,
+          "transitJd": 826547.3076575742,
+          "transitHourAngleDeg": 0.0000030366862411312923,
+          "transitAltitudeDeg": 45.9978325557933,
+          "transitAzimuthDeg": 179.99974548337488,
+          "transitDecOfDateDeg": -14.022999505623664
+        }
+      }
+    },
+    {
+      "epoch": -10499,
+      "jd": -2113714.75,
+      "date": "-10500-12-18T18:00:00",
+      "deltaTSeconds": 457871.32244839385,
+      "stars": {
+        "alnitak": {
+          "designation": "HIP 26727",
+          "name": "Alnitak",
+          "raOfDateDeg": 274.2746484537911,
+          "decOfDateDeg": -50.834594351302655,
+          "raJ2000Deg": 85.17859962588246,
+          "decJ2000Deg": -1.9496295268017105,
+          "transitJd": -2113714.848073688,
+          "transitHourAngleDeg": 4.738160441775108e-8,
+          "transitAltitudeDeg": 9.186237709580817,
+          "transitAzimuthDeg": 180.00000003031317,
+          "transitDecOfDateDeg": -50.83459435218677
+        },
+        "thuban": {
+          "designation": "HIP 68756",
+          "name": "Thuban",
+          "raOfDateDeg": 310.2575317510008,
+          "decOfDateDeg": 51.41760322637047,
+          "raJ2000Deg": 211.54807460197415,
+          "decJ2000Deg": 64.33246005352575,
+          "transitJd": -2113714.7483941424,
+          "transitHourAngleDeg": 2.9360933240241138e-8,
+          "transitAltitudeDeg": 68.56156372296931,
+          "transitAzimuthDeg": 359.99999994990276,
+          "transitDecOfDateDeg": 51.41760421526311
+        },
+        "sirius": {
+          "designation": "HIP 32349",
+          "name": "Sirius",
+          "raOfDateDeg": 308.4220218654748,
+          "decOfDateDeg": -58.367875919749295,
+          "raJ2000Deg": 103.01656225854472,
+          "decJ2000Deg": -13.120170508204408,
+          "transitJd": -2113714.753478865,
+          "transitHourAngleDeg": -7.593979489683989e-8,
+          "transitAltitudeDeg": 1.6529561260875243,
+          "transitAzimuthDeg": 179.99999996015575,
+          "transitDecOfDateDeg": -58.36787593568007
+        },
+        "kochab": {
+          "designation": "HIP 72607",
+          "name": "Kochab",
+          "raOfDateDeg": 293.2628949125445,
+          "decOfDateDeg": 51.54315590873351,
+          "raJ2000Deg": 223.09228697725374,
+          "decJ2000Deg": 74.11524755118481,
+          "transitJd": -2113714.7954725754,
+          "transitHourAngleDeg": 1.226226800099539e-7,
+          "transitAltitudeDeg": 68.43601200278617,
+          "transitAzimuthDeg": 359.99999979250674,
+          "transitDecOfDateDeg": 51.54315593544624
+        },
+        "alnilam": {
+          "designation": "HIP 26311",
+          "name": "Alnilam",
+          "raOfDateDeg": 272.53831035050536,
+          "decOfDateDeg": -50.049170114797356,
+          "raJ2000Deg": 84.0483847052712,
+          "decJ2000Deg": -1.1992088650376542,
+          "transitJd": -2113714.8528836733,
+          "transitHourAngleDeg": 7.461363793481723e-8,
+          "transitAltitudeDeg": 9.971661978223887,
+          "transitAzimuthDeg": 180.0000000486465,
+          "transitDecOfDateDeg": -50.04917008354369
+        },
+        "mintaka": {
+          "designation": "HIP 25930",
+          "name": "Mintaka",
+          "raOfDateDeg": 270.9966212893265,
+          "decOfDateDeg": -49.092493562944796,
+          "raJ2000Deg": 82.9994265943604,
+          "decJ2000Deg": -0.296677395534185,
+          "transitJd": -2113714.8571544415,
+          "transitHourAngleDeg": 1.4478433740805485e-7,
+          "transitAltitudeDeg": 10.928338526175134,
+          "transitAzimuthDeg": 180.00000009656165,
+          "transitDecOfDateDeg": -49.09249353559245
+        }
+      }
+    }
+  ],
+  "properMotionProbe": [
+    {
+      "epoch": 1000,
+      "jd": 2086295,
+      "stars": {
+        "alnitak": {
+          "raJ2000Deg": 85.18880727959146,
+          "decJ2000Deg": -1.9431380670362148
+        },
+        "thuban": {
+          "raJ2000Deg": 211.13351456952938,
+          "decJ2000Deg": 64.37243952703574
+        },
+        "sirius": {
+          "raJ2000Deg": 101.43287902040807,
+          "decJ2000Deg": -16.4173509862906
+        },
+        "kochab": {
+          "raJ2000Deg": 222.70956373065636,
+          "decJ2000Deg": 74.15232471115587
+        },
+        "alnilam": {
+          "raJ2000Deg": 84.05298863302009,
+          "decJ2000Deg": -1.2017026037151233
+        },
+        "mintaka": {
+          "raJ2000Deg": 83.00147501299118,
+          "decJ2000Deg": -0.29888462558941725
+        }
+      }
+    },
+    {
+      "epoch": 3000,
+      "jd": 2816795,
+      "stars": {
+        "alnitak": {
+          "raJ2000Deg": 85.19058079393278,
+          "decJ2000Deg": -1.9420102130202248
+        },
+        "thuban": {
+          "raJ2000Deg": 211.06112451891607,
+          "decJ2000Deg": 64.37928886116832
+        },
+        "sirius": {
+          "raJ2000Deg": 101.13964844312648,
+          "decJ2000Deg": -17.01623500191447
+        },
+        "kochab": {
+          "raJ2000Deg": 222.64320600204337,
+          "decJ2000Deg": 74.15866770947349
+        },
+        "alnilam": {
+          "raJ2000Deg": 84.0537889434627,
+          "decJ2000Deg": -1.2021360384590511
+        },
+        "mintaka": {
+          "raJ2000Deg": 83.00183101051323,
+          "decJ2000Deg": -0.2992679835601144
+        }
+      }
+    }
+  ],
+  "obliquityProbe": [
+    {
+      "epoch": 2000,
+      "jd": 2451545,
+      "obliquityDeg": 23.439279443904848
+    },
+    {
+      "epoch": 1000,
+      "jd": 2086295,
+      "obliquityDeg": 23.568822313893925
+    },
+    {
+      "epoch": -500,
+      "jd": 1538420,
+      "obliquityDeg": 23.75584468009345
+    },
+    {
+      "epoch": -1500,
+      "jd": 1173170,
+      "obliquityDeg": 23.870894888410522
+    },
+    {
+      "epoch": -2449,
+      "jd": 826547.75,
+      "obliquityDeg": 23.969628413539922
+    },
+    {
+      "epoch": -5000,
+      "jd": -105205,
+      "obliquityDeg": 24.16600024824581
+    },
+    {
+      "epoch": -7500,
+      "jd": -1018330,
+      "obliquityDeg": 24.233375995953548
+    },
+    {
+      "epoch": -10499,
+      "jd": -2113714.75,
+      "obliquityDeg": 24.125460271701755
+    }
+  ]
+}

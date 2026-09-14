@@ -1,0 +1,214 @@
+//
+// Name: Seked transit check
+// License: same as the Seked repository
+// Description: Reads four stars' mean places of date and their meridian
+// altitudes from Giza at three epochs, so packages/sky can be checked against
+// an independent implementation of the same precession model.
+//
+// This file holds no numbers of its own. scripts/stellarium/run.ts prepends a
+// SEKED object carrying the observer from data/measurements and data/sites.json
+// and the Julian Days from julianEpochToJd, then writes the two halves into
+// Stellarium's own scripts directory and runs them. Everything below is the
+// procedure; everything it is given comes from the database.
+//
+// Four things about Stellarium's scripting engine govern the shape of this
+// script. The first is that the values it reports are recomputed once per
+// drawn frame, not when they are asked for: a getObjectInfo immediately after
+// a setJDay returns the previous date's precession matrix and the previous
+// date's horizon. Every change of time or place is therefore followed by a
+// core.wait, which yields to the event loop for as many frames as it takes.
+// The second is that Stellarium looks its own location up over the network
+// while the script is already running, and the answer, when it arrives,
+// silently replaces whatever the script had set: the observer is therefore set
+// in a loop that reads it back, and a run whose observer will not stay put
+// fails rather than reporting somebody else's sky. The third is that a script
+// which throws leaves the application running with no user to close it, so the
+// body is wrapped in a try and the quit is outside it. The fourth is that
+// core.output can only write into Stellarium's own user directory, so the
+// result goes there as one line of JSON and the runner reads it back out.
+//
+
+var SETTLE = 0.35; // seconds of real time per frame yield; see the note above
+var SIDEREAL_DAY = 0.9972695663; // mean solar days in one sidereal day
+var HOUR_ANGLE_TOLERANCE = 1e-5; // degrees, which is 0.036 arcseconds of sky
+// Degrees. Stellarium keeps a location in single-precision floats, so it hands
+// the latitude back rounded by a few thousandths of an arcsecond and the check
+// has to be a tolerance rather than an equality. A thousandth of a degree is
+// far coarser than that rounding and far finer than the thousands of
+// kilometres a network lookup would move the observer, which is the only thing
+// this is watching for.
+var OBSERVER_TOLERANCE = 1e-3;
+
+function wrap180(deg) {
+  while (deg > 180) { deg -= 360; }
+  while (deg <= -180) { deg += 360; }
+  return deg;
+}
+
+function wrap360(deg) {
+  var x = deg % 360;
+  return x < 0 ? x + 360 : x;
+}
+
+/**
+ * Put the observer where the database says and make sure it stays there. The
+ * network lookup Stellarium starts at launch can land at any moment in the
+ * first seconds of a run and move the observer without saying so, so this sets
+ * the place, reads it back, and only returns once the reading agrees.
+ */
+function placeObserver() {
+  var consecutive = 0;
+  for (var attempt = 0; attempt < 40; attempt++) {
+    core.setObserverLocation(SEKED.observer.longitudeDeg, SEKED.observer.latitudeDeg, SEKED.observer.elevationM, 0, SEKED.observer.name, 'Earth');
+    core.wait(SETTLE);
+    var here = core.getObserverLocationInfo();
+    var settled = Math.abs(here['latitude'] - SEKED.observer.latitudeDeg) < OBSERVER_TOLERANCE
+      && Math.abs(here['longitude'] - SEKED.observer.longitudeDeg) < OBSERVER_TOLERANCE;
+    // Three readings in a row, so that a lookup arriving between one set and
+    // the next cannot be mistaken for a place that has settled.
+    consecutive = settled ? consecutive + 1 : 0;
+    if (consecutive >= 3) { return here; }
+  }
+  throw new Error('the observer would not stay at ' + SEKED.observer.name);
+}
+
+/**
+ * The instant nearest `jd` at which the object is on the observer's meridian,
+ * found by stepping the clock back by the hour angle it reports. The hour
+ * angle is very nearly linear in time, so this converges in two steps; the
+ * loop is only there to catch the case where it does not.
+ */
+function settleOnMeridian(designation, jd) {
+  for (var it = 0; it < 8; it++) {
+    core.setJDay(jd);
+    core.wait(SETTLE);
+    var hourAngle = wrap180(core.getObjectInfo(designation)['hourAngle-dd']);
+    if (Math.abs(hourAngle) < HOUR_ANGLE_TOLERANCE) { return jd; }
+    jd -= (hourAngle / 360) * SIDEREAL_DAY;
+  }
+  return jd;
+}
+
+try {
+  core.resetOutput();
+  core.setGuiVisible(false);
+  core.setTimeRate(0); // so that waiting for a frame does not advance the clock
+
+  // Mean place, to compare with a package that computes mean places: no
+  // nutation, no annual aberration, no diurnal parallax and no refraction.
+  core.setStelProperty('StelCore.flagUseNutation', false);
+  core.setStelProperty('StelCore.flagUseAberration', false);
+  core.setStelProperty('StelCore.flagUseTopocentricCoordinates', false);
+  core.setStelProperty('LandscapeMgr.atmosphereDisplayed', false);
+
+  var observer = placeObserver();
+
+  var result = {
+    settings: {
+      nutation: core.getStelProperty('StelCore.flagUseNutation'),
+      aberration: core.getStelProperty('StelCore.flagUseAberration'),
+      topocentric: core.getStelProperty('StelCore.flagUseTopocentricCoordinates'),
+      atmosphere: core.getStelProperty('LandscapeMgr.atmosphereDisplayed'),
+      deltaTAlgorithm: core.getDeltaTAlgorithm(),
+    },
+    // What Stellarium made of the place it was given, so the record can be
+    // compared with the coordinates the database actually holds.
+    observerAsSet: {
+      latitudeDeg: observer['latitude'],
+      longitudeDeg: observer['longitude'],
+      elevationM: observer['altitude'],
+      planet: observer['planet'],
+    },
+    epochs: [],
+  };
+
+  for (var e = 0; e < SEKED.epochs.length; e++) {
+    var epoch = SEKED.epochs[e];
+    placeObserver();
+    core.setJDay(epoch.jd);
+    core.wait(SETTLE);
+    var record = {
+      epoch: epoch.epoch,
+      jd: core.getJDay(),
+      date: core.getDate('utc'),
+      deltaTSeconds: core.getDeltaTsec(),
+      stars: {},
+    };
+
+    for (var s = 0; s < SEKED.stars.length; s++) {
+      var star = SEKED.stars[s];
+      core.setJDay(epoch.jd);
+      core.wait(SETTLE);
+      var at = core.getObjectInfo(star.designation);
+      if (!at['found']) { throw new Error('Stellarium does not know ' + star.designation); }
+
+      // The mean place of date, and the same place still on the J2000 axes,
+      // which is proper motion alone and separates the two halves of the
+      // calculation when the numbers are compared.
+      var entry = {
+        designation: star.designation,
+        name: at['localized-name'],
+        raOfDateDeg: wrap360(at['ra']),
+        decOfDateDeg: at['dec'],
+        raJ2000Deg: wrap360(at['raJ2000']),
+        decJ2000Deg: at['decJ2000'],
+      };
+
+      // Then the meridian itself: put the star's hour angle at zero and read
+      // the altitude there, rather than trusting 90 - |lat - dec| on both sides
+      // of the comparison.
+      var transitJd = settleOnMeridian(star.designation, epoch.jd);
+      var onMeridian = core.getObjectInfo(star.designation);
+      entry.transitJd = transitJd;
+      entry.transitHourAngleDeg = wrap180(onMeridian['hourAngle-dd']);
+      entry.transitAltitudeDeg = onMeridian['altitude-geometric'];
+      entry.transitAzimuthDeg = onMeridian['azimuth-geometric'];
+      entry.transitDecOfDateDeg = onMeridian['dec'];
+      record.stars[star.id] = entry;
+    }
+    result.epochs.push(record);
+  }
+
+  // A pair of epochs on either side of J2000, far enough apart that the
+  // catalogue's proper motion shows plainly and close enough that no
+  // curvature in it matters. Nothing but the J2000-axis position is wanted:
+  // the difference between the two is the rate Stellarium's own star catalogue
+  // carries, which is the other half of every disagreement recorded above.
+  result.properMotionProbe = [];
+  for (var p = 0; p < SEKED.properMotionProbe.length; p++) {
+    var probeEpoch = SEKED.properMotionProbe[p];
+    core.setJDay(probeEpoch.jd);
+    core.wait(SETTLE);
+    var probe = { epoch: probeEpoch.epoch, jd: core.getJDay(), stars: {} };
+    for (var q = 0; q < SEKED.stars.length; q++) {
+      var probed = core.getObjectInfo(SEKED.stars[q].designation);
+      probe.stars[SEKED.stars[q].id] = {
+        raJ2000Deg: wrap360(probed['raJ2000']),
+        decJ2000Deg: probed['decJ2000'],
+      };
+    }
+    result.properMotionProbe.push(probe);
+  }
+
+  // The obliquity of date is the precession model with no star in it at all,
+  // which makes it the one quantity here that compares the two implementations
+  // and nothing else. Stellarium reports it alongside every object, so any
+  // star will do to ask for it.
+  result.obliquityProbe = [];
+  for (var o = 0; o < SEKED.obliquityProbe.length; o++) {
+    var obliquityEpoch = SEKED.obliquityProbe[o];
+    core.setJDay(obliquityEpoch.jd);
+    core.wait(SETTLE);
+    result.obliquityProbe.push({
+      epoch: obliquityEpoch.epoch,
+      jd: core.getJDay(),
+      obliquityDeg: core.getObjectInfo(SEKED.stars[0].designation)['ecliptic-obliquity'],
+    });
+  }
+
+  core.output(JSON.stringify(result));
+} catch (error) {
+  core.output('SEKED_ERROR ' + error);
+}
+core.saveOutputAs(SEKED.outputFile);
+core.quitStellarium();
