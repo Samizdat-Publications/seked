@@ -132,6 +132,180 @@ def square_pyramid_volume(base, height):
     return base * base * height / 3.0
 
 
+# --- Interior solids -------------------------------------------------------
+# Mirrors packages/geometry/src/interior.ts. Passages, chambers and corbelled
+# galleries are separate objects in the project frame (origin at the Great
+# Pyramid's base centre, +X east, +Y north, +Z up, metres), with the same
+# vertex order as the TypeScript builders so the two can be compared.
+
+_FLAT = 1e-12
+_DEG = math.pi / 180.0
+
+
+def _cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def _section_frame(start, end, height_mode):
+    """
+    Width is horizontal and square to the axis's horizontal projection; up is
+    the direction a section's heights are measured in. A vertical axis has no
+    horizontal projection to be square to, so width falls back to east and, in
+    perpendicular mode, the heights then run north.
+    """
+    d = (end[0] - start[0], end[1] - start[1], end[2] - start[2])
+    run = math.hypot(d[0], d[1])
+    width = (-d[1] / run, d[0] / run, 0.0) if run > _FLAT else (1.0, 0.0, 0.0)
+    if height_mode == "vertical":
+        if run <= _FLAT:
+            raise ValueError("extruded_section: vertical heights need an axis with a horizontal run")
+        return width, (0.0, 0.0, 1.0)
+    length = math.hypot(d[0], d[1], d[2])
+    axis = (d[0] / length, d[1] / length, d[2] / length)
+    # (axis, width, up) is right-handed, so up leans with the sloping floor.
+    return width, _cross(axis, width)
+
+
+def extruded_section(start, end, section, height_mode="perpendicular"):
+    """
+    Extrude a mirrored [half_width, height] cross-section along the straight
+    axis from start to end, both points on the floor centre line.
+
+    Vertices are the near-end outline and then the far-end outline, so a
+    section of n pairs gives 4n. Within one outline, index k is section pair k
+    on the +width side and 2n-1-k is its mirror, which walks counter-clockwise
+    in the (width, up) plane. Faces are polygons wound counter-clockwise seen
+    from outside: one quad per outline edge, then a ladder of cells between the
+    two mirrored halves at each end. The zero-height cells at a corbel step are
+    kept rather than skipped, because they are what keeps the end caps
+    edge-manifold with the ledge faces; they enclose no volume.
+    """
+    n = len(section)
+    if n < 2:
+        raise ValueError("extruded_section: a section needs at least two [half_width, height] pairs")
+    for k in range(1, n):
+        if section[k][1] < section[k - 1][1]:
+            raise ValueError("extruded_section: section heights must not decrease")
+    width, up = _section_frame(start, end, height_mode)
+
+    m = 2 * n
+    outline = [None] * m
+    for k in range(n):
+        hw, h = section[k]
+        outline[k] = (width[0] * hw + up[0] * h, width[1] * hw + up[1] * h, width[2] * hw + up[2] * h)
+        outline[m - 1 - k] = (up[0] * h - width[0] * hw, up[1] * h - width[1] * hw, up[2] * h - width[2] * hw)
+
+    verts = [(start[0] + p[0], start[1] + p[1], start[2] + p[2]) for p in outline]
+    verts += [(end[0] + p[0], end[1] + p[1], end[2] + p[2]) for p in outline]
+
+    faces = []
+    for k in range(m):
+        j = (k + 1) % m
+        faces.append((k, j, m + j, m + k))           # wall along outline edge k
+    for i in range(n - 1):
+        a, b, c, d = i, i + 1, m - 2 - i, m - 1 - i
+        faces.append((m + a, m + b, m + c, m + d))   # far cap, faces along the axis
+        faces.append((d, c, b, a))                   # near cap, faces back against it
+    return verts, faces
+
+
+def passage(start, end, width, height, height_mode="perpendicular"):
+    """A passage of constant rectangular section: extruded_section with two pairs."""
+    half = width / 2.0
+    return extruded_section(start, end, [(half, 0.0), (half, height)], height_mode)
+
+
+CORNERS = ("NE", "NW", "SW", "SE")
+
+
+def chamber(mn, mx, gable=None):
+    """
+    An axis-aligned chamber from mn to mx, optionally with a pitched roof above
+    the wall tops. `gable` is {"ridge_height": metres above the floor, "axis":
+    "x" or "y"}, the axis being the horizontal direction the ridge runs along.
+
+    Vertices 0-3 are the floor ring and 4-7 the wall-top ring, both counter-
+    clockwise seen from above starting north-east, matching CORNERS; then, when
+    gabled, the two ridge ends, east first for a ridge along x and north first
+    for one along y.
+    """
+    x0, y0, z0 = mn
+    x1, y1, z1 = mx
+    cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+    plan = [(x1, y1), (x0, y1), (x0, y0), (x1, y0)]
+    verts = [(x, y, z0) for x, y in plan] + [(x, y, z1) for x, y in plan]
+
+    faces = [(0, 3, 2, 1)]                           # floor, clockwise from above so it faces down
+    for i in range(4):
+        j = (i + 1) % 4
+        faces.append((i, j, 4 + j, 4 + i))           # walls
+    if gable is None:
+        faces.append((4, 5, 6, 7))                   # flat ceiling, counter-clockwise from above
+    else:
+        rz = z0 + gable["ridge_height"]
+        if gable["axis"] == "x":
+            verts += [(x1, cy, rz), (x0, cy, rz)]    # 8 east end, 9 west end
+            faces += [(4, 5, 9, 8),                  # north slope
+                      (6, 7, 8, 9),                  # south slope
+                      (4, 8, 7),                     # east gable end
+                      (5, 6, 9)]                     # west gable end
+        else:
+            verts += [(cx, y1, rz), (cx, y0, rz)]    # 8 north end, 9 south end
+            faces += [(7, 4, 8, 9),                  # east slope
+                      (5, 6, 9, 8),                  # west slope
+                      (4, 5, 8),                     # north gable end
+                      (6, 7, 9)]                     # south gable end
+    return verts, faces
+
+
+# The Grand Gallery as a five-step corbel, half-widths narrowing upward.
+GALLERY_SECTION = [
+    (1.047, 0.00), (1.047, 2.29),
+    (0.970, 2.29), (0.970, 2.75),
+    (0.893, 2.75), (0.893, 3.21),
+    (0.816, 3.21), (0.816, 3.67),
+    (0.739, 3.67), (0.739, 4.13),
+]
+
+
+def shape_cases():
+    """
+    Literal interior solids in metres, for the parity test in packages/data.
+    They read nothing from data/: the numbers are here to be identical on both
+    sides of the comparison, not to be measurements.
+    """
+    cases = []
+
+    def add(name, built):
+        verts, faces = built
+        cases.append({"name": name,
+                      "verts": [list(v) for v in verts],
+                      "faces": [list(f) for f in faces],
+                      "volume": polyhedron_volume(verts, faces)})
+
+    slope = 26.5 * _DEG
+    add("sloped_passage", passage(
+        (0.0, 24.0, 17.0),
+        (0.0, 24.0 - 40.0 * math.cos(slope), 17.0 - 40.0 * math.sin(slope)),
+        1.05, 1.20, "perpendicular"))
+    add("level_passage", passage((0.0, 0.0, 21.0), (0.0, -38.7, 21.0), 1.05, 1.17, "vertical"))
+    add("box_chamber", chamber((-5.235, -2.615, 43.0), (5.235, 2.615, 48.85)))
+    walls, ridge = 184.47 * 0.0254, 245.1 * 0.0254
+    add("gabled_chamber", chamber((-2.615, -2.875, 21.0), (2.615, 2.875, 21.0 + walls),
+                                  {"ridge_height": ridge, "axis": "x"}))
+    gallery_slope = 26.2 * _DEG
+    add("corbelled_gallery", extruded_section(
+        (0.0, 0.0, 22.0),
+        (0.0, -46.12 * math.cos(gallery_slope), 22.0 + 46.12 * math.sin(gallery_slope)),
+        GALLERY_SECTION, "perpendicular"))
+    # Two controls on an oblique bearing, where the width direction and the two
+    # height modes are the easiest things to mirror wrongly.
+    oblique_start, oblique_end = (-12.5, 18.0, 5.0), (14.0, -9.0, -6.5)
+    add("oblique_perpendicular", passage(oblique_start, oblique_end, 1.05, 1.20, "perpendicular"))
+    add("oblique_vertical", passage(oblique_start, oblique_end, 1.05, 1.20, "vertical"))
+    return cases
+
+
 def geometry_variants(values, structure):
     """Every mesh the generator builds for one pyramid, for parity tests against packages/geometry."""
     p = pyramid_params(values, structure)
@@ -149,6 +323,10 @@ def geometry_variants(values, structure):
 
 
 if __name__ == "__main__":
+    if "--shapes" in sys.argv:
+        # Literal interior solids, so this mode works without reading data/.
+        print(json.dumps(shape_cases()))
+        sys.exit(0)
     preset = sys.argv[1] if len(sys.argv) > 1 else "canonical"
     db = load_database()
     r = resolve(db, preset)
