@@ -11,6 +11,7 @@ export const LAYERS = [
   { id: 'terrain', label: 'Terrain (GLO-30 context)' },
   { id: 'grid', label: 'Grid' },
   { id: 'north', label: 'North arrow' },
+  { id: 'sky', label: 'Sky (stars of the epoch)' },
   { id: 'overlay', label: 'Claim overlay' },
 ] as const;
 
@@ -61,6 +62,14 @@ export interface View {
   preset: string;
   /** Royal cubit override in metres, or null for the value the preset resolves. */
   cubit: number | null;
+  /**
+   * Julian epoch the sky is drawn at and every dated claim is evaluated at,
+   * or null to let each claim keep its own epoch and the sky follow whichever
+   * claim is selected. Astronomical year numbering: 2450 BCE is -2449.
+   */
+  epoch: number | null;
+  /** Local apparent sidereal time as an angle, 0 to 360 degrees. */
+  lst: number;
   layers: Record<LayerId, boolean>;
   claim: string | null;
   camera: CameraView;
@@ -73,6 +82,24 @@ export interface View {
 export const CUBIT_MIN = 0.52;
 export const CUBIT_MAX = 0.53;
 export const CUBIT_STEP = 0.00005;
+
+// Back to 12,000 BCE, which covers every epoch the claims reach for, and
+// forward to the present. Vondrak 2011 is good for a hundred times this span;
+// the catalogue's linear proper motion is what sets the honest limit.
+export const EPOCH_MIN = -12000;
+export const EPOCH_MAX = 2026;
+export const EPOCH_STEP = 1;
+
+/**
+ * The sky the viewer opens on when no claim is selected and nothing is
+ * overridden: 2450 BCE, the epoch C2 is stated at and the one the monument
+ * itself is usually dated to.
+ */
+export const DEFAULT_EPOCH = -2449;
+
+export const LST_MIN = 0;
+export const LST_MAX = 360;
+export const LST_STEP = 0.25;
 
 // Far enough west and south to clear G3, far enough east and north to clear
 // G1, which is the whole range a cut through the three pyramids needs.
@@ -87,6 +114,8 @@ export const SPEED_STEP = 1;
 export const DEFAULT_VIEW: View = {
   preset: 'canonical',
   cubit: null,
+  epoch: null,
+  lst: 0,
   layers: {
     pyramids: true,
     today: false,
@@ -95,6 +124,7 @@ export const DEFAULT_VIEW: View = {
     terrain: false,
     grid: true,
     north: true,
+    sky: false,
     overlay: true,
   },
   claim: null,
@@ -105,6 +135,25 @@ export const DEFAULT_VIEW: View = {
 };
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
+
+/**
+ * Sidereal time is an angle on a circle, so it wraps rather than clamping:
+ * dragging past 360 comes back to 0 and the sky keeps turning the same way.
+ */
+export function normaliseLst(deg: number): number {
+  const x = deg % 360;
+  return x < 0 ? x + 360 : x;
+}
+
+/**
+ * The epoch the scene is actually drawn at: the reader's override if there is
+ * one, else the selected claim's own epoch, else the default. So selecting a
+ * sky claim snaps the sky to the epoch that claim is stated at, and dragging
+ * the slider takes it from there.
+ */
+export function sceneEpoch(override: number | null, claimEpoch: number | undefined): number {
+  return override ?? claimEpoch ?? DEFAULT_EPOCH;
+}
 
 function numbers(text: string | null, count: number): number[] | undefined {
   if (!text) return undefined;
@@ -131,6 +180,8 @@ export function decodeView(search: string, presetIds: string[]): View {
   const q = new URLSearchParams(search);
   const preset = q.get('preset');
   const cubit = q.get('cubit') === null ? Number.NaN : Number(q.get('cubit'));
+  const epoch = q.get('epoch') === null ? Number.NaN : Number(q.get('epoch'));
+  const lst = Number(q.get('lst'));
   const layerList = q.get('layers');
   const cam = numbers(q.get('cam'), 6);
   const mode = q.get('mode');
@@ -143,6 +194,8 @@ export function decodeView(search: string, presetIds: string[]): View {
   return {
     preset: preset && presetIds.includes(preset) ? preset : DEFAULT_VIEW.preset,
     cubit: Number.isFinite(cubit) ? clamp(cubit, CUBIT_MIN, CUBIT_MAX) : null,
+    epoch: Number.isFinite(epoch) ? clamp(epoch, EPOCH_MIN, EPOCH_MAX) : null,
+    lst: Number.isFinite(lst) ? normaliseLst(lst) : DEFAULT_VIEW.lst,
     layers,
     claim: q.get('claim'),
     camera: cam
@@ -164,6 +217,8 @@ export function encodeView(view: View): string {
   const q = new URLSearchParams();
   q.set('preset', view.preset);
   if (view.cubit !== null) q.set('cubit', view.cubit.toFixed(5));
+  if (view.epoch !== null) q.set('epoch', round(view.epoch, 0));
+  q.set('lst', round(view.lst, 2));
   q.set('layers', LAYERS.filter((l) => view.layers[l.id]).map((l) => l.id).join(','));
   if (view.claim) q.set('claim', view.claim);
   q.set('cam', [...view.camera.position, ...view.camera.target].map((n) => round(n, 1)).join(','));

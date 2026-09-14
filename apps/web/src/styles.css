@@ -422,3 +422,37 @@ ul.inputs .note {
   border-radius: 2px;
   vertical-align: baseline;
 }
+
+/* Sky */
+
+.subhead {
+  margin: 0.9rem 0 0.35rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-soft);
+}
+
+ul.transits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button.transit {
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+button.transit:hover {
+  background: var(--paper-sunk);
+}

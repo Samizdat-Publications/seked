@@ -8,12 +8,15 @@ import {
   CUBIT_MAX,
   CUBIT_MIN,
   DEFAULT_VIEW,
+  EPOCH_MAX,
+  EPOCH_MIN,
   SECTION_MAX,
   SECTION_MIN,
   SPEED_MAX,
   SPEED_MIN,
   decodeView,
   encodeView,
+  normaliseLst,
   type CameraMode,
   type CameraView,
   type LayerId,
@@ -30,6 +33,8 @@ export interface ViewStore extends View {
   cameraEpoch: number;
   setPreset: (preset: string) => void;
   setCubit: (cubit: number | null) => void;
+  setEpoch: (epoch: number | null) => void;
+  setLst: (lst: number) => void;
   toggleLayer: (id: LayerId) => void;
   setClaim: (claim: string | null) => void;
   setCamera: (camera: CameraView) => void;
@@ -46,6 +51,8 @@ export const useView = create<ViewStore>((set) => ({
   cameraEpoch: 0,
   setPreset: (preset) => set({ preset }),
   setCubit: (cubit) => set({ cubit: cubit === null ? null : clamp(cubit, CUBIT_MIN, CUBIT_MAX) }),
+  setEpoch: (epoch) => set({ epoch: epoch === null ? null : clamp(epoch, EPOCH_MIN, EPOCH_MAX) }),
+  setLst: (lst) => set({ lst: normaliseLst(lst) }),
   toggleLayer: (id) => set((s) => ({ layers: { ...s.layers, [id]: !s.layers[id] } })),
   setClaim: (claim) => set((s) => ({ claim: s.claim === claim ? null : claim })),
   setCamera: (camera) => set({ camera }),

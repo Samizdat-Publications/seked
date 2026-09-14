@@ -32,6 +32,12 @@ export function starById(stars: Star[], id: string): Star {
   return s;
 }
 
+/** A direction on the celestial sphere, in degrees. Which equator and equinox it is on is the caller's business. */
+export interface Equatorial {
+  raDeg: number;
+  decDeg: number;
+}
+
 /** Everything `positionAtEpoch` needs, so a catalogue star can be precessed without being a claim star. */
 export type StarMotion = Pick<Star, 'raDeg' | 'decDeg' | 'pmRaMasYr' | 'pmDecMasYr'>;
 
@@ -41,12 +47,23 @@ export type StarMotion = Pick<Star, 'raDeg' | 'decDeg' | 'pmRaMasYr' | 'pmDecMas
  * would want rigorous space motion for the last few arcminutes), then
  * precessed with the long-term model.
  */
-export function positionAtEpoch(star: StarMotion, epj: number): { raDeg: number; decDeg: number } {
+export function positionAtEpoch(star: StarMotion, epj: number): Equatorial {
+  const { raDeg, decDeg } = properMotionAtEpoch(star, epj);
+  return precessIcrsToDate(raDeg, decDeg, epj);
+}
+
+/**
+ * Where proper motion alone puts a star at a Julian epoch, still on the ICRS
+ * axes. `positionAtEpoch` precesses this; a caller with a whole catalogue to
+ * move builds the precession matrix once and applies it to these instead.
+ */
+export function properMotionAtEpoch(star: StarMotion, epj: number): Equatorial {
   const dt = epj - 2000;
   const cosDec = Math.cos((star.decDeg * Math.PI) / 180);
-  const ra = star.raDeg + ((star.pmRaMasYr / 3.6e6) * dt) / cosDec;
-  const dec = star.decDeg + (star.pmDecMasYr / 3.6e6) * dt;
-  return precessIcrsToDate(ra, dec, epj);
+  return {
+    raDeg: star.raDeg + ((star.pmRaMasYr / 3.6e6) * dt) / cosDec,
+    decDeg: star.decDeg + (star.pmDecMasYr / 3.6e6) * dt,
+  };
 }
 
 /**

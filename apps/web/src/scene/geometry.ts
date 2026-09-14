@@ -46,3 +46,27 @@ export function lineGeometry(points: number[][]): BufferGeometry {
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
   return geometry;
 }
+
+/**
+ * A polyline as the pairs `lineSegments` wants: every interior point twice.
+ * `close` joins the last point back to the first, which is how the horizon
+ * ring and the compass rose are drawn.
+ */
+export function polylineGeometry(points: number[][], close = false): BufferGeometry {
+  const pairs: number[][] = [];
+  const last = close ? points.length : points.length - 1;
+  for (let i = 0; i < last; i++) {
+    pairs.push(points[i] as number[], points[(i + 1) % points.length] as number[]);
+  }
+  return lineGeometry(pairs);
+}
+
+/** A horizontal ring of `segments` sides at radius `r` and height `z`, in the data frame. */
+export function ringPoints(r: number, z = 0, segments = 180): number[][] {
+  const out: number[][] = [];
+  for (let i = 0; i < segments; i++) {
+    const a = (i / segments) * Math.PI * 2;
+    out.push([r * Math.sin(a), r * Math.cos(a), z]);
+  }
+  return out;
+}

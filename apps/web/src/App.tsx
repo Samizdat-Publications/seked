@@ -1,16 +1,22 @@
 import { useMemo } from 'react';
+import { brightStarsOf } from './bundle';
 import type { LoadedBundle } from './load';
 import { buildModel } from './model';
 import { ghostProfileSpec } from './overlays';
 import { Claims } from './panels/Claims';
 import { CubitSlider, LayerToggles, PresetPicker, SectionControls } from './panels/Controls';
+import { SkyControls } from './panels/Sky';
 import { Scene } from './scene/Scene';
+import { domeBuffers, namedOnDome } from './sky';
 import { useView } from './store';
+import { sceneEpoch } from './view';
 
 export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const { bundle, heights } = loaded;
   const preset = useView((s) => s.preset);
   const cubit = useView((s) => s.cubit);
+  const epochOverride = useView((s) => s.epoch);
+  const lst = useView((s) => s.lst);
   const layers = useView((s) => s.layers);
   const selected = useView((s) => s.claim);
 
@@ -25,12 +31,25 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   );
 
   const claim = bundle.claims.find((c) => c.id === selected);
+  // With nothing overridden the scene follows the open claim, so choosing a
+  // sky claim puts the sky at the epoch that claim is stated at.
+  const epoch = sceneEpoch(epochOverride, claim?.epoch);
+
+  // The catalogue is expanded once; the dome is rebuilt when the epoch moves
+  // and only then, because sidereal time turns it rather than moving its
+  // stars. The named ten are cheap enough to keep even with the layer off,
+  // since the transit buttons in the panel read their right ascensions.
+  const catalogue = useMemo(() => brightStarsOf(bundle), [bundle]);
+  const named = useMemo(() => namedOnDome(bundle.stars, epoch), [bundle.stars, epoch]);
+  const buffers = useMemo(() => (layers.sky ? domeBuffers(catalogue, epoch) : undefined), [layers.sky, catalogue, epoch]);
+  const sky = buffers ? { buffers, named, latitudeDeg: model.env['g1.center.latitude'] ?? 0, lstDeg: lst } : undefined;
+
   const ghosts = useMemo(() => (claim ? ghostProfileSpec(claim, model.env) : undefined), [claim, model.env]);
 
   return (
     <div className="app">
       <main className="stage">
-        <Scene model={model} terrain={terrain} layers={layers} ghosts={ghosts} />
+        <Scene model={model} terrain={terrain} layers={layers} ghosts={ghosts} sky={sky} />
       </main>
       <aside className="panel">
         <header className="masthead">
@@ -39,6 +58,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
         </header>
         <PresetPicker presets={bundle.presets} />
         <CubitSlider model={model} />
+        <SkyControls epoch={epoch} named={named} claim={claim} />
         <LayerToggles />
         <SectionControls model={model} />
         <Claims claims={bundle.claims} model={model} />
