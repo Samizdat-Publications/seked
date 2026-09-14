@@ -290,7 +290,14 @@ describe.skipIf(!py)('blender/seked_data.py derives the same centre offsets as @
   const env = buildEnvironment(resolve(db, 'canonical').values);
 
   it('derives the same keys', () => {
-    expect(Object.keys(theirs).sort()).toEqual(['g1.centre.offset.east', 'g1.centre.offset.north', 'sphinx.centre.offset.east', 'sphinx.centre.offset.north']);
+    expect(Object.keys(theirs).sort()).toEqual([
+      'g1.centre.offset.east',
+      'g1.centre.offset.north',
+      'heliopolis.obelisk.centre.offset.east',
+      'heliopolis.obelisk.centre.offset.north',
+      'sphinx.centre.offset.east',
+      'sphinx.centre.offset.north',
+    ]);
   });
 
   it('agrees on every one of them to the micrometre', () => {

@@ -1,9 +1,11 @@
 import { evaluate, scopeFor } from '@seked/claims/browser';
+import { DEG } from '@seked/units';
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
 import { atEpoch, buildModel, type Model } from './model';
 import {
   groundBearingsSpec,
+  groundLineSpec,
   groundOutlinesSpec,
   groundRectangleSpec,
   passageRaySpec,
@@ -264,5 +266,48 @@ describe("the D2 ground rectangle", () => {
     // that move with the slider and the cubits that stand still.
     expect(moved.claimedEastCubits).toBeCloseTo(spec.claimedEastCubits, 12);
     expect(moved.claimedEastM).not.toBeCloseTo(spec.claimedEastM, 3);
+  });
+});
+
+describe('the D1 ground line', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const spec = groundLineSpec(claim('D1'), contextFor(model, -2449)) as NonNullable<ReturnType<typeof groundLineSpec>>;
+  const comparisons = () => model.results.get('D1')?.comparisons ?? [];
+
+  it('takes the bearings the claim compares, and runs through the corner it names', () => {
+    expect(spec.cornerBearingDeg).toBeCloseTo(comparisons()[0]?.value as number, 9);
+    expect(spec.targetBearingDeg).toBeCloseTo(comparisons()[0]?.targetValue as number, 9);
+    expect(spec.referenceBearingDeg).toBeCloseTo(comparisons()[1]?.targetValue as number, 9);
+    expect(spec.residualToTargetDeg).toBeCloseTo(comparisons()[0]?.absolute as number, 9);
+
+    // Walking the drawn bearing from the far corner for the distance between
+    // the two corners has to land on the near one: the line the claim's
+    // formula states and the line the viewer draws are one line.
+    const run = Math.hypot(spec.through.at[0] - spec.from.at[0], spec.through.at[1] - spec.from.at[1]);
+    const a = spec.cornerBearingDeg * DEG;
+    const east = spec.from.at[0] + Math.sin(a) * run;
+    const north = spec.from.at[1] + Math.cos(a) * run;
+    expect(Math.hypot(east - spec.through.at[0], north - spec.through.at[1])).toBeLessThan(1e-6);
+  });
+
+  it('places the obelisk where its own coordinates put it, and says which records those are', () => {
+    expect(spec.to.label).toBe('Heliopolis obelisk');
+    expect(spec.to.at[0]).toBeCloseTo(model.env['heliopolis.obelisk.centre.offset.east'] as number, 9);
+    expect(spec.to.at[1]).toBeCloseTo(model.env['heliopolis.obelisk.centre.offset.north'] as number, 9);
+    expect(spec.to.distanceM).toBeCloseTo(Math.hypot(spec.to.at[0], spec.to.at[1]), 9);
+    for (const key of spec.to.recordKeys) expect(model.resolved.records.has(key), key).toBe(true);
+  });
+
+  // The claim used to take the bearing from the coordinates itself. It now
+  // takes it from the offsets `buildEnvironment` derives, which are built in
+  // the same flat frame, so the change is a change of spelling and not of
+  // number. Nothing else would let the site plan and the claim agree.
+  it('reads the same bearing the coordinates gave before the offsets were derived', () => {
+    const before = evaluate(
+      'atan2((heliopolis.obelisk.center.longitude - g1.center.longitude) * cos(g1.center.latitude), ' +
+        'heliopolis.obelisk.center.latitude - g1.center.latitude)',
+      model.env,
+    );
+    expect(Math.abs((comparisons()[0]?.targetValue as number) - before)).toBeLessThan(1e-6);
   });
 });

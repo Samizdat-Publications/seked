@@ -68,7 +68,7 @@ export function ClaimDetail({
 
       <h4>Overlay</h4>
       <p className={overlay.built ? 'note' : 'note pending'}>{overlay.text}</p>
-      {drawn && <OverlayControls overlay={drawn} />}
+      {drawn && <OverlayControls overlay={drawn} model={model} />}
 
       {claim.notes && (
         <>
@@ -137,20 +137,20 @@ function Comparison({ c }: { c: ComparisonResult }): React.JSX.Element {
   );
 }
 
+/** How a source is written out, or its id when the database has lost it. */
+function citationOf(model: Model, id: string): string {
+  try {
+    return sourceById(model.db, id).citation;
+  } catch {
+    return id;
+  }
+}
+
 function Citations({ label, ids, model }: { label: string; ids: string[]; model: Model }): React.JSX.Element | null {
   if (ids.length === 0) return null;
   return (
     <p className="note">
-      <strong>{label}:</strong>{' '}
-      {ids
-        .map((id) => {
-          try {
-            return sourceById(model.db, id).citation;
-          } catch {
-            return id;
-          }
-        })
-        .join(' · ')}
+      <strong>{label}:</strong> {ids.map((id) => citationOf(model, id)).join(' · ')}
     </p>
   );
 }
@@ -183,7 +183,7 @@ function EpochLine({ claim, model }: { claim: Claim; model: Model }): React.JSX.
  * shaft's star to be on the meridian, and which way up the sky is laid on the
  * ground.
  */
-function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Element | null {
+function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Model }): React.JSX.Element | null {
   const setLst = useView((s) => s.setLst);
   const krupp = useView((s) => s.krupp);
   const toggleKrupp = useView((s) => s.toggleKrupp);
@@ -327,6 +327,40 @@ function OverlayControls({ overlay }: { overlay: OverlaySpec }): React.JSX.Eleme
             The cubits are the metres divided by the royal cubit, so the slider above moves them and the residuals with them and
             leaves the metres where the survey put them.
           </li>
+        </ul>
+      );
+    }
+    case 'ground-line': {
+      const spec = overlay.spec;
+      // Where the target came from, said from its own records rather than
+      // asserted here: a cited coordinate is not a survey and the panel has
+      // to be the place that admits it.
+      const placement = recordsFor(spec.to.recordKeys, model.resolved);
+      const cited = placement[0];
+      return (
+        <ul className="plain rays">
+          <li>
+            <span className="swatch" style={{ background: spec.cornerColour }} />
+            {spec.from.label} through {spec.through.label}: {spec.cornerBearingDeg.toFixed(2)}°
+          </li>
+          <li>
+            <span className="swatch" style={{ background: spec.targetColour }} />
+            Base centre to the {spec.to.label}, {(spec.to.distanceM / 1000).toFixed(1)} km off:{' '}
+            {spec.targetBearingDeg.toFixed(2)}°. The corner line misses it by {spec.residualToTargetDeg.toFixed(2)}°.
+          </li>
+          {spec.referenceBearingDeg !== undefined && spec.residualToReferenceDeg !== undefined && (
+            <li>
+              <span className="swatch" style={{ background: spec.referenceColour }} />
+              The round {spec.referenceBearingDeg.toFixed(2)}° the claim also states: the corner line is{' '}
+              {spec.residualToReferenceDeg.toFixed(2)}° off it.
+            </li>
+          )}
+          {cited && (
+            <li className="note">
+              The {spec.to.label} is placed from {citationOf(model, cited.source)}
+              {placement.some((m) => !m.verified) ? ', unverified' : ''}: {cited.note ?? 'a cited coordinate, not a survey'}
+            </li>
+          )}
         </ul>
       );
     }

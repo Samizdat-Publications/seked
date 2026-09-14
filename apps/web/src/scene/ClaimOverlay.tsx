@@ -1,8 +1,9 @@
 /**
  * The claim overlays that are not ghost profiles: the shaft rays, the
  * descending passage's ray, the compass rose, the Orion projection, the
- * bearings taken along the plateau, the base lines drawn on it and Legon's
- * rectangle over the three pyramids.
+ * bearings taken along the plateau, the base lines drawn on it, Legon's
+ * rectangle over the three pyramids and the corner line carried off the
+ * plateau towards Heliopolis.
  *
  * Every one of them is drawn from a spec built in ../overlays.ts out of the
  * claim file's own params, so nothing here knows which claim it is serving.
@@ -18,6 +19,7 @@ import type { Plane } from 'three';
 import type {
   CompassRoseSpec,
   GroundBearingsSpec,
+  GroundLineSpec,
   GroundOutlinesSpec,
   GroundRectangleSpec,
   OverlaySpec,
@@ -59,6 +61,8 @@ export function ClaimOverlay({
       return <GroundOutlines spec={overlay.spec} />;
     case 'ground-rectangle':
       return <GroundRectangle spec={overlay.spec} />;
+    case 'ground-line':
+      return <GroundLine spec={overlay.spec} />;
   }
 }
 
@@ -340,6 +344,71 @@ function GroundRectangle({ spec }: { spec: GroundRectangleSpec }): React.JSX.Ele
         position={[spec.claimedSouthWest[0], spec.claimedSouthWest[1], z + 60]}
         colour={spec.claimedColour}
       />
+    </group>
+  );
+}
+
+/** How far the round-number reference line is run, metres. A kilometre reads. */
+const REFERENCE_RUN_M = 1000;
+
+/**
+ * D1. The line through Menkaure's and Khufu's south-east corners, carried out
+ * to the distance of the obelisk at Heliopolis, with the bearing to the
+ * obelisk itself drawn from the Great Pyramid's base centre and the round 45
+ * degrees the claim also states drawn short beside it.
+ *
+ * The three lines start together and part over twenty kilometres, which is
+ * the only honest way to show a degree and a half: the panel's arcminutes
+ * are small enough to argue with, and a picture of the fan is not.
+ */
+function GroundLine({ spec }: { spec: GroundLineSpec }): React.JSX.Element {
+  const z = spec.height;
+  const at = (origin: readonly number[], azimuthDeg: number, distance: number): Point3 => [
+    (origin[0] as number) + Math.sin((azimuthDeg * Math.PI) / 180) * distance,
+    (origin[1] as number) + Math.cos((azimuthDeg * Math.PI) / 180) * distance,
+    z,
+  ];
+  const start: Point3 = [spec.from.at[0], spec.from.at[1], z];
+  const target: Point3 = [spec.to.at[0], spec.to.at[1], z];
+
+  return (
+    <group>
+      <Ray points={[start, at(spec.from.at, spec.cornerBearingDeg, spec.to.distanceM)]} colour={spec.cornerColour} />
+      <Label
+        text={`${spec.from.label} through ${spec.through.label}, ${spec.cornerBearingDeg.toFixed(2)}°`}
+        position={at(spec.from.at, spec.cornerBearingDeg, spec.to.distanceM * 0.45)}
+        colour={spec.cornerColour}
+      />
+      <Marker position={start} colour={spec.cornerColour} />
+      <Marker position={[spec.through.at[0], spec.through.at[1], z]} colour={spec.cornerColour} />
+
+      <Ray points={[[0, 0, z], target]} colour={spec.targetColour} />
+      <Label
+        text={`${spec.to.label}, ${(spec.to.distanceM / 1000).toFixed(1)} km`}
+        position={[target[0], target[1], z + 200]}
+        colour={spec.targetColour}
+      />
+      <Marker position={target} colour={spec.targetColour} />
+      <Label
+        text={`base centre to the ${spec.to.label}, ${spec.targetBearingDeg.toFixed(2)}°`}
+        position={at([0, 0], spec.targetBearingDeg, spec.to.distanceM * 0.7)}
+        colour={spec.targetColour}
+      />
+
+      {spec.referenceBearingDeg !== undefined && (
+        <group>
+          <Ray
+            points={[start, at(spec.from.at, spec.referenceBearingDeg, REFERENCE_RUN_M)]}
+            colour={spec.referenceColour}
+            opacity={0.55}
+          />
+          <Label
+            text={`${spec.referenceBearingDeg.toFixed(2)}° exactly`}
+            position={at(spec.from.at, spec.referenceBearingDeg, REFERENCE_RUN_M)}
+            colour={spec.referenceColour}
+          />
+        </group>
+      )}
     </group>
   );
 }

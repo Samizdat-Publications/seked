@@ -847,6 +847,107 @@ export function groundRectangleSpec(claim: Claim, ctx: OverlayContext): GroundRe
   };
 }
 
+// --- D1 the corner line, carried off the plateau ---------------------------
+
+/** Somewhere off the plateau a line is aimed at, placed from its coordinates. */
+export interface GroundTarget {
+  /** The claim's own name for it, such as `heliopolis.obelisk`. */
+  key: string;
+  label: string;
+  /** East and north in the scene frame, metres. */
+  at: [number, number];
+  /** Its distance from the frame's origin, which is the Great Pyramid's base centre. */
+  distanceM: number;
+  /**
+   * The records `buildEnvironment` derived those offsets from, so the panel
+   * can say how well the place is actually known instead of asserting it.
+   */
+  recordKeys: string[];
+}
+
+export interface GroundLineSpec {
+  /** The far corner the line is taken from, and the near one it runs through. */
+  from: GroundCorner;
+  through: GroundCorner;
+  to: GroundTarget;
+  /** Metres above the datum the lines are drawn at. */
+  height: number;
+  /** The bearing the two corners give, which is the claim's measured value. */
+  cornerBearingDeg: number;
+  /** The bearing from the frame's origin to the target, which is its first target. */
+  targetBearingDeg: number;
+  /** The round number the claim also compares the corner line with. */
+  referenceBearingDeg: number | undefined;
+  residualToTargetDeg: number;
+  residualToReferenceDeg: number | undefined;
+  cornerColour: string;
+  targetColour: string;
+  referenceColour: string;
+}
+
+/** `heliopolis.obelisk` read as a name rather than as a key. */
+function nameOf(key: string): string {
+  const words = key.split('.').join(' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/**
+ * D1. The line through two south-east corners, carried out to the distance of
+ * the obelisk it is said to point at, beside the bearing to the obelisk
+ * itself and the round 45 degrees the claim also asks for.
+ *
+ * Three lines from one place is the whole picture: the reader sees at once
+ * that the corner line and the bearing to Heliopolis are a degree and a half
+ * apart, which no amount of arithmetic in a panel makes as plain. The target
+ * is placed from its own coordinates through the environment's derived
+ * offsets, so the drawing and the claim's target are the same number.
+ */
+export function groundLineSpec(claim: Claim, ctx: OverlayContext): GroundLineSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'ground-line') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const from = cornerOf(ctx.env, asString(params.from) ?? '');
+  const through = cornerOf(ctx.env, asString(params.through) ?? '');
+  const key = asString(params.to) ?? '';
+  const at = centreOf(ctx.env, key);
+  if (!from || !through || !at) return undefined;
+
+  // The second comparison is the round number the claim also states, which
+  // the drawing carries as a third line rather than as a constant of its own.
+  const reference = claim.comparisons[1];
+  let referenceBearingDeg: number | undefined;
+  if (reference) {
+    try {
+      referenceBearingDeg = evaluate(reference.target, ctx.env);
+    } catch {
+      // A reference the environment cannot evaluate is simply not drawn.
+    }
+  }
+
+  const cornerBearingDeg = azimuthTo(from.at, through.at);
+  const targetBearingDeg = azimuthTo([0, 0], at);
+  return {
+    from,
+    through,
+    to: {
+      key,
+      label: nameOf(key),
+      at,
+      distanceM: Math.hypot(at[0], at[1]),
+      recordKeys: [`${key}.center.latitude`, `${key}.center.longitude`],
+    },
+    height: 8,
+    cornerBearingDeg,
+    targetBearingDeg,
+    referenceBearingDeg,
+    residualToTargetDeg: cornerBearingDeg - targetBearingDeg,
+    residualToReferenceDeg: referenceBearingDeg === undefined ? undefined : cornerBearingDeg - referenceBearingDeg,
+    cornerColour: RAY_COLOURS[0] as string,
+    targetColour: RAY_COLOURS[1] as string,
+    referenceColour: SIGHT_COLOUR,
+  };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -857,7 +958,8 @@ export type OverlaySpec =
   | { kind: 'sky-projection'; spec: SkyProjectionSpec }
   | { kind: 'ground-bearings'; spec: GroundBearingsSpec }
   | { kind: 'ground-outlines'; spec: GroundOutlinesSpec }
-  | { kind: 'ground-rectangle'; spec: GroundRectangleSpec };
+  | { kind: 'ground-rectangle'; spec: GroundRectangleSpec }
+  | { kind: 'ground-line'; spec: GroundLineSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -878,6 +980,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (outlines) return { kind: 'ground-outlines', spec: outlines };
   const rectangle = groundRectangleSpec(claim, ctx);
   if (rectangle) return { kind: 'ground-rectangle', spec: rectangle };
+  const line = groundLineSpec(claim, ctx);
+  if (line) return { kind: 'ground-line', spec: line };
   return undefined;
 }
 
@@ -925,6 +1029,10 @@ function describe(overlay: OverlaySpec): string {
     case 'ground-rectangle': {
       const spec = overlay.spec;
       return `The rectangle the pyramids make, ${ROUND(spec.extentEastCubits)} by ${ROUND(spec.extentNorthCubits)} cubits, against the claimed ${ROUND(spec.claimedEastCubits)} by ${ROUND(spec.claimedNorthCubits)}, both anchored on the ${spec.from.label} so the claimed corner falls where the arithmetic puts it.`;
+    }
+    case 'ground-line': {
+      const spec = overlay.spec;
+      return `The corner line at ${ROUND(spec.cornerBearingDeg, 2)}° carried ${ROUND(spec.to.distanceM / 1000)} km to the ${spec.to.label}, which lies at ${ROUND(spec.targetBearingDeg, 2)}° from the Great Pyramid's base centre.`;
     }
   }
 }

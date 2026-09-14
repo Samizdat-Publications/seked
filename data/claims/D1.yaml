@@ -8,7 +8,7 @@ summary: >-
 comparisons:
   - label: bearing of the G3 to G1 south-east corner line against the bearing to the obelisk
     formula: atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)
-    target: atan2((heliopolis.obelisk.longitude - g1.center.longitude) * cos(g1.center.latitude), heliopolis.obelisk.latitude - g1.center.latitude)
+    target: atan2(heliopolis.obelisk.centre.offset.east, heliopolis.obelisk.centre.offset.north)
     unit: deg
     tolerance_pct: 2
   - label: bearing of the corner line against 45 degrees
@@ -34,7 +34,11 @@ notes: >-
   enters as its mean side. The bearing to the obelisk is taken in the local
   east-north frame with the longitude difference scaled by the cosine of
   the latitude; at 17 km that approximation is good to about 0.1 degrees,
-  which is far inside the 2 percent (0.9 degree) tolerance. The obelisk's
+  which is far inside the 2 percent (0.9 degree) tolerance. The bearing is
+  now taken from the obelisk's derived offsets from the frame's origin,
+  which are built in that same cosine-of-latitude flat frame, so the number
+  is unchanged and the site plan and the claim read one position. The
+  obelisk's
   position is a commonly cited value, unverified, and its sigma of 50 m
   moves the bearing by 0.2 degrees at most. Petrie found no exact relation
   between the corners of the three pyramids (section 92).
