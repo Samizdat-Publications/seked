@@ -42,6 +42,10 @@ export const BUILT_OVERLAYS = new Set([
   'sun-ribbon',
   'akhet',
   'ground-bearings',
+  'ground-outlines',
+  'ground-rectangle',
+  'ground-line',
+  'chamber-wireframe',
 ]);
 
 /** Enough colours for the three slopes A3 puts side by side. */
@@ -948,6 +952,111 @@ export function groundLineSpec(claim: Claim, ctx: OverlayContext): GroundLineSpe
   };
 }
 
+// --- A4 the King's Chamber as a wireframe ----------------------------------
+
+/** One diagonal of a chamber, and what the claim asks of it. */
+export interface ChamberDiagonal {
+  /** The diagonal as the claim file names it: `end-wall`, `floor` or `space`. */
+  name: string;
+  /** Its two ends in the scene frame. */
+  from: Point;
+  to: Point;
+  lengthM: number;
+  cubits: number;
+  /** What the claim's matching comparison asks for, when it has one. */
+  target: number | undefined;
+  residualPct: number | undefined;
+  colour: string;
+}
+
+export interface ChamberWireframeSpec {
+  structure: StructureId;
+  /** The chamber's landmark prefix, such as `kc`. */
+  chamber: string;
+  /**
+   * The twelve edges as twenty-four points, each pair one edge: four on the
+   * floor, four on the ceiling and four standing between them.
+   */
+  edges: Point[];
+  diagonals: ChamberDiagonal[];
+}
+
+/** Which two corners each named diagonal runs between. */
+const CHAMBER_DIAGONALS: Record<string, readonly [string, string]> = {
+  // The end walls are the short ones, ten cubits wide and eleven high; the
+  // chamber is twenty cubits east to west, so this runs up the east wall.
+  'end-wall': ['SE.floor', 'NE.ceiling'],
+  floor: ['SW.floor', 'NE.floor'],
+  space: ['SW.floor', 'NE.ceiling'],
+};
+
+/** The corner ring `chamber()` builds, in the order it builds it. */
+const CHAMBER_CORNERS = ['NE', 'NW', 'SW', 'SE'] as const;
+
+/**
+ * A4. The King's Chamber as twelve edges and three diagonals, drawn through
+ * the masonry so the 3-4-5 the claim is about can be seen whole.
+ *
+ * The box is the one the wall records build; the diagonals are labelled with
+ * the claim's own comparisons, evaluated here in the same environment the
+ * dossier evaluates them in. Those are not quite the same chamber: Petrie's
+ * `kc.length`, `kc.width` and `kc.height` are his means of the wall faces and
+ * differ from the four wall positions by a few centimetres. The wireframe is
+ * therefore where the room is and the numbers beside it are what the claim
+ * compares, which is the only way both can be true at once.
+ */
+export function chamberWireframeSpec(claim: Claim, ctx: OverlayContext): ChamberWireframeSpec | undefined {
+  const overlay = claim.overlay;
+  if (!overlay || overlay.type !== 'chamber-wireframe') return undefined;
+  const params: Record<string, unknown> = overlay.params ?? {};
+  const structure = asString(params.structure) ?? 'g1';
+  if (!isStructure(structure)) return undefined;
+  const placed = structureOf(ctx, structure);
+  const chamber = asString(params.chamber);
+  const cubit = ctx.env['cubit.royal'];
+  if (!placed || !chamber || cubit === undefined) return undefined;
+
+  const corner = (name: string): Point | undefined => {
+    const point = landmark(ctx, structure, `${chamber}.corner.${name}`);
+    return point === undefined ? undefined : placePoint(point, placed);
+  };
+  const floor = CHAMBER_CORNERS.map((c) => corner(`${c}.floor`));
+  const ceiling = CHAMBER_CORNERS.map((c) => corner(`${c}.ceiling`));
+  if (floor.some((p) => p === undefined) || ceiling.some((p) => p === undefined)) return undefined;
+
+  const edges: Point[] = [];
+  for (let i = 0; i < 4; i++) {
+    const j = (i + 1) % 4;
+    edges.push(floor[i] as Point, floor[j] as Point);
+    edges.push(ceiling[i] as Point, ceiling[j] as Point);
+    edges.push(floor[i] as Point, ceiling[i] as Point);
+  }
+
+  const diagonals: ChamberDiagonal[] = [];
+  for (const name of asStrings(params.diagonals)) {
+    const ends = CHAMBER_DIAGONALS[name];
+    const from = ends === undefined ? undefined : corner(ends[0]);
+    const to = ends === undefined ? undefined : corner(ends[1]);
+    if (!from || !to) continue;
+    const comparison = comparisonFor(claim, name);
+    // With a comparison the diagonal carries the claim's own arithmetic; with
+    // none it carries the length of the line that is drawn, and no target.
+    const cubits = comparison ? evaluate(comparison.formula, ctx.env) : Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]) / cubit;
+    const target = comparison ? evaluate(comparison.target, ctx.env) : undefined;
+    diagonals.push({
+      name,
+      from,
+      to,
+      lengthM: cubits * cubit,
+      cubits,
+      target,
+      residualPct: target === undefined ? undefined : ((cubits - target) / target) * 100,
+      colour: RAY_COLOURS[diagonals.length % RAY_COLOURS.length] as string,
+    });
+  }
+  return diagonals.length === 0 ? undefined : { structure, chamber, edges, diagonals };
+}
+
 // --- What the scene is handed ---------------------------------------------
 
 export type OverlaySpec =
@@ -959,7 +1068,8 @@ export type OverlaySpec =
   | { kind: 'ground-bearings'; spec: GroundBearingsSpec }
   | { kind: 'ground-outlines'; spec: GroundOutlinesSpec }
   | { kind: 'ground-rectangle'; spec: GroundRectangleSpec }
-  | { kind: 'ground-line'; spec: GroundLineSpec };
+  | { kind: 'ground-line'; spec: GroundLineSpec }
+  | { kind: 'chamber-wireframe'; spec: ChamberWireframeSpec };
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
@@ -982,6 +1092,8 @@ export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): Over
   if (rectangle) return { kind: 'ground-rectangle', spec: rectangle };
   const line = groundLineSpec(claim, ctx);
   if (line) return { kind: 'ground-line', spec: line };
+  const wireframe = chamberWireframeSpec(claim, ctx);
+  if (wireframe) return { kind: 'chamber-wireframe', spec: wireframe };
   return undefined;
 }
 
@@ -1033,6 +1145,11 @@ function describe(overlay: OverlaySpec): string {
     case 'ground-line': {
       const spec = overlay.spec;
       return `The corner line at ${ROUND(spec.cornerBearingDeg, 2)}° carried ${ROUND(spec.to.distanceM / 1000)} km to the ${spec.to.label}, which lies at ${ROUND(spec.targetBearingDeg, 2)}° from the Great Pyramid's base centre.`;
+    }
+    case 'chamber-wireframe': {
+      const spec = overlay.spec;
+      const drawn = spec.diagonals.map((d) => `${d.name} ${ROUND(d.cubits, 2)} rc`).join(', ');
+      return `${spec.chamber.toUpperCase()} as a wireframe through the masonry, with the diagonals the claim compares: ${drawn}.`;
     }
   }
 }

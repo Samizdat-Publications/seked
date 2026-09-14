@@ -2,8 +2,8 @@
  * The claim overlays that are not ghost profiles: the shaft rays, the
  * descending passage's ray, the compass rose, the Orion projection, the
  * bearings taken along the plateau, the base lines drawn on it, Legon's
- * rectangle over the three pyramids and the corner line carried off the
- * plateau towards Heliopolis.
+ * rectangle over the three pyramids, the corner line carried off the plateau
+ * towards Heliopolis and the King's Chamber as a wireframe.
  *
  * Every one of them is drawn from a spec built in ../overlays.ts out of the
  * claim file's own params, so nothing here knows which claim it is serving.
@@ -17,6 +17,7 @@ import { formatDms } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import type { Plane } from 'three';
 import type {
+  ChamberWireframeSpec,
   CompassRoseSpec,
   GroundBearingsSpec,
   GroundLineSpec,
@@ -63,6 +64,8 @@ export function ClaimOverlay({
       return <GroundRectangle spec={overlay.spec} />;
     case 'ground-line':
       return <GroundLine spec={overlay.spec} />;
+    case 'chamber-wireframe':
+      return <ChamberWireframe spec={overlay.spec} />;
   }
 }
 
@@ -409,6 +412,38 @@ function GroundLine({ spec }: { spec: GroundLineSpec }): React.JSX.Element {
           />
         </group>
       )}
+    </group>
+  );
+}
+
+/** The chamber's own edges, dim enough that the diagonals read over them. */
+const WIREFRAME = '#8fa6bd';
+
+/**
+ * A4. The King's Chamber as a box of twelve edges with the three diagonals
+ * the claim compares drawn across it, all of it through the masonry: the
+ * 3-4-5 is a claim about a room forty metres inside a pyramid, and an overlay
+ * that waits for the reader to find the section plane shows it to nobody.
+ *
+ * The lengths written at the middle of each diagonal are the claim's own,
+ * which are Petrie's means of the wall faces and not the four wall positions
+ * the box is built from. The two differ by a centimetre or two, far less than
+ * the lines are thick.
+ */
+function ChamberWireframe({ spec }: { spec: ChamberWireframeSpec }): React.JSX.Element {
+  return (
+    <group>
+      <Ray points={spec.edges} colour={WIREFRAME} opacity={0.5} />
+      {spec.diagonals.map((d) => (
+        <group key={d.name}>
+          <Ray points={[d.from, d.to]} colour={d.colour} />
+          <Label
+            text={`${d.name} ${formatValue(d.cubits, 'rc')} rc${d.target === undefined ? '' : `, claimed ${formatValue(d.target, 'rc')}`}`}
+            position={[(d.from[0] + d.to[0]) / 2, (d.from[1] + d.to[1]) / 2, (d.from[2] + d.to[2]) / 2]}
+            colour={d.colour}
+          />
+        </group>
+      ))}
     </group>
   );
 }

@@ -330,6 +330,25 @@ function OverlayControls({ overlay, model }: { overlay: OverlaySpec; model: Mode
         </ul>
       );
     }
+    case 'chamber-wireframe': {
+      const spec = overlay.spec;
+      return (
+        <ul className="plain rays">
+          {spec.diagonals.map((d) => (
+            <li key={d.name}>
+              <span className="swatch" style={{ background: d.colour }} />
+              {d.name}: {formatValue(d.lengthM, 'm')}, {formatValue(d.cubits, 'rc')} rc
+              {d.target === undefined ? '' : ` against ${formatValue(d.target, 'rc')}`}
+              {d.residualPct === undefined ? '' : `, ${percent(d.residualPct)}`}
+            </li>
+          ))}
+          <li className="note">
+            The box is the four measured wall positions and the two measured levels; the cubits beside each diagonal are the
+            claim's own, which are Petrie's means of the wall faces. The two differ by a centimetre or two.
+          </li>
+        </ul>
+      );
+    }
     case 'ground-line': {
       const spec = overlay.spec;
       // Where the target came from, said from its own records rather than

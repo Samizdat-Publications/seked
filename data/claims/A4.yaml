@@ -9,6 +9,9 @@ comparisons:
   - label: end-wall diagonal in cubits against 15
     formula: sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)
     target: "15"
+  - label: floor diagonal in cubits against √500
+    formula: sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2)
+    target: sqrt(500)
   - label: space diagonal in cubits against 25
     formula: sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)
     target: "25"

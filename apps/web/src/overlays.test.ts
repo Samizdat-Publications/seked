@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
 import { atEpoch, buildModel, type Model } from './model';
 import {
+  chamberWireframeSpec,
   groundBearingsSpec,
   groundLineSpec,
   groundOutlinesSpec,
@@ -309,5 +310,39 @@ describe('the D1 ground line', () => {
       model.env,
     );
     expect(Math.abs((comparisons()[0]?.targetValue as number) - before)).toBeLessThan(1e-6);
+  });
+});
+
+describe('the A4 chamber wireframe', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const a4 = claim('A4');
+  const spec = chamberWireframeSpec(a4, contextFor(model, -2449)) as NonNullable<ReturnType<typeof chamberWireframeSpec>>;
+
+  it('labels each diagonal with the comparison the claim makes about it', () => {
+    const comparisons = model.results.get('A4')?.comparisons ?? [];
+    expect(spec.diagonals.map((d) => d.name)).toEqual(['end-wall', 'floor', 'space']);
+    for (const diagonal of spec.diagonals) {
+      const comparison = comparisons.find((c) => c.label.startsWith(diagonal.name));
+      expect(comparison, diagonal.name).toBeDefined();
+      expect(diagonal.cubits, diagonal.name).toBeCloseTo(comparison?.value as number, 9);
+      expect(diagonal.target, diagonal.name).toBeCloseTo(comparison?.targetValue as number, 9);
+      expect(diagonal.residualPct, diagonal.name).toBeCloseTo(comparison?.residualPct as number, 9);
+    }
+  });
+
+  it('draws twelve edges and runs the end-wall diagonal up one wall', () => {
+    expect(spec.edges).toHaveLength(24);
+    const endWall = spec.diagonals.find((d) => d.name === 'end-wall');
+    // The east wall is a plane of constant east in the chamber's own frame.
+    // In the scene frame the pyramid's few arcminutes of orientation twist it,
+    // so the two ends part by the chamber's width times the sine of that
+    // angle, about six millimetres, and by no more than that.
+    const placed = model.pyramids.find((p) => p.id === spec.structure);
+    const width = (model.env['kc.wall.north.north'] as number) - (model.env['kc.wall.south.north'] as number);
+    const twist = Math.abs(Math.sin((placed?.orientationDeg as number) * DEG)) * width;
+    expect(Math.abs((endWall?.from[0] as number) - (endWall?.to[0] as number))).toBeLessThanOrEqual(twist + 1e-9);
+    // It is the diagonal of a wall and not of the floor, so it rises the full
+    // height of the room.
+    expect((endWall?.to[2] as number) - (endWall?.from[2] as number)).toBeGreaterThan(5);
   });
 });
