@@ -29,7 +29,7 @@ export interface DomeBuffers {
   count: number;
 }
 
-/** One of the ten stars the claims name, placed on the same sphere. */
+/** One of the stars the claims name, placed on the same sphere. */
 export interface NamedDomeStar extends Equatorial {
   id: string;
   name: string;
@@ -129,7 +129,7 @@ export function namedOnDome(stars: readonly Star[], epoch: number, radius = DOME
   });
 }
 
-/** A star of the bundle's named ten, by the display name a claim's overlay writes. */
+/** A star of the bundle's named ones, by the display name a claim's overlay writes. */
 export function starByName(stars: readonly Star[], name: string): Star | undefined {
   return stars.find((s) => s.name.toLowerCase() === name.toLowerCase() || s.id === name.toLowerCase());
 }

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
 import { atEpoch, buildModel, type Model } from './model';
 import {
+  BUILT_OVERLAYS,
   chamberWireframeSpec,
   cornerMissWords,
   ghostEarthSpec,
@@ -12,11 +13,14 @@ import {
   groundOutlinesSpec,
   groundRectangleSpec,
   mapInsetSpec,
+  overlaySpec,
   passageRaySpec,
+  PANEL_ONLY,
   shaftRaysSpec,
   skyProjectionSpec,
   type OverlayContext,
 } from './overlays';
+import { DEFAULT_EPOCH } from './view';
 
 /**
  * The overlays are the claims drawn, so the two have to say the same thing.
@@ -26,6 +30,9 @@ import {
  */
 const bundle = buildBundle();
 const claim = (id: string) => bundle.claims.find((c) => c.id === id) as NonNullable<(typeof bundle.claims)[number]>;
+
+/** The site origin's elevation, which is what a caller holding the bundle has. */
+const elevationM = bundle.sites.find((s) => s.id === 'giza')?.origin.elevation ?? 0;
 
 function contextFor(model: Model, epoch: number, krupp = true): OverlayContext {
   return {
@@ -37,6 +44,7 @@ function contextFor(model: Model, epoch: number, krupp = true): OverlayContext {
     lstDeg: 0,
     latitudeDeg: model.latitudeDeg,
     krupp,
+    elevationM,
   };
 }
 
@@ -393,12 +401,7 @@ describe('the B1 ghost Earth', () => {
 
 describe('the B3 map inset', () => {
   const model = buildModel(bundle, 'canonical', null, null);
-  // The height the datum shift is computed at is the site's own origin
-  // elevation, which is what a caller holding the bundle has.
-  const elevationM = bundle.sites.find((s) => s.id === 'giza')?.origin.elevation ?? 0;
-  const spec = mapInsetSpec(claim('B3'), { ...contextFor(model, -2449), elevationM }) as NonNullable<
-    ReturnType<typeof mapInsetSpec>
-  >;
+  const spec = mapInsetSpec(claim('B3'), contextFor(model, -2449)) as NonNullable<ReturnType<typeof mapInsetSpec>>;
 
   it("puts the claim's own parallel where its own residual puts it", () => {
     const comparison = model.results.get('B3')?.comparisons[0];
@@ -434,5 +437,35 @@ describe('the B3 map inset', () => {
     >;
     expect(without.parallels.map((p) => p.name)).toEqual(['measured', 'claimed']);
     expect(without.datumOverResidual).toBeUndefined();
+  });
+});
+
+/**
+ * Phase 4's own "done when". A claim's overlay is a declaration in its YAML
+ * file rather than code, so the list of types that exist has always run ahead
+ * of the list the viewer draws. This is the test that says it no longer does:
+ * every claim that declares a picture gets one, under the canonical preset
+ * and at the epoch the viewer would draw it at.
+ */
+describe('every overlay a claim declares is built', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const declared = bundle.claims.filter((c) => c.overlay !== undefined);
+
+  it('builds a spec for every claim that declares a picture', () => {
+    expect(declared.length).toBeGreaterThan(18);
+    for (const c of declared) {
+      const type = c.overlay?.type as string;
+      if (type === PANEL_ONLY) continue;
+      const context = contextFor(model, c.epoch ?? DEFAULT_EPOCH);
+      expect(BUILT_OVERLAYS.has(type), `${c.id} declares ${type}`).toBe(true);
+      expect(overlaySpec(c, context), `${c.id} declares ${type}`).toBeDefined();
+    }
+  });
+
+  it('leaves unbuilt only the type that says there is no picture', () => {
+    const types = declared.map((c) => c.overlay?.type as string);
+    expect([...new Set(types.filter((t) => !BUILT_OVERLAYS.has(t)))]).toEqual([PANEL_ONLY]);
+    // And that type is still a claim's own word for it, not an omission.
+    expect(types.filter((t) => t === PANEL_ONLY)).toHaveLength(3);
   });
 });

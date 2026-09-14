@@ -264,7 +264,7 @@ Residual by survey preset:
 
 **Context:** Commonly cited WGS84 coordinates of the Great Pyramid's base centre (29°58′45″ N, 31°08′03″ E). · BIPM (2019). The International System of Units, 9th edition. c = 299 792 458 m/s exactly.
 
-The commonly cited base centre, 29°58′45″ N, is about 9 m south of the meme's coordinate, well inside a base 230 m on a side. The seventh decimal place of a latitude is a centimetre; no survey of the base centre is that precise, and the answer changes by tens of metres with the datum.
+The commonly cited base centre, 29°58′45″ N, is about 9 m south of the meme's coordinate, well inside a base 230 m on a side. The seventh decimal place of a latitude is a centimetre; no survey of the base centre is that precise, and the answer changes by tens of metres with the datum. Read on Old Egyptian 1907, the datum Egypt's own survey of the plateau ran on, that same base centre falls 18.4 m south of its WGS84 parallel, twice the 9 m the coincidence rests on and in the other direction. That shift is the EPSG 1148 geocentric translation applied on the Helmert 1906 ellipsoid, computed by the overlay from the records rather than quoted.
 
 ### B4 · Pyramid inch and the year
 
@@ -537,7 +537,7 @@ This is C4's engine with another constellation in it: the same two shape compari
 
 ### D1 · Giza diagonal to Heliopolis
 
-A line through the south-east corners of the three pyramids runs at 45 degrees and points at the obelisk of Senusret I at Heliopolis, 17 km to the north-east.
+A line through the south-east corners of the three pyramids runs at 45 degrees and points at the obelisk of Senusret I at Heliopolis, about 24 km to the north-east.
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
@@ -561,7 +561,7 @@ Residual by survey preset:
 
 **Context:** Legon, J. A. R. (1979). The Plan of the Giza Pyramids. Archaeological Reports of the Archaeology Society of Staten Island 10(1). · Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer.
 
-The corner line is built from Petrie's G1 to G3 centre offsets (section 92) and the mean half-bases, so Menkaure's slightly rectangular base enters as its mean side. The bearing to the obelisk is taken in the local east-north frame with the longitude difference scaled by the cosine of the latitude; at 17 km that approximation is good to about 0.1 degrees, which is far inside the 2 percent (0.9 degree) tolerance. The bearing is now taken from the obelisk's derived offsets from the frame's origin, which are built in that same cosine-of-latitude flat frame, so the number is unchanged and the site plan and the claim read one position. The obelisk's position is a commonly cited value, unverified, and its sigma of 50 m moves the bearing by 0.2 degrees at most. Petrie found no exact relation between the corners of the three pyramids (section 92).
+The corner line is built from Petrie's G1 to G3 centre offsets (section 92) and the mean half-bases, so Menkaure's slightly rectangular base enters as its mean side. The bearing to the obelisk is taken in the local east-north frame with the longitude difference scaled by the cosine of the latitude; at 24 km that approximation is good to about 0.1 degrees, which is far inside the 2 percent (0.9 degree) tolerance. The 17 km the plan quotes is each leg and not the distance: the obelisk's derived offsets put it 16.7 km east and 16.7 km north of the Great Pyramid's base centre, which is 23.6 km away. The bearing is now taken from the obelisk's derived offsets from the frame's origin, which are built in that same cosine-of-latitude flat frame, so the number is unchanged and the site plan and the claim read one position. The obelisk's position is a commonly cited value, unverified, and its sigma of 50 m moves the bearing by 0.2 degrees at most. Petrie found no exact relation between the corners of the three pyramids (section 92).
 
 ### D2 · Legon's rectangle
 

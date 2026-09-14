@@ -25,7 +25,7 @@ export interface SekedBundle {
   measurements: Measurement[];
   /** Claims with the formula/target shorthand already normalised into comparisons. */
   claims: Claim[];
-  /** The ten stars the claims name, with their roles. */
+  /** The stars the claims name, with their roles: the original ten, and the four Cygnus stars C7 adds. */
   stars: Star[];
   /**
    * HYG, for the sky dome. The whole catalogue on disk goes to magnitude 6.5

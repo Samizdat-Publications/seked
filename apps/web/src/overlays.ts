@@ -110,7 +110,7 @@ export interface OverlayContext {
   env: Environment;
   pyramids: PyramidParams[];
   interiors: StructureInterior[];
-  /** The ten stars the claims name, from the bundle. */
+  /** The stars the claims name: the original ten, and the four C7 adds. */
   stars: Star[];
   /** The epoch the scene is drawn at, which is what the overlays follow. */
   epoch: number;
@@ -1332,9 +1332,21 @@ export interface OverlayNote {
 
 const ROUND = (v: number, d = 1): string => v.toFixed(d);
 
+/**
+ * The type a claim declares when there is nothing in the scene to draw. A5,
+ * B2 and B5 are each arithmetic on two numbers, and a picture of that is a
+ * picture of the panel. Saying so is how a claim states that the monument is
+ * not where it is argued, which is a different thing from an overlay nobody
+ * has built yet.
+ */
+export const PANEL_ONLY = 'panel';
+
 export function overlayNote(claim: Claim, ctx: OverlayContext): OverlayNote {
   const type = claim.overlay?.type;
   if (!type) return { type: undefined, built: false, text: 'This claim declares no overlay.' };
+  if (type === PANEL_ONLY) {
+    return { type, built: false, text: 'Nothing to draw: the comparison above is the whole of this claim.' };
+  }
   const found = overlaySpec(claim, ctx);
   if (!found) return { type, built: false, text: `Overlay "${type}" not built yet.` };
   return { type, built: true, text: describe(found) };
