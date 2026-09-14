@@ -122,4 +122,15 @@ describe('C · sky claims, evaluated at the epoch each claim names', () => {
     expect(Math.abs(c.absolute)).toBeLessThan(0.25);
     expect(c.within).toBe(true);
   });
+
+  it("C3: the descending passage sits within 10′ of Thuban's lower culmination in 2170 BCE", () => {
+    const r = byId('C3');
+    expect(r.status).toBe('computed');
+    expect(r.comparisons).toHaveLength(1);
+    const c = r.comparisons[0]!;
+    expect(Number.isFinite(c.residualPct)).toBe(true);
+    expect(Math.abs(c.absolute) * 60).toBeLessThan(10);
+    expect(r.fits).toBe(true);
+    expect(r.freeChoices).toBe(1);
+  });
 });

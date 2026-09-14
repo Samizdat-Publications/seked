@@ -1,0 +1,36 @@
+id: C3
+title: Descending passage and the pole star
+group: sky
+status: computed
+epoch: -2169
+summary: >-
+  The descending passage was bored at 26°31′ so that an observer looking up
+  it, north and below the pole, saw Thuban at its lower culmination around
+  2170 BCE.
+comparisons:
+  - label: descending passage angle against Thuban's lower culmination
+    formula: passage.descending.angle
+    target: star.thuban.lower.altitude
+    unit: deg
+tolerance_pct: 1
+free_choices:
+  - the epoch
+overlay:
+  type: passage-ray
+  params:
+    passage: passage.descending.angle
+    star: Thuban
+    culmination: lower
+sources:
+  for: [smyth-1864]
+  context: [petrie-1883, spence-2000, vondrak-2011]
+notes: >-
+  Thuban's lower culmination climbs to about 29°53′ near 2800 BCE and falls
+  away on either side, so the passage angle is reached twice: near 3409 BCE
+  on the way up and near 2185 BCE on the way down. Choosing which crossing to
+  call the alignment is this claim's one free choice, and it is not a small
+  one, since the two dates are twelve centuries apart. Tolerance is 1 %,
+  about 16′ at this angle, the same band as C2. There is a mundane reading as
+  well: the measured 26°31′ is within 3′ of atan(1/2), a rise of one on a run
+  of two, which is a seked of 14 palms per cubit and needs no star at all,
+  and the ascending passage sits within 32′ of the same slope. See A3.
