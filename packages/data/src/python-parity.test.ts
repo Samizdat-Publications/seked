@@ -279,9 +279,10 @@ describe.skipIf(!py)('blender/seked_data.py flattens the ground exactly like @se
 });
 /**
  * The other half of the placement: G2 and G3 are where Petrie's triangulation
- * put them, and the Sphinx is where a latitude and a longitude put it. Both
- * readers have to agree about the second kind too, or the .blend, the GLB and
- * the viewer would stand the Sphinx in different places.
+ * put them, and the Sphinx and the three points of the Delta are where a
+ * latitude and a longitude put them. Both readers have to agree about the
+ * second kind too, or the .blend, the GLB and the viewer would stand the
+ * Sphinx in different places.
  */
 describe.skipIf(!py)('blender/seked_data.py derives the same centre offsets as @seked/geometry', () => {
   const db = loadDatabase();
@@ -290,7 +291,13 @@ describe.skipIf(!py)('blender/seked_data.py derives the same centre offsets as @
   const env = buildEnvironment(resolve(db, 'canonical').values);
 
   it('derives the same keys', () => {
-    expect(Object.keys(theirs).sort()).toEqual(['g1.centre.offset.east', 'g1.centre.offset.north', 'sphinx.centre.offset.east', 'sphinx.centre.offset.north']);
+    expect(Object.keys(theirs).sort()).toEqual([
+      'delta.apex.centre.offset.east', 'delta.apex.centre.offset.north',
+      'delta.east.centre.offset.east', 'delta.east.centre.offset.north',
+      'delta.west.centre.offset.east', 'delta.west.centre.offset.north',
+      'g1.centre.offset.east', 'g1.centre.offset.north',
+      'sphinx.centre.offset.east', 'sphinx.centre.offset.north',
+    ]);
   });
 
   it('agrees on every one of them to the micrometre', () => {

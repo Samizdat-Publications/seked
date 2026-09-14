@@ -69,6 +69,12 @@
     "note": "Placeholder until a surveyed position is entered; the obelisk is the only standing monument of the Heliopolis temple."
   },
   {
+    "id": "coords-delta-cited",
+    "kind": "reference",
+    "citation": "Commonly cited WGS84 coordinates of three points on the Nile Delta: the Delta Barrage at El-Qanater el-Khayreya, where the river divides (30°11′ N, 31°08′ E); Alexandria (31°12′ N, 29°55′ E); and Port Said (31°15′ N, 32°18′ E).",
+    "note": "Placeholders, and placeholders of a second kind: not only are the positions uncited gazetteer values, the places themselves stand in for features Stecchini's claim is actually about. Alexandria and Port Said are modern towns standing for the Canopic and Pelusiac mouths, the Delta's western and eastern limits in antiquity, and the barrage is a nineteenth-century dam standing for the head of the Delta. Every one of them is a town or a structure rather than a point, so each is quoted to the arcminute and entered with a sigma of 0.02°, about 2 km. Stecchini's own figures, an axis of Egypt at 31°14′ E and a Delta apex at 30°06′ N, reach us only through Tompkins' appendix and secondary accounts of it, and are not entered."
+  },
+  {
     "id": "coords-sphinx-cited",
     "kind": "reference",
     "citation": "Commonly cited WGS84 coordinates of the Great Sphinx of Giza: 29°58′31″ N, 31°08′16″ E.",
