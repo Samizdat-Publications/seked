@@ -599,9 +599,18 @@ INTERIOR_BUILDERS = [
 # interiors appear. The shapes looked for under "<id>." are:
 #
 #   passage.<name>.floor.begin.{north,east,up}   floor centre line
-#   passage.<name>.floor.end.{north,east,up}
+#   passage.<name>.floor.end.{north,east,up}     the far end, if measured
+#   passage.<name>.length                        else metres along the floor
+#   passage.<name>.angle                         and the slope in degrees
+#   passage.<name>.direction                     optional bearing, azimuth
 #   passage.<name>.{width,height}                rectangular section
-#   passage.<name>.angle                         optional, provenance only
+#
+# A passage that records both ends is drawn between them and its angle, if
+# there is one, is provenance. A passage that records only where it begins is
+# drawn from length and angle, the slope being positive for a passage that
+# rises going away from its beginning, along direction if a record gives one
+# and due south otherwise. That is how a published plan states a passage, and
+# computing the far end keeps it out of the database.
 #
 #   chamber.<name>.wall.{north,south}.north      wall positions
 #   chamber.<name>.wall.{east,west}.east
@@ -620,12 +629,21 @@ INTERIOR_BUILDERS = [
 # distance south of the north base edge, and an east one as
 # "<point>.from_east_side", a distance west of the east base edge; both are
 # converted here with the half-base. A passage with no floor.begin of its own
-# starts at the structure's entrance. Anything incomplete is skipped.
+# starts at the structure's entrance. An entrance that records a level and an
+# east offset but no north coordinate is put on the north face, which is where
+# every entrance at Giza is, from "<id>.face.angle" and the half base.
+# Anything incomplete is skipped.
 
 INTERIOR_STRUCTURES = ("g1", "g2", "g3")
 
 # A passage shorter than this is a rounding artefact, not a passage.
 _MIN_RUN = 1e-6
+
+# The bearing a passage takes when no record gives it one. Every entrance
+# passage at Giza runs south into its pyramid from the north face, so a
+# published plan that states a length and a slope and nothing else is stating
+# a run due south.
+_DUE_SOUTH = 180.0
 
 
 def interior_key_prefix(structure):
@@ -755,34 +773,114 @@ def _half_base(values, structure):
     return None if base is None else base / 2.0
 
 
-def _entrance_begin(values, prefix, name, half):
+def _face_north(values, base, structure, half):
+    """
+    The north coordinate of a point in the pyramid's north face, taken from
+    the face instead of read off a record.
+
+    Every entrance at Giza is in the north face, and a face is a plane, so a
+    point on it at height up stands up / tan(face angle) south of the north
+    base edge: a survey that recorded the threshold's height recorded its plan
+    position along with it, and the setback is the face's own geometry rather
+    than a second measurement. That makes it a derived quantity, which belongs
+    here and not in the database.
+
+    The face angle is the resolved "<id>.face.angle", so it moves with the
+    preset, and it is named among the records because it is what does the
+    work. The half base converts as it does for from_north_base and goes
+    unnamed for the same reason. A preset carrying no face angle, or no base
+    to halve, leaves the point unmade and the passage unbuilt, as before.
+    """
+    up = _number_at(values, base + ".up")
+    key = structure + ".face.angle"
+    angle = _number_at(values, key)
+    if up is None or half is None or angle is None:
+        return None
+    if angle <= 0 or angle >= 90:
+        return None
+    return (half - up / math.tan(math.radians(angle)), key)
+
+
+def _entrance_point(values, base, structure, half):
+    """
+    An entrance point: the stored point if all three coordinates are recorded,
+    and otherwise the same point with its north coordinate taken from the
+    north face, which is where every entrance at Giza is.
+    """
+    stored = _stored_point(values, base, half)
+    if stored is not None:
+        return stored
+    north = _face_north(values, base, structure, half)
+    east = _coordinate(values, base, "east", half)
+    up = _coordinate(values, base, "up", half)
+    if north is None or east is None or up is None:
+        return None
+    return ((east[0], north[0], up[0]), [north[1], east[1], up[1]])
+
+
+def _entrance_begin(values, structure, prefix, name, half):
     """Where a passage begins when it records no floor.begin of its own."""
-    named = _stored_point(values, prefix + "entrance." + name + ".floor.begin", half)
+    named = _entrance_point(values, prefix + "entrance." + name + ".floor.begin", structure, half)
     if named is not None:
         return named
     if name == "descending":
-        return _stored_point(values, prefix + "entrance.floor.begin", half)
+        return _entrance_point(values, prefix + "entrance.floor.begin", structure, half)
     return None
 
 
-def _passage_builder(values, prefix, name, half):
+def _end_from_run(values, base, start):
+    """
+    The far end of a passage whose source states it as a run, not as a point.
+
+    "<base>.length" is metres measured along the floor and "<base>.angle" the
+    slope in degrees, positive for a passage that rises going away from its
+    beginning and negative for one that descends. The bearing is
+    "<base>.direction" when a record gives it as an azimuth in degrees, and
+    _DUE_SOUTH otherwise. The end point itself is never stored: it is a
+    derived quantity, so it is computed here from the three records.
+    """
+    length = _number_at(values, base + ".length")
+    angle = _number_at(values, base + ".angle")
+    if length is None or angle is None or length <= 0:
+        return None
+    keys = [base + ".length", base + ".angle"]
+    direction = _number_at(values, base + ".direction")
+    if direction is not None:
+        keys.append(base + ".direction")
+    azimuth = math.radians(_DUE_SOUTH if direction is None else direction)
+    slope = math.radians(angle)
+    flat = length * math.cos(slope)
+    end = (start[0] + flat * math.sin(azimuth),
+           start[1] + flat * math.cos(azimuth),
+           start[2] + length * math.sin(slope))
+    return (end, keys)
+
+
+def _passage_builder(values, structure, prefix, name, half):
     base = prefix + "passage." + name
     begin = _stored_point(values, base + ".floor.begin", half)
     if begin is None:
-        begin = _entrance_begin(values, prefix, name, half)
-    end = _stored_point(values, base + ".floor.end", half)
+        begin = _entrance_begin(values, structure, prefix, name, half)
     width = _number_at(values, base + ".width")
     height = _number_at(values, base + ".height")
-    if begin is None or end is None or width is None or height is None or width <= 0 or height <= 0:
+    if begin is None or width is None or height is None or width <= 0 or height <= 0:
         return None
     start, start_keys = begin
+    # A survey that could reach both ends leaves two points. A published plan
+    # states a length along the floor and a slope instead, and the far end is
+    # worked out from them rather than written down anywhere.
+    stored = _stored_point(values, base + ".floor.end", half)
+    end = stored if stored is not None else _end_from_run(values, base, start)
+    if end is None:
+        return None
     finish, finish_keys = end
     if math.sqrt(sum((finish[i] - start[i]) ** 2 for i in range(3))) < _MIN_RUN:
         return None
     keys = start_keys + finish_keys + [base + ".width", base + ".height"]
     # The recorded slope is not needed to build a passage whose two ends are
-    # known, but it is part of the provenance when the database carries it.
-    if _number_at(values, base + ".angle") is not None:
+    # known, but it is part of the provenance when the database carries it. On
+    # the other path it is load-bearing and _end_from_run has already named it.
+    if stored is not None and _number_at(values, base + ".angle") is not None:
         keys.append(base + ".angle")
     return (base, keys, lambda v: passage(start, finish, width, height))
 
@@ -817,7 +915,7 @@ def _discover_builders(values, structure):
     half = _half_base(values, structure)
     out = []
     for name in _member_names(values, prefix, "passage"):
-        built = _passage_builder(values, prefix, name, half)
+        built = _passage_builder(values, structure, prefix, name, half)
         if built is not None:
             out.append(built)
     for name in _member_names(values, prefix, "chamber"):
@@ -905,6 +1003,34 @@ INTERIOR_DISCOVERY_CASE = {
     "g2.passage.horizontal.floor.end.up": 0.0,
     "g2.passage.horizontal.width": 1.0,
     "g2.passage.horizontal.height": 2.0,
+    # A passage stated the way a published plan states one: where it begins, a
+    # length along the floor and a slope, with no far end written down. This
+    # one takes the default bearing, due south.
+    "g2.passage.lower_descending.floor.begin.north": -20.0,
+    "g2.passage.lower_descending.floor.begin.east": 5.0,
+    "g2.passage.lower_descending.floor.begin.up": 0.0,
+    "g2.passage.lower_descending.length": 20.0,
+    "g2.passage.lower_descending.angle": -30.0,
+    "g2.passage.lower_descending.width": 1.0,
+    "g2.passage.lower_descending.height": 2.0,
+    # An entrance with a level and an east offset but no north coordinate, put
+    # on the north face from the face angle and the half base.
+    "g2.face.angle": 50.0,
+    "g2.entrance.upper.floor.begin.east": 2.0,
+    "g2.entrance.upper.floor.begin.up": 10.0,
+    "g2.passage.upper.length": 30.0,
+    "g2.passage.upper.angle": -26.0,
+    "g2.passage.upper.width": 1.0,
+    "g2.passage.upper.height": 2.0,
+    # The same, with a recorded bearing that is not due south.
+    "g2.passage.well.floor.begin.north": -26.0,
+    "g2.passage.well.floor.begin.east": 5.0,
+    "g2.passage.well.floor.begin.up": -10.0,
+    "g2.passage.well.length": 8.0,
+    "g2.passage.well.angle": 0.0,
+    "g2.passage.well.direction": 90.0,
+    "g2.passage.well.width": 1.0,
+    "g2.passage.well.height": 2.0,
     "g2.chamber.burial.wall.north.north": -20.0,
     "g2.chamber.burial.wall.south.north": -26.0,
     "g2.chamber.burial.wall.east.east": 11.0,
