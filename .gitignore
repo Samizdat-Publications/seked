@@ -30,3 +30,4 @@ apps/web/public/terrain/
 # Plugin scratch data and agent worktrees
 .claude/data/
 .claude/worktrees/
+.playwright-mcp/
