@@ -20,8 +20,9 @@ pyramid, so a section view is a matter of hiding or showing that collection.
 Nothing here knows what any interior looks like: seked_data reads the plan out
 of the records. The Sphinx is a box: an axis-aligned massing placeholder on a cited position,
 standing in for the sculpt, and it says so in a custom property. The plateau arrives as
-a hidden "Terrain (GLO-30 context)" grid and a visible "Terrain (ground)" grid; read their notes before treating
-anything near a monument as ground.
+a hidden "Terrain (GLO-30 context)" grid and a visible "Terrain (ground)" grid, with a
+"Terrain (far context)" ring carrying the horizon out past their edge; read their notes
+before treating anything near a monument as ground.
 
 `blender/check.py` asserts what this script produced; run it after a save.
 """
@@ -59,6 +60,8 @@ from seked_data import (  # noqa: E402
 STRUCTURES = [("g1", "G1 Khufu"), ("g2", "G2 Khafre"), ("g3", "G3 Menkaure")]
 TERRAIN_NAME = "Terrain (GLO-30 context)"
 GROUND_NAME = "Terrain (ground)"
+FAR_TERRAIN_NAME = "Terrain (far context)"
+FAR_TERRAIN_GRID = "giza-glo30-far"
 INTERIOR_NAME = "Interior"
 
 
@@ -271,6 +274,92 @@ def build_terrain(parent, preset_id, pyramids=()):
     obj.hide_render = True
     print(f"{TERRAIN_NAME}: {nx} x {ny} at {spacing} m, origin elevation {elevation} m, hidden")
     build_ground(parent, preset_id, header, ground, faces, elevation)
+    build_far_context(parent, preset_id, header, elevation)
+    return obj
+
+
+def build_far_context(parent, preset_id, near_header, elevation):
+    """
+    The coarse ring that carries the horizon out past the near grid.
+
+    The same Copernicus product cut again at twelve kilometres and sixty
+    metres, with the same site origin elevation taken off, and drawn only
+    where the near grid does not reach: every face the near grid already
+    covers is left out, so the two meet along the near grid's outer edge
+    rather than lying one on the other and z-fighting. Its vertices are all
+    there, the ones under the near grid included, so the mesh is the nx by ny
+    its own header describes. Nothing is flattened here: the pyramids are
+    inside the near grid.
+    """
+    header, heights = load_terrain(name=FAR_TERRAIN_GRID)
+    nx, ny, spacing = header["nx"], header["ny"], header["spacing"]
+    x0, y0 = header["x0"], header["y0"]
+    near_spacing = near_header["spacing"]
+
+    # The two grids have to share their sample points, or the ring's inner edge
+    # would not sit on the near grid's outer edge. That needs the far spacing to
+    # be a whole multiple of the near one and the two origins to be a whole
+    # number of far steps apart, so both are checked rather than assumed.
+    ratio = spacing / near_spacing
+    if abs(ratio - round(ratio)) > 1e-9 or round(ratio) < 1:
+        raise ValueError(
+            f"{FAR_TERRAIN_GRID} is spaced {spacing} m and the near grid {near_spacing} m, "
+            f"a ratio of {ratio}, which is not a whole multiple, so the two share no sample points"
+        )
+    for axis in ("x", "y"):
+        far0, near0 = header[axis + "0"], near_header[axis + "0"]
+        steps = (near0 - far0) / spacing
+        if abs(steps - round(steps)) > 1e-9:
+            raise ValueError(
+                f"{FAR_TERRAIN_GRID} starts at {axis}0 = {far0} m and the near grid at {near0} m, "
+                f"which is {steps} steps of {spacing} m apart rather than a whole number, so the "
+                "grids are offset and their samples do not coincide"
+            )
+
+    verts = []
+    for j in range(ny):
+        y = y0 + j * spacing
+        row = j * nx
+        for i in range(nx):
+            verts.append((x0 + i * spacing, y, heights[row + i] - elevation))
+
+    near_x1 = near_header["x0"] + (near_header["nx"] - 1) * near_spacing
+    near_y1 = near_header["y0"] + (near_header["ny"] - 1) * near_spacing
+    eps = spacing * 1e-6
+    faces, covered = [], 0
+    for j in range(ny - 1):
+        inside_y = (y0 + j * spacing >= near_header["y0"] - eps
+                    and y0 + (j + 1) * spacing <= near_y1 + eps)
+        for i in range(nx - 1):
+            if (inside_y and x0 + i * spacing >= near_header["x0"] - eps
+                    and x0 + (i + 1) * spacing <= near_x1 + eps):
+                covered += 1        # the near grid already draws this ground, at its own spacing
+                continue
+            a = j * nx + i
+            # Counter-clockwise seen from above, so the surface faces up.
+            faces.append((a, a + 1, a + nx + 1, a + nx))
+
+    obj = make_object(FAR_TERRAIN_NAME, verts, faces, parent, {
+        "seked_preset": preset_id,
+        "seked_structure": "terrain",
+        "seked_site": header["site"],
+        "seked_sources": header["source"],
+        "seked_terrain_sha256": header["sha256"],
+        "seked_terrain_datum": header["verticalDatum"],
+        "seked_origin_elevation_m": float(elevation),
+        "seked_note": (
+            f"The coarse ring past the near grid: the same GLO-30 surface model cut out to "
+            f"{abs(x0):.0f} m at {spacing:.0f} m spacing, so the horizon does not stop where the near "
+            f"grid does at {near_x1:.0f} m. Its inner edge is the near grid's outer edge sampled at "
+            f"{spacing:.0f} m rather than {near_spacing:.0f} m, and every face the near grid already "
+            "covers is left out, so the two meet edge to edge instead of overlapping. The monument "
+            "footprints are edited here as they are in the near grid, and nothing is flattened: the "
+            "pyramids are inside the near grid. Heights are orthometric on EGM2008, less the site "
+            "origin elevation from data/sites.json."
+        ),
+    })
+    print(f"{FAR_TERRAIN_NAME}: {nx} x {ny} at {spacing} m out to {abs(x0):.0f} m, "
+          f"{len(faces)} faces, {covered} left to the near grid")
     return obj
 
 

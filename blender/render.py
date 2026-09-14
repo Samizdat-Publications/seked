@@ -163,14 +163,20 @@ def make_camera(scene, location, target, lens, name="Hero camera", clip_end=4.0 
     return cam
 
 
+# The terrain that renders: the flattened ground and the coarse ring that
+# carries the horizon past it. The GLO-30 context grid they were cut from
+# stays hidden.
+RENDERED_TERRAIN = ("Terrain (ground)", "Terrain (far context)")
+
+
 def show_ground_only():
-    """The flattened ground renders, smooth-shaded; the GLO-30 context grid it was cut from stays hidden."""
+    """The ground and the far ring render, smooth-shaded; every other terrain grid is hidden."""
     for obj in bpy.data.objects:
         if obj.name.startswith("Terrain"):
-            ground = obj.name == "Terrain (ground)"
-            obj.hide_set(not ground)
-            obj.hide_render = not ground
-            if ground:
+            shown = obj.name in RENDERED_TERRAIN
+            obj.hide_set(not shown)
+            obj.hide_render = not shown
+            if shown:
                 for poly in obj.data.polygons:
                     poly.use_smooth = True
 
@@ -204,6 +210,27 @@ def setup_view(scene, name, view, bake):
         build_star_dome(scene, bake, location)
     scene.view_settings.exposure = view.get("exposure", 0.0)
     describe_camera(location, target, view["lens"], scene.view_settings.exposure)
+
+
+def show_ground_only():
+    """
+    Of the three terrain objects the generator writes, render the two that are
+    ground: "Terrain (ground)", the near grid flattened under the pyramids, and
+    "Terrain (far context)", the coarse ring that carries the horizon out to
+    twelve kilometres. The raw GLO-30 grid stays hidden, because it lies under
+    the flattened one and turns the monuments into mounds. Both are shaded
+    smooth: a grid this coarse is a sampled landscape, not a field of facets.
+    """
+    shown = ("Terrain (ground)", "Terrain (far context)")
+    for obj in bpy.data.objects:
+        if not obj.name.startswith("Terrain"):
+            continue
+        visible = obj.name in shown
+        obj.hide_set(not visible)
+        obj.hide_render = not visible
+        if visible:
+            for poly in obj.data.polygons:
+                poly.use_smooth = True
 
 
 def choose_engine(scene, requested):

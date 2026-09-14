@@ -77,6 +77,42 @@ describe('the Giza heightfield', () => {
   });
 });
 
+describe('the coarse grid that carries the horizon past the near one', () => {
+  const far = loadTerrain(DATA_DIR, 'giza-glo30-far');
+
+  it('is a twelve kilometre window on the same site, and its header says the same things', () => {
+    expect([far.header.nx, far.header.ny]).toEqual([401, 401]);
+    expect(far.header.spacing).toBe(60);
+    expect([far.header.x0, far.header.y0]).toEqual([-12000, -12000]);
+    expect(far.heights.length).toBe(far.header.nx * far.header.ny);
+    expect(far.header.site).toBe(header.site);
+    expect(far.header.source).toBe(header.source);
+    expect(far.header.verticalDatum).toBe('EGM2008');
+    const bytes = readFileSync(join(DATA_DIR, 'terrain', far.header.heights));
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe(far.header.sha256);
+  });
+
+  it('shares its sample points with the near grid, which is what lets the two meet edge to edge', () => {
+    const ratio = far.header.spacing / header.spacing;
+    expect(ratio).toBe(Math.round(ratio));
+    expect((header.x0 - far.header.x0) / far.header.spacing).toBe(150);
+    expect((header.y0 - far.header.y0) / far.header.spacing).toBe(150);
+    const x1 = header.x0 + (header.nx - 1) * header.spacing;
+    const y1 = header.y0 + (header.ny - 1) * header.spacing;
+    for (const x of [header.x0, x1]) {
+      for (const y of [header.y0, y1]) {
+        expect(far.sample(x, y), `(${x}, ${y})`).toBeCloseTo(terrain.sample(x, y), 3);
+      }
+    }
+  });
+
+  it('reaches the same plateau and the same valley the near grid does', () => {
+    expect(far.sample(0, 0)).toBeCloseTo(terrain.sample(0, 0), 3);
+    expect(far.heights.every((h) => Number.isFinite(h) && h > -25 && h < 300)).toBe(true);
+    expect(() => far.sample(12000 + 1e-6, 0)).toThrow(/outside the heightfield/);
+  });
+});
+
 function python(): string | undefined {
   for (const bin of ['python3', 'python']) {
     try { execFileSync(bin, ['--version'], { stdio: 'ignore' }); return bin; } catch { /* try next */ }
