@@ -1,11 +1,30 @@
 id: C2
 title: Shafts point at stars
 group: sky
-status: needs-sky
+status: computed
+epoch: -2449
 summary: >-
   Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its
   north shaft at Thuban; the Queen's Chamber south shaft pointed at Sirius
   and its north shaft at Kochab, each at meridian transit.
+comparisons:
+  - label: King's Chamber south shaft against Alnitak
+    formula: kc.shaft.south.angle
+    target: star.alnitak.transit.altitude
+    unit: deg
+  - label: King's Chamber north shaft against Thuban
+    formula: kc.shaft.north.angle
+    target: star.thuban.transit.altitude
+    unit: deg
+  - label: Queen's Chamber south shaft against Sirius
+    formula: qc.shaft.south.angle
+    target: star.sirius.transit.altitude
+    unit: deg
+  - label: Queen's Chamber north shaft against Kochab
+    formula: qc.shaft.north.angle
+    target: star.kochab.transit.altitude
+    unit: deg
+tolerance_pct: 1
 free_choices:
   - the epoch
   - which star is assigned to each shaft
@@ -18,8 +37,12 @@ sources:
   for: [bauval-gilbert-1994]
   context: [gantenbrink-1993, vondrak-2011]
 notes: >-
-  packages/sky solves this numerically; `pnpm shafts` writes docs/shafts.md
-  with, for each shaft, the epoch at which the named star crossed the
-  meridian at the shaft's altitude and how many years the date moves per
-  arcminute of shaft angle. The dossier will carry it once claims can call
-  the sky engine.
+  Tolerance is 1 %, which on a 40° shaft is about 24′. The shaft angles are
+  unverified Gantenbrink values, the bores are not straight, and the
+  assignment of a star to a shaft is itself a free choice, so a tighter band
+  would be false precision. The epoch is fixed here at Bauval and Gilbert's
+  2450 BCE for all four shafts, which is the claim as made; each shaft on its
+  own prefers a different date. packages/sky solves that inverse problem
+  numerically: `pnpm shafts` writes docs/shafts.md with, for each shaft, the
+  epoch at which the named star crossed the meridian at the shaft's altitude
+  and how many years the date moves per arcminute of shaft angle.

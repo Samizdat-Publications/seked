@@ -103,3 +103,23 @@ describe('the sky reaches the claims only through an epoch', () => {
     expect(today).toBeLessThan(70);
   });
 });
+
+describe('C · sky claims, evaluated at the epoch each claim names', () => {
+  it('C2: four shafts against four stars in 2450 BCE, all finite', () => {
+    const r = byId('C2');
+    expect(r.status).toBe('computed');
+    expect(r.comparisons).toHaveLength(4);
+    for (const c of r.comparisons) {
+      expect(Number.isFinite(c.residualPct), c.label).toBe(true);
+      expect(c.unit).toBe('deg');
+      expect(c.targetValue).toBeGreaterThan(20);
+      expect(c.targetValue).toBeLessThan(60);
+    }
+  });
+
+  it("C2: the King's Chamber south shaft sits within a quarter of a degree of Alnitak", () => {
+    const c = byId('C2').comparisons[0]!;
+    expect(Math.abs(c.absolute)).toBeLessThan(0.25);
+    expect(c.within).toBe(true);
+  });
+});
