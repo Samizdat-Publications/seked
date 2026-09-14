@@ -6,9 +6,10 @@ import type { GhostProfileSpec } from '../overlays';
 import { useView } from '../store';
 import type { LayerId } from '../view';
 import { GhostProfiles } from './GhostProfile';
+import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
 import { Pyramids } from './Pyramids';
-import { Terrain, type TerrainProps } from './Terrain';
+import { Plateau, type TerrainProps } from './Terrain';
 
 export interface SceneProps {
   model: Model;
@@ -39,8 +40,9 @@ export function Scene({ model, terrain, layers, ghosts }: SceneProps): React.JSX
       {layers.grid && <gridHelper args={[6000, 60, '#38475a', '#1d2630']} />}
 
       <group rotation={[-Math.PI / 2, 0, 0]}>
-        {layers.terrain && <Terrain {...terrain} />}
+        <Plateau {...terrain} context={layers.terrain} ground={layers.ground} />
         {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} />}
+        {layers.interior && <Interiors interiors={model.interiors} />}
         {layers.north && <NorthArrow />}
         {layers.overlay && ghosts && <GhostProfiles spec={ghosts} pyramids={model.pyramids} />}
       </group>

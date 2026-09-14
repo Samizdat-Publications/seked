@@ -6,7 +6,7 @@
  */
 import { evaluateClaim, type Claim, type ClaimResult, type ComparisonResult } from '@seked/claims/browser';
 import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
-import { buildEnvironment, type Environment } from '@seked/geometry';
+import { buildEnvironment, interiorSolids, type Environment, type Solid } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
 
 export const STRUCTURES = ['g1', 'g2', 'g3'] as const;
@@ -57,6 +57,16 @@ export function pyramidParams(values: Record<string, number>, id: StructureId): 
   };
 }
 
+/**
+ * One structure's interior, in its own frame, beside what it takes to place it.
+ * Which structures are here is the database's answer, not the viewer's: a
+ * structure whose interior records the preset carries gets one.
+ */
+export interface StructureInterior {
+  params: PyramidParams;
+  solids: Record<string, Solid>;
+}
+
 export interface Model {
   /** The bundle's own records, in the shape resolve() and sourceById() want. */
   db: Database;
@@ -65,6 +75,7 @@ export interface Model {
   values: Record<string, number>;
   env: Environment;
   pyramids: PyramidParams[];
+  interiors: StructureInterior[];
   results: Map<string, ClaimResult>;
   /** The measured royal cubit under this preset, which the slider starts from. */
   measuredCubit: number;
@@ -81,9 +92,12 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
   const values = cubit === null ? resolved.values : { ...resolved.values, 'cubit.royal': cubit };
   const env = buildEnvironment(values);
   const pyramids = STRUCTURES.map((id) => pyramidParams(values, id)).filter((p): p is PyramidParams => p !== undefined);
+  const interiors = pyramids
+    .map((params) => ({ params, solids: interiorSolids(env, { structure: params.id }) }))
+    .filter((interior) => Object.keys(interior.solids).length > 0);
   const results = new Map<string, ClaimResult>();
   for (const claim of bundle.claims) results.set(claim.id, evaluateClaimSafely(claim, env));
-  return { db, resolved, values, env, pyramids, results, measuredCubit };
+  return { db, resolved, values, env, pyramids, interiors, results, measuredCubit };
 }
 
 /**

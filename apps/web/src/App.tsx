@@ -17,7 +17,12 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const model = useMemo(() => buildModel(bundle, preset, cubit), [bundle, preset, cubit]);
   const header = bundle.terrain.header;
   const datum = bundle.sites.find((s) => s.id === header.site)?.origin.elevation ?? 0;
-  const terrain = useMemo(() => ({ header, heights, datum }), [header, heights, datum]);
+  // The ground grid is flattened under whatever pyramids the preset places, so
+  // it is rebuilt when the preset moves one of them.
+  const terrain = useMemo(
+    () => ({ header, heights, datum, pyramids: model.pyramids }),
+    [header, heights, datum, model.pyramids],
+  );
 
   const claim = bundle.claims.find((c) => c.id === selected);
   const ghosts = useMemo(() => (claim ? ghostProfileSpec(claim, model.env) : undefined), [claim, model.env]);

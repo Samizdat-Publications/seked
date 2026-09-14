@@ -83,7 +83,8 @@ export function LayerToggles(): React.JSX.Element {
       </ul>
       <p className="note">
         The terrain is Copernicus GLO-30 at 20 m. Its editing mask smooths the monuments out, so it is context for the plateau and not a
-        measurement of anything on it.
+        measurement of anything on it. The ground is that same grid with each footprint set to the surveyed base level and blended back over
+        260 m, which is why the monuments sit on it rather than in its mounds. The interior shows where the section cut opens it.
       </p>
     </section>
   );

@@ -6,7 +6,9 @@
 export const LAYERS = [
   { id: 'pyramids', label: 'Pyramids as built' },
   { id: 'today', label: 'Today (truncated)' },
-  { id: 'terrain', label: 'Terrain (GLO-30)' },
+  { id: 'interior', label: 'Interior' },
+  { id: 'ground', label: 'Ground (flattened)' },
+  { id: 'terrain', label: 'Terrain (GLO-30 context)' },
   { id: 'grid', label: 'Grid' },
   { id: 'north', label: 'North arrow' },
   { id: 'overlay', label: 'Claim overlay' },
@@ -41,7 +43,16 @@ export const CUBIT_STEP = 0.00005;
 export const DEFAULT_VIEW: View = {
   preset: 'canonical',
   cubit: null,
-  layers: { pyramids: true, today: false, terrain: true, grid: true, north: true, overlay: true },
+  layers: {
+    pyramids: true,
+    today: false,
+    interior: true,
+    ground: true,
+    terrain: false,
+    grid: true,
+    north: true,
+    overlay: true,
+  },
   claim: null,
   camera: { position: [980, 780, 1520], target: [-250, 30, 350] },
 };
