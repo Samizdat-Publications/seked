@@ -13,6 +13,7 @@ pnpm test           # vitest, all packages
 pnpm typecheck      # tsc --noEmit
 pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
+pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
 ```
 
 ## Rules that keep the project honest
@@ -27,6 +28,12 @@ pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 - **`verified: false` is the default.** A record becomes `verified: true`
   only after someone has checked it against the cited page of the source.
   The starting sheet was entered from memory and secondary sources.
+- **Star data is imported, never typed.** Everything in `data/stars/` is
+  written by `pnpm run stars` out of one HYG 4.2 CSV: `hyg-bright.json` is the
+  catalogue to magnitude 6.5, `named.json` the ten stars the claims name, cut
+  from the same rows so the two cannot disagree. The raw CSV is gitignored and
+  `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
+  attribution the licence requires.
 - **Claims are data.** One YAML file per claim in `data/claims/`. A claim is
   inputs, formulas, targets, tolerance, free choices, sources and an overlay
   spec. Adding a claim never touches package code.

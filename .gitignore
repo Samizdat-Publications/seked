@@ -18,6 +18,10 @@ build/
 *.tif
 *.tiff
 
+# Downloaded by hand for `pnpm stars`; see data/sources.json, source hyg-4.2
+data/stars/hyg_v42.csv
+data/stars/hyg_v42.csv.gz
+
 # Written by `pnpm bundle` from data/
 apps/web/public/seked.json
 apps/web/public/terrain/

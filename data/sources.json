@@ -194,11 +194,20 @@
     "url": "https://www.aanda.org/articles/aa/pdf/2011/10/aa17274-11.pdf"
   },
   {
+    "id": "hyg-4.2",
+    "kind": "reference",
+    "year": 2025,
+    "citation": "astronexus. The HYG Database, version 4.2. A merge of the Hipparcos, Yale Bright Star and Gliese catalogues into one CSV, with positions and proper motions at epoch and equinox J2000, distances, magnitudes, spectral types, colour indices and catalogue designations.",
+    "url": "https://codeberg.org/astronexus/hyg/media/branch/main/data/hyg/OLDER/hyg_v42.csv.gz",
+    "license": "CC BY-SA 4.0, https://creativecommons.org/licenses/by-sa/4.0/. Required attribution: HYG Database v4.2 by astronexus, https://codeberg.org/astronexus/hyg, licensed CC BY-SA 4.0. data/stars/hyg-bright.json and data/stars/named.json are adapted databases under that licence and carry the credit in their own headers.",
+    "note": "HYG moved off github.com/astronexus/HYG-Database, which stops at v4.1 and points here. On Codeberg the file is stored with Git LFS, so the /media/ URL above returns the 13 MB gzip and the /raw/ one returns only the 133-byte pointer; sha256 of the gzip is 5ca9431ff364c8002a4a3efa91b2b9296746aea1543374db4cb6b4fab049d601 and the version is dated 2025-06-29 by its own gzip timestamp. HYG gives right ascension in hours and distance in parsecs; scripts/stars.ts converts both and cuts the catalogue to magnitude 6.5. Row 0 of the CSV is the Sun, at right ascension 0 and distance 0, and is dropped. A distance of 100000 pc or more is HYG marking a missing or negative Hipparcos parallax."
+  },
+  {
     "id": "hipparcos-1997",
     "kind": "reference",
     "year": 1997,
     "citation": "ESA (1997). The Hipparcos and Tycho Catalogues. ESA SP-1200.",
-    "note": "Positions and proper motions of the named stars were entered from memory of SIMBAD/Hipparcos values and are to be replaced by the HYG 4.2 import."
+    "note": "Positions and proper motions of the named stars were entered from memory of SIMBAD/Hipparcos values. They were replaced by the HYG 4.2 import (source hyg-4.2) and data/stars/named.json now cites that source; HYG is itself a merge of Hipparcos with the Yale Bright Star and Gliese catalogues, so this citation stands behind it. The differences the replacement exposed are checked by a test in packages/sky and are reported by pnpm stars."
   },
   {
     "id": "erfa",

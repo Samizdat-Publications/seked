@@ -18,9 +18,9 @@ Generated 2026-09-14 from `data/` with the **canonical** preset. Every number be
 | B4 | Pyramid inch and the year | −0.16 % | −0.79 % | no | 3 |
 | B5 | Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.34 m (−0.68 %) | yes | 2 |
 | C1 | True north | −3.9′ | −3.9′ | yes | 0 |
-| C2 | Shafts point at stars | −12.2′ (−0.452 %) | 39.5′ (+2.061 %) | no | 2 |
-| C3 | Descending passage and the pole star | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | yes | 1 |
-| C4 | Orion Correlation | +19.14 % | 12°57′28″ (+34.233 %) | no | 3 |
+| C2 | Shafts point at stars | −12.2′ (−0.450 %) | 39.5′ (+2.060 %) | no | 2 |
+| C3 | Descending passage and the pole star | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | yes | 1 |
+| C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
 | D1 | Giza diagonal to Heliopolis | - | - | pending (needs-site) | 1 |
 | D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
 
@@ -350,19 +350,19 @@ Around 2450 BCE the King's Chamber south shaft pointed at Alnitak and its north 
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| King's Chamber south shaft against Alnitak | `kc.shaft.south.angle` vs `star.alnitak.transit.altitude` | 45°00′00″ | 45°12′15″ | −12.2′ (−0.452 %) | yes (±1 %) |
-| King's Chamber north shaft against Thuban | `kc.shaft.north.angle` vs `star.thuban.transit.altitude` | 32°36′00″ | 31°56′30″ | 39.5′ (+2.061 %) | no (±1 %) |
-| Queen's Chamber south shaft against Sirius | `qc.shaft.south.angle` vs `star.sirius.transit.altitude` | 39°36′28″ | 39°21′32″ | 14.9′ (+0.633 %) | yes (±1 %) |
-| Queen's Chamber north shaft against Kochab | `qc.shaft.north.angle` vs `star.kochab.transit.altitude` | 39°07′00″ | 39°21′21″ | −14.3′ (−0.608 %) | yes (±1 %) |
+| King's Chamber south shaft against Alnitak | `kc.shaft.south.angle` vs `star.alnitak.transit.altitude` | 45°00′00″ | 45°12′12″ | −12.2′ (−0.450 %) | yes (±1 %) |
+| King's Chamber north shaft against Thuban | `kc.shaft.north.angle` vs `star.thuban.transit.altitude` | 32°36′00″ | 31°56′31″ | 39.5′ (+2.060 %) | no (±1 %) |
+| Queen's Chamber south shaft against Sirius | `qc.shaft.south.angle` vs `star.sirius.transit.altitude` | 39°36′28″ | 39°21′32″ | 14.9′ (+0.632 %) | yes (±1 %) |
+| Queen's Chamber north shaft against Kochab | `qc.shaft.north.angle` vs `star.kochab.transit.altitude` | 39°07′00″ | 39°21′19″ | −14.3′ (−0.606 %) | yes (±1 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| King's Chamber south shaft against Alnitak | −12.2′ (−0.452 %) | −12.2′ (−0.452 %) | −12.2′ (−0.452 %) | −12.2′ (−0.452 %) |
-| King's Chamber north shaft against Thuban | 39.5′ (+2.061 %) | 39.5′ (+2.061 %) | 39.5′ (+2.061 %) | 39.5′ (+2.061 %) |
-| Queen's Chamber south shaft against Sirius | 14.9′ (+0.633 %) | 14.9′ (+0.633 %) | 14.9′ (+0.633 %) | 14.9′ (+0.633 %) |
-| Queen's Chamber north shaft against Kochab | −14.3′ (−0.608 %) | −14.3′ (−0.608 %) | −14.3′ (−0.608 %) | −14.3′ (−0.608 %) |
+| King's Chamber south shaft against Alnitak | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) |
+| King's Chamber north shaft against Thuban | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) |
+| Queen's Chamber south shaft against Sirius | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) |
+| Queen's Chamber north shaft against Kochab | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) |
 
 **Free choices (2)**:
 - the epoch
@@ -384,13 +384,13 @@ The descending passage was bored at 26°31′ so that an observer looking up it,
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| descending passage angle against Thuban's lower culmination | `passage.descending.angle` vs `star.thuban.lower.altitude` | 26°31′23″ | 26°26′27″ | 4.9′ (+0.311 %) | yes (±1 %) |
+| descending passage angle against Thuban's lower culmination | `passage.descending.angle` vs `star.thuban.lower.altitude` | 26°31′23″ | 26°26′26″ | 4.9′ (+0.312 %) | yes (±1 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| descending passage angle against Thuban's lower culmination | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) | 4.9′ (+0.311 %) |
+| descending passage angle against Thuban's lower culmination | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) |
 
 **Free choices (1)**:
 - the epoch
@@ -411,15 +411,15 @@ The three pyramids are laid out as Orion's Belt (Alnitak, Alnilam, Mintaka), inc
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°48′35″ | 37°51′07″ | 12°57′28″ (+34.233 %) | no (±5 %) |
-| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.alnitak.dec - star.alnilam.dec) * (star.mintaka.ra - star.alnilam.ra) * cos(star.alnilam.dec) - (star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)` | 0.18527 | 0.155505 | +19.14 % | no (±5 %) |
+| belt angle from the meridian against the G1 to G3 diagonal | `atan(abs((star.mintaka.ra - star.alnitak.ra) * cos(star.alnilam.dec)) / abs(star.mintaka.dec - star.alnitak.dec))` vs `atan(g3.centre.offset.west / g3.centre.offset.south)` | 50°51′40″ | 37°51′07″ | 13°00′33″ (+34.368 %) | no (±5 %) |
+| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | `abs(g2.centre.offset.west * g3.centre.offset.south - g2.centre.offset.south * g3.centre.offset.west) / (g2.centre.offset.west^2 + g2.centre.offset.south^2)` vs `abs((star.alnitak.dec - star.alnilam.dec) * (star.mintaka.ra - star.alnilam.ra) * cos(star.alnilam.dec) - (star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec) * (star.mintaka.dec - star.alnilam.dec)) / (((star.alnitak.ra - star.alnilam.ra) * cos(star.alnilam.dec))^2 + (star.alnitak.dec - star.alnilam.dec)^2)` | 0.18527 | 0.148248 | +24.97 % | no (±5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| belt angle from the meridian against the G1 to G3 diagonal | 12°57′28″ (+34.233 %) | 12°57′28″ (+34.233 %) | 12°57′28″ (+34.233 %) | 12°57′28″ (+34.233 %) |
-| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | +19.14 % | +19.14 % | +19.14 % | +19.14 % |
+| belt angle from the meridian against the G1 to G3 diagonal | 13°00′33″ (+34.368 %) | 13°00′33″ (+34.368 %) | 13°00′33″ (+34.368 %) | 13°00′33″ (+34.368 %) |
+| Menkaure off the G1 to G2 line against Mintaka off the Alnitak to Alnilam line | +24.97 % | +24.97 % | +24.97 % | +24.97 % |
 
 **Free choices (3)**:
 - the epoch

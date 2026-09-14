@@ -13,7 +13,8 @@
     "build:web": "pnpm bundle && pnpm --filter @seked/web build",
     "site": "pnpm build:web && tsx scripts/site.ts",
     "dossier": "tsx scripts/dossier.ts",
-    "shafts": "tsx scripts/shafts.ts"
+    "shafts": "tsx scripts/shafts.ts",
+    "stars": "tsx scripts/stars.ts"
   },
   "devDependencies": {
     "@seked/claims": "workspace:*",

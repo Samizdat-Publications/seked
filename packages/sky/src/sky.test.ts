@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { skyEnvironment } from './environment';
 import { isCircumpolar, transitAltitude } from './frames';
 import { REFRACTION_LIMIT_DEG, altAz, apparentAltitude, enuDirection, transitLst } from './horizon';
-import { loadNamedStars } from './catalogue';
-import { positionAtEpoch, starById } from './stars';
+import { loadBrightStars, loadNamedStars } from './catalogue';
+import { BRIGHT_COLUMNS, BrightCatalogueSchema, expandBrightStars, limitMagnitude, positionAtEpoch, starById } from './stars';
 import { ltp, ltpb, ltpecl, ltpequ, precessIcrsToDate } from './vondrak';
 
 const close = (got: number, want: number, tol = 1e-13) => expect(Math.abs(got - want)).toBeLessThan(tol);
@@ -177,5 +177,133 @@ describe('the horizon frame the sky dome needs', () => {
     expect(apparentAltitude(-0.5)).toBeGreaterThan(-0.5);
     expect(apparentAltitude(-0.5)).toBeLessThan(0.3);
     for (let alt = -1; alt < 20; alt += 0.25) expect(apparentAltitude(alt), `alt ${alt}`).toBeGreaterThanOrEqual(alt);
+  });
+});
+
+/**
+ * The ten named stars as data/stars/named.json had them before the HYG 4.2
+ * import: raDeg, decDeg, pmRaMasYr, pmDecMasYr, entered from memory of SIMBAD
+ * and Hipparcos values under source hipparcos-1997. They are kept here so the
+ * import has something to be measured against, which is the check the plan
+ * asked for on a sheet that was typed from memory. `pnpm run stars` prints the
+ * same differences when it regenerates the file.
+ */
+const FROM_MEMORY: Record<string, [number, number, number, number]> = {
+  alnitak: [85.18969, -1.94258, 3.19, 2.03],
+  alnilam: [84.05334, -1.20192, 1.44, -0.78],
+  mintaka: [83.00167, -0.29909, 0.64, -0.69],
+  sirius: [101.28716, -16.71612, -546.01, -1223.07],
+  thuban: [211.09731, 64.37585, -56.34, 17.21],
+  kochab: [222.67636, 74.1555, -32.61, 11.42],
+  mizar: [200.98142, 54.92536, 121.23, -22.01],
+  regulus: [152.09296, 11.96721, -248.73, 5.59],
+  vega: [279.23473, 38.78369, 200.94, 286.23],
+  polaris: [37.95456, 89.26411, 44.48, -11.85],
+};
+
+/** Worst difference actually seen is Mizar at 0.455 arcseconds. */
+const POSITION_TOLERANCE_ARCSEC = 0.5;
+/** Worst difference actually seen is Mintaka at 1.25 milliarcseconds per year. */
+const PROPER_MOTION_TOLERANCE_MAS_YR = 1.5;
+
+/** Great-circle separation between two positions, in arcseconds. */
+function separationArcsec(a: { raDeg: number; decDeg: number }, b: { raDeg: number; decDeg: number }): number {
+  const d2r = Math.PI / 180;
+  const cos =
+    Math.sin(a.decDeg * d2r) * Math.sin(b.decDeg * d2r) +
+    Math.cos(a.decDeg * d2r) * Math.cos(b.decDeg * d2r) * Math.cos((a.raDeg - b.raDeg) * d2r);
+  return (Math.acos(Math.min(1, Math.max(-1, cos))) / d2r) * 3600;
+}
+
+describe('the named stars, against the values that were entered from memory', () => {
+  const stars = loadNamedStars();
+
+  it('is the same ten stars, now cited to HYG 4.2', () => {
+    expect(stars.map((s) => s.id).sort()).toEqual(Object.keys(FROM_MEMORY).sort());
+    for (const star of stars) expect(star.source, star.id).toBe('hyg-4.2');
+  });
+
+  it(`has every position within ${POSITION_TOLERANCE_ARCSEC}" of the remembered one`, () => {
+    for (const star of stars) {
+      const [raDeg, decDeg] = FROM_MEMORY[star.id] as [number, number, number, number];
+      expect(separationArcsec(star, { raDeg, decDeg }), star.id).toBeLessThan(POSITION_TOLERANCE_ARCSEC);
+    }
+  });
+
+  it(`has every proper motion within ${PROPER_MOTION_TOLERANCE_MAS_YR} mas/yr of the remembered one`, () => {
+    for (const star of stars) {
+      const [, , pmRa, pmDec] = FROM_MEMORY[star.id] as [number, number, number, number];
+      expect(Math.abs(star.pmRaMasYr - pmRa), `${star.id} pmRA`).toBeLessThan(PROPER_MOTION_TOLERANCE_MAS_YR);
+      expect(Math.abs(star.pmDecMasYr - pmDec), `${star.id} pmDec`).toBeLessThan(PROPER_MOTION_TOLERANCE_MAS_YR);
+    }
+  });
+
+  it('moves no star far enough to matter: the worst is Mintaka, 7.2\" at 2450 BCE and 20.2\" at 10,500 BCE', () => {
+    for (const star of stars) {
+      const [raDeg, decDeg, pmRa, pmDec] = FROM_MEMORY[star.id] as [number, number, number, number];
+      const remembered = { raDeg, decDeg, pmRaMasYr: pmRa, pmDecMasYr: pmDec };
+      // Proper motion is what the differences are made of, so they grow with the epoch.
+      expect(separationArcsec(positionAtEpoch(star, -2449), positionAtEpoch(remembered, -2449)), star.id).toBeLessThan(10);
+      expect(separationArcsec(positionAtEpoch(star, -10499), positionAtEpoch(remembered, -10499)), star.id).toBeLessThan(25);
+    }
+  });
+});
+
+describe('the HYG 4.2 bright catalogue', () => {
+  const catalogue = loadBrightStars();
+  const stars = expandBrightStars(catalogue);
+  const named = loadNamedStars();
+
+  it('validates, cites its source and carries the credit the licence asks for', () => {
+    expect(() => BrightCatalogueSchema.parse(catalogue)).not.toThrow();
+    expect(catalogue.source).toBe('hyg-4.2');
+    expect(catalogue.attribution).toMatch(/CC BY-SA 4\.0/);
+    expect(catalogue.columns).toEqual([...BRIGHT_COLUMNS]);
+  });
+
+  it('stops at magnitude 6.5 and has no duplicate ids', () => {
+    expect(catalogue.magnitudeLimit).toBe(6.5);
+    expect(stars.length).toBeGreaterThan(8000);
+    for (const star of stars) expect(star.mag, star.id).toBeLessThanOrEqual(6.5);
+    expect(new Set(stars.map((s) => s.id)).size).toBe(stars.length);
+  });
+
+  it('holds the ten named stars, at exactly the numbers named.json has', () => {
+    const byName = new Map(stars.filter((s) => s.name).map((s) => [s.name as string, s]));
+    for (const star of named) {
+      const bright = byName.get(star.name);
+      expect(bright, `${star.name} is missing from hyg-bright.json`).toBeDefined();
+      const b = bright as (typeof stars)[number];
+      expect(b.raDeg, `${star.id} ra`).toBe(star.raDeg);
+      expect(b.decDeg, `${star.id} dec`).toBe(star.decDeg);
+      expect(b.pmRaMasYr, `${star.id} pmRA`).toBe(star.pmRaMasYr);
+      expect(b.pmDecMasYr, `${star.id} pmDec`).toBe(star.pmDecMasYr);
+      expect(b.id).toMatch(/^hip\d+$/);
+    }
+  });
+
+  it('leaves the sparse columns off the expanded objects rather than nulling them', () => {
+    const sirius = stars.find((s) => s.name === 'Sirius') as (typeof stars)[number];
+    expect(sirius.bf).toBe('9Alp CMa');
+    expect(sirius.parallaxMas).toBeGreaterThan(370);
+    expect(sirius.ci).toBeTypeOf('number');
+    const anonymous = stars.find((s) => s.name === undefined) as (typeof stars)[number];
+    expect(Object.keys(anonymous)).not.toContain('name');
+  });
+
+  it('precesses like any other star, putting Sirius well south from Giza in 2450 BCE', () => {
+    const sirius = stars.find((s) => s.name === 'Sirius') as (typeof stars)[number];
+    const { decDeg } = positionAtEpoch(sirius, -2449);
+    expect(transitAltitude(decDeg, 29.979167)).toBeCloseTo(39.6, 0);
+  });
+
+  it('cuts to a brighter limit for the browser, keeping the header and the brightest stars', () => {
+    const cut = limitMagnitude(catalogue, 4);
+    expect(cut.magnitudeLimit).toBe(4);
+    expect(cut.source).toBe(catalogue.source);
+    expect(cut.stars.length).toBeLessThan(catalogue.stars.length);
+    for (const row of cut.stars) expect(row[8]).toBeLessThanOrEqual(4);
+    expect(expandBrightStars(cut).some((s) => s.name === 'Thuban')).toBe(true);
+    expect(limitMagnitude(catalogue, 99)).toBe(catalogue);
   });
 });
