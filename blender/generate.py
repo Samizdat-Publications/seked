@@ -7,7 +7,7 @@ Run from Blender's Text Editor, or headless:
 
 Every object is generated from data/; nothing is modelled by hand. Each object
 carries custom properties naming the preset and the source of each value, so
-the provenance survives inside the .blend file. The concavity of the Great
+the provenance survives inside the .blend file and, as glTF extras, in the GLB. The concavity of the Great
 Pyramid is a shape key ("Concavity", 0 = flat faces, 1 = the measured
 hollowing), and each pyramid gets an "as built" and a "today" object.
 """
@@ -130,7 +130,7 @@ def main():
     if opts["gltf"]:
         path = os.path.abspath(opts["gltf"])
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", export_yup=True, export_apply=False)
+        bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", export_yup=True, export_apply=False, export_extras=True)
         print(f"exported {path}")
 
 

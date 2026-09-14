@@ -18,7 +18,8 @@ GLB contain only the generated objects. In the Text Editor it adds the
 collection to whatever is open.
 
 Object custom properties record the preset and the source of the base and
-height, so the provenance travels with the .blend file.
+height, so the provenance travels with the .blend file and, as glTF extras,
+with the GLB.
 
 `seked_data.py` is the standard-library reader the generator uses. Running it
 directly prints the resolved values for a preset; `--check` exercises the
