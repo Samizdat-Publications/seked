@@ -72,7 +72,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
         </header>
         <PresetPicker presets={bundle.presets} />
         <CubitSlider model={model} />
-        <SkyControls epoch={epoch} named={named} claim={claim} />
+        <SkyControls epoch={epoch} named={named} claim={claim} latitudeDeg={model.latitudeDeg} longitudeDeg={model.env['g1.center.longitude'] ?? 0} />
         <LayerToggles />
         <SectionControls model={model} />
         <Claims claims={bundle.claims} model={model} context={overlayContext} />

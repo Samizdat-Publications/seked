@@ -11,9 +11,10 @@ const db = loadDatabase();
 const claims = loadClaims();
 const env = buildEnvironment(resolve(db, 'canonical').values);
 const LATITUDE = env['g1.center.latitude'] as number;
+const LONGITUDE = env['g1.center.longitude'] as number;
 /** What a claim with an epoch actually evaluates against. */
 const scopeFor = (epoch: number | undefined) =>
-  epoch === undefined ? env : { ...env, ...skyEnvironment({ epoch, latitudeDeg: LATITUDE }) };
+  epoch === undefined ? env : { ...env, ...skyEnvironment({ epoch, latitudeDeg: LATITUDE, longitudeDeg: LONGITUDE }) };
 const byId = (id: string) => {
   const c = claims.find((x) => x.id === id);
   if (!c) throw new Error(`no claim ${id}`);
