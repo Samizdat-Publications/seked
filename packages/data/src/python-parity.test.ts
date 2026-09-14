@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildEnvironment, chamber, extrudedSection, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh } from '@seked/geometry';
-import type { Point, SectionPair, Solid } from '@seked/geometry';
+import { buildEnvironment, chamber, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh } from '@seked/geometry';
+import type { GroundPyramid, Point, SectionPair, Solid } from '@seked/geometry';
 import { loadDatabase, REPO_ROOT, resolve } from './index';
 
 function python(): string | undefined {
@@ -228,4 +228,37 @@ describe.skipIf(!py)('blender/seked_data.py discovers a prefixed interior the sa
   it('builds them vertex for vertex', () => {
     expectSameSolids(theirs, ours);
   });
+});
+
+interface PyGround { x: number; y: number; surface: number; ground: number }
+
+/**
+ * The same two pyramids and the same samples as GROUND_CASE_PYRAMIDS and
+ * GROUND_PROBES in blender/seked_data.py, literal on both sides so the two
+ * flattenings can be compared. They are not measurements: what is being
+ * checked is that the .blend, the GLB and the viewer put the ground in the
+ * same place, on and between the flat margin, the blend and the untouched
+ * surface model.
+ */
+const GROUND_CASE_PYRAMIDS: GroundPyramid[] = [
+  { base: 230, offsetEast: 0, offsetNorth: 0, offsetUp: 0 },
+  { base: 200, offsetEast: -400, offsetNorth: -500, offsetUp: 10 },
+];
+
+describe.skipIf(!py)('blender/seked_data.py flattens the ground exactly like @seked/geometry', () => {
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), 'canonical', '--ground'], { encoding: 'utf8' });
+  const theirs = JSON.parse(lastLine(out)) as PyGround[];
+
+  it('covers the flat footprint, the blend and the surface beyond it', () => {
+    expect(theirs.length).toBeGreaterThanOrEqual(12);
+    expect(theirs.some((c) => c.ground === 0)).toBe(true);
+    expect(theirs.some((c) => c.ground > 0 && c.ground < c.surface)).toBe(true);
+    expect(theirs.some((c) => c.ground === c.surface)).toBe(true);
+  });
+
+  for (const c of theirs) {
+    it(`(${c.x}, ${c.y}) on a ${c.surface} m surface`, () => {
+      expect(groundHeight(c.x, c.y, c.surface, GROUND_CASE_PYRAMIDS)).toBeCloseTo(c.ground, 12);
+    });
+  }
 });

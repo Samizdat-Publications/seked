@@ -111,10 +111,11 @@ python3 blender/seked_data.py --shapes
 entry per structure that has any, each solid with the records it came from;
 `--interior-case` prints the same for an invented prefixed pyramid, so the
 discovery can be compared with the TypeScript one before G2's or G3's records
-exist; and `--terrain` prints the heightfield's identity and a fixed set of
-probes. All three are checked against the TypeScript side by the parity tests.
-The file is append-only, so they print after the resolved values: take the
-last line.
+exist; `--terrain` prints the heightfield's identity and a fixed set of probes;
+and `--ground` prints the flattened height at a fixed set of samples around two
+literal pyramids. All four are checked against the TypeScript side by the
+parity tests. The file is append-only, so they print after the resolved values:
+take the last line.
 
 ```
 python3 blender/seked_data.py canonical --interior
@@ -132,6 +133,11 @@ because its editing mask turns the monuments into smooth mounds, and
 its surveyed base level within 40 m of the footprint and blended back into
 the model over the next 260 m. The ground is a stand-in until the GPMP
 contours are entered; `check.py` verifies both grids.
+
+The flattening itself is `ground_height` in `seked_data.py`, which mirrors
+`groundHeight` in `@seked/geometry`; a parity test pins the two to each other
+on a fixed set of samples, so the .blend, the GLB and the web viewer cannot
+disagree about where the ground is.
 
 `render.py` renders a still headless, with the plan's materials and the
 first hero view (equinox dawn from the north-east, sun 6 degrees up in the

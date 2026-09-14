@@ -33,6 +33,9 @@ if HERE not in sys.path:
 import bpy  # noqa: E402  (only available inside Blender)
 
 from seked_data import (  # noqa: E402
+    GROUND_BLEND_DISTANCE,
+    GROUND_FLAT_MARGIN,
+    ground_height,
     interior_solids,
     interior_structures,
     load_database,
@@ -46,10 +49,6 @@ from seked_data import (  # noqa: E402
 STRUCTURES = [("g1", "G1 Khufu"), ("g2", "G2 Khafre"), ("g3", "G3 Menkaure")]
 TERRAIN_NAME = "Terrain (GLO-30 context)"
 GROUND_NAME = "Terrain (ground)"
-# Metres beyond a pyramid's footprint over which the ground sits at its surveyed base level,
-# and the further distance over which that level blends back into the surface model.
-GROUND_FLAT_MARGIN = 40.0
-GROUND_BLEND_DISTANCE = 260.0
 INTERIOR_NAME = "Interior"
 
 
@@ -146,24 +145,6 @@ def build_interior(parent, preset_id, resolved):
     if not built:
         print(f"no {INTERIOR_NAME}: the preset carries no interior records")
     return built
-
-
-def ground_height(x, y, z_surface, pyramids):
-    """
-    The surface model with each pyramid's footprint (plus a margin) set to the
-    pyramid's surveyed base level and blended smoothly back into the model
-    beyond it. The square footprint ignores the few arcminutes of orientation.
-    """
-    z = z_surface
-    for p in pyramids:
-        d = max(abs(x - p["offset_east"]), abs(y - p["offset_north"])) - p["base"] / 2.0
-        if d <= GROUND_FLAT_MARGIN:
-            return p["offset_up"]
-        if d < GROUND_FLAT_MARGIN + GROUND_BLEND_DISTANCE:
-            t = (d - GROUND_FLAT_MARGIN) / GROUND_BLEND_DISTANCE
-            s = t * t * (3.0 - 2.0 * t)
-            z = min(z, p["offset_up"] + (z_surface - p["offset_up"]) * s)
-    return z
 
 
 def build_terrain(parent, preset_id, pyramids=()):

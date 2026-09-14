@@ -851,3 +851,66 @@ INTERIOR_DISCOVERY_CASE = {
 if __name__ == "__main__" and "--interior-case" in sys.argv:
     # Appended, so the file only ever grows; this is the last line printed.
     print(json.dumps(interior_solids(INTERIOR_DISCOVERY_CASE, "g2")))
+
+
+# --- The ground under the monuments ----------------------------------------
+# Mirrors packages/geometry/src/terrain.ts. GLO-30 is a surface model whose
+# editing mask marks the monument footprints, so each pyramid arrives as a
+# smooth mound and the sample at the origin is neither the ground under Khufu
+# nor the built surface of Khufu. This puts the ground under each footprint at
+# the base elevation the survey gives it and blends back into the model beyond
+# it. A stand-in until the GPMP contours are entered, and deliberately crude: a
+# square footprint ignoring the few arcminutes of orientation, a flat margin,
+# and one smoothstep.
+
+# Metres beyond a footprint over which the ground stays at the surveyed base
+# level, and the further distance over which that level blends back in.
+GROUND_FLAT_MARGIN = 40.0
+GROUND_BLEND_DISTANCE = 260.0
+
+
+def ground_height(x, y, z_surface, pyramids):
+    """
+    The surface height at one sample with the pyramids' footprints flattened.
+
+    Inside a footprint plus GROUND_FLAT_MARGIN the answer is that pyramid's
+    base level outright. Further out the model is pulled down towards the base
+    level by a smoothstep reaching the untouched surface at
+    GROUND_FLAT_MARGIN + GROUND_BLEND_DISTANCE; where two pyramids both reach a
+    sample the lower of the two wins, so no monument is left on a shelf.
+
+    `pyramids` are pyramid_params dicts: base, offset_east, offset_north and
+    offset_up.
+    """
+    z = z_surface
+    for p in pyramids:
+        d = max(abs(x - p["offset_east"]), abs(y - p["offset_north"])) - p["base"] / 2.0
+        if d <= GROUND_FLAT_MARGIN:
+            return p["offset_up"]
+        if d < GROUND_FLAT_MARGIN + GROUND_BLEND_DISTANCE:
+            t = (d - GROUND_FLAT_MARGIN) / GROUND_BLEND_DISTANCE
+            s = t * t * (3.0 - 2.0 * t)
+            z = min(z, p["offset_up"] + (z_surface - p["offset_up"]) * s)
+    return z
+
+
+# Two pyramids and a set of samples on and between the flat, the blend and the
+# untouched model, for the parity test in packages/data. Literal on both sides:
+# these are not measurements.
+GROUND_CASE_PYRAMIDS = [
+    {"base": 230.0, "offset_east": 0.0, "offset_north": 0.0, "offset_up": 0.0},
+    {"base": 200.0, "offset_east": -400.0, "offset_north": -500.0, "offset_up": 10.0},
+]
+GROUND_PROBES = [
+    (0.0, 0.0, 62.5), (115.0, 115.0, 62.5), (155.0, 0.0, 62.5), (155.0, 155.0, 62.5),
+    (155.001, 0.0, 62.5), (200.0, 0.0, 62.5), (285.0, 0.0, 62.5), (414.0, 0.0, 62.5),
+    (415.0, 0.0, 62.5), (500.0, 0.0, 62.5), (-400.0, -500.0, 70.0), (-200.0, -300.0, 70.0),
+    (-320.5, -420.25, 66.0), (0.0, -600.0, 58.0), (3000.0, 3000.0, 40.0), (-3000.0, -3000.0, 33.5),
+]
+
+if __name__ == "__main__" and "--ground" in sys.argv:
+    # Appended, so the file only ever grows; this is the last line printed.
+    print(json.dumps([
+        {"x": x, "y": y, "surface": z, "ground": ground_height(x, y, z, GROUND_CASE_PYRAMIDS)}
+        for x, y, z in GROUND_PROBES
+    ]))
