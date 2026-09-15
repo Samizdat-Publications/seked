@@ -91,6 +91,23 @@ VIEWS = {
         "fill": 0.0,
         "placeholder_sun": (-0.833, 298.0),
     },
+    "section": {
+        # The Great Pyramid in elevation from due east through a casing left
+        # almost clear, an orthographic camera so it reads as a section
+        # drawing: the passages, the chambers and the four shafts in place, at
+        # their true slopes, with nothing foreshortened. The frame is wide
+        # enough for the whole pyramid and deep enough for the subterranean
+        # chamber under it. Lit by the equinox morning sun like the dawn view.
+        "moment": "equinox-sunrise-plus-hour",
+        "location": (700.0, 0.0, 55.0),
+        "target": (0.0, 0.0, 55.0),
+        "lens": 50.0,
+        "ortho_scale": 275.0,
+        "casing_alpha": 0.06,
+        "exposure": -3.8,
+        "fill": 0.0,
+        "placeholder_sun": (35.0, 135.0),
+    },
     "night": {
         "moment": "alnitak-transit",
         "location": (0.0, 300.0, 45.0),
@@ -150,11 +167,14 @@ def sphinx_viewpoint(name, fallback):
     ))
 
 
-def make_camera(scene, location, target, lens, name="Hero camera", clip_end=4.0 * DOME_RADIUS_M):
-    """A camera at a place, looking at a point, with a far clip past the star dome."""
+def make_camera(scene, location, target, lens, name="Hero camera", clip_end=4.0 * DOME_RADIUS_M, ortho_scale=None):
+    """A camera at a place, looking at a point, with a far clip past the star dome; orthographic if an `ortho_scale` is given."""
     cam_data = bpy.data.cameras.new(name)
     cam_data.lens = lens
     cam_data.clip_end = clip_end
+    if ortho_scale is not None:
+        cam_data.type = "ORTHO"
+        cam_data.ortho_scale = ortho_scale
     cam = bpy.data.objects.new(name, cam_data)
     scene.collection.objects.link(cam)
     cam.location = location
@@ -196,12 +216,12 @@ def setup_view(scene, name, view, bake):
     altitude_deg, apparent_deg, azimuth_deg, provenance = baked_sun(bake, view)
     location = sphinx_viewpoint(view["from_object"], view["location"]) if "from_object" in view else Vector(view["location"])
     target = Vector(view["target"])
-    make_camera(scene, location, target, view["lens"])
+    make_camera(scene, location, target, view["lens"], ortho_scale=view.get("ortho_scale"))
 
-    if name == "cutaway":
+    if name == "cutaway" or "casing_alpha" in view:
         g1 = bpy.data.objects.get("G1 Khufu (as built)")
         if g1 is not None:
-            make_translucent(g1, 0.15)
+            make_translucent(g1, view.get("casing_alpha", 0.15))
 
     print(f"view {name}: sun altitude {altitude_deg:.3f} deg, seen at {apparent_deg:.3f} deg, azimuth {azimuth_deg:.3f} deg ({provenance})")
     build_world(scene, apparent_deg, azimuth_deg, view.get("fill", 0.0))
