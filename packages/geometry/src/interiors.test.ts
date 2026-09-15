@@ -411,8 +411,18 @@ describe('the Great Pyramid stays hand-written', () => {
       'gg',
       'antechamber',
       'kc',
+      'kc.shaft.north',
+      'kc.shaft.south',
+      'qc.shaft.north',
+      'qc.shaft.south',
     ]);
-    expect(interiorSolidInputs(env)).toEqual(INTERIOR_SOLID_INPUTS);
+    // A room's inputs are fixed; a shaft's start with the fixed ones and go
+    // on with however many legs the environment carries.
+    const inputs = interiorSolidInputs(env);
+    for (const [name, fixed] of Object.entries(INTERIOR_SOLID_INPUTS)) {
+      if (name.includes('.shaft.')) expect(inputs[name]?.slice(0, fixed.length)).toEqual(fixed);
+      else expect(inputs[name]).toEqual(fixed);
+    }
   });
 });
 

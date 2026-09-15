@@ -37,7 +37,11 @@ Phases 0 and 1 are done, Phase 4 is closed, and Phases 2, 3 and 5 are
 under way. Every Petrie 1883 record for all three pyramids and the Dash
 2015 records are verified against the source page, and so are Cole's 1925
 sides and azimuths, read from a scan of the Survey of Egypt paper. The Great Pyramid's interior is generated
-from Petrie's positions in both the Blender scene and the browser; Khafre's
+from Petrie's positions in both the Blender scene and the browser, and its
+four shafts are bores that bend: Gantenbrink's inlet runs and angles, the
+northern shafts' dog-legs round the Grand Gallery, the slab 59 m up the
+Queen's Chamber's southern shaft, and Petrie's mouths on the faces, with the
+few figures only his drawings give entered as labelled estimates; Khafre's
 and Menkaure's sheets carry Petrie's dimensions but he gives no positions,
 so Khafre's descending corridor and burial chamber are placed from
 Maragioglio and Rinaldi's published lengths, slope and levels, and
@@ -118,15 +122,20 @@ meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
 and sunset, so a claim that names an `epoch` can reach the sky from its
 YAML without the claims package learning any astronomy.
 
-Next: a citable level for Menkaure's chambers so the rest of his interior
-can build, and a way to hang a chamber off the foot of a passage where a
-source places it there and nowhere else; the GPMP contours for the ground;
-the Tier 3 masses (the queens' pyramids, the temples and causeways) from a
-source that gives their footprints, which Petrie's chapter 12 does not; and
-the Blender work the plan's hero renders still need, which is where the
-project's visual weight lands: the Sphinx sculpt in place of the massing
-placeholder, and the cinematic rendered at hero quality once the plateau
-under it is finished.
+Next, in order, each from a public source checked on 2026-09-14: the rest of
+the Great Pyramid's section (the five construction chambers from Petrie §62
+and Vyse's heights, the Gallery's real corbel laps from §46, the well shaft
+and grotto from the Edgars, and the ScanPyramids voids as instrumented boxes
+from the two open-access papers); Menkaure's chambers hung off the foot of
+his corridor from Vyse's table and Petrie's dimensions; the Tier 3 masses
+from OpenStreetMap's footprints, which name the queens' pyramids, the
+temples, the causeways, the Wall of the Crow, Khentkawes and the boat pits,
+with the Sphinx built up from its plan outline there in place of the box;
+Khafre's casing cap as a labelled estimate; and the cinematic re-rendered at
+hero quality once the plateau under it is finished. What no public source
+gives (a shaft inlet's exact place in a wall, a bent leg's length, a chamber
+level) is entered as an estimate on its own source, with a sigma, and stays
+unverified until a figure turns up.
 
 ## Layout
 

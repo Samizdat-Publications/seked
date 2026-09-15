@@ -167,6 +167,105 @@ export function passage(o: PassageOptions): Solid {
   });
 }
 
+/**
+ * One leg of a bore: a run along the floor at a slope, on a bearing. A leg
+ * has either a `length` in metres or `toFace`, which carries it until it
+ * meets the pyramid's face on the side its bearing points at.
+ */
+export interface BoreSegment {
+  length?: number;
+  toFace?: boolean;
+  /** Slope in degrees above the horizontal along the run. */
+  angleDeg: number;
+  /** Bearing, azimuth in degrees from north through east. */
+  directionDeg: number;
+}
+
+export interface BoreOptions {
+  /** Where the bore starts: the floor centre of its mouth in the chamber wall. */
+  inlet: Point;
+  segments: readonly BoreSegment[];
+  width: number;
+  height: number;
+  /** The pyramid the bore is inside, for a segment that runs to its face: half the base and the face angle. */
+  face: { halfBase: number; faceAngleDeg: number };
+  prefix?: string;
+}
+
+/**
+ * Where a run from `from` at `angleDeg` and `directionDeg` meets the north or
+ * south face of a pyramid, as a distance along the run. A face is a plane
+ * that stands `z / tan(face angle)` inside the base edge at height z, so the
+ * run is solved against the plane on the side it heads for; the east and
+ * west faces are not looked at, because every bore at Giza runs north or
+ * south, and a run that never reaches the face is refused rather than
+ * extended backwards.
+ */
+export function runToFace(from: Point, angleDeg: number, directionDeg: number, face: { halfBase: number; faceAngleDeg: number }): number {
+  const a = (angleDeg * Math.PI) / 180;
+  const az = (directionDeg * Math.PI) / 180;
+  const dy = Math.cos(a) * Math.cos(az);
+  const dz = Math.sin(a);
+  const cot = 1 / Math.tan((face.faceAngleDeg * Math.PI) / 180);
+  // North face: y = half - z cot; south face: y = -(half - z cot).
+  const side = dy >= 0 ? 1 : -1;
+  const denominator = side * dy + dz * cot;
+  if (denominator <= 1e-12) throw new Error('runToFace: the run never reaches the face');
+  const t = (face.halfBase - from[2] * cot - side * from[1]) / denominator;
+  if (t <= 0) throw new Error('runToFace: the run starts outside the face');
+  return t;
+}
+
+/** The far end of a run of `length` from `from` at a slope on a bearing. */
+export function runEnd(from: Point, length: number, angleDeg: number, directionDeg: number): Point {
+  const a = (angleDeg * Math.PI) / 180;
+  const az = (directionDeg * Math.PI) / 180;
+  return [
+    from[0] + length * Math.cos(a) * Math.sin(az),
+    from[1] + length * Math.cos(a) * Math.cos(az),
+    from[2] + length * Math.sin(a),
+  ];
+}
+
+/**
+ * A bore of constant rectangular section that bends: one `passage` per
+ * segment, laid end to end from the inlet, welded into a single mesh. The
+ * joints are butted, not mitred, which at twenty centimetres across is a
+ * thumbnail of overlap; the shafts are drawn to be seen in a section, not
+ * crawled through.
+ *
+ * Landmarks: the inlet, each joint as `point.<k>`, and the far end as
+ * `mouth`, all on the floor centre line.
+ */
+export function bore(o: BoreOptions): Solid {
+  if (o.segments.length === 0) throw new Error('bore: a bore needs at least one segment');
+  const points: Point[] = [o.inlet];
+  for (const s of o.segments) {
+    const from = points[points.length - 1] as Point;
+    const length = s.toFace ? runToFace(from, s.angleDeg, s.directionDeg, o.face) : s.length;
+    if (length === undefined || !(length > 0)) throw new Error('bore: a segment needs a positive length or toFace');
+    points.push(runEnd(from, length, s.angleDeg, s.directionDeg));
+  }
+  const verts: number[] = [];
+  const tris: number[] = [];
+  for (let k = 0; k + 1 < points.length; k++) {
+    const leg = passage({ from: points[k] as Point, to: points[k + 1] as Point, width: o.width, height: o.height });
+    const offset = verts.length / 3;
+    for (const x of leg.positions) verts.push(x);
+    for (const i of leg.indices) tris.push(i + offset);
+  }
+  const p = o.prefix ? `${o.prefix}.` : '';
+  const landmarks: Landmarks = { [`${p}inlet`]: points[0] as Point, [`${p}mouth`]: points[points.length - 1] as Point };
+  points.slice(1, -1).forEach((pt, i) => { landmarks[`${p}point.${i + 1}`] = pt; });
+  return {
+    positions: Float32Array.from(verts),
+    indices: Uint32Array.from(tris),
+    vertexCount: verts.length / 3,
+    triangleCount: tris.length / 3,
+    landmarks,
+  };
+}
+
 export interface Gable {
   /** Height of the ridge above the chamber floor, so above `min[2]`. */
   ridgeHeight: number;

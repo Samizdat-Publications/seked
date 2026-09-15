@@ -320,5 +320,23 @@
     "url": "https://archive.org/details/operationscarrie02howa",
     "license": "Public domain",
     "note": "Perring's measurements as Vyse printed them. The Third Pyramid's Table of Dimensions is in the Appendix, pp. 120 to 122, read from the archive.org OCR of this scan on 2026-09-14. The OCR sets the table's column of feet and inches apart from its labels, so a figure has to be paired with its line by order; an angle is printed inline with its label and needs no pairing."
+  },
+  {
+    "id": "gantenbrink-1999",
+    "kind": "survey",
+    "year": 1999,
+    "citation": "Gantenbrink, R. (1999). The Upuaut Project: the findings, the lower and upper northern and southern shafts, and the 1993 campaign diary. www.cheops.org.",
+    "url": "http://web.archive.org/web/2000/http://www.cheops.org/startpage/thefindings/theuppersouthshaft/uppersouth.htm",
+    "license": "Copyright Rudolf Gantenbrink 1999; the measurements are cited as facts, no drawing or image is reproduced",
+    "note": "The site as captured by the Wayback Machine between 1999 and 2001; the live cheops.org no longer carries these pages. The four shaft pages give the horizontal inlet lengths, the measured angles of ascent, where the northern shafts bend to clear the Grand Gallery, and the 1993 diary gives the distance up the lower southern shaft to the blocking slab. The block-by-block drawings were AutoCAD DWF files in a Java viewer and are not readable here, so a leg length that only the drawings give is entered as this project's estimate instead."
+  },
+  {
+    "id": "seked-estimate",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Seked project estimate: a figure no public source states, chosen so a solid can be drawn, with the reasoning and a sigma in the record's note.",
+    "url": "https://github.com/Samizdat-Publications/seked",
+    "license": "CC0",
+    "note": "Every record on this source is verified: false and stays so. It exists so the scene can show a passage or a room whose overall shape is known while one dimension is not, without pretending the dimension was measured; a record on it should be replaced the moment a survey figure is found, and the dossier and the viewer mark it as an estimate."
   }
 ]

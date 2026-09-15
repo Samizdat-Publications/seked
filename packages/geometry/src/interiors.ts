@@ -27,8 +27,8 @@
  */
 
 import type { Environment } from './environment';
-import { chamber, extrudedSection, passage } from './interior';
-import type { Gable, SectionPair, Solid } from './interior';
+import { bore, chamber, extrudedSection, passage } from './interior';
+import type { BoreSegment, Gable, SectionPair, Solid } from './interior';
 import type { Point } from './landmarks';
 
 /** The structures whose interiors are looked for, when a caller names none. */
@@ -99,12 +99,21 @@ const SHARED_SECTION = ['passage.descending.width', 'passage.descending.height']
 interface Builder {
   /** Name of the solid, and the prefix of every landmark it carries. */
   name: string;
-  /** Every record the solid is built from, for provenance and for the skip test. */
-  keys: readonly string[];
+  /**
+   * Every record the solid is built from, for provenance and for the skip
+   * test. A function where the list depends on what the records carry, as a
+   * shaft's does on how many legs it has.
+   */
+  keys: readonly string[] | ((env: Environment) => readonly string[]);
   build(env: Environment): Solid;
 }
 
-const BUILDERS: readonly Builder[] = [
+/** A builder's inputs under this environment. */
+function keysOf(builder: Builder, env: Environment): readonly string[] {
+  return typeof builder.keys === 'function' ? builder.keys(env) : builder.keys;
+}
+
+const ROOM_BUILDERS: readonly Builder[] = [
   {
     // The entrance passage, from the true beginning of its floor in the north
     // face down to the flat end Petrie measured in the rock.
@@ -274,6 +283,122 @@ const BUILDERS: readonly Builder[] = [
     },
   },
 ];
+
+// --- The four shafts --------------------------------------------------------
+//
+// A shaft is a bore out of a chamber wall: an inlet, then legs laid end to
+// end. The records, under `<chamber>.shaft.<side>.`:
+//
+//   inlet.from_east_wall      metres west of the chamber's east wall
+//   inlet.from_floor          metres above the chamber's floor
+//   segment.<k>.length        metres along the floor, or
+//   segment.<k>.to_face       1: run until the pyramid's face
+//   segment.<k>.angle         slope, degrees above the horizontal
+//   segment.<k>.direction     optional azimuth; the side's own bearing otherwise
+//   width, height             the section, heights square to the floor
+//
+// The inlet's north coordinate is the chamber wall the shaft leaves, which is
+// the side in its name, and comes off the chamber's own records; nothing about
+// the wall is typed a second time. A last leg that runs to the face ends on
+// the face, which is where Petrie found the mouths, and the level it comes
+// out at is a result, not an input. The four are the King's Chamber's and the
+// Queen's Chamber's, north and south; the count of legs is whatever the
+// records carry, in order, so a survey that resolves one more bend adds a
+// record and no code.
+
+/** How many legs a shaft may carry; the records are read in order until one is missing. */
+const MAX_SEGMENTS = 12;
+
+/** The chamber walls a shaft can leave, from the records that place them. */
+const SHAFT_CHAMBERS: Record<string, {
+  wall: (env: Environment, side: 'north' | 'south') => number;
+  eastWall: (env: Environment) => number;
+  floor: (env: Environment) => number;
+  keys: readonly string[];
+}> = {
+  kc: {
+    wall: (env, side) => value(env, `kc.wall.${side}.north`),
+    eastWall: (env) => value(env, 'kc.wall.east.east'),
+    floor: (env) => value(env, 'kc.floor.elevation'),
+    keys: ['kc.wall.north.north', 'kc.wall.south.north', 'kc.wall.east.east', 'kc.floor.elevation'],
+  },
+  qc: {
+    wall: (env, side) => (side === 'north' ? value(env, 'qc.corner.ne.north') : value(env, 'qc.corner.ne.north') - value(env, 'qc.width')),
+    eastWall: (env) => value(env, 'qc.corner.ne.east'),
+    floor: (env) => value(env, 'qc.corner.ne.up'),
+    keys: ['qc.corner.ne.north', 'qc.corner.ne.east', 'qc.corner.ne.up', 'qc.width'],
+  },
+};
+
+/** The records that describe one shaft's legs, in order, or nothing if the first is missing. */
+function shaftSegmentKeys(env: Environment, base: string): string[] {
+  const keys: string[] = [];
+  for (let k = 1; k <= MAX_SEGMENTS; k++) {
+    const leg = `${base}.segment.${k}`;
+    const hasLength = env[`${leg}.length`] !== undefined;
+    const toFace = env[`${leg}.to_face`] !== undefined;
+    if (!hasLength && !toFace) break;
+    keys.push(hasLength ? `${leg}.length` : `${leg}.to_face`, `${leg}.angle`);
+    if (env[`${leg}.direction`] !== undefined) keys.push(`${leg}.direction`);
+  }
+  return keys;
+}
+
+function shaftBuilder(chamberId: string, side: 'north' | 'south'): Builder {
+  const base = `${chamberId}.shaft.${side}`;
+  const room = SHAFT_CHAMBERS[chamberId] as (typeof SHAFT_CHAMBERS)[string];
+  return {
+    name: base,
+    // How many legs there are is the records' business, so the keys are read
+    // off the environment: the fixed part, then every leg it carries. A shaft
+    // with no first leg names segment.1.angle and is skipped for want of it.
+    keys: (env) => [
+      ...room.keys, 'g1.base.side.mean', 'g1.face.angle',
+      `${base}.inlet.from_east_wall`, `${base}.inlet.from_floor`, `${base}.width`, `${base}.height`,
+      `${base}.segment.1.angle`, ...shaftSegmentKeys(env, base),
+    ],
+    build: (env) => {
+      const inlet: Point = [
+        room.eastWall(env) - value(env, `${base}.inlet.from_east_wall`),
+        room.wall(env, side),
+        room.floor(env) + value(env, `${base}.inlet.from_floor`),
+      ];
+      const bearing = side === 'north' ? 0 : 180;
+      const segments: BoreSegment[] = [];
+      for (let k = 1; k <= MAX_SEGMENTS; k++) {
+        const leg = `${base}.segment.${k}`;
+        const length = env[`${leg}.length`];
+        const toFace = env[`${leg}.to_face`];
+        if (length === undefined && toFace === undefined) break;
+        segments.push({
+          ...(length !== undefined ? { length } : { toFace: true }),
+          angleDeg: value(env, `${leg}.angle`),
+          directionDeg: env[`${leg}.direction`] ?? bearing,
+        });
+      }
+      return bore({
+        inlet,
+        segments,
+        width: value(env, `${base}.width`),
+        height: value(env, `${base}.height`),
+        face: { halfBase: value(env, 'g1.base.side.mean') / 2, faceAngleDeg: value(env, 'g1.face.angle') },
+        prefix: base,
+      });
+    },
+  };
+}
+
+function shaftBuilders(): Builder[] {
+  return (['kc', 'qc'] as const).flatMap((room) => (['north', 'south'] as const).map((side) => shaftBuilder(room, side)));
+}
+
+/** The Great Pyramid's solids: Petrie's rooms in order from the entrance down and then up, then the four shafts. */
+const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders()];
+
+/** Every record a shaft is built from under this environment: the fixed keys and the legs it actually carries. */
+export function shaftInputs(env: Environment, chamberId: string, side: 'north' | 'south'): readonly string[] {
+  return keysOf(shaftBuilder(chamberId, side), env);
+}
 
 // --- Structures whose plan is discovered from their records ----------------
 //
@@ -616,13 +741,17 @@ function buildersFor(env: Environment, structure: string): readonly Builder[] {
   return structure === 'g1' ? BUILDERS : discover(env, structure);
 }
 
-/** Every record each of the Great Pyramid's solids is built from, for provenance. */
+/**
+ * Every record each of the Great Pyramid's solids is built from, for
+ * provenance, with no environment to ask: a shaft lists its fixed records and
+ * its first leg's angle here, and `interiorSolidInputs` lists the rest.
+ */
 export const INTERIOR_SOLID_INPUTS: Record<string, readonly string[]> =
-  Object.fromEntries(BUILDERS.map((b) => [b.name, b.keys]));
+  Object.fromEntries(BUILDERS.map((b) => [b.name, keysOf(b, {})]));
 
 /** The records behind each solid a structure's interior actually builds. */
 export function interiorSolidInputs(env: Environment, options: InteriorOptions = {}): Record<string, readonly string[]> {
-  return Object.fromEntries(buildersFor(env, options.structure ?? 'g1').map((b) => [b.name, b.keys]));
+  return Object.fromEntries(buildersFor(env, options.structure ?? 'g1').map((b) => [b.name, keysOf(b, env)]));
 }
 
 /**
@@ -634,7 +763,7 @@ export function interiorSolidInputs(env: Environment, options: InteriorOptions =
 export function interiorSolids(env: Environment, options: InteriorOptions = {}): Record<string, Solid> {
   const out: Record<string, Solid> = {};
   for (const builder of buildersFor(env, options.structure ?? 'g1')) {
-    if (!builder.keys.every((key) => Number.isFinite(env[key]))) continue;
+    if (!keysOf(builder, env).every((key) => Number.isFinite(env[key]))) continue;
     out[builder.name] = builder.build(env);
   }
   return out;
@@ -642,5 +771,5 @@ export function interiorSolids(env: Environment, options: InteriorOptions = {}):
 
 /** Which of `ids` the environment carries an interior for, in the order given. */
 export function interiorStructures(env: Environment, ids: readonly string[] = INTERIOR_STRUCTURES): string[] {
-  return ids.filter((id) => buildersFor(env, id).some((b) => b.keys.every((key) => Number.isFinite(env[key]))));
+  return ids.filter((id) => buildersFor(env, id).some((b) => keysOf(b, env).every((key) => Number.isFinite(env[key]))));
 }

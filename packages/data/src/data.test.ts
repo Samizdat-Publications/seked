@@ -19,7 +19,8 @@ describe('database', () => {
     expect(db.measurements.find((m) => m.key === 'c')?.verified).toBe(true);
     const kind = new Map(db.sources.map((s) => [s.id, s.kind]));
     for (const m of db.measurements.filter((m) => m.verified && kind.get(m.source) === 'survey')) {
-      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+/);
+      // A section, a page number, or, for a survey published as a website, the named page or diary entry it was read on.
+      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+|\bshaft page\b|\bcampaign diary\b/);
     }
   });
 });

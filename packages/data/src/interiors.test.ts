@@ -25,6 +25,10 @@ const EXPECTED = [
   'gg',
   'antechamber',
   'kc',
+  'kc.shaft.north',
+  'kc.shaft.south',
+  'qc.shaft.north',
+  'qc.shaft.south',
 ];
 
 /** A closed surface uses every directed edge once, and its neighbour uses the reverse. */

@@ -302,6 +302,59 @@ def passage(start, end, width, height, height_mode="perpendicular"):
     return extruded_section(start, end, [(half, 0.0), (half, height)], height_mode)
 
 
+def run_to_face(start, angle_deg, direction_deg, half_base, face_angle_deg):
+    """
+    How far a run from `start` at that slope and bearing goes before it meets
+    the pyramid's north or south face, whichever its bearing heads for. Mirrors
+    runToFace in packages/geometry: the face is the plane standing
+    z / tan(face angle) inside the base edge at height z.
+    """
+    a, az = math.radians(angle_deg), math.radians(direction_deg)
+    dy, dz = math.cos(a) * math.cos(az), math.sin(a)
+    cot = 1.0 / math.tan(math.radians(face_angle_deg))
+    side = 1.0 if dy >= 0 else -1.0
+    denominator = side * dy + dz * cot
+    if denominator <= 1e-12:
+        raise ValueError("run_to_face: the run never reaches the face")
+    t = (half_base - start[2] * cot - side * start[1]) / denominator
+    if t <= 0:
+        raise ValueError("run_to_face: the run starts outside the face")
+    return t
+
+
+def run_end(start, length, angle_deg, direction_deg):
+    """The far end of a run of `length` from `start` at a slope on a bearing. Mirrors runEnd."""
+    a, az = math.radians(angle_deg), math.radians(direction_deg)
+    return (start[0] + length * math.cos(a) * math.sin(az),
+            start[1] + length * math.cos(a) * math.cos(az),
+            start[2] + length * math.sin(a))
+
+
+def bore(inlet, segments, width, height, half_base, face_angle_deg):
+    """
+    A bore of constant rectangular section that bends: one passage per
+    segment, laid end to end from the inlet, welded into one mesh. Each
+    segment is a dict with "angle", "direction" and either "length" or
+    "to_face". Mirrors bore in packages/geometry, vertex for vertex.
+    """
+    if not segments:
+        raise ValueError("bore: a bore needs at least one segment")
+    points = [inlet]
+    for s in segments:
+        start = points[-1]
+        length = run_to_face(start, s["angle"], s["direction"], half_base, face_angle_deg) if s.get("to_face") else s.get("length")
+        if length is None or not length > 0:
+            raise ValueError("bore: a segment needs a positive length or to_face")
+        points.append(run_end(start, length, s["angle"], s["direction"]))
+    verts, faces = [], []
+    for k in range(len(points) - 1):
+        leg_verts, leg_faces = passage(points[k], points[k + 1], width, height)
+        offset = len(verts)
+        verts.extend(leg_verts)
+        faces.extend(tuple(i + offset for i in f) for f in leg_faces)
+    return verts, faces
+
+
 CORNERS = ("NE", "NW", "SW", "SE")
 
 
@@ -390,6 +443,20 @@ def shape_cases():
     oblique_start, oblique_end = (-12.5, 18.0, 5.0), (14.0, -9.0, -6.5)
     add("oblique_perpendicular", passage(oblique_start, oblique_end, 1.05, 1.20, "perpendicular"))
     add("oblique_vertical", passage(oblique_start, oblique_end, 1.05, 1.20, "vertical"))
+    # A bore with four legs, the last run to the south face, and one that
+    # dog-legs north-west before running to the north face.
+    add("bent_bore_south", bore((2.5, -13.6, 43.9), [
+        {"length": 1.72, "angle": 0.0, "direction": 180.0},
+        {"length": 1.5, "angle": 39.2, "direction": 180.0},
+        {"length": 3.0, "angle": 50.54, "direction": 180.0},
+        {"to_face": True, "angle": 45.0, "direction": 180.0},
+    ], 0.216, 0.2235, 115.165, 51.8444))
+    add("dogleg_bore_north", bore((4.9, 2.6, 22.2), [
+        {"length": 1.93, "angle": 0.0, "direction": 0.0},
+        {"length": 16.07, "angle": 39.1167, "direction": 0.0},
+        {"length": 8.0, "angle": 39.1167, "direction": 315.0},
+        {"to_face": True, "angle": 39.1167, "direction": 0.0},
+    ], 0.2032, 0.2184, 115.165, 51.8444))
     return cases
 
 
@@ -676,6 +743,86 @@ INTERIOR_BUILDERS = [
       "kc.floor.elevation", "kc.ceiling.up"],
      _build_kings_chamber),
 ]
+
+
+# --- The four shafts --------------------------------------------------------
+# Mirrors shaftBuilders in packages/geometry/src/interiors.ts. A shaft is a
+# bore out of a chamber wall: an inlet placed from the chamber's own records
+# and the shaft's inlet.from_east_wall and inlet.from_floor, then legs read in
+# order from segment.<k>.{length|to_face,angle,direction} until one is
+# missing, each on the side's own bearing unless a direction record says
+# otherwise, and a last leg that runs to the pyramid's face.
+
+_MAX_SEGMENTS = 12
+
+_SHAFT_CHAMBERS = {
+    "kc": {
+        "wall": lambda v, side: _value(v, "kc.wall.%s.north" % side),
+        "east_wall": lambda v: _value(v, "kc.wall.east.east"),
+        "floor": lambda v: _value(v, "kc.floor.elevation"),
+        "keys": ["kc.wall.north.north", "kc.wall.south.north", "kc.wall.east.east", "kc.floor.elevation"],
+    },
+    "qc": {
+        "wall": lambda v, side: _value(v, "qc.corner.ne.north") if side == "north" else _value(v, "qc.corner.ne.north") - _value(v, "qc.width"),
+        "east_wall": lambda v: _value(v, "qc.corner.ne.east"),
+        "floor": lambda v: _value(v, "qc.corner.ne.up"),
+        "keys": ["qc.corner.ne.north", "qc.corner.ne.east", "qc.corner.ne.up", "qc.width"],
+    },
+}
+
+
+def _shaft_segments(values, base, bearing):
+    out = []
+    for k in range(1, _MAX_SEGMENTS + 1):
+        leg = "%s.segment.%d" % (base, k)
+        length = values.get(leg + ".length")
+        to_face = values.get(leg + ".to_face")
+        if length is None and to_face is None:
+            break
+        direction = values.get(leg + ".direction")
+        out.append({"length": length, "to_face": to_face is not None, "angle": _value(values, leg + ".angle"),
+                    "direction": bearing if direction is None else direction})
+    return out
+
+
+def shaft_segment_keys(values, base):
+    """The records that describe one shaft's legs, in order, or nothing if the first is missing."""
+    keys = []
+    for k in range(1, _MAX_SEGMENTS + 1):
+        leg = "%s.segment.%d" % (base, k)
+        has_length = values.get(leg + ".length") is not None
+        to_face = values.get(leg + ".to_face") is not None
+        if not has_length and not to_face:
+            break
+        keys.append(leg + ".length" if has_length else leg + ".to_face")
+        keys.append(leg + ".angle")
+        if values.get(leg + ".direction") is not None:
+            keys.append(leg + ".direction")
+    return keys
+
+
+def _shaft_builder(chamber_id, side):
+    base = "%s.shaft.%s" % (chamber_id, side)
+    room = _SHAFT_CHAMBERS[chamber_id]
+    fixed = list(room["keys"]) + ["g1.base.side.mean", "g1.face.angle",
+                                  base + ".inlet.from_east_wall", base + ".inlet.from_floor",
+                                  base + ".width", base + ".height", base + ".segment.1.angle"]
+
+    def keys(v):
+        return fixed + shaft_segment_keys(v, base)
+
+    def build(v):
+        inlet = (room["east_wall"](v) - _value(v, base + ".inlet.from_east_wall"),
+                 room["wall"](v, side),
+                 room["floor"](v) + _value(v, base + ".inlet.from_floor"))
+        bearing = 0.0 if side == "north" else 180.0
+        return bore(inlet, _shaft_segments(v, base, bearing), _value(v, base + ".width"), _value(v, base + ".height"),
+                    _value(v, "g1.base.side.mean") / 2.0, _value(v, "g1.face.angle"))
+
+    return (base, keys, build)
+
+
+INTERIOR_BUILDERS += [_shaft_builder(room, side) for room in ("kc", "qc") for side in ("north", "south")]
 
 
 # --- Structures whose plan is discovered from their records ----------------
@@ -1027,6 +1174,7 @@ def interior_solids(values, structure="g1"):
     """
     out = []
     for name, keys, build in _builders_for(values, structure):
+        keys = keys(values) if callable(keys) else keys
         if any(values.get(k) is None for k in keys):
             continue
         verts, faces = build(values)
@@ -1039,7 +1187,7 @@ def interior_solids(values, structure="g1"):
 def interior_structures(values, ids=INTERIOR_STRUCTURES):
     """Which of `ids` the resolved values carry an interior for, in the order given."""
     return [i for i in ids
-            if any(all(values.get(k) is not None for k in keys)
+            if any(all(values.get(k) is not None for k in (keys(values) if callable(keys) else keys))
                    for _, keys, _ in _builders_for(values, i))]
 
 

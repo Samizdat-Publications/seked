@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildEnvironment, chamber, courseHeights, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh, steppedPyramidMesh } from '@seked/geometry';
+import { bore, buildEnvironment, chamber, courseHeights, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh, steppedPyramidMesh } from '@seked/geometry';
 import type { GroundPyramid, Point, SectionPair, Solid } from '@seked/geometry';
 import { loadDatabase, REPO_ROOT, resolve } from './index';
 
@@ -104,6 +104,28 @@ function interiorShapes(): Record<string, Solid> {
     oblique_vertical: passage({
       from: obliqueFrom, to: obliqueTo, width: 1.05, height: 1.2, heightMode: 'vertical',
     }),
+    // A bore with four legs, the last run to the south face, and one that
+    // dog-legs north-west before running to the north face.
+    bent_bore_south: bore({
+      inlet: [2.5, -13.6, 43.9],
+      segments: [
+        { length: 1.72, angleDeg: 0, directionDeg: 180 },
+        { length: 1.5, angleDeg: 39.2, directionDeg: 180 },
+        { length: 3.0, angleDeg: 50.54, directionDeg: 180 },
+        { toFace: true, angleDeg: 45, directionDeg: 180 },
+      ],
+      width: 0.216, height: 0.2235, face: { halfBase: 115.165, faceAngleDeg: 51.8444 },
+    }),
+    dogleg_bore_north: bore({
+      inlet: [4.9, 2.6, 22.2],
+      segments: [
+        { length: 1.93, angleDeg: 0, directionDeg: 0 },
+        { length: 16.07, angleDeg: 39.1167, directionDeg: 0 },
+        { length: 8.0, angleDeg: 39.1167, directionDeg: 315 },
+        { toFace: true, angleDeg: 39.1167, directionDeg: 0 },
+      ],
+      width: 0.2032, height: 0.2184, face: { halfBase: 115.165, faceAngleDeg: 51.8444 },
+    }),
   };
 }
 
@@ -154,7 +176,11 @@ function expectSameSolids(theirs: PyInterior[], ours: Record<string, Solid>): vo
       }
     }
     const oursVolume = meshVolume(mine);
-    expect(Math.abs(oursVolume - solid.volume) / solid.volume, `${solid.name} volume`).toBeLessThan(1e-5);
+    // A part in a hundred thousand, or a tenth of a litre: a shaft twenty
+    // centimetres across eighty metres from the origin holds a few cubic
+    // metres, and float32 at that distance is good to a few micrometres, which
+    // on so thin a section is more than a part in a hundred thousand.
+    expect(Math.abs(oursVolume - solid.volume), `${solid.name} volume`).toBeLessThan(Math.max(1e-5 * solid.volume, 1e-4));
   }
 }
 

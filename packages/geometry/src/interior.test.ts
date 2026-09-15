@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { chamber, extrudedSection, meshVolume, passage } from './index';
+import { bore, chamber, extrudedSection, meshVolume, passage, runEnd, runToFace } from './index';
 import type { Mesh, Point, SectionPair } from './index';
 
 const DEG = Math.PI / 180;
@@ -242,5 +242,60 @@ describe('chamber', () => {
     const q = chamber({ min, max, gable: { ridgeHeight: 7.4, axis: 'x' }, prefix: 'g1.queen' });
     expect(q.landmarks['g1.queen.ridge.mid']).toEqual([0, 0, 43 + 7.4]);
     expect(Object.keys(q.landmarks).at(-1)).toBe('g1.queen.ridge.mid');
+  });
+});
+
+describe('a bore', () => {
+  const face = { halfBase: 115.165, faceAngleDeg: 51.8444 };
+
+  it('runs a last leg exactly to the face on the side it heads for', () => {
+    const from: Point = [0, -20, 47];
+    const t = runToFace(from, 45, 180, face);
+    const end = runEnd(from, t, 45, 180);
+    // On the south face, y = -(half - z / tan(face angle)).
+    expect(end[1]).toBeCloseTo(-(face.halfBase - end[2] / Math.tan((face.faceAngleDeg * Math.PI) / 180)), 9);
+    expect(end[2]).toBeGreaterThan(from[2]);
+    const north = runEnd([0, -2, 46], runToFace([0, -2, 46], 32.6, 0, face), 32.6, 0);
+    expect(north[1]).toBeCloseTo(face.halfBase - north[2] / Math.tan((face.faceAngleDeg * Math.PI) / 180), 9);
+  });
+
+  it('refuses a run that never reaches the face or starts outside it', () => {
+    expect(() => runToFace([0, 0, 10], -80, 180, face)).toThrow(/never reaches/);
+    expect(() => runToFace([0, -200, 10], 45, 180, face)).toThrow(/starts outside/);
+  });
+
+  it('chains its legs from the inlet and names the joints', () => {
+    const solid = bore({
+      inlet: [2.5, -13.6, 43.9],
+      segments: [
+        { length: 1.72, angleDeg: 0, directionDeg: 180 },
+        { length: 2, angleDeg: 30, directionDeg: 180 },
+        { toFace: true, angleDeg: 45, directionDeg: 180 },
+      ],
+      width: 0.2, height: 0.2, face, prefix: 'kc.shaft.south',
+    });
+    expect(solid.landmarks['kc.shaft.south.inlet']).toEqual([2.5, -13.6, 43.9]);
+    const [x1, y1, z1] = solid.landmarks['kc.shaft.south.point.1'] as Point;
+    expect([x1, y1, z1]).toEqual([2.5, -13.6 - 1.72, 43.9]);
+    const [, y2, z2] = solid.landmarks['kc.shaft.south.point.2'] as Point;
+    expect(z2 - z1).toBeCloseTo(2 * Math.sin(Math.PI / 6), 9);
+    expect(y1 - y2).toBeCloseTo(2 * Math.cos(Math.PI / 6), 9);
+    const mouth = solid.landmarks['kc.shaft.south.mouth'] as Point;
+    expect(mouth[2]).toBeGreaterThan(z2);
+    // Three legs of a two-pair section: three passages of 8 vertices and 12 triangles each.
+    expect(solid.vertexCount).toBe(24);
+    expect(solid.triangleCount).toBe(36);
+    expect(meshVolume(solid)).toBeGreaterThan(0);
+  });
+
+  it('follows a bearing that is not the side it leaves from', () => {
+    const solid = bore({
+      inlet: [0, 0, 0],
+      segments: [{ length: 10, angleDeg: 0, directionDeg: 315 }],
+      width: 0.2, height: 0.2, face,
+    });
+    const [x, y] = solid.landmarks['mouth'] as Point;
+    expect(x).toBeCloseTo(-10 / Math.SQRT2, 9);
+    expect(y).toBeCloseTo(10 / Math.SQRT2, 9);
   });
 });

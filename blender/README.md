@@ -47,8 +47,19 @@ child collection of its own: `Interior` for the Great Pyramid, and
 `Interior (G2 Khafre)` or `Interior (G3 Menkaure)` for the others. The Great
 Pyramid's holds one object per solid: the entrance passage, the three
 subterranean pieces, the ascending passage, the passage to the Queen's
-Chamber, the Queen's Chamber, the Grand Gallery, the Antechamber and the
-King's Chamber. They are separate solids rather than a boolean cut out of the
+Chamber, the Queen's Chamber, the Grand Gallery, the Antechamber, the
+King's Chamber, and the four shafts as bores out of the two chambers' north
+and south walls. A shaft is legs laid end to end from its inlet, each a
+length at a slope on a bearing, read from `<chamber>.shaft.<side>.segment.<k>`
+records until one is missing, with a last leg that runs until it meets the
+pyramid's face: Gantenbrink's horizontal inlet runs and angles of ascent, the
+bend the northern shafts make to clear the Grand Gallery, the slab at 59 m up
+the Queen's Chamber's southern shaft, and Petrie's mouths on the 103rd and
+104th courses, which the King's Chamber's legs come out at within the two
+courses his count and Goyon's differ by. Where only Gantenbrink's drawing
+gives a figure, the inlet's place in the wall and a bent leg's length, the
+record is this project's own estimate on the `seked-estimate` source with a
+sigma, verified false, to be replaced when a survey figure turns up. They are separate solids rather than a boolean cut out of the
 masonry, so a section view is a matter of clipping them or hiding the whole
 collection, and a claim overlay can name a point on one. A solid whose records
 the preset does not carry is left out rather than guessed at, and a structure
