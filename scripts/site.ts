@@ -18,7 +18,8 @@ cpSync(dist, site, { recursive: true });
 const progressDir = join(REPO_ROOT, 'docs', 'progress');
 const outProgress = join(site, 'progress');
 mkdirSync(outProgress, { recursive: true });
-for (const f of readdirSync(progressDir)) if (f.endsWith('.png')) cpSync(join(progressDir, f), join(outProgress, f));
+// The snapshots, and the film a snapshot row links to beside its frame.
+for (const f of readdirSync(progressDir)) if (f.endsWith('.png') || f.endsWith('.mp4')) cpSync(join(progressDir, f), join(outProgress, f));
 
 interface Row { id: string; file: string; alt: string; date: string; caption: string }
 const rows: Row[] = [];
