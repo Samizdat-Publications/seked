@@ -125,8 +125,8 @@ def emissive_material(name, colour, strength):
 def camera_only(obj):
     """
     Seen by the camera and by nothing else. A drawn line or a label is an
-    annotation, not a lamp: an emissive prism fifty kilometres long would
-    otherwise light the plateau like a second sun.
+    annotation, not a lamp: an emissive prism two hundred kilometres long
+    would otherwise light the plateau like a second sun.
     """
     obj.visible_shadow = False
     obj.visible_diffuse = False
@@ -161,7 +161,8 @@ def build_shaft_ray(scene, chamber, angle_deg, camera_location, material):
     """
     The King's Chamber's south shaft as a line of sight: from the chamber's
     centre, south and up at the measured angle in the meridian plane, out to
-    the dome. A tapered prism so it stays a visible width at fifty kilometres.
+    the dome. A tapered prism so it stays a visible width at two hundred
+    kilometres.
     The shafts are not in the database as geometry, only as angles, so a ray
     is drawn rather than a bore, as the viewer's overlay does.
     """
@@ -249,14 +250,21 @@ def encode(frames_dir, names, mp4, fps, width, height):
     scene.render.resolution_x, scene.render.resolution_y = width, height
     scene.render.resolution_percentage = 100
     scene.frame_start, scene.frame_end = 1, len(names)
-    scene.render.image_settings.file_format = "FFMPEG"
+    # Blender 5 chooses between image and video output before it offers the
+    # video formats; asked for FFMPEG without that it lists the still formats
+    # and refuses. An older Blender has no media type and takes the format.
+    settings = scene.render.image_settings
+    if hasattr(settings, "media_type"):
+        settings.media_type = "VIDEO"
+    settings.file_format = "FFMPEG"
     scene.render.ffmpeg.format = "MPEG4"
     scene.render.ffmpeg.codec = "H264"
     scene.render.ffmpeg.constant_rate_factor = "HIGH"
     scene.render.ffmpeg.gopsize = fps
     scene.render.filepath = mp4
     editor = scene.sequence_editor_create()
-    strips = getattr(editor, "strips", None) or editor.sequences
+    # Blender 4.4 renamed the collection; an empty one is false, so ask by name.
+    strips = editor.strips if hasattr(editor, "strips") else editor.sequences
     strip = strips.new_image("frames", filepath=os.path.join(frames_dir, names[0]), channel=1, frame_start=1)
     for name in names[1:]:
         strip.elements.append(name)
