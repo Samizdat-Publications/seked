@@ -67,11 +67,18 @@ VIEWS = {
         "placeholder_sun": (6.0, 90.0),
     },
     "cutaway": {
+        # Close in from the east-south-east and a little above the King's
+        # Chamber, so the passages fill the frame rather than sit in the
+        # middle distance with two other pyramids over them. The old station,
+        # 430 m out at 130 m up, framed the plateau and left the interior a
+        # pale smudge inside a pale pyramid; this one is inside the Pyramid's
+        # own footprint looking down the line of the Gallery.
         "moment": "equinox-sunrise-plus-hour",
-        "location": (430.0, 170.0, 130.0),
-        "target": (-15.0, -5.0, 50.0),
-        "lens": 40.0,
-        "exposure": -3.5,
+        "location": (215.0, 95.0, 96.0),
+        "target": (2.0, 6.0, 46.0),
+        "lens": 55.0,
+        "casing_alpha": 0.05,
+        "exposure": -4.6,
         "fill": 0.0,
         "placeholder_sun": (35.0, 135.0),
     },
@@ -365,6 +372,12 @@ def configure_render(scene, opts):
     scene.render.resolution_y = int(opts["height"])
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
+    # Eight bits and full compression. These frames are delivered images, not
+    # working files, and a section drawn in four flat values gains nothing
+    # from sixteen bits a channel while costing about twice the bytes; every
+    # one of them is kept in docs/progress/log/, so the bytes are a real cost.
+    scene.render.image_settings.color_depth = "8"
+    scene.render.image_settings.compression = 100
     return engine, samples
 
 

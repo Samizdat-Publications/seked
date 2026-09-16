@@ -8,5 +8,65 @@
     "kept": false,
     "note": "The Grand Gallery corbelled from Petrie's measured lap heights for the first time: a 2.65 m vertical wall under seven laps of 0.851 m, where the steps used to be spread evenly over the gallery's height.",
     "bytes": 1374744
+  },
+  {
+    "file": "2026-09-16T05-12-07Z--akhet--a210e9d-dirty.png",
+    "taken": "2026-09-16T05:12:07+00:00",
+    "view": "akhet",
+    "commit": "a210e9d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Lehner's akhet: the summer solstice sun of 2500 BCE setting into the notch between the Great Pyramid and Khafre's, from the Sphinx's viewpoint.",
+    "bytes": 910286
+  },
+  {
+    "file": "2026-09-16T05-12-07Z--cutaway--a210e9d-dirty.png",
+    "taken": "2026-09-16T05:12:07+00:00",
+    "view": "cutaway",
+    "commit": "a210e9d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The cutaway from the east through a translucent casing, now with the five chambers of construction and both Big Void hypotheses inside it.",
+    "bytes": 1058930
+  },
+  {
+    "file": "2026-09-16T05-12-07Z--dawn--a210e9d-dirty.png",
+    "taken": "2026-09-16T05:12:07+00:00",
+    "view": "dawn",
+    "commit": "a210e9d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Equinox dawn from the east-north-east, re-rendered at 192 samples after the chambers of construction, the two voids and the Gallery's corbels went in.",
+    "bytes": 973892
+  },
+  {
+    "file": "2026-09-16T05-12-07Z--section--a210e9d-dirty.png",
+    "taken": "2026-09-16T05:12:07+00:00",
+    "view": "section",
+    "commit": "a210e9d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The section at eight bits, after the Grand Gallery's corbels moved to their measured lap heights.",
+    "bytes": 893948
+  },
+  {
+    "file": "2026-09-16T05-12-08Z--night--a210e9d-dirty.png",
+    "taken": "2026-09-16T05:12:08+00:00",
+    "view": "night",
+    "commit": "a210e9d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The star dome with Alnitak on the meridian at 2450 BCE.",
+    "bytes": 853811
+  },
+  {
+    "file": "2026-09-16T05-16-42Z--cutaway--a210e9d-dirty.png",
+    "taken": "2026-09-16T05:16:42+00:00",
+    "view": "cutaway",
+    "commit": "a210e9d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The cutaway reframed from inside the Great Pyramid's own footprint, with the void solids on the hypothesis material: the five chambers of construction stacked on their granite floors, the Grand Gallery's corbels, and the Big Void as a pale volume that is plainly not a room.",
+    "bytes": 1098923
   }
 ]

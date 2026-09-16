@@ -302,6 +302,39 @@ def casing_over_granite_material(structure, label, height):
     return mat
 
 
+HYPOTHESIS_NAME = "Seked hypothesis"
+
+
+def hypothesis_material():
+    """
+    What a `void.*` solid is made of in a view that is meant to look like a
+    photograph. Nobody has stood in either of these, and a photograph of a room
+    nobody has entered is a fiction whatever stone it is given, so they are not
+    given stone: this is a cool, translucent, faintly lit surface that reads as
+    a volume rather than a chamber. The section view has its own answer, an
+    outline with no fill at all; this is the same thought in a view that has
+    light in it.
+    """
+    mat, tree, bsdf = new_material(HYPOTHESIS_NAME)
+    if tree is None:
+        return mat
+    bsdf.inputs["Base Color"].default_value = (0.32, 0.48, 0.62, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.35
+    bsdf.inputs["Alpha"].default_value = 0.22
+    if "Specular IOR Level" in bsdf.inputs:
+        bsdf.inputs["Specular IOR Level"].default_value = 0.4
+    if "Emission Color" in bsdf.inputs:
+        bsdf.inputs["Emission Color"].default_value = (0.30, 0.46, 0.60, 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 0.6
+    for attr, value in (("surface_render_method", "BLENDED"), ("blend_method", "BLEND")):
+        if hasattr(mat, attr):
+            try:
+                setattr(mat, attr, value)
+            except TypeError:
+                pass
+    return mat
+
+
 def assign_materials():
     """
     Materials over the whole scene, by what an object is. A "(today)" object
@@ -309,10 +342,12 @@ def assign_materials():
     courses are its geometry; the Sphinx's box and a flat truncation take the
     banded one, because theirs are not. An "(as built)" pyramid takes the
     casing, over granite where the database says the faces were granite. The
-    interior solids are granite, the terrain is sand.
+    interior solids are granite, a `void.*` solid is the hypothesis material
+    because nobody has stood in it, and the terrain is sand.
     """
     casing = casing_material()
     granite = granite_material()
+    hypothesis = hypothesis_material()
     sand = sand_material()
     core, banded = core_material(False), core_material(True)
     cased = {}
@@ -333,6 +368,8 @@ def assign_materials():
             mat = core if obj.get("seked_courses") else banded
         elif "(as built)" in name:
             mat = cased.get(name, casing)
+        elif name.startswith("void."):
+            mat = hypothesis
         else:
             mat = granite
         obj.data.materials.clear()
