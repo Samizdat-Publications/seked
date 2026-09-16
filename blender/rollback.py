@@ -273,6 +273,22 @@ def encode(frames_dir, names, mp4, fps, width, height):
     print(f"encoded {len(names)} frames at {fps} fps into {mp4}")
 
 
+def hide_voids():
+    """
+    Take the muon voids out of the film. It is a night view of the pyramids as
+    silhouettes, and the only interior solid that can show at all is the North
+    Face Corridor, whose top edge is four centimetres inside the as-built face
+    and whose faint glow came through it as a bright point at the Pyramid's
+    foot on the first hero test frame. Nothing in the film is about the voids.
+    """
+    hidden = 0
+    for obj in bpy.data.objects:
+        if obj.name.startswith("void."):
+            obj.hide_render = True
+            hidden += 1
+    print(f"rollback: {hidden} void solids taken out of the film")
+
+
 def main():
     from mathutils import Vector
 
@@ -298,6 +314,7 @@ def main():
 
     assign_materials()
     show_ground_only()
+    hide_voids()
     start, end = Vector(CAMERA_FROM), Vector(CAMERA_TO)
     target_of = lambda at: at + Vector((0.0, -math.cos(math.radians(CAMERA_PITCH_DEG)), math.sin(math.radians(CAMERA_PITCH_DEG)))) * 1000.0
     camera = make_camera(scene, start, target_of(start), CAMERA_LENS_MM, clip_end=4.0 * ROLLBACK_DOME_RADIUS_M)
