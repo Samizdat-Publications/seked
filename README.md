@@ -208,10 +208,13 @@ trench axes in section 29 also check the OSM registration where nothing was
 fitted: the boat pits east of Khufu land within 3.3 and 1.5 m of them.
 
 Next, in order. The sky-rollback film is being re-rendered at 1920 by 1080
-over the populated plateau. Deployment is built and switched off: the Pages
-workflow runs the tests and assembles the site on every push, and publishes
-only when the repository's PAGES_ENABLED variable is true, which is a decision
-for the owner and not for a script. Four items wait on material that is not
+over the populated plateau. The site is live at https://seked.pages.dev, on
+Cloudflare Pages by direct upload with `pnpm deploy`. GitHub Pages is not
+available for a private repository on this account's plan, so the Pages
+workflow still runs the tests and assembles the site on every push but does
+not publish unless PAGES_ENABLED is set. The deploy pins wrangler 4.20.0,
+because later releases route `pages deploy` from a workspace root into
+Workers and fail. Four items wait on material that is not
 text, and are recorded as such so they are not rediscovered: the well shaft
 and grotto, which Petrie declines to measure and the Edgars give only as
 "about" figures, their geometry being on their plates; the placement of
@@ -219,7 +222,8 @@ Menkaure's chambers, whose dimensions are all in but whose plan is not stated
 in prose; Khafre's casing cap, which Petrie mentions and never levels; and
 per-tomb heights for the mastabas, which Reisner tabulates by tomb number when
 OSM's outlines carry no tomb numbers, so matching the two needs his cemetery
-plans. What no public source gives is entered as an estimate on its own
+plans. The plan for all four, against the specific plates that resolve
+each one, is docs/geometry-blockers.md. What no public source gives is entered as an estimate on its own
 source, with a sigma, and stays unverified until a figure turns up.
 
 ## Layout
