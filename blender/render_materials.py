@@ -339,6 +339,91 @@ def assign_materials():
         obj.data.materials.append(mat)
 
 
+VOID_NAME = "Seked void"
+GHOST_NAME = "Seked ghost"
+
+# The three values a section is drawn at, as linear scene-referred grey. The
+# void is the lightest, the masonry a mid tone, and the backdrop the darkest,
+# so a passage reads against the stone and the stone reads against the ground.
+# They are chosen, not measured, and that is the point: see `drawing_material`.
+VOID_VALUE = 0.95
+GHOST_VALUE = 0.42
+
+
+def drawing_material(name, value, opacity, tint=(1.0, 0.96, 0.90)):
+    """
+    A surface with a value rather than a lighting response.
+
+    No sun reaches inside a pyramid. A lit interior is a fiction however it is
+    lit, and a lamp put in the Grand Gallery to make the render work would be
+    the one thing in this scene that was neither measured nor computed. A
+    drawing has always answered that by giving each thing a tone instead, so
+    that is what this is: an emission at `value`, mixed with a transparent
+    shader at `opacity`, and nothing else. It casts no light, takes none, and
+    looks the same wherever the camera stands.
+
+    Everything geometric in the frame is still survey, to the vertex. Only the
+    ink is a choice, and it is confined to these two numbers.
+    """
+    mat, tree, bsdf = new_material(name)
+    if tree is None:
+        return mat
+    out = next(n for n in tree.nodes if n.type == "OUTPUT_MATERIAL")
+    tree.nodes.remove(bsdf)
+    emission = tree.nodes.new("ShaderNodeEmission")
+    emission.inputs["Color"].default_value = (tint[0] * value, tint[1] * value, tint[2] * value, 1.0)
+    emission.inputs["Strength"].default_value = 1.0
+    if opacity >= 1.0:
+        tree.links.new(emission.outputs[0], out.inputs["Surface"])
+        return mat
+    clear = tree.nodes.new("ShaderNodeBsdfTransparent")
+    mix = tree.nodes.new("ShaderNodeMixShader")
+    mix.inputs["Fac"].default_value = 1.0 - opacity
+    tree.links.new(emission.outputs[0], mix.inputs[1])
+    tree.links.new(clear.outputs[0], mix.inputs[2])
+    tree.links.new(mix.outputs[0], out.inputs["Surface"])
+    return mat
+
+
+def draw_as_section(structure, casing_opacity):
+    """
+    Put the scene on the two drawing materials and take everything else out of
+    the frame. A section of one pyramid is a picture of that pyramid: only the
+    named structure is kept, and of its objects only the "(as built)" shell
+    and the interior solids, because the "(today)" stack of courses stands in
+    the same place and would read as a second pyramid drawn over the first.
+
+    The shell is the only translucent thing, at `casing_opacity`; the rooms
+    and passages are drawn solid, so a passage reads at the same weight
+    wherever it lies and however much stone is in front of it.
+
+    Which objects belong to which structure is the generator's own
+    `seked_structure` property, so nothing here parses a name to find out.
+    Which of them is an interior solid is the rule `assign_materials` already
+    uses, so the two cannot disagree.
+    """
+    void = drawing_material(VOID_NAME, VOID_VALUE, 1.0)
+    ghost = drawing_material(GHOST_NAME, GHOST_VALUE, casing_opacity)
+    kept, hidden = 0, 0
+    for obj in bpy.data.objects:
+        if obj.type != "MESH":
+            continue
+        mine = obj.get("seked_structure") == structure
+        shell = "(as built)" in obj.name
+        interior = mine and not (shell or "(today)" in obj.name or obj.name.startswith("Sphinx"))
+        show = mine and (shell or interior)
+        obj.hide_set(not show)
+        obj.hide_render = not show
+        if not show:
+            hidden += 1
+            continue
+        kept += 1
+        obj.data.materials.clear()
+        obj.data.materials.append(void if interior else ghost)
+    print(f"drawing {structure}: {kept} objects kept, {hidden} taken out of the frame; "
+          f"masonry at {GHOST_VALUE:.2f} and {casing_opacity:.0%} opaque, the void at {VOID_VALUE:.2f}")
+
+
 def make_translucent(obj, alpha):
     """Keep the casing visible as a shell while the interior shows through it."""
     mat = obj.data.materials[0].copy()

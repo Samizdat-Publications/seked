@@ -33,7 +33,7 @@ if HERE not in sys.path:
 
 import bpy  # noqa: E402  (only available inside Blender)
 
-from render_materials import assign_materials, make_translucent  # noqa: E402
+from render_materials import assign_materials, draw_as_section, make_translucent  # noqa: E402
 from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
 # Where the akhet view stands relative to the Sphinx: back along the line it
@@ -97,15 +97,25 @@ VIEWS = {
         # drawing: the passages, the chambers and the four shafts in place, at
         # their true slopes, with nothing foreshortened. The frame is wide
         # enough for the whole pyramid and deep enough for the subterranean
-        # chamber under it. Lit by the equinox morning sun like the dawn view.
+        # chamber under it.
+        #
+        # This one is a drawing and not a photograph, and says so: no terrain,
+        # no sky, no sun. See `drawing` below for why.
         "moment": "equinox-sunrise-plus-hour",
-        "location": (700.0, 0.0, 55.0),
-        "target": (0.0, 0.0, 55.0),
+        "location": (700.0, 0.0, 58.0),
+        "target": (0.0, 0.0, 58.0),
         "lens": 50.0,
-        "ortho_scale": 275.0,
-        "casing_alpha": 0.06,
-        "exposure": -3.8,
+        # Wide enough for the 230 m base and tall enough for the apex at
+        # 146.6 m and the subterranean chamber 30 m under the pavement, so
+        # the whole of what was measured is in the frame and none of it is
+        # cropped to make a picture.
+        "ortho_scale": 340.0,
+        "casing_alpha": 0.22,
+        "exposure": 0.0,
         "fill": 0.0,
+        "drawing": (0.055, 0.061, 0.072),
+        "drawing_line": (0.06, 0.065, 0.075, 1.1),
+        "drawing_structure": "g1",
         "placeholder_sun": (35.0, 135.0),
     },
     "night": {
@@ -189,18 +199,6 @@ def make_camera(scene, location, target, lens, name="Hero camera", clip_end=4.0 
 RENDERED_TERRAIN = ("Terrain (ground)", "Terrain (far context)")
 
 
-def show_ground_only():
-    """The ground and the far ring render, smooth-shaded; every other terrain grid is hidden."""
-    for obj in bpy.data.objects:
-        if obj.name.startswith("Terrain"):
-            shown = obj.name in RENDERED_TERRAIN
-            obj.hide_set(not shown)
-            obj.hide_render = not shown
-            if shown:
-                for poly in obj.data.polygons:
-                    poly.use_smooth = True
-
-
 def describe_camera(location, target, lens, exposure):
     towards = target - location
     bearing = math.degrees(math.atan2(towards.x, towards.y)) % 360.0
@@ -209,30 +207,112 @@ def describe_camera(location, target, lens, exposure):
     print(f"  bearing {bearing:.1f} deg, pitch {pitch:+.1f} deg, {lens:.0f} mm, exposure {exposure:+.1f} stops")
 
 
+def build_backdrop(scene, colour):
+    """
+    A flat world for a drawing: one colour, lighting everything in the frame
+    evenly and standing behind it as the paper does. No sky texture and no sun
+    lamp, because neither of them is what a section is a picture of, and
+    because a physical sky over a ghosted pyramid buries the thing the drawing
+    is for. The colour is the view's own, dark enough that the near-white
+    masonry and the inked interior both read against it.
+    """
+    world = bpy.data.worlds.new("Seked backdrop")
+    scene.world = world
+    world.use_nodes = True
+    tree = world.node_tree
+    tree.nodes.clear()
+    out = tree.nodes.new("ShaderNodeOutputWorld")
+    background = tree.nodes.new("ShaderNodeBackground")
+    background.inputs["Color"].default_value = (colour[0], colour[1], colour[2], 1.0)
+    background.inputs["Strength"].default_value = 1.0
+    tree.links.new(background.outputs[0], out.inputs["Surface"])
+    for lamp in [o for o in bpy.data.objects if o.type == "LIGHT"]:
+        bpy.data.objects.remove(lamp, do_unlink=True)
+
+
+def draw_outlines(scene, line):
+    """
+    A hairline on every silhouette and crease, which is the half of a section
+    drawing that shading cannot do. Without it the passages are pale shapes on
+    a pale pyramid; with it they are drawn objects, and the eight faces, the
+    arrises and the gable on Campbell's chamber all read as edges rather than
+    as a change of tone.
+
+    Freestyle draws these in image space, after the trace, so it finds the
+    interior solids through the ghosted casing exactly as it finds the casing
+    against the backdrop. `line` is the colour and the thickness in pixels.
+    """
+    colour, thickness = line[:3], line[3]
+    scene.render.use_freestyle = True
+    scene.render.line_thickness_mode = "ABSOLUTE"
+    scene.render.line_thickness = thickness
+    layer = scene.view_layers[0]
+    layer.use_freestyle = True
+    settings = layer.freestyle_settings
+    for existing in list(settings.linesets):
+        settings.linesets.remove(existing)
+    lineset = settings.linesets.new("Seked outline")
+    lineset.select_silhouette = True
+    lineset.select_border = True
+    lineset.select_contour = True
+    lineset.select_external_contour = False
+    lineset.select_edge_mark = False
+    # No creases. A crease test is "sharper than", and the sharpest folds in
+    # this scene are the Grand Gallery's seven corbel steps, which run the
+    # whole length of the gallery and come out as hatching over the one solid
+    # the drawing most needs to read. Outlines are what a section draws.
+    lineset.select_crease = False
+    # A section shows what the stone hides, but only just. Freestyle counts
+    # how many surfaces stand between an edge and the camera, and the range
+    # here is nought to one: an edge seen through the casing alone is drawn,
+    # and an edge seen through the casing and then through a solid's own far
+    # wall is not. Without the limit the Grand Gallery's corbel steps come
+    # back twice over, near side and far, and the one solid the drawing most
+    # needs to read comes out hatched.
+    lineset.select_by_visibility = True
+    lineset.visibility = "RANGE"
+    lineset.qi_start = 0
+    lineset.qi_end = 1
+    lineset.linestyle.color = colour
+    lineset.linestyle.thickness = thickness
+    print(f"drawing: outlines at {thickness:.1f} px, freestyle {scene.render.use_freestyle}, linesets {len(settings.linesets)}")
+
+
 def setup_view(scene, name, view, bake):
     """The camera, the sun, the sky and, for the night view, the stars. Everything chosen is printed."""
     from mathutils import Vector
 
-    altitude_deg, apparent_deg, azimuth_deg, provenance = baked_sun(bake, view)
     location = sphinx_viewpoint(view["from_object"], view["location"]) if "from_object" in view else Vector(view["location"])
     target = Vector(view["target"])
     make_camera(scene, location, target, view["lens"], ortho_scale=view.get("ortho_scale"))
 
-    if name == "cutaway" or "casing_alpha" in view:
+    backdrop = view.get("drawing")
+    if backdrop is None:
+        altitude_deg, apparent_deg, azimuth_deg, provenance = baked_sun(bake, view)
+        print(f"view {name}: sun altitude {altitude_deg:.3f} deg, seen at {apparent_deg:.3f} deg, azimuth {azimuth_deg:.3f} deg ({provenance})")
+        build_world(scene, apparent_deg, azimuth_deg, view.get("fill", 0.0))
+        build_sun(scene, altitude_deg, apparent_deg, azimuth_deg)
+    else:
+        print(f"view {name}: a drawing, so no sun and no sky; every surface carries its own value")
+        build_backdrop(scene, backdrop)
+        if "drawing_line" in view:
+            draw_outlines(scene, view["drawing_line"])
+
+    # A drawing has already built its shell translucent, at a value of its own;
+    # this is the photographic path, where the casing keeps its own material
+    # and only loses its opacity.
+    if backdrop is None and (name == "cutaway" or "casing_alpha" in view):
         g1 = bpy.data.objects.get("G1 Khufu (as built)")
         if g1 is not None:
             make_translucent(g1, view.get("casing_alpha", 0.15))
 
-    print(f"view {name}: sun altitude {altitude_deg:.3f} deg, seen at {apparent_deg:.3f} deg, azimuth {azimuth_deg:.3f} deg ({provenance})")
-    build_world(scene, apparent_deg, azimuth_deg, view.get("fill", 0.0))
-    build_sun(scene, altitude_deg, apparent_deg, azimuth_deg)
     if view.get("stars"):
         build_star_dome(scene, bake, location)
     scene.view_settings.exposure = view.get("exposure", 0.0)
     describe_camera(location, target, view["lens"], scene.view_settings.exposure)
 
 
-def show_ground_only():
+def show_ground_only(drawing=False):
     """
     Of the three terrain objects the generator writes, render the two that are
     ground: "Terrain (ground)", the near grid flattened under the pyramids, and
@@ -240,12 +320,15 @@ def show_ground_only():
     twelve kilometres. The raw GLO-30 grid stays hidden, because it lies under
     the flattened one and turns the monuments into mounds. Both are shaded
     smooth: a grid this coarse is a sampled landscape, not a field of facets.
+
+    A drawing gets none of them. An elevation is drawn against nothing, and a
+    desert behind a ghosted pyramid is what turned the first section render
+    into pale on pale.
     """
-    shown = ("Terrain (ground)", "Terrain (far context)")
     for obj in bpy.data.objects:
         if not obj.name.startswith("Terrain"):
             continue
-        visible = obj.name in shown
+        visible = not drawing and obj.name in RENDERED_TERRAIN
         obj.hide_set(not visible)
         obj.hide_render = not visible
         if visible:
@@ -292,8 +375,11 @@ def main():
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
     view = VIEWS[opts["view"]]
 
+    drawing = "drawing" in view
     assign_materials()
-    show_ground_only()
+    if drawing:
+        draw_as_section(view["drawing_structure"], view["casing_alpha"])
+    show_ground_only(drawing)
     setup_view(scene, opts["view"], view, load_bake(opts["bake"]))
     engine, samples = configure_render(scene, opts)
     out = os.path.abspath(opts["out"])

@@ -122,20 +122,28 @@ meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
 and sunset, so a claim that names an `epoch` can reach the sky from its
 YAML without the claims package learning any astronomy.
 
+The five chambers of construction over the King's Chamber are in, from
+Petrie §62 and the table of dimensions in Vyse's second volume. Their levels
+are the one thing in the Great Pyramid that is solved rather than stored:
+nobody measured how thick the granite beams between them are, and Petrie
+says outright that the beams are "very unequal in depth", so the stack is
+closed instead against the one figure Vyse gives for the whole of it, 69 ft
+3 in from the King's Chamber floor to the roof of Campbell's. That leaves
+1.85 m a beam. Sharing it evenly is the only assumption in the five.
+
 Next, in order, each from a public source checked on 2026-09-14: the rest of
-the Great Pyramid's section (the five construction chambers from Petrie §62
-and Vyse's heights, the Gallery's real corbel laps from §46, the well shaft
-and grotto from the Edgars, and the ScanPyramids voids as instrumented boxes
-from the two open-access papers); Menkaure's chambers hung off the foot of
-his corridor from Vyse's table and Petrie's dimensions; the Tier 3 masses
-from OpenStreetMap's footprints, which name the queens' pyramids, the
-temples, the causeways, the Wall of the Crow, Khentkawes and the boat pits,
-with the Sphinx built up from its plan outline there in place of the box;
-Khafre's casing cap as a labelled estimate; and the cinematic re-rendered at
-hero quality once the plateau under it is finished. What no public source
-gives (a shaft inlet's exact place in a wall, a bent leg's length, a chamber
-level) is entered as an estimate on its own source, with a sigma, and stays
-unverified until a figure turns up.
+the Great Pyramid's section (the Gallery's real corbel laps from §46, the
+well shaft and grotto from the Edgars, and the ScanPyramids voids as
+instrumented boxes from the two open-access papers); Menkaure's chambers
+hung off the foot of his corridor from Vyse's table and Petrie's dimensions;
+the Tier 3 masses from OpenStreetMap's footprints, which name the queens'
+pyramids, the temples, the causeways, the Wall of the Crow, Khentkawes and
+the boat pits, with the Sphinx built up from its plan outline there in place
+of the box; Khafre's casing cap as a labelled estimate; and the cinematic
+re-rendered at hero quality once the plateau under it is finished. What no
+public source gives (a shaft inlet's exact place in a wall, a bent leg's
+length, a chamber level) is entered as an estimate on its own source, with a
+sigma, and stays unverified until a figure turns up.
 
 ## Layout
 
