@@ -459,9 +459,12 @@ describe('the Grand Gallery on the canonical preset', () => {
     // The gallery is one straight extrusion, so its volume is its section's
     // area times its run. The area is checked against the bands the records
     // describe rather than against a number written down here.
-    const from = ['east', 'north', 'up'].map((a) => values[`passage.ascending.floor.end.${a}`] as number);
-    const to = ['east', 'north', 'up'].map((a) => values[`gg.floor.virtual_south_end.${a}`] as number);
-    const run = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
+    const axis = (key: string, a: string) => values[`${key}.${a}`] as number;
+    const run = Math.hypot(
+      axis('gg.floor.virtual_south_end', 'east') - axis('passage.ascending.floor.end', 'east'),
+      axis('gg.floor.virtual_south_end', 'north') - axis('passage.ascending.floor.end', 'north'),
+      axis('gg.floor.virtual_south_end', 'up') - axis('passage.ascending.floor.end', 'up'),
+    );
 
     let area = 2 * halfFloor * (height - laps * lap);
     for (let i = 1; i <= laps; i++) area += 2 * (halfFloor - (i * overhang) / laps) * lap;

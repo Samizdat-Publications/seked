@@ -4,6 +4,10 @@ Renders and screenshots taken at milestones, oldest first, so the project's
 path from the first low-poly plateau to the finished viewer can be shown on
 the project page. Each one names the commit it was taken at.
 
+These are the frames that were chosen. Every render made along the way, kept
+or not, is in [`log/`](log/README.md), named so the folder sorts by when it
+was taken and stamped with its date, its view and its commit.
+
 | # | Image | Taken | What it shows |
 |---|---|---|---|
 | 0001 | ![Plateau, first light](0001-plateau-first-light.png) | 2026-09-13 | First headless render: the three pyramids generated from the database, placed by Petrie's centre offsets on the GLO-30 ground, equinox dawn from the east. Eight-sided G1 with its concavity shape key; no interiors visible, no casing detail, no Sphinx, terrain at 20 m. |
