@@ -7,7 +7,9 @@ assigned by what an object is. The only numbers in them that come out of the
 database are the course thickness the banded limestone uses and the height of
 the granite on the cased faces of Khafre's and Menkaure's pyramids.
 """
+import json
 import math
+import os
 
 import bpy
 
@@ -152,17 +154,167 @@ def bump(tree, height, strength, distance):
     return node.outputs["Normal"]
 
 
+# --- Photographed surfaces --------------------------------------------------
+#
+# The CC0 texture sets `scripts/textures.py` downloads into build/textures/.
+# None of them is a measurement. Each is projected onto an object from its own
+# frame by box mapping, so no UVs are needed and a pyramid's grain stays put
+# when it is moved, at the real-world tile size Poly Haven states for it. A
+# face 230 m wide would show a 2 m tile repeating, so every map is sampled
+# twice, at its own size and at an odd multiple of it, and the two are
+# blended by a noise tens of metres across. Where the textures have not been
+# fetched, each stone falls back to its procedural wiring, so a render never
+# fails for want of a download.
+
+TEXTURE_INDEX = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build", "textures", "index.json")
+_TEXTURES = {}
+
+
+def texture_sets():
+    """The fetched texture sets by role, or an empty dict where scripts/textures.py has not been run."""
+    if "sets" not in _TEXTURES:
+        try:
+            with open(TEXTURE_INDEX, encoding="utf-8") as f:
+                index = json.load(f)
+        except OSError:
+            print(f"no {TEXTURE_INDEX}: procedural stone only; run python scripts/textures.py for the photographed surfaces")
+            index = {"sets": {}}
+        root = os.path.dirname(TEXTURE_INDEX)
+        for entry in index["sets"].values():
+            entry["paths"] = {kind: os.path.join(root, rel) for kind, rel in entry["files"].items()}
+        _TEXTURES["sets"] = index["sets"]
+    return _TEXTURES["sets"]
+
+
+def ramp(tree, value, low, high):
+    """A value rescaled so `low` is nought and `high` is one, clamped, which is how a noise becomes a mask."""
+    node = tree.nodes.new("ShaderNodeMapRange")
+    node.inputs["From Min"].default_value = low
+    node.inputs["From Max"].default_value = high
+    node.clamp = True
+    tree.links.new(value, node.inputs["Value"])
+    return node.outputs["Result"]
+
+
+def scaled(tree, vector, factor, offset=(0.0, 0.0, 0.0)):
+    node = tree.nodes.new("ShaderNodeMapping")
+    node.inputs["Location"].default_value = offset
+    node.inputs["Scale"].default_value = (factor, factor, factor)
+    tree.links.new(vector, node.inputs["Vector"])
+    return node.outputs["Vector"]
+
+
+def image_map(tree, vector, path, colour):
+    node = tree.nodes.new("ShaderNodeTexImage")
+    node.image = bpy.data.images.load(path, check_existing=True)
+    node.image.colorspace_settings.name = "sRGB" if colour else "Non-Color"
+    node.projection = "BOX"
+    node.projection_blend = 0.3
+    node.interpolation = "Cubic"
+    tree.links.new(vector, node.inputs["Vector"])
+    return node.outputs["Color"]
+
+
+def mix_sockets(tree, factor, a, b, blend="MIX"):
+    node = tree.nodes.new("ShaderNodeMixRGB")
+    node.blend_type = blend
+    tree.links.new(factor, node.inputs["Fac"])
+    tree.links.new(a, node.inputs["Color1"])
+    tree.links.new(b, node.inputs["Color2"])
+    return node.outputs["Color"]
+
+
+def photographed(tree, vector, role, tile_factor=1.0):
+    """
+    A texture set's colour, roughness and height for `role`, box-projected at
+    its stated tile size times `tile_factor` and at 3.7 times that, blended by
+    a noise of about 40 m, or None where the set has not been fetched.
+    """
+    entry = texture_sets().get(role)
+    if entry is None:
+        return None
+    tile = entry["tile_m"][0] * tile_factor
+    near = scaled(tree, vector, 1.0 / tile)
+    far = scaled(tree, vector, 1.0 / (tile * 3.7), (0.31, 0.17, 0.53))
+    blend = ramp(tree, noise(tree, vector, 0.025, 2.0), 0.35, 0.65)
+    out = {}
+    for key, kind, colour in (("colour", "Diffuse", True), ("rough", "Rough", False), ("height", "Displacement", False)):
+        path = entry["paths"][kind]
+        out[key] = mix_sockets(tree, blend, image_map(tree, near, path, colour), image_map(tree, far, path, colour))
+    return out
+
+
+def tinted(tree, colour, tint, amount):
+    """A photographed colour pulled toward a stated one: `amount` 0 keeps the photograph, 1 is the tint."""
+    node = tree.nodes.new("ShaderNodeMixRGB")
+    node.blend_type = "MIX"
+    node.inputs["Fac"].default_value = amount
+    tree.links.new(colour, node.inputs["Color1"])
+    node.inputs["Color2"].default_value = (*tint, 1.0)
+    return node.outputs["Color"]
+
+
+def darken(tree, colour, factor, by):
+    """`colour` multiplied toward black by `by` where `factor` is one."""
+    scale = tree.nodes.new("ShaderNodeMath")
+    scale.operation = "MULTIPLY"
+    scale.inputs[1].default_value = by
+    tree.links.new(factor, scale.inputs[0])
+    node = tree.nodes.new("ShaderNodeMixRGB")
+    node.blend_type = "MIX"
+    tree.links.new(scale.outputs[0], node.inputs["Fac"])
+    tree.links.new(colour, node.inputs["Color1"])
+    node.inputs["Color2"].default_value = (0.0, 0.0, 0.0, 1.0)
+    return node.outputs["Color"]
+
+
+def block_cells(tree, vector, size):
+    """A value per block-sized cell of stone, so neighbouring blocks differ in tone the way quarried blocks do."""
+    node = tree.nodes.new("ShaderNodeTexVoronoi")
+    node.feature = "F1"
+    node.distance = "CHEBYCHEV"
+    node.inputs["Scale"].default_value = 1.0 / size
+    node.inputs["Randomness"].default_value = 0.85
+    tree.links.new(vector, node.inputs["Vector"])
+    return node.outputs["Color"]
+
+
+def streaks(tree, vector):
+    """Weathering that runs down a face: a noise stretched sixteen times along Z, as rain and dust leave it."""
+    node = tree.nodes.new("ShaderNodeMapping")
+    node.inputs["Scale"].default_value = (1.0, 1.0, 1.0 / 16.0)
+    tree.links.new(vector, node.inputs["Vector"])
+    return ramp(tree, noise(tree, node.outputs["Vector"], 0.35, 5.0), 0.45, 0.75)
+
+
 # --- The stones, as wiring onto a Principled BSDF --------------------------
 
 
-def wire_casing(tree, bsdf, vector):
+def wire_casing(tree, bsdf, vector, weathered=False):
     """
     Tura limestone: the fine white casing, smooth enough to have been polished,
     with a large-scale variation in roughness so a face catches the light
-    unevenly instead of reading as one flat plane.
+    unevenly instead of reading as one flat plane. With the photographed set,
+    its grain is laid faint under the white; `weathered` adds what four and a
+    half thousand years leave on the part that still stands, streaks down the
+    face and a greyer tone, and is for a pyramid as it is today.
     """
-    bsdf.inputs["Base Color"].default_value = (0.88, 0.86, 0.80, 1.0)
-    tree.links.new(map_range(tree, noise(tree, vector, 0.04), 0.24, 0.46), bsdf.inputs["Roughness"])
+    maps = photographed(tree, vector, "casing", 1.6)
+    if maps is None:
+        bsdf.inputs["Base Color"].default_value = (0.88, 0.86, 0.80, 1.0)
+        tree.links.new(map_range(tree, noise(tree, vector, 0.04), 0.24, 0.46), bsdf.inputs["Roughness"])
+        return
+    colour = tinted(tree, maps["colour"], (0.86, 0.83, 0.76), 0.55)
+    colour = darken(tree, colour, block_cells(tree, vector, 1.4), 0.10)
+    rough = map_range(tree, maps["rough"], 0.30, 0.55)
+    if weathered:
+        colour = tinted(tree, colour, (0.60, 0.56, 0.48), 0.45)
+        colour = darken(tree, colour, streaks(tree, vector), 0.30)
+        colour = darken(tree, colour, ramp(tree, noise(tree, vector, 0.05, 4.0), 0.45, 0.7), 0.20)
+        rough = map_range(tree, maps["rough"], 0.55, 0.85)
+    tree.links.new(colour, bsdf.inputs["Base Color"])
+    tree.links.new(rough, bsdf.inputs["Roughness"])
+    tree.links.new(bump(tree, maps["height"], 0.10 if not weathered else 0.25, 0.03), bsdf.inputs["Normal"])
 
 
 def wire_granite(tree, bsdf, vector):
@@ -182,13 +334,27 @@ def wire_core(tree, bsdf, vector, course=None):
     the courses visible at all when the sun is grazing. Without one the bands
     are left off, because the object's courses are its geometry.
     """
-    blocks = noise(tree, vector, 0.25, 3.0)
-    colour = mix_colours(tree, blocks, (0.55, 0.47, 0.36), (0.66, 0.58, 0.45))
-    pits = noise(tree, vector, 3.0, 6.0)
-    tree.links.new(map_range(tree, pits, 0.72, 0.95), bsdf.inputs["Roughness"])
+    maps = photographed(tree, vector, "core", 1.0)
+    if maps is None:
+        blocks = noise(tree, vector, 0.25, 3.0)
+        colour = mix_colours(tree, blocks, (0.55, 0.47, 0.36), (0.66, 0.58, 0.45))
+        pits = noise(tree, vector, 3.0, 6.0)
+        tree.links.new(map_range(tree, pits, 0.72, 0.95), bsdf.inputs["Roughness"])
+    else:
+        # The photograph pulled a little toward Giza's own warm grey-tan, one
+        # tone per block, and weathered darker down the faces.
+        colour = tinted(tree, maps["colour"], (0.50, 0.41, 0.30), 0.40)
+        cells = block_cells(tree, vector, 1.3)
+        colour = mix_sockets(tree, ramp(tree, noise(tree, vector, 0.9, 1.0), 0.3, 0.7), colour, darken(tree, colour, cells, 0.45))
+        # Weathered patches tens of metres across, where the outer blocks have
+        # spalled or the dust has settled, so a face is not one even tone.
+        colour = darken(tree, colour, ramp(tree, noise(tree, vector, 0.035, 4.0), 0.45, 0.7), 0.30)
+        colour = darken(tree, colour, streaks(tree, vector), 0.25)
+        pits = maps["height"]
+        tree.links.new(map_range(tree, maps["rough"], 0.75, 0.98), bsdf.inputs["Roughness"])
     if course is None:
         tree.links.new(colour, bsdf.inputs["Base Color"])
-        tree.links.new(bump(tree, pits, 0.12, 0.06), bsdf.inputs["Normal"])
+        tree.links.new(bump(tree, pits, 0.12 if maps is None else 0.45, 0.06 if maps is None else 0.08), bsdf.inputs["Normal"])
         return
 
     # Blender's banded wave texture runs its sine over 20 * scale * z, so a
@@ -219,11 +385,32 @@ def wire_core(tree, bsdf, vector, course=None):
 
 
 def wire_sand(tree, bsdf, vector):
-    """The plateau: pale, rough, and softly undulating over tens of metres so the ground is not a sheet."""
+    """
+    The plateau: pale, rough, and softly undulating over tens of metres so the
+    ground is not a sheet. With the photographed sets, fine sand and ground
+    strewn with limestone chips, mixed by a noise about 60 m across, over the
+    same long undulation.
+    """
     drift = noise(tree, vector, 0.02, 4.0)
-    tree.links.new(mix_colours(tree, drift, *SAND_COLOURS), bsdf.inputs["Base Color"])
-    tree.links.new(map_range(tree, noise(tree, vector, 0.3, 6.0), 0.86, 1.0), bsdf.inputs["Roughness"])
-    tree.links.new(bump(tree, drift, 0.25, 1.5), bsdf.inputs["Normal"])
+    sand, gravel = photographed(tree, vector, "sand", 1.0), photographed(tree, vector, "gravel", 1.0)
+    if sand is None or gravel is None:
+        tree.links.new(mix_colours(tree, drift, *SAND_COLOURS), bsdf.inputs["Base Color"])
+        tree.links.new(map_range(tree, noise(tree, vector, 0.3, 6.0), 0.86, 1.0), bsdf.inputs["Roughness"])
+        tree.links.new(bump(tree, drift, 0.25, 1.5), bsdf.inputs["Normal"])
+        return
+    patches = ramp(tree, noise(tree, vector, 0.016, 3.0), 0.42, 0.62)
+    colour = mix_sockets(tree, patches, sand["colour"], gravel["colour"])
+    colour = mix_sockets(tree, drift, tinted(tree, colour, SAND_COLOURS[0], 0.35), tinted(tree, colour, SAND_COLOURS[1], 0.35))
+    height = mix_sockets(tree, patches, sand["height"], gravel["height"])
+    tree.links.new(colour, bsdf.inputs["Base Color"])
+    tree.links.new(map_range(tree, mix_sockets(tree, patches, sand["rough"], gravel["rough"]), 0.85, 1.0), bsdf.inputs["Roughness"])
+    fine = bump(tree, height, 0.35, 0.05)
+    broad = tree.nodes.new("ShaderNodeBump")
+    broad.inputs["Strength"].default_value = 0.25
+    broad.inputs["Distance"].default_value = 1.5
+    tree.links.new(drift, broad.inputs["Height"])
+    tree.links.new(fine, broad.inputs["Normal"])
+    tree.links.new(broad.outputs["Normal"], bsdf.inputs["Normal"])
 
 
 # --- The materials ---------------------------------------------------------
@@ -334,7 +521,7 @@ def cap_over_core_material(structure, label, level):
     core = tree.nodes.new("ShaderNodeBsdfPrincipled")
     wire_core(tree, core, vector, course)
     casing = tree.nodes.new("ShaderNodeBsdfPrincipled")
-    wire_casing(tree, casing, vector)
+    wire_casing(tree, casing, vector, weathered=True)
 
     split = tree.nodes.new("ShaderNodeSeparateXYZ")
     tree.links.new(vector, split.inputs["Vector"])

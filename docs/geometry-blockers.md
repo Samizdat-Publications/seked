@@ -134,6 +134,15 @@ field rather than a surveyed one:
 The standard is the one Stewart set: stunning, well textured, with light and
 atmosphere worth looking at. In order of return on effort:
 
+First pass done 2026-09-16: `blender/textures.json` names four CC0 Poly
+Haven sets (core, casing, sand, gravel) and `python scripts/textures.py`
+fetches them; `render_materials.py` box-projects them at two scales with block
+tones and weathering, falling back to the procedural stone when they are not
+fetched. `render_sky.build_atmosphere` adds a haze and a low dust layer, made
+invisible to shadow rays so they do not dim the sun twice (shadow linking does
+not reach volume attenuation in Blender 5.1). Still to do: displacement on the
+stepped core, Aswan granite and basalt textures, and the mastabas.
+
 1. **Materials.** Replace the flat procedural colours with PBR texture sets
    (base colour, roughness, normal, displacement) from CC0 libraries,
    **Poly Haven** and **ambientCG**, both downloadable by API without an

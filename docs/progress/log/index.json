@@ -138,5 +138,25 @@
     "kept": false,
     "note": "First render with --state today: the pyramids as they stand, Khufu's stepped core and Khafre's casing cap from 93.9 m up (Perring's present height less M&R's 42.5 m of surviving casing). Materials still procedural.",
     "bytes": 973083
+  },
+  {
+    "file": "2026-09-16T19-29-21Z--akhet--75eee1b-dirty.png",
+    "taken": "2026-09-16T19:29:21+00:00",
+    "view": "akhet",
+    "commit": "75eee1b",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The same materials and air at sunset: Khafre's weathered cap over his core.",
+    "bytes": 1011477
+  },
+  {
+    "file": "2026-09-16T19-29-21Z--dawn--75eee1b-dirty.png",
+    "taken": "2026-09-16T19:29:21+00:00",
+    "view": "dawn",
+    "commit": "75eee1b",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Materials pass: CC0 Poly Haven stone and sand (scripts/textures.py), box-projected at two scales, block tones and weathering; haze and a low dust layer, invisible to shadow rays. --state today.",
+    "bytes": 1196673
   }
 ]

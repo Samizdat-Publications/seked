@@ -491,3 +491,111 @@ def build_star_dome(scene, bake, centre):
         f"{stars['meridian']['name']} on the meridian"
     )
     return dome
+
+
+# --- The air over the plateau ----------------------------------------------
+#
+# The sky texture draws the atmosphere above and beyond the scene; it does not
+# put air between the camera and a pyramid a kilometre off. These two volumes
+# do. Their densities are look choices, not measurements, and are named here
+# so they can be argued with: extinction per metre, which is 3.9 over the
+# visibility in metres.
+#
+#   HAZE_EXTINCTION   the whole view: 2e-4 per metre, a visibility of about
+#                     20 km, which is a clear day at Giza and not a dusty one.
+#   DUST_EXTINCTION   a layer that thins with height from DUST_BASE_M above the
+#                     datum with DUST_SCALE_M, so it pools in the valley by the
+#                     Sphinx and thins over the plateau, as dust does at dawn.
+#
+# The sun lamp's beam is already the light that crossed the whole atmosphere
+# (see `beam`), so these volumes must not dim it a second time: they are made
+# invisible to shadow rays, while they still scatter its light into the glow
+# around it.
+
+HAZE_EXTINCTION = 2.0e-4
+HAZE_COLOUR = (0.86, 0.84, 0.82)
+HAZE_HALF_WIDTH_M = 12000.0
+HAZE_TOP_M = 600.0
+DUST_EXTINCTION = 6.0e-4
+DUST_COLOUR = (0.95, 0.83, 0.66)
+DUST_BASE_M = 15.0
+DUST_SCALE_M = 28.0
+DUST_HALF_WIDTH_M = 1800.0
+DUST_TOP_M = 220.0
+AIR_ANISOTROPY = 0.55
+
+
+def _box(name, half_width, bottom, top):
+    import bmesh
+    mesh = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    for v in bm.verts:
+        v.co.x *= 2.0 * half_width
+        v.co.y *= 2.0 * half_width
+        v.co.z = bottom if v.co.z < 0 else top
+    bm.to_mesh(mesh)
+    bm.free()
+    return bpy.data.objects.new(name, mesh)
+
+
+def _volume_material(name, colour, extinction, falloff=None):
+    mat = bpy.data.materials.new(name)
+    tree = node_tree_of(mat)
+    tree.nodes.clear()
+    out = tree.nodes.new("ShaderNodeOutputMaterial")
+    volume = tree.nodes.new("ShaderNodeVolumePrincipled")
+    volume.inputs["Color"].default_value = (*colour, 1.0)
+    volume.inputs["Anisotropy"].default_value = AIR_ANISOTROPY
+    if falloff is None:
+        volume.inputs["Density"].default_value = extinction
+    else:
+        base, scale = falloff
+        coords = tree.nodes.new("ShaderNodeTexCoord")
+        split = tree.nodes.new("ShaderNodeSeparateXYZ")
+        tree.links.new(coords.outputs["Object"], split.inputs["Vector"])
+        above = tree.nodes.new("ShaderNodeMath")
+        above.operation = "SUBTRACT"
+        above.inputs[1].default_value = base
+        tree.links.new(split.outputs["Z"], above.inputs[0])
+        over = tree.nodes.new("ShaderNodeMath")
+        over.operation = "DIVIDE"
+        over.inputs[1].default_value = -scale
+        tree.links.new(above.outputs[0], over.inputs[0])
+        exp = tree.nodes.new("ShaderNodeMath")
+        exp.operation = "EXPONENT"
+        tree.links.new(over.outputs[0], exp.inputs[0])
+        capped = tree.nodes.new("ShaderNodeMath")
+        capped.operation = "MINIMUM"
+        capped.inputs[1].default_value = 1.0
+        tree.links.new(exp.outputs[0], capped.inputs[0])
+        density = tree.nodes.new("ShaderNodeMath")
+        density.operation = "MULTIPLY"
+        density.inputs[1].default_value = extinction
+        tree.links.new(capped.outputs[0], density.inputs[0])
+        tree.links.new(density.outputs[0], volume.inputs["Density"])
+    tree.links.new(volume.outputs[0], out.inputs["Volume"])
+    return mat
+
+
+def build_atmosphere(scene, centre):
+    """Haze over the whole view and dust low over the plateau, both invisible to shadow rays."""
+    haze = _box("Air (haze)", HAZE_HALF_WIDTH_M, -60.0, HAZE_TOP_M)
+    haze.data.materials.append(_volume_material("Air haze", HAZE_COLOUR, HAZE_EXTINCTION))
+    dust = _box("Air (dust)", DUST_HALF_WIDTH_M, -40.0, DUST_TOP_M)
+    dust.data.materials.append(_volume_material("Air dust", DUST_COLOUR, DUST_EXTINCTION, (DUST_BASE_M, DUST_SCALE_M)))
+    for obj in (haze, dust):
+        obj.location = (centre[0], centre[1], 0.0)
+        scene.collection.objects.link(obj)
+    # The dust has a texture, so Cycles steps through it; this many steps over
+    # a ray a few kilometres long resolves a layer tens of metres thick.
+    scene.cycles.volume_step_rate = 1.0
+    scene.cycles.volume_max_steps = 512
+    scene.cycles.volume_bounces = 1
+    for obj in (haze, dust):
+        # Invisible to shadow rays, so neither dims a lamp or the sky a second
+        # time; camera and scattered rays still see them. Shadow linking was
+        # tried first and does not reach volume attenuation in Blender 5.1.
+        obj.visible_shadow = False
+    print(f"air: haze {HAZE_EXTINCTION:g} per m to {HAZE_TOP_M:g} m, dust {DUST_EXTINCTION:g} per m from {DUST_BASE_M:g} m "
+          f"falling off over {DUST_SCALE_M:g} m; look choices, not measurements; invisible to shadow rays")

@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--state built|today] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--state built|today] [--air on|off] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -34,7 +34,7 @@ if HERE not in sys.path:
 import bpy  # noqa: E402  (only available inside Blender)
 
 from render_materials import STRUCTURE_LABELS, assign_materials, draw_as_section, make_translucent  # noqa: E402
-from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
+from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
 # Where the akhet view stands relative to the Sphinx: back along the line it
 # looks out on, far enough that the whole statue is in the frame with the two
@@ -296,7 +296,7 @@ def draw_outlines(scene, line):
     print(f"drawing: outlines at {thickness:.1f} px, freestyle {scene.render.use_freestyle}, linesets {len(settings.linesets)}")
 
 
-def setup_view(scene, name, view, bake):
+def setup_view(scene, name, view, bake, air=True):
     """The camera, the sun, the sky and, for the night view, the stars. Everything chosen is printed."""
     from mathutils import Vector
 
@@ -324,6 +324,8 @@ def setup_view(scene, name, view, bake):
         if g1 is not None:
             make_translucent(g1, view.get("casing_alpha", 0.15))
 
+    if air and backdrop is None and not view.get("stars") and view.get("air", True):
+        build_atmosphere(scene, (0.0, 0.0))
     if view.get("stars"):
         build_star_dome(scene, bake, location)
     scene.view_settings.exposure = view.get("exposure", 0.0)
@@ -452,7 +454,7 @@ def configure_render(scene, opts):
 
 
 def main():
-    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "bake": SKY_BAKE})
+    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "air": "on", "bake": SKY_BAKE})
     scene = bpy.context.scene
     if opts["view"] not in VIEWS:
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
@@ -464,7 +466,7 @@ def main():
     if drawing:
         draw_as_section(view["drawing_structure"], view["casing_alpha"])
     show_ground_only(drawing)
-    setup_view(scene, opts["view"], view, load_bake(opts["bake"]))
+    setup_view(scene, opts["view"], view, load_bake(opts["bake"]), opts["air"] != "off")
     engine, samples = configure_render(scene, opts)
     out = os.path.abspath(opts["out"])
     os.makedirs(os.path.dirname(out), exist_ok=True)
