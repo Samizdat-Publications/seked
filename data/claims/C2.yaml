@@ -37,10 +37,18 @@ sources:
   for: [bauval-gilbert-1994]
   context: [gantenbrink-1993, vondrak-2011]
 notes: >-
-  Tolerance is 1 %, which on a 40° shaft is about 24′. The shaft angles are
-  unverified Gantenbrink values, the bores are not straight, and the
-  assignment of a star to a shaft is itself a free choice, so a tighter band
-  would be false precision. The epoch is fixed here at Bauval and Gilbert's
+  Tolerance is 1 %, which on a 40° shaft is about 24′. Three of the four
+  shaft angles are verified against the text of Gantenbrink's report: 45° and
+  32.60° for the King's Chamber shafts, each a chord between two measured
+  points, and 39.6078° for the Queen's Chamber south shaft, a mean of 24
+  readings. The fourth, 39°07′ for the Queen's Chamber north shaft, is the
+  figure this claim is stated with and is widely attributed to Gantenbrink,
+  but his report prints instead a fluctuation between 33.3° and 40.1° over 14
+  measurements and declines to name one angle; so that comparison is made at
+  39°07′, as the claim makes it, and its record carries the measured spread as
+  a sigma of 3.4°, about fourteen times its residual. The bores are not
+  straight, and the assignment of a star to a shaft is itself a free choice,
+  so a tighter band would be false precision. The epoch is fixed here at Bauval and Gilbert's
   2450 BCE for all four shafts, which is the claim as made; each shaft on its
   own prefers a different date. packages/sky solves that inverse problem
   numerically: `pnpm shafts` writes docs/shafts.md with, for each shaft, the
