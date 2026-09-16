@@ -209,7 +209,8 @@ fitted: the boat pits east of Khufu land within 3.3 and 1.5 m of them.
 
 Next, in order. The sky-rollback film is being re-rendered at 1920 by 1080
 over the populated plateau. The site is live at https://seked.pages.dev, on
-Cloudflare Pages by direct upload with `pnpm deploy`. GitHub Pages is not
+Cloudflare Pages by direct upload with `pnpm run deploy` (pnpm has a
+`deploy` command of its own). GitHub Pages is not
 available for a private repository on this account's plan, so the Pages
 workflow still runs the tests and assembles the site on every push but does
 not publish unless PAGES_ENABLED is set. The deploy pins wrangler 4.20.0,

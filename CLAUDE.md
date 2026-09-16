@@ -30,7 +30,7 @@ pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
 pnpm run footprints # re-import the plateau's lesser monuments from OSM into data/footprints/
-pnpm deploy         # build the viewer, assemble site/, upload to Cloudflare Pages (https://seked.pages.dev)
+pnpm run deploy     # build the viewer, assemble site/, upload to Cloudflare Pages (https://seked.pages.dev); pnpm owns the bare `pnpm deploy`
 pnpm sky-bake       # bake the sun and the star dome into build/ for blender/render.py
 pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for blender/rollback.py
 ```

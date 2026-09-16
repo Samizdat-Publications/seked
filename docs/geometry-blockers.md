@@ -147,7 +147,7 @@ atmosphere worth looking at. In order of return on effort:
 ## Order of work
 
 1. The hero film: finish it if the background render stopped (see memory),
-   add it to docs/progress, `pnpm deploy`.
+   add it to docs/progress, `pnpm run deploy`.
 2. The well shaft, from Smyth.
 3. `scripts/plate.py`.
 4. Khafre's casing cap.
