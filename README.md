@@ -190,7 +190,7 @@ packages/
   sky/         Vondrák 2011 precession (ERFA-verified), horizon frame, sun, star dome, named stars, claim environment
 blender/       generate.py (the scene from data/), seked_data.py (stdlib reader and mesh mirrors), check.py, render.py
 apps/web/      Vite + React + React Three Fiber viewer
-scripts/       dossier generator, shaft solver, star import, web bundle, terrain cutter, site assembly
-docs/          plan.html, dossier.md, shafts.md, progress/
+scripts/       dossier generator, shaft solver, star import, web bundle, terrain cutter, site assembly, render log
+docs/          plan.html, dossier.md, shafts.md, progress/ (chosen snapshots) and progress/log/ (every render, stamped and indexed)
 .github/       the Pages workflow: tests, typecheck, site assembly, deploy when PAGES_ENABLED is true
 ```

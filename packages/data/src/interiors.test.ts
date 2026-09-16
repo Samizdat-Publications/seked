@@ -432,3 +432,58 @@ describe('the Big Void on the canonical preset', () => {
     }
   });
 });
+
+/**
+ * The Grand Gallery's corbelling, which is the one solid in the Great Pyramid
+ * whose shape changed when a column of Petrie's was finally entered rather
+ * than when a room was added. Section 46's "High on S. End" column gives a lap
+ * 33.0 to 34.0 in, and what seven of those leave under them is the vertical
+ * wall the corbelling stands on. Before the column was entered the steps were
+ * spread evenly over the gallery's height, which made the wall vanish and
+ * every lap half as tall again as Petrie measured.
+ */
+describe('the Grand Gallery on the canonical preset', () => {
+  const laps = Math.round(values['gg.corbel.count'] as number);
+  const lap = values['gg.corbel.height'] as number;
+  const height = values['gg.height'] as number;
+  const overhang = values['gg.ramp.width'] as number;
+  const halfFloor = (values['gg.floor.width'] as number) / 2 + overhang;
+
+  it('leaves a vertical wall under the laps, and it is a wall and not a rounding', () => {
+    const wall = height - laps * lap;
+    expect(wall).toBeGreaterThan(2);
+    expect(wall).toBeLessThan(height / 2);
+  });
+
+  it('builds the section out of that wall and seven measured laps', () => {
+    // The gallery is one straight extrusion, so its volume is its section's
+    // area times its run. The area is checked against the bands the records
+    // describe rather than against a number written down here.
+    const from = ['east', 'north', 'up'].map((a) => values[`passage.ascending.floor.end.${a}`] as number);
+    const to = ['east', 'north', 'up'].map((a) => values[`gg.floor.virtual_south_end.${a}`] as number);
+    const run = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
+
+    let area = 2 * halfFloor * (height - laps * lap);
+    for (let i = 1; i <= laps; i++) area += 2 * (halfFloor - (i * overhang) / laps) * lap;
+    expect(meshVolume(solids['gg'] as Mesh)).toBeCloseTo(area * run, 2);
+  });
+
+  it('narrows to a roof as wide as the floor between the ramps, which is what Petrie says it is', () => {
+    // "the space between the ramps (2 cubits), is equal to the space between
+    // the walls at the top", section 46.
+    expect(2 * (halfFloor - overhang)).toBeCloseTo(values['gg.floor.width'] as number, 9);
+    expect(values['gg.roof.width']).toBeCloseTo(values['gg.floor.width'] as number, 9);
+  });
+
+  it('puts Smyth\u2019s third lap within a sixth of a metre of where section 46 quotes it', () => {
+    // The laps are stacked from the measured heights; Smyth's 166.2 in for the
+    // third lap is an independent figure and was not used to build anything.
+    // That the two land this close is the check on the whole arrangement.
+    const third = height - laps * lap + 2 * lap;
+    expect(Math.abs(third - (values['gg.corbel.third.height'] as number))).toBeLessThan(0.17);
+  });
+
+  it('names the lap height among its inputs now that a preset carries it', () => {
+    expect(interiorSolidInputs(env)['gg']).toContain('gg.corbel.height');
+  });
+});

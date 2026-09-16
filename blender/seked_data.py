@@ -594,23 +594,34 @@ def _box(a, b):
 
 def _gallery_section(values):
     """
-    The Grand Gallery's cross-section: the full floor, ramps included,
-    narrowing by one lap's overhang at each corbel step up to a roof as wide as
-    the floor between the ramps. Section 46 gives the number of laps and the
-    20.55 in total overhang but only one lap's height, so the steps are spread
-    evenly over gg.height: the widths are measured, the heights are a
-    placeholder until the lap levels are entered as records.
+    The Grand Gallery's cross-section. Mirrors gallerySection in
+    packages/geometry/src/interiors.ts.
+
+    Widths from the 20.55 in Petrie measures by plumb-line for the sum of the
+    seven projections, shared equally. Heights from gg.corbel.height, section
+    46's "High on S. End" column; what seven laps of it leave under them is
+    the vertical wall the corbelling stands on. A preset with no lap height,
+    or laps that will not fit, spreads the steps evenly instead.
     """
     overhang = _value(values, "gg.ramp.width")
     half_floor = _value(values, "gg.floor.width") / 2.0 + overhang
     laps = int(round(_value(values, "gg.corbel.count")))
-    bands = laps + 1
-    band = _value(values, "gg.height") / bands
+    height = _value(values, "gg.height")
+    lap = _number_at(values, "gg.corbel.height")
+    wall = None if lap is None else height - laps * lap
+    even = height / (laps + 1)
+
     section = []
-    for i in range(bands):
+    level = 0.0
+    for i in range(laps + 1):
         half_width = half_floor - (i * overhang) / laps
-        section.append((half_width, i * band))
-        section.append((half_width, (i + 1) * band))
+        if wall is not None and wall > 0:
+            band = wall if i == 0 else lap
+        else:
+            band = even
+        section.append((half_width, level))
+        section.append((half_width, level + band))
+        level += band
     return section
 
 
@@ -732,8 +743,10 @@ INTERIOR_BUILDERS = [
      _point_keys("qc.corner.ne") + ["qc.length", "qc.width", "qc.wall.height", "qc.gable.height"],
      _build_queens_chamber),
     ("gg",
-     _point_keys("passage.ascending.floor.end") + _point_keys("gg.floor.virtual_south_end")
-     + ["gg.floor.width", "gg.ramp.width", "gg.corbel.count", "gg.height"],
+     # The lap height is named only where a preset carries it.
+     lambda v: (_point_keys("passage.ascending.floor.end") + _point_keys("gg.floor.virtual_south_end")
+                + ["gg.floor.width", "gg.ramp.width", "gg.corbel.count", "gg.height"]
+                + (["gg.corbel.height"] if _number_at(v, "gg.corbel.height") is not None else [])),
      _build_gallery),
     ("antechamber",
      _point_keys("antechamber.floor.north_end") + _point_keys("antechamber.roof.south_end") + ["antechamber.width"],

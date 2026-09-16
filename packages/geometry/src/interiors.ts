@@ -74,21 +74,43 @@ function box(a: Point, b: Point): { min: Point; max: Point } {
 /**
  * The Grand Gallery's cross-section: the full floor, ramps included, narrowing
  * by one lap's overhang at each corbel step up to a roof as wide as the floor
- * between the ramps. §46 gives the number of laps and the 20.55 in total
- * overhang but only one lap's height (Smyth's third lap, 166.2 in), so the
- * steps are spread evenly over `gg.height`: the widths are measured, the
- * heights are a placeholder until §46's lap levels are entered as records.
+ * between the ramps, which is what section 46 means by "the space between the
+ * ramps (2 cubits), is equal to the space between the walls at the top".
+ *
+ * The widths come from the 20.55 in Petrie measures by plumb-line for the sum
+ * of the seven projections, shared equally: he gives that total four ways and
+ * a single lap only as a mean of four spot measures, so the total is the
+ * better-determined figure and the one the steps are cut from.
+ *
+ * The heights come from `gg.corbel.height`, section 46's "High on S. End"
+ * column, 33.0 to 34.0 in a lap. Seven laps of that do not fill `gg.height`,
+ * and what is left over is the vertical wall the corbelling stands on, which
+ * is a real part of the gallery and not a remainder: it comes out at about
+ * 2.65 m, and Smyth's third lap then sits within about 0.13 m of the 166.2 in
+ * section 46 quotes for it, which is as well as these sources agree anywhere.
+ *
+ * A preset with no lap height, or one whose laps will not fit inside the
+ * gallery, falls back to spreading the steps evenly over the height. That was
+ * the only behaviour before the column was entered, and it is still the
+ * honest one when the column is missing.
  */
 function gallerySection(env: Environment): SectionPair[] {
   const overhang = value(env, 'gg.ramp.width');
   const halfFloor = value(env, 'gg.floor.width') / 2 + overhang;
   const laps = Math.round(value(env, 'gg.corbel.count'));
-  const bands = laps + 1;
-  const band = value(env, 'gg.height') / bands;
+  const height = value(env, 'gg.height');
+  const lap = numberAt(env, 'gg.corbel.height');
+  // The wall below the lowest lap, where the laps are measured and fit.
+  const wall = lap === undefined ? undefined : height - laps * lap;
+  const even = height / (laps + 1);
+
   const section: SectionPair[] = [];
-  for (let i = 0; i < bands; i++) {
+  let level = 0;
+  for (let i = 0; i <= laps; i++) {
     const halfWidth = halfFloor - (i * overhang) / laps;
-    section.push([halfWidth, i * band], [halfWidth, (i + 1) * band]);
+    const band = wall !== undefined && wall > 0 ? (i === 0 ? wall : (lap as number)) : even;
+    section.push([halfWidth, level], [halfWidth, level + band]);
+    level += band;
   }
   return section;
 }
@@ -238,9 +260,13 @@ const ROOM_BUILDERS: readonly Builder[] = [
     // south end of its floor: the slope carried on through the great step to
     // the plane of the south wall.
     name: 'gg',
-    keys: [
+    // The lap height is named only where a preset carries it, because a
+    // gallery with evenly spread steps is still a gallery and was what this
+    // drew before section 46's column was entered.
+    keys: (env) => [
       ...pointKeys('passage.ascending.floor.end'), ...pointKeys('gg.floor.virtual_south_end'),
       'gg.floor.width', 'gg.ramp.width', 'gg.corbel.count', 'gg.height',
+      ...(numberAt(env, 'gg.corbel.height') !== undefined ? ['gg.corbel.height'] : []),
     ],
     build: (env) => extrudedSection({
       from: point(env, 'passage.ascending.floor.end'),
