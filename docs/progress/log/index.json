@@ -188,5 +188,15 @@
     "kept": true,
     "note": "Last frame of the hero sky-rollback film, 1920 by 1080 at 128 samples on the GPU: 10,500 BCE, Alnitak transiting just above the apex.",
     "bytes": 1304467
+  },
+  {
+    "file": "2026-09-16T20-43-49Z--section-g3--260bce8-dirty.png",
+    "taken": "2026-09-16T20:43:49+00:00",
+    "view": "section-g3",
+    "commit": "260bce8",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Menkaure's apartments placed for the first time, by a route: Perring's chain and M&R's text laid end to end from the entrance; the large chamber's floor lands at -10.59 m against the -10.55 Tav. 4 prints. Also the first render with G2 and G3 interiors placed under their own pyramids.",
+    "bytes": 893088
   }
 ]

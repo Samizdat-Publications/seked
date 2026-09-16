@@ -168,7 +168,7 @@ def interior_collection_name(structure):
     return f"{INTERIOR_NAME} ({dict(STRUCTURES).get(structure, structure)})"
 
 
-def build_interior(parent, preset_id, resolved):
+def build_interior(parent, preset_id, resolved, placements=None):
     """
     Each pyramid's passages and chambers, one object each in its own "Interior"
     child collection. They are separate solids, not a boolean cut, so the
@@ -177,8 +177,15 @@ def build_interior(parent, preset_id, resolved):
     Which structures appear is a question for the database: a structure whose
     interior records the preset carries is built, and one whose records are not
     there yet is not mentioned.
+
+    The solids are built in the structure's own frame, origin at its base
+    centre, and each object is then given its pyramid's location and rotation
+    from `placements`, the same centre offsets, base level and orientation the
+    pyramid object carries. Before this, Khafre's and Menkaure's rooms were
+    left at the origin, inside the Great Pyramid.
     """
     records = resolved["records"]
+    placements = placements or {}
     built = {}
     for structure in interior_structures(resolved["values"]):
         name = interior_collection_name(structure)
@@ -186,13 +193,15 @@ def build_interior(parent, preset_id, resolved):
         solids = interior_solids(resolved["values"], structure)
         for solid in solids:
             sources = sorted({records[k]["source"] for k in solid["keys"] if k in records})
-            make_object(solid["name"], solid["verts"], solid["faces"], collection, {
+            obj = make_object(solid["name"], solid["verts"], solid["faces"], collection, {
                 "seked_preset": preset_id,
                 "seked_structure": structure,
                 "seked_solid": solid["name"],
                 "seked_sources": ", ".join(sources),
                 "seked_records": ", ".join(solid["keys"]),
             })
+            if structure in placements:
+                obj.location, obj.rotation_euler = placements[structure]
         built[structure] = solids
         names = ", ".join(s["name"] for s in solids)
         print(f"{name}: {len(solids)} solids ({names})")
@@ -465,6 +474,7 @@ def build(preset_id):
     coll = get_collection("Seked")
 
     placed = []
+    placements = {}
     for structure, label in STRUCTURES:
         p = pyramid_params(values, structure)
         if p is None:
@@ -479,6 +489,7 @@ def build(preset_id):
         }
         location = (p["offset_east"], p["offset_north"], p["offset_up"])
         rotation = (0.0, 0.0, math.radians(p["orientation_deg"]))
+        placements[structure] = (location, rotation)
 
         # As built: full height, flat basis with the concavity as a shape key.
         verts, faces = pyramid_geometry(p["base"], p["height"], concavity=0.0)
@@ -500,7 +511,7 @@ def build(preset_id):
         print(f"{label}: base {p['base']} m, height {p['height']} m, concavity {p['concavity']} m, "
               f"orientation {p['orientation_deg'] * 60:.1f}', at {location}")
 
-    build_interior(coll, preset_id, resolved)
+    build_interior(coll, preset_id, resolved, placements)
     footprints = build_footprints(coll, preset_id, resolved)
     # The OSM Sphinx supersedes the box: an outline modelled as forepaws, body
     # and head, on the ground it is cut into, against an axis-aligned box on

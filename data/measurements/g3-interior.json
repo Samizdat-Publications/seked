@@ -134,7 +134,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.height",
+    "key": "g3.passage.portcullis.height",
     "structure": "g3",
     "quantity": "length",
     "value": 1.2446,
@@ -156,7 +156,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.portcullis.first.from_doorway",
+    "key": "g3.passage.portcullis.first.from_doorway",
     "structure": "g3",
     "quantity": "length",
     "value": 1.76403,
@@ -168,7 +168,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.portcullis.second.from_doorway",
+    "key": "g3.passage.portcullis.second.from_doorway",
     "structure": "g3",
     "quantity": "length",
     "value": 2.91465,
@@ -180,7 +180,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.portcullis.third.from_doorway",
+    "key": "g3.passage.portcullis.third.from_doorway",
     "structure": "g3",
     "quantity": "length",
     "value": 3.94716,
@@ -358,7 +358,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.second.upper_passage.bottom.up",
+    "key": "g3.chamber.second.upper_passage.bottom.over_floor",
     "structure": "g3",
     "quantity": "length",
     "value": 2.98958,
@@ -369,7 +369,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.second.upper_passage.top.up",
+    "key": "g3.chamber.second.upper_passage.top.over_floor",
     "structure": "g3",
     "quantity": "length",
     "value": 4.37134,
@@ -380,7 +380,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.second.ceiling.up",
+    "key": "g3.chamber.second.height",
     "structure": "g3",
     "quantity": "length",
     "value": 4.87172,
@@ -391,7 +391,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.second.original.roof.up",
+    "key": "g3.chamber.second.original.roof.over_passage_floor",
     "structure": "g3",
     "quantity": "length",
     "value": 1.88214,

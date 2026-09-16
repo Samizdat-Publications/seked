@@ -1,7 +1,7 @@
 """
 Read a drawing without reading it by eye.
 
-    python scripts/plate.py render PDF PAGE
+    python scripts/plate.py render PDF PAGE [--dpi N] [--clip X0 Y0 X1 Y1]
     python scripts/plate.py grid PNG --box X0 Y0 X1 Y1 [--step 50] [--zoom 2]
     python scripts/plate.py scale --bar X0 Y0 X1 Y1 LENGTH [--check X0 Y0 X1 Y1 LENGTH ...]
     python scripts/plate.py measure --mpp M --shrink S --drafting-m D X0 Y0 X1 Y1 [--key K ...]
@@ -49,7 +49,8 @@ def render(args):
     doc = pymupdf.open(args.pdf)
     page = doc[args.page]
     stem = os.path.splitext(os.path.basename(args.pdf))[0].replace(" ", "_")
-    out = args.out or os.path.join(cache_dir(), stem, f"p{args.page:03d}.png")
+    suffix = "" if not args.clip else "_clip_" + "_".join(str(int(v)) for v in args.clip)
+    out = args.out or os.path.join(cache_dir(), stem, f"p{args.page:03d}{'' if not args.dpi else f'_{args.dpi}dpi'}{suffix}.png")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     images = page.get_images(full=True)
     if len(images) == 1 and not args.dpi:
@@ -57,8 +58,9 @@ def render(args):
         how = "embedded scan, native resolution"
     else:
         dpi = args.dpi or 300
-        pix = page.get_pixmap(dpi=dpi)
-        how = f"rasterised at {dpi} dpi"
+        clip = pymupdf.Rect(*args.clip) if args.clip else None
+        pix = page.get_pixmap(dpi=dpi, clip=clip)
+        how = f"rasterised at {dpi} dpi" + (f", clipped to {args.clip} pt" if clip else "")
     if pix.n - pix.alpha > 3:
         pix = pymupdf.Pixmap(pymupdf.csRGB, pix)
     pix.save(out)
@@ -186,6 +188,8 @@ def main(argv=None):
     r = sub.add_parser("render", help="a PDF page to PNG, natively where it is one scan")
     r.add_argument("pdf"); r.add_argument("page", type=int)
     r.add_argument("--dpi", type=int); r.add_argument("--out")
+    r.add_argument("--clip", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"),
+                   help="a region of the page in PDF points, for a page too large to rasterise whole at the dpi wanted")
     r.set_defaults(fn=render)
 
     g = sub.add_parser("grid", help="a crop with a labelled pixel grid in source coordinates")

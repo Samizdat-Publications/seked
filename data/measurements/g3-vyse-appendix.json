@@ -48,7 +48,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.descending.to_first_chamber",
+    "key": "g3.passage.foot.length",
     "structure": "g3",
     "quantity": "length",
     "value": 1.2954,
@@ -96,7 +96,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.to_portcullis_end",
+    "key": "g3.passage.portcullis.length",
     "structure": "g3",
     "quantity": "length",
     "value": 4.0894,
@@ -108,7 +108,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.from_portcullis.length",
+    "key": "g3.passage.first_to_second.length",
     "structure": "g3",
     "quantity": "length",
     "value": 12.573,
@@ -120,7 +120,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.from_portcullis.width",
+    "key": "g3.passage.first_to_second.width",
     "structure": "g3",
     "quantity": "length",
     "value": 1.0541,
@@ -132,7 +132,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.first_to_second.from_portcullis.height",
+    "key": "g3.passage.first_to_second.height",
     "structure": "g3",
     "quantity": "length",
     "value": 1.778,

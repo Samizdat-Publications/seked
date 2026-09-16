@@ -984,7 +984,7 @@ function extent(
   return { lo: centre.value - span.value / 2, hi: centre.value + span.value / 2, keys: [centre.key, ...span.keys] };
 }
 
-/** The vertical extent: the floor, and either the ceiling or the wall height. */
+/** The vertical extent: the floor, and the ceiling, the wall height or the chamber's height, in that order. */
 function verticalExtent(env: Environment, base: string): Extent | undefined {
   const floor = numberAt(env, `${base}.floor.up`);
   if (floor === undefined) return undefined;
@@ -994,6 +994,8 @@ function verticalExtent(env: Environment, base: string): Extent | undefined {
   }
   const walls = numberAt(env, `${base}.wall.height`);
   if (walls !== undefined && walls > 0) return { lo: floor, hi: floor + walls, keys: [`${base}.floor.up`, `${base}.wall.height`] };
+  const tall = numberAt(env, `${base}.height`);
+  if (tall !== undefined && tall > 0) return { lo: floor, hi: floor + tall, keys: [`${base}.floor.up`, `${base}.height`] };
   return undefined;
 }
 
@@ -1094,11 +1096,11 @@ function endFromRun(env: Environment, base: string, from: Point): { point: Point
   };
 }
 
-function passageBuilder(env: Environment, structure: string, prefix: string, name: string, half: number | undefined): Builder | undefined {
+function passageBuilder(env: Environment, structure: string, prefix: string, name: string, half: number | undefined, routed?: Routed): Builder | undefined {
   const base = `${prefix}passage.${name}`;
-  const from = storedPoint(env, `${base}.floor.begin`, half) ?? entranceBegin(env, structure, prefix, name, half);
-  const width = numberAt(env, `${base}.width`);
-  const height = numberAt(env, `${base}.height`);
+  const from = routed?.begin ?? storedPoint(env, `${base}.floor.begin`, half) ?? entranceBegin(env, structure, prefix, name, half);
+  const width = routed?.section?.width ?? numberAt(env, `${base}.width`);
+  const height = routed?.section?.height ?? numberAt(env, `${base}.height`);
   if (!from || width === undefined || height === undefined || width <= 0 || height <= 0) return undefined;
   // A survey that could reach both ends leaves two points. A published plan
   // states a length along the floor and a slope instead, and the far end is
@@ -1109,7 +1111,8 @@ function passageBuilder(env: Environment, structure: string, prefix: string, nam
   const run = Math.hypot(to.point[0] - from.point[0], to.point[1] - from.point[1], to.point[2] - from.point[2]);
   if (run < MIN_RUN) return undefined;
 
-  const keys = [...from.keys, ...to.keys, `${base}.width`, `${base}.height`];
+  const sectionKeys = routed?.section ? [...routed.section.widthKeys, ...routed.section.heightKeys] : [`${base}.width`, `${base}.height`];
+  const keys = [...new Set([...from.keys, ...to.keys, ...sectionKeys])];
   // The recorded slope is not needed to build a passage whose two ends are
   // known, but it is part of the provenance when the database carries it. On
   // the other path it is load-bearing and `endFromRun` has already named it.
@@ -1121,11 +1124,15 @@ function passageBuilder(env: Environment, structure: string, prefix: string, nam
   };
 }
 
-function chamberBuilder(env: Environment, prefix: string, name: string, half: number | undefined): Builder | undefined {
+function chamberBuilder(env: Environment, prefix: string, name: string, half: number | undefined, routed?: Routed): Builder | undefined {
   const base = `${prefix}chamber.${name}`;
-  const northSouth = extent(env, base, 'north', half, 'wall.south', 'wall.north', 'width', ['east', 'west']);
-  const eastWest = extent(env, base, 'east', half, 'wall.west', 'wall.east', 'length', ['north', 'south']);
-  const upDown = verticalExtent(env, base);
+  // A routed chamber's walls and floor are derived from the chain; they are
+  // read as if they were records and then swapped for the records behind them.
+  const derived = routed?.derived ?? {};
+  const read: Environment = routed?.derived ? { ...env, ...derived } : env;
+  const northSouth = extent(read, base, 'north', half, 'wall.south', 'wall.north', 'width', ['east', 'west']);
+  const eastWest = extent(read, base, 'east', half, 'wall.west', 'wall.east', 'length', ['north', 'south']);
+  const upDown = verticalExtent(read, base);
   if (!northSouth || !eastWest || !upDown) return undefined;
 
   const min: Point = [eastWest.lo, northSouth.lo, upDown.lo];
@@ -1133,7 +1140,8 @@ function chamberBuilder(env: Environment, prefix: string, name: string, half: nu
   const span: Point = [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
   if (span[0] <= 0 || span[1] <= 0 || span[2] <= 0) return undefined;
 
-  const keys = [...northSouth.keys, ...eastWest.keys, ...upDown.keys];
+  const measured = [...northSouth.keys, ...eastWest.keys, ...upDown.keys].filter((k) => !(k in derived));
+  const keys = [...new Set([...(routed?.keys ?? []), ...measured])];
   // A gable is optional, and only a ridge above the wall tops is one: the
   // ridge runs along the chamber's longer horizontal axis, which is how every
   // gabled chamber at Giza is roofed, G1's Queen's Chamber included.
@@ -1148,6 +1156,147 @@ function chamberBuilder(env: Environment, prefix: string, name: string, half: nu
     keys,
     build: () => (gable ? chamber({ min, max, gable, prefix: base }) : chamber({ min, max, prefix: base })),
   };
+}
+
+// --- Routes -----------------------------------------------------------------
+//
+// A survey that walks an interior from the entrance states it as a chain:
+// this far down the corridor, this far to the anteroom, the anteroom this
+// long, and so on. A member may carry its place in such a chain:
+//
+//   <id>.passage.<name>.step, <id>.chamber.<name>.step   order from the entrance
+//
+// Members with a step are laid in step order. A routed passage with no
+// `floor.begin` of its own begins where the member before it ends, and one
+// with no `width` or `height` continues the section of the passage before it,
+// which is how a source describes "a short level stretch of the same width".
+// A routed chamber with no stored walls is entered on the wall facing the
+// arriving passage: arriving southwards, its north wall stands at the
+// arrival point, its floor at the arrival level unless `floor.up` is
+// recorded, and its east wall at the entering door's recorded offset, which
+// is `door.north.from_east_wall` and half `door.north.width`, or the middle of
+// `door.begin.from_east_wall` and `door.end.from_east_wall`. It is left
+// through `door.south` if one is recorded, on its south wall at the same
+// level. Only southward arrivals are read, because every chamber on a route
+// at Giza is entered from the north; any other bearing ends the route there.
+// Every coordinate a route produces is derived, so none is stored, and every
+// routed member names the whole chain of records behind it.
+
+interface Placed {
+  point: Point;
+  keys: string[];
+}
+
+interface Section {
+  width: number;
+  widthKeys: string[];
+  height: number;
+  heightKeys: string[];
+}
+
+interface Routed {
+  begin?: Placed;
+  section?: Section;
+  derived?: Record<string, number>;
+  keys?: string[];
+}
+
+/** A chamber door's middle as metres west of its east wall, on the wall named, and the records it came from. */
+function doorOffset(env: Environment, base: string, wall: 'north' | 'south'): { value: number; keys: string[] } | undefined {
+  const fromKey = `${base}.door.${wall}.from_east_wall`;
+  const widthKey = `${base}.door.${wall}.width`;
+  const from = numberAt(env, fromKey);
+  const width = numberAt(env, widthKey);
+  if (from !== undefined && width !== undefined) return { value: from + width / 2, keys: [fromKey, widthKey] };
+  if (wall !== 'north') return undefined;
+  const beginKey = `${base}.door.begin.from_east_wall`;
+  const endKey = `${base}.door.end.from_east_wall`;
+  const begin = numberAt(env, beginKey);
+  const end = numberAt(env, endKey);
+  return begin !== undefined && end !== undefined ? { value: (begin + end) / 2, keys: [beginKey, endKey] } : undefined;
+}
+
+interface RouteMember {
+  kind: 'passage' | 'chamber';
+  name: string;
+  base: string;
+  step: number;
+}
+
+/** The routed members under a prefix, passages and chambers together, in step order. */
+function routeMembers(env: Environment, prefix: string): RouteMember[] {
+  const members: RouteMember[] = [];
+  for (const kind of ['passage', 'chamber'] as const) {
+    for (const name of memberNames(env, prefix, kind)) {
+      const base = `${prefix}${kind}.${name}`;
+      const step = numberAt(env, `${base}.step`);
+      if (step !== undefined) members.push({ kind, name, base, step });
+    }
+  }
+  return members.sort((a, b) => a.step - b.step);
+}
+
+/** Every routed member's derived start, section or walls, walked from the entrance. */
+function walkRoute(env: Environment, structure: string, prefix: string, half: number | undefined): Map<string, Routed> {
+  const out = new Map<string, Routed>();
+  let exit: Placed | undefined;
+  let bearing = DUE_SOUTH;
+  let section: Section | undefined;
+  for (const member of routeMembers(env, prefix)) {
+    const { base } = member;
+    const stepKey = `${base}.step`;
+    if (member.kind === 'passage') {
+      const begin = storedPoint(env, `${base}.floor.begin`, half) ?? exit ?? entranceBegin(env, structure, prefix, member.name, half);
+      const ownWidth = numberAt(env, `${base}.width`);
+      const ownHeight = numberAt(env, `${base}.height`);
+      const width = ownWidth ?? section?.width;
+      const height = ownHeight ?? section?.height;
+      if (!begin || width === undefined || height === undefined) {
+        exit = undefined;
+        continue;
+      }
+      const here: Section = {
+        width,
+        widthKeys: ownWidth !== undefined ? [`${base}.width`] : (section as Section).widthKeys,
+        height,
+        heightKeys: ownHeight !== undefined ? [`${base}.height`] : (section as Section).heightKeys,
+      };
+      const start: Placed = { point: begin.point, keys: [...begin.keys, stepKey] };
+      const end = storedPoint(env, `${base}.floor.end`, half) ?? endFromRun(env, base, begin.point);
+      out.set(base, { begin: start, section: here });
+      if (!end) {
+        exit = undefined;
+        continue;
+      }
+      const dx = end.point[0] - begin.point[0];
+      const dy = end.point[1] - begin.point[1];
+      if (Math.hypot(dx, dy) > MIN_RUN) bearing = ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360;
+      exit = { point: end.point, keys: [...start.keys, ...end.keys] };
+      section = here;
+      continue;
+    }
+    if (!exit) continue;
+    const southward = Math.abs(((bearing - 180 + 540) % 360) - 180) <= 45;
+    const door = southward ? doorOffset(env, base, 'north') : undefined;
+    if (!door) {
+      exit = undefined;
+      continue;
+    }
+    const recordedFloor = numberAt(env, `${base}.floor.up`);
+    const floor = recordedFloor ?? exit.point[2];
+    const east = exit.point[0] + door.value;
+    const north = exit.point[1];
+    const derived: Record<string, number> = { [`${base}.wall.north.north`]: north, [`${base}.wall.east.east`]: east };
+    if (recordedFloor === undefined) derived[`${base}.floor.up`] = floor;
+    const keys = [...exit.keys, stepKey, ...door.keys];
+    out.set(base, { derived, keys });
+    const leave = doorOffset(env, base, 'south');
+    const depth = dimension(env, `${base}.width`, ['east', 'west']);
+    exit = leave && depth
+      ? { point: [east - leave.value, north - depth.value, floor], keys: [...keys, ...depth.keys, ...leave.keys] }
+      : undefined;
+  }
+  return out;
 }
 
 /**
@@ -1170,13 +1319,14 @@ function halfBase(env: Environment, structure: string): number | undefined {
 function discover(env: Environment, structure: string): Builder[] {
   const prefix = interiorKeyPrefix(structure);
   const half = halfBase(env, structure);
+  const route = walkRoute(env, structure, prefix, half);
   const out: Builder[] = [];
   for (const name of memberNames(env, prefix, 'passage')) {
-    const builder = passageBuilder(env, structure, prefix, name, half);
+    const builder = passageBuilder(env, structure, prefix, name, half, route.get(`${prefix}passage.${name}`));
     if (builder) out.push(builder);
   }
   for (const name of memberNames(env, prefix, 'chamber')) {
-    const builder = chamberBuilder(env, prefix, name, half);
+    const builder = chamberBuilder(env, prefix, name, half, route.get(`${prefix}chamber.${name}`));
     if (builder) out.push(builder);
   }
   return out;

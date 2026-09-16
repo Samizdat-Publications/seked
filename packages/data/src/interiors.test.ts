@@ -177,9 +177,16 @@ describe('the discovered interiors on the canonical preset', () => {
     expect(ez).toBeLessThan(0);
   });
 
-  it("builds Menkaure's descending corridor from Petrie's entrance, Maragioglio and Rinaldi's length and Vyse's slope, and nothing else", () => {
+  it("builds Menkaure's descending corridor from Petrie's entrance, Maragioglio and Rinaldi's length and Vyse's slope", () => {
     const built = interiorSolids(env, { structure: 'g3' });
-    expect(Object.keys(built)).toEqual(['g3.passage.descending']);
+    expect(Object.keys(built)).toEqual([
+      'g3.passage.descending',
+      'g3.passage.first_to_second',
+      'g3.passage.foot',
+      'g3.passage.portcullis',
+      'g3.chamber.first',
+      'g3.chamber.second',
+    ]);
     const solid = built['g3.passage.descending'];
     const [bx, by, bz] = solid?.landmarks['g3.passage.descending.floor.begin'] as [number, number, number];
     const [ex, ey, ez] = solid?.landmarks['g3.passage.descending.floor.end'] as [number, number, number];
@@ -196,6 +203,68 @@ describe('the discovered interiors on the canonical preset', () => {
     expect(ex).toBeCloseTo(bx, 6);
     expect(ey).toBeLessThan(by);
     expect(ez).toBeLessThan(0);
+  });
+});
+
+/**
+ * Menkaure's apartments are placed by walking them: the chain of distances in
+ * Perring's table and Maragioglio and Rinaldi's text, laid end to end from
+ * the entrance. Nothing on the way is a stored coordinate, so the checks are
+ * what the chain has to agree with: the level Tav. 4 prints for the large
+ * chamber's floor, and the doors it enters by.
+ */
+describe("Menkaure's route on the canonical preset", () => {
+  const built = interiorSolids(env, { structure: 'g3' });
+  const inputs = interiorSolidInputs(env, { structure: 'g3' });
+  const bounds = (name: string) => {
+    const p = built[name]?.positions as Float32Array;
+    const lo = [Infinity, Infinity, Infinity];
+    const hi = [-Infinity, -Infinity, -Infinity];
+    for (let i = 0; i < p.length; i++) {
+      lo[i % 3] = Math.min(lo[i % 3] as number, p[i] as number);
+      hi[i % 3] = Math.max(hi[i % 3] as number, p[i] as number);
+    }
+    return { lo, hi };
+  };
+  const v = (key: string) => env[key] as number;
+  const floorBegin = (name: string) => built[name]?.landmarks[`${name}.floor.begin`] as [number, number, number];
+  const floorEnd = (name: string) => built[name]?.landmarks[`${name}.floor.end`] as [number, number, number];
+
+  it('lays each passage from where the member before it ends', () => {
+    expect(floorBegin('g3.passage.foot')).toEqual(floorEnd('g3.passage.descending'));
+    const first = bounds('g3.chamber.first');
+    expect(floorBegin('g3.passage.portcullis')[1]).toBeCloseTo(first.lo[1] as number, 4);
+    expect(floorBegin('g3.passage.first_to_second')).toEqual(floorEnd('g3.passage.portcullis'));
+  });
+
+  it('enters the antechamber on its north wall through Petrie\u2019s door, which leaves it symmetrical on the corridor', () => {
+    const first = bounds('g3.chamber.first');
+    const arrival = floorEnd('g3.passage.foot');
+    expect(first.hi[1]).toBeCloseTo(arrival[1], 6);
+    expect(first.lo[2]).toBeCloseTo(arrival[2], 6);
+    // Maragioglio and Rinaldi, p. 39: the antechamber is "simmetrica" on the corridor.
+    const middle = ((first.lo[0] as number) + (first.hi[0] as number)) / 2;
+    expect(Math.abs(middle - arrival[0])).toBeLessThan(0.05);
+  });
+
+  it('puts the large chamber\u2019s floor within a quarter metre of the level Tav. 4 prints for it', () => {
+    const second = bounds('g3.chamber.second');
+    expect(Math.abs((second.lo[2] as number) - -v('g3.chamber.second.floor.depth'))).toBeLessThan(0.25);
+  });
+
+  it('keeps the large chamber\u2019s floor level with the mouth of the corridor into it, as p. 43 says', () => {
+    expect(bounds('g3.chamber.second').lo[2]).toBeCloseTo(floorEnd('g3.passage.first_to_second')[2], 5);
+  });
+
+  it('never builds from the printed levels, which would make the check circular', () => {
+    for (const keys of Object.values(inputs)) expect(keys.some((k) => k.endsWith('.floor.depth'))).toBe(false);
+  });
+
+  it('names the whole chain behind a routed chamber', () => {
+    const keys = inputs['g3.chamber.second'] as readonly string[];
+    for (const k of ['g3.entrance.floor.begin.up', 'g3.passage.descending.length', 'g3.passage.foot.length', 'g3.chamber.first.door.south.from_east_wall', 'g3.passage.portcullis.length', 'g3.passage.first_to_second.angle', 'g3.chamber.second.door.begin.from_east_wall']) {
+      expect(keys, k).toContain(k);
+    }
   });
 });
 

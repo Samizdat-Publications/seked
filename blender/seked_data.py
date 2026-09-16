@@ -1265,7 +1265,7 @@ def _extent(values, base, axis, half, low, high, size, sides):
 
 
 def _vertical_extent(values, base):
-    """The vertical extent: the floor, and either the ceiling or the wall height."""
+    """The vertical extent: the floor, and the ceiling, the wall height or the chamber's height, in that order."""
     floor = _number_at(values, base + ".floor.up")
     if floor is None:
         return None
@@ -1275,6 +1275,9 @@ def _vertical_extent(values, base):
     walls = _number_at(values, base + ".wall.height")
     if walls is not None and walls > 0:
         return (floor, floor + walls, [base + ".floor.up", base + ".wall.height"])
+    tall = _number_at(values, base + ".height")
+    if tall is not None and tall > 0:
+        return (floor, floor + tall, [base + ".floor.up", base + ".height"])
     return None
 
 
@@ -1398,13 +1401,17 @@ def _end_from_run(values, base, start):
     return (end, keys)
 
 
-def _passage_builder(values, structure, prefix, name, half):
+def _passage_builder(values, structure, prefix, name, half, routed=None):
     base = prefix + "passage." + name
-    begin = _stored_point(values, base + ".floor.begin", half)
+    routed = routed or {}
+    begin = routed.get("begin")
+    if begin is None:
+        begin = _stored_point(values, base + ".floor.begin", half)
     if begin is None:
         begin = _entrance_begin(values, structure, prefix, name, half)
-    width = _number_at(values, base + ".width")
-    height = _number_at(values, base + ".height")
+    section = routed.get("section")
+    width = section["width"] if section else _number_at(values, base + ".width")
+    height = section["height"] if section else _number_at(values, base + ".height")
     if begin is None or width is None or height is None or width <= 0 or height <= 0:
         return None
     start, start_keys = begin
@@ -1418,7 +1425,8 @@ def _passage_builder(values, structure, prefix, name, half):
     finish, finish_keys = end
     if math.sqrt(sum((finish[i] - start[i]) ** 2 for i in range(3))) < _MIN_RUN:
         return None
-    keys = start_keys + finish_keys + [base + ".width", base + ".height"]
+    section_keys = section["width_keys"] + section["height_keys"] if section else [base + ".width", base + ".height"]
+    keys = _unique(start_keys + finish_keys + section_keys)
     # The recorded slope is not needed to build a passage whose two ends are
     # known, but it is part of the provenance when the database carries it. On
     # the other path it is load-bearing and _end_from_run has already named it.
@@ -1427,11 +1435,16 @@ def _passage_builder(values, structure, prefix, name, half):
     return (base, keys, lambda v: passage(start, finish, width, height))
 
 
-def _chamber_builder(values, prefix, name, half):
+def _chamber_builder(values, prefix, name, half, routed=None):
     base = prefix + "chamber." + name
-    north_south = _extent(values, base, "north", half, "wall.south", "wall.north", "width", ("east", "west"))
-    east_west = _extent(values, base, "east", half, "wall.west", "wall.east", "length", ("north", "south"))
-    up_down = _vertical_extent(values, base)
+    # A routed chamber's walls and floor are derived from the chain; they are
+    # read as if they were records and then swapped for the records behind them.
+    routed = routed or {}
+    derived = routed.get("derived") or {}
+    read = dict(values, **derived) if derived else values
+    north_south = _extent(read, base, "north", half, "wall.south", "wall.north", "width", ("east", "west"))
+    east_west = _extent(read, base, "east", half, "wall.west", "wall.east", "length", ("north", "south"))
+    up_down = _vertical_extent(read, base)
     if north_south is None or east_west is None or up_down is None:
         return None
     mn = (east_west[0], north_south[0], up_down[0])
@@ -1439,7 +1452,8 @@ def _chamber_builder(values, prefix, name, half):
     span = (mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2])
     if span[0] <= 0 or span[1] <= 0 or span[2] <= 0:
         return None
-    keys = list(north_south[2]) + list(east_west[2]) + list(up_down[2])
+    measured = [k for k in list(north_south[2]) + list(east_west[2]) + list(up_down[2]) if k not in derived]
+    keys = _unique(list(routed.get("keys") or []) + measured)
     # A gable is optional, and only a ridge above the wall tops is one: it runs
     # along the chamber's longer horizontal axis, which is how every gabled
     # chamber at Giza is roofed, G1's Queen's Chamber included.
@@ -1451,17 +1465,129 @@ def _chamber_builder(values, prefix, name, half):
     return (base, keys, lambda v: chamber(mn, mx, gable))
 
 
+# --- Routes ----------------------------------------------------------------
+# Mirrors walkRoute in packages/geometry/src/interiors.ts. Members carrying a
+# "<base>.step" are laid in step order: a routed passage with no floor.begin
+# begins where the member before it ends and continues the section before it
+# where it records none; a routed chamber with no stored walls is entered on
+# its north wall at the arrival point, at the arrival level unless floor.up is
+# recorded, with its east wall at the entering door's offset, and left through
+# its south door. Only southward arrivals are read.
+
+
+def _unique(keys):
+    seen = set()
+    out = []
+    for k in keys:
+        if k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out
+
+
+def _door_offset(values, base, wall):
+    from_key = base + ".door." + wall + ".from_east_wall"
+    width_key = base + ".door." + wall + ".width"
+    frm = _number_at(values, from_key)
+    width = _number_at(values, width_key)
+    if frm is not None and width is not None:
+        return (frm + width / 2, [from_key, width_key])
+    if wall != "north":
+        return None
+    begin_key = base + ".door.begin.from_east_wall"
+    end_key = base + ".door.end.from_east_wall"
+    begin = _number_at(values, begin_key)
+    end = _number_at(values, end_key)
+    return ((begin + end) / 2, [begin_key, end_key]) if begin is not None and end is not None else None
+
+
+def _route_members(values, prefix):
+    members = []
+    for kind in ("passage", "chamber"):
+        for name in _member_names(values, prefix, kind):
+            base = prefix + kind + "." + name
+            step = _number_at(values, base + ".step")
+            if step is not None:
+                members.append((kind, name, base, step))
+    # A stable sort on the step, passages before chambers at equal steps, as Array.sort does.
+    return sorted(members, key=lambda m: m[3])
+
+
+def _walk_route(values, structure, prefix, half):
+    out = {}
+    exit_ = None
+    bearing = _DUE_SOUTH
+    section = None
+    for kind, name, base, _step in _route_members(values, prefix):
+        step_key = base + ".step"
+        if kind == "passage":
+            begin = _stored_point(values, base + ".floor.begin", half)
+            if begin is None:
+                begin = exit_
+            if begin is None:
+                begin = _entrance_begin(values, structure, prefix, name, half)
+            own_width = _number_at(values, base + ".width")
+            own_height = _number_at(values, base + ".height")
+            width = own_width if own_width is not None else (section["width"] if section else None)
+            height = own_height if own_height is not None else (section["height"] if section else None)
+            if begin is None or width is None or height is None:
+                exit_ = None
+                continue
+            here = {
+                "width": width,
+                "width_keys": [base + ".width"] if own_width is not None else section["width_keys"],
+                "height": height,
+                "height_keys": [base + ".height"] if own_height is not None else section["height_keys"],
+            }
+            start = (begin[0], list(begin[1]) + [step_key])
+            end = _stored_point(values, base + ".floor.end", half)
+            if end is None:
+                end = _end_from_run(values, base, begin[0])
+            out[base] = {"begin": start, "section": here}
+            if end is None:
+                exit_ = None
+                continue
+            dx = end[0][0] - begin[0][0]
+            dy = end[0][1] - begin[0][1]
+            if math.hypot(dx, dy) > _MIN_RUN:
+                bearing = (math.atan2(dx, dy) * 180 / math.pi + 360) % 360
+            exit_ = (end[0], start[1] + list(end[1]))
+            section = here
+            continue
+        if exit_ is None:
+            continue
+        southward = abs(((bearing - 180 + 540) % 360) - 180) <= 45
+        door = _door_offset(values, base, "north") if southward else None
+        if door is None:
+            exit_ = None
+            continue
+        recorded_floor = _number_at(values, base + ".floor.up")
+        floor = recorded_floor if recorded_floor is not None else exit_[0][2]
+        east = exit_[0][0] + door[0]
+        north = exit_[0][1]
+        derived = {base + ".wall.north.north": north, base + ".wall.east.east": east}
+        if recorded_floor is None:
+            derived[base + ".floor.up"] = floor
+        keys = list(exit_[1]) + [step_key] + list(door[1])
+        out[base] = {"derived": derived, "keys": keys}
+        leave = _door_offset(values, base, "south")
+        depth = _dimension(values, base + ".width", ("east", "west"))
+        exit_ = ((east - leave[0], north - depth[0], floor), keys + list(depth[1]) + list(leave[1])) if leave and depth else None
+    return out
+
+
 def _discover_builders(values, structure):
     """Passages first and then chambers, each group in name order."""
     prefix = interior_key_prefix(structure)
     half = _half_base(values, structure)
+    route = _walk_route(values, structure, prefix, half)
     out = []
     for name in _member_names(values, prefix, "passage"):
-        built = _passage_builder(values, structure, prefix, name, half)
+        built = _passage_builder(values, structure, prefix, name, half, route.get(prefix + "passage." + name))
         if built is not None:
             out.append(built)
     for name in _member_names(values, prefix, "chamber"):
-        built = _chamber_builder(values, prefix, name, half)
+        built = _chamber_builder(values, prefix, name, half, route.get(prefix + "chamber." + name))
         if built is not None:
             out.append(built)
     return out

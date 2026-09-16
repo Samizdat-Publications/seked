@@ -1,0 +1,124 @@
+[
+  {
+    "key": "g3.passage.descending.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 1,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 1 of the route from the entrance down, the descending corridor (D), which starts at the entrance, in the order Maragioglio and Rinaldi walk the apartments on pp. 39 to 43: the descending corridor (D), the short level stretch (G), the panelled antechamber (A), the room of the portcullises (S), the corridor (I) and the large chamber (B). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.foot.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 2,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 2 of the route from the entrance down, the short level stretch (G) at the corridor's foot, in the order Maragioglio and Rinaldi walk the apartments on pp. 39 to 43: the descending corridor (D), the short level stretch (G), the panelled antechamber (A), the room of the portcullises (S), the corridor (I) and the large chamber (B). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.foot.angle",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 0,
+    "unit": "deg",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Level: \"Al corridoio discendente segue un breve tratto piano (G), della medesima larghezza, ma di altezza maggiore\", p. 39. The same sentence gives it the corridor's width, which is why the route lets it take the descending corridor's section; its height is only \"greater\", so the drawn stretch is lower than the real one, which is a filled hole and said here.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.first.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 3,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 3 of the route from the entrance down, the panelled antechamber (A), entered on its north wall, in the order Maragioglio and Rinaldi walk the apartments on pp. 39 to 43: the descending corridor (D), the short level stretch (G), the panelled antechamber (A), the room of the portcullises (S), the corridor (I) and the large chamber (B). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.portcullis.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 4,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 4 of the route from the entrance down, the room of the portcullises (S), in the order Maragioglio and Rinaldi walk the apartments on pp. 39 to 43: the descending corridor (D), the short level stretch (G), the panelled antechamber (A), the room of the portcullises (S), the corridor (I) and the large chamber (B). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.portcullis.angle",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 0,
+    "unit": "deg",
+    "sigma": 2,
+    "source": "vyse-1840",
+    "method": "inferred",
+    "note": "Taken as level. Perring's table in Vyse's Appendix, p. 121, gives \"From anteroom to end of the three portcullises, 13 ft 5 in\" with no angle and then an angle, 4°, for the passage beyond; Maragioglio and Rinaldi, p. 41, single out that passage (I) as \"non è orizzontale, ma inclinato di circa 4°\" and say nothing of a slope in (S). Neither says in words that (S) is level, so this is an inference and stays unverified. It is checked by the route: with (S) level the large chamber's floor comes out within a few centimetres of the level Tav. 4 prints for it.",
+    "verified": false
+  },
+  {
+    "key": "g3.passage.first_to_second.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 5,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 5 of the route from the entrance down, the corridor (I) from the portcullises to the large chamber, in the order Maragioglio and Rinaldi walk the apartments on pp. 39 to 43: the descending corridor (D), the short level stretch (G), the panelled antechamber (A), the room of the portcullises (S), the corridor (I) and the large chamber (B). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.second.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 6,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 6 of the route from the entrance down, the large chamber (B), entered on its north wall, in the order Maragioglio and Rinaldi walk the apartments on pp. 39 to 43: the descending corridor (D), the short level stretch (G), the panelled antechamber (A), the room of the portcullises (S), the corridor (I) and the large chamber (B). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.second.floor.depth",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 10.55,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1967-tavole",
+    "method": "published-plan",
+    "note": "Printed [10.55] on Tav. 4, fig. 2 (Sezione S-N) and fig. 5 (Sezione E-W), dimensioned from the base line down to the floor of the large chamber (B). Square brackets on this plate mark Perring's figures, as its own \"lato base [108.05] (105.50)\" shows beside the Petrie figure in round ones. Not used to build anything: the route places the chamber from the chain of passages, and this is what its floor is checked against.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.granite.floor.depth",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 15.55,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1967-tavole",
+    "method": "published-plan",
+    "note": "Printed [15.55] on Tav. 4, fig. 2 and fig. 5, from the base line down to the floor of the granite crypt (C), a Perring figure by the plate's bracket convention. A check for the route when it is carried on to the crypt.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.loculus.floor.depth",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 16.95,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1967-tavole",
+    "method": "published-plan",
+    "note": "Printed [16.95] on Tav. 4, fig. 2, from the base line down to the floor of the chamber of the niches (W), a Perring figure by the plate's bracket convention. A check for the route when it is carried on.",
+    "verified": true
+  }
+]

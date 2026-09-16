@@ -146,6 +146,25 @@ VIEWS = {
         "fill": 0.0,
         "placeholder_sun": (12.0, 97.0),
     },
+    "section-g3": {
+        # Menkaure's pyramid in elevation from due east, drawn like the Great
+        # Pyramid's section: his apartments as the route lays them, from the
+        # entrance down the corridor to the panelled antechamber, the
+        # portcullises and the large chamber. The camera stands on his own
+        # centre, which is Petrie's offset from Khufu's.
+        "moment": "equinox-sunrise-plus-hour",
+        "location": (-174.45, -739.19, 24.0),
+        "target": (-574.45, -739.19, 24.0),
+        "lens": 50.0,
+        "ortho_scale": 165.0,
+        "casing_alpha": 0.22,
+        "exposure": 0.0,
+        "fill": 0.0,
+        "drawing": (0.055, 0.061, 0.072),
+        "drawing_line": (0.06, 0.065, 0.075, 1.1),
+        "drawing_structure": "g3",
+        "placeholder_sun": (35.0, 135.0),
+    },
     "night": {
         "moment": "alnitak-transit",
         "location": (0.0, 300.0, 45.0),
