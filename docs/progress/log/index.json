@@ -158,5 +158,15 @@
     "kept": false,
     "note": "Materials pass: CC0 Poly Haven stone and sand (scripts/textures.py), box-projected at two scales, block tones and weathering; haze and a low dust layer, invisible to shadow rays. --state today.",
     "bytes": 1196673
+  },
+  {
+    "file": "2026-09-16T19-56-14Z--sphinx--0adc016-dirty.png",
+    "taken": "2026-09-16T19:56:14+00:00",
+    "view": "sphinx",
+    "commit": "0adc016",
+    "tree": "dirty",
+    "kept": false,
+    "note": "First stand-in: the Watt Institution's CC BY scan of Longworth's 1903 bronze of the Sphinx, sand to its chest as it then was, cut from its plinth and fitted to the OSM outlines (75 m, turned to face east). New 'sphinx' view.",
+    "bytes": 1528823
   }
 ]

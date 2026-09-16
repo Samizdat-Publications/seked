@@ -155,7 +155,13 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
    the air; a volumetric dust layer low over the sand at dawn and sunset;
    filmic tone mapping tuned per view. The physical sky and the baked sun are
    already right; this is what makes them look it.
-3. **Stand-in models for everything that is not a pyramid**, from free
+3. First stand-in done 2026-09-16: `blender/models.json` and `scripts/models.py`
+   (Sketchfab API, Stewart's token) and `blender/render_standins.py`, which fits
+   a model to the OSM outlines it replaces at render time and hides them. The
+   Sphinx is the Watt Institution's scan of an 1903 bronze, so it is buried to
+   the chest; a scan of the excavated Sphinx should replace it. The manifest
+   lives in blender/, beside textures.json, rather than in models/ as planned.
+   **Stand-in models for everything that is not a pyramid**, from free
    sources, each fitted to its OSM footprint (centroid, principal axis for
    orientation, a scale check against the outline) and recorded in a
    `models/manifest.json` with URL, licence, attribution and the footprint it

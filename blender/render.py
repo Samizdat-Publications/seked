@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--state built|today] [--air on|off] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--state built|today] [--air on|off] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -34,6 +34,7 @@ if HERE not in sys.path:
 import bpy  # noqa: E402  (only available inside Blender)
 
 from render_materials import STRUCTURE_LABELS, assign_materials, draw_as_section, make_translucent  # noqa: E402
+from render_standins import build_standins  # noqa: E402
 from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
 # Where the akhet view stands relative to the Sphinx: back along the line it
@@ -132,6 +133,18 @@ VIEWS = {
         "drawing_line": (0.06, 0.065, 0.075, 1.1),
         "drawing_structure": "g1",
         "placeholder_sun": (35.0, 135.0),
+    },
+    "sphinx": {
+        # The postcard: the Sphinx from the east, close, in the morning sun
+        # that lights its face, Khafre's pyramid behind it and Khufu's to the
+        # right. A composition, not a claim.
+        "moment": "equinox-sunrise-plus-hour",
+        "location": (392.0, -462.0, -26.0),
+        "target": (318.0, -425.0, -31.0),
+        "lens": 30.0,
+        "exposure": -4.2,
+        "fill": 0.0,
+        "placeholder_sun": (12.0, 97.0),
     },
     "night": {
         "moment": "alnitak-transit",
@@ -454,15 +467,26 @@ def configure_render(scene, opts):
 
 
 def main():
-    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "air": "on", "bake": SKY_BAKE})
+    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "air": "on", "standins": "on", "location": "", "target": "", "lens": "", "bake": SKY_BAKE})
     scene = bpy.context.scene
     if opts["view"] not in VIEWS:
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
     view = VIEWS[opts["view"]]
+    # A camera moved for one render, to look at something the named views do
+    # not frame, keeps everything else about the view: its moment and light.
+    view = dict(view)
+    for key in ("location", "target"):
+        if opts[key]:
+            view[key] = tuple(float(v) for v in opts[key].split(","))
+            view.pop("from_object", None)
+    if opts["lens"]:
+        view["lens"] = float(opts["lens"])
 
     drawing = "drawing" in view
     assign_materials()
     show_state(opts["state"])
+    if not drawing and opts["standins"] != "off":
+        build_standins(scene)
     if drawing:
         draw_as_section(view["drawing_structure"], view["casing_alpha"])
     show_ground_only(drawing)

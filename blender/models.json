@@ -1,0 +1,26 @@
+{
+  "about": "Third-party models used as visual stand-ins for structures that are not pyramids. None is a measurement: each is placed on the OSM footprint of what it stands for (centroid, principal axis and length along it), and nothing about its form is entered in data/. `python scripts/models.py` downloads them into build/models/ (gitignored) through the Sketchfab API with the token in SKETCHFAB_TOKEN or ~/.seked/keys.env; `blender/render_standins.py` fits them at render time and labels every one a stand-in.",
+  "models": [
+    {
+      "id": "sphinx-watt",
+      "sketchfab": "c126509af31142a9a0d116e264e7b629",
+      "name": "The Great Sphinx of Giza",
+      "author": "The Watt Institution",
+      "url": "https://sketchfab.com/3d-models/the-great-sphinx-of-giza-c126509af31142a9a0d116e264e7b629",
+      "license": "CC BY 4.0",
+      "attribution": "\"The Great Sphinx of Giza\" by The Watt Institution (https://sketchfab.com/wattinstitution), CC BY 4.0: a scan of Bert W. Longworth's cast bronze topographic model of the Sphinx, cast by François Rudier, exhibited at the Paris Salon in 1903. Cut from its plinth, decimated and refitted.",
+      "replaces": [
+        "sphinx.body",
+        "sphinx.head",
+        "sphinx.paws"
+      ],
+      "front": "+y",
+      "cut_z": 0.07,
+      "faces": 300000,
+      "why": "A sculptor's topographic model of 1903 rather than a survey, and of the Sphinx as it stood then, sand to its chest: its forepaws and the lower body are under the sculpted sand, which Baraize did not clear until 1925 to 1936. So the proportions are an artist's and the pose is a century out of date. It is still far nearer the Sphinx than the three prisms OSM models it as, and it should be replaced when a scan of the excavated Sphinx can be had. Its bronze texture is dropped for the scene's own core limestone.",
+      "front_from": "sphinx.body",
+      "front_to": "sphinx.paws",
+      "ground_z": 0.13
+    }
+  ]
+}

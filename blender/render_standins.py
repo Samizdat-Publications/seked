@@ -1,0 +1,174 @@
+"""
+Visual stand-ins for structures that are not pyramids, fitted at render time.
+
+CLAUDE.md allows a good free model for anything that is not a pyramid, placed
+on that structure's footprint, keeping its licence and source, and marked a
+stand-in wherever it is shown; nothing about its form is a measurement. This
+module does the placing. The generated .blend and the viewer's GLB never hold a
+stand-in: they stay what the database built, and a render adds the models on
+top, hiding the OSM solids each one replaces.
+
+The fit uses only the footprint. For each model: cut away what is below
+`cut_z` in the model's own units (a plinth), set its `ground_z` on the
+outline's base so what is left of the plinth sinks under the sand, decimate to `faces`, take the
+principal axis of what is left in plan and its length along that axis, and do
+the same for the OSM outlines it replaces. The scale is the ratio of the two
+lengths, the rotation turns one axis onto the other with the model's `front`
+toward the outline named `front_to` from the one named `front_from`, the
+midpoints of the two extents coincide, and the model stands on the lowest
+base the replaced outlines carry. Its height is then a result, and is printed
+beside the height OSM gives, as the check on the scale.
+"""
+import json
+import math
+import os
+
+import bmesh
+import bpy
+from mathutils import Matrix, Vector
+
+from render_materials import core_material
+from seked_data import load_footprints
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+MANIFEST = os.path.join(HERE, "models.json")
+INDEX = os.path.join(ROOT, "build", "models", "index.json")
+
+
+def principal_axis(points):
+    """The unit vector along which 2-D points spread most, from their covariance."""
+    n = len(points)
+    mx = sum(p[0] for p in points) / n
+    my = sum(p[1] for p in points) / n
+    sxx = sum((p[0] - mx) ** 2 for p in points) / n
+    syy = sum((p[1] - my) ** 2 for p in points) / n
+    sxy = sum((p[0] - mx) * (p[1] - my) for p in points) / n
+    angle = 0.5 * math.atan2(2.0 * sxy, sxx - syy)
+    return Vector((math.cos(angle), math.sin(angle)))
+
+
+def extent(points, axis):
+    """Length along `axis` and the plan midpoint of that extent, with the mean across it."""
+    along = [p[0] * axis.x + p[1] * axis.y for p in points]
+    normal = Vector((-axis.y, axis.x))
+    across = sum(p[0] * normal.x + p[1] * normal.y for p in points) / len(points)
+    lo, hi = min(along), max(along)
+    mid = axis * ((lo + hi) / 2.0) + normal * across
+    return hi - lo, mid
+
+
+def import_model(path, name):
+    """The GLB's meshes as one object with its transforms applied."""
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=path)
+    new = [o for o in bpy.data.objects if o not in before]
+    meshes = [o for o in new if o.type == "MESH"]
+    bm = bmesh.new()
+    for obj in meshes:
+        part = obj.data.copy()
+        part.transform(obj.matrix_world)
+        bm.from_mesh(part)
+        bpy.data.meshes.remove(part)
+    for obj in new:
+        bpy.data.objects.remove(obj, do_unlink=True)
+    mesh = bpy.data.meshes.new(name)
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.materials.clear()
+    return mesh
+
+
+def cut_and_reduce(mesh, cut_z, faces):
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
+    bmesh.ops.bisect_plane(bm, geom=geom, plane_co=(0.0, 0.0, cut_z), plane_no=(0.0, 0.0, 1.0), clear_inner=True)
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = bpy.data.objects.new(mesh.name, mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    count = len(mesh.polygons)
+    if count > faces:
+        mod = obj.modifiers.new("reduce", "DECIMATE")
+        mod.ratio = faces / count
+        with bpy.context.temp_override(object=obj, active_object=obj, selected_objects=[obj]):
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+    return obj
+
+
+def fit(obj, model, features):
+    """Scale, turn and move the object onto the replaced outlines; returns what was done, for the log."""
+    verts = [v.co for v in obj.data.vertices]
+    step = max(1, len(verts) // 20000)
+    plan = [(v.x, v.y) for v in verts[::step]]
+    m_axis = principal_axis(plan)
+    front = Vector((0.0, 1.0)) if model["front"].endswith("y") else Vector((1.0, 0.0))
+    if model["front"].startswith("-"):
+        front = -front
+    if m_axis.dot(front) < 0:
+        m_axis = -m_axis
+    m_len, m_mid = extent(plan, m_axis)
+
+    rings = [f for f in features if f["id"] in model["replaces"]]
+    points = [tuple(pt) for f in rings for ring in ([f["ring"]] if isinstance(f["ring"][0][0], (int, float)) else f["ring"]) for pt in ring]
+    o_axis = principal_axis(points)
+
+    def centroid(fid):
+        ring = next(f["ring"] for f in rings if f["id"] == fid)
+        ring = ring if isinstance(ring[0][0], (int, float)) else ring[0]
+        return Vector((sum(p[0] for p in ring) / len(ring), sum(p[1] for p in ring) / len(ring)))
+
+    if o_axis.dot(centroid(model["front_to"]) - centroid(model["front_from"])) < 0:
+        o_axis = -o_axis
+    o_len, o_mid = extent(points, o_axis)
+
+    scale = o_len / m_len
+    turn = math.atan2(o_axis.y, o_axis.x) - math.atan2(m_axis.y, m_axis.x)
+    base = min(f["base"] for f in rings)
+    # The model's ground, where its sculpted sand meets the figure, goes on the
+    # outline's base; what the cut left of its plinth below that sinks under the terrain.
+    z0 = model.get("ground_z", min(v.z for v in verts))
+    rotated_mid = Matrix.Rotation(turn, 2) @ (m_mid * scale)
+    obj.data.transform(Matrix.Translation((0.0, 0.0, -z0)))
+    obj.scale = (scale, scale, scale)
+    obj.rotation_euler = (0.0, 0.0, turn)
+    obj.location = (o_mid.x - rotated_mid.x, o_mid.y - rotated_mid.y, base)
+    height = max(v.co.z for v in obj.data.vertices) * scale
+    tallest = max((f.get("height") or 0) + f["base"] - base for f in rings)
+    return {"scale": scale, "turn_deg": math.degrees(turn), "length_m": o_len, "height_m": height, "osm_height_m": tallest}
+
+
+def build_standins(scene):
+    """Every stand-in the manifest names and build/models/ holds, fitted and labelled; the OSM solids they replace hidden."""
+    if not os.path.exists(INDEX):
+        print(f"no {INDEX}: no stand-in models; run python scripts/models.py")
+        return []
+    index = json.load(open(INDEX, encoding="utf-8"))["models"]
+    features = (load_footprints() or {}).get("features", [])
+    built = []
+    for model in json.load(open(MANIFEST, encoding="utf-8"))["models"]:
+        entry = index.get(model["id"])
+        if entry is None:
+            print(f"stand-in {model['id']}: not downloaded; run python scripts/models.py")
+            continue
+        if not any(f["id"] in model["replaces"] for f in features):
+            print(f"stand-in {model['id']}: none of {model['replaces']} is in the footprints, so it has nowhere to stand")
+            continue
+        path = os.path.join(os.path.dirname(INDEX), entry["file"])
+        name = f"{model['name']} (stand-in)"
+        obj = cut_and_reduce(import_model(path, name), model["cut_z"], model["faces"])
+        done = fit(obj, model, features)
+        obj.data.materials.append(core_material(True))
+        obj["seked_standin"] = model["attribution"]
+        obj["seked_license"] = model["license"]
+        obj["seked_replaces"] = ", ".join(model["replaces"])
+        for other in bpy.data.objects:
+            if other.get("seked_footprint") in model["replaces"]:
+                other.hide_set(True)
+                other.hide_render = True
+        print(f"stand-in {name}: {len(obj.data.polygons)} faces, scale {done['scale']:.3f}, turned {done['turn_deg']:.2f} deg, "
+              f"{done['length_m']:.1f} m long on {', '.join(model['replaces'])}; stands {done['height_m']:.1f} m against OSM's "
+              f"{done['osm_height_m']:.1f} m. {model['license']}: {model['author']}")
+        built.append(obj)
+    return built

@@ -33,6 +33,7 @@ pnpm run footprints # re-import the plateau's lesser monuments from OSM into dat
 pnpm run deploy     # build the viewer, assemble site/, upload to Cloudflare Pages (https://seked.pages.dev); pnpm owns the bare `pnpm deploy`
 pnpm sky-bake       # bake the sun and the star dome into build/ for blender/render.py
 pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for blender/rollback.py
+python scripts/models.py     # fetch the stand-in models in blender/models.json from Sketchfab into build/models/ (token in ~/.seked/keys.env)
 python scripts/textures.py   # fetch the CC0 Poly Haven texture sets in blender/textures.json into build/textures/ (md5-checked)
 python scripts/plate.py render|grid|scale|measure|register   # read a drawing: native scan, pixel grid, scale bar, scaled figure with its sigma
 ```
