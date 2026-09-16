@@ -168,5 +168,15 @@
     "kept": false,
     "note": "First stand-in: the Watt Institution's CC BY scan of Longworth's 1903 bronze of the Sphinx, sand to its chest as it then was, cut from its plinth and fitted to the OSM outlines (75 m, turned to face east). New 'sphinx' view.",
     "bytes": 1528823
+  },
+  {
+    "file": "2026-09-16T20-08-45Z--night--74ae085-dirty.png",
+    "taken": "2026-09-16T20:08:45+00:00",
+    "view": "night",
+    "commit": "74ae085",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The Milky Way behind the HYG stars: NASA SVS 4851 milkyway_2020_8k.exr turned into the sky of 2449 BCE by the bake's icrsToEnu, the stars' own precession and horizon turn; checked against NASA's constellation figures.",
+    "bytes": 1491413
   }
 ]

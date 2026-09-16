@@ -269,6 +269,15 @@
     "note": "HYG moved off github.com/astronexus/HYG-Database, which stops at v4.1 and points here. On Codeberg the file is stored with Git LFS, so the /media/ URL above returns the 13 MB gzip and the /raw/ one returns only the 133-byte pointer; sha256 of the gzip is 5ca9431ff364c8002a4a3efa91b2b9296746aea1543374db4cb6b4fab049d601 and the version is dated 2025-06-29 by its own gzip timestamp. HYG gives right ascension in hours and distance in parsecs; scripts/stars.ts converts both and cuts the catalogue to magnitude 6.5. Row 0 of the CSV is the Sun, at right ascension 0 and distance 0, and is dropped. A distance of 100000 pc or more is HYG marking a missing or negative Hipparcos parallax."
   },
   {
+    "id": "nasa-svs-4851",
+    "kind": "reference",
+    "year": 2020,
+    "citation": "NASA/Goddard Space Flight Center Scientific Visualization Studio (2020). Deep Star Maps 2020, SVS 4851: milkyway_2020_8k.exr, the Milky Way background in celestial coordinates. Gaia DR2: ESA/Gaia/DPAC; Hipparcos and Tycho-2: ESA.",
+    "url": "https://svs.gsfc.nasa.gov/4851",
+    "license": "Public domain (NASA); credit NASA/Goddard Space Flight Center Scientific Visualization Studio",
+    "note": "An image, not a catalogue: the diffuse light of the Milky Way with the stars left out, as an equirectangular map on J2000 geocentric axes centred at 0h with right ascension increasing to the left. The night render draws it behind the HYG stars, turned into the local sky by stars.icrsToEnu in build/sky-bake.json, which is the precession matrix and horizon turn the stars themselves are placed with, so the two cannot disagree. Fetched to build/sky/ (gitignored), 137307727 bytes, sha256 361d1961647af073b3b3e4aea4fca85f15b3c9d915e0c8c4befb02520dadd10a, on 2026-09-16."
+  },
+  {
     "id": "hipparcos-1997",
     "kind": "reference",
     "year": 1997,

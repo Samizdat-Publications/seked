@@ -35,7 +35,7 @@ import bpy  # noqa: E402  (only available inside Blender)
 
 from render_materials import STRUCTURE_LABELS, assign_materials, draw_as_section, make_translucent  # noqa: E402
 from render_standins import build_standins  # noqa: E402
-from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
+from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_milky_way, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
 # Where the akhet view stands relative to the Sphinx: back along the line it
 # looks out on, far enough that the whole statue is in the frame with the two
@@ -341,6 +341,7 @@ def setup_view(scene, name, view, bake, air=True):
         build_atmosphere(scene, (0.0, 0.0))
     if view.get("stars"):
         build_star_dome(scene, bake, location)
+        build_milky_way(scene, bake)
     scene.view_settings.exposure = view.get("exposure", 0.0)
     describe_camera(location, target, view["lens"], scene.view_settings.exposure)
 

@@ -27,6 +27,9 @@ import { loadDatabase, REPO_ROOT, resolve } from '@seked/data';
 import {
   altAz,
   apparentAltitude,
+  apply,
+  equatorialToHorizon,
+  ltpb,
   calendarYearOfEpoch,
   expandBrightStars,
   loadBrightStars,
@@ -103,6 +106,13 @@ export interface BakedStars {
   catalogue: { source: string; attribution: string; magnitudeLimit: number; count: number };
   columns: readonly string[];
   stars: number[][];
+  /**
+   * The rotation that carries an ICRS unit vector to east, north and up at this
+   * epoch and sidereal time, rows first: the same precession matrix the stars
+   * are moved with and the same horizon turn. A render uses it to set a sky
+   * image drawn on ICRS axes, such as the Milky Way, where these stars are.
+   */
+  icrsToEnu: number[][];
 }
 
 export interface SkyBake {
@@ -244,9 +254,15 @@ function bakeStars(latitudeDeg: number): BakedStars {
     return [round(azDeg), round(altDeg), round(star.mag, 3), round(star.ci ?? 0, 3)];
   });
 
+  const precession = ltpb(NIGHT_EPOCH);
+  const horizon = equatorialToHorizon(latitudeDeg, lstDeg);
+  const columns = ([[1, 0, 0], [0, 1, 0], [0, 0, 1]] as const).map((e) => apply(horizon, apply(precession, [e[0], e[1], e[2]])));
+  const icrsToEnu = [0, 1, 2].map((row) => columns.map((column) => Number(column[row]!.toFixed(12))));
+
   return {
     epoch: NIGHT_EPOCH,
     lstDeg: round(lstDeg),
+    icrsToEnu,
     meridian: {
       star: MERIDIAN_STAR,
       name: meridianStar.name,

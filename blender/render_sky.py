@@ -599,3 +599,50 @@ def build_atmosphere(scene, centre):
         obj.visible_shadow = False
     print(f"air: haze {HAZE_EXTINCTION:g} per m to {HAZE_TOP_M:g} m, dust {DUST_EXTINCTION:g} per m from {DUST_BASE_M:g} m "
           f"falling off over {DUST_SCALE_M:g} m; look choices, not measurements; invisible to shadow rays")
+
+
+# --- The Milky Way ----------------------------------------------------------
+#
+# NASA's Deep Star Maps 2020 (SVS 4851, public domain) draws the Milky Way's
+# diffuse light with the stars left out, as an equirectangular map on J2000
+# axes centred at 0h with right ascension increasing to the left. That is
+# exactly the layout Blender's equirectangular environment lookup gives an
+# ICRS direction, so the world direction only has to be turned from east,
+# north and up into ICRS, which is the transpose of the bake's icrsToEnu: the
+# stars' own precession and horizon turn. The brightness is a look choice.
+
+MILKY_WAY = os.path.join(REPO_ROOT, "build", "sky", "milkyway_2020_8k.exr")
+MILKY_WAY_STRENGTH = 0.012
+
+
+def build_milky_way(scene, bake):
+    if bake is None or "icrsToEnu" not in bake.get("stars", {}):
+        print("no Milky Way: the sky bake carries no icrsToEnu; run pnpm sky-bake")
+        return
+    if not os.path.exists(MILKY_WAY):
+        print(f"no Milky Way: {MILKY_WAY} is missing; fetch milkyway_2020_8k.exr from https://svs.gsfc.nasa.gov/4851 (see data/sources.json, nasa-svs-4851)")
+        return
+    from mathutils import Matrix
+    m = Matrix(bake["stars"]["icrsToEnu"]).transposed()
+    tree = node_tree_of(scene.world)
+    out = next(n for n in tree.nodes if n.type == "OUTPUT_WORLD")
+    existing = out.inputs["Surface"].links[0].from_socket
+
+    coords = tree.nodes.new("ShaderNodeTexCoord")
+    turn = tree.nodes.new("ShaderNodeMapping")
+    turn.vector_type = "VECTOR"
+    turn.inputs["Rotation"].default_value = m.to_euler("XYZ")
+    tree.links.new(coords.outputs["Generated"], turn.inputs["Vector"])
+    image = tree.nodes.new("ShaderNodeTexEnvironment")
+    image.image = bpy.data.images.load(MILKY_WAY, check_existing=True)
+    image.projection = "EQUIRECTANGULAR"
+    tree.links.new(turn.outputs["Vector"], image.inputs["Vector"])
+    glow = tree.nodes.new("ShaderNodeBackground")
+    glow.inputs["Strength"].default_value = MILKY_WAY_STRENGTH
+    tree.links.new(image.outputs["Color"], glow.inputs["Color"])
+    add = tree.nodes.new("ShaderNodeAddShader")
+    tree.links.new(existing, add.inputs[0])
+    tree.links.new(glow.outputs[0], add.inputs[1])
+    tree.links.new(add.outputs[0], out.inputs["Surface"])
+    print(f"  Milky Way: {os.path.basename(MILKY_WAY)} turned by the transpose of stars.icrsToEnu (epoch {bake['stars']['epoch']}, "
+          f"sidereal time {bake['stars']['lstDeg']:.3f} deg), strength {MILKY_WAY_STRENGTH:g}")

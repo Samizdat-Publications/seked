@@ -170,7 +170,12 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
    temple and mastaba models. Sketchfab downloads need an account; if a model
    is wanted from there, Stewart downloads the file and it goes in the
    scratchpad.
-4. **The sky.** The HYG stars are placed by the sky package and stay the
+4. Done 2026-09-16: the bake exports `stars.icrsToEnu` (tested against the
+   baked stars), and `render_sky.build_milky_way` turns NASA's
+   milkyway_2020_8k.exr (source nasa-svs-4851, fetched to build/sky/) by its
+   transpose. Checked by swapping in NASA's constellation figures: figure
+   vertices land on the HYG stars except where proper motion over 4,450 years
+   has moved them. **The sky.** The HYG stars are placed by the sky package and stay the
    measured layer. Add a Milky Way background from a public-domain
    equirectangular map (NASA's Deep Star Maps), rotated by the same precession
    the stars use so it cannot disagree with them.

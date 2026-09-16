@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { apparentAltitude, expandBrightStars, loadBrightStars, skyEnvironment, transitAltitude, SUN_STANDARD_ALTITUDE_DEG } from '@seked/sky';
+import { apparentAltitude, expandBrightStars, loadBrightStars, properMotionAtEpoch, skyEnvironment, transitAltitude, SUN_STANDARD_ALTITUDE_DEG } from '@seked/sky';
 import { STAR_COLUMNS, writeSkyBake, type SkyBake } from './sky-bake';
 
 const dir = mkdtempSync(join(tmpdir(), 'seked-sky-bake-'));
@@ -84,5 +84,23 @@ describe('the sky bake', () => {
     const up = bake.stars.stars.filter((row) => row[1]! > 0).length;
     expect(up).toBeGreaterThan(bake.stars.stars.length * 0.4);
     expect(up).toBeLessThan(bake.stars.stars.length * 0.6);
+  });
+
+  it('carries the ICRS-to-horizon rotation that puts every baked star where the bake does', () => {
+    const m = bake.stars.icrsToEnu;
+    const bright = expandBrightStars(loadBrightStars());
+    for (const i of [0, 7, 101, 2023]) {
+      const star = bright[i]!;
+      const { raDeg, decDeg } = properMotionAtEpoch(star, bake.stars.epoch);
+      const r = (raDeg * Math.PI) / 180;
+      const d = (decDeg * Math.PI) / 180;
+      const v = [Math.cos(d) * Math.cos(r), Math.cos(d) * Math.sin(r), Math.sin(d)];
+      const enu = [0, 1, 2].map((row) => m[row]![0]! * v[0]! + m[row]![1]! * v[1]! + m[row]![2]! * v[2]!);
+      const az = ((Math.atan2(enu[0]!, enu[1]!) * 180) / Math.PI + 360) % 360;
+      const alt = (Math.asin(enu[2]!) * 180) / Math.PI;
+      const [bakedAz, bakedAlt] = bake.stars.stars[i]!;
+      expect(alt, `star ${i} altitude`).toBeCloseTo(bakedAlt!, 3);
+      if (Math.abs(alt) < 85) expect(Math.abs(((az - bakedAz! + 540) % 360) - 180), `star ${i} azimuth`).toBeLessThan(1e-3);
+    }
   });
 });
