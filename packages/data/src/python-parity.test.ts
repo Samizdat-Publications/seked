@@ -126,6 +126,16 @@ function interiorShapes(): Record<string, Solid> {
       ],
       width: 0.2032, height: 0.2184, face: { halfBase: 115.165, faceAngleDeg: 51.8444 },
     }),
+    // A well: laid about its axis, with vertical legs, and a last leg off the meridian.
+    centred_well_bore: bore({
+      inlet: [5.02, 40.42, 21.19],
+      segments: [
+        { length: 7.96, angleDeg: -90, directionDeg: 180 },
+        { length: 7.9, angleDeg: -66, directionDeg: 180 },
+        { length: 9.72, angleDeg: -64.87, directionDeg: 155.27 },
+      ],
+      width: 0.71, height: 0.7112, centred: true,
+    }),
   };
 }
 

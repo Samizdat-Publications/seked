@@ -31,6 +31,10 @@ Still forbidden: a coordinate guessed from the look of a picture.
 
 ### The tool to build first: `scripts/plate.py`
 
+Built 2026-09-16. One finding from its first use: the Parte IV plates' page
+sizes in the archive.org PDF are the sheets' true sizes, which is how Tav. 3
+reads as 1:200 and Tav. 5 as 1:50 and how the drafting term is got.
+
 Standard library plus `pymupdf`, which is installed and renders PDF pages
 without poppler (the reason the Read tool could not show a PDF).
 
@@ -48,7 +52,17 @@ without poppler (the reason the Read tool could not show a PDF).
 
 All sources below were checked on 2026-09-16 and download without a login.
 
-### 1. The well shaft and the grotto (Great Pyramid). Do first.
+### 1. The well shaft and the grotto (Great Pyramid). Done 2026-09-16.
+
+Smyth turned out to measure only the mouth, and the archive.org item named
+below as Parte IV's text is its plates volume. The plates were enough:
+`data/measurements/g1-well.json` holds the five legs as Maragioglio and
+Rinaldi print them on Tav. 3 and Tav. 5, the two slopes they do not print
+scaled with `scripts/plate.py`, and the outlet 7.62 m up the descending
+passage. The last leg is solved onto that outlet and checked against the
+plates' own 9.50 m at 75 deg: it comes out 9.72 m at 64.9 deg, a miss of
+1.3 m in the section, inside what the scaled angles allow, plus 1.7 m east
+to west that the section cannot show. What was planned:
 
 Petrie declines to measure it (section 46) because Smyth already had, so the
 source is **Smyth, *Life and Work at the Great Pyramid* (1867), vol. II**:

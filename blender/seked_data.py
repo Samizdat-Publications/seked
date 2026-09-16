@@ -330,25 +330,32 @@ def run_end(start, length, angle_deg, direction_deg):
             start[2] + length * math.sin(a))
 
 
-def bore(inlet, segments, width, height, half_base, face_angle_deg):
+def bore(inlet, segments, width, height, half_base=None, face_angle_deg=None, centred=False):
     """
     A bore of constant rectangular section that bends: one passage per
     segment, laid end to end from the inlet, welded into one mesh. Each
     segment is a dict with "angle", "direction" and either "length" or
-    "to_face". Mirrors bore in packages/geometry, vertex for vertex.
+    "to_face". With centred, the section is laid about the line rather than
+    up from it, as the well's is. Mirrors bore in packages/geometry, vertex
+    for vertex.
     """
     if not segments:
         raise ValueError("bore: a bore needs at least one segment")
     points = [inlet]
     for s in segments:
         start = points[-1]
+        if s.get("to_face") and half_base is None:
+            raise ValueError("bore: a segment that runs to the face needs the face")
         length = run_to_face(start, s["angle"], s["direction"], half_base, face_angle_deg) if s.get("to_face") else s.get("length")
         if length is None or not length > 0:
             raise ValueError("bore: a segment needs a positive length or to_face")
         points.append(run_end(start, length, s["angle"], s["direction"]))
     verts, faces = [], []
     for k in range(len(points) - 1):
-        leg_verts, leg_faces = passage(points[k], points[k + 1], width, height)
+        if centred:
+            leg_verts, leg_faces = extruded_section(points[k], points[k + 1], [(width / 2.0, -height / 2.0), (width / 2.0, height / 2.0)])
+        else:
+            leg_verts, leg_faces = passage(points[k], points[k + 1], width, height)
         offset = len(verts)
         verts.extend(leg_verts)
         faces.extend(tuple(i + offset for i in f) for f in leg_faces)
@@ -457,6 +464,12 @@ def shape_cases():
         {"length": 8.0, "angle": 39.1167, "direction": 315.0},
         {"to_face": True, "angle": 39.1167, "direction": 0.0},
     ], 0.2032, 0.2184, 115.165, 51.8444))
+    # A well: laid about its axis, with vertical legs, and a last leg off the meridian.
+    add("centred_well_bore", bore((5.02, 40.42, 21.19), [
+        {"length": 7.96, "angle": -90.0, "direction": 180.0},
+        {"length": 7.9, "angle": -66.0, "direction": 180.0},
+        {"length": 9.72, "angle": -64.87, "direction": 155.27},
+    ], 0.71, 0.7112, centred=True))
     return cases
 
 
@@ -836,6 +849,61 @@ def _shaft_builder(chamber_id, side):
 
 
 INTERIOR_BUILDERS += [_shaft_builder(room, side) for room in ("kc", "qc") for side in ("north", "south")]
+
+# --- The well ---------------------------------------------------------------
+# Mirrors wellRoute and WELL_BUILDER in packages/geometry/src/interiors.ts. The
+# shaft from the foot of the Grand Gallery to the descending passage: an inlet
+# on its axis below Petrie's mouth, at the level of the Queen's Chamber floor,
+# four legs south from Maragioglio and Rinaldi's plates, and a fifth that is
+# whatever joins the fourth leg's end to the outlet on the descending passage's
+# west wall, so its length and slope are results and the plates' own figures
+# for it are the check.
+
+_WELL_LEGS = 4
+
+_WELL_KEYS = (["passage.ascending.floor.end.north", "passage.ascending.floor.end.east", "qc.corner.ne.up",
+               "well.mouth.from_gallery_north_wall", "well.axis.from_gallery_axis", "well.width", "well.height"]
+              + [key for k in range(1, _WELL_LEGS + 1) for key in ("well.segment.%d.length" % k, "well.segment.%d.angle" % k)]
+              + _point_keys("passage.descending.floor.end") + _point_keys("entrance.floor.begin")
+              + ["passage.descending.width", "well.outlet.from_descending_end"])
+
+
+def well_route(values):
+    """The well's inlet, outlet and five legs, the last solved onto the descending passage. Mirrors wellRoute."""
+    inlet = (_value(values, "passage.ascending.floor.end.east") - _value(values, "well.axis.from_gallery_axis"),
+             _value(values, "passage.ascending.floor.end.north") - _value(values, "well.mouth.from_gallery_north_wall"),
+             _value(values, "qc.corner.ne.up"))
+    segments = []
+    at = inlet
+    for k in range(1, _WELL_LEGS + 1):
+        leg = {"length": _value(values, "well.segment.%d.length" % k), "angle": _value(values, "well.segment.%d.angle" % k),
+               "direction": 180.0}
+        segments.append(leg)
+        at = run_end(at, leg["length"], leg["angle"], leg["direction"])
+    low = _point(values, "passage.descending.floor.end")
+    high = _point(values, "entrance.floor.begin")
+    d = (high[0] - low[0], high[1] - low[1], high[2] - low[2])
+    length = math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2])
+    run = math.hypot(d[0], d[1])
+    along = _value(values, "well.outlet.from_descending_end") / length
+    half = _value(values, "passage.descending.width") / 2.0
+    outlet = (low[0] + d[0] * along - (d[1] / run) * half,
+              low[1] + d[1] * along + (d[0] / run) * half,
+              low[2] + d[2] * along)
+    v = (outlet[0] - at[0], outlet[1] - at[1], outlet[2] - at[2])
+    horizontal = math.hypot(v[0], v[1])
+    segments.append({"length": math.hypot(horizontal, v[2]),
+                     "angle": math.degrees(math.atan2(v[2], horizontal)),
+                     "direction": (math.degrees(math.atan2(v[0], v[1])) + 360.0) % 360.0})
+    return {"inlet": inlet, "outlet": outlet, "segments": segments}
+
+
+def _build_well(values):
+    route = well_route(values)
+    return bore(route["inlet"], route["segments"], _value(values, "well.width"), _value(values, "well.height"), centred=True)
+
+
+INTERIOR_BUILDERS += [("well", _WELL_KEYS, _build_well)]
 
 # --- The chambers of construction ------------------------------------------
 # Mirrors constructionBuilders in packages/geometry/src/interiors.ts. Five

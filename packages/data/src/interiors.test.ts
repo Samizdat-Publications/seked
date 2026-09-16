@@ -6,8 +6,10 @@ import {
   interiorSolidInputs,
   interiorSolids,
   meshVolume,
+  runEnd,
+  wellRoute,
 } from '@seked/geometry';
-import type { Mesh } from '@seked/geometry';
+import type { Mesh, Point } from '@seked/geometry';
 import { loadDatabase, resolve } from './index';
 
 /**
@@ -36,6 +38,7 @@ const EXPECTED = [
   'kc.shaft.south',
   'qc.shaft.north',
   'qc.shaft.south',
+  'well',
   'chamber.construction_1',
   'chamber.construction_2',
   'chamber.construction_3',
@@ -548,5 +551,52 @@ describe('the shafts against Gantenbrink\u2019s measured outlets', () => {
       const inputs = interiorSolidInputs(env)[`kc.shaft.${side}`] as readonly string[];
       expect(inputs.some((k) => k.includes('.outlet.')), side).toBe(false);
     }
+  });
+});
+
+describe('the well against the plates it is read from', () => {
+  const route = wellRoute(env);
+  const v = (key: string) => values[key] as number;
+  const sigma = (key: string) => db.measurements.find((m) => m.key === key)?.sigma as number;
+  const legEnd = (k: number) => route.segments.slice(0, k).reduce<Point>((at, s) => runEnd(at, s.length as number, s.angleDeg, s.directionDeg), route.inlet);
+
+  it('starts under Petrie\u2019s mouth, west of the gallery by the plates\u2019 227 cm, at the Queen\u2019s Chamber floor', () => {
+    expect(route.inlet[0]).toBeCloseTo(v('passage.ascending.floor.end.east') - 2.27, 9);
+    expect(route.inlet[1]).toBeCloseTo(v('passage.ascending.floor.end.north') - v('well.mouth.from_gallery_north_wall'), 9);
+    expect(route.inlet[2]).toBeCloseTo(v('qc.corner.ne.up'), 9);
+  });
+
+  it('ends its last leg exactly on the outlet, which is on the descending passage\u2019s west wall', () => {
+    const end = legEnd(5);
+    for (let i = 0; i < 3; i++) expect(end[i]).toBeCloseTo(route.outlet[i] as number, 9);
+    expect(route.outlet[0]).toBeCloseTo(v('passage.descending.floor.end.east') - v('passage.descending.width') / 2, 1);
+  });
+
+  it('solves a last leg within a quarter metre of the length the plates print', () => {
+    const solved = route.segments[4]?.length as number;
+    expect(Math.abs(solved - v('well.segment.5.length'))).toBeLessThan(0.25);
+  });
+
+  it('misses the printed last leg in the north-south section by less than the scaled angles allow', () => {
+    // The plates' own last leg, 9.50 m at 75 deg laid south from the fourth
+    // leg's end, lands this far from the outlet in the section's plane. The
+    // allowance is what the two scaled angles' sigmas swing their legs'
+    // ends through, plus the half metre the two plates disagree on for where
+    // the first leg starts. The east-west part of the miss is not in the
+    // section at all, and is what the solved leg's bearing takes up.
+    const at = legEnd(4);
+    const printed = runEnd(at, v('well.segment.5.length'), v('well.segment.5.angle'), 180);
+    const miss = Math.hypot(printed[1] - route.outlet[1], printed[2] - route.outlet[2]);
+    const rad = Math.PI / 180;
+    const allowance = v('well.segment.2.length') * sigma('well.segment.2.angle') * rad
+      + v('well.segment.4.length') * sigma('well.segment.4.angle') * rad + 0.5;
+    expect(miss).toBeGreaterThan(0.5);
+    expect(miss).toBeLessThan(allowance);
+  });
+
+  it('never builds the well from the last leg\u2019s printed figures, which would make the check circular', () => {
+    const inputs = interiorSolidInputs(env).well as readonly string[];
+    expect(inputs).not.toContain('well.segment.5.length');
+    expect(inputs).not.toContain('well.segment.5.angle');
   });
 });

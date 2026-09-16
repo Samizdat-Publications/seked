@@ -188,7 +188,13 @@ export interface BoreOptions {
   width: number;
   height: number;
   /** The pyramid the bore is inside, for a segment that runs to its face: half the base and the face angle. */
-  face: { halfBase: number; faceAngleDeg: number };
+  face?: { halfBase: number; faceAngleDeg: number };
+  /**
+   * Lay the section about the line rather than up from it. A shaft is placed
+   * by its floor; the well is placed by its axis, which is what the survey
+   * gives for a bore that runs vertical in parts and has no floor there.
+   */
+  centred?: boolean;
   prefix?: string;
 }
 
@@ -242,14 +248,17 @@ export function bore(o: BoreOptions): Solid {
   const points: Point[] = [o.inlet];
   for (const s of o.segments) {
     const from = points[points.length - 1] as Point;
-    const length = s.toFace ? runToFace(from, s.angleDeg, s.directionDeg, o.face) : s.length;
+    if (s.toFace && !o.face) throw new Error('bore: a segment that runs to the face needs the face');
+    const length = s.toFace ? runToFace(from, s.angleDeg, s.directionDeg, o.face as NonNullable<BoreOptions['face']>) : s.length;
     if (length === undefined || !(length > 0)) throw new Error('bore: a segment needs a positive length or toFace');
     points.push(runEnd(from, length, s.angleDeg, s.directionDeg));
   }
   const verts: number[] = [];
   const tris: number[] = [];
   for (let k = 0; k + 1 < points.length; k++) {
-    const leg = passage({ from: points[k] as Point, to: points[k + 1] as Point, width: o.width, height: o.height });
+    const leg = o.centred
+      ? extrudedSection({ from: points[k] as Point, to: points[k + 1] as Point, section: [[o.width / 2, -o.height / 2], [o.width / 2, o.height / 2]] })
+      : passage({ from: points[k] as Point, to: points[k + 1] as Point, width: o.width, height: o.height });
     const offset = verts.length / 3;
     for (const x of leg.positions) verts.push(x);
     for (const i of leg.indices) tris.push(i + offset);

@@ -24,7 +24,8 @@ describe('database', () => {
       // page names are "the findings page" and "the <upper|lower> <northern|
       // southern> shaft page", and both count: each identifies one page of one
       // report as exactly as a section number identifies one part of a book.
-      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+|\bshaft page\b|\bfindings page\b|\bcampaign diary\b/);
+      // A figure transcribed from a drawing cites its plate, "Tav. 5".
+      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+|\bshaft page\b|\bfindings page\b|\bcampaign diary\b|\bTav\. \d+/);
     }
   });
 });

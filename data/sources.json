@@ -52,6 +52,14 @@
     "citation": "Maragioglio, V. & Rinaldi, C. (1965). L'Architettura delle Piramidi Menfite, Parte IV. Rapallo."
   },
   {
+    "id": "maragioglio-rinaldi-1965-tavole",
+    "kind": "survey",
+    "year": 1965,
+    "citation": "Maragioglio, V. & Rinaldi, C. (1965). L'Architettura delle Piramidi Menfite, Parte IV, Tavole. Rapallo.",
+    "url": "https://archive.org/details/l-architectura-della-piramidi-menfite-parte-4",
+    "note": "The plates volume of Parte IV, the Great Pyramid: fourteen measured drawings, Tav. 1 to Tav. 14 on pages 1 to 14 of the archive.org PDF, each page one scan of about 6000 by 4000 pixels. The text volume is not online. Dimensions are printed in metres, or in centimetres for small parts, and a figure the authors mark with a tilde is their own approximation. The page sizes of the PDF make Tav. 3 a 1:200 drawing and Tav. 5 a 1:50 one, which is what their scale bars give. Figures printed on a plate are transcribed and cite the plate and figure; anything scaled off one goes through scripts/plate.py and says so. Read on 2026-09-16."
+  },
+  {
     "id": "maragioglio-rinaldi-1966",
     "kind": "survey",
     "year": 1966,
@@ -148,6 +156,15 @@
     "citation": "Smyth, C. P. (1864). Our Inheritance in the Great Pyramid. London: Strahan.",
     "license": "Public domain",
     "note": "Origin of the pyramid inch and of the land-centre claim."
+  },
+  {
+    "id": "smyth-1867",
+    "kind": "survey",
+    "year": 1867,
+    "citation": "Smyth, C. P. (1867). Life and Work at the Great Pyramid during the months of January, February, March, and April, A.D. 1865, vol. II. Edinburgh: Edmonston and Douglas.",
+    "url": "https://archive.org/details/lifeandworkatgr02smytgoog",
+    "license": "Public domain",
+    "note": "Smyth's own measures, in British inches, and in section V the measures of others reprinted, among them the table of Vyse and Perring (pp. 321 to 329). The well's mouth is measured on pp. 70 to 72; the Vyse and Perring figures for the well's legs are on p. 328. Page numbers are the book's own, read from the archive.org OCR of this scan on 2026-09-16."
   },
   {
     "id": "tompkins-1971",

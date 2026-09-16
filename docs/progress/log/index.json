@@ -118,5 +118,15 @@
     "kept": false,
     "note": "Dawn with Khufu's basalt temple platform from Petrie's four corners, behind the queens' pyramids from this side.",
     "bytes": 1055914
+  },
+  {
+    "file": "2026-09-16T18-35-34Z--section--098506d-dirty.png",
+    "taken": "2026-09-16T18:35:34+00:00",
+    "view": "section",
+    "commit": "098506d",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The well shaft added from Maragioglio and Rinaldi's Parte IV plates: five legs from the foot of the Grand Gallery to the descending passage, the last solved onto the outlet 7.62 m up that passage.",
+    "bytes": 927353
   }
 ]

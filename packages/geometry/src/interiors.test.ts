@@ -415,6 +415,7 @@ describe('the Great Pyramid stays hand-written', () => {
       'kc.shaft.south',
       'qc.shaft.north',
       'qc.shaft.south',
+      'well',
       'chamber.construction_1',
       'chamber.construction_2',
       'chamber.construction_3',

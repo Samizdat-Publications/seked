@@ -216,8 +216,9 @@ workflow still runs the tests and assembles the site on every push but does
 not publish unless PAGES_ENABLED is set. The deploy pins wrangler 4.20.0,
 because later releases route `pages deploy` from a workspace root into
 Workers and fail. The next round is planned in docs/geometry-blockers.md: the
-four holes left in the geometry (the well shaft from Smyth, Khafre's casing
-cap and Menkaure's chambers from Maragioglio and Rinaldi's plates volumes,
+four holes left in the geometry (the well shaft, now built from
+Maragioglio and Rinaldi's Parte IV plates with `scripts/plate.py`, Khafre's casing
+cap and Menkaure's chambers from the same authors' plates volumes,
 and the mastabas, now a plausible field rather than a surveyed one), a rule
 agreed for reading drawings without eyeballing them, and a visual track
 (PBR materials, atmosphere, stand-in models fitted to their footprints, a

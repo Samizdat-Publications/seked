@@ -27,7 +27,7 @@
  */
 
 import type { Environment } from './environment';
-import { bore, chamber, extrudedSection, passage } from './interior';
+import { bore, chamber, extrudedSection, passage, runEnd } from './interior';
 import type { BoreSegment, Gable, SectionPair, Solid } from './interior';
 import type { Point } from './landmarks';
 
@@ -418,6 +418,97 @@ function shaftBuilders(): Builder[] {
   return (['kc', 'qc'] as const).flatMap((room) => (['north', 'south'] as const).map((side) => shaftBuilder(room, side)));
 }
 
+// --- The well ----------------------------------------------------------------
+//
+// The shaft from the foot of the Grand Gallery down to the descending passage.
+// Petrie declined to publish it (section 46) beyond the place of its mouth;
+// its legs are Maragioglio and Rinaldi's, printed on their Parte IV plates.
+// The records, under `well.`:
+//
+//   mouth.from_gallery_north_wall   metres south of the gallery's N. wall to the mouth's middle
+//   axis.from_gallery_axis          metres west of the gallery's axis to the well's
+//   segment.<k>.length              metres along the leg, k = 1 to 4
+//   segment.<k>.angle               slope, degrees above the horizontal, so negative
+//   outlet.from_descending_end      metres up the descending passage's floor from its lower end
+//   width, height                   the square section, laid about the axis
+//
+// The gallery's N. wall stands where the ascending passage's floor ends, at
+// the latitude Petrie measures that end at, and the gallery's axis is that
+// passage's axis there. The top of the first leg is the level of the Queen's
+// Chamber floor, which is where the plates start the 7.96 m of the first leg
+// from. The four measured legs run south, the way the plates' north-south
+// section draws them. The well also wanders a little east and west, which
+// that section cannot show and the plates' east-west section is too small to
+// read, so the fifth leg is not laid from its records: it is whatever joins
+// the fourth leg's end to the outlet on the passage's west wall. Its length
+// and slope are results, and the plates' own figures for them,
+// `well.segment.5.length` and `.angle`, are the check on the whole chain.
+
+const WELL_LEGS = 4;
+
+const WELL_KEYS: readonly string[] = [
+  'passage.ascending.floor.end.north', 'passage.ascending.floor.end.east', 'qc.corner.ne.up',
+  'well.mouth.from_gallery_north_wall', 'well.axis.from_gallery_axis', 'well.width', 'well.height',
+  ...Array.from({ length: WELL_LEGS }, (_, i) => [`well.segment.${i + 1}.length`, `well.segment.${i + 1}.angle`]).flat(),
+  ...pointKeys('passage.descending.floor.end'), ...pointKeys('entrance.floor.begin'),
+  'passage.descending.width', 'well.outlet.from_descending_end',
+];
+
+export interface WellRoute {
+  /** The top of the first leg, on the well's axis. */
+  inlet: Point;
+  /** Where the well meets the descending passage: the foot of its west wall. */
+  outlet: Point;
+  /** All five legs, the last solved to reach the outlet. */
+  segments: BoreSegment[];
+}
+
+/** The well's legs under this environment, with the fifth solved onto the descending passage. */
+export function wellRoute(env: Environment): WellRoute {
+  const inlet: Point = [
+    value(env, 'passage.ascending.floor.end.east') - value(env, 'well.axis.from_gallery_axis'),
+    value(env, 'passage.ascending.floor.end.north') - value(env, 'well.mouth.from_gallery_north_wall'),
+    value(env, 'qc.corner.ne.up'),
+  ];
+  const segments: BoreSegment[] = [];
+  let at: Point = inlet;
+  for (let k = 1; k <= WELL_LEGS; k++) {
+    const leg = { length: value(env, `well.segment.${k}.length`), angleDeg: value(env, `well.segment.${k}.angle`), directionDeg: 180 };
+    segments.push(leg);
+    at = runEnd(at, leg.length, leg.angleDeg, leg.directionDeg);
+  }
+  // Up the descending passage's floor from its lower end, then across to its west wall.
+  const low = point(env, 'passage.descending.floor.end');
+  const high = point(env, 'entrance.floor.begin');
+  const d: Point = [high[0] - low[0], high[1] - low[1], high[2] - low[2]];
+  const len = Math.hypot(d[0], d[1], d[2]);
+  const run = Math.hypot(d[0], d[1]);
+  const along = value(env, 'well.outlet.from_descending_end') / len;
+  const half = value(env, 'passage.descending.width') / 2;
+  const outlet: Point = [
+    low[0] + d[0] * along - (d[1] / run) * half,
+    low[1] + d[1] * along + (d[0] / run) * half,
+    low[2] + d[2] * along,
+  ];
+  const v: Point = [outlet[0] - at[0], outlet[1] - at[1], outlet[2] - at[2]];
+  const horizontal = Math.hypot(v[0], v[1]);
+  segments.push({
+    length: Math.hypot(horizontal, v[2]),
+    angleDeg: (Math.atan2(v[2], horizontal) * 180) / Math.PI,
+    directionDeg: (((Math.atan2(v[0], v[1]) * 180) / Math.PI) + 360) % 360,
+  });
+  return { inlet, outlet, segments };
+}
+
+const WELL_BUILDER: Builder = {
+  name: 'well',
+  keys: WELL_KEYS,
+  build: (env) => {
+    const { inlet, segments } = wellRoute(env);
+    return bore({ inlet, segments, width: value(env, 'well.width'), height: value(env, 'well.height'), centred: true, prefix: 'well' });
+  },
+};
+
 // --- The chambers of construction ------------------------------------------
 //
 // Five spaces stacked over the King's Chamber, each floored with the rough
@@ -738,8 +829,8 @@ const VOID_BUILDERS: readonly Builder[] = [
 ];
 
 /** The Great Pyramid's solids: Petrie's rooms in order from the entrance down and then up,
- *  then the four shafts, the five chambers of construction, and the voids the muons found. */
-const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders(), ...constructionBuilders(), ...VOID_BUILDERS];
+ *  then the four shafts, the well, the five chambers of construction, and the voids the muons found. */
+const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders(), WELL_BUILDER, ...constructionBuilders(), ...VOID_BUILDERS];
 
 /** Every record a shaft is built from under this environment: the fixed keys and the legs it actually carries. */
 export function shaftInputs(env: Environment, chamberId: string, side: 'north' | 'south'): readonly string[] {

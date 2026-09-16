@@ -1,0 +1,171 @@
+[
+  {
+    "key": "well.mouth.from_gallery_north_wall",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 0.898398,
+    "unit": "m",
+    "sigma": 0.002,
+    "source": "petrie-1883",
+    "method": "interior",
+    "note": "35.37 in, §46: \"the opening is from 21.8 to 49.0 horizontally from N. wall of gallery on floor, 21.8 to 48.7 near its top, and 21.9 to 48.9 by the sloping distance reduced. Thus the middle of it is at 35.40, 35.25, or 35.37 by different methods.\" Sigma covers the three. Petrie publishes nothing else of the well, because it is \"so rough and so evidently utilitarian\" that Smyth's measures suffice. The gallery's N. wall is taken at the latitude where the ascending passage's floor ends, which §39 and §64 give.",
+    "verified": true
+  },
+  {
+    "key": "well.axis.from_gallery_axis",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 2.27,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed 227 (cm) on Tav. 5, fig. 3, \"Imboccatura superiore del pozzo, sezione AB\", between the lines marked \"asse della galleria\" and \"asse del pozzo\", with the parts printed beside it: 52 ramp, 105 floor, 52 ramp, 88 of wall to the well, 71 of well, whose half-sums come to 228. The well is west of the gallery: Smyth, vol. II p. 70, puts the hole \"within the limits of the western ramp\". Transcribed from the plate, not scaled.",
+    "verified": true
+  },
+  {
+    "key": "well.width",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 0.71,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed 71 (cm) across the first leg on Tav. 3, fig. 1 and on Tav. 5, fig. 1, and across the well east to west on Tav. 5, fig. 3. Smyth, vol. II p. 71, has 28.0 in (0.711 m) east to west at the mouth. The section is laid about the well's axis, because the axis is what the plates place and a well has no floor to lay it on.",
+    "verified": true
+  },
+  {
+    "key": "well.height",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 0.7112,
+    "unit": "m",
+    "source": "smyth-1867",
+    "method": "direct",
+    "note": "28.0 in, vol. II p. 71: \"Distance North side, to South side of Well mouth\", the side square to well.width, which on a leg that is not vertical is taken square to the axis. The Vyse and Perring table Smyth reprints on p. 328 gives the shaft as \"Square in section, with length of one side\" 28 in.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.1.length",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 7.96,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed 7.96 on Tav. 3, fig. 1 and on Tav. 5, fig. 1, the vertical first leg. On Tav. 5 the dimension starts at a dashed line labelled \"livello del pavimento della camera della regina\", which is why the builder starts the leg at qc.corner.ne.up; on Tav. 3 the same dimension line reaches up to the floor of the horizontal passage instead, 0.5 m higher, and the two plates are not reconciled here. Perring's \"Depth of upper and vertical part of shaft\", 313 in (7.95 m), which Smyth reprints in vol. II p. 328, agrees.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.1.angle",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": -90,
+    "unit": "deg",
+    "source": "smyth-1867",
+    "method": "direct",
+    "note": "Vertical: \"Depth of upper and vertical part of shaft, 313\", the Vyse and Perring table in Smyth, vol. II p. 328. Both Maragioglio and Rinaldi plates draw it and dimension it vertical.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.2.length",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 7.9,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed \"~7.90\" along the second leg on Tav. 3, fig. 1 and Tav. 5, fig. 1; the tilde is the authors' own mark for an approximate figure, the leg being cut in rough rock. Perring's \"Thence to grotto\", 389 in (9.88 m) in Smyth vol. II p. 328, runs on into the next leg.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.2.angle",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": -66.0,
+    "unit": "deg",
+    "sigma": 3.3,
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "scaled from plate",
+    "note": "No angle is printed for this leg. Scaled twice with scripts/plate.py and stored as the mean. Tav. 5, fig. 1 (1:50 by the plate's own scale bar of 10 m, 1162.0 px from (2958, 3615) to (4120, 3625) of the native scan): the dimension line drawn parallel to the leg, from (1587, 2143) to (1182, 2990), 64.4 deg, sigma 0.4 (3 px at each end, 0.025 m drafting, the printed 7.90 scaling to 8.08, 2.3 per cent). Tav. 3, fig. 1 (1:200, scale bar of 40 m, 1170 px from (3289, 700) to (4459, 700)): the west wall from (2140, 2455) to (2053, 2665), 67.5 deg, sigma 1.8 (3 px, 0.10 m drafting). Sigma is half the plates' 3.1 deg disagreement plus the larger reading's own. Shrinkage that is the same in both directions does not change an angle.",
+    "verified": false
+  },
+  {
+    "key": "well.segment.3.length",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 5.2,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed \"~5.20\" on Tav. 3, fig. 1 and Tav. 5, fig. 1, the vertical leg through the grotto, of which Tav. 5 prints \"~2.15\" below the rock surface. Petrie, §46, says the part through the gravel-filled fissure \"has been steined with 10 courses of small stones, varying from 7¼ to 8 inches in height\", which Tav. 5 draws as the lined part above the rock.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.3.angle",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": -90,
+    "unit": "deg",
+    "sigma": 0.7,
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "scaled from plate",
+    "note": "No angle is printed. Scaled with scripts/plate.py on Tav. 5, fig. 1 (1:50, scale bar of 10 m, 1162.0 px): the west wall runs from (1152, 3005) to (1152, 3610) of the native scan, vertical to the pixel over 605 px. Sigma is 3 px at each end and 0.025 m drafting over the 5.2 m leg.",
+    "verified": false
+  },
+  {
+    "key": "well.segment.4.length",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 26.5,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed \"26.50\" along the long fourth leg on Tav. 3, fig. 1, from the foot of the grotto leg to the bend above the descending passage. Tav. 5 breaks this leg off and does not print it.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.4.angle",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": -44.6,
+    "unit": "deg",
+    "sigma": 1.6,
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "scaled from plate",
+    "note": "No angle is printed. Scaled with scripts/plate.py on Tav. 3, fig. 1 (1:200, scale bar of 40 m, 1170 px from (3289, 700) to (4459, 700) of the native scan, which scales the printed 7.96 and 5.20 to 8.07 and 5.30, 1.4 and 1.9 per cent long) along both walls of the leg: (2058, 2822) to (1535, 3355) gives 45.5 deg and (2000, 2855) to (1478, 3352) gives 43.6 deg, each sigma 0.7 (4 px at each end, 0.10 m drafting). Stored as their mean; sigma is half their difference plus one reading's own. The walls are rough rock, drawn wavering.",
+    "verified": false
+  },
+  {
+    "key": "well.segment.5.length",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 9.5,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed \"~9.50\" along the last leg on Tav. 3, fig. 1 and on the inset of Tav. 5, \"Pianta dell'incontro del pozzo col corridoio discendente\". Not used to build the leg: the builder solves the last leg from the fourth leg's end to well.outlet.from_descending_end, and this figure and well.segment.5.angle are what the solved leg is checked against.",
+    "verified": true
+  },
+  {
+    "key": "well.segment.5.angle",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": -75,
+    "unit": "deg",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed \"75°\" on the inset of Tav. 5, between the last leg's wall and a horizontal. A check on the solved leg, like well.segment.5.length; the walls of the same leg on Tav. 3 scale to 72 and 74.5 deg.",
+    "verified": true
+  },
+  {
+    "key": "well.outlet.from_descending_end",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 7.62,
+    "unit": "m",
+    "source": "maragioglio-rinaldi-1965-tavole",
+    "method": "published-plan",
+    "note": "Printed on the inset of Tav. 5, along a dimension line parallel to the descending passage from its lower end: \"al termine 7.35\" to the near edge of the opening and \"7.62 al punto d'intersezione\" to where the well meets the passage, the opening itself being 2.60 long horizontally. Perring's \"Thence to the subterranean horizontal passage\", 296 in (7.52 m), in Smyth vol. II p. 323, measures the same stretch. The outlet is laid this far up the passage's floor from passage.descending.floor.end and then half the passage's width west, onto the foot of the west wall the well opens in.",
+    "verified": true
+  }
+]
