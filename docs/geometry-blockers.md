@@ -129,6 +129,13 @@ out of the built route (104 ft down the corridor, 4 ft 3 in to the anteroom,
 
 ### 4. The mastabas. Downgraded.
 
+Form done 2026-09-16: Reisner's Appendix A gives the Western Field's core
+mastabas a "general batter" of 73°37′ to 77°19′ and stepped courses about 35
+cm high. `tier3.mastaba.batter` (74.8°) draws every OSM mastaba outline with
+its walls leaning in (a `batterKey` on the footprint, mirrored in Python), and
+`tier3.mastaba.course.height` bands their stone in the renders. Heights are
+still the single 4 m estimate. What was planned:
+
 Survey heights for 577 tombs are no longer worth chasing: they are not
 pyramids, and their placement is already right. The plan now is a plausible
 field rather than a surveyed one:
@@ -206,8 +213,8 @@ first materials and atmosphere pass, the first stand-in (the Sphinx), and the
 Milky Way (snapshots 0017 to 0020). What is left, in order:
 
 1. Menkaure's chamber of the niches, a branch off the route.
-2. Mastaba form and heights (hole 4), and more stand-ins: the temples, and an
-   excavated Sphinx to replace the 1903 bronze.
+2. Mastaba heights by cemetery (hole 4), and more stand-ins: the temples, and
+   an excavated Sphinx to replace the 1903 bronze.
 3. The second materials pass: displacement on the stepped core, granite and
    basalt, the mastabas' stone.
 4. The viewer's textures, and the film re-rendered over the new materials and

@@ -208,5 +208,15 @@
     "kept": false,
     "note": "Menkaure's route carried on to the granite crypt: the corridor west out of the large chamber's floor at a slope scaled from Tav. 6, the portcullis slot, the foot of the incline, the horizontal passage and the crypt entered on its east wall. Crypt floor -15.27 against Tav. 4's [15.55].",
     "bytes": 895645
+  },
+  {
+    "file": "2026-09-16T21-16-59Z--dawn--64b3386-dirty.png",
+    "taken": "2026-09-16T21:16:59+00:00",
+    "view": "dawn",
+    "commit": "64b3386",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The mastaba field with Reisner's batter (74.8 deg, Appendix A) and his stepped course height (35 cm) for its stone banding.",
+    "bytes": 1192728
   }
 ]

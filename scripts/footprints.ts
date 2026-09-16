@@ -80,6 +80,8 @@ interface Curated {
   heightKey?: string;
   /** A measurement key for a pit's depth. */
   depthKey?: string;
+  /** A measurement key for the angle a prism's walls lean in at. */
+  batterKey?: string;
   /** Which group of the scene it belongs in. */
   group: 'queens' | 'sphinx' | 'temples' | 'pits' | 'walls' | 'tombs';
 }
@@ -349,6 +351,7 @@ async function main(): Promise<void> {
     name: way.tags?.name ?? 'Mastaba',
     kind: 'prism' as Kind,
     heightKey: 'tier3.mastaba.height',
+    batterKey: 'tier3.mastaba.batter',
     group: 'mastabas',
   }));
 

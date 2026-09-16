@@ -131,6 +131,7 @@ export const FootprintSchema = z.object({
   minHeight: z.number().nonnegative().optional(),
   heightKey: z.string().optional(),
   depthKey: z.string().optional(),
+  batterKey: z.string().optional(),
   area: z.number().positive(),
   ring: z.array(z.tuple([z.number(), z.number()])).min(3),
 });

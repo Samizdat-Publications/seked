@@ -2058,10 +2058,48 @@ def ring_centroid(ring):
     return (cx / (3.0 * a), cy / (3.0 * a))
 
 
+# How far a batter may draw the top in, as a share of the least distance from
+# the outline's centroid to an edge, and how long a mitred corner may grow.
+BATTER_LIMIT = 0.4
+MITRE_LIMIT = 4
+
+
+def inset_ring(ring, inset):
+    """An outline drawn in by `inset` metres along each corner's bisector, capped. Mirrors insetRing."""
+    n = len(ring)
+    cx, cy = ring_centroid(ring)
+    least = float("inf")
+    for i in range(n):
+        x0, y0 = ring[i]
+        x1, y1 = ring[(i + 1) % n]
+        dx = x1 - x0
+        dy = y1 - y0
+        len2 = dx * dx + dy * dy
+        t = max(0.0, min(1.0, ((cx - x0) * dx + (cy - y0) * dy) / len2)) if len2 > 0 else 0.0
+        least = min(least, math.hypot(cx - (x0 + t * dx), cy - (y0 + t * dy)))
+    d = min(inset, BATTER_LIMIT * least)
+    out = []
+    for i, (x, y) in enumerate(ring):
+        px, py = ring[(i + n - 1) % n]
+        qx, qy = ring[(i + 1) % n]
+        l1 = math.hypot(x - px, y - py)
+        l2 = math.hypot(qx - x, qy - y)
+        if l1 == 0 or l2 == 0:
+            out.append((x, y))
+            continue
+        n1x = -(y - py) / l1
+        n1y = (x - px) / l1
+        n2x = -(qy - y) / l2
+        n2y = (qx - x) / l2
+        mitre = min(MITRE_LIMIT, 1 / max(1e-9, 1 + n1x * n2x + n1y * n2y))
+        out.append((x + (n1x + n2x) * d * mitre, y + (n1y + n2y) * d * mitre))
+    return out
+
+
 def footprint_inputs(feature):
     """The records a footprint's solid is built from: its outline's records and its height or depth key."""
     keys = list(feature.get("records") or [])
-    return keys + [k for k in (feature.get("heightKey"), feature.get("depthKey")) if k is not None]
+    return keys + [k for k in (feature.get("heightKey"), feature.get("depthKey"), feature.get("batterKey")) if k is not None]
 
 
 def _rise(feature, i):
@@ -2108,7 +2146,10 @@ def footprint_geometry(feature, values):
         for i in range(n):
             faces.append((i, (i + 1) % n, n))
         return verts, faces
-    verts.extend((x, y, top + _rise(feature, i)) for i, (x, y) in enumerate(ring))
+    angle = values.get(feature["batterKey"]) if feature.get("batterKey") is not None else None
+    upper = (inset_ring(ring, (top - bottom) / math.tan(angle * math.pi / 180))
+             if angle is not None and 0 < angle < 90 else ring)
+    verts.extend((x, y, top + _rise(feature, i)) for i, (x, y) in enumerate(upper))
     for t in range(0, len(caps), 3):
         faces.append((n + caps[t], n + caps[t + 1], n + caps[t + 2]))
     for i in range(n):

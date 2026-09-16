@@ -58,5 +58,29 @@
     "method": "massing estimate",
     "note": "How far each boat pit in the OSM footprint import is cut below the ground it is traced on. The pits east of the Great Pyramid are deep rock-cut trenches and OSM gives only their outlines, so six metres is a figure chosen to draw them as cuts rather than as marks on the surface.",
     "verified": false
+  },
+  {
+    "key": "tier3.mastaba.batter",
+    "structure": "plateau",
+    "quantity": "angle",
+    "value": 74.84,
+    "unit": "deg",
+    "sigma": 1.02,
+    "source": "reisner-1942",
+    "method": "tabulated",
+    "note": "The mean of the \"general batter\" Reisner gives for the stepped retaining walls of core mastabas in the Western Field, Appendix A: 74°27′ (p. 385), 74°57′ (p. 389), 74°3′ (p. 392), 74°18′ (p. 394), 75°36′ (p. 396), 74°45′ (p. 398), 74°30′ (p. 408), 73°37′ (p. 412) and 77°19′ (p. 418), measured \"by a line touching the edges of the steps\" from the horizontal. Two more on pp. 403 and 407 come through the text layer garbled (\"7.2 degrees 52 minutes\", \"7.4 degrees and 18 minutes\") and are left out. Sigma is the spread of the nine. These are one cemetery's core mastabas, stepped courses about 37 cm high set back about 10 cm; every mastaba outline OSM traces is drawn with this batter, which is a plausible form for the field and not a survey of any one tomb.",
+    "verified": true
+  },
+  {
+    "key": "tier3.mastaba.course.height",
+    "structure": "plateau",
+    "quantity": "length",
+    "value": 0.3497,
+    "unit": "m",
+    "sigma": 0.0381,
+    "source": "reisner-1942",
+    "method": "tabulated",
+    "note": "The mean of the average height of the stepped courses Reisner gives for the same nine core mastabas of the Western Field as tier3.mastaba.batter, Appendix A: 37.2 cm (p. 385), 36.6 (p. 389), 34.2 (p. 392), 37.2 (p. 394), 38 (p. 396), 26.1 (p. 398), 38.7 (p. 408), 35.6 (p. 412) and 31.1 (p. 418). Sigma is their spread. The renders band the mastaba field's stone at this period; nothing is built from it.",
+    "verified": true
   }
 ]

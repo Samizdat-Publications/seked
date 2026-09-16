@@ -381,5 +381,14 @@
     "url": "https://www.openstreetmap.org/",
     "license": "Open Database License (ODbL) 1.0. Attribution: © OpenStreetMap contributors.",
     "note": "Traced from imagery, not surveyed, and some of it modelled in three dimensions by mappers: the Sphinx is a body to 11 m, a head from 11 to 20 m and forepaws to 4 m, and the queens' pyramids carry heights that are the restored originals from the Egyptological literature rather than what stands today. scripts/footprints.ts registers the outlines onto the survey frame through the three large pyramids and writes data/footprints/giza.json with the fit's residuals in its header; the raw Overpass response is gitignored and its sha256 is in that header. A height OSM gives is used as OSM gives it; a height it does not is a measurement key, usually a seked-estimate."
+  },
+  {
+    "id": "reisner-1942",
+    "kind": "survey",
+    "year": 1942,
+    "citation": "Reisner, G. A. (1942). A History of the Giza Necropolis, vol. I. Cambridge, MA: Harvard University Press.",
+    "url": "https://giza.fas.harvard.edu/pubdocs/128/full/",
+    "license": "Free to read from Harvard's Digital Giza",
+    "note": "Read from the PDF Digital Giza serves without a login, https://d1g9lvwdq3dcse.cloudfront.net/images/MFA-images/Giza/GizaImage/full/library/reisner_gn_books/giza_necropolis_1/giza_necropolis_1.pdf, which has a text layer. Page citations are Reisner's printed pages; the PDF's page index runs 48 ahead of them (index 460 is p. 412). Appendix A describes the core mastabas of the Western Field tomb by tomb. Read on 2026-09-16."
   }
 ]

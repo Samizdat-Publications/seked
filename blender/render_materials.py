@@ -580,7 +580,32 @@ def plateau_material(obj, limestone, granite, pit, basalt=None):
         return granite
     if basalt is not None and obj.get("seked_footprint") == "khufu.basalt_pavement":
         return basalt
+    if obj.get("seked_group") == "mastabas":
+        return mastaba_material(limestone)
     return limestone
+
+
+MASTABA_NAME = "Core limestone (mastaba courses)"
+
+
+def mastaba_material(fallback):
+    """
+    The mastaba field's stone, banded at the course height Reisner gives the
+    stepped core mastabas of the Western Field rather than the Great Pyramid's,
+    so a tomb four metres high reads as a dozen courses and not as six.
+    Falls back to the plateau's banded limestone where the preset carries no
+    such record.
+    """
+    mat = bpy.data.materials.get(MASTABA_NAME)
+    if mat is not None:
+        return mat
+    course = resolved_values().get("tier3.mastaba.course.height")
+    if course is None:
+        return fallback
+    mat, tree, bsdf = new_material(MASTABA_NAME)
+    wire_core(tree, bsdf, object_coordinates(tree), course)
+    print(f"{MASTABA_NAME}: courses of {course:.4f} m, tier3.mastaba.course.height")
+    return mat
 
 
 HYPOTHESIS_NAME = "Seked hypothesis"

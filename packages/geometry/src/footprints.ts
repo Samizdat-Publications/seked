@@ -55,6 +55,12 @@ export interface Footprint {
   heightKey?: string;
   /** The measurement key for a pit's depth. */
   depthKey?: string;
+  /**
+   * The measurement key for a batter: the angle a prism's walls lean in at,
+   * degrees above the horizontal. The top outline is drawn inside the bottom
+   * one by the height over the tangent of that angle, as a mastaba's is.
+   */
+  batterKey?: string;
   area: number;
   /** Counter-clockwise seen from above, open (the first point is not repeated), metres. */
   ring: [number, number][];
@@ -145,7 +151,7 @@ export function ringCentroid(ring: readonly Xy[]): [number, number] {
 
 /** The records a footprint's solid is built from: its outline's records and its height or depth key. */
 export function footprintInputs(f: Footprint): string[] {
-  return [...(f.records ?? []), f.heightKey, f.depthKey].filter((k): k is string => k !== undefined);
+  return [...(f.records ?? []), f.heightKey, f.depthKey, f.batterKey].filter((k): k is string => k !== undefined);
 }
 
 /** The solid's bottom and top in the frame, or nothing where the environment lacks the height it needs. */
@@ -174,6 +180,48 @@ function toMesh(verts: number[][], tris: number[]): Mesh {
   return { positions, indices: Uint32Array.from(tris), vertexCount: verts.length, triangleCount: tris.length / 3 };
 }
 
+/** How far a batter may draw the top in, as a share of the least distance from the outline's centroid to an edge. */
+const BATTER_LIMIT = 0.4;
+
+/** How long a mitred corner may grow against the inset, so a sharp corner of a traced outline cannot fly off. */
+const MITRE_LIMIT = 4;
+
+/**
+ * An outline drawn in by `inset` metres, each corner moved along its bisector
+ * far enough that both of its edges move in by the inset. The inset is capped
+ * at `BATTER_LIMIT` of the least distance from the area centroid to an edge,
+ * so a small or narrow traced outline is drawn in and never turned inside out.
+ */
+export function insetRing(ring: readonly Xy[], inset: number): Xy[] {
+  const n = ring.length;
+  const [cx, cy] = ringCentroid(ring);
+  let least = Infinity;
+  for (let i = 0; i < n; i++) {
+    const [x0, y0] = ring[i] as Xy;
+    const [x1, y1] = ring[(i + 1) % n] as Xy;
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const len2 = dx * dx + dy * dy;
+    const t = len2 > 0 ? Math.max(0, Math.min(1, ((cx - x0) * dx + (cy - y0) * dy) / len2)) : 0;
+    least = Math.min(least, Math.hypot(cx - (x0 + t * dx), cy - (y0 + t * dy)));
+  }
+  const d = Math.min(inset, BATTER_LIMIT * least);
+  return ring.map(([x, y], i) => {
+    const [px, py] = ring[(i + n - 1) % n] as Xy;
+    const [qx, qy] = ring[(i + 1) % n] as Xy;
+    const l1 = Math.hypot(x - px, y - py);
+    const l2 = Math.hypot(qx - x, qy - y);
+    if (l1 === 0 || l2 === 0) return [x, y] as Xy;
+    // The inward normal of a counter-clockwise edge is its direction turned left.
+    const n1x = -(y - py) / l1;
+    const n1y = (x - px) / l1;
+    const n2x = -(qy - y) / l2;
+    const n2y = (qx - x) / l2;
+    const mitre = Math.min(MITRE_LIMIT, 1 / Math.max(1e-9, 1 + n1x * n2x + n1y * n2y));
+    return [x + (n1x + n2x) * d * mitre, y + (n1y + n2y) * d * mitre] as Xy;
+  });
+}
+
 /**
  * One footprint's solid. Vertices are the outline at the bottom, then either
  * the outline at the top (prism, pit) or a single apex (pyramid). Faces wind
@@ -196,7 +244,11 @@ export function footprintMesh(f: Footprint, env: Environment): Mesh | undefined 
     return toMesh(verts, tris);
   }
 
-  f.ring.forEach(([x, y], i) => verts.push([x, y, span.top + rise(f, i)]));
+  const angle = f.batterKey === undefined ? undefined : env[f.batterKey];
+  const top = angle !== undefined && angle > 0 && angle < 90
+    ? insetRing(f.ring, (span.top - span.bottom) / Math.tan((angle * Math.PI) / 180))
+    : f.ring;
+  top.forEach(([x, y], i) => verts.push([x, y, span.top + rise(f, i)]));
   for (let t = 0; t < caps.length; t += 3) tris.push(n + (caps[t] as number), n + (caps[t + 1] as number), n + (caps[t + 2] as number));
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
