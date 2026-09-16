@@ -45,6 +45,9 @@ from seked_data import (  # noqa: E402
     course_levels,
     ground_height,
     massing_geometry,
+    footprint_geometry,
+    footprint_inputs,
+    load_footprints,
     interior_solids,
     interior_structures,
     load_database,
@@ -381,6 +384,73 @@ def build_ground(parent, preset_id, header, ground, faces, elevation):
     return obj
 
 
+
+FOOTPRINT_COLLECTION = "Plateau (Tier 3)"
+MASTABA_OBJECT = "Mastaba fields (OSM)"
+
+
+def build_footprints(parent, preset_id, resolved):
+    """
+    The plateau's lesser monuments, from data/footprints/giza.json: one object
+    per named monument, and the 577 mastabas as a single object, because a
+    field of them is one thing to look at and six hundred objects is not.
+
+    Every object says where it came from: the OSM way, the import's source,
+    the kind of solid, and the measurement its height was looked up in when
+    OSM tagged none. Returns the ids built, so the caller can tell whether the
+    Sphinx came from OSM or still needs its box.
+    """
+    file = load_footprints()
+    if file is None:
+        print("no footprints: data/footprints/giza.json is missing; run `pnpm run footprints`")
+        return set()
+    values, records = resolved["values"], resolved["records"]
+    coll = get_child_collection(parent, FOOTPRINT_COLLECTION)
+    built = set()
+    field_verts, field_faces, field_ids = [], [], []
+    skipped = []
+    for f in file["features"]:
+        geometry = footprint_geometry(f, values)
+        if geometry is None:
+            skipped.append(f["id"])
+            continue
+        verts, faces = geometry
+        inputs = footprint_inputs(f)
+        if f["group"] == "mastabas":
+            offset = len(field_verts)
+            field_verts.extend(verts)
+            field_faces.extend(tuple(i + offset for i in face) for face in faces)
+            field_ids.append(f["osm"])
+            built.add(f["id"])
+            continue
+        make_object(f["name"], verts, faces, coll, {
+            "seked_preset": preset_id,
+            "seked_structure": "plateau",
+            "seked_footprint": f["id"],
+            "seked_group": f["group"],
+            "seked_kind": f["kind"],
+            "seked_osm_way": f["osm"],
+            "seked_sources": ", ".join(sorted({file["source"]} | {records[k]["source"] for k in inputs if k in records})),
+            "seked_height": "OSM tag" if f.get("height") is not None else ", ".join(inputs),
+        })
+        built.add(f["id"])
+    if field_verts:
+        make_object(MASTABA_OBJECT, field_verts, field_faces, coll, {
+            "seked_preset": preset_id,
+            "seked_structure": "plateau",
+            "seked_footprint": "mastabas",
+            "seked_group": "mastabas",
+            "seked_kind": "prism",
+            "seked_mastaba_count": len(field_ids),
+            "seked_sources": ", ".join(sorted({file["source"], records["tier3.mastaba.height"]["source"]})),
+            "seked_height": "tier3.mastaba.height",
+        })
+    reg = file["registration"]
+    print(f"{FOOTPRINT_COLLECTION}: {len(built) - len(field_ids)} monuments and {len(field_ids)} mastabas from OSM "
+          f"({file['osmBase']}), registered to residuals {reg['residuals']} m; skipped {skipped or 'none'}")
+    return built
+
+
 def build(preset_id):
     db = load_database()
     resolved = resolve(db, preset_id)
@@ -427,7 +497,13 @@ def build(preset_id):
               f"orientation {p['orientation_deg'] * 60:.1f}', at {location}")
 
     build_interior(coll, preset_id, resolved)
-    build_sphinx(coll, preset_id, resolved)
+    footprints = build_footprints(coll, preset_id, resolved)
+    # The OSM Sphinx supersedes the box: an outline modelled as forepaws, body
+    # and head, on the ground it is cut into, against an axis-aligned box on
+    # the datum plane forty metres above that ground. The box is still built
+    # when the import is missing, because a placeholder is better than nothing.
+    if "sphinx.body" not in footprints:
+        build_sphinx(coll, preset_id, resolved)
     build_terrain(coll, preset_id, placed)
 
 

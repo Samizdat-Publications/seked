@@ -82,7 +82,7 @@ export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): Rea
       <group rotation={[-Math.PI / 2, 0, 0]}>
         {layers.sky && sky && <SkyDome {...sky} radius={DOME_RADIUS} />}
         <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
-        {layers.pyramids && <Pyramids pyramids={model.pyramids} massings={model.massings} today={layers.today} clippingPlanes={planes} />}
+        {layers.pyramids && <Pyramids pyramids={model.pyramids} massings={model.massings} plateau={model.plateau} today={layers.today} clippingPlanes={planes} />}
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
         {layers.north && <NorthArrow />}
         {layers.overlay && overlay && <ClaimOverlay overlay={overlay} pyramids={model.pyramids} clippingPlanes={planes} />}

@@ -78,5 +78,25 @@
     "kept": false,
     "note": "After the verification pass on the shafts: the King's Chamber shaft inlets moved from the middle of the chamber wall, which was an estimate, onto Gantenbrink's measured 2.49 and 2.48 m.",
     "bytes": 894039
+  },
+  {
+    "file": "2026-09-16T14-51-35Z--akhet--cdc4d90-dirty.png",
+    "taken": "2026-09-16T14:51:35+00:00",
+    "view": "akhet",
+    "commit": "cdc4d90",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The akhet recomposed around the OSM Sphinx, which stands in its hollow 39 m below Khufu's base where the old box floated on the datum plane: head and body in the foreground, the solstice sun in the notch.",
+    "bytes": 926802
+  },
+  {
+    "file": "2026-09-16T14-51-35Z--dawn--cdc4d90-dirty.png",
+    "taken": "2026-09-16T14:51:35+00:00",
+    "view": "dawn",
+    "commit": "cdc4d90",
+    "tree": "dirty",
+    "kept": true,
+    "note": "The plateau populated for the first time: the queens' pyramids, the Eastern and Western Field mastabas, a boat pit and Menkaure's queens, from OpenStreetMap registered onto Petrie's three pyramids to under a metre.",
+    "bytes": 1052978
   }
 ]

@@ -89,6 +89,7 @@ pnpm typecheck   # the packages, the scripts and the viewer
 pnpm dossier     # regenerates docs/dossier.md from data/
 pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
 pnpm run stars   # rebuilds data/stars/ from the HYG 4.2 catalogue (run, not a bare pnpm stars)
+pnpm run footprints  # rebuilds data/footprints/giza.json from OpenStreetMap, registered onto the survey
 pnpm run courses # rebuilds data/measurements/g1-courses.json from Goyon 1978's transcription
 pnpm sky-bake    # writes build/sky-bake.json, the sun and the stars for Blender
 pnpm sky-rollback # writes build/sky-rollback.json and .f32, the stars frame by frame for the cinematic
@@ -182,22 +183,34 @@ there, so both are drawn on the one solved centre and neither is preferred.
 The figures carry more, and a position read off a figure by eye is not a
 measurement, so none was.
 
-Next, in order, each from a public source checked on 2026-09-14: the rest of
-the Great Pyramid's section (the Gallery's real corbel laps, for which §46
-gives the eight laps' plumb offsets but only Smyth's one lap height, so the
-heights still need a source; and the well shaft and grotto from the Edgars,
-which Petrie declines to measure in §46, saying it is "not worth while to
-publish more complete measures than those of Prof. Smyth"); Menkaure's
-chambers
-hung off the foot of his corridor from Vyse's table and Petrie's dimensions;
-the Tier 3 masses from OpenStreetMap's footprints, which name the queens'
-pyramids, the temples, the causeways, the Wall of the Crow, Khentkawes and
-the boat pits, with the Sphinx built up from its plan outline there in place
-of the box; Khafre's casing cap as a labelled estimate; and the cinematic
-re-rendered at hero quality once the plateau under it is finished. What no
-public source gives (a shaft inlet's exact place in a wall, a bent leg's
-length, a chamber level) is entered as an estimate on its own source, with a
-sigma, and stays unverified until a figure turns up.
+The plateau is populated. Its lesser monuments come from OpenStreetMap by
+`pnpm run footprints`: the queens' and satellite pyramids, Khentkawes, the
+temples of Khafre and Menkaure, the Sphinx Temple and Amenhotep II's, the boat
+pits east of Khufu, the Wall of the Crow, Hemiunu's mastaba and 577 mastabas
+from the cemetery fields. The import fits OSM onto the three pyramids whose
+places the survey knows, and the residuals are 0.45, 0.96 and 0.54 m with the
+unfitted scale at 0.99962; the 6.2 arcminute rotation is Petrie orienting his
+offsets to the pyramids' own mean azimuth rather than to true north. Every
+outline is set on the scene's own ground, so the Sphinx and the valley temples
+stand forty metres below Khufu's base, where they are. The Sphinx is OSM's own
+three-dimensional model of it, forepaws, body and head, and it replaces the
+box, which floated on the datum plane at the old commonly cited coordinates.
+Heights are OSM's where it tags one and a seked-estimate where it does not.
+
+Next, in order. Khafre's causeway as a ribbon between the two temples it
+joins, which are now both placed, at the "about 15 feet wide" Petrie gives it
+in section 95; Khufu's mortuary temple, which OSM does not carry because
+little but its basalt pavement survives; per-tomb heights for the mastabas in
+place of the one estimate; a decision on `qc.shaft.north.angle`, which the
+Upuaut report does not support (see above); and the cinematic re-rendered at
+hero quality. Three items wait on drawings rather than text, and are recorded
+as such so they are not rediscovered: the well shaft and grotto, which Petrie
+declines to measure and the Edgars give only as "about" figures, their real
+geometry being on their plates; the placement of Menkaure's chambers, whose
+dimensions are all in but whose plan is not stated in prose; and Khafre's
+casing cap, which Petrie mentions and never levels. What no public source
+gives is entered as an estimate on its own source, with a sigma, and stays
+unverified until a figure turns up.
 
 ## Layout
 
@@ -211,6 +224,7 @@ data/
   claims/*.yaml         one claim per file: comparisons, tolerance, free choices, sources, overlay
   stars/                the fourteen named stars and the HYG 4.2 catalogue to magnitude 6.5 (imported, never typed)
   terrain/              the GLO-30 heightfield around Giza in the project frame (the tiles are not tracked)
+  footprints/           the plateau's lesser monuments from OSM, registered and set on the ground (imported, never typed)
 packages/
   units/       cubit, pyramid inch, seked <-> degrees, DMS formatting
   geometry/    pyramid profile numbers, eight-sided mesh generator, interior solids, ground, landmarks, expression environment

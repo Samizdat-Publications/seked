@@ -41,7 +41,13 @@ from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_star_dome, buil
 # pyramids beyond it, and high enough to see over its back. A bearing, a
 # distance and a height, all of them composition; the point they are measured
 # from is the box's own cited position.
-SPHINX_STANDOFF = {"bearing_deg": 114.0, "distance_m": 170.0, "height_m": 26.0}
+# Recomposed when the OSM Sphinx replaced the box. The box stood on the datum
+# plane with its top at 20 m; the Sphinx really stands in its hollow with its
+# head's top 19 m below Khufu's base, and from the old standoff, 26 m over the
+# box and 170 m back, it fell below the bottom of the frame. Closer and lower,
+# with a wider lens, puts the head and the line of the back in the foreground
+# against the notch, which is what the view was always meant to show.
+SPHINX_STANDOFF = {"bearing_deg": 114.0, "distance_m": 110.0, "height_m": 6.0}
 
 # The night's fill, in the sky texture's units, and its exposure in stops. The
 # fill is what keeps a moonless sky from being black; with it at 0.006 the
@@ -86,14 +92,16 @@ VIEWS = {
         # Looking at the middle of the gap between the Great Pyramid's
         # south-west corner and Khafre's north-east one, which is C6's own
         # target, from a stand in front of the Sphinx. The camera is taken off
-        # the box itself, so it follows the cited coordinates instead of
-        # repeating them; the location here is what is used if the Sphinx is
-        # not in the scene.
+        # the Sphinx itself, so it follows the footprint import instead of
+        # repeating its coordinates; the location here is what is used if the
+        # Sphinx is not in the scene.
         "moment": "solstice-summer-sunset",
         "location": (503.1, -501.5, 46.2),
-        "from_object": "Sphinx (massing placeholder)",
+        # The Sphinx's head where the footprint import built one, and the old
+        # box otherwise; the first of these the scene carries is used.
+        "from_object": ("Great Sphinx, head", "Sphinx (massing placeholder)"),
         "target": (-206.4, -132.1, 67.1),
-        "lens": 50.0,
+        "lens": 35.0,
         "exposure": -2.0,
         "fill": 0.0,
         "placeholder_sun": (-0.833, 298.0),
@@ -162,15 +170,18 @@ def sphinx_viewpoint(name, fallback):
     Where the akhet is photographed from: back along the line the Sphinx looks
     out on, high enough that its back is in the frame with the pyramids beyond
     it. The bearing, the distance and the height are composition; the place
-    they are measured from is the box's own cited position, so the viewpoint
-    follows those coordinates instead of repeating them.
+    they are measured from is the Sphinx object's own bounding box, the head's
+    where the footprint import built one, so the viewpoint follows the data
+    instead of repeating it.
     """
     from mathutils import Vector
 
-    obj = bpy.data.objects.get(name)
+    names = (name,) if isinstance(name, str) else tuple(name)
+    obj = next((bpy.data.objects.get(n) for n in names if bpy.data.objects.get(n) is not None), None)
     if obj is None:
-        print(f"WARNING: no {name!r} in the scene; standing at the fallback viewpoint instead.")
+        print(f"WARNING: none of {names!r} is in the scene; standing at the fallback viewpoint instead.")
         return Vector(fallback)
+    print(f"  standing off {obj.name!r}")
     corners = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
     centre_east = sum(corner.x for corner in corners) / len(corners)
     centre_north = sum(corner.y for corner in corners) / len(corners)

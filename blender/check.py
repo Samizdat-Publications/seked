@@ -34,6 +34,8 @@ from seked_data import (  # noqa: E402
     load_database,
     load_terrain,
     massing_geometry,
+    footprint_geometry,
+    load_footprints,
     pyramid_params,
     resolve,
     sphinx_params,
@@ -250,25 +252,55 @@ def main():
         wrong = [o.name for o in interior.objects if o.get("seked_structure") != structure]
         check(not wrong, f"every solid in {name} is stamped {structure}: {wrong or 'none wrong'}")
 
-    sphinx = sphinx_params(values)
-    if check(sphinx is not None, "the database carries the Sphinx's size and position"):
-        obj = bpy.data.objects.get(SPHINX_MASSING_NAME)
-        if check(obj is not None, f'"{SPHINX_MASSING_NAME}" is present'):
-            check(str(obj.get("seked_placeholder", "")).lower().startswith("placeholder"),
-                  "the Sphinx box says it is a placeholder and not a model of the statue")
-            verts, _ = massing_geometry(sphinx)
-            check(len(obj.data.vertices) == 8, f"the Sphinx box is a box: {len(obj.data.vertices)} vertices")
-            # Blender stores vertices in single precision, so a coordinate
-            # 350 m out is only good to about 30 micrometres.
-            got = sorted(tuple(v.co) for v in obj.data.vertices)
-            want = sorted(tuple(v) for v in verts)
-            worst = max(abs(a - b) for g, w in zip(got, want) for a, b in zip(g, w))
-            check(worst < 1e-3, f"the Sphinx box is where seked_data puts it, vertex for vertex: worst {worst:.2e} m")
-            # Length east-west, width north-south, and the front face east.
-            size = [max(v[i] for v in verts) - min(v[i] for v in verts) for i in range(3)]
-            check(abs(size[0] - sphinx["length"]) < 1e-9 and abs(size[1] - sphinx["width"]) < 1e-9
-                  and abs(size[2] - sphinx["height"]) < 1e-9,
-                  f"the Sphinx box measures length by width by height east-north-up: {[round(v, 2) for v in size]}")
+    footprints = load_footprints()
+    if footprints is not None:
+        # The plateau from the footprint import, which supersedes the Sphinx box.
+        coll = bpy.data.collections.get("Plateau (Tier 3)")
+        if check(coll is not None, '"Plateau (Tier 3)" is a collection'):
+            named = [f for f in footprints["features"] if f["group"] != "mastabas"]
+            mastabas = [f for f in footprints["features"] if f["group"] == "mastabas"]
+            got = sorted(o.get("seked_footprint") for o in coll.objects)
+            want = sorted([f["id"] for f in named] + (["mastabas"] if mastabas else []))
+            check(got == want, f"it holds one object per named monument and one for the mastaba fields: {len(got)} of {len(want)}")
+            field = bpy.data.objects.get("Mastaba fields (OSM)")
+            if check(field is not None, '"Mastaba fields (OSM)" is present'):
+                check(field.get("seked_mastaba_count") == len(mastabas),
+                      f"the mastaba field holds all {len(mastabas)} mastabas: {field.get('seked_mastaba_count')}")
+            unsourced = [o.name for o in coll.objects if "osm-2026" not in str(o.get("seked_sources", ""))]
+            check(not unsourced, f"every mass cites the OSM import: {unsourced or 'none missing'}")
+            check(bpy.data.objects.get(SPHINX_MASSING_NAME) is None,
+                  "the Sphinx box is gone, the OSM Sphinx having superseded it")
+            for f in (x for x in named if x["group"] == "sphinx"):
+                obj = next((o for o in coll.objects if o.get("seked_footprint") == f["id"]), None)
+                verts, _ = footprint_geometry(f, values)
+                if check(obj is not None, f"{f['id']} is built"):
+                    got_v = [tuple(v.co) for v in obj.data.vertices]
+                    worst = max(abs(a - b) for g, w in zip(got_v, verts) for a, b in zip(g, w))
+                    check(len(got_v) == len(verts) and worst < 1e-3,
+                          f"{f['id']} is where seked_data puts it, vertex for vertex: worst {worst:.2e} m")
+            body = next((f for f in named if f["id"] == "sphinx.body"), None)
+            if body is not None:
+                check(body["base"] < -30, f"the Sphinx stands in its hollow, {body['base']:.1f} m below Khufu's base")
+    else:
+        sphinx = sphinx_params(values)
+        if check(sphinx is not None, "the database carries the Sphinx's size and position"):
+            obj = bpy.data.objects.get(SPHINX_MASSING_NAME)
+            if check(obj is not None, f'"{SPHINX_MASSING_NAME}" is present'):
+                check(str(obj.get("seked_placeholder", "")).lower().startswith("placeholder"),
+                      "the Sphinx box says it is a placeholder and not a model of the statue")
+                verts, _ = massing_geometry(sphinx)
+                check(len(obj.data.vertices) == 8, f"the Sphinx box is a box: {len(obj.data.vertices)} vertices")
+                # Blender stores vertices in single precision, so a coordinate
+                # 350 m out is only good to about 30 micrometres.
+                got = sorted(tuple(v.co) for v in obj.data.vertices)
+                want = sorted(tuple(v) for v in verts)
+                worst = max(abs(a - b) for g, w in zip(got, want) for a, b in zip(g, w))
+                check(worst < 1e-3, f"the Sphinx box is where seked_data puts it, vertex for vertex: worst {worst:.2e} m")
+                # Length east-west, width north-south, and the front face east.
+                size = [max(v[i] for v in verts) - min(v[i] for v in verts) for i in range(3)]
+                check(abs(size[0] - sphinx["length"]) < 1e-9 and abs(size[1] - sphinx["width"]) < 1e-9
+                      and abs(size[2] - sphinx["height"]) < 1e-9,
+                      f"the Sphinx box measures length by width by height east-north-up: {[round(v, 2) for v in size]}")
 
     terrain = bpy.data.objects.get(TERRAIN_NAME)
     if check(terrain is not None, f'"{TERRAIN_NAME}" is present'):

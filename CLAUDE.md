@@ -14,6 +14,7 @@ pnpm typecheck      # tsc --noEmit
 pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
+pnpm run footprints # re-import the plateau's lesser monuments from OSM into data/footprints/
 pnpm sky-bake       # bake the sun and the star dome into build/ for blender/render.py
 pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for blender/rollback.py
 ```
@@ -36,6 +37,11 @@ pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for b
   from the same rows so the two cannot disagree. The raw CSV is gitignored and
   `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
   attribution the licence requires.
+- **Footprints are imported, never typed.** `data/footprints/giza.json` is
+  written by `pnpm run footprints` from OpenStreetMap, fitted onto the three
+  surveyed pyramids (its header carries the residuals) and set on the scene's
+  ground. A height OSM does not tag is a measurement key, not a number in the
+  file.
 - **Claims are data.** One YAML file per claim in `data/claims/`. A claim is
   inputs, formulas, targets, tolerance, free choices, sources and an overlay
   spec. Adding a claim never touches package code.

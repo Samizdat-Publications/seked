@@ -302,6 +302,37 @@ def casing_over_granite_material(structure, label, height):
     return mat
 
 
+PIT_NAME = "Rock-cut pit"
+
+# The one footprint that is not limestone: the temple Petrie calls the Granite
+# Temple, whose walls and pillars are Aswan granite over a limestone core.
+GRANITE_FOOTPRINTS = ("khafre.valley_temple",)
+
+
+def pit_material():
+    """A rock-cut hollow: the bedrock's own colour, dark, because it is in shadow at any hour."""
+    mat, tree, bsdf = new_material(PIT_NAME)
+    if tree is None:
+        return mat
+    bsdf.inputs["Base Color"].default_value = (0.09, 0.075, 0.06, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.95
+    return mat
+
+
+def plateau_material(obj, limestone, granite, pit):
+    """
+    The masses from the footprint import, by what they are rather than by name:
+    a pit is dark, the Granite Temple is granite, and everything else is the
+    banded limestone the Sphinx's box was, because every one of them is a
+    massing whose courses are not geometry.
+    """
+    if obj.get("seked_kind") == "pit":
+        return pit
+    if obj.get("seked_footprint") in GRANITE_FOOTPRINTS:
+        return granite
+    return limestone
+
+
 HYPOTHESIS_NAME = "Seked hypothesis"
 
 
@@ -348,6 +379,7 @@ def assign_materials():
     casing = casing_material()
     granite = granite_material()
     hypothesis = hypothesis_material()
+    pit = pit_material()
     sand = sand_material()
     core, banded = core_material(False), core_material(True)
     cased = {}
@@ -370,6 +402,8 @@ def assign_materials():
             mat = cased.get(name, casing)
         elif name.startswith("void."):
             mat = hypothesis
+        elif obj.get("seked_structure") == "plateau":
+            mat = plateau_material(obj, banded, granite, pit)
         else:
             mat = granite
         obj.data.materials.clear()

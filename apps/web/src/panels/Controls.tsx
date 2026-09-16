@@ -232,9 +232,11 @@ export function LayerToggles(): React.JSX.Element {
         The terrain is Copernicus GLO-30 at 20 m. Its editing mask smooths the monuments out, so it is context for the plateau and not a
         measurement of anything on it. The ground is that same grid with each footprint set to the surveyed base level and blended back over
         260 m, which is why the monuments sit on it rather than in its mounds. The interior shows where the section cut opens it. The
-        pyramids layer also carries the {SPHINX_MASSING_LABEL}: a box of the ARCE survey's length, width and height on a commonly cited
-        latitude and longitude worth about 55 m, standing on the Great Pyramid's base level because no elevation for the Sphinx is in the
-        database. It is a volume in the right place, not a model of the statue.
+        pyramids layer also carries the plateau's lesser monuments, from OpenStreetMap: the queens' pyramids, Khentkawes, the temples, the
+        boat pits, the Wall of the Crow, the Sphinx as its body, head and forepaws, and the
+        mastaba fields. The outlines are fitted onto the three surveyed pyramids to within a metre and set on this same ground; the heights are
+        OSM's or a massing estimate, so they are volumes in the right places and not models. Without the import the Sphinx falls back to
+        the {SPHINX_MASSING_LABEL}, a box of the ARCE survey's size on a commonly cited position.
       </p>
     </section>
   );

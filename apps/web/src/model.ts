@@ -6,7 +6,7 @@
  */
 import { evaluateClaim, type Claim, type ClaimResult } from '@seked/claims/browser';
 import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
-import { buildEnvironment, courseHeights, interiorSolids, type Environment, type Solid } from '@seked/geometry';
+import { buildEnvironment, courseHeights, footprintMesh, interiorSolids, type Environment, type Footprint, type Mesh, type Solid } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
 
 export const STRUCTURES = ['g1', 'g2', 'g3'] as const;
@@ -102,6 +102,58 @@ export function massingParams(values: Record<string, number>, id: string, label:
 }
 
 /**
+ * The plateau's lesser monuments, as the footprint import has them.
+ *
+ * One mass per named monument, and the mastaba fields as a single mass,
+ * because six hundred meshes would cost the viewer far more than one and a
+ * field of tombs is one thing to look at. Built with `footprintMesh`, the
+ * function blender/seked_data.py mirrors, so the browser and the .blend stand
+ * the same solids in the same places. Heights a footprint looks up in the
+ * database come from `env`, so a preset that carried a better figure would
+ * move them.
+ */
+export interface PlateauMass {
+  id: string;
+  name: string;
+  group: string;
+  kind: Footprint['kind'];
+  mesh: Mesh;
+  /** How many footprints went into it: one, or the whole field. */
+  count: number;
+}
+
+/** Several meshes as one, indices offset so each still points at its own vertices. */
+export function mergeMeshes(meshes: readonly Mesh[]): Mesh {
+  const vertexCount = meshes.reduce((a, m) => a + m.vertexCount, 0);
+  const positions = new Float32Array(vertexCount * 3);
+  const indices = new Uint32Array(meshes.reduce((a, m) => a + m.indices.length, 0));
+  let v = 0;
+  let i = 0;
+  for (const m of meshes) {
+    positions.set(m.positions, v * 3);
+    for (let k = 0; k < m.indices.length; k++) indices[i + k] = (m.indices[k] as number) + v;
+    v += m.vertexCount;
+    i += m.indices.length;
+  }
+  return { positions, indices, vertexCount, triangleCount: indices.length / 3 };
+}
+
+export function plateauMasses(features: readonly Footprint[], env: Environment): PlateauMass[] {
+  const out: PlateauMass[] = [];
+  const field: Mesh[] = [];
+  for (const f of features) {
+    const mesh = footprintMesh(f, env);
+    if (!mesh) continue;
+    if (f.group === 'mastabas') field.push(mesh);
+    else out.push({ id: f.id, name: f.name, group: f.group, kind: f.kind, mesh, count: 1 });
+  }
+  if (field.length > 0) {
+    out.push({ id: 'mastabas', name: 'Mastaba fields', group: 'mastabas', kind: 'prism', mesh: mergeMeshes(field), count: field.length });
+  }
+  return out;
+}
+
+/**
  * One structure's interior, in its own frame, beside what it takes to place it.
  * Which structures are here is the database's answer, not the viewer's: a
  * structure whose interior records the preset carries gets one.
@@ -119,8 +171,10 @@ export interface Model {
   values: Record<string, number>;
   env: Environment;
   pyramids: PyramidParams[];
-  /** The Sphinx's box, when the preset carries the size and the position for it. */
+  /** The Sphinx's box, when the preset carries the size and the position for it and the footprint import has no Sphinx. */
   massings: MassingParams[];
+  /** The plateau's lesser monuments from the footprint import. */
+  plateau: PlateauMass[];
   interiors: StructureInterior[];
   results: Map<string, ClaimResult>;
   /** The measured royal cubit under this preset, which the slider starts from. */
@@ -157,7 +211,14 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
   // The offsets the box is placed by are derived, so it reads `env` and not
   // the resolved values: `buildEnvironment` is where a coordinate becomes a
   // position in the frame.
-  const massings = [massingParams(env, 'sphinx', SPHINX_MASSING_LABEL)].filter((m): m is MassingParams => m !== undefined);
+  const plateau = plateauMasses((bundle.footprints?.features ?? []) as Footprint[], env);
+  // The OSM Sphinx supersedes the box, as it does in blender/generate.py: an
+  // outline modelled as forepaws, body and head on the ground it is cut into,
+  // against a box on the datum plane forty metres above that ground.
+  const osmSphinx = plateau.some((m) => m.id === 'sphinx.body');
+  const massings = osmSphinx
+    ? []
+    : [massingParams(env, 'sphinx', SPHINX_MASSING_LABEL)].filter((m): m is MassingParams => m !== undefined);
   const interiors = pyramids
     .map((params) => ({ params, solids: interiorSolids(env, { structure: params.id }) }))
     .filter((interior) => Object.keys(interior.solids).length > 0);
@@ -170,6 +231,7 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
     env,
     pyramids,
     massings,
+    plateau,
     interiors,
     results,
     measuredCubit,

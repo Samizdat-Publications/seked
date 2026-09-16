@@ -1,8 +1,8 @@
 import { DEG } from '@seked/units';
 import { useEffect, useMemo } from 'react';
 import { DoubleSide, FrontSide, type Plane } from 'three';
-import type { MassingParams, PyramidParams } from '../model';
-import { pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import type { MassingParams, PlateauMass, PyramidParams } from '../model';
+import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
 
 /**
  * The three pyramids, placed exactly as blender/generate.py places them: the
@@ -12,11 +12,13 @@ import { pyramidGeometry, steppedPyramidGeometry } from './geometry';
 export function Pyramids({
   pyramids,
   massings,
+  plateau,
   today,
   clippingPlanes,
 }: {
   pyramids: PyramidParams[];
   massings: MassingParams[];
+  plateau: PlateauMass[];
   today: boolean;
   clippingPlanes: Plane[];
 }): React.JSX.Element {
@@ -28,7 +30,39 @@ export function Pyramids({
       {massings.map((params) => (
         <Massing key={params.id} params={params} clippingPlanes={clippingPlanes} />
       ))}
+      {plateau.map((mass) => (
+        <Mass key={mass.id} mass={mass} clippingPlanes={clippingPlanes} />
+      ))}
     </>
+  );
+}
+
+/** Colours for the plateau's masses: limestone, the Granite Temple's granite, and a rock-cut pit in shadow. */
+const MASS_LIMESTONE = '#bfb08e';
+const MASS_GRANITE = '#9d827b';
+const MASS_PIT = '#3a3128';
+
+/**
+ * One of the plateau's lesser monuments from the footprint import. Drawn flat
+ * and dull like the old Sphinx box, because every one of them is a massing:
+ * a traced outline carried up to a height that is OSM's or an estimate.
+ *
+ * The model is rebuilt on every store change, so the mesh arrives as a new
+ * object each time even when not one vertex has moved; the geometry is keyed
+ * on what could actually move it, the vertex count and the solid's vertical
+ * extent, so a cubit tick does not rebuild six hundred tombs.
+ */
+function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Plane[] }): React.JSX.Element {
+  const zs = mass.mesh.positions;
+  const key = `${mass.mesh.vertexCount}:${zs[2]}:${zs[zs.length - 1]}`;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const geometry = useMemo(() => meshGeometry(mass.mesh), [key]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  const color = mass.kind === 'pit' ? MASS_PIT : mass.id === 'khafre.valley_temple' ? MASS_GRANITE : MASS_LIMESTONE;
+  return (
+    <mesh geometry={geometry} name={mass.id}>
+      <meshStandardMaterial color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />
+    </mesh>
   );
 }
 

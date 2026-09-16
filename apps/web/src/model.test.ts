@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
-import { SPHINX_MASSING_LABEL, buildModel, massingParams, pyramidParams, type Model, type PyramidParams } from './model';
+import { meshVolume } from '@seked/geometry';
+import { SPHINX_MASSING_LABEL, buildModel, massingParams, mergeMeshes, pyramidParams, type Model, type PyramidParams } from './model';
 
 /**
  * The epoch override is the cubit slider's move applied to time, and the
@@ -69,20 +70,42 @@ describe('the pyramid as it stands', () => {
   });
 });
 
-describe('the Sphinx massing placeholder', () => {
+describe('the plateau and the Sphinx', () => {
   const model = buildModel(bundle, 'canonical', null, null);
 
-  it('is a box of the surveyed size at the derived offsets', () => {
-    const sphinx = model.massings.find((m) => m.id === 'sphinx');
+  it('builds every footprint in the import, the mastabas as one field', () => {
+    const features = bundle.footprints.features;
+    const named = features.filter((f) => f.group !== 'mastabas');
+    const field = model.plateau.find((m) => m.id === 'mastabas');
+    expect(model.plateau.length).toBe(named.length + 1);
+    expect(field?.count).toBe(features.length - named.length);
+  });
+
+  it('draws the Sphinx from OSM and drops the box, as the Blender generator does', () => {
+    for (const id of ['sphinx.body', 'sphinx.head', 'sphinx.paws']) expect(model.plateau.some((m) => m.id === id), id).toBe(true);
+    expect(model.massings).toEqual([]);
+  });
+
+  it('falls back to the box when the bundle has no footprints', () => {
+    const bare = buildModel({ ...bundle, footprints: { ...bundle.footprints, features: [] } }, 'canonical', null, null);
+    const sphinx = bare.massings.find((m) => m.id === 'sphinx');
     expect(sphinx?.label).toBe(SPHINX_MASSING_LABEL);
-    expect(sphinx?.length).toBe(model.env['sphinx.length']);
-    expect(sphinx?.width).toBe(model.env['sphinx.width']);
-    expect(sphinx?.height).toBe(model.env['sphinx.height']);
-    // East and south of the Great Pyramid's base centre, a few hundred metres out.
-    expect(sphinx?.offsetEast).toBeCloseTo(model.env['sphinx.centre.offset.east'] as number, 12);
-    expect(sphinx?.offsetNorth).toBeCloseTo(model.env['sphinx.centre.offset.north'] as number, 12);
+    expect(sphinx?.length).toBe(bare.env['sphinx.length']);
+    expect(sphinx?.width).toBe(bare.env['sphinx.width']);
+    expect(sphinx?.height).toBe(bare.env['sphinx.height']);
+    expect(sphinx?.offsetEast).toBeCloseTo(bare.env['sphinx.centre.offset.east'] as number, 12);
+    expect(sphinx?.offsetNorth).toBeCloseTo(bare.env['sphinx.centre.offset.north'] as number, 12);
     expect(sphinx?.offsetEast as number).toBeGreaterThan(0);
     expect(sphinx?.offsetNorth as number).toBeLessThan(0);
+  });
+
+  it('merges meshes without losing a triangle or a cubic metre', () => {
+    const field = model.plateau.find((m) => m.id === 'mastabas');
+    expect(field).toBeDefined();
+    const parts = model.plateau.filter((m) => m.group === 'queens').map((m) => m.mesh);
+    const merged = mergeMeshes(parts);
+    expect(merged.triangleCount).toBe(parts.reduce((a, m) => a + m.triangleCount, 0));
+    expect(meshVolume(merged)).toBeCloseTo(parts.reduce((a, m) => a + meshVolume(m), 0), 0);
   });
 
   it('is left out rather than guessed at when a size or a position is missing', () => {
