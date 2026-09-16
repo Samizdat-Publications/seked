@@ -549,9 +549,62 @@ function constructionBuilders(): Builder[] {
   return Array.from({ length: CONSTRUCTION_COUNT }, (_, i) => constructionBuilder(i + 1));
 }
 
+// --- The voids the muons found --------------------------------------------
+//
+// A void is not a room. Nobody has stood in either of these; they are the
+// shape a muon deficit takes, fitted as a rectangular cuboid, and the records
+// carry the fit's own error bars. They are built here beside Petrie's rooms
+// because they are inside the same pyramid and belong in the same frame, and
+// they are named `void.*` so that everything downstream can tell them apart
+// from a chamber somebody has walked into.
+//
+// The North Face Corridor is fixed by the paper in three ways and derived in
+// the fourth. Its size and its floor level are records. East to west it is
+// centred on the descending corridor, which the paper states outright: its
+// central axis "is coincident with the center of the Chevron and above the
+// DC". North to south it stands 0.84 m behind the north face of the Chevron,
+// and the Chevron stands in the pyramid's north face, so the setback is taken
+// off the face plane at the corridor's own mid-height, the same way an
+// entrance's north coordinate is taken off it.
+//
+// Two things that follows are worth saying plainly. The face plane is the
+// casing's, and the casing is long gone from the entrance, so a corridor
+// placed against it stands about the casing's thickness further in than one
+// placed against the core face the paper's team could actually see. And the
+// paper's slope, -0.3 +/- 1.5 degrees, has zero inside it and the paper
+// favours a horizontal corridor, so the solid is drawn level.
+
+const NFC = 'void.north_face_corridor';
+
+const VOID_BUILDERS: readonly Builder[] = [
+  {
+    name: NFC,
+    keys: [
+      `${NFC}.length`, `${NFC}.width`, `${NFC}.height`, `${NFC}.floor.up`, `${NFC}.from_north_face`,
+      'entrance.floor.begin.east', 'g1.base.side.mean', 'g1.face.angle',
+    ],
+    build: (env) => {
+      const floor = value(env, `${NFC}.floor.up`);
+      const height = value(env, `${NFC}.height`);
+      const halfBase = value(env, 'g1.base.side.mean') / 2;
+      const faceAngle = (value(env, 'g1.face.angle') * Math.PI) / 180;
+      // The face at the corridor's mid-height, then in by the setback.
+      const face = halfBase - (floor + height / 2) / Math.tan(faceAngle);
+      const north = face - value(env, `${NFC}.from_north_face`);
+      const east = value(env, 'entrance.floor.begin.east');
+      const halfLength = value(env, `${NFC}.length`) / 2;
+      return chamber({
+        min: [east - halfLength, north - value(env, `${NFC}.width`), floor],
+        max: [east + halfLength, north, floor + height],
+        prefix: NFC,
+      });
+    },
+  },
+];
+
 /** The Great Pyramid's solids: Petrie's rooms in order from the entrance down and then up,
- *  then the four shafts, then the five chambers of construction. */
-const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders(), ...constructionBuilders()];
+ *  then the four shafts, the five chambers of construction, and the voids the muons found. */
+const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders(), ...constructionBuilders(), ...VOID_BUILDERS];
 
 /** Every record a shaft is built from under this environment: the fixed keys and the legs it actually carries. */
 export function shaftInputs(env: Environment, chamberId: string, side: 'north' | 'south'): readonly string[] {

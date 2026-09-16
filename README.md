@@ -131,10 +131,22 @@ closed instead against the one figure Vyse gives for the whole of it, 69 ft
 3 in from the King's Chamber floor to the roof of Campbell's. That leaves
 1.85 m a beam. Sharing it evenly is the only assumption in the five.
 
+The ScanPyramids North Face Corridor is in too, out of Procureur and the
+others' 2023 paper, and it is the first solid here that nobody has stood in.
+Its size is theirs to a few centimetres, with their error bars; where it
+stands is derived, its east-west axis being the descending corridor's, which
+the paper states, and its north end standing 0.84 m behind the north face at
+its own mid-height, the Chevron standing in that face. The section draws it
+as an outline with no fill, because a shape fitted to a muon deficit should
+not read like a room with a floor.
+
 Next, in order, each from a public source checked on 2026-09-14: the rest of
-the Great Pyramid's section (the Gallery's real corbel laps from §46, the
-well shaft and grotto from the Edgars, and the ScanPyramids voids as
-instrumented boxes from the two open-access papers); Menkaure's chambers
+the Great Pyramid's section (the Gallery's real corbel laps, for which §46
+gives the eight laps' plumb offsets but only Smyth's one lap height, so the
+heights still need a source; the well shaft and grotto from the Edgars, which
+Petrie declines to measure in §46; and the ScanPyramids Big Void, whose
+length and cross-section are in the 2017 abstract but whose position is only
+in the figure); Menkaure's chambers
 hung off the foot of his corridor from Vyse's table and Petrie's dimensions;
 the Tier 3 masses from OpenStreetMap's footprints, which name the queens'
 pyramids, the temples, the causeways, the Wall of the Crow, Khentkawes and

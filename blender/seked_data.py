@@ -933,6 +933,39 @@ def _construction_builder(n):
 INTERIOR_BUILDERS += [_construction_builder(n) for n in range(1, _CONSTRUCTION_COUNT + 1)]
 
 
+# --- The voids the muons found --------------------------------------------
+# Mirrors VOID_BUILDERS in packages/geometry/src/interiors.ts. A void is not a
+# room: nobody has stood in it, and its box is the shape a muon deficit takes,
+# fitted as a rectangular cuboid with the fit's own error bars. The North Face
+# Corridor's size and floor level are records; east to west it is centred on
+# the descending corridor, which the paper states, and north to south it
+# stands its measured setback behind the pyramid's north face at its own
+# mid-height, the Chevron standing in that face.
+
+_NFC = "void.north_face_corridor"
+
+
+def _build_north_face_corridor(v):
+    floor = _value(v, _NFC + ".floor.up")
+    height = _value(v, _NFC + ".height")
+    half_base = _value(v, "g1.base.side.mean") / 2.0
+    face_angle = math.radians(_value(v, "g1.face.angle"))
+    face = half_base - (floor + height / 2.0) / math.tan(face_angle)
+    north = face - _value(v, _NFC + ".from_north_face")
+    east = _value(v, "entrance.floor.begin.east")
+    half_length = _value(v, _NFC + ".length") / 2.0
+    return chamber((east - half_length, north - _value(v, _NFC + ".width"), floor),
+                   (east + half_length, north, floor + height))
+
+
+INTERIOR_BUILDERS += [
+    (_NFC,
+     [_NFC + ".length", _NFC + ".width", _NFC + ".height", _NFC + ".floor.up", _NFC + ".from_north_face",
+      "entrance.floor.begin.east", "g1.base.side.mean", "g1.face.angle"],
+     _build_north_face_corridor),
+]
+
+
 # --- Structures whose plan is discovered from their records ----------------
 # Mirrors the second half of packages/geometry/src/interiors.ts. G1's rooms are
 # written out above because Petrie stores each of them differently; every other

@@ -41,6 +41,7 @@ const EXPECTED = [
   'chamber.construction_3',
   'chamber.construction_4',
   'chamber.construction_5',
+  'void.north_face_corridor',
 ];
 
 /** A closed surface uses every directed edge once, and its neighbour uses the reverse. */
@@ -267,5 +268,66 @@ describe('the chambers of construction on the canonical preset', () => {
     expect((chambers[0] as { floor: number }).floor).toBeGreaterThan(values['kc.ceiling.up'] as number);
     const apex = chambers[4] as { floor: number; ridge?: number };
     expect(apex.floor + (apex.ridge as number)).toBeLessThan(values['g1.height.original'] as number);
+  });
+});
+
+/**
+ * The North Face Corridor is the first solid in the scene that nobody has
+ * stood in. Its checks are about where it landed rather than what it
+ * measures: the paper places it above the descending corridor, behind the
+ * Chevron and just inside the north face, and none of those three is a record.
+ */
+describe('the voids the muons found, on the canonical preset', () => {
+  const mesh = solids['void.north_face_corridor'] as Mesh;
+  // The mesh is a Float32Array and the corridor stands ninety metres north of
+  // the base centre, so four places is as close as single precision gets
+  // there. The records themselves are good to a centimetre at best.
+
+  const axis = (k: number) => {
+    const all = mesh.positions.filter((_, i) => i % 3 === k);
+    return { lo: Math.min(...all), hi: Math.max(...all) };
+  };
+
+  it('measures what Procureur and the others fitted', () => {
+    const [east, north, up] = [axis(0), axis(1), axis(2)];
+    expect(east.hi - east.lo).toBeCloseTo(values['void.north_face_corridor.length'] as number, 4);
+    expect(north.hi - north.lo).toBeCloseTo(values['void.north_face_corridor.width'] as number, 4);
+    expect(up.hi - up.lo).toBeCloseTo(values['void.north_face_corridor.height'] as number, 4);
+  });
+
+  it('centres it east and west on the descending corridor, as the paper states', () => {
+    const east = axis(0);
+    expect((east.lo + east.hi) / 2).toBeCloseTo(values['entrance.floor.begin.east'] as number, 4);
+  });
+
+  it('sets it back behind the north face by the distance measured to the Chevron', () => {
+    const north = axis(1);
+    const up = axis(2);
+    const half = (values['g1.base.side.mean'] as number) / 2;
+    const mid = (up.lo + up.hi) / 2;
+    const face = half - mid / Math.tan(((values['g1.face.angle'] as number) * Math.PI) / 180);
+    expect(face - north.hi).toBeCloseTo(values['void.north_face_corridor.from_north_face'] as number, 4);
+  });
+
+  it('puts it above the entrance and inside the stone, not out in the air', () => {
+    const north = axis(1);
+    const up = axis(2);
+    // Above the entrance Petrie measured, and south of it, because the face
+    // leans in going up.
+    expect(up.lo).toBeGreaterThan(values['entrance.floor.begin.up'] as number);
+    expect(north.hi).toBeLessThan(values['entrance.floor.begin.north'] as number);
+    // And inside the pyramid at its own height: the face at the corridor's
+    // deepest point is still north of its south end.
+    const half = (values['g1.base.side.mean'] as number) / 2;
+    expect(north.lo).toBeGreaterThan(-half);
+  });
+
+  it('draws it level, the measured slope having zero inside its error bar', () => {
+    const slope = values['void.north_face_corridor.slope'] as number;
+    const sigma = db.measurements.find((m) => m.key === 'void.north_face_corridor.slope')?.sigma as number;
+    expect(Math.abs(slope)).toBeLessThan(sigma);
+    const up = axis(2);
+    const floors = mesh.positions.filter((_, i) => i % 3 === 2).filter((z) => z < (up.lo + up.hi) / 2);
+    expect(Math.max(...floors) - Math.min(...floors)).toBe(0);
   });
 });

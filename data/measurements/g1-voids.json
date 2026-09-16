@@ -1,0 +1,74 @@
+[
+  {
+    "key": "void.north_face_corridor.length",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 2.02,
+    "unit": "m",
+    "sigma": 0.06,
+    "source": "procureur-2023",
+    "method": "muon radiography",
+    "note": "East to west, which the paper calls the corridor's width: \"a width of 2.02 +/- 0.06 m\". The key is the project's own sense of length, east to west, as every chamber's is. Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
+    "verified": true
+  },
+  {
+    "key": "void.north_face_corridor.width",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 9.06,
+    "unit": "m",
+    "sigma": 0.07,
+    "source": "procureur-2023",
+    "method": "muon radiography",
+    "note": "North to south, which the paper calls the corridor's length: \"a length of 9.06 +/- 0.07 m\". The discussion rounds the same run to \"starts at 0.8 m behind the Chevron and ends at 9.1 m southward\". Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
+    "verified": true
+  },
+  {
+    "key": "void.north_face_corridor.height",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 2.18,
+    "unit": "m",
+    "sigma": 0.17,
+    "source": "procureur-2023",
+    "method": "muon radiography",
+    "note": "\"a height of 2.18 +/- 0.17 m\". The paper favours a horizontal corridor \"with a transverse section around 2.0 m x 2.0 m\", and says more complex shapes than a parallelepiped are possible \"but with the same mean height and width\", so the box is a mean and not a claim about the walls. Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
+    "verified": true
+  },
+  {
+    "key": "void.north_face_corridor.floor.up",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 20.0,
+    "unit": "m",
+    "sigma": 0.5,
+    "source": "procureur-2023",
+    "method": "muon radiography",
+    "note": "\"The bottom plane of the NFC is located at Z = 0.72 +/- 0.13 m which corresponds to ~20 m from the ground level.\" The 0.72 m is in the paper's own frame, which it does not tie to the pavement, so the figure entered is the one it states above the ground and the sigma is half a metre for the word \"about\", not the 0.13 m the fit gives in its own frame. Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
+    "verified": true
+  },
+  {
+    "key": "void.north_face_corridor.from_north_face",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 0.84,
+    "unit": "m",
+    "sigma": 0.05,
+    "source": "procureur-2023",
+    "method": "muon radiography",
+    "note": "\"The distance from the North face of NFC to the North face of the Chevron is 0.84 +/- 0.05 m\", which the paper notes is about the thickness of the chevron block itself, \"suggesting the NFC would be located just behind it\". The Chevron stands in the pyramid's north face, so this is what sets the corridor back from the face plane. Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
+    "verified": true
+  },
+  {
+    "key": "void.north_face_corridor.slope",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": -0.3,
+    "unit": "deg",
+    "sigma": 1.5,
+    "source": "procureur-2023",
+    "method": "muon radiography",
+    "note": "\"the slope alpha is -0.3 +/- 1.5 deg\", from the al-Ma'mun corridor analysis. Zero is inside the error bar and the paper's own conclusion is that \"a horizontal corridor is favored\", so the solid is drawn level; the record is here because the slope was measured and because a later survey that resolves it should replace this and not add to it. Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
+    "verified": true
+  }
+]

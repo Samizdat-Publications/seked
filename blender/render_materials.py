@@ -341,6 +341,7 @@ def assign_materials():
 
 VOID_NAME = "Seked void"
 GHOST_NAME = "Seked ghost"
+INFERRED_NAME = "Seked inferred void"
 
 # The three values a section is drawn at, as linear scene-referred grey. The
 # void is the lightest, the masonry a mid tone, and the backdrop the darkest,
@@ -395,7 +396,9 @@ def draw_as_section(structure, casing_opacity):
 
     The shell is the only translucent thing, at `casing_opacity`; the rooms
     and passages are drawn solid, so a passage reads at the same weight
-    wherever it lies and however much stone is in front of it.
+    wherever it lies and however much stone is in front of it. A `void.*`
+    solid is the exception and is drawn as an outline with no fill, because a
+    shape fitted to a muon deficit should not read like a room with a floor.
 
     Which objects belong to which structure is the generator's own
     `seked_structure` property, so nothing here parses a name to find out.
@@ -404,7 +407,11 @@ def draw_as_section(structure, casing_opacity):
     """
     void = drawing_material(VOID_NAME, VOID_VALUE, 1.0)
     ghost = drawing_material(GHOST_NAME, GHOST_VALUE, casing_opacity)
-    kept, hidden = 0, 0
+    # A void the muons found is drawn as an outline and nothing else. It has
+    # no fill because nobody has stood in it, and a solid tone would put it on
+    # the same footing as a room Petrie walked through with a tape.
+    inferred = drawing_material(INFERRED_NAME, VOID_VALUE, 0.0)
+    kept, hidden, found = 0, 0, 0
     for obj in bpy.data.objects:
         if obj.type != "MESH":
             continue
@@ -418,10 +425,17 @@ def draw_as_section(structure, casing_opacity):
             hidden += 1
             continue
         kept += 1
+        if not interior:
+            mat = ghost
+        elif obj.name.startswith("void."):
+            mat, found = inferred, found + 1
+        else:
+            mat = void
         obj.data.materials.clear()
-        obj.data.materials.append(void if interior else ghost)
+        obj.data.materials.append(mat)
     print(f"drawing {structure}: {kept} objects kept, {hidden} taken out of the frame; "
-          f"masonry at {GHOST_VALUE:.2f} and {casing_opacity:.0%} opaque, the void at {VOID_VALUE:.2f}")
+          f"masonry at {GHOST_VALUE:.2f} and {casing_opacity:.0%} opaque, the void at {VOID_VALUE:.2f}, "
+          f"{found} drawn as outline only, nobody having stood in them")
 
 
 def make_translucent(obj, alpha):
