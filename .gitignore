@@ -28,6 +28,7 @@ data/footprints/overpass-giza.json
 # Written by `pnpm bundle` from data/
 apps/web/public/seked.json
 apps/web/public/terrain/
+apps/web/public/textures/
 
 # Local
 .env

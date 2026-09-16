@@ -1,8 +1,19 @@
 import { DEG } from '@seked/units';
-import { useEffect, useMemo } from 'react';
-import { DoubleSide, FrontSide, type Plane } from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import { DoubleSide, FrontSide, type MeshStandardMaterial, type Plane } from 'three';
 import type { MassingParams, PlateauMass, PyramidParams } from '../model';
 import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import { applyStone, useStone, type StoneRole } from './stone';
+
+/** A standard material that takes a role's photographed stone once it has loaded, and flat colour until then. */
+function useStoneMaterial(role: StoneRole | undefined, strength: number): React.RefObject<MeshStandardMaterial | null> {
+  const ref = useRef<MeshStandardMaterial>(null);
+  const stone = useStone(role ?? 'core');
+  useEffect(() => {
+    if (ref.current && role) applyStone(ref.current, stone, strength);
+  }, [stone, role, strength]);
+  return ref;
+}
 
 /**
  * The three pyramids, placed exactly as blender/generate.py places them: the
@@ -64,9 +75,10 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
       : mass.id === 'khafre.valley_temple' ? MASS_GRANITE
         : mass.id === 'khufu.basalt_pavement' ? MASS_BASALT
           : MASS_LIMESTONE;
+  const material = useStoneMaterial(color === MASS_LIMESTONE ? 'core' : undefined, 0.85);
   return (
     <mesh geometry={geometry} name={mass.id}>
-      <meshStandardMaterial color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />
+      <meshStandardMaterial ref={material} color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />
     </mesh>
   );
 }
@@ -118,11 +130,15 @@ function Pyramid({
 
   // A section leaves the far side of the masonry facing away from the reader,
   // so the cut only reads if the back faces are drawn.
+  // Cased, a face takes the fine pale stone faintly; standing, the coarse core.
+  const material = useStoneMaterial(standing ? 'core' : 'casing', standing ? 0.9 : 0.45);
   const cut = clippingPlanes.length > 0 && clippingPlanes[0]?.constant !== undefined && Math.abs(clippingPlanes[0].constant) < 1e6;
 
   return (
     <mesh geometry={geometry} position={[params.offsetEast, params.offsetNorth, params.offsetUp]} rotation={[0, 0, orientationDeg * DEG]}>
       <meshStandardMaterial
+        key={standing ? 'standing' : 'cased'}
+        ref={material}
         color={standing ? '#b3a789' : '#d6c49c'}
         roughness={0.94}
         metalness={0}

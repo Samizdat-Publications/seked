@@ -1,8 +1,9 @@
 import type { TerrainHeader } from '@seked/data/browser';
 import { terrainGrid, type GroundPyramid } from '@seked/geometry';
-import { useEffect, useMemo } from 'react';
-import type { Plane } from 'three';
+import { useEffect, useMemo, useRef } from 'react';
+import type { MeshStandardMaterial, Plane } from 'three';
 import { gridGeometry } from './geometry';
+import { applyStone, useStone } from './stone';
 
 export interface TerrainProps {
   header: TerrainHeader;
@@ -46,6 +47,13 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
     contextGeometry.dispose();
     groundGeometry.dispose();
   }, [contextGeometry, groundGeometry]);
+  // The ground takes the renders' fine sand, three times its tile so the
+  // twenty-metre grid does not show it repeating at the distances it is seen from.
+  const sand = useStone('sand');
+  const groundMaterial = useRef<MeshStandardMaterial>(null);
+  useEffect(() => {
+    if (groundMaterial.current) applyStone(groundMaterial.current, sand, 0.8, 3);
+  }, [sand]);
 
   return (
     <>
@@ -55,6 +63,7 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
               cap, which is the one place two surfaces genuinely share a plane:
               the offset settles which of them the depth buffer keeps. */}
           <meshStandardMaterial
+            ref={groundMaterial}
             color="#6a6152"
             roughness={1}
             metalness={0}
