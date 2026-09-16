@@ -41,7 +41,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DATA_DIR, loadDatabase, loadTerrain, resolve } from '@seked/data';
-import { buildEnvironment, groundHeight, type GroundPyramid } from '@seked/geometry';
+import { buildEnvironment, groundHeight, khafreCauseway, type Footprint, type GroundPyramid } from '@seked/geometry';
 
 const OUT_DIR = join(DATA_DIR, 'footprints');
 const CACHE = join(OUT_DIR, 'overpass-giza.json');
@@ -307,6 +307,23 @@ async function main(): Promise<void> {
     }
     return f;
   });
+
+  // --- Khafre's causeway, laid on its ridge -------------------------------
+  // Built from the two temples just placed and Petrie's width, in segments
+  // short enough to follow the ground, each vertex set on the ground under it.
+  const CAUSEWAY_SEGMENTS = 24;
+  const causeway = khafreCauseway(env, features as unknown as Footprint[], CAUSEWAY_SEGMENTS);
+  if (causeway) {
+    const bases = causeway.ring.map((pt) => round2(ground(pt as Xy)));
+    features.push({
+      ...causeway,
+      base: bases[0] as number,
+      bases,
+      area: round2(causeway.area),
+      ring: causeway.ring.map(([x, y]) => [round2(x), round2(y)]),
+    } as unknown as (typeof features)[number]);
+    console.log(`causeway: ${CAUSEWAY_SEGMENTS} segments, climbing from ${bases[0]} to ${bases[CAUSEWAY_SEGMENTS]} m`);
+  }
 
   // --- The mastaba fields ------------------------------------------------
   const fenceWay = ways.get(SITE_FENCE);

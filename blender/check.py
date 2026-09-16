@@ -36,6 +36,7 @@ from seked_data import (  # noqa: E402
     massing_geometry,
     footprint_geometry,
     load_footprints,
+    survey_footprints,
     pyramid_params,
     resolve,
     sphinx_params,
@@ -258,6 +259,7 @@ def main():
         coll = bpy.data.collections.get("Plateau (Tier 3)")
         if check(coll is not None, '"Plateau (Tier 3)" is a collection'):
             named = [f for f in footprints["features"] if f["group"] != "mastabas"]
+            named += survey_footprints(values, footprints["features"])
             mastabas = [f for f in footprints["features"] if f["group"] == "mastabas"]
             got = sorted(o.get("seked_footprint") for o in coll.objects)
             want = sorted([f["id"] for f in named] + (["mastabas"] if mastabas else []))
@@ -266,8 +268,13 @@ def main():
             if check(field is not None, '"Mastaba fields (OSM)" is present'):
                 check(field.get("seked_mastaba_count") == len(mastabas),
                       f"the mastaba field holds all {len(mastabas)} mastabas: {field.get('seked_mastaba_count')}")
-            unsourced = [o.name for o in coll.objects if "osm-2026" not in str(o.get("seked_sources", ""))]
-            check(not unsourced, f"every mass cites the OSM import: {unsourced or 'none missing'}")
+            unsourced = [o.name for o in coll.objects if not o.get("seked_sources")]
+            check(not unsourced, f"every mass cites its sources: {unsourced or 'none missing'}")
+            traced = [o.name for o in coll.objects if o.get("seked_osm_way") and "osm-2026" not in str(o.get("seked_sources"))]
+            check(not traced, f"every traced mass cites the OSM import: {traced or 'none missing'}")
+            surveyed = bpy.data.objects.get("Basalt pavement of Khufu\u2019s mortuary temple")
+            if check(surveyed is not None, "the basalt pavement is built from Petrie's corners"):
+                check("petrie-1883" in str(surveyed.get("seked_sources")), f"and cites him: {surveyed.get('seked_sources')}")
             check(bpy.data.objects.get(SPHINX_MASSING_NAME) is None,
                   "the Sphinx box is gone, the OSM Sphinx having superseded it")
             for f in (x for x in named if x["group"] == "sphinx"):

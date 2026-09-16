@@ -36,9 +36,17 @@ export interface Footprint {
   name: string;
   kind: FootprintKind;
   group: string;
-  osm: number;
+  /** The OSM way it was traced from; absent for one built from survey records. */
+  osm?: number;
   /** The ground under the outline, metres above the Great Pyramid's base. */
   base: number;
+  /**
+   * A base level for each vertex of the ring, for a solid that climbs, as a
+   * causeway does. `base` is then the first of them. A pyramid ignores it.
+   */
+  bases?: number[];
+  /** The measurement records its outline was computed from, for one built from a survey rather than traced. */
+  records?: string[];
   /** Top of the solid above `base`, as OSM tags it. */
   height?: number;
   /** Bottom of the solid above `base`, as OSM tags it, for a part that starts off the ground. */
@@ -135,9 +143,9 @@ export function ringCentroid(ring: readonly Xy[]): [number, number] {
   return [cx / (3 * a), cy / (3 * a)];
 }
 
-/** The records a footprint's solid is built from: its height or depth key, if it names one. */
+/** The records a footprint's solid is built from: its outline's records and its height or depth key. */
 export function footprintInputs(f: Footprint): string[] {
-  return [f.heightKey, f.depthKey].filter((k): k is string => k !== undefined);
+  return [...(f.records ?? []), f.heightKey, f.depthKey].filter((k): k is string => k !== undefined);
 }
 
 /** The solid's bottom and top in the frame, or nothing where the environment lacks the height it needs. */
@@ -152,6 +160,12 @@ export function footprintSpan(f: Footprint, env: Environment): { bottom: number;
   const bottom = f.base + (f.minHeight ?? 0);
   const top = f.base + height;
   return top > bottom ? { bottom, top } : undefined;
+}
+
+/** How far vertex `i`'s own base stands above the footprint's `base`, for a solid that climbs. */
+function rise(f: Footprint, i: number): number {
+  const b = f.bases?.[i];
+  return b === undefined ? 0 : b - f.base;
 }
 
 function toMesh(verts: number[][], tris: number[]): Mesh {
@@ -170,7 +184,7 @@ export function footprintMesh(f: Footprint, env: Environment): Mesh | undefined 
   if (!span || f.ring.length < 3) return undefined;
   const n = f.ring.length;
   const caps = triangulate(f.ring);
-  const verts: number[][] = f.ring.map(([x, y]) => [x, y, span.bottom]);
+  const verts: number[][] = f.ring.map(([x, y], i) => [x, y, span.bottom + (f.kind === 'pyramid' ? 0 : rise(f, i))]);
   const tris: number[] = [];
   // The bottom faces down, so each cap triangle is reversed.
   for (let t = 0; t < caps.length; t += 3) tris.push(caps[t] as number, caps[t + 2] as number, caps[t + 1] as number);
@@ -182,11 +196,160 @@ export function footprintMesh(f: Footprint, env: Environment): Mesh | undefined 
     return toMesh(verts, tris);
   }
 
-  for (const [x, y] of f.ring) verts.push([x, y, span.top]);
+  f.ring.forEach(([x, y], i) => verts.push([x, y, span.top + rise(f, i)]));
   for (let t = 0; t < caps.length; t += 3) tris.push(n + (caps[t] as number), n + (caps[t + 1] as number), n + (caps[t + 2] as number));
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
     tris.push(i, j, n + j, i, n + j, n + i);
   }
   return toMesh(verts, tris);
+}
+
+// --- Solids built from survey records rather than traced -------------------
+//
+// Two monuments on the plateau are placed better by Petrie than by any
+// tracing, or are not traced at all. They are built here from the database as
+// footprints, so that everything downstream of a footprint (Blender, the
+// viewer, the parity test) takes them without knowing the difference.
+
+/** The measurement keys fixing one corner of the basalt pavement's rock-cut bed: east, then north. */
+function pavementCorner(corner: string): [string, string] {
+  return [`g1.basalt_pavement.corner.${corner}.beyond_east_base`, `g1.basalt_pavement.corner.${corner}.north`];
+}
+
+function signedArea(ring: readonly Xy[]): number {
+  let a = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const [x0, y0] = ring[i] as Xy;
+    const [x1, y1] = ring[(i + 1) % ring.length] as Xy;
+    a += x0 * y1 - x1 * y0;
+  }
+  return a / 2;
+}
+
+/**
+ * The basalt pavement east of the Great Pyramid, the floor of Khufu's
+ * destroyed mortuary temple, from the four corners of its rock-cut bed in
+ * Petrie's section 28. His figures are east of the Pyramid's east base edge
+ * and north of its central line, which is this frame, so a corner is the half
+ * base plus the one, and the other as it stands. It lies at the Pyramid's own
+ * base level, Petrie finding it "within two inches of the same level as" the
+ * limestone pavement, and is drawn as a slab the estimated thickness proud.
+ */
+export function basaltPavement(env: Environment): Footprint | undefined {
+  const side = env['g1.base.side.mean'];
+  if (side === undefined) return undefined;
+  const half = side / 2;
+  // Counter-clockwise seen from above: south-west, south-east, north-east, north-west.
+  const order = ['sw', 'se', 'ne', 'nw'];
+  const keys = order.flatMap(pavementCorner);
+  if (keys.some((k) => env[k] === undefined)) return undefined;
+  const ring = order.map((c) => {
+    const [east, north] = pavementCorner(c);
+    return [half + (env[east] as number), env[north] as number] as [number, number];
+  });
+  return {
+    id: 'khufu.basalt_pavement',
+    name: 'Basalt pavement of Khufu\u2019s mortuary temple',
+    kind: 'prism',
+    group: 'temples',
+    base: env['g1.base.elevation.relative'] ?? 0,
+    heightKey: 'g1.basalt_pavement.thickness',
+    area: Math.abs(signedArea(ring)),
+    ring,
+    records: ['g1.base.side.mean', ...keys],
+  };
+}
+
+/**
+ * Where the segment from `a` to `b` crosses a polygon's boundary, as the
+ * parameter along it: the last crossing if `last`, else the first. Undefined
+ * if it does not cross at all.
+ */
+function crossing(a: Xy, b: Xy, ring: readonly Xy[], last: boolean): number | undefined {
+  let found: number | undefined;
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  for (let i = 0; i < ring.length; i++) {
+    const p = ring[i] as Xy;
+    const q = ring[(i + 1) % ring.length] as Xy;
+    const ex = q[0] - p[0];
+    const ey = q[1] - p[1];
+    const denom = dx * ey - dy * ex;
+    if (Math.abs(denom) < COLLINEAR) continue;
+    const t = ((p[0] - a[0]) * ey - (p[1] - a[1]) * ex) / denom;
+    const u = ((p[0] - a[0]) * dy - (p[1] - a[1]) * dx) / denom;
+    if (t < 0 || t > 1 || u < 0 || u > 1) continue;
+    if (found === undefined || (last ? t > found : t < found)) found = t;
+  }
+  return found;
+}
+
+/**
+ * Khafre's causeway, which Petrie says in section 95 "leads from [the Granite
+ * Temple's] entrance, straight up to the entrance of the temple of that
+ * Pyramid", "about 15 feet wide and over quarter of a mile long", on "a very
+ * suitable ridge of rock running in this direction, with a sharp fall away on
+ * each side of it". No record places either entrance, so it is drawn on the
+ * straight line between the two temples' area centroids, from where that line
+ * leaves the valley temple to where it enters the mortuary temple, at
+ * Petrie's width. The centroid-to-centroid line is the assumption; its length
+ * is checked against his quarter of a mile.
+ *
+ * It comes back as a ribbon of `segments` lengths with no base levels, because
+ * a causeway laid on a ridge has to follow the ground and only the footprint
+ * import has the ground: scripts/footprints.ts sets each vertex's base from
+ * the terrain and writes the result into the file like any other footprint.
+ * A straight ramp from one temple floor to the other, which is what this was
+ * first, ran up to three and a half metres under the ridge it is built on.
+ */
+export function khafreCauseway(env: Environment, features: readonly Footprint[], segments = 1): Footprint | undefined {
+  const valley = features.find((f) => f.id === 'khafre.valley_temple');
+  const temple = features.find((f) => f.id === 'khafre.mortuary_temple');
+  const width = env['khafre.causeway.width'];
+  if (!valley || !temple || width === undefined || !(width > 0) || segments < 1) return undefined;
+  const a = ringCentroid(valley.ring);
+  const b = ringCentroid(temple.ring);
+  const leave = crossing(a, b, valley.ring, true);
+  const enter = crossing(a, b, temple.ring, false);
+  if (leave === undefined || enter === undefined || !(enter > leave)) return undefined;
+  const at = (t: number): Xy => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  const start = at(leave);
+  const end = at(enter);
+  const length = Math.hypot(end[0] - start[0], end[1] - start[1]);
+  const nx = (-(end[1] - start[1]) / length) * (width / 2);
+  const ny = ((end[0] - start[0]) / length) * (width / 2);
+  const along = (k: number): Xy => [
+    start[0] + ((end[0] - start[0]) * k) / segments,
+    start[1] + ((end[1] - start[1]) * k) / segments,
+  ];
+  // Counter-clockwise seen from above: up the right-hand side, back down the left.
+  const ring: [number, number][] = [];
+  for (let k = 0; k <= segments; k++) {
+    const [x, y] = along(k);
+    ring.push([x - nx, y - ny]);
+  }
+  for (let k = segments; k >= 0; k--) {
+    const [x, y] = along(k);
+    ring.push([x + nx, y + ny]);
+  }
+  return {
+    id: 'khafre.causeway',
+    name: 'Causeway of Khafre',
+    kind: 'prism',
+    group: 'causeways',
+    base: valley.base,
+    heightKey: 'khafre.causeway.thickness',
+    area: Math.abs(signedArea(ring)),
+    ring,
+    records: ['khafre.causeway.width'],
+  };
+}
+
+/**
+ * Every solid built from survey records at build time. Khafre's causeway is
+ * not among them: it needs the ground, so the footprint import builds it.
+ */
+export function surveyFootprints(env: Environment, _features: readonly Footprint[] = []): Footprint[] {
+  return [basaltPavement(env)].filter((f): f is Footprint => f !== undefined);
 }

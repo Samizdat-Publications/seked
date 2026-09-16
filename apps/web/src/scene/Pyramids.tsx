@@ -41,6 +41,7 @@ export function Pyramids({
 const MASS_LIMESTONE = '#bfb08e';
 const MASS_GRANITE = '#9d827b';
 const MASS_PIT = '#3a3128';
+const MASS_BASALT = '#3b3c3d';
 
 /**
  * One of the plateau's lesser monuments from the footprint import. Drawn flat
@@ -58,7 +59,11 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const geometry = useMemo(() => meshGeometry(mass.mesh), [key]);
   useEffect(() => () => geometry.dispose(), [geometry]);
-  const color = mass.kind === 'pit' ? MASS_PIT : mass.id === 'khafre.valley_temple' ? MASS_GRANITE : MASS_LIMESTONE;
+  const color =
+    mass.kind === 'pit' ? MASS_PIT
+      : mass.id === 'khafre.valley_temple' ? MASS_GRANITE
+        : mass.id === 'khufu.basalt_pavement' ? MASS_BASALT
+          : MASS_LIMESTONE;
   return (
     <mesh geometry={geometry} name={mass.id}>
       <meshStandardMaterial color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />

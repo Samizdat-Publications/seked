@@ -98,5 +98,25 @@
     "kept": true,
     "note": "The plateau populated for the first time: the queens' pyramids, the Eastern and Western Field mastabas, a boat pit and Menkaure's queens, from OpenStreetMap registered onto Petrie's three pyramids to under a metre.",
     "bytes": 1052978
+  },
+  {
+    "file": "2026-09-16T16-57-59Z--akhet--96490ce-dirty.png",
+    "taken": "2026-09-16T16:57:59+00:00",
+    "view": "akhet",
+    "commit": "96490ce",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Khafre's causeway, first as a straight ramp buried up to 3.5 m under its own ridge and invisible, then laid on the ground in 24 segments: it now climbs from the valley temple in the foreground to Khafre's mortuary temple.",
+    "bytes": 961681
+  },
+  {
+    "file": "2026-09-16T16-57-59Z--dawn--96490ce-dirty.png",
+    "taken": "2026-09-16T16:57:59+00:00",
+    "view": "dawn",
+    "commit": "96490ce",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Dawn with Khufu's basalt temple platform from Petrie's four corners, behind the queens' pyramids from this side.",
+    "bytes": 1055914
   }
 ]

@@ -1810,8 +1810,14 @@ def ring_centroid(ring):
 
 
 def footprint_inputs(feature):
-    """The records a footprint's solid is built from."""
-    return [k for k in (feature.get("heightKey"), feature.get("depthKey")) if k is not None]
+    """The records a footprint's solid is built from: its outline's records and its height or depth key."""
+    keys = list(feature.get("records") or [])
+    return keys + [k for k in (feature.get("heightKey"), feature.get("depthKey")) if k is not None]
+
+
+def _rise(feature, i):
+    bases = feature.get("bases")
+    return 0.0 if bases is None else bases[i] - feature["base"]
 
 
 def footprint_span(feature, values):
@@ -1842,7 +1848,8 @@ def footprint_geometry(feature, values):
     bottom, top = span
     n = len(ring)
     caps = triangulate(ring)
-    verts = [(x, y, bottom) for x, y in ring]
+    pyramid = feature["kind"] == "pyramid"
+    verts = [(x, y, bottom + (0.0 if pyramid else _rise(feature, i))) for i, (x, y) in enumerate(ring)]
     faces = []
     for t in range(0, len(caps), 3):
         faces.append((caps[t], caps[t + 2], caps[t + 1]))
@@ -1852,7 +1859,7 @@ def footprint_geometry(feature, values):
         for i in range(n):
             faces.append((i, (i + 1) % n, n))
         return verts, faces
-    verts.extend((x, y, top) for x, y in ring)
+    verts.extend((x, y, top + _rise(feature, i)) for i, (x, y) in enumerate(ring))
     for t in range(0, len(caps), 3):
         faces.append((n + caps[t], n + caps[t + 1], n + caps[t + 2]))
     for i in range(n):
@@ -1862,13 +1869,59 @@ def footprint_geometry(feature, values):
     return verts, faces
 
 
+def basalt_pavement(values):
+    """The basalt pavement from Petrie section 28's corners. Mirrors basaltPavement in footprints.ts."""
+    side = values.get("g1.base.side.mean")
+    if side is None:
+        return None
+    half = side / 2.0
+    order = ("sw", "se", "ne", "nw")
+    keys = []
+    for c in order:
+        keys += ["g1.basalt_pavement.corner.%s.beyond_east_base" % c, "g1.basalt_pavement.corner.%s.north" % c]
+    if any(values.get(k) is None for k in keys):
+        return None
+    ring = [[half + values["g1.basalt_pavement.corner.%s.beyond_east_base" % c],
+             values["g1.basalt_pavement.corner.%s.north" % c]] for c in order]
+    return {
+        "id": "khufu.basalt_pavement",
+        "name": "Basalt pavement of Khufu\u2019s mortuary temple",
+        "kind": "prism",
+        "group": "temples",
+        "base": values.get("g1.base.elevation.relative", 0.0),
+        "heightKey": "g1.basalt_pavement.thickness",
+        "area": abs(_signed_area(ring)),
+        "ring": ring,
+        "records": ["g1.base.side.mean"] + keys,
+    }
+
+
+def _signed_area(ring):
+    a = 0.0
+    for i in range(len(ring)):
+        x0, y0 = ring[i]
+        x1, y1 = ring[(i + 1) % len(ring)]
+        a += x0 * y1 - x1 * y0
+    return a / 2.0
+
+
+def survey_footprints(values, features=()):
+    """
+    Every solid built from survey records at build time. Mirrors surveyFootprints
+    in footprints.ts; Khafre's causeway needs the ground, so the footprint import
+    builds it and it arrives in the file.
+    """
+    return [f for f in (basalt_pavement(values),) if f is not None]
+
+
 if __name__ == "__main__" and "--footprints" in sys.argv:
     # Appended, so the file only ever grows; this is the last line printed.
     _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
     _values = resolve(load_database(), _preset)["values"]
     _file = load_footprints()
+    _features = (_file or {}).get("features", [])
     _out = {}
-    for _f in (_file or {}).get("features", []):
+    for _f in _features + survey_footprints(_values, _features):
         _g = footprint_geometry(_f, _values)
         if _g is not None:
             _out[_f["id"]] = {"verts": [list(v) for v in _g[0]], "faces": [list(f) for f in _g[1]]}

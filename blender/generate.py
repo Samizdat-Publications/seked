@@ -48,6 +48,7 @@ from seked_data import (  # noqa: E402
     footprint_geometry,
     footprint_inputs,
     load_footprints,
+    survey_footprints,
     interior_solids,
     interior_structures,
     load_database,
@@ -409,7 +410,9 @@ def build_footprints(parent, preset_id, resolved):
     built = set()
     field_verts, field_faces, field_ids = [], [], []
     skipped = []
-    for f in file["features"]:
+    # The traced outlines, then the solids built from survey records, some of
+    # which (Khafre's causeway) are placed by the traced ones they join.
+    for f in file["features"] + survey_footprints(values, file["features"]):
         geometry = footprint_geometry(f, values)
         if geometry is None:
             skipped.append(f["id"])
@@ -429,9 +432,10 @@ def build_footprints(parent, preset_id, resolved):
             "seked_footprint": f["id"],
             "seked_group": f["group"],
             "seked_kind": f["kind"],
-            "seked_osm_way": f["osm"],
-            "seked_sources": ", ".join(sorted({file["source"]} | {records[k]["source"] for k in inputs if k in records})),
-            "seked_height": "OSM tag" if f.get("height") is not None else ", ".join(inputs),
+            "seked_osm_way": f.get("osm", 0),
+            "seked_sources": ", ".join(sorted(({file["source"]} if f.get("osm") else set())
+                                              | {records[k]["source"] for k in inputs if k in records})),
+            "seked_height": "OSM tag" if f.get("height") is not None else ", ".join(footprint_inputs({"heightKey": f.get("heightKey"), "depthKey": f.get("depthKey")})),
         })
         built.add(f["id"])
     if field_verts:

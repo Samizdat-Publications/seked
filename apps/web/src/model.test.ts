@@ -77,7 +77,10 @@ describe('the plateau and the Sphinx', () => {
     const features = bundle.footprints.features;
     const named = features.filter((f) => f.group !== 'mastabas');
     const field = model.plateau.find((m) => m.id === 'mastabas');
-    expect(model.plateau.length).toBe(named.length + 1);
+    // Plus the one built from Petrie's records at build time: Khufu's basalt pavement.
+    expect(model.plateau.length).toBe(named.length + 1 + 1);
+    expect(model.plateau.some((m) => m.id === 'khufu.basalt_pavement')).toBe(true);
+    expect(model.plateau.some((m) => m.id === 'khafre.causeway')).toBe(true);
     expect(field?.count).toBe(features.length - named.length);
   });
 

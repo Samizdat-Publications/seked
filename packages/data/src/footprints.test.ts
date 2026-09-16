@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildEnvironment, footprintInputs, footprintMesh, meshVolume, type Footprint, type Mesh } from '@seked/geometry';
+import { buildEnvironment, footprintInputs, footprintMesh, meshVolume, ringCentroid, surveyFootprints, type Footprint, type Mesh } from '@seked/geometry';
 import { REPO_ROOT, loadDatabase, loadFootprints, resolve } from './index';
 
 /**
@@ -17,6 +17,8 @@ const { values } = resolve(db, file.preset);
 const env = buildEnvironment(values);
 const features = file.features as Footprint[];
 const byId = new Map(features.map((f) => [f.id, f]));
+const surveyed = surveyFootprints(env, features);
+const everything = [...features, ...surveyed];
 
 describe('the footprint import', () => {
   it('cites a source the database knows, and carries its attribution', () => {
@@ -42,11 +44,11 @@ describe('the footprint import', () => {
 
   it('asks the database only for heights the database has', () => {
     const keys = new Set(db.measurements.map((m) => m.key));
-    for (const f of features) for (const key of footprintInputs(f)) expect(keys.has(key), `${f.id} wants ${key}`).toBe(true);
+    for (const f of everything) for (const key of footprintInputs(f)) expect(keys.has(key), `${f.id} wants ${key}`).toBe(true);
   });
 
   it('builds every one of them, each enclosing a positive volume', () => {
-    for (const f of features) {
+    for (const f of everything) {
       const mesh = footprintMesh(f, env);
       expect(mesh, f.id).toBeDefined();
       expect(meshVolume(mesh as Mesh), f.id).toBeGreaterThan(0);
@@ -81,6 +83,58 @@ describe('the footprint import', () => {
   });
 });
 
+/**
+ * The two solids built from Petrie rather than traced, and the check on the
+ * tracing that his trenches make possible: OSM's boat pits east of Khufu,
+ * registered only through the three pyramids, against the trench axes he
+ * measured in section 29, which nothing was fitted to.
+ */
+describe('the plateau against Petrie', () => {
+  const half = (values['g1.base.side.mean'] as number) / 2;
+
+  it('lays the basalt pavement against Khufu’s east face, two squares of about 1060 inches', () => {
+    const pavement = surveyed.find((f) => f.id === 'khufu.basalt_pavement') as Footprint;
+    expect(pavement).toBeDefined();
+    const xs = pavement.ring.map(([x]) => x);
+    const ys = pavement.ring.map(([, y]) => y);
+    expect(Math.min(...xs)).toBeGreaterThan(half);
+    // "the plan of the basalt pavement seems to be two adjacent squares of
+    // about 1,060 inches in the side", section 28.
+    const square = 1060 * 0.0254;
+    expect((Math.max(...ys) - Math.min(...ys)) / 2).toBeCloseTo(square, -1);
+    expect(Math.max(...xs) - Math.min(...xs)).toBeCloseTo(square, -1);
+  });
+
+  it('runs Khafre’s causeway over a quarter of a mile, as Petrie says it is, and climbs to the upper temple', () => {
+    const causeway = byId.get('khafre.causeway') as Footprint;
+    expect(causeway).toBeDefined();
+    const ring = causeway.ring as [number, number][];
+    const half = ring.length / 2;
+    const [a, b, d] = [ring[0], ring[half - 1], ring[ring.length - 1]] as [number, number][];
+    const length = Math.hypot((b as number[])[0] as number - (a as number[])[0]!, (b as number[])[1] as number - (a as number[])[1]!);
+    expect(length).toBeGreaterThan(values['khafre.causeway.length.min'] as number);
+    // The width was taken from the record when the file was written, so a
+    // changed record is caught here until the import is run again.
+    const width = Math.hypot((d as number[])[0] as number - (a as number[])[0]!, (d as number[])[1] as number - (a as number[])[1]!);
+    expect(width).toBeCloseTo(values['khafre.causeway.width'] as number, 1);
+    const bases = causeway.bases as number[];
+    expect(bases.length).toBe(ring.length);
+    expect(bases[half - 1] as number).toBeGreaterThan((bases[0] as number) + 30);
+  });
+
+  it('finds OSM’s boat pits within a few metres of the trench axes Petrie measured, which nothing was fitted to', () => {
+    for (const [side, osm] of [['north', 'g1.boat_pit.north_east'], ['south', 'g1.boat_pit.south_east']] as const) {
+      const at = (end: string, axis: string) => values[`g1.trench.${side}.axis.${end}.${axis}`] as number;
+      const petrie: [number, number] = [
+        half + (at('inner', 'beyond_east_base') + at('outer', 'beyond_east_base')) / 2,
+        (at('inner', 'north') + at('outer', 'north')) / 2,
+      ];
+      const [x, y] = ringCentroid((byId.get(osm) as Footprint).ring);
+      expect(Math.hypot(x - petrie[0], y - petrie[1]), side).toBeLessThan(5);
+    }
+  });
+});
+
 function python(): string | undefined {
   for (const bin of ['python3', 'python']) {
     try {
@@ -103,13 +157,13 @@ describe.skipIf(!py)('blender/seked_data.py builds the same footprint solids as 
   const theirs = JSON.parse(lines[lines.length - 1] as string) as Record<string, { verts: number[][]; faces: number[][] }>;
 
   it('builds the same set', () => {
-    expect(Object.keys(theirs).sort()).toEqual(features.map((f) => f.id).sort());
+    expect(Object.keys(theirs).sort()).toEqual(everything.map((f) => f.id).sort());
   });
 
   it('with the same triangles and the same vertices, every one', () => {
     let worst = 0;
     let where = '';
-    for (const f of features) {
+    for (const f of everything) {
       const ours = footprintMesh(f, env) as Mesh;
       const mirror = theirs[f.id] as { verts: number[][]; faces: number[][] };
       expect(mirror.verts.length, `${f.id} vertices`).toBe(ours.vertexCount);

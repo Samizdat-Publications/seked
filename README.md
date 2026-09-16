@@ -197,10 +197,17 @@ three-dimensional model of it, forepaws, body and head, and it replaces the
 box, which floated on the datum plane at the old commonly cited coordinates.
 Heights are OSM's where it tags one and a seked-estimate where it does not.
 
-Next, in order. Khafre's causeway as a ribbon between the two temples it
-joins, which are now both placed, at the "about 15 feet wide" Petrie gives it
-in section 95; Khufu's mortuary temple, which OSM does not carry because
-little but its basalt pavement survives; per-tomb heights for the mastabas in
+Two monuments are built from Petrie rather than from OSM. Khufu's mortuary
+temple is gone but its basalt floor is not, and section 28 gives the four
+corners of its rock-cut bed in the Pyramid's own frame, two squares of about
+1060 inches. Khafre's causeway joins his two temples at the "about 15 feet
+wide" section 95 gives it and runs 495 m, which is his "over quarter of a
+mile"; it is laid on its ridge in 24 segments, because a straight ramp between
+the two temple floors ran up to three and a half metres underground. Petrie's
+trench axes in section 29 also check the OSM registration where nothing was
+fitted: the boat pits east of Khufu land within 3.3 and 1.5 m of them.
+
+Next, in order: per-tomb heights for the mastabas in
 place of the one estimate; a decision on `qc.shaft.north.angle`, which the
 Upuaut report does not support (see above); and the cinematic re-rendered at
 hero quality. Three items wait on drawings rather than text, and are recorded

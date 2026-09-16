@@ -303,6 +303,7 @@ def casing_over_granite_material(structure, label, height):
 
 
 PIT_NAME = "Rock-cut pit"
+BASALT_NAME = "Basalt paving"
 
 # The one footprint that is not limestone: the temple Petrie calls the Granite
 # Temple, whose walls and pillars are Aswan granite over a limestone core.
@@ -319,7 +320,17 @@ def pit_material():
     return mat
 
 
-def plateau_material(obj, limestone, granite, pit):
+def basalt_material():
+    """The basalt of Khufu's temple floor: near black, a little glossy where it was sawn and dressed."""
+    mat, tree, bsdf = new_material(BASALT_NAME)
+    if tree is None:
+        return mat
+    bsdf.inputs["Base Color"].default_value = (0.035, 0.036, 0.038, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.55
+    return mat
+
+
+def plateau_material(obj, limestone, granite, pit, basalt=None):
     """
     The masses from the footprint import, by what they are rather than by name:
     a pit is dark, the Granite Temple is granite, and everything else is the
@@ -330,6 +341,8 @@ def plateau_material(obj, limestone, granite, pit):
         return pit
     if obj.get("seked_footprint") in GRANITE_FOOTPRINTS:
         return granite
+    if basalt is not None and obj.get("seked_footprint") == "khufu.basalt_pavement":
+        return basalt
     return limestone
 
 
@@ -380,6 +393,7 @@ def assign_materials():
     granite = granite_material()
     hypothesis = hypothesis_material()
     pit = pit_material()
+    basalt = basalt_material()
     sand = sand_material()
     core, banded = core_material(False), core_material(True)
     cased = {}
@@ -403,7 +417,7 @@ def assign_materials():
         elif name.startswith("void."):
             mat = hypothesis
         elif obj.get("seked_structure") == "plateau":
-            mat = plateau_material(obj, banded, granite, pit)
+            mat = plateau_material(obj, banded, granite, pit, basalt)
         else:
             mat = granite
         obj.data.materials.clear()

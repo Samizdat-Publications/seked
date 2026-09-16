@@ -6,7 +6,7 @@
  */
 import { evaluateClaim, type Claim, type ClaimResult } from '@seked/claims/browser';
 import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
-import { buildEnvironment, courseHeights, footprintMesh, interiorSolids, type Environment, type Footprint, type Mesh, type Solid } from '@seked/geometry';
+import { buildEnvironment, courseHeights, footprintMesh, interiorSolids, surveyFootprints, type Environment, type Footprint, type Mesh, type Solid } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
 
 export const STRUCTURES = ['g1', 'g2', 'g3'] as const;
@@ -141,7 +141,9 @@ export function mergeMeshes(meshes: readonly Mesh[]): Mesh {
 export function plateauMasses(features: readonly Footprint[], env: Environment): PlateauMass[] {
   const out: PlateauMass[] = [];
   const field: Mesh[] = [];
-  for (const f of features) {
+  // The traced footprints, then the solids built from survey records, some of
+  // which (Khafre's causeway) are placed by the traced ones they join.
+  for (const f of [...features, ...surveyFootprints(env, features)]) {
     const mesh = footprintMesh(f, env);
     if (!mesh) continue;
     if (f.group === 'mastabas') field.push(mesh);
