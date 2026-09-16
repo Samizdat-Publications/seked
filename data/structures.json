@@ -142,5 +142,13 @@
     "evidence": "excavated",
     "source": "coords-delta-cited",
     "note": "A place rather than a monument, and a modern town standing for the Pelusiac mouth at the Delta's eastern limit."
+  },
+  {
+    "id": "plateau",
+    "site": "giza",
+    "name": "The plateau's lesser monuments (Tier 3)",
+    "evidence": "excavated",
+    "source": "osm-2026",
+    "note": "The queens' and satellite pyramids, Khentkawes, the four temples of Khafre and Menkaure, the Sphinx Temple and Amenhotep II's, the boat pits east of Khufu, the Wall of the Crow and the mastaba fields, as massing solids from OSM footprints registered onto the survey. Every one is excavated; what is not measured is their height, which is a seked-estimate where OSM gives none."
   }
 ]

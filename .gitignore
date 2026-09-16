@@ -22,6 +22,9 @@ build/
 data/stars/hyg_v42.csv
 data/stars/hyg_v42.csv.gz
 
+# Fetched from Overpass by `pnpm run footprints`; see data/sources.json, source osm-2026
+data/footprints/overpass-giza.json
+
 # Written by `pnpm bundle` from data/
 apps/web/public/seked.json
 apps/web/public/terrain/

@@ -17,7 +17,8 @@
     "shafts": "tsx scripts/shafts.ts",
     "sky-bake": "tsx scripts/sky-bake.ts",
     "sky-rollback": "tsx scripts/sky-rollback.ts",
-    "stars": "tsx scripts/stars.ts"
+    "stars": "tsx scripts/stars.ts",
+    "footprints": "tsx scripts/footprints.ts"
   },
   "devDependencies": {
     "@seked/claims": "workspace:*",

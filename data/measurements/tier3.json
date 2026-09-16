@@ -1,0 +1,62 @@
+[
+  {
+    "key": "tier3.mastaba.height",
+    "structure": "plateau",
+    "quantity": "length",
+    "value": 4.0,
+    "unit": "m",
+    "sigma": 2.0,
+    "source": "seked-estimate",
+    "method": "massing estimate",
+    "note": "One height for every mastaba in the OSM footprint import, which traces outlines and tags no heights. Four metres is a massing figure so the cemetery fields read as a field of low solid tombs rather than as outlines on the sand: the Giza mastabas were built to several times that, and most now stand far lower, so the sigma is half the value and nothing should be concluded from any one of them. Replace it with a per-tomb height from Reisner or the Giza Archives when one is to hand.",
+    "verified": false
+  },
+  {
+    "key": "tier3.temple.height",
+    "structure": "plateau",
+    "quantity": "length",
+    "value": 6.0,
+    "unit": "m",
+    "sigma": 4.0,
+    "source": "seked-estimate",
+    "method": "massing estimate",
+    "note": "One height for the six temples in the OSM footprint import: the mortuary and valley temples of Khafre and Menkaure, the Sphinx Temple and the temple of Amenhotep II. They survive very unequally, Khafre's valley temple standing to its roof in places and Menkaure's mortuary temple barely above its foundations, so this is a massing figure with a wide sigma, not a claim about any of them.",
+    "verified": false
+  },
+  {
+    "key": "tier3.satellite_pyramid.height",
+    "structure": "plateau",
+    "quantity": "length",
+    "value": 3.0,
+    "unit": "m",
+    "sigma": 2.0,
+    "source": "seked-estimate",
+    "method": "massing estimate",
+    "note": "Khafre's satellite pyramid, G2-a, south of his pyramid, survives as little more than its foundation. OSM traces the footprint and gives no height; three metres keeps it visible as a ruin and says nothing about what it was.",
+    "verified": false
+  },
+  {
+    "key": "tier3.wall_of_the_crow.height",
+    "structure": "plateau",
+    "quantity": "length",
+    "value": 8.0,
+    "unit": "m",
+    "sigma": 3.0,
+    "source": "seked-estimate",
+    "method": "massing estimate",
+    "note": "The Wall of the Crow, the great limestone wall at the south-east of the plateau between the pyramids and the workers' town. OSM traces a short stretch and tags no height; eight metres is a massing figure for a wall that stands to roughly that order, with a sigma to say it is not measured.",
+    "verified": false
+  },
+  {
+    "key": "tier3.boat_pit.depth",
+    "structure": "plateau",
+    "quantity": "length",
+    "value": 6.0,
+    "unit": "m",
+    "sigma": 3.0,
+    "source": "seked-estimate",
+    "method": "massing estimate",
+    "note": "How far each boat pit in the OSM footprint import is cut below the ground it is traced on. The pits east of the Great Pyramid are deep rock-cut trenches and OSM gives only their outlines, so six metres is a figure chosen to draw them as cuts rather than as marks on the surface.",
+    "verified": false
+  }
+]

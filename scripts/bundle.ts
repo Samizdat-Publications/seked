@@ -7,7 +7,7 @@
  * the dossier's inputs are. What lands in the browser is the database itself,
  * not a rendering of it: sources, sites, structures, presets, every
  * measurement, the normalised claims, the named stars, the bright star
- * catalogue and the terrain header.
+ * catalogue, the terrain header and the footprint import.
  * The viewer resolves presets and evaluates claims for itself.
  *
  * Running it twice writes the same bytes twice.
@@ -16,7 +16,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadClaims } from '@seked/claims';
-import { DATA_DIR, REPO_ROOT, TerrainHeaderSchema, loadDatabase } from '@seked/data';
+import { DATA_DIR, REPO_ROOT, TerrainHeaderSchema, loadDatabase, loadFootprints } from '@seked/data';
 import { limitMagnitude, loadBrightStars, loadNamedStars } from '@seked/sky';
 import type { SekedBundle } from '../apps/web/src/bundle';
 
@@ -49,6 +49,7 @@ export function buildBundle(dataDir = DATA_DIR): SekedBundle {
     stars,
     brightStars,
     terrain: { header, heights: `${TERRAIN_DIR}/${header.heights}` },
+    footprints: loadFootprints(dataDir),
   };
 }
 

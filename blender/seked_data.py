@@ -1731,3 +1731,145 @@ if __name__ == "__main__" and "--courses" in sys.argv:
     # Appended, so the file only ever grows; this is the last line printed.
     _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
     print(json.dumps(stepped_variants(resolve(load_database(), _preset)["values"])))
+
+
+# --- The plateau's lesser monuments, from footprints -----------------------
+# Mirrors packages/geometry/src/footprints.ts, and a parity test pins the two
+# meshes to each other. A footprint is an outline already in the project frame
+# and already set on the scene's ground by scripts/footprints.ts, from
+# OpenStreetMap. It becomes a prism (carried straight up), a pyramid (rising
+# to an apex over its own area centroid) or a pit (cut down from the ground).
+# These are massings: no courses, no casing, and heights that are OSM's or a
+# seked-estimate. The three large pyramids are never built here.
+
+PIT_LIP = 0.01
+_COLLINEAR = 1e-9
+
+
+def load_footprints(data_dir=DATA_DIR, name="giza"):
+    """The footprint import as written, or None if it has not been run."""
+    path = os.path.join(data_dir, "footprints", name + ".json")
+    if not os.path.exists(path):
+        return None
+    return _read(path)
+
+
+def _cross2(a, b, c):
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+
+
+def _strictly_inside(p, a, b, c):
+    return (_cross2(a, b, p) > _COLLINEAR and _cross2(b, c, p) > _COLLINEAR
+            and _cross2(c, a, p) > _COLLINEAR)
+
+
+def triangulate(ring):
+    """
+    Ear clipping over a simple counter-clockwise polygon, as a flat list of
+    indices, three to a triangle. Mirrors triangulate in footprints.ts step for
+    step, collinear vertices clipped as zero-area triangles and any remainder
+    fanned from its first vertex, so the two produce the same triangles.
+    """
+    open_ = list(range(len(ring)))
+    out = []
+    while len(open_) > 3:
+        clipped = False
+        for k in range(len(open_)):
+            i0 = open_[(k + len(open_) - 1) % len(open_)]
+            i1 = open_[k]
+            i2 = open_[(k + 1) % len(open_)]
+            a, b, c = ring[i0], ring[i1], ring[i2]
+            turn = _cross2(a, b, c)
+            if turn < -_COLLINEAR:
+                continue
+            if turn > _COLLINEAR:
+                if any(_strictly_inside(ring[j], a, b, c) for j in open_ if j not in (i0, i1, i2)):
+                    continue
+            out.extend((i0, i1, i2))
+            del open_[k]
+            clipped = True
+            break
+        if not clipped:
+            break
+    for k in range(1, len(open_) - 1):
+        out.extend((open_[0], open_[k], open_[k + 1]))
+    return out
+
+
+def ring_centroid(ring):
+    """The area centroid of a counter-clockwise polygon."""
+    a = cx = cy = 0.0
+    for i in range(len(ring)):
+        x0, y0 = ring[i]
+        x1, y1 = ring[(i + 1) % len(ring)]
+        c = x0 * y1 - x1 * y0
+        a += c
+        cx += (x0 + x1) * c
+        cy += (y0 + y1) * c
+    return (cx / (3.0 * a), cy / (3.0 * a))
+
+
+def footprint_inputs(feature):
+    """The records a footprint's solid is built from."""
+    return [k for k in (feature.get("heightKey"), feature.get("depthKey")) if k is not None]
+
+
+def footprint_span(feature, values):
+    """(bottom, top) in the frame, or None where the values lack the height it needs."""
+    base = feature["base"]
+    if feature["kind"] == "pit":
+        key = feature.get("depthKey")
+        depth = values.get(key) if key is not None else None
+        if depth is None or not depth > 0:
+            return None
+        return (base - depth, base + PIT_LIP)
+    height = feature.get("height")
+    if height is None and feature.get("heightKey") is not None:
+        height = values.get(feature["heightKey"])
+    if height is None:
+        return None
+    bottom = base + feature.get("minHeight", 0.0)
+    top = base + height
+    return (bottom, top) if top > bottom else None
+
+
+def footprint_geometry(feature, values):
+    """Vertices and faces for one footprint's solid, or None. Same layout and winding as footprintMesh."""
+    span = footprint_span(feature, values)
+    ring = [tuple(p) for p in feature["ring"]]
+    if span is None or len(ring) < 3:
+        return None
+    bottom, top = span
+    n = len(ring)
+    caps = triangulate(ring)
+    verts = [(x, y, bottom) for x, y in ring]
+    faces = []
+    for t in range(0, len(caps), 3):
+        faces.append((caps[t], caps[t + 2], caps[t + 1]))
+    if feature["kind"] == "pyramid":
+        cx, cy = ring_centroid(ring)
+        verts.append((cx, cy, top))
+        for i in range(n):
+            faces.append((i, (i + 1) % n, n))
+        return verts, faces
+    verts.extend((x, y, top) for x, y in ring)
+    for t in range(0, len(caps), 3):
+        faces.append((n + caps[t], n + caps[t + 1], n + caps[t + 2]))
+    for i in range(n):
+        j = (i + 1) % n
+        faces.append((i, j, n + j))
+        faces.append((i, n + j, n + i))
+    return verts, faces
+
+
+if __name__ == "__main__" and "--footprints" in sys.argv:
+    # Appended, so the file only ever grows; this is the last line printed.
+    _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
+    _values = resolve(load_database(), _preset)["values"]
+    _file = load_footprints()
+    _out = {}
+    for _f in (_file or {}).get("features", []):
+        _g = footprint_geometry(_f, _values)
+        if _g is not None:
+            _out[_f["id"]] = {"verts": [list(v) for v in _g[0]], "faces": [list(f) for f in _g[1]]}
+    print(json.dumps(_out))

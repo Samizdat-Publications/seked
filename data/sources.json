@@ -338,5 +338,14 @@
     "url": "https://github.com/Samizdat-Publications/seked",
     "license": "CC0",
     "note": "Every record on this source is verified: false and stays so. It exists so the scene can show a passage or a room whose overall shape is known while one dimension is not, without pretending the dimension was measured; a record on it should be replaced the moment a survey figure is found, and the dossier and the viewer mark it as an estimate."
+  },
+  {
+    "id": "osm-2026",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "OpenStreetMap contributors. Ways on the Giza plateau tagged historic, tomb, building:part or building=sphinx, fetched through the Overpass API from the planet as of 2026-07-15.",
+    "url": "https://www.openstreetmap.org/",
+    "license": "Open Database License (ODbL) 1.0. Attribution: © OpenStreetMap contributors.",
+    "note": "Traced from imagery, not surveyed, and some of it modelled in three dimensions by mappers: the Sphinx is a body to 11 m, a head from 11 to 20 m and forepaws to 4 m, and the queens' pyramids carry heights that are the restored originals from the Egyptological literature rather than what stands today. scripts/footprints.ts registers the outlines onto the survey frame through the three large pyramids and writes data/footprints/giza.json with the fit's residuals in its header; the raw Overpass response is gitignored and its sha256 is in that header. A height OSM gives is used as OSM gives it; a height it does not is a measurement key, usually a seked-estimate."
   }
 ]

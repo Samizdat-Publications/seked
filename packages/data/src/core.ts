@@ -113,6 +113,47 @@ export const TerrainHeaderSchema = z.object({
 });
 export type TerrainHeader = z.infer<typeof TerrainHeaderSchema>;
 
+/**
+ * One monument's outline from the footprint import, already in the project
+ * frame and set on the scene's ground. See scripts/footprints.ts for how it
+ * got there and packages/geometry/src/footprints.ts for what is built from it.
+ */
+export const FootprintSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  kind: z.enum(['prism', 'pyramid', 'pit']),
+  group: z.string(),
+  osm: z.number().int(),
+  base: z.number(),
+  height: z.number().positive().optional(),
+  minHeight: z.number().nonnegative().optional(),
+  heightKey: z.string().optional(),
+  depthKey: z.string().optional(),
+  area: z.number().positive(),
+  ring: z.array(z.tuple([z.number(), z.number()])).min(3),
+});
+export type FootprintRecord = z.infer<typeof FootprintSchema>;
+
+/** The footprint import as written: its provenance, the registration fit, and the outlines. */
+export const FootprintFileSchema = z.object({
+  source: z.string(),
+  attribution: z.string(),
+  osmBase: z.string(),
+  query: z.string(),
+  sha256: z.string().regex(/^[0-9a-f]{64}$/),
+  preset: z.string(),
+  registration: z.object({
+    method: z.string(),
+    origin: z.object({ latitude: z.number(), longitude: z.number() }),
+    rotationArcmin: z.number(),
+    translation: z.tuple([z.number(), z.number()]),
+    residuals: z.record(z.string(), z.number().nonnegative()),
+    unfittedScale: z.number().positive(),
+  }),
+  features: z.array(FootprintSchema),
+});
+export type FootprintFile = z.infer<typeof FootprintFileSchema>;
+
 export interface Resolved {
   preset: Preset;
   /** The winning record for each key. */

@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
-import { MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, type Database, type Measurement } from './core';
+import { FootprintFileSchema, MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, type Database, type FootprintFile, type Measurement } from './core';
 
 export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 export const DATA_DIR = join(REPO_ROOT, 'data');
@@ -64,6 +64,11 @@ export function loadDatabase(dataDir = DATA_DIR): Database {
     seen.add(k);
   }
   return { sources, sites, structures, measurements, presets };
+}
+
+/** The footprint import, validated. Written by `pnpm run footprints`. */
+export function loadFootprints(dataDir = DATA_DIR, name = 'giza'): FootprintFile {
+  return FootprintFileSchema.parse(JSON.parse(readFileSync(join(dataDir, 'footprints', `${name}.json`), 'utf8')));
 }
 
 // The terrain heightfield reader lives in its own module; re-exported so `@seked/data` stays one import.

@@ -8,7 +8,7 @@
  * script as well as the app, so nothing here may touch the DOM or Node.
  */
 import type { Claim } from '@seked/claims/browser';
-import type { Database, Measurement, Preset, Site, Source, Structure, TerrainHeader } from '@seked/data/browser';
+import type { Database, FootprintFile, Measurement, Preset, Site, Source, Structure, TerrainHeader } from '@seked/data/browser';
 import { expandBrightStars, type BrightCatalogue, type BrightStar, type Star } from '@seked/sky/browser';
 
 export interface BundledTerrain {
@@ -35,6 +35,12 @@ export interface SekedBundle {
    */
   brightStars: BrightCatalogue;
   terrain: BundledTerrain;
+  /**
+   * The plateau's lesser monuments, from OpenStreetMap, registered onto the
+   * survey and set on the ground by scripts/footprints.ts. The viewer builds
+   * them with the same `footprintMesh` Blender's mirror runs.
+   */
+  footprints: FootprintFile;
 }
 
 /** The catalogue rows with their columns named. Call it once and keep the result. */
