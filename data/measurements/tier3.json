@@ -8,7 +8,7 @@
     "sigma": 2.0,
     "source": "seked-estimate",
     "method": "massing estimate",
-    "note": "One height for every mastaba in the OSM footprint import, which traces outlines and tags no heights. Four metres is a massing figure so the cemetery fields read as a field of low solid tombs rather than as outlines on the sand: the Giza mastabas were built to several times that, and most now stand far lower, so the sigma is half the value and nothing should be concluded from any one of them. Replace it with a per-tomb height from Reisner or the Giza Archives when one is to hand.",
+    "note": "One height for every mastaba in the OSM footprint import, which traces outlines and tags no heights. Four metres is a massing figure so the cemetery fields read as a field of low solid tombs rather than as outlines on the sand: the Giza mastabas were built to several times that, and most now stand far lower, so the sigma is half the value and nothing should be concluded from any one of them. Replace it with a per-tomb height from Reisner or the Giza Archives when one is to hand. Checked against Reisner on 2026-09-16 (source reisner-1942): the core mastabas of cemetery G 1200 in his Appendix A stand to a maximum height of 5.1 m (p. 389), 4.1 m (p. 392), c. 5.0 m (p. 394) and 5.0 m (p. 396), and the other tombs whose height the text layer gives cleanly run from 3 to 6 m. Their areas cluster so closely (254 to 262 sq. m) that no height can be scaled from an outline's size, so the one figure stands, and it errs low for a core mastaba as built.",
     "verified": false
   },
   {
