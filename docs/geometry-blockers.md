@@ -41,11 +41,11 @@ without poppler (the reason the Read tool could not show a PDF).
 1. `render` a page to PNG at a stated DPI, cached outside the repo.
 2. `grid` a crop with a labelled pixel grid burned in, so points are located
    by reading the grid.
-2. `scale` from the two pixel ends of a scale bar and its printed length:
+3. `scale` from the two pixel ends of a scale bar and its printed length:
    metres per pixel, and shrinkage against nominal.
-3. `measure` pixel points into metres with the three-term sigma, printed as a
+4. `measure` pixel points into metres with the three-term sigma, printed as a
    ready-to-paste record.
-4. `register` a plan onto the frame from control points, with the same
+5. `register` a plan onto the frame from control points, with the same
    least-squares rotation and translation `scripts/footprints.ts` fits OSM with.
 
 ## Part 2. The four holes
@@ -182,21 +182,24 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
 5. **Hero renders and the film**, re-rendered at the end of each step above,
    logged in `docs/progress/log/`, with milestone snapshots in
    `docs/progress/`.
-5. **The viewer**, fed the same textures through glTF with KTX2 compression
+6. **The viewer**, fed the same textures through glTF with KTX2 compression
    (gltf-transform), as docs/plan.html always intended, so the browser is not
    the poor relation of the renders.
 
 ## Order of work
 
-1. The well shaft, from Smyth.
-2. `scripts/plate.py`.
-3. Khafre's casing cap.
-4. Materials (visual 1) and atmosphere (visual 2), then a hero-render pass.
-   The biggest visible gain in the project.
-5. Menkaure's route.
-6. Stand-in models (visual 3), mastaba form and heights (hole 4).
-7. Milky Way, the viewer's textures, the film re-rendered over the new
-   materials.
+Done on 2026-09-16: the hero film (snapshot 0016), the well shaft (from the
+plates, not Smyth), `scripts/plate.py`, Khafre's casing cap (from text), a
+first materials and atmosphere pass, the first stand-in (the Sphinx), and the
+Milky Way (snapshots 0017 to 0020). What is left, in order:
+
+1. Menkaure's route, from Maragioglio and Rinaldi's Tavole 6,2.
+2. Mastaba form and heights (hole 4), and more stand-ins: the temples, and an
+   excavated Sphinx to replace the 1903 bronze.
+3. The second materials pass: displacement on the stepped core, granite and
+   basalt, the mastabas' stone.
+4. The viewer's textures, and the film re-rendered over the new materials and
+   the Milky Way.
 
 ## Links
 
