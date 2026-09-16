@@ -415,9 +415,16 @@ describe('the Great Pyramid stays hand-written', () => {
       'kc.shaft.south',
       'qc.shaft.north',
       'qc.shaft.south',
+      'chamber.construction_1',
+      'chamber.construction_2',
+      'chamber.construction_3',
+      'chamber.construction_4',
+      'chamber.construction_5',
     ]);
     // A room's inputs are fixed; a shaft's start with the fixed ones and go
-    // on with however many legs the environment carries.
+    // on with however many legs the environment carries. A chamber of
+    // construction names the fallback list here, this environment carrying
+    // none of the stack, and names the whole solved stack where one resolves.
     const inputs = interiorSolidInputs(env);
     for (const [name, fixed] of Object.entries(INTERIOR_SOLID_INPUTS)) {
       if (name.includes('.shaft.')) expect(inputs[name]?.slice(0, fixed.length)).toEqual(fixed);

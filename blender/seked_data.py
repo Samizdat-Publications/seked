@@ -824,6 +824,114 @@ def _shaft_builder(chamber_id, side):
 
 INTERIOR_BUILDERS += [_shaft_builder(room, side) for room in ("kc", "qc") for side in ("north", "south")]
 
+# --- The chambers of construction ------------------------------------------
+# Mirrors constructionBuilders in packages/geometry/src/interiors.ts. Five
+# spaces stacked over the King's Chamber, each floored with the rough upper
+# side of the beams that roof the space below it. No source states how thick
+# those beams are, so the levels are not in the database: Vyse's 69 ft 3 in
+# from the King's Chamber floor to the roof of Campbell's closes the stack,
+# and what the five chambers' own heights leave of it is shared evenly
+# between the five floors. In plan they are centred on the King's Chamber,
+# which is Petrie's reading of the masons' lines in section 62.
+
+_CONSTRUCTION_COUNT = 5
+
+_CONSTRUCTION_ROOM_KEYS = ["kc.wall.north.north", "kc.wall.south.north",
+                           "kc.wall.east.east", "kc.wall.west.east",
+                           "kc.floor.elevation", "kc.ceiling.up"]
+
+
+def _construction_height(values, n):
+    """A chamber's height: the mean of the range Vyse's table gives it."""
+    base = "chamber.construction_%d.height" % n
+    lo = _number_at(values, base + ".min")
+    hi = _number_at(values, base + ".max")
+    if lo is None or hi is None or hi <= 0:
+        return None
+    return ((lo + hi) / 2.0, [base + ".min", base + ".max"])
+
+
+def construction_stack(values):
+    """
+    The whole stack, solved, as {"chambers", "slab", "keys"}, or None unless
+    every chamber's plan and height are carried and the closing figure with
+    them: four measured chambers and a guess at the fifth is not what the
+    sources say. A chamber is {"floor", "top", "ridge", "length", "width"},
+    "ridge" being None except on Campbell's, which is the one with a gable.
+    """
+    closing = _number_at(values, "chamber.construction.stack.height")
+    kc_floor = _number_at(values, "kc.floor.elevation")
+    kc_ceiling = _number_at(values, "kc.ceiling.up")
+    if closing is None or kc_floor is None or kc_ceiling is None or kc_ceiling <= kc_floor:
+        return None
+
+    keys = ["chamber.construction.stack.height"] + list(_CONSTRUCTION_ROOM_KEYS)
+    parts = []
+    for n in range(1, _CONSTRUCTION_COUNT + 1):
+        base = "chamber.construction_%d" % n
+        height = _construction_height(values, n)
+        length = _dimension(values, base + ".length", ("north", "south"))
+        width = _dimension(values, base + ".width", ("east", "west"))
+        if height is None or length is None or width is None or length[0] <= 0 or width[0] <= 0:
+            return None
+        own = list(height[1]) + list(length[1]) + list(width[1])
+        parts.append({"height": height[0], "length": length[0], "width": width[0], "keys": own})
+        keys += own
+
+    rooms = sum(part["height"] for part in parts)
+    slab = (closing - (kc_ceiling - kc_floor) - rooms) / _CONSTRUCTION_COUNT
+    if not slab > 0:
+        return None
+
+    gable_key = "chamber.construction_%d.wall.height" % _CONSTRUCTION_COUNT
+    gable_wall = _number_at(values, gable_key)
+
+    chambers = []
+    level = kc_ceiling
+    for i, part in enumerate(parts):
+        floor = level + slab
+        gabled = (i == _CONSTRUCTION_COUNT - 1 and gable_wall is not None
+                  and 0 < gable_wall < part["height"])
+        if gabled:
+            keys.append(gable_key)
+        chambers.append({"floor": floor,
+                         "top": floor + (gable_wall if gabled else part["height"]),
+                         "ridge": part["height"] if gabled else None,
+                         "length": part["length"], "width": part["width"]})
+        level = floor + part["height"]
+    return {"chambers": chambers, "slab": slab, "keys": keys}
+
+
+def _construction_builder(n):
+    prefix = "chamber.construction_%d" % n
+    fallback = [prefix + ".height.min", prefix + ".height.max",
+                "chamber.construction.stack.height"] + list(_CONSTRUCTION_ROOM_KEYS)
+
+    def keys(v):
+        # One chamber cannot be built without the other four: the floors
+        # between them come out of the closing figure, which only closes over
+        # the whole stack.
+        stack = construction_stack(v)
+        return list(stack["keys"]) if stack else fallback
+
+    def build(v):
+        stack = construction_stack(v)
+        if stack is None:
+            raise ValueError("interior_solids: the chambers of construction are not all in the values")
+        room = stack["chambers"][n - 1]
+        east = (_value(v, "kc.wall.east.east") + _value(v, "kc.wall.west.east")) / 2.0
+        north = (_value(v, "kc.wall.north.north") + _value(v, "kc.wall.south.north")) / 2.0
+        mn = (east - room["length"] / 2.0, north - room["width"] / 2.0, room["floor"])
+        mx = (east + room["length"] / 2.0, north + room["width"] / 2.0, room["top"])
+        if room["ridge"] is None:
+            return chamber(mn, mx)
+        return chamber(mn, mx, gable={"ridge_height": room["ridge"], "axis": "x"})
+
+    return (prefix, keys, build)
+
+
+INTERIOR_BUILDERS += [_construction_builder(n) for n in range(1, _CONSTRUCTION_COUNT + 1)]
+
 
 # --- Structures whose plan is discovered from their records ----------------
 # Mirrors the second half of packages/geometry/src/interiors.ts. G1's rooms are
@@ -919,18 +1027,23 @@ def _coordinate(values, base, axis, half):
 
 def _dimension(values, base, sides):
     """
-    A measured dimension, whole or as the sides a survey took it on: "length",
-    or the mean of "length.north" and "length.south". Whichever sides are
-    present are averaged, which is what G1's subterranean chamber does.
+    A measured dimension, as the sides a survey took it on or whole: the mean
+    of "length.north" and "length.south", or failing those "length". Whichever
+    sides are present are averaged, which is what G1's subterranean chamber
+    does.
+
+    The sides come first. A survey that reached both walls measured more than
+    one that stated an overall size, and the two spellings are different keys,
+    so the preset cannot arbitrate between them the way it does between two
+    sources of one key. That is how the chambers of construction take Petrie's
+    walls for their plan and Vyse's table for their heights.
     """
-    whole = _number_at(values, base)
-    if whole is not None:
-        return (whole, [base])
     found = [(base + "." + side, _number_at(values, base + "." + side)) for side in sides]
     found = [(k, v) for k, v in found if v is not None]
-    if not found:
-        return None
-    return (sum(v for _, v in found) / len(found), [k for k, _ in found])
+    if found:
+        return (sum(v for _, v in found) / len(found), [k for k, _ in found])
+    whole = _number_at(values, base)
+    return None if whole is None else (whole, [base])
 
 
 def _extent(values, base, axis, half, low, high, size, sides):

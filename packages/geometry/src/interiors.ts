@@ -392,8 +392,166 @@ function shaftBuilders(): Builder[] {
   return (['kc', 'qc'] as const).flatMap((room) => (['north', 'south'] as const).map((side) => shaftBuilder(room, side)));
 }
 
-/** The Great Pyramid's solids: Petrie's rooms in order from the entrance down and then up, then the four shafts. */
-const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders()];
+// --- The chambers of construction ------------------------------------------
+//
+// Five spaces stacked over the King's Chamber, each floored with the rough
+// upper side of the beams that roof the space below it. No source states how
+// thick those beams are: Petrie says in section 62 that they are "very
+// unequal in depth", and neither he nor Vyse measured one. So the levels are
+// not in the database and cannot be, and the stack is solved instead.
+//
+// Vyse's appendix gives each chamber's plan and the range its height varies
+// over, and one further figure that closes the whole thing: 69 ft 3 in,
+// perpendicular, from the King's Chamber floor to the roof of Campbell's.
+// Take the King's Chamber's own height out of that, take the five chambers'
+// heights out of it, and what is left is the five floors. Sharing that evenly
+// is the single assumption here; everything else is a measured record, and
+// the top of Campbell's lands on Vyse's figure by construction rather than by
+// agreement.
+//
+// In plan they are centred on the King's Chamber. That is Petrie's own
+// reading of the masons' lines in section 62: two vertical lines on the
+// second chamber's south wall 413.5 apart, "evidently intended for the length
+// of the King's Chamber below them", and a mid-line pair on its east wall
+// totalling 204.65, "intended for King's Chamber width". The chambers overrun
+// the room below on every side, and the builders set them out from its centre.
+
+/** The five, lowest first: Davison's, Wellington's, Nelson's, Lady Arbuthnot's, Campbell's. */
+const CONSTRUCTION_COUNT = 5;
+
+/** The records fixing the King's Chamber, which the stack stands on and is centred over. */
+const CONSTRUCTION_ROOM_KEYS = [
+  'kc.wall.north.north', 'kc.wall.south.north', 'kc.wall.east.east', 'kc.wall.west.east',
+  'kc.floor.elevation', 'kc.ceiling.up',
+] as const;
+
+interface ConstructionChamber {
+  /** Its floor, and the level its side walls stop at: the ceiling, or the wall top under a gable. */
+  floor: number;
+  top: number;
+  /** The ridge above the floor, where the chamber is roofed with a gable. */
+  ridge?: number;
+  length: number;
+  width: number;
+  keys: string[];
+}
+
+/** A chamber's height: the mean of the range Vyse's table gives it. */
+function constructionHeight(env: Environment, n: number): { value: number; keys: string[] } | undefined {
+  const base = `chamber.construction_${n}.height`;
+  const lo = numberAt(env, `${base}.min`);
+  const hi = numberAt(env, `${base}.max`);
+  if (lo === undefined || hi === undefined || hi <= 0) return undefined;
+  return { value: (lo + hi) / 2, keys: [`${base}.min`, `${base}.max`] };
+}
+
+/**
+ * The whole stack, solved. Nothing comes back unless every chamber's plan and
+ * height are carried and the closing figure with them, because four measured
+ * chambers and a guess at the fifth is not what the sources say.
+ */
+function constructionStack(env: Environment): { chambers: ConstructionChamber[]; slab: number; keys: string[] } | undefined {
+  const closing = numberAt(env, 'chamber.construction.stack.height');
+  const kcFloor = numberAt(env, 'kc.floor.elevation');
+  const kcCeiling = numberAt(env, 'kc.ceiling.up');
+  if (closing === undefined || kcFloor === undefined || kcCeiling === undefined) return undefined;
+  if (kcCeiling <= kcFloor) return undefined;
+
+  const keys: string[] = ['chamber.construction.stack.height', ...CONSTRUCTION_ROOM_KEYS];
+  const parts: { height: number; length: number; width: number; keys: string[] }[] = [];
+  for (let n = 1; n <= CONSTRUCTION_COUNT; n++) {
+    const base = `chamber.construction_${n}`;
+    const height = constructionHeight(env, n);
+    const length = dimension(env, `${base}.length`, ['north', 'south']);
+    const width = dimension(env, `${base}.width`, ['east', 'west']);
+    if (!height || !length || !width || length.value <= 0 || width.value <= 0) return undefined;
+    const own = [...height.keys, ...length.keys, ...width.keys];
+    parts.push({ height: height.value, length: length.value, width: width.value, keys: own });
+    keys.push(...own);
+  }
+
+  // What the closing figure leaves for the five floors, shared evenly.
+  const rooms = parts.reduce((a, part) => a + part.height, 0);
+  const slab = (closing - (kcCeiling - kcFloor) - rooms) / CONSTRUCTION_COUNT;
+  if (!(slab > 0)) return undefined;
+
+  // Campbell's is the one with a pitched roof: its side walls stop at the low
+  // wall Vyse measured, and the mean height carries on up to the ridge.
+  const gableKey = `chamber.construction_${CONSTRUCTION_COUNT}.wall.height`;
+  const gableWall = numberAt(env, gableKey);
+
+  const chambers: ConstructionChamber[] = [];
+  let level = kcCeiling;
+  for (const [i, part] of parts.entries()) {
+    const floor = level + slab;
+    const gabled = i === CONSTRUCTION_COUNT - 1 && gableWall !== undefined && gableWall > 0 && gableWall < part.height;
+    if (gabled) keys.push(gableKey);
+    chambers.push({
+      floor,
+      top: floor + (gabled ? (gableWall as number) : part.height),
+      ...(gabled ? { ridge: part.height } : {}),
+      length: part.length,
+      width: part.width,
+      keys: part.keys,
+    });
+    level = floor + part.height;
+  }
+  return { chambers, slab, keys };
+}
+
+/**
+ * The stack's solved levels, and how thick one floor came out, for a caller
+ * that wants the numbers rather than the solids: the dossier, a test that
+ * checks the top lands on Vyse's figure, and the Python mirror's parity test.
+ */
+export interface ConstructionStack {
+  slab: number;
+  chambers: { floor: number; top: number; ridge?: number }[];
+}
+
+export function constructionChamberLevels(env: Environment): ConstructionStack | undefined {
+  const stack = constructionStack(env);
+  if (!stack) return undefined;
+  return {
+    slab: stack.slab,
+    chambers: stack.chambers.map(({ floor, top, ridge }) => (ridge === undefined ? { floor, top } : { floor, top, ridge })),
+  };
+}
+
+function constructionBuilder(n: number): Builder {
+  const prefix = `chamber.construction_${n}`;
+  return {
+    name: prefix,
+    // One chamber cannot be built without the other four: the floors between
+    // them come out of the closing figure, which only closes over the whole
+    // stack. So every one of them names every record the stack was solved
+    // from, and a preset missing any of them builds none of the five.
+    keys: (env) => constructionStack(env)?.keys ?? [
+      `${prefix}.height.min`, `${prefix}.height.max`,
+      'chamber.construction.stack.height', ...CONSTRUCTION_ROOM_KEYS,
+    ],
+    build: (env) => {
+      const stack = constructionStack(env);
+      if (!stack) throw new Error('interiorSolids: the chambers of construction are not all in the environment');
+      const room = stack.chambers[n - 1] as ConstructionChamber;
+      const east = (value(env, 'kc.wall.east.east') + value(env, 'kc.wall.west.east')) / 2;
+      const north = (value(env, 'kc.wall.north.north') + value(env, 'kc.wall.south.north')) / 2;
+      const min: Point = [east - room.length / 2, north - room.width / 2, room.floor];
+      const max: Point = [east + room.length / 2, north + room.width / 2, room.top];
+      return room.ridge === undefined
+        ? chamber({ min, max, prefix })
+        : chamber({ min, max, gable: { ridgeHeight: room.ridge, axis: 'x' }, prefix });
+    },
+  };
+}
+
+function constructionBuilders(): Builder[] {
+  return Array.from({ length: CONSTRUCTION_COUNT }, (_, i) => constructionBuilder(i + 1));
+}
+
+/** The Great Pyramid's solids: Petrie's rooms in order from the entrance down and then up,
+ *  then the four shafts, then the five chambers of construction. */
+const BUILDERS: readonly Builder[] = [...ROOM_BUILDERS, ...shaftBuilders(), ...constructionBuilders()];
 
 /** Every record a shaft is built from under this environment: the fixed keys and the legs it actually carries. */
 export function shaftInputs(env: Environment, chamberId: string, side: 'north' | 'south'): readonly string[] {
@@ -496,18 +654,26 @@ interface Extent {
 }
 
 /**
- * A measured dimension, either whole or as the sides a survey took it on:
- * `length` or the mean of `length.north` and `length.south`. Whichever sides
- * are present are averaged, which is what G1's subterranean chamber does.
+ * A measured dimension, either as the sides a survey took it on or whole:
+ * the mean of `length.north` and `length.south`, or failing those `length`.
+ * Whichever sides are present are averaged, which is what G1's subterranean
+ * chamber does.
+ *
+ * The sides come first. A survey that reached both walls measured more than
+ * one that stated an overall size, and the two spellings are different keys,
+ * so the preset cannot arbitrate between them the way it does between two
+ * sources of one key. That is how the chambers of construction take Petrie's
+ * walls for their plan and Vyse's table for their heights.
  */
 function dimension(env: Environment, base: string, sides: readonly string[]): { value: number; keys: string[] } | undefined {
-  const whole = numberAt(env, base);
-  if (whole !== undefined) return { value: whole, keys: [base] };
   const found = sides
     .map((side) => ({ key: `${base}.${side}`, value: numberAt(env, `${base}.${side}`) }))
     .filter((p): p is { key: string; value: number } => p.value !== undefined);
-  if (found.length === 0) return undefined;
-  return { value: found.reduce((a, p) => a + p.value, 0) / found.length, keys: found.map((p) => p.key) };
+  if (found.length > 0) {
+    return { value: found.reduce((a, p) => a + p.value, 0) / found.length, keys: found.map((p) => p.key) };
+  }
+  const whole = numberAt(env, base);
+  return whole === undefined ? undefined : { value: whole, keys: [base] };
 }
 
 /**

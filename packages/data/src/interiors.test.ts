@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { INTERIOR_SOLID_INPUTS, buildEnvironment, interiorSolids, meshVolume } from '@seked/geometry';
+import {
+  INTERIOR_SOLID_INPUTS,
+  buildEnvironment,
+  constructionChamberLevels,
+  interiorSolidInputs,
+  interiorSolids,
+  meshVolume,
+} from '@seked/geometry';
 import type { Mesh } from '@seked/geometry';
 import { loadDatabase, resolve } from './index';
 
@@ -29,6 +36,11 @@ const EXPECTED = [
   'kc.shaft.south',
   'qc.shaft.north',
   'qc.shaft.south',
+  'chamber.construction_1',
+  'chamber.construction_2',
+  'chamber.construction_3',
+  'chamber.construction_4',
+  'chamber.construction_5',
 ];
 
 /** A closed surface uses every directed edge once, and its neighbour uses the reverse. */
@@ -108,7 +120,11 @@ describe('interiorSolids on the canonical preset', () => {
     const thin = { ...env };
     delete thin['kc.ceiling.up'];
     const built = interiorSolids(thin);
-    expect(Object.keys(built)).toEqual(EXPECTED.filter((name) => name !== 'kc'));
+    // The chambers of construction go with it: they stand on the King's
+    // Chamber roof, and the closing figure is measured from its floor, so
+    // without the ceiling there is nothing to take their own heights out of.
+    const gone = (name: string) => name === 'kc' || name.startsWith('chamber.construction_');
+    expect(Object.keys(built)).toEqual(EXPECTED.filter((name) => !gone(name)));
   });
 });
 
@@ -174,5 +190,82 @@ describe('the discovered interiors on the canonical preset', () => {
     expect(ex).toBeCloseTo(bx, 6);
     expect(ey).toBeLessThan(by);
     expect(ez).toBeLessThan(0);
+  });
+});
+
+/**
+ * The chambers of construction are the one part of the Great Pyramid whose
+ * levels are solved rather than stored, so they get their own checks: that the
+ * solve closes on the figure it was solved against, that the floors it invents
+ * are a thickness a granite beam could be, and that Vyse and Petrie agree
+ * about the plan of the chambers they both reached.
+ */
+describe('the chambers of construction on the canonical preset', () => {
+  const stack = constructionChamberLevels(env);
+  const inches = (metres: number) => metres / 0.0254;
+
+  it('lands the top of Campbell’s on the height Vyse measured to it', () => {
+    expect(stack).toBeDefined();
+    const apex = (stack as NonNullable<typeof stack>).chambers[4] as { floor: number; ridge?: number };
+    const above = apex.floor + (apex.ridge as number) - (values['kc.floor.elevation'] as number);
+    expect(inches(above)).toBeCloseTo(69 * 12 + 3, 6);
+  });
+
+  it('shares what is left over into five floors a granite beam could be', () => {
+    // Petrie calls the flooring beams "very unequal in depth" and no source
+    // measures one, so the even share is the assumption. What it must not be
+    // is absurd: a metre and a half to two and a half is the range the beams
+    // over the King’s Chamber are drawn at.
+    const slab = (stack as NonNullable<typeof stack>).slab;
+    expect(slab).toBeGreaterThan(1.5);
+    expect(slab).toBeLessThan(2.5);
+  });
+
+  it('stacks the five without a gap or an overlap', () => {
+    const chambers = (stack as NonNullable<typeof stack>).chambers;
+    const slab = (stack as NonNullable<typeof stack>).slab;
+    let below = values['kc.ceiling.up'] as number;
+    for (const room of chambers) {
+      expect(room.floor - below).toBeCloseTo(slab, 9);
+      below = room.floor + (room.ridge ?? room.top - room.floor);
+    }
+  });
+
+  it('roofs only Campbell’s with a gable, on the east-west ridge its slabs need', () => {
+    const chambers = (stack as NonNullable<typeof stack>).chambers;
+    expect(chambers.slice(0, 4).every((room) => room.ridge === undefined)).toBe(true);
+    const top = chambers[4] as { floor: number; top: number; ridge?: number };
+    expect(top.ridge).toBeGreaterThan(top.top - top.floor);
+    // The ridge runs east and west, so the solid is longer east to west than
+    // it is north to south, which is what puts the gable on that axis.
+    const mesh = solids['chamber.construction_5'] as Mesh;
+    const xs = mesh.positions.filter((_, i) => i % 3 === 0);
+    const ys = mesh.positions.filter((_, i) => i % 3 === 1);
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(Math.max(...ys) - Math.min(...ys));
+  });
+
+  it('takes the plan from Petrie’s walls where he reached them and from Vyse where he did not', () => {
+    // Davison’s: Petrie measured all four walls, so none of Vyse’s four
+    // figures for it is used, and the two surveys agree to about four inches.
+    const inputs = interiorSolidInputs(env)['chamber.construction_1'] as readonly string[];
+    expect(inputs).toContain('chamber.construction_1.length.north');
+    expect(inputs).not.toContain('chamber.construction_1.length');
+    const petrie = ((values['chamber.construction_1.length.north'] as number)
+      + (values['chamber.construction_1.length.south'] as number)) / 2;
+    expect(Math.abs(inches(petrie) - (38 * 12 + 4))) .toBeLessThan(5);
+
+    // Campbell’s: Petrie could only reach its south wall, and its width he
+    // says is "quite undefined", so its width is Vyse’s whole figure.
+    const top = interiorSolidInputs(env)['chamber.construction_5'] as readonly string[];
+    expect(top).toContain('chamber.construction_5.length.south');
+    expect(top).toContain('chamber.construction_5.width');
+    expect(top).not.toContain('chamber.construction_5.width.east');
+  });
+
+  it('stands the whole stack clear of the King’s Chamber and inside the Pyramid', () => {
+    const chambers = (stack as NonNullable<typeof stack>).chambers;
+    expect((chambers[0] as { floor: number }).floor).toBeGreaterThan(values['kc.ceiling.up'] as number);
+    const apex = chambers[4] as { floor: number; ridge?: number };
+    expect(apex.floor + (apex.ridge as number)).toBeLessThan(values['g1.height.original'] as number);
   });
 });
