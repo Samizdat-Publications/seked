@@ -19,8 +19,12 @@ describe('database', () => {
     expect(db.measurements.find((m) => m.key === 'c')?.verified).toBe(true);
     const kind = new Map(db.sources.map((s) => [s.id, s.kind]));
     for (const m of db.measurements.filter((m) => m.verified && kind.get(m.source) === 'survey')) {
-      // A section, a page number, or, for a survey published as a website, the named page or diary entry it was read on.
-      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+|\bshaft page\b|\bcampaign diary\b/);
+      // A section, a page number, or, for a survey published as a website,
+      // the named page or diary entry it was read on. The Upuaut report's own
+      // page names are "the findings page" and "the <upper|lower> <northern|
+      // southern> shaft page", and both count: each identifies one page of one
+      // report as exactly as a section number identifies one part of a book.
+      expect(m.note, `${m.key} from ${m.source} is verified without a section or page reference`).toMatch(/§\d+|pp?\. \d+|\bshaft page\b|\bfindings page\b|\bcampaign diary\b/);
     }
   });
 });

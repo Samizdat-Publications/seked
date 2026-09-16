@@ -490,3 +490,63 @@ describe('the Grand Gallery on the canonical preset', () => {
     expect(interiorSolidInputs(env)['gg']).toContain('gg.corbel.height');
   });
 });
+
+/**
+ * Gantenbrink measured where the King's Chamber shafts come out on the face,
+ * and this project does not build from those figures: the last leg of a shaft
+ * runs until it meets the face and the level it arrives at is a result. So the
+ * two can be compared, and the comparison is the only end-to-end check the
+ * shafts have.
+ *
+ * One of the four numbers agrees and three do not, and both facts are recorded
+ * here rather than only the flattering one. What agrees is the southern
+ * shaft's position east, and it agrees because the inlet it starts from
+ * stopped being an estimate: the middle of the chamber wall was 2.75 m out,
+ * and Gantenbrink's measured inlet puts the computed outlet within 0.16 m of
+ * his measured outlet, which is about the half shaft-width his east-wall
+ * convention costs. What does not agree is the northern shaft's position,
+ * whose westward dog-leg round the Grand Gallery is still two estimates, and
+ * both outlet heights, which are high because the legs below the final run are
+ * estimates too and because he measured on the present core face while the
+ * scene runs to the casing.
+ */
+describe('the shafts against Gantenbrink\u2019s measured outlets', () => {
+  const top = (name: string, k: number) => {
+    const mesh = solids[name] as Mesh;
+    return Math.max(...mesh.positions.filter((_, i) => i % 3 === k));
+  };
+
+  it('brings the southern shaft out where he measured it, east and west', () => {
+    const measured = values['kc.shaft.south.outlet.east'] as number;
+    expect(Math.abs(top('kc.shaft.south', 0) - measured)).toBeLessThan(0.3);
+  });
+
+  it('does not yet bring the northern shaft out where he measured it, its bend being estimated', () => {
+    // Held as a fact about the model, not an aspiration: segment 2's length and
+    // bearing are both seked-estimate, and until they are measured or solved
+    // this shaft cannot land on his figure. If this ever starts passing at a
+    // tight tolerance, the estimates have been replaced and the test should be
+    // turned round to say so.
+    const measured = values['kc.shaft.north.outlet.east'] as number;
+    expect(Math.abs(top('kc.shaft.north', 0) - measured)).toBeGreaterThan(1);
+  });
+
+  it('runs both shafts out above the level he measured, because it runs them to the casing', () => {
+    // He measured "excluding the missing casing", so on the present core face;
+    // the scene runs the last leg until it meets the as-built casing, which is
+    // further out and therefore higher. Part of the gap is that, and part is
+    // the estimated legs below. Bounded so a change either way is noticed.
+    for (const side of ['south', 'north']) {
+      const gap = top(`kc.shaft.${side}`, 2) - (values[`kc.shaft.${side}.outlet.up`] as number);
+      expect(gap, side).toBeGreaterThan(0);
+      expect(gap, side).toBeLessThan(4);
+    }
+  });
+
+  it('never builds a shaft from an outlet record, which would make the check circular', () => {
+    for (const side of ['south', 'north']) {
+      const inputs = interiorSolidInputs(env)[`kc.shaft.${side}`] as readonly string[];
+      expect(inputs.some((k) => k.includes('.outlet.')), side).toBe(false);
+    }
+  });
+});

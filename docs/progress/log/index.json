@@ -68,5 +68,15 @@
     "kept": false,
     "note": "The cutaway reframed from inside the Great Pyramid's own footprint, with the void solids on the hypothesis material: the five chambers of construction stacked on their granite floors, the Grand Gallery's corbels, and the Big Void as a pale volume that is plainly not a room.",
     "bytes": 1098923
+  },
+  {
+    "file": "2026-09-16T14-06-20Z--section--9fffb19-dirty.png",
+    "taken": "2026-09-16T14:06:20+00:00",
+    "view": "section",
+    "commit": "9fffb19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "After the verification pass on the shafts: the King's Chamber shaft inlets moved from the middle of the chamber wall, which was an estimate, onto Gantenbrink's measured 2.49 and 2.48 m.",
+    "bytes": 894039
   }
 ]

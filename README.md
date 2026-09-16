@@ -140,6 +140,35 @@ its own mid-height, the Chevron standing in that face. The section draws it
 as an outline with no fill, because a shape fitted to a muon deficit should
 not read like a room with a floor.
 
+A verification pass on the shafts, 2026-09-16, closed the open question in
+`kc.shaft.north.angle`'s own note and turned up two things. The Upuaut
+report's upper northern shaft page settles the angle outright: "The angle
+between this point and the point of the shaft's outlet on the flank of the
+pyramid (we measured both points) is 32.60°", which is 32° 36′, so the
+stored figure is the report's and not Bauval's 32° 28′. Three of claim
+C2's four shaft angles are now verified against the report's text.
+
+The fourth is not, and cannot be. `qc.shaft.north.angle` was entered on the
+starting sheet as 39° 07′ and **the report does not state it**. What the
+lower northern shaft page gives is a fluctuation, "between 33.3° and 40.1°"
+over 14 measurements, and an explicit refusal to name the intended angle. The
+two measured bounds are now recorded beside it; the old value is left in place
+and unverified rather than changed, because claim C2 draws a ray from it and
+which replacement the claim should use is a decision rather than a correction.
+
+The second finding was cheaper to fix. All four shaft inlet positions were
+estimates reading "the middle of the chamber wall", entered because
+"Gantenbrink's inlet positions are on his drawing and not in his text". They
+are in his text, on the findings page rather than the four shaft pages. The
+King's Chamber southern inlet moves 2.75 m east onto his measured 2.49 m, and
+its computed outlet moves with it to within 0.16 m of the 5.20 m east of the
+axis that the same page measures, which is about what his east-wall convention
+costs. Those outlet figures are now in the database purely as a check: nothing
+is built from them, and the one end-to-end test the shafts have compares them
+with a run the scene computes. The northern shaft still misses, its dog-leg
+round the Grand Gallery being two estimates, and the test says so rather than
+only reporting the shaft that agrees.
+
 The Big Void is in as well, and it is the clearest case in the project of a
 solid built out of sentences rather than coordinates. Morishima and the
 others' 2017 paper states no position for it anywhere in its text. It says
