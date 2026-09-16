@@ -178,5 +178,15 @@
     "kept": false,
     "note": "The Milky Way behind the HYG stars: NASA SVS 4851 milkyway_2020_8k.exr turned into the sky of 2449 BCE by the bake's icrsToEnu, the stars' own precession and horizon turn; checked against NASA's constellation figures.",
     "bytes": 1491413
+  },
+  {
+    "file": "2026-09-16T20-10-01Z--rollback--a5edc4a-dirty.png",
+    "taken": "2026-09-16T20:10:01+00:00",
+    "view": "rollback",
+    "commit": "a5edc4a",
+    "tree": "dirty",
+    "kept": true,
+    "note": "Last frame of the hero sky-rollback film, 1920 by 1080 at 128 samples on the GPU: 10,500 BCE, Alnitak transiting just above the apex.",
+    "bytes": 1304467
   }
 ]

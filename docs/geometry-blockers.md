@@ -41,11 +41,11 @@ without poppler (the reason the Read tool could not show a PDF).
 1. `render` a page to PNG at a stated DPI, cached outside the repo.
 2. `grid` a crop with a labelled pixel grid burned in, so points are located
    by reading the grid.
-3. `scale` from the two pixel ends of a scale bar and its printed length:
+2. `scale` from the two pixel ends of a scale bar and its printed length:
    metres per pixel, and shrinkage against nominal.
-4. `measure` pixel points into metres with the three-term sigma, printed as a
+3. `measure` pixel points into metres with the three-term sigma, printed as a
    ready-to-paste record.
-5. `register` a plan onto the frame from control points, with the same
+4. `register` a plan onto the frame from control points, with the same
    least-squares rotation and translation `scripts/footprints.ts` fits OSM with.
 
 ## Part 2. The four holes
@@ -182,22 +182,21 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
 5. **Hero renders and the film**, re-rendered at the end of each step above,
    logged in `docs/progress/log/`, with milestone snapshots in
    `docs/progress/`.
-6. **The viewer**, fed the same textures through glTF with KTX2 compression
+5. **The viewer**, fed the same textures through glTF with KTX2 compression
    (gltf-transform), as docs/plan.html always intended, so the browser is not
    the poor relation of the renders.
 
 ## Order of work
 
-1. The hero film: finish it if the background render stopped (see memory),
-   add it to docs/progress, `pnpm run deploy`.
-2. The well shaft, from Smyth.
-3. `scripts/plate.py`.
-4. Khafre's casing cap.
-5. Materials (visual 1) and atmosphere (visual 2), then a hero-render pass.
+1. The well shaft, from Smyth.
+2. `scripts/plate.py`.
+3. Khafre's casing cap.
+4. Materials (visual 1) and atmosphere (visual 2), then a hero-render pass.
    The biggest visible gain in the project.
-6. Menkaure's route.
-7. Stand-in models (visual 3), mastaba form and heights (hole 4).
-8. Milky Way, the viewer's textures, the film at full quality.
+5. Menkaure's route.
+6. Stand-in models (visual 3), mastaba form and heights (hole 4).
+7. Milky Way, the viewer's textures, the film re-rendered over the new
+   materials.
 
 ## Links
 
