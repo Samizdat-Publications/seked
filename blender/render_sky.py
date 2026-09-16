@@ -615,15 +615,17 @@ MILKY_WAY = os.path.join(REPO_ROOT, "build", "sky", "milkyway_2020_8k.exr")
 MILKY_WAY_STRENGTH = 0.012
 
 
-def build_milky_way(scene, bake):
-    if bake is None or "icrsToEnu" not in bake.get("stars", {}):
-        print("no Milky Way: the sky bake carries no icrsToEnu; run pnpm sky-bake")
-        return
+def milky_way_rotation(icrs_to_enu):
+    """The Euler angles that turn a world direction back onto ICRS axes: the transpose of a baked icrsToEnu."""
+    from mathutils import Matrix
+    return Matrix(icrs_to_enu).transposed().to_euler("XYZ")
+
+
+def add_milky_way(scene, icrs_to_enu):
+    """The Milky Way added under the world's existing surface, turned by `icrs_to_enu`; returns the mapping node, or None."""
     if not os.path.exists(MILKY_WAY):
         print(f"no Milky Way: {MILKY_WAY} is missing; fetch milkyway_2020_8k.exr from https://svs.gsfc.nasa.gov/4851 (see data/sources.json, nasa-svs-4851)")
-        return
-    from mathutils import Matrix
-    m = Matrix(bake["stars"]["icrsToEnu"]).transposed()
+        return None
     tree = node_tree_of(scene.world)
     out = next(n for n in tree.nodes if n.type == "OUTPUT_WORLD")
     existing = out.inputs["Surface"].links[0].from_socket
@@ -631,7 +633,7 @@ def build_milky_way(scene, bake):
     coords = tree.nodes.new("ShaderNodeTexCoord")
     turn = tree.nodes.new("ShaderNodeMapping")
     turn.vector_type = "VECTOR"
-    turn.inputs["Rotation"].default_value = m.to_euler("XYZ")
+    turn.inputs["Rotation"].default_value = milky_way_rotation(icrs_to_enu)
     tree.links.new(coords.outputs["Generated"], turn.inputs["Vector"])
     image = tree.nodes.new("ShaderNodeTexEnvironment")
     image.image = bpy.data.images.load(MILKY_WAY, check_existing=True)
@@ -644,5 +646,13 @@ def build_milky_way(scene, bake):
     tree.links.new(existing, add.inputs[0])
     tree.links.new(glow.outputs[0], add.inputs[1])
     tree.links.new(add.outputs[0], out.inputs["Surface"])
-    print(f"  Milky Way: {os.path.basename(MILKY_WAY)} turned by the transpose of stars.icrsToEnu (epoch {bake['stars']['epoch']}, "
-          f"sidereal time {bake['stars']['lstDeg']:.3f} deg), strength {MILKY_WAY_STRENGTH:g}")
+    return turn
+
+
+def build_milky_way(scene, bake):
+    if bake is None or "icrsToEnu" not in bake.get("stars", {}):
+        print("no Milky Way: the sky bake carries no icrsToEnu; run pnpm sky-bake")
+        return
+    if add_milky_way(scene, bake["stars"]["icrsToEnu"]) is not None:
+        print(f"  Milky Way: {os.path.basename(MILKY_WAY)} turned by the transpose of stars.icrsToEnu (epoch {bake['stars']['epoch']}, "
+              f"sidereal time {bake['stars']['lstDeg']:.3f} deg), strength {MILKY_WAY_STRENGTH:g}")

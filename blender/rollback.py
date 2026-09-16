@@ -37,7 +37,7 @@ import bpy  # noqa: E402  (only available inside Blender)
 
 from render import NIGHT_FILL, NIGHT_EXPOSURE, configure_render, look_at, make_camera, parse_args, show_ground_only  # noqa: E402
 from render_materials import assign_materials, node_tree_of  # noqa: E402
-from render_sky import REPO_ROOT, build_world, load_rollback, make_star_cloud, place_stars, dome_point  # noqa: E402
+from render_sky import REPO_ROOT, add_milky_way, build_world, load_rollback, make_star_cloud, milky_way_rotation, place_stars, dome_point  # noqa: E402
 from seked_data import load_database, resolve  # noqa: E402
 
 SKY_ROLLBACK = os.path.join(REPO_ROOT, "build", "sky-rollback.json")
@@ -320,6 +320,11 @@ def main():
     camera = make_camera(scene, start, target_of(start), CAMERA_LENS_MM, clip_end=4.0 * ROLLBACK_DOME_RADIUS_M)
     build_world(scene, NO_SUN_ALTITUDE_DEG, 0.0, NIGHT_FILL)
     scene.view_settings.exposure = NIGHT_EXPOSURE
+    # The Milky Way turns with the stars, frame by frame, by the rotation the
+    # bake computed from the same precession; a bake from before it existed
+    # has no rotation and the film goes without.
+    milky_way = add_milky_way(scene, frames[0]["icrsToEnu"]) if "icrsToEnu" in frames[0] else None
+    print("rollback: Milky Way " + ("turned per frame by icrsToEnu" if milky_way is not None else "left out"))
 
     dome, radii = make_star_cloud(
         "Sky (rollback)", header["catalogue"]["mag"], header["catalogue"]["ci"], ROLLBACK_DOME_RADIUS_M,
@@ -367,6 +372,8 @@ def main():
         dome.location = at
         aim_ring(aim, at, angle_deg)
         aim_ring(star_ring, at, info["meridianAltDeg"])
+        if milky_way is not None:
+            milky_way.inputs["Rotation"].default_value = milky_way_rotation(info["icrsToEnu"])
         base = f * count * 2
         up = place_stars(dome, radii, positions[base:base + 2 * count:2], positions[base + 1:base + 2 * count:2], ROLLBACK_DOME_RADIUS_M)
         label.data.body = (f"{epoch_text(info['epoch'])}\n{header['meridian']['name']} crosses the meridian at "

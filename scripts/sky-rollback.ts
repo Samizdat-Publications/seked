@@ -26,7 +26,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadDatabase, REPO_ROOT, resolve } from '@seked/data';
 import {
   altAz,
+  apply,
+  equatorialToHorizon,
   expandBrightStars,
+  ltpb,
   loadBrightStars,
   loadNamedStars,
   positionAtEpoch,
@@ -93,6 +96,13 @@ export interface RollbackFrame {
   lstDeg: number;
   /** The meridian star's transit altitude at that epoch: what C2 compares the shaft to. */
   meridianAltDeg: number;
+  /**
+   * The rotation carrying an ICRS unit vector to east, north and up at this
+   * frame's epoch and sidereal time, rows first: the precession matrix and
+   * horizon turn the frame's stars are placed with, for a sky image drawn on
+   * ICRS axes such as the Milky Way.
+   */
+  icrsToEnu: number[][];
 }
 
 export interface SkyRollback {
@@ -147,11 +157,15 @@ export function buildSkyRollback(frames = DEFAULT_FRAMES, fps = DEFAULT_FPS, pre
       positions[base + 2 * i] = azDeg;
       positions[base + 2 * i + 1] = altDeg;
     }
+    const precession = ltpb(epoch);
+    const horizon = equatorialToHorizon(latitudeDeg, lstDeg);
+    const columns = ([[1, 0, 0], [0, 1, 0], [0, 0, 1]] as const).map((e) => apply(horizon, apply(precession, [e[0], e[1], e[2]])));
     baked.push({
       frame,
       epoch: round(epoch, 2),
       lstDeg: round(lstDeg),
       meridianAltDeg: round(transitAltitude(meridianAt.decDeg, latitudeDeg)),
+      icrsToEnu: [0, 1, 2].map((row) => columns.map((column) => Number(column[row]!.toFixed(9)))),
     });
   }
 

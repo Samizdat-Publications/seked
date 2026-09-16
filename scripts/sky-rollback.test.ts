@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { loadDatabase, resolve } from '@seked/data';
-import { altAz, expandBrightStars, loadBrightStars, loadNamedStars, positionAtEpoch, starById, transitAltitude, transitLst } from '@seked/sky';
+import { altAz, expandBrightStars, loadBrightStars, loadNamedStars, positionAtEpoch, properMotionAtEpoch, starById, transitAltitude, transitLst } from '@seked/sky';
 import { epochAt, writeSkyRollback, SCHEDULE, type SkyRollback } from './sky-rollback';
 
 const dir = mkdtempSync(join(tmpdir(), 'seked-sky-rollback-'));
@@ -108,5 +108,27 @@ describe('the rollback bake', () => {
     expect(header.shaft.key).toBe('kc.shaft.south');
     expect(header.shaft.angleDeg).toBe(values['kc.shaft.south.angle']);
     expect(header.shaft.source).toBe(records.get('kc.shaft.south.angle')?.source);
+  });
+});
+
+describe('the Milky Way rotation', () => {
+  it('puts a frame\u2019s stars where the frame bakes them, at every hold', () => {
+    const bright = expandBrightStars(loadBrightStars());
+    for (const frame of [0, Math.floor(FRAMES / 2), FRAMES - 1]) {
+      const info = header.frames[frame]!;
+      const m = info.icrsToEnu;
+      // At 10,500 BCE a fast star has moved far on the sky, and the bake
+      // stores the exact epoch only to two decimals, so compare at the bake's
+      // own epoch and at a place tolerance that swallows the rounding.
+      for (const i of [3, 40, 555]) {
+        const { raDeg, decDeg } = properMotionAtEpoch(bright[i]!, info.epoch);
+        const r = (raDeg * Math.PI) / 180;
+        const d = (decDeg * Math.PI) / 180;
+        const v = [Math.cos(d) * Math.cos(r), Math.cos(d) * Math.sin(r), Math.sin(d)];
+        const enu = [0, 1, 2].map((row) => m[row]![0]! * v[0]! + m[row]![1]! * v[1]! + m[row]![2]! * v[2]!);
+        const alt = (Math.asin(enu[2]!) * 180) / Math.PI;
+        expect(Math.abs(alt - azAlt(frame, i)[1]), `frame ${frame} star ${i}`).toBeLessThan(0.01);
+      }
+    }
   });
 });
