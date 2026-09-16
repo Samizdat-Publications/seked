@@ -128,5 +128,15 @@
     "kept": false,
     "note": "The well shaft added from Maragioglio and Rinaldi's Parte IV plates: five legs from the foot of the Grand Gallery to the descending passage, the last solved onto the outlet 7.62 m up that passage.",
     "bytes": 927353
+  },
+  {
+    "file": "2026-09-16T18-55-06Z--akhet--ad5bab7-dirty.png",
+    "taken": "2026-09-16T18:55:06+00:00",
+    "view": "akhet",
+    "commit": "ad5bab7",
+    "tree": "dirty",
+    "kept": false,
+    "note": "First render with --state today: the pyramids as they stand, Khufu's stepped core and Khafre's casing cap from 93.9 m up (Perring's present height less M&R's 42.5 m of surviving casing). Materials still procedural.",
+    "bytes": 973083
   }
 ]

@@ -79,6 +79,14 @@ descending passage's floor.
 
 ### 2. Khafre's casing cap (Second Pyramid)
 
+Done 2026-09-16, from text and not a plate. Maragioglio and Rinaldi's Parte V
+text, p. 51, has the casing standing "per un'altezza di 40-45 metri a partire
+dalla cima", and Perring's table in Vyse's Appendix, p. 117, has "from present
+top to bottom of casing from 130 to 150 ft" and Khafre's present height, 447 ft
+6 in. `g2.casing.cap.depth` and `g2.height.today` carry them (with Menkaure's
+present height from p. 120), and `blender/render.py --state today` draws the
+pyramids as they stand, Khafre's cap over his core. What was planned:
+
 **Maragioglio and Rinaldi, *Tavole* 5,2 (1966)**: archive.org `Maragioglio_5-2`
 (73 MB). Read the Parte V text volume already cited in the database first, in
 case the course or level is stated in words; otherwise scale it off their

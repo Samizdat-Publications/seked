@@ -388,5 +388,39 @@
     "method": "direct",
     "note": "41.52 ± .05 in, §68: “The lowest course of casing was of granite, and is 41.52 ± .05 high, vertically, from the top to the base of its slope, and its vertical face below that 11 high, as measured at the S.W.” §65 says the lowest two courses of the casing are of granite, with Petrie’s own footnote: “I have seen but one course; Vyse reports finding two courses.” Only the course Petrie measured is entered; if Vyse is right the granite reaches the top of the second course, which the S.W. column of the §68 course table puts at 86.5 in. The upper part was cased in Mokattam limestone, §68.",
     "verified": true
+  },
+  {
+    "key": "g2.height.today",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 136.398,
+    "unit": "m",
+    "source": "vyse-1840",
+    "method": "tabulated",
+    "note": "447 ft 6 in, \"Present height, perpendicular\", Perring's Table of Dimensions for the Second Pyramid in Vyse's Appendix, p. 117. The OCR sets the column of figures apart from the labels; paired by order, former base 707 ft 9, present base 690 ft 9, former height perpendicular 454 ft 3, present height perpendicular 447 ft 6, former and present heights inclined 572 ft 6 and 563 ft 6. The same table gives the angle as 52°20' and the platform on the top as \"about 9 0\" feet square. Perring's angle is Petrie's 53°10' less 50', and his heights follow from it: on Petrie's base and angle a pyramid cut at this height leaves a platform about 11 m across, not 9 ft, so the scene's summit is blunter than the one Perring stood on.",
+    "verified": true
+  },
+  {
+    "key": "g2.casing.cap.depth",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 42.5,
+    "unit": "m",
+    "sigma": 2.5,
+    "source": "maragioglio-rinaldi-1966",
+    "method": "published-plan",
+    "note": "\"Nel monumento di Chefren esso è ancora conservato per un'altezza di 40-45 metri a partire dalla cima\", p. 51: the limestone casing still stands for a height of 40 to 45 m down from the top. Stored as the middle with sigma covering the range. Perring's table in Vyse's Appendix, p. 117, agrees: \"From present top to bottom of casing from 130 to 150 ft\", 39.6 to 45.7 m. The level the cap's lower edge stands at is g2.height.today less this, and is not stored. Both authors describe the edge as ragged, so one level for all four faces is itself an idealisation. M&R add, same page, that the nucleus directly under the surviving casing shows regular courses \"come una precisa gradinata\", like a flight of steps.",
+    "verified": true
+  },
+  {
+    "key": "g3.height.today",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 61.8744,
+    "unit": "m",
+    "source": "vyse-1840",
+    "method": "tabulated",
+    "note": "203 ft 0 in, \"Present height, perpendicular\", Perring's Table of Dimensions for the Third Pyramid in Vyse's Appendix, p. 120, paired by order with the column the OCR sets apart: base 354 ft 6, present height perpendicular 203 ft 0, former height perpendicular 218 ft 0. The table gives the platform at the top as \"about 16 0\" feet square, 4.9 m, and on Petrie's base and his 51° angle a pyramid cut at this height leaves a platform of about 4.4 m, so the two agree.",
+    "verified": true
   }
 ]

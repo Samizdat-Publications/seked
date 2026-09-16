@@ -302,6 +302,56 @@ def casing_over_granite_material(structure, label, height):
     return mat
 
 
+def casing_cap_level(structure):
+    """
+    The level above a pyramid's base where the casing still standing today
+    begins, or None: its present height less the depth of casing a source
+    says survives under the summit. Only Khafre has one (M&R Parte V, p. 51).
+    """
+    values = resolved_values()
+    top, depth = values.get(f"{structure}.height.today"), values.get(f"{structure}.casing.cap.depth")
+    return None if top is None or depth is None else top - depth
+
+
+def cap_over_core_material(structure, label, level):
+    """
+    A pyramid as it stands where its casing survives only at the top: the
+    banded core below `level` and the casing above it, Khafre's white cap over
+    his stepped core. Like the granite, the switch is the object's own Z
+    against a number from the database, so nothing is placed by hand.
+    """
+    name = f"{CASING_NAME} cap over core ({label})"
+    mat = bpy.data.materials.get(name)
+    if mat is not None:
+        return mat
+    course, provenance = mean_course_height()
+    mat = bpy.data.materials.new(name)
+    tree = node_tree_of(mat)
+    tree.nodes.clear()
+    out = tree.nodes.new("ShaderNodeOutputMaterial")
+    vector = object_coordinates(tree)
+
+    core = tree.nodes.new("ShaderNodeBsdfPrincipled")
+    wire_core(tree, core, vector, course)
+    casing = tree.nodes.new("ShaderNodeBsdfPrincipled")
+    wire_casing(tree, casing, vector)
+
+    split = tree.nodes.new("ShaderNodeSeparateXYZ")
+    tree.links.new(vector, split.inputs["Vector"])
+    above = tree.nodes.new("ShaderNodeMath")
+    above.operation = "GREATER_THAN"
+    above.inputs[1].default_value = level
+    tree.links.new(split.outputs["Z"], above.inputs[0])
+
+    mix = tree.nodes.new("ShaderNodeMixShader")
+    tree.links.new(above.outputs["Value"], mix.inputs["Fac"])
+    tree.links.new(core.outputs[0], mix.inputs[1])
+    tree.links.new(casing.outputs[0], mix.inputs[2])
+    tree.links.new(mix.outputs[0], out.inputs["Surface"])
+    print(f"{name}: casing above {level:.3f} m, {structure}.height.today less {structure}.casing.cap.depth; core bands of {course:.4f} m, {provenance}")
+    return mat
+
+
 PIT_NAME = "Rock-cut pit"
 BASALT_NAME = "Basalt paving"
 
@@ -401,6 +451,9 @@ def assign_materials():
         height = granite_casing_height(structure)
         if height:
             cased[f"{label} (as built)"] = casing_over_granite_material(structure, label, height)
+        level = casing_cap_level(structure)
+        if level is not None:
+            cased[f"{label} (today)"] = cap_over_core_material(structure, label, level)
 
     for obj in bpy.data.objects:
         if obj.type != "MESH":
@@ -411,7 +464,7 @@ def assign_materials():
         elif name.startswith("Sphinx"):
             mat = banded
         elif "(today)" in name:
-            mat = core if obj.get("seked_courses") else banded
+            mat = cased.get(name) or (core if obj.get("seked_courses") else banded)
         elif "(as built)" in name:
             mat = cased.get(name, casing)
         elif name.startswith("void."):

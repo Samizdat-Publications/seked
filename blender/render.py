@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--state built|today] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -33,7 +33,7 @@ if HERE not in sys.path:
 
 import bpy  # noqa: E402  (only available inside Blender)
 
-from render_materials import assign_materials, draw_as_section, make_translucent  # noqa: E402
+from render_materials import STRUCTURE_LABELS, assign_materials, draw_as_section, make_translucent  # noqa: E402
 from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
 # Where the akhet view stands relative to the Sphinx: back along the line it
@@ -354,6 +354,26 @@ def show_ground_only(drawing=False):
                 poly.use_smooth = True
 
 
+def show_state(state):
+    """
+    Which pyramids are drawn: "built", the default, is each as it was finished,
+    cased and pointed; "today" is each as it stands, where the scene has a
+    "(today)" object for it, and as built where it does not, which is said.
+    Khafre's today carries his cap of casing; Khufu's is his stepped core.
+    """
+    if state not in ("built", "today"):
+        raise SystemExit(f"unknown state {state!r}; choose built or today")
+    for label in STRUCTURE_LABELS.values():
+        built, today = bpy.data.objects.get(f"{label} (as built)"), bpy.data.objects.get(f"{label} (today)")
+        use_today = state == "today" and today is not None
+        if state == "today" and today is None:
+            print(f"state today: {label} has no (today) object, so it is drawn as built")
+        for obj, visible in ((built, not use_today), (today, use_today)):
+            if obj is not None:
+                obj.hide_set(not visible)
+                obj.hide_render = not visible
+
+
 def choose_engine(scene, requested):
     """
     Cycles, because the sky texture, the sun's penumbra and eight thousand
@@ -432,7 +452,7 @@ def configure_render(scene, opts):
 
 
 def main():
-    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "bake": SKY_BAKE})
+    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "bake": SKY_BAKE})
     scene = bpy.context.scene
     if opts["view"] not in VIEWS:
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
@@ -440,6 +460,7 @@ def main():
 
     drawing = "drawing" in view
     assign_materials()
+    show_state(opts["state"])
     if drawing:
         draw_as_section(view["drawing_structure"], view["casing_alpha"])
     show_ground_only(drawing)
