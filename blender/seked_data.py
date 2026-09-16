@@ -965,6 +965,87 @@ INTERIOR_BUILDERS += [
      _build_north_face_corridor),
 ]
 
+# The Big Void, whose place the 2017 paper never puts in numbers. It states
+# four things: the void is above the Grand Gallery, its cross section is
+# comparable to the Gallery's, its length is at least 30 m, and its centre is
+# between 40 m and 50 m from the floor of the Queen's Chamber. That is enough,
+# because "above the Grand Gallery" fixes two coordinates and the distance
+# fixes the third. Its inclination was never resolved, so both hypotheses are
+# drawn on the one solved centre. Mirrors bigVoid in
+# packages/geometry/src/interiors.ts.
+
+_BIG = "void.big"
+
+_BIG_VOID_KEYS = ([_BIG + ".length.min",
+                   _BIG + ".centre.from_queens_chamber_floor.min",
+                   _BIG + ".centre.from_queens_chamber_floor.max"]
+                  + _point_keys("passage.ascending.floor.end")
+                  + _point_keys("gg.floor.virtual_south_end")
+                  + ["gg.floor.width", "gg.ramp.width", "gg.height"]
+                  + _point_keys("qc.corner.ne") + ["qc.length", "qc.width"])
+
+
+def big_void(values):
+    """Where the Big Void's centre is, and the section and length it is drawn at, or None."""
+    near = _number_at(values, _BIG + ".centre.from_queens_chamber_floor.min")
+    far = _number_at(values, _BIG + ".centre.from_queens_chamber_floor.max")
+    length = _number_at(values, _BIG + ".length.min")
+    if near is None or far is None or length is None or length <= 0:
+        return None
+
+    qc_east, qc_north, qc_up = _point(values, "qc.corner.ne")
+    queens = (qc_east - _value(values, "qc.length") / 2.0,
+              qc_north - _value(values, "qc.width") / 2.0,
+              qc_up)
+
+    low = _point(values, "passage.ascending.floor.end")
+    high = _point(values, "gg.floor.virtual_south_end")
+    along = (high[0] - low[0], high[1] - low[1], high[2] - low[2])
+    run = math.sqrt(sum(c * c for c in along))
+    if run < 1e-6:
+        return None
+
+    east = (low[0] + high[0]) / 2.0
+    north = (low[1] + high[1]) / 2.0
+    distance = (near + far) / 2.0
+    flat = math.hypot(east - queens[0], north - queens[1])
+    rise = distance * distance - flat * flat
+    if not rise > 0:
+        return None
+
+    return {
+        "centre": (east, north, queens[2] + math.sqrt(rise)),
+        "along": tuple(c / run for c in along),
+        "length": length,
+        "width": _value(values, "gg.floor.width") + 2.0 * _value(values, "gg.ramp.width"),
+        "height": _value(values, "gg.height"),
+    }
+
+
+def _big_void_builder(name, inclined):
+    def build(v):
+        big = big_void(v)
+        if big is None:
+            raise ValueError("interior_solids: the Big Void is not in the values")
+        unit = big["along"] if inclined else (0.0, 1.0, 0.0)
+        half = big["length"] / 2.0
+        centre = big["centre"]
+        # passage() takes the floor centre line and measures its heights
+        # square to it, so the line runs half a section-height below the
+        # void's centre along that same square-to-the-axis up.
+        lean = unit[2]
+        up = (-unit[0] * lean, -unit[1] * lean, 1.0 - unit[2] * lean)
+        drop = big["height"] / 2.0 / math.sqrt(sum(c * c for c in up))
+        floor = tuple(centre[i] - up[i] * drop for i in range(3))
+        start = tuple(floor[i] - unit[i] * half for i in range(3))
+        end = tuple(floor[i] + unit[i] * half for i in range(3))
+        return passage(start, end, big["width"], big["height"])
+
+    return ("%s.%s" % (_BIG, name), list(_BIG_VOID_KEYS), build)
+
+
+INTERIOR_BUILDERS += [_big_void_builder("horizontal", False), _big_void_builder("inclined", True)]
+
 
 # --- Structures whose plan is discovered from their records ----------------
 # Mirrors the second half of packages/geometry/src/interiors.ts. G1's rooms are

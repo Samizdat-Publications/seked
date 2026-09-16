@@ -42,6 +42,8 @@ const EXPECTED = [
   'chamber.construction_4',
   'chamber.construction_5',
   'void.north_face_corridor',
+  'void.big.horizontal',
+  'void.big.inclined',
 ];
 
 /** A closed surface uses every directed edge once, and its neighbour uses the reverse. */
@@ -329,5 +331,104 @@ describe('the voids the muons found, on the canonical preset', () => {
     const up = axis(2);
     const floors = mesh.positions.filter((_, i) => i % 3 === 2).filter((z) => z < (up.lo + up.hi) / 2);
     expect(Math.max(...floors) - Math.min(...floors)).toBe(0);
+  });
+});
+
+/**
+ * The Big Void is the one solid here whose place appears nowhere in its source
+ * as a number. The 2017 paper states four things about it and no coordinates,
+ * and the checks below are that those four are what the solid was built from
+ * and that what comes out is where the paper says it is: above the Grand
+ * Gallery, a section like the Gallery's, and the published distance from the
+ * Queen's Chamber floor.
+ */
+describe('the Big Void on the canonical preset', () => {
+  const span = (name: string, k: number) => {
+    const mesh = solids[name] as Mesh;
+    const all = mesh.positions.filter((_, i) => i % 3 === k);
+    return { lo: Math.min(...all), hi: Math.max(...all) };
+  };
+  const centre = (name: string, k: number) => {
+    const { lo, hi } = span(name, k);
+    return (lo + hi) / 2;
+  };
+  const both = ['void.big.horizontal', 'void.big.inclined'];
+
+  it('draws both hypotheses, the paper having resolved neither', () => {
+    for (const name of both) expect(solids[name], name).toBeDefined();
+    expect(values['void.big.inclination.hypotheses']).toBe(both.length);
+  });
+
+  it('puts them on one centre, the hypotheses differing in lie and not in place', () => {
+    for (const k of [0, 1, 2]) {
+      expect(centre(both[0] as string, k)).toBeCloseTo(centre(both[1] as string, k), 4);
+    }
+  });
+
+  it('stands that centre the published distance from the Queen’s Chamber floor', () => {
+    const near = values['void.big.centre.from_queens_chamber_floor.min'] as number;
+    const far = values['void.big.centre.from_queens_chamber_floor.max'] as number;
+    const floor = [
+      (values['qc.corner.ne.east'] as number) - (values['qc.length'] as number) / 2,
+      (values['qc.corner.ne.north'] as number) - (values['qc.width'] as number) / 2,
+      values['qc.corner.ne.up'] as number,
+    ];
+    for (const name of both) {
+      const d = Math.hypot(
+        centre(name, 0) - (floor[0] as number),
+        centre(name, 1) - (floor[1] as number),
+        centre(name, 2) - (floor[2] as number),
+      );
+      expect(d, name).toBeCloseTo((near + far) / 2, 3);
+      expect(d).toBeGreaterThan(near);
+      expect(d).toBeLessThan(far);
+    }
+  });
+
+  it('puts it above the Grand Gallery, which is the other thing the paper says', () => {
+    const roof = (values['gg.floor.virtual_south_end.up'] as number) + (values['gg.height'] as number);
+    // Both hypotheses have their whole length over the Gallery's roof, the
+    // inclined one only just, its lower end running close above it.
+    for (const name of both) expect(span(name, 2).lo, name).toBeGreaterThanOrEqual(roof - 1);
+    // And the level one clears it outright.
+    expect(span('void.big.horizontal', 2).lo).toBeGreaterThan(roof);
+  });
+
+  it('gives it the Grand Gallery’s own section and the stated minimum length', () => {
+    // Volume rather than a bounding box: a tube's volume is its section times
+    // its length whichever way it lies, and a bounding box would also be
+    // measuring the east and west drift the Grand Gallery's own axis has.
+    const width = (values['gg.floor.width'] as number) + 2 * (values['gg.ramp.width'] as number);
+    const want = width * (values['gg.height'] as number) * (values['void.big.length.min'] as number);
+    for (const name of both) {
+      expect(meshVolume(solids[name] as Mesh), name).toBeCloseTo(want, 2);
+    }
+    // And the level one runs due north and south, so its plan length is the
+    // whole of it.
+    const north = span('void.big.horizontal', 1);
+    expect(north.hi - north.lo).toBeCloseTo(values['void.big.length.min'] as number, 4);
+  });
+
+  it('lays the inclined one along the Grand Gallery’s slope and the other level', () => {
+    const flat = span('void.big.horizontal', 2);
+    expect(flat.hi - flat.lo).toBeCloseTo(values['gg.height'] as number, 4);
+    // The sloping one is taller in elevation than its own section, by exactly
+    // as much as a 30 m run at the Gallery's angle rises.
+    const slope = span('void.big.inclined', 2);
+    const rise = (values['void.big.length.min'] as number) * Math.sin(((values['gg.angle'] as number) * Math.PI) / 180);
+    expect(slope.hi - slope.lo).toBeGreaterThan(flat.hi - flat.lo);
+    expect(slope.hi - slope.lo).toBeCloseTo(rise + (values['gg.height'] as number) * Math.cos(((values['gg.angle'] as number) * Math.PI) / 180), 1);
+  });
+
+  it('names nothing it was not given, and no coordinate, because the paper states none', () => {
+    const inputs = interiorSolidInputs(env)['void.big.horizontal'] as readonly string[];
+    expect(inputs).toContain('void.big.length.min');
+    expect(inputs).toContain('void.big.centre.from_queens_chamber_floor.min');
+    expect(inputs).toContain('void.big.centre.from_queens_chamber_floor.max');
+    expect(inputs.some((k) => k.startsWith('void.big.centre.north') || k.startsWith('void.big.centre.up'))).toBe(false);
+    // Everything else it uses belongs to the Gallery or the Queen's Chamber.
+    for (const key of inputs) {
+      expect(key.startsWith('void.big.') || key.startsWith('gg.') || key.startsWith('qc.') || key.startsWith('passage.ascending.'), key).toBe(true);
+    }
   });
 });

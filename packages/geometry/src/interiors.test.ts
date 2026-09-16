@@ -421,6 +421,8 @@ describe('the Great Pyramid stays hand-written', () => {
       'chamber.construction_4',
       'chamber.construction_5',
       'void.north_face_corridor',
+      'void.big.horizontal',
+      'void.big.inclined',
     ]);
     // A room's inputs are fixed; a shaft's start with the fixed ones and go
     // on with however many legs the environment carries. A chamber of

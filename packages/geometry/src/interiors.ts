@@ -576,6 +576,113 @@ function constructionBuilders(): Builder[] {
 
 const NFC = 'void.north_face_corridor';
 
+const BIG = 'void.big';
+
+/** The records fixing the Grand Gallery, which the Big Void stands over and borrows its section from. */
+const BIG_VOID_GALLERY_KEYS = [
+  ...pointKeys('passage.ascending.floor.end'), ...pointKeys('gg.floor.virtual_south_end'),
+  'gg.floor.width', 'gg.ramp.width', 'gg.height',
+] as const;
+
+/** The records fixing the Queen's Chamber floor, which the one published distance is measured from. */
+const BIG_VOID_QUEENS_KEYS = [...pointKeys('qc.corner.ne'), 'qc.length', 'qc.width'] as const;
+
+const BIG_VOID_KEYS = [
+  `${BIG}.length.min`,
+  `${BIG}.centre.from_queens_chamber_floor.min`, `${BIG}.centre.from_queens_chamber_floor.max`,
+  ...BIG_VOID_GALLERY_KEYS, ...BIG_VOID_QUEENS_KEYS,
+] as const;
+
+/**
+ * Where the Big Void's centre is, solved from the one distance the paper
+ * publishes, and the section and length it is drawn at.
+ *
+ * The 2017 paper states four things about it and no coordinates at all: the
+ * void is above the Grand Gallery, its cross section is comparable to the
+ * Gallery's, its length is at least 30 m, and its centre is between 40 m and
+ * 50 m from the floor of the Queen's Chamber. Nothing else about its place is
+ * anywhere in the text; the figures carry it, and a position read off a
+ * figure by eye is not a measurement.
+ *
+ * Those four are enough, because "above the Grand Gallery" fixes two of the
+ * three coordinates and the distance fixes the third. The centre stands over
+ * the Gallery's own plan midpoint, on the Gallery's east offset, and its
+ * height is whatever puts it the published distance from the Queen's Chamber
+ * floor. That comes out at about 61 m over the pavement, some ten metres over
+ * the Gallery's roof, and the two published bounds put it between 56 m and
+ * 67 m, which is the error bar the void carries and the reason it is drawn as
+ * an outline and never as a room.
+ */
+function bigVoid(env: Environment): { centre: Point; along: Point; length: number; width: number; height: number } | undefined {
+  const near = numberAt(env, `${BIG}.centre.from_queens_chamber_floor.min`);
+  const far = numberAt(env, `${BIG}.centre.from_queens_chamber_floor.max`);
+  const length = numberAt(env, `${BIG}.length.min`);
+  if (near === undefined || far === undefined || length === undefined || length <= 0) return undefined;
+
+  // The Queen's Chamber floor, taken at its centre: the films were near its
+  // south-west corner and in the Niche on its east side, and the paper says
+  // "the floor of the Queen's chamber" rather than either of them.
+  const [qcEast, qcNorth, qcUp] = point(env, 'qc.corner.ne');
+  const queens: Point = [qcEast - value(env, 'qc.length') / 2, qcNorth - value(env, 'qc.width') / 2, qcUp];
+
+  const low = point(env, 'passage.ascending.floor.end');
+  const high = point(env, 'gg.floor.virtual_south_end');
+  const along: Point = [high[0] - low[0], high[1] - low[1], high[2] - low[2]];
+  const run = Math.hypot(along[0], along[1], along[2]);
+  if (run < MIN_RUN) return undefined;
+
+  const east = (low[0] + high[0]) / 2;
+  const north = (low[1] + high[1]) / 2;
+  const distance = (near + far) / 2;
+  const flat = Math.hypot(east - queens[0], north - queens[1]);
+  const rise = distance * distance - flat * flat;
+  // A void that near the Queen's Chamber in plan and that far from it must
+  // stand above it. If the arithmetic says otherwise the preset is not
+  // describing this pyramid, and nothing is drawn.
+  if (!(rise > 0)) return undefined;
+
+  return {
+    centre: [east, north, queens[2] + Math.sqrt(rise)],
+    along: [along[0] / run, along[1] / run, along[2] / run],
+    length,
+    // "comparable to that of the Grand Gallery": the Gallery's own floor,
+    // ramps included, by its own height. A rectangle, because "comparable" is
+    // as far as the paper goes and a corbelled copy would claim more.
+    width: value(env, 'gg.floor.width') + 2 * value(env, 'gg.ramp.width'),
+    height: value(env, 'gg.height'),
+  };
+}
+
+/** One of the two inclinations the paper leaves open, as a tube through the solved centre. */
+function bigVoidBuilder(name: string, inclined: boolean): Builder {
+  return {
+    name: `${BIG}.${name}`,
+    keys: BIG_VOID_KEYS,
+    build: (env) => {
+      const big = bigVoid(env);
+      if (!big) throw new Error('interiorSolids: the Big Void is not in the environment');
+      // Level, or along the Grand Gallery's own slope. The centre is the same
+      // either way: the paper's two hypotheses differ in how the void lies,
+      // not in where it was found.
+      const unit: Point = inclined ? big.along : [0, 1, 0];
+      const half = big.length / 2;
+      // `passage` takes the floor centre line and measures its heights square
+      // to it, so the line has to run half a section-height below the void's
+      // centre, along that same square-to-the-axis up. Straight up for a level
+      // run, and for a sloping one whatever part of straight up is square to
+      // the axis, which is the frame `passage` will use.
+      const lean = unit[2];
+      const up: Point = [-unit[0] * lean, -unit[1] * lean, 1 - unit[2] * lean];
+      const upLength = Math.hypot(up[0], up[1], up[2]);
+      const drop = big.height / 2 / upLength;
+      const floor: Point = [big.centre[0] - up[0] * drop, big.centre[1] - up[1] * drop, big.centre[2] - up[2] * drop];
+      const from: Point = [floor[0] - unit[0] * half, floor[1] - unit[1] * half, floor[2] - unit[2] * half];
+      const to: Point = [floor[0] + unit[0] * half, floor[1] + unit[1] * half, floor[2] + unit[2] * half];
+      return passage({ from, to, width: big.width, height: big.height, prefix: `${BIG}.${name}` });
+    },
+  };
+}
+
 const VOID_BUILDERS: readonly Builder[] = [
   {
     name: NFC,
@@ -600,6 +707,8 @@ const VOID_BUILDERS: readonly Builder[] = [
       });
     },
   },
+  bigVoidBuilder('horizontal', false),
+  bigVoidBuilder('inclined', true),
 ];
 
 /** The Great Pyramid's solids: Petrie's rooms in order from the entrance down and then up,

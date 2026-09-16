@@ -70,5 +70,49 @@
     "method": "muon radiography",
     "note": "\"the slope alpha is -0.3 +/- 1.5 deg\", from the al-Ma'mun corridor analysis. Zero is inside the error bar and the paper's own conclusion is that \"a horizontal corridor is favored\", so the solid is drawn level; the record is here because the slope was measured and because a later survey that resolves it should replace this and not add to it. Procureur et al. 2023, Nature Communications 14, 1144, CC BY 4.0. The emulsion-film analysis from the descending corridor, whose rectangular-cuboid fit is the paper's most precise statement of the corridor; the Micromegas analysis from the al-Ma'mun corridor agrees with it inside its own error bars.",
     "verified": true
+  },
+  {
+    "key": "void.big.length.min",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 30.0,
+    "unit": "m",
+    "source": "morishima-2017",
+    "method": "muon radiography",
+    "note": "\"a large void (with a cross section similar to the Grand Gallery and a length of 30 m minimum) above the Grand Gallery\", and again in the conclusion, \"Its length is more than 30 m and its cross section is comparable to that of the Grand Gallery\". This is a stated lower bound and not a measurement, so it carries no sigma and the solid drawn from it is the shortest the paper allows. The cross section is not a number anywhere in the paper, so the solid takes the Grand Gallery's own records for its section rather than storing one here. Morishima et al. 2017, Nature 552, 386-390, open access; read from the arXiv PDF of the accepted version, arXiv:1711.01576v2, on 2026-09-16.",
+    "verified": true
+  },
+  {
+    "key": "void.big.centre.from_queens_chamber_floor.min",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 40.0,
+    "unit": "m",
+    "source": "morishima-2017",
+    "method": "muon radiography",
+    "note": "\"The centre of the void is located between 40 m and 50 m from the floor of the Queen's chamber\"; this is the nearer bound. It is the only distance the paper gives to the void, and with \"above the Grand Gallery\" it is what fixes how high the void stands. The paper's other figure, \"located between 40 m and 50 m away from the detector positions, 21 m above the ground level\", is the same distance with the detectors' own level attached, the films having been in the Queen's chamber and the Niche beside it. Morishima et al. 2017, Nature 552, 386-390, open access; read from the arXiv PDF of the accepted version, arXiv:1711.01576v2, on 2026-09-16.",
+    "verified": true
+  },
+  {
+    "key": "void.big.centre.from_queens_chamber_floor.max",
+    "structure": "g1",
+    "quantity": "length",
+    "value": 50.0,
+    "unit": "m",
+    "source": "morishima-2017",
+    "method": "muon radiography",
+    "note": "The farther bound of \"between 40 m and 50 m from the floor of the Queen's chamber\". The two bounds are five metres either side of their mean, which is the error bar the void's height carries and the reason it is drawn as an outline. Morishima et al. 2017, Nature 552, 386-390, open access; read from the arXiv PDF of the accepted version, arXiv:1711.01576v2, on 2026-09-16.",
+    "verified": true
+  },
+  {
+    "key": "void.big.inclination.hypotheses",
+    "structure": "g1",
+    "quantity": "count",
+    "value": 2.0,
+    "unit": "count",
+    "source": "morishima-2017",
+    "method": "muon radiography",
+    "note": "\"There are still many architectural hypotheses to consider; in particular, the big void could be made of one or several adjacent structures, and it could be inclined or horizontal.\" The paper leaves the inclination open, so the scene draws both and neither is preferred: void.big.horizontal lies level and void.big.inclined lies along the Grand Gallery's own slope, on the same solved centre. This record exists so that a preset carrying the void has to carry the fact that its inclination was never resolved. Morishima et al. 2017, Nature 552, 386-390, open access; read from the arXiv PDF of the accepted version, arXiv:1711.01576v2, on 2026-09-16.",
+    "verified": true
   }
 ]

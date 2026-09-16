@@ -140,13 +140,26 @@ its own mid-height, the Chevron standing in that face. The section draws it
 as an outline with no fill, because a shape fitted to a muon deficit should
 not read like a room with a floor.
 
+The Big Void is in as well, and it is the clearest case in the project of a
+solid built out of sentences rather than coordinates. Morishima and the
+others' 2017 paper states no position for it anywhere in its text. It says
+the void is above the Grand Gallery, that its cross section is comparable to
+the Gallery's, that it is at least 30 m long, and that its centre lies
+between 40 m and 50 m from the floor of the Queen's Chamber. That is enough:
+"above the Grand Gallery" fixes two coordinates and the distance fixes the
+third, which lands 61.5 m over the pavement, ten metres over the Gallery's
+roof. The paper says the void "could be inclined or horizontal" and leaves it
+there, so both are drawn on the one solved centre and neither is preferred.
+The figures carry more, and a position read off a figure by eye is not a
+measurement, so none was.
+
 Next, in order, each from a public source checked on 2026-09-14: the rest of
 the Great Pyramid's section (the Gallery's real corbel laps, for which §46
 gives the eight laps' plumb offsets but only Smyth's one lap height, so the
-heights still need a source; the well shaft and grotto from the Edgars, which
-Petrie declines to measure in §46; and the ScanPyramids Big Void, whose
-length and cross-section are in the 2017 abstract but whose position is only
-in the figure); Menkaure's chambers
+heights still need a source; and the well shaft and grotto from the Edgars,
+which Petrie declines to measure in §46, saying it is "not worth while to
+publish more complete measures than those of Prof. Smyth"); Menkaure's
+chambers
 hung off the foot of his corridor from Vyse's table and Petrie's dimensions;
 the Tier 3 masses from OpenStreetMap's footprints, which name the queens'
 pyramids, the temples, the causeways, the Wall of the Crow, Khentkawes and
