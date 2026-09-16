@@ -1419,7 +1419,9 @@ def _passage_builder(values, structure, prefix, name, half, routed=None):
     # states a length along the floor and a slope instead, and the far end is
     # worked out from them rather than written down anywhere.
     stored = _stored_point(values, base + ".floor.end", half)
-    end = stored if stored is not None else _end_from_run(values, base, start)
+    end = routed.get("end")
+    if end is None:
+        end = stored if stored is not None else _end_from_run(values, base, start)
     if end is None:
         return None
     finish, finish_keys = end
@@ -1467,12 +1469,16 @@ def _chamber_builder(values, prefix, name, half, routed=None):
 
 # --- Routes ----------------------------------------------------------------
 # Mirrors walkRoute in packages/geometry/src/interiors.ts. Members carrying a
-# "<base>.step" are laid in step order: a routed passage with no floor.begin
-# begins where the member before it ends and continues the section before it
-# where it records none; a routed chamber with no stored walls is entered on
-# its north wall at the arrival point, at the arrival level unless floor.up is
-# recorded, with its east wall at the entering door's offset, and left through
-# its south door. Only southward arrivals are read.
+# "<base>.step" are laid in step order. A routed passage begins at its own
+# floor.begin; else, straight after a chamber, at floor.begin.from_east_wall
+# west of that chamber's east wall on its north-south centre line and floor;
+# else where the member before it ends; else at the entrance. It runs its
+# length, and continues from the passage before it whatever section, slope
+# or bearing it does not record. A routed chamber with no stored walls is
+# entered on its north wall when arriving southwards (door placed from the
+# east wall) or on its east wall when arriving westwards (door placed from the
+# south wall), at the arrival level unless floor.up is recorded, and a chamber
+# entered from the north is left through its south door.
 
 
 def _unique(keys):
@@ -1486,12 +1492,13 @@ def _unique(keys):
 
 
 def _door_offset(values, base, wall):
-    from_key = base + ".door." + wall + ".from_east_wall"
+    frm = "from_south_wall" if wall == "east" else "from_east_wall"
+    from_key = base + ".door." + wall + "." + frm
     width_key = base + ".door." + wall + ".width"
-    frm = _number_at(values, from_key)
+    offset = _number_at(values, from_key)
     width = _number_at(values, width_key)
-    if frm is not None and width is not None:
-        return (frm + width / 2, [from_key, width_key])
+    if offset is not None and width is not None:
+        return (offset + width / 2, [from_key, width_key])
     if wall != "north":
         return None
     begin_key = base + ".door.begin.from_east_wall"
@@ -1513,19 +1520,31 @@ def _route_members(values, prefix):
     return sorted(members, key=lambda m: m[3])
 
 
+def _carry(values, key, before):
+    own = _number_at(values, key)
+    return (own, [key]) if own is not None else before
+
+
 def _walk_route(values, structure, prefix, half):
     out = {}
     exit_ = None
-    bearing = _DUE_SOUTH
+    room = None
+    bearing = None
+    slope = None
     section = None
     for kind, name, base, _step in _route_members(values, prefix):
         step_key = base + ".step"
         if kind == "passage":
+            in_room_key = base + ".floor.begin.from_east_wall"
+            in_room = _number_at(values, in_room_key)
             begin = _stored_point(values, base + ".floor.begin", half)
+            if begin is None and room is not None and in_room is not None:
+                begin = ((room["east"] - in_room, room["centre_north"], room["floor"]), list(room["keys"]) + [in_room_key])
             if begin is None:
                 begin = exit_
             if begin is None:
                 begin = _entrance_begin(values, structure, prefix, name, half)
+            room = None
             own_width = _number_at(values, base + ".width")
             own_height = _number_at(values, base + ".height")
             width = own_width if own_width is not None else (section["width"] if section else None)
@@ -1540,39 +1559,75 @@ def _walk_route(values, structure, prefix, half):
                 "height_keys": [base + ".height"] if own_height is not None else section["height_keys"],
             }
             start = (begin[0], list(begin[1]) + [step_key])
+            angle = _carry(values, base + ".angle", slope)
+            heading = _carry(values, base + ".direction", bearing)
+            length_key = base + ".length"
+            length = _number_at(values, length_key)
             end = _stored_point(values, base + ".floor.end", half)
-            if end is None:
-                end = _end_from_run(values, base, begin[0])
-            out[base] = {"begin": start, "section": here}
+            if end is None and length is not None and length > 0 and angle is not None:
+                azimuth = (heading[0] if heading is not None else _DUE_SOUTH) * math.pi / 180
+                tilt = angle[0] * math.pi / 180
+                flat = length * math.cos(tilt)
+                end = ((begin[0][0] + flat * math.sin(azimuth),
+                        begin[0][1] + flat * math.cos(azimuth),
+                        begin[0][2] + length * math.sin(tilt)),
+                       [length_key] + list(angle[1]) + (list(heading[1]) if heading is not None else []))
+            entry = {"begin": start, "section": here}
+            if end is not None:
+                entry["end"] = end
+            out[base] = entry
             if end is None:
                 exit_ = None
                 continue
             dx = end[0][0] - begin[0][0]
             dy = end[0][1] - begin[0][1]
             if math.hypot(dx, dy) > _MIN_RUN:
-                bearing = (math.atan2(dx, dy) * 180 / math.pi + 360) % 360
+                bearing = ((math.atan2(dx, dy) * 180 / math.pi + 360) % 360, list(heading[1]) if heading is not None else [])
+            if angle is not None:
+                slope = angle
             exit_ = (end[0], start[1] + list(end[1]))
             section = here
             continue
+        room = None
         if exit_ is None:
             continue
-        southward = abs(((bearing - 180 + 540) % 360) - 180) <= 45
-        door = _door_offset(values, base, "north") if southward else None
-        if door is None:
+        towards = bearing[0] if bearing is not None else _DUE_SOUTH
+
+        def off(target):
+            return abs(((towards - target + 540) % 360) - 180)
+
+        wall = "north" if off(180) <= 45 else ("east" if off(270) <= 45 else None)
+        door = _door_offset(values, base, wall) if wall is not None else None
+        if wall is None or door is None:
             exit_ = None
             continue
         recorded_floor = _number_at(values, base + ".floor.up")
         floor = recorded_floor if recorded_floor is not None else exit_[0][2]
-        east = exit_[0][0] + door[0]
-        north = exit_[0][1]
-        derived = {base + ".wall.north.north": north, base + ".wall.east.east": east}
+        derived = {}
+        keys = list(exit_[1]) + [step_key] + list(door[1])
+        depth = _dimension(values, base + ".width", ("east", "west"))
+        centre_north = None
+        if wall == "north":
+            east = exit_[0][0] + door[0]
+            derived[base + ".wall.north.north"] = exit_[0][1]
+            derived[base + ".wall.east.east"] = east
+            if depth is not None:
+                centre_north = exit_[0][1] - depth[0] / 2
+        else:
+            east = exit_[0][0]
+            south = exit_[0][1] - door[0]
+            derived[base + ".wall.east.east"] = east
+            derived[base + ".wall.south.north"] = south
+            if depth is not None:
+                centre_north = south + depth[0] / 2
         if recorded_floor is None:
             derived[base + ".floor.up"] = floor
-        keys = list(exit_[1]) + [step_key] + list(door[1])
         out[base] = {"derived": derived, "keys": keys}
-        leave = _door_offset(values, base, "south")
-        depth = _dimension(values, base + ".width", ("east", "west"))
-        exit_ = ((east - leave[0], north - depth[0], floor), keys + list(depth[1]) + list(leave[1])) if leave and depth else None
+        room = ({"east": east, "centre_north": centre_north, "floor": floor, "keys": keys + list(depth[1])}
+                if depth is not None and centre_north is not None else None)
+        leave = _door_offset(values, base, "south") if wall == "north" else None
+        exit_ = (((east - leave[0], exit_[0][1] - depth[0], floor), keys + list(depth[1]) + list(leave[1]))
+                 if leave is not None and depth is not None else None)
     return out
 
 

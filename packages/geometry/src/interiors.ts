@@ -1106,7 +1106,7 @@ function passageBuilder(env: Environment, structure: string, prefix: string, nam
   // states a length along the floor and a slope instead, and the far end is
   // worked out from them rather than written down anywhere.
   const stored = storedPoint(env, `${base}.floor.end`, half);
-  const to = stored ?? endFromRun(env, base, from.point);
+  const to = routed?.end ?? stored ?? endFromRun(env, base, from.point);
   if (!to) return undefined;
   const run = Math.hypot(to.point[0] - from.point[0], to.point[1] - from.point[1], to.point[2] - from.point[2]);
   if (run < MIN_RUN) return undefined;
@@ -1166,24 +1166,36 @@ function chamberBuilder(env: Environment, prefix: string, name: string, half: nu
 //
 //   <id>.passage.<name>.step, <id>.chamber.<name>.step   order from the entrance
 //
-// Members with a step are laid in step order. A routed passage with no
-// `floor.begin` of its own begins where the member before it ends, and one
-// with no `width` or `height` continues the section of the passage before it,
-// which is how a source describes "a short level stretch of the same width".
+// Members with a step are laid in step order.
+//
+// A routed passage begins at its own `floor.begin` if it records one; else,
+// straight after a chamber, at `floor.begin.from_east_wall` metres west of that
+// chamber's east wall on its north-south centre line and at its floor, which
+// is how a source says "from the middle of the floor"; else where the member
+// before it ends; else at the entrance. It runs its `length`, and whatever it
+// does not record of its section, slope or bearing it continues from the
+// passage before it, which is how a source describes "a short stretch of the
+// same width" or a portcullis slot in the same incline.
+//
 // A routed chamber with no stored walls is entered on the wall facing the
-// arriving passage: arriving southwards, its north wall stands at the
-// arrival point, its floor at the arrival level unless `floor.up` is
-// recorded, and its east wall at the entering door's recorded offset, which
-// is `door.north.from_east_wall` and half `door.north.width`, or the middle of
-// `door.begin.from_east_wall` and `door.end.from_east_wall`. It is left
-// through `door.south` if one is recorded, on its south wall at the same
-// level. Only southward arrivals are read, because every chamber on a route
-// at Giza is entered from the north; any other bearing ends the route there.
-// Every coordinate a route produces is derived, so none is stored, and every
-// routed member names the whole chain of records behind it.
+// arriving passage, at the level it arrives at unless `floor.up` is recorded.
+// Arriving southwards it is entered on its north wall, whose door is placed
+// from the east wall: `door.north.from_east_wall` and half `door.north.width`,
+// or the middle of `door.begin.from_east_wall` and `door.end.from_east_wall`.
+// Arriving westwards it is entered on its east wall, whose door is placed from
+// the south wall: `door.east.from_south_wall` and half `door.east.width`. A
+// chamber entered from the north is left through `door.south` if one is
+// recorded. Other arrivals end the route, because no chamber on a route at
+// Giza is entered any other way. Every coordinate a route produces is derived,
+// so none is stored, and every routed member names the whole chain behind it.
 
 interface Placed {
   point: Point;
+  keys: string[];
+}
+
+interface Carried {
+  value: number;
   keys: string[];
 }
 
@@ -1196,18 +1208,27 @@ interface Section {
 
 interface Routed {
   begin?: Placed;
+  end?: Placed;
   section?: Section;
   derived?: Record<string, number>;
   keys?: string[];
 }
 
-/** A chamber door's middle as metres west of its east wall, on the wall named, and the records it came from. */
-function doorOffset(env: Environment, base: string, wall: 'north' | 'south'): { value: number; keys: string[] } | undefined {
-  const fromKey = `${base}.door.${wall}.from_east_wall`;
+interface Room {
+  east: number;
+  centreNorth: number;
+  floor: number;
+  keys: string[];
+}
+
+/** A chamber door's middle, as metres from the wall it is placed from, on the wall named, and the records it came from. */
+function doorOffset(env: Environment, base: string, wall: 'north' | 'south' | 'east'): Carried | undefined {
+  const from = wall === 'east' ? 'from_south_wall' : 'from_east_wall';
+  const fromKey = `${base}.door.${wall}.${from}`;
   const widthKey = `${base}.door.${wall}.width`;
-  const from = numberAt(env, fromKey);
+  const offset = numberAt(env, fromKey);
   const width = numberAt(env, widthKey);
-  if (from !== undefined && width !== undefined) return { value: from + width / 2, keys: [fromKey, widthKey] };
+  if (offset !== undefined && width !== undefined) return { value: offset + width / 2, keys: [fromKey, widthKey] };
   if (wall !== 'north') return undefined;
   const beginKey = `${base}.door.begin.from_east_wall`;
   const endKey = `${base}.door.end.from_east_wall`;
@@ -1236,17 +1257,32 @@ function routeMembers(env: Environment, prefix: string): RouteMember[] {
   return members.sort((a, b) => a.step - b.step);
 }
 
-/** Every routed member's derived start, section or walls, walked from the entrance. */
+/** A record of the passage's own, or what the passage before it carried. */
+function carry(env: Environment, key: string, before: Carried | undefined): Carried | undefined {
+  const own = numberAt(env, key);
+  return own !== undefined ? { value: own, keys: [key] } : before;
+}
+
+/** Every routed member's derived start and end, section or walls, walked from the entrance. */
 function walkRoute(env: Environment, structure: string, prefix: string, half: number | undefined): Map<string, Routed> {
   const out = new Map<string, Routed>();
   let exit: Placed | undefined;
-  let bearing = DUE_SOUTH;
+  let room: Room | undefined;
+  let bearing: Carried | undefined;
+  let slope: Carried | undefined;
   let section: Section | undefined;
   for (const member of routeMembers(env, prefix)) {
     const { base } = member;
     const stepKey = `${base}.step`;
     if (member.kind === 'passage') {
-      const begin = storedPoint(env, `${base}.floor.begin`, half) ?? exit ?? entranceBegin(env, structure, prefix, member.name, half);
+      const inRoomKey = `${base}.floor.begin.from_east_wall`;
+      const inRoom = numberAt(env, inRoomKey);
+      const begin =
+        storedPoint(env, `${base}.floor.begin`, half) ??
+        (room && inRoom !== undefined ? { point: [room.east - inRoom, room.centreNorth, room.floor] as Point, keys: [...room.keys, inRoomKey] } : undefined) ??
+        exit ??
+        entranceBegin(env, structure, prefix, member.name, half);
+      room = undefined;
       const ownWidth = numberAt(env, `${base}.width`);
       const ownHeight = numberAt(env, `${base}.height`);
       const width = ownWidth ?? section?.width;
@@ -1262,38 +1298,77 @@ function walkRoute(env: Environment, structure: string, prefix: string, half: nu
         heightKeys: ownHeight !== undefined ? [`${base}.height`] : (section as Section).heightKeys,
       };
       const start: Placed = { point: begin.point, keys: [...begin.keys, stepKey] };
-      const end = storedPoint(env, `${base}.floor.end`, half) ?? endFromRun(env, base, begin.point);
-      out.set(base, { begin: start, section: here });
+      const angle = carry(env, `${base}.angle`, slope);
+      const heading = carry(env, `${base}.direction`, bearing);
+      const lengthKey = `${base}.length`;
+      const length = numberAt(env, lengthKey);
+      const stored = storedPoint(env, `${base}.floor.end`, half);
+      let end: Placed | undefined = stored;
+      if (!end && length !== undefined && length > 0 && angle) {
+        const azimuth = ((heading?.value ?? DUE_SOUTH) * Math.PI) / 180;
+        const tilt = (angle.value * Math.PI) / 180;
+        const flat = length * Math.cos(tilt);
+        end = {
+          point: [
+            begin.point[0] + flat * Math.sin(azimuth),
+            begin.point[1] + flat * Math.cos(azimuth),
+            begin.point[2] + length * Math.sin(tilt),
+          ],
+          keys: [lengthKey, ...angle.keys, ...(heading?.keys ?? [])],
+        };
+      }
+      out.set(base, { begin: start, section: here, ...(end ? { end } : {}) });
       if (!end) {
         exit = undefined;
         continue;
       }
       const dx = end.point[0] - begin.point[0];
       const dy = end.point[1] - begin.point[1];
-      if (Math.hypot(dx, dy) > MIN_RUN) bearing = ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360;
+      const run = Math.hypot(dx, dy);
+      if (run > MIN_RUN) {
+        const keys = heading?.keys ?? [];
+        bearing = { value: ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360, keys };
+      }
+      if (angle) slope = angle;
       exit = { point: end.point, keys: [...start.keys, ...end.keys] };
       section = here;
       continue;
     }
+    room = undefined;
     if (!exit) continue;
-    const southward = Math.abs(((bearing - 180 + 540) % 360) - 180) <= 45;
-    const door = southward ? doorOffset(env, base, 'north') : undefined;
-    if (!door) {
+    const towards = bearing?.value ?? DUE_SOUTH;
+    const off = (target: number) => Math.abs(((towards - target + 540) % 360) - 180);
+    const wall = off(180) <= 45 ? 'north' : off(270) <= 45 ? 'east' : undefined;
+    const door = wall ? doorOffset(env, base, wall) : undefined;
+    if (!wall || !door) {
       exit = undefined;
       continue;
     }
     const recordedFloor = numberAt(env, `${base}.floor.up`);
     const floor = recordedFloor ?? exit.point[2];
-    const east = exit.point[0] + door.value;
-    const north = exit.point[1];
-    const derived: Record<string, number> = { [`${base}.wall.north.north`]: north, [`${base}.wall.east.east`]: east };
-    if (recordedFloor === undefined) derived[`${base}.floor.up`] = floor;
+    const derived: Record<string, number> = {};
     const keys = [...exit.keys, stepKey, ...door.keys];
-    out.set(base, { derived, keys });
-    const leave = doorOffset(env, base, 'south');
+    let east: number;
+    let centreNorth: number | undefined;
     const depth = dimension(env, `${base}.width`, ['east', 'west']);
+    if (wall === 'north') {
+      east = exit.point[0] + door.value;
+      derived[`${base}.wall.north.north`] = exit.point[1];
+      derived[`${base}.wall.east.east`] = east;
+      if (depth) centreNorth = exit.point[1] - depth.value / 2;
+    } else {
+      east = exit.point[0];
+      const south = exit.point[1] - door.value;
+      derived[`${base}.wall.east.east`] = east;
+      derived[`${base}.wall.south.north`] = south;
+      if (depth) centreNorth = south + depth.value / 2;
+    }
+    if (recordedFloor === undefined) derived[`${base}.floor.up`] = floor;
+    out.set(base, { derived, keys });
+    room = depth && centreNorth !== undefined ? { east, centreNorth, floor, keys: [...keys, ...depth.keys] } : undefined;
+    const leave = wall === 'north' ? doorOffset(env, base, 'south') : undefined;
     exit = leave && depth
-      ? { point: [east - leave.value, north - depth.value, floor], keys: [...keys, ...depth.keys, ...leave.keys] }
+      ? { point: [east - leave.value, exit.point[1] - depth.value, floor], keys: [...keys, ...depth.keys, ...leave.keys] }
       : undefined;
   }
   return out;

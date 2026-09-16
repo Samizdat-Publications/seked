@@ -348,7 +348,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.granite.to_portcullis",
+    "key": "g3.passage.granite.length",
     "structure": "g3",
     "quantity": "length",
     "value": 9.144,
@@ -408,7 +408,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.granite.portcullis.thickness",
+    "key": "g3.passage.granite_portcullis.length",
     "structure": "g3",
     "quantity": "length",
     "value": 0.254,
@@ -420,7 +420,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.granite.portcullis_to_incline_bottom",
+    "key": "g3.passage.granite_foot.length",
     "structure": "g3",
     "quantity": "length",
     "value": 0.7366,
@@ -432,7 +432,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.granite.horizontal.length",
+    "key": "g3.passage.granite_horizontal.length",
     "structure": "g3",
     "quantity": "length",
     "value": 3.048,
@@ -444,7 +444,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.granite.horizontal.width",
+    "key": "g3.passage.granite_horizontal.width",
     "structure": "g3",
     "quantity": "length",
     "value": 1.3716,
@@ -456,7 +456,7 @@
     "verified": true
   },
   {
-    "key": "g3.passage.granite.horizontal.height",
+    "key": "g3.passage.granite_horizontal.height",
     "structure": "g3",
     "quantity": "length",
     "value": 2.0574,

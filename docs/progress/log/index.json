@@ -198,5 +198,15 @@
     "kept": false,
     "note": "Menkaure's apartments placed for the first time, by a route: Perring's chain and M&R's text laid end to end from the entrance; the large chamber's floor lands at -10.59 m against the -10.55 Tav. 4 prints. Also the first render with G2 and G3 interiors placed under their own pyramids.",
     "bytes": 893088
+  },
+  {
+    "file": "2026-09-16T20-57-26Z--section-g3--30e912b-dirty.png",
+    "taken": "2026-09-16T20:57:26+00:00",
+    "view": "section-g3",
+    "commit": "30e912b",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Menkaure's route carried on to the granite crypt: the corridor west out of the large chamber's floor at a slope scaled from Tav. 6, the portcullis slot, the foot of the incline, the horizontal passage and the crypt entered on its east wall. Crypt floor -15.27 against Tav. 4's [15.55].",
+    "bytes": 895645
   }
 ]

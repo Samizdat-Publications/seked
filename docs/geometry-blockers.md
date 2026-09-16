@@ -102,9 +102,11 @@ plates: Perring's chain in Vyse's Appendix and Maragioglio and Rinaldi's
 description (pp. 39 to 43) laid end to end, with `<member>.step` records and the
 route in `interiors.ts` and `seked_data.py`. Tav. 4's printed levels became the
 check instead of the input: the large chamber's floor comes out at -10.59 m
-against its [10.55]. Still to route: the passage down to the granite crypt (C,
-[15.55]) and the chamber of the niches (W, [16.95]), which leave the large
-chamber westwards and need a west-going leg and a chamber entered from the east.
+against its [10.55]. Carried on the same day to the granite crypt (C), through
+a corridor whose slope is scaled from Tav. 6 (27.5 ± 1.8°): its floor lands at
+-15.27 m against [15.55]. Still to route: the chamber of the niches (W,
+[16.95]), which branches off the horizontal passage through a door in its
+north wall and down six steps, so it needs a branch rather than a next step.
 What was planned:
 
 **Maragioglio and Rinaldi, *Tavole* 6,2 (1967)**: archive.org `Maragioglio_6-2`
@@ -203,7 +205,7 @@ plates, not Smyth), `scripts/plate.py`, Khafre's casing cap (from text), a
 first materials and atmosphere pass, the first stand-in (the Sphinx), and the
 Milky Way (snapshots 0017 to 0020). What is left, in order:
 
-1. Menkaure's route on to the granite crypt and the chamber of the niches.
+1. Menkaure's chamber of the niches, a branch off the route.
 2. Mastaba form and heights (hole 4), and more stand-ins: the temples, and an
    excavated Sphinx to replace the 1903 bronze.
 3. The second materials pass: displacement on the stepped core, granite and

@@ -183,8 +183,13 @@ describe('the discovered interiors on the canonical preset', () => {
       'g3.passage.descending',
       'g3.passage.first_to_second',
       'g3.passage.foot',
+      'g3.passage.granite',
+      'g3.passage.granite_foot',
+      'g3.passage.granite_horizontal',
+      'g3.passage.granite_portcullis',
       'g3.passage.portcullis',
       'g3.chamber.first',
+      'g3.chamber.granite',
       'g3.chamber.second',
     ]);
     const solid = built['g3.passage.descending'];
@@ -254,6 +259,37 @@ describe("Menkaure's route on the canonical preset", () => {
 
   it('keeps the large chamber\u2019s floor level with the mouth of the corridor into it, as p. 43 says', () => {
     expect(bounds('g3.chamber.second').lo[2]).toBeCloseTo(floorEnd('g3.passage.first_to_second')[2], 5);
+  });
+
+  it('starts the corridor to the crypt in the middle of the large chamber’s floor, as Petrie and p. 43 say', () => {
+    const second = bounds('g3.chamber.second');
+    const [x, y, z] = floorBegin('g3.passage.granite');
+    expect(x).toBeCloseTo((second.hi[0] as number) - v('g3.passage.granite.floor.begin.from_east_wall'), 4);
+    expect(y).toBeCloseTo(((second.lo[1] as number) + (second.hi[1] as number)) / 2, 4);
+    expect(z).toBeCloseTo(second.lo[2] as number, 4);
+  });
+
+  it('runs the portcullis slot and the foot of the incline on down the corridor’s own slope', () => {
+    const slope = (name: string) => {
+      const [bx, by, bz] = floorBegin(name);
+      const [ex, ey, ez] = floorEnd(name);
+      return (Math.atan2(ez - bz, Math.hypot(ex - bx, ey - by)) * 180) / Math.PI;
+    };
+    expect(slope('g3.passage.granite_portcullis')).toBeCloseTo(v('g3.passage.granite.angle'), 6);
+    expect(slope('g3.passage.granite_foot')).toBeCloseTo(v('g3.passage.granite.angle'), 6);
+  });
+
+  it('enters the crypt on its east wall with its doorway on the south wall, as section 87 says', () => {
+    const crypt = bounds('g3.chamber.granite');
+    const [x, y] = floorEnd('g3.passage.granite_horizontal');
+    expect(crypt.hi[0]).toBeCloseTo(x, 4);
+    expect(y - (crypt.lo[1] as number)).toBeCloseTo(v('g3.chamber.granite.door.east.width') / 2, 4);
+  });
+
+  it('puts the crypt’s floor within half a metre of the level Tav. 4 prints for it, the scaled slope being the loose link', () => {
+    const miss = (bounds('g3.chamber.granite').lo[2] as number) - -v('g3.chamber.granite.floor.depth');
+    // A slope good to 1.8 degrees swings the foot of a ten-metre incline about a third of a metre.
+    expect(Math.abs(miss)).toBeLessThan(0.5);
   });
 
   it('never builds from the printed levels, which would make the check circular', () => {

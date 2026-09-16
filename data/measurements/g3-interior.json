@@ -504,7 +504,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.granite.door.width",
+    "key": "g3.chamber.granite.door.east.width",
     "structure": "g3",
     "quantity": "length",
     "value": 1.384808,

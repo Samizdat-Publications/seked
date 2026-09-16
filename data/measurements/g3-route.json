@@ -120,5 +120,105 @@
     "method": "published-plan",
     "note": "Printed [16.95] on Tav. 4, fig. 2, from the base line down to the floor of the chamber of the niches (W), a Perring figure by the plate's bracket convention. A check for the route when it is carried on.",
     "verified": true
+  },
+  {
+    "key": "g3.passage.granite.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 7,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 7 of the route from the entrance, the corridor (R) to the crypt, which starts in the floor of the large chamber, in the order Maragioglio and Rinaldi walk the lower apartment on pp. 43 to 45: the corridor (R) down from the floor of the large chamber, the portcullis (M) at its end, the foot of the incline, the horizontal passage (Z) and the crypt (C). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.granite.direction",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 270,
+    "unit": "deg",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Due west: \"parte un corridoio discendente (R), diretto verso ovest\", p. 43. Petrie, §86, has the same passage descend \"westwards\" out of the middle of the second chamber's floor. The portcullis and the foot of the incline continue this bearing, and the horizontal passage after them.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.granite.angle",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": -27.5,
+    "unit": "deg",
+    "sigma": 1.8,
+    "source": "maragioglio-rinaldi-1967-tavole",
+    "method": "scaled from plate",
+    "note": "No slope is printed for this corridor and neither Petrie nor the Parte VI text states one. Scaled with scripts/plate.py on Tav. 6, fig. 8 (\"Sezione αα guardando a nord\"), rasterised at 300 dpi clipped to (1300, 1500, 2420, 1960) pt: the dimension line printed \"~9.90\", drawn parallel to the corridor, from (2875, 1420) to (3625, 1030) gives 27.47 deg with a pixel and drafting sigma of 0.8; a second line parallel to the passage, from (2600, 1325) to (3100, 1075), gives 26.57; the rough rock-cut walls read between 25.4 and 29.1. Sigma covers the walls. Stored negative, descending away from the chamber. Maragioglio and Rinaldi, p. 43, say the corridor was first cut at a lesser slope and later made steeper; this is the steeper, present one. The portcullis slot and the foot of the incline continue it.",
+    "verified": false
+  },
+  {
+    "key": "g3.passage.granite_portcullis.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 8,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 8 of the route from the entrance, the slot of the portcullis (M) at the end of (R), in the order Maragioglio and Rinaldi walk the lower apartment on pp. 43 to 45: the corridor (R) down from the floor of the large chamber, the portcullis (M) at its end, the foot of the incline, the horizontal passage (Z) and the crypt (C). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.granite_foot.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 9,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 9 of the route from the entrance, the rest of the incline, from the portcullis to its foot, in the order Maragioglio and Rinaldi walk the lower apartment on pp. 43 to 45: the corridor (R) down from the floor of the large chamber, the portcullis (M) at its end, the foot of the incline, the horizontal passage (Z) and the crypt (C). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.granite_horizontal.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 10,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 10 of the route from the entrance, the horizontal passage (Z) into the crypt, in the order Maragioglio and Rinaldi walk the lower apartment on pp. 43 to 45: the corridor (R) down from the floor of the large chamber, the portcullis (M) at its end, the foot of the incline, the horizontal passage (Z) and the crypt (C). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.passage.granite_horizontal.angle",
+    "structure": "g3",
+    "quantity": "angle",
+    "value": 0,
+    "unit": "deg",
+    "source": "vyse-1840",
+    "method": "tabulated",
+    "note": "Level: \"Length of horizontal passage to the apartment of the sarcophagus, 10 ft 0 in\", Perring's Table of Dimensions of the Third Pyramid, Vyse vol. II, Appendix, pp. 120 to 122; Maragioglio and Rinaldi, p. 45, call it \"un passaggio orizzontale (Z)\" too. They add that its floor has a step about 15 cm high a little over 90 cm beyond the portcullis, which the scene does not draw.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.granite.step",
+    "structure": "g3",
+    "quantity": "count",
+    "value": 11,
+    "unit": "count",
+    "source": "maragioglio-rinaldi-1967",
+    "method": "published-plan",
+    "note": "Step 11 of the route from the entrance, the granite-lined crypt (C), entered on its east wall, in the order Maragioglio and Rinaldi walk the lower apartment on pp. 43 to 45: the corridor (R) down from the floor of the large chamber, the portcullis (M) at its end, the foot of the incline, the horizontal passage (Z) and the crypt (C). A member with a step and no stored start begins where the one before it ends; see the route in packages/geometry/src/interiors.ts.",
+    "verified": true
+  },
+  {
+    "key": "g3.chamber.granite.door.east.from_south_wall",
+    "structure": "g3",
+    "quantity": "length",
+    "value": 0,
+    "unit": "m",
+    "source": "petrie-1883",
+    "method": "interior",
+    "note": "\"The doorway is 54.52 wide, and one side of it in the plane of the S. wall\", §87: the doorway into the crypt, in its east side, starts at the south wall. So the passage (Z) runs in along the crypt's south wall, and the route stands the crypt's south wall half a doorway south of the passage's axis.",
+    "verified": true
   }
 ]
