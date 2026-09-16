@@ -69,8 +69,12 @@ const G1: Vec3 = [0, 70, 0];
 const KINGS_CHAMBER: Vec3 = [7, 43, 11];
 /** The three pyramids together. */
 const THREE: Vec3 = [-300, 30, 360];
-/** The Sphinx's box. */
-const SPHINX: Vec3 = [350, 10, 430];
+/**
+ * The Sphinx's body, in its hollow. This was the box's middle, ten metres over
+ * the datum plane, until the footprint import stood the Sphinx on the ground
+ * it is cut into, some thirty-eight metres below Khufu's base.
+ */
+const SPHINX: Vec3 = [330, -30, 430];
 /** The middle of Legon's rectangle, which lies on the ground. */
 const RECTANGLE: Vec3 = [-260, 0, 340];
 
