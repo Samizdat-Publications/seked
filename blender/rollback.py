@@ -293,7 +293,7 @@ def main():
     from mathutils import Vector
 
     opts = parse_args({"out": "build/rollback", "mp4": "", "frames": "all", "width": "1280", "height": "720",
-                       "samples": "64", "engine": "", "bake": SKY_ROLLBACK})
+                       "samples": "64", "engine": "", "bake": SKY_ROLLBACK, "device": "auto"})
     scene = bpy.context.scene
     header, positions = load_rollback(opts["bake"])
     frames = header["frames"]
@@ -344,6 +344,12 @@ def main():
     label = build_label(scene, camera)
 
     engine, samples = configure_render(scene, opts)
+    # Keep the scene between frames. Every frame is rendered in this one
+    # process and only the camera, the star cloud, the two rings and the
+    # caption move, but without this Cycles rebuilds everything for each of
+    # them, and with the plateau's six hundred masses and the terrain in the
+    # scene that rebuild was a minute a frame whatever the sample count.
+    scene.render.use_persistent_data = True
     out_dir = os.path.abspath(opts["out"])
     os.makedirs(out_dir, exist_ok=True)
     print(f"rollback: {len(wanted)} of {len(frames)} frames, {header['meridian']['name']} on the meridian, "

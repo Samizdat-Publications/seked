@@ -370,9 +370,48 @@ def choose_engine(scene, requested):
     raise RuntimeError("no usable render engine")
 
 
+def use_gpu(scene, requested="auto"):
+    """
+    Render Cycles on the GPU when there is one, and say which device it chose.
+
+    Every render in this project ran on the CPU until the plateau was populated
+    and a 1080p frame of the film took a minute. Cycles only uses a GPU when the
+    Cycles add-on's preferences name a compute backend and the scene asks for
+    the GPU, and a headless run does neither by itself. OptiX is tried first
+    because it is the faster backend on an RTX card, then CUDA, HIP, oneAPI and
+    Metal, and the CPU is what is left. `--device cpu` forces the CPU, which is
+    the way to reproduce a render bit for bit on another machine; the two
+    devices converge on the same image but not on the same noise.
+    """
+    if scene.render.engine != "CYCLES" or requested == "cpu":
+        scene.cycles.device = "CPU" if scene.render.engine == "CYCLES" else getattr(scene.cycles, "device", "CPU")
+        return "CPU"
+    try:
+        prefs = bpy.context.preferences.addons["cycles"].preferences
+    except KeyError:
+        return "CPU"
+    for backend in ("OPTIX", "CUDA", "HIP", "ONEAPI", "METAL"):
+        try:
+            prefs.compute_device_type = backend
+        except TypeError:
+            continue
+        prefs.refresh_devices() if hasattr(prefs, "refresh_devices") else prefs.get_devices()
+        gpus = [d for d in prefs.devices if d.type == backend]
+        if not gpus:
+            continue
+        for d in prefs.devices:
+            d.use = d.type == backend
+        scene.cycles.device = "GPU"
+        return f"{backend} ({', '.join(d.name for d in gpus)})"
+    scene.cycles.device = "CPU"
+    return "CPU"
+
+
 def configure_render(scene, opts):
     """Engine, samples and frame size from the options; returns the engine's name."""
     engine = choose_engine(scene, opts["engine"])
+    device = use_gpu(scene, opts.get("device", "auto"))
+    print(f"  rendering on {device}")
     samples = int(opts["samples"])
     if engine.startswith("BLENDER_EEVEE"):
         scene.eevee.taa_render_samples = samples
@@ -393,7 +432,7 @@ def configure_render(scene, opts):
 
 
 def main():
-    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "view": "dawn", "bake": SKY_BAKE})
+    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "bake": SKY_BAKE})
     scene = bpy.context.scene
     if opts["view"] not in VIEWS:
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
