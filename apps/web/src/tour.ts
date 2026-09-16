@@ -104,9 +104,10 @@ export const TOUR: TourStep[] = [
     text:
       'Everything here is placed from the measurement database: a base side, a height, a centre offset and an orientation, each with a ' +
       'cited source. Nothing derived is stored, so the perimeters and face angles the claims are about are computed from those numbers ' +
-      'as the page loads. The Sphinx is a box at a cited position rather than a sculpt, and the panel says so.',
+      'as the page loads. The lesser monuments and the mastaba fields are OpenStreetMap outlines fitted onto the three surveyed ' +
+      'pyramids to within a metre, and their heights are estimates, which the panel says.',
     claim: null,
-    layers: { pyramids: true, ground: true, terrain: true, north: true, sky: false },
+    layers: { pyramids: true, ground: true, terrain: false, north: true, sky: false },
     camera: PLATEAU,
   },
   {
@@ -117,7 +118,7 @@ export const TOUR: TourStep[] = [
       'royal cubit under it is a measurement like any other, and the slider overrides it. Move either and everything downstream ' +
       're-resolves: the geometry, the overlays and every residual in the panel.',
     claim: null,
-    layers: { pyramids: true, ground: true, terrain: true, north: true, sky: false },
+    layers: { pyramids: true, ground: true, terrain: false, north: true, sky: false },
     camera: cameraFrom(G1, 135, 25, 700),
   },
   {
@@ -233,7 +234,7 @@ export const TOUR: TourStep[] = [
       'and the reasoning behind all of it is in docs/plan.html beside it. The address bar has been keeping up the whole way, so ' +
       'whatever is on screen now is already a link.',
     claim: null,
-    layers: { pyramids: true, ground: true, terrain: true, north: true, sky: false },
+    layers: { pyramids: true, ground: true, terrain: false, north: true, sky: false },
     camera: PLATEAU,
   },
 ];

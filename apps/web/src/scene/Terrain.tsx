@@ -33,7 +33,10 @@ export interface PlateauProps extends TerrainProps {
  * with each footprint set to the base elevation the survey gives it. That is a
  * stand-in until the GPMP contours are entered, and it says so in the panel.
  * Shown together, the raw model goes over the ground as a wireframe, which is
- * the honest way to see how much of the plateau has been moved.
+ * the honest way to see how much of the plateau has been moved. It is off in
+ * the tour: the raw model's mounds rise through the lower faces of every
+ * pyramid, and a wireframe crossing a pyramid's base reads as the pyramid
+ * having sunk, which is the opposite of what it shows.
  */
 export function Plateau({ header, heights, datum, pyramids, context, ground, clippingPlanes }: PlateauProps): React.JSX.Element {
   const grids = useMemo(() => terrainGrid({ header, heights, datum, pyramids }), [header, heights, datum, pyramids]);

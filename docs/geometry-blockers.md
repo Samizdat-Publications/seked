@@ -1,201 +1,175 @@
-# Resolving the missing geometry
+# The next round
 
-Four pieces of the scene are still missing, and they have one thing in common.
-None of them is missing for want of a source. Each is missing because its
-geometry is drawn and not written: the text of every survey read so far states
-the dimensions and leaves the arrangement to a plate. So the plan has two
-halves. First a rule and a tool for taking figures off drawings without
-breaking the project's rule that nothing is eyeballed. Then the four blockers,
-each against the specific drawing that resolves it, all of which were checked
-on 2026-09-16 and are named here with their archive.org identifiers.
+Two tracks: filling the four holes left in the geometry, and making the scene
+beautiful. They meet in the middle, because a hole filled with a good model is
+both.
 
-## Part 1. Reading drawings honestly
+The project's purpose was restated on 2026-09-16 and it sets the priorities
+below. Seked is a test of how beautiful a fully Claude-driven scene of the
+plateau can be, "as close to survey as we can get, with the holes filled in".
+The pyramids, inside and out, stay as near survey as the sources allow,
+because the claims are tested against them. Everything else needs its place
+right, which the OpenStreetMap registration already gives to about a metre,
+and may take a good free model fitted to its footprint.
 
-The project forbids reading a position off a figure by eye, and it should keep
-forbidding that. What it has never had is a way to use a drawing *properly*,
-and there are two proper ways.
+## Part 1. Reading drawings (agreed)
 
-**Transcribed from a plate.** A dimension printed on the drawing ("21'8''", "3,45")
-is text that happens to sit on a plate. It is entered exactly as a figure from a
-table is: the value as printed, the plate number in the note, `verified: true`
-once the transcription is checked against the image. This is no weaker than
-anything already in the database.
+Agreed 2026-09-16 and written into CLAUDE.md's honesty rules.
 
-**Scaled from a plate.** A distance measured off the drawing against its own
-scale bar is a measurement with a known error, not a guess. It is entered with
-`method: "scaled from plate"`, the plate and the scale bar named in the note,
-and a sigma that is the sum of three honest terms: the pixel resolution of the
-scan converted through the scale, the drafting tolerance of the original (half
-a millimetre on the sheet unless the author states otherwise), and the paper
-shrinkage of the scan (taken from how far the scale bar itself deviates from
-its nominal length). It stays `verified: false`, because "verified" means
-checked against a stated figure and a scaled figure has none. The dossier and
-the viewer already mark unverified inputs, so a claim resting on a scaled
-figure says so without any new machinery.
+**Transcribed from a plate.** A dimension printed on a drawing is text on a
+plate: entered as printed, the plate cited, `verified: true` once checked
+against the image.
 
-What remains forbidden is the thing the rule was written for: a coordinate
-guessed from the look of a picture, with no scale, no sigma and no plate
-reference.
+**Scaled from a plate.** A distance measured against the drawing's own scale
+bar: `method: "scaled from plate"`, the plate and the bar named, a sigma that
+sums the scan's pixel resolution through the scale, the drafting tolerance
+(half a millimetre on the sheet unless the author states one), and the scan's
+shrinkage (how far the scale bar deviates from its nominal length). Never
+verified, because verified means checked against a stated figure.
 
-### The tool
+Still forbidden: a coordinate guessed from the look of a picture.
 
-`scripts/plate.py`, standard library plus `pymupdf` (already installed; it
-renders PDF pages without poppler, which is what stopped the Read tool):
+### The tool to build first: `scripts/plate.py`
 
-1. `render`: one PDF page to a PNG at a stated DPI, cached under the
-   scratchpad, never committed.
-2. `grid`: the same page with a labelled pixel grid burned over a crop, so a
-   point can be located to a few pixels by reading the grid rather than by
-   estimating.
-3. `scale`: given the two pixel ends of a scale bar and its printed length,
-   the metres per pixel and the shrinkage against nominal.
-4. `measure`: pixel points in, metres and the three-term sigma out, printed as
-   a ready-to-paste measurement record.
-5. `register`: control points in pixels and in the project frame, fitted with
-   the same least-squares rotation and translation `scripts/footprints.ts`
-   uses for OSM, residuals printed, for plans that are to be laid onto the
-   plateau rather than measured within.
+Standard library plus `pymupdf`, which is installed and renders PDF pages
+without poppler (the reason the Read tool could not show a PDF).
 
-Each blocker below says which of the two methods it needs.
+1. `render` a page to PNG at a stated DPI, cached outside the repo.
+2. `grid` a crop with a labelled pixel grid burned in, so points are located
+   by reading the grid.
+3. `scale` from the two pixel ends of a scale bar and its printed length:
+   metres per pixel, and shrinkage against nominal.
+4. `measure` pixel points into metres with the three-term sigma, printed as a
+   ready-to-paste record.
+5. `register` a plan onto the frame from control points, with the same
+   least-squares rotation and translation `scripts/footprints.ts` fits OSM with.
 
-## Part 2. The four blockers
+## Part 2. The four holes
 
-### 1. The well shaft and the grotto (Great Pyramid)
+All sources below were checked on 2026-09-16 and download without a login.
 
-**Why it is blocked.** Petrie declines to measure it (section 46, "it is not
-worth while to publish more complete measures than those of Prof. Smyth").
-The Edgars (archive.org `Edgar-1910`) give only "about" figures in prose.
+### 1. The well shaft and the grotto (Great Pyramid). Do first.
 
-**What resolves it, in order of preference.**
+Petrie declines to measure it (section 46) because Smyth already had, so the
+source is **Smyth, *Life and Work at the Great Pyramid* (1867), vol. II**:
+archive.org `lifeandworkatgr02smytgoog` or `in.ernet.dli.2015.181325`, both
+with a text layer. This is probably text and needs no drawing work. Cross-check
+against **Maragioglio and Rinaldi, Parte IV**: archive.org
+`l-architectura-della-piramidi-menfite-parte-4` (33 MB, text layer), and the
+Edgars' plates in `Edgar-1910`.
 
-- **Piazzi Smyth, *Life and Work at the Great Pyramid* (1867), vol. II.**
-  Open, with a text layer: `lifeandworkatgr02smytgoog`, also
-  `in.ernet.dli.2015.181325`. Petrie's own sentence says Smyth published the
-  measures, so this is most likely **text, not a drawing**, and may resolve
-  without Part 1 at all: the well's vertical and sloping legs, their lengths
-  and angles, and the grotto's level.
-- **Maragioglio and Rinaldi, Parte IV (the Great Pyramid).** Open, 33 MB with
-  a text layer: `l-architectura-della-piramidi-menfite-parte-4`. Their
-  sections of G1 carry the well. Transcribed where dimensioned.
-- The Edgars' plates in `Edgar-1910` as a cross-check, scaled where Smyth and
-  M&R are silent.
+Built as a fifth bore with the existing `bore()`: inlet at Petrie's measured
+mouth (35.37 in from the Gallery's north wall on the west ramp, section 46),
+legs from Smyth. Its check comes free: the last leg must arrive on the
+descending passage's floor.
 
-**How it is built.** The well is a bore that bends, which the shafts already
-are: `bore()` takes an inlet and a list of legs with lengths and angles. The
-inlet is Petrie's measured mouth (35.37 in from the Gallery's north wall on the
-west ramp, section 46); the outlet is the descending passage, which is already
-built. So the well becomes a fifth shaft, and like the shafts it has an
-end-to-end check for free: its last leg must arrive at the descending
-passage's floor, and how close it arrives is the test.
+### 2. Khafre's casing cap (Second Pyramid)
 
-**Effort.** Small if Smyth has it in text. Start here.
+**Maragioglio and Rinaldi, *Tavole* 5,2 (1966)**: archive.org `Maragioglio_5-2`
+(73 MB). Read the Parte V text volume already cited in the database first, in
+case the course or level is stated in words; otherwise scale it off their
+elevation. One record, `g2.casing.cap.lower_edge.up`, and the material split
+by height the generator already does for Menkaure's granite. This is also a
+visible win: Khafre's white cap over the stepped core is the silhouette people
+recognise.
 
-### 2. Placing Menkaure's chambers (Third Pyramid)
+### 3. Placing Menkaure's chambers (Third Pyramid)
 
-**Why it is blocked.** Every dimension is already in the database, from
-Petrie, M&R Parte VI's text and Vyse's appendix (all verified). Not one room
-has a position, because the plan (which wall the large apartment's door is in,
-which way the granite passage runs down to the sepulchral chamber) is never
-stated in prose.
+**Maragioglio and Rinaldi, *Tavole* 6,2 (1967)**: archive.org `Maragioglio_6-2`
+(92 MB). Second reading: Perring's "Sections of Apartments in the Third
+Pyramid" in Vyse vol. II (`operationscarrie02howa`, plate at p. 81). Reisner's
+***Mycerinus* (1931)** is free from Harvard's Digital Giza (link below) for
+the temples.
 
-**What resolves it.**
+Needs one new mechanism in `packages/geometry/src/interiors.ts`, mirrored in
+`blender/seked_data.py` with a parity test: a **route**. Each member carries
+`<member>.step`, its order from the entrance; a passage that turns carries a
+`.direction` azimuth, which discovery already reads; a member with no stored
+start begins at the previous member's exit, and a chamber is entered on the
+wall facing the arriving passage at the offset the plate gives (several such
+door offsets, "from the east wall", are already recorded from Petrie).
 
-- **Maragioglio and Rinaldi, *Tavole* 6,2 (1967)**, the plates volume for
-  Parte VI. Open PDF, 92 MB: `Maragioglio_6-2`. The plan and sections of
-  Menkaure's substructure, dimensioned.
-- Perring's section in Vyse vol. II, "Sections of Apartments in the Third
-  Pyramid" (plate at p. 81 of `operationscarrie02howa`), as a second reading.
+The check: Vyse's chain distances, already entered and never used, must come
+out of the built route (104 ft down the corridor, 4 ft 3 in to the anteroom,
+13 ft 5 in to the end of the portcullises, 41 ft 3 in to the large apartment).
 
-**How it is built.** Mostly by transcription. What the plates add is topology
-and a handful of offsets, and that needs one new mechanism in
-`packages/geometry/src/interiors.ts`, designed but not built: a **route**. Each
-passage and chamber that joins the one before carries `<member>.step` (its
-order from the entrance), and a passage that turns carries `.direction` as an
-azimuth, which the discovery already understands. A member with no stored
-start begins at the previous member's exit; a chamber is entered on the wall
-facing the arriving passage, at the offset along that wall the plate gives
-(Petrie already recorded the doors "from the east wall", so several offsets are
-in the database now). Numbers only, so it fits the schema, and it serves Khafre
-as well as Menkaure.
+### 4. The mastabas. Downgraded.
 
-**The check.** Vyse's chain distances are already entered and were never used
-to build anything: 104 ft down the corridor, 4 ft 3 in to the anteroom, 13 ft 5
-in to the end of the portcullises, 41 ft 3 in to the large apartment. The
-route built from M&R's plates must reproduce them.
+Survey heights for 577 tombs are no longer worth chasing: they are not
+pyramids, and their placement is already right. The plan now is a plausible
+field rather than a surveyed one:
 
-**Effort.** Medium. The route mechanism is the real work, and it has to be
-mirrored in `blender/seked_data.py` with a parity test like every other builder.
+- **Reisner, *A History of the Giza Necropolis* I (1942)**, free from Harvard's
+  Digital Giza (link below), gives typical core-mastaba proportions by
+  cemetery. Use them to set a height per cemetery class, or to scale a height
+  from each outline's footprint, as a labelled estimate.
+- Give the mastabas real form in the visual track (a battered stone core with
+  a stepped or cased face), instances of one or two good models fitted to
+  each outline rather than extruded boxes.
 
-### 3. Khafre's casing cap (Second Pyramid)
+## Part 3. The visual track
 
-**Why it is blocked.** Petrie mentions "the present cap of casing" (section 68)
-and observed its lowest corners in his triangulation (section 66), but prints
-only their horizontal offsets, never their level.
+The standard is the one Stewart set: stunning, well textured, with light and
+atmosphere worth looking at. In order of return on effort:
 
-**What resolves it.**
-
-- **Maragioglio and Rinaldi, *Tavole* 5,2 (1966)**, the plates volume for
-  Parte V. Open PDF, 73 MB: `Maragioglio_5-2`. Their elevation of Khafre shows
-  where the surviving casing stops, and the Parte V text volume already in the
-  database (`51maragioglio...1966lr`) may state the course number or level in
-  words; read the text first.
-- Petrie's plates in `cu31924012038927` for his triangulation stations.
-
-**How it is built.** One record, `g2.casing.cap.lower_edge.up`, transcribed if
-M&R state it, scaled off their elevation if they do not. The generator already
-splits materials by height on a pyramid (Menkaure's granite courses,
-`granite_casing_height`), so the cap is the same mechanism with casing above
-the line and exposed core below it on the "(today)" object.
-
-**Effort.** Small once the figure is found.
-
-### 4. Heights for the mastabas (the cemetery fields)
-
-**Why it is blocked.** The 577 mastabas are outlines from OSM with one
-estimated height between them. Reisner tabulates his tombs by number, OSM
-carries no numbers (three exceptions: G 2197, G 5110 and G 5170), and matching
-the two needs his cemetery plans.
-
-**What resolves it.**
-
-- **Reisner, *A History of the Giza Necropolis* I (1942)**, with the cemetery
-  plans and the tomb tables. On archive.org as `historyofgizanec0002reis`, but
-  **lending-restricted**: it needs a signed-in account, which is yours to use,
-  not this project's scripts'. Harvard's Digital Giza is expected to carry the
-  same volume as a free download; that is unverified and is the first thing to
-  check.
-- The three tombs OSM does number are the registration's check points.
-
-**How it is built.** Registration rather than measurement: lay each cemetery
-plan onto the frame with `plate.py register`, using the corners of the Great
-Pyramid and the queens' pyramids as control points, exactly as the OSM import
-was fitted; then match each OSM outline to the Reisner number whose drawn tomb
-contains its centroid, and take that tomb's height from his tables into a new
-`mastaba.<number>.height` record. An outline with no match keeps
-`tier3.mastaba.height`, so the field improves tomb by tomb and never regresses.
-
-**The check.** G 2197, G 5110 and G 5170 must match themselves, and the
-registration residuals must be reported like the OSM ones.
-
-**Effort.** The largest of the four, and the one with a dependency outside the
-project. Last.
+1. **Materials.** Replace the flat procedural colours with PBR texture sets
+   (base colour, roughness, normal, displacement) from CC0 libraries,
+   **Poly Haven** and **ambientCG**, both downloadable by API without an
+   account. Tura casing (fine white limestone), nummulitic core (coarse,
+   pitted, with course lines and block joints), Aswan granite, basalt paving,
+   and sand with wind ripples. Weathering by height and exposure. Displacement
+   on the "(today)" core, where Petrie's measured courses already give the
+   steps, so each course reads as blocks and not as slabs.
+2. **Atmosphere.** Aerial perspective and haze so the far pyramids sit back in
+   the air; a volumetric dust layer low over the sand at dawn and sunset;
+   filmic tone mapping tuned per view. The physical sky and the baked sun are
+   already right; this is what makes them look it.
+3. **Stand-in models for everything that is not a pyramid**, from free
+   sources, each fitted to its OSM footprint (centroid, principal axis for
+   orientation, a scale check against the outline) and recorded in a
+   `models/manifest.json` with URL, licence, attribution and the footprint it
+   is fitted to. Candidates: the CC-BY photogrammetry scans of the Sphinx and
+   the Great Pyramid already named in docs/plan.html (Sketchfab), and free
+   temple and mastaba models. Sketchfab downloads need an account; if a model
+   is wanted from there, Stewart downloads the file and it goes in the
+   scratchpad.
+4. **The sky.** The HYG stars are placed by the sky package and stay the
+   measured layer. Add a Milky Way background from a public-domain
+   equirectangular map (NASA's Deep Star Maps), rotated by the same precession
+   the stars use so it cannot disagree with them.
+5. **Hero renders and the film**, re-rendered at the end of each step above,
+   logged in `docs/progress/log/`, with milestone snapshots in
+   `docs/progress/`.
+6. **The viewer**, fed the same textures through glTF with KTX2 compression
+   (gltf-transform), as docs/plan.html always intended, so the browser is not
+   the poor relation of the renders.
 
 ## Order of work
 
-1. **The well shaft**, from Smyth's text. Probably no drawing work at all, and
-   it exercises the bore builder's end-to-end check.
-2. **`scripts/plate.py`** and the two-method rule, written into CLAUDE.md's
-   honesty rules beside "nothing is typed twice".
-3. **Khafre's casing cap**, the smallest use of the new tool.
-4. **Menkaure's chambers**, the route mechanism, checked against Vyse's chain.
-5. **The mastabas**, after the Reisner volume is in hand.
+1. The hero film: finish it if the background render stopped (see memory),
+   add it to docs/progress, `pnpm deploy`.
+2. The well shaft, from Smyth.
+3. `scripts/plate.py`.
+4. Khafre's casing cap.
+5. Materials (visual 1) and atmosphere (visual 2), then a hero-render pass.
+   The biggest visible gain in the project.
+6. Menkaure's route.
+7. Stand-in models (visual 3), mastaba form and heights (hole 4).
+8. Milky Way, the viewer's textures, the film at full quality.
 
-## What is needed from Stewart
+## Links
 
-- Nothing for items 1 to 4.
-- For item 5, either confirm that Digital Giza's copy of *A History of the
-  Giza Necropolis* I downloads freely, or borrow the archive.org copy under
-  your own account and drop the PDF in the scratchpad.
-- A yes or no on the two-method rule in Part 1 before it goes into CLAUDE.md,
-  since it loosens a rule the project was built on, if only slightly and only
-  with a sigma attached.
+- Reisner, *A History of the Giza Necropolis* I, free, no login (262 MB):
+  https://d1g9lvwdq3dcse.cloudfront.net/images/MFA-images/Giza/GizaImage/full/library/reisner_gn_books/giza_necropolis_1/giza_necropolis_1.pdf
+  (listed at https://giza.fas.harvard.edu/pubdocs/128/full/)
+- Reisner, *Mycerinus: The Temples of the Third Pyramid at Giza*, free, no
+  login (179 MB):
+  https://d1g9lvwdq3dcse.cloudfront.net/images/MFA-images/Giza/GizaImage/full/library/reisner_gn_books/mycerinus/reisner_mycerinus.pdf
+  (listed at https://giza.fas.harvard.edu/pubdocs/130/full/)
+- Maragioglio and Rinaldi: https://archive.org/details/Maragioglio_5-2 ,
+  https://archive.org/details/Maragioglio_6-2 ,
+  https://archive.org/details/l-architectura-della-piramidi-menfite-parte-4
+- Smyth: https://archive.org/details/lifeandworkatgr02smytgoog
+
+Nothing in this round needs anything from Stewart unless a Sketchfab model is
+wanted.

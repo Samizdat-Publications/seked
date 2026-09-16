@@ -214,16 +214,14 @@ available for a private repository on this account's plan, so the Pages
 workflow still runs the tests and assembles the site on every push but does
 not publish unless PAGES_ENABLED is set. The deploy pins wrangler 4.20.0,
 because later releases route `pages deploy` from a workspace root into
-Workers and fail. Four items wait on material that is not
-text, and are recorded as such so they are not rediscovered: the well shaft
-and grotto, which Petrie declines to measure and the Edgars give only as
-"about" figures, their geometry being on their plates; the placement of
-Menkaure's chambers, whose dimensions are all in but whose plan is not stated
-in prose; Khafre's casing cap, which Petrie mentions and never levels; and
-per-tomb heights for the mastabas, which Reisner tabulates by tomb number when
-OSM's outlines carry no tomb numbers, so matching the two needs his cemetery
-plans. The plan for all four, against the specific plates that resolve
-each one, is docs/geometry-blockers.md. What no public source gives is entered as an estimate on its own
+Workers and fail. The next round is planned in docs/geometry-blockers.md: the
+four holes left in the geometry (the well shaft from Smyth, Khafre's casing
+cap and Menkaure's chambers from Maragioglio and Rinaldi's plates volumes,
+and the mastabas, now a plausible field rather than a surveyed one), a rule
+agreed for reading drawings without eyeballing them, and a visual track
+(PBR materials, atmosphere, stand-in models fitted to their footprints, a
+Milky Way that precesses with the stars) that the project's purpose puts on
+an equal footing with the measurements. What no public source gives is entered as an estimate on its own
 source, with a sigma, and stays unverified until a figure turns up.
 
 ## Layout

@@ -5,6 +5,21 @@ mathematics" claim is a live overlay computed from the measurement database.
 The full plan is `docs/plan.html`; the generated claims dossier is
 `docs/dossier.md`.
 
+## What this is for
+
+A test of how beautiful a fully Claude-driven scene of the Giza plateau can be:
+modelled, lit, textured and given atmosphere, the pyramids above all, inside
+and out, under a correctly mapped sky, and still able to test a claim. It is
+"as close to survey as we can get, with the holes filled in", not a survey for
+its own sake. The pyramids stay as near survey as the sources allow, because
+they are what the claims are about. Everything else (temples, tombs, the
+Sphinx, causeways) needs its placement right, which the OSM registration
+gives to about a metre, and may use a good free 3D model fitted to its
+footprint and labelled as a visual stand-in. Filled-in parts are fine and are
+said to be filled. Render quality is a deliverable, not polish. Later: a tour
+of the star alignments, and an LLM that runs claims such as Hancock's against
+the sim. The next round's plan is `docs/geometry-blockers.md`.
+
 ## Commands
 
 ```
@@ -43,6 +58,18 @@ pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for b
   surveyed pyramids (its header carries the residuals) and set on the scene's
   ground. A height OSM does not tag is a measurement key, not a number in the
   file.
+- **Drawings are read two ways, never by eye.** A dimension printed on a
+  plate is transcribed like any figure from a table, cites the plate, and is
+  verified once checked against the image. A distance scaled off a plate
+  against its own scale bar has `method: "scaled from plate"`, names the
+  plate and the scale bar, carries a sigma summing the scan's pixel
+  resolution, the drafting tolerance and the scan's shrinkage, and is never
+  verified. A position guessed from how a picture looks is still not a
+  measurement. (Agreed 2026-09-16.)
+- **Visual stand-ins are labelled.** A third-party model used for a
+  non-pyramid structure is placed on that structure's footprint, keeps its
+  licence and source in a manifest, and is marked a stand-in wherever it is
+  shown; nothing about its form is entered as a measurement.
 - **Claims are data.** One YAML file per claim in `data/claims/`. A claim is
   inputs, formulas, targets, tolerance, free choices, sources and an overlay
   spec. Adding a claim never touches package code.
