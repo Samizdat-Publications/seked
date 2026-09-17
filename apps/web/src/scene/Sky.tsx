@@ -118,11 +118,27 @@ interface SkyLook {
   ambient: number;
 }
 
+/**
+ * The anchors are close together from -6 to +10 degrees because that band is
+ * where a picture of this place is decided and the first pass had nothing in
+ * it: the akhet moment sits at -1.6 degrees, between the old -6 and 0, and
+ * the plateau came out nearly black.
+ *
+ * What the renders show at that moment (0007 and 0015) is that after sunset
+ * the sun is not what lights the plateau at all: the pyramids are flat
+ * lavender shapes and the ground is warm cream, both of them lit only by a
+ * sky that is still bright. So the fill is held at 0.15 at civil twilight and
+ * climbs from there rather than falling away with the sun, which is what a
+ * sky whose whole western half is still alight actually does. Only past civil
+ * twilight, where the renders go dark too, does it go out.
+ */
 const SKY_LOOK: ReadonlyArray<SkyLook> = [
   { altitude: -18, turbidity: 3.0, rayleigh: 0.35, mie: 0.004, mieG: 0.8, fill: 0.03, ambient: 0.025 },
-  { altitude: -6, turbidity: 4.0, rayleigh: 1.4, mie: 0.006, mieG: 0.82, fill: 0.08, ambient: 0.04 },
-  { altitude: 0, turbidity: 8.0, rayleigh: 3.2, mie: 0.02, mieG: 0.88, fill: 0.22, ambient: 0.07 },
-  { altitude: 8, turbidity: 6.0, rayleigh: 2.4, mie: 0.012, mieG: 0.84, fill: 0.34, ambient: 0.09 },
+  { altitude: -6, turbidity: 4.4, rayleigh: 0.7, mie: 0.016, mieG: 0.78, fill: 0.15, ambient: 0.055 },
+  { altitude: -3, turbidity: 5.2, rayleigh: 0.95, mie: 0.022, mieG: 0.76, fill: 0.19, ambient: 0.065 },
+  { altitude: 0, turbidity: 5.6, rayleigh: 1.25, mie: 0.024, mieG: 0.76, fill: 0.24, ambient: 0.075 },
+  { altitude: 2, turbidity: 5.8, rayleigh: 1.6, mie: 0.02, mieG: 0.78, fill: 0.28, ambient: 0.08 },
+  { altitude: 10, turbidity: 5.4, rayleigh: 2.2, mie: 0.011, mieG: 0.82, fill: 0.37, ambient: 0.095 },
   { altitude: 25, turbidity: 4.2, rayleigh: 1.6, mie: 0.006, mieG: 0.8, fill: 0.5, ambient: 0.12 },
   { altitude: 60, turbidity: 3.4, rayleigh: 1.1, mie: 0.005, mieG: 0.8, fill: 0.62, ambient: 0.14 },
 ];
@@ -183,6 +199,27 @@ const NIGHT_AMBIENT = new Color('#16243f');
 const DAY_AMBIENT = new Color('#bcccdf');
 
 /**
+ * What the lit half of the sky is when the sun is at the horizon. A look
+ * choice, read off the band in docs/progress/0015-blender-akhet-causeway.png.
+ *
+ * A hemisphere light has one colour for everything facing up, and taking that
+ * colour to the zenith's blue at sunset is what made the akhet plateau read
+ * cold and dead: at that moment the greater part of the light falling on the
+ * ground has come out of the orange west, not out of the blue overhead.
+ */
+const DUSK_GLOW = new Color('#c9885a');
+
+/** How far the fill is allowed to be pulled to that glow at its strongest. A look choice. */
+const DUSK_GLOW_SHARE = 0.55;
+
+/**
+ * How near the horizon the sun has to be for that glow to count, in degrees
+ * either side. A look choice: by ten degrees up the west is no longer a
+ * furnace and the sky is the ordinary blue one again.
+ */
+const DUSK_GLOW_BAND = 10;
+
+/**
  * How far down the sun is before the sky is called night, and the band it
  * fades across: civil twilight at one end, near astronomical at the other.
  * Inside that band the stars come up and the daylit sky goes out.
@@ -224,10 +261,16 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
   const night = nightness(sun.altitudeDeg);
 
   // The fill goes from the daylit zenith through dusk to a deep blue, which
-  // is the one colour a shadowed face takes when the sun has gone.
+  // is the one colour a shadowed face takes when the sun has gone; and while
+  // the sun is within a few degrees of the horizon it is pulled toward the
+  // glow of the lit west, which is what keeps the akhet plateau warm.
   const fill = useMemo(() => {
     const dusk = Math.min(1, Math.max(0, (8 - sun.altitudeDeg) / 14));
-    return new Color().lerpColors(ZENITH, DUSK_ZENITH, dusk).lerp(NIGHT_ZENITH, night);
+    const glow = Math.max(0, 1 - Math.abs(sun.altitudeDeg) / DUSK_GLOW_BAND) * (1 - night);
+    return new Color()
+      .lerpColors(ZENITH, DUSK_ZENITH, dusk)
+      .lerp(DUSK_GLOW, glow * DUSK_GLOW_SHARE)
+      .lerp(NIGHT_ZENITH, night);
   }, [sun.altitudeDeg, night]);
   const ambient = useMemo(() => new Color().lerpColors(DAY_AMBIENT, NIGHT_AMBIENT, night), [night]);
 

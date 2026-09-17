@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 import { Color, HalfFloatType, NoToneMapping, PCFShadowMap, Vector3 } from 'three';
 import { CSM } from 'three/examples/jsm/csm/CSM.js';
 import { setCascades } from './materials/shadows';
-import { nightness, worldDirection, type Sun } from './Sky';
+import { worldDirection, type Sun } from './Sky';
 
 /**
  * Look choices, all of them. Exposure is the stop the AgX curve is fed at:
@@ -26,25 +26,12 @@ import { nightness, worldDirection, type Sun } from './Sky';
  * the sun is doing.
  */
 const LOOK = {
-  /** Exposure before the tone curve, by day. Set against the Blender panorama. */
-  exposure: 0.62,
-  /**
-   * And at night, which is a photograph taken with the aperture open: the
-   * render's own night view does the same thing with its camera. Starlight is
-   * this faint, and a picture of it is not.
-   */
-  nightExposure: 2.4,
   /** How far ambient occlusion reaches, in metres of world space. */
   aoRadius: 14,
   aoIntensity: 1.6,
   /** Only the sky and the specular glints are meant to bloom, so the threshold is high. */
   bloom: { threshold: 0.92, smoothing: 0.35, intensity: 0.28 },
   vignette: { offset: 0.34, darkness: 0.42 },
-  /**
-   * AgX trades saturation for its highlight roll-off, which is why Blender's
-   * own "AgX - Punchy" adds some back. This is that, after the curve.
-   */
-  saturation: 0.16,
   shadows: {
     /** Cascades over the distance the plateau fills: near the camera, mid, and the far pyramids. */
     cascades: 3,
@@ -97,7 +84,7 @@ export function Renderer({ sun, quality = 'full' }: RendererProps): React.JSX.El
         <Vignette offset={LOOK.vignette.offset} darkness={LOOK.vignette.darkness} eskil={false} />
         <SMAA />
         <ToneMapping mode={ToneMappingMode.AGX} />
-        <HueSaturation saturation={LOOK.saturation} />
+        <HueSaturation saturation={saturationAt(sun.altitudeDeg)} />
       </EffectComposer>
     </>
   );
@@ -112,17 +99,79 @@ export function Renderer({ sun, quality = 'full' }: RendererProps): React.JSX.El
  */
 function Settings({ sun }: { sun: Sun }): null {
   const gl = useThree((s) => s.gl);
-  const night = nightness(sun.altitudeDeg);
+  const exposure = exposureAt(sun.altitudeDeg);
   useEffect(() => {
     gl.localClippingEnabled = true;
     gl.toneMapping = NoToneMapping;
-    gl.toneMappingExposure = LOOK.exposure + (LOOK.nightExposure - LOOK.exposure) * night;
+    gl.toneMappingExposure = exposure;
     gl.shadowMap.enabled = true;
     // Three 0.186 removed PCFSoftShadowMap; the cascades carry the sharpness
     // a wider filter would otherwise have had to make up for.
     gl.shadowMap.type = PCFShadowMap;
-  }, [gl, night]);
+  }, [gl, exposure]);
   return null;
+}
+
+/**
+ * The stop the AgX curve is fed at, by the sun's altitude. Look choices, all
+ * of them, and the same move a photographer makes: the plateau at noon is
+ * three stops brighter than the plateau at sunset, and a fixed exposure that
+ * holds noon leaves dusk nearly black, which is what stage 2 showed at the
+ * akhet moment.
+ *
+ * The top anchor is the panorama's own exposure, which is what the Blender
+ * renders were matched at; the bottom is the night one, which is a photograph
+ * taken with the aperture open, as the render's night view is.
+ */
+const EXPOSURE: ReadonlyArray<readonly [number, number]> = [
+  [-14, 2.4],
+  [-6, 1.9],
+  [-1, 1.45],
+  [2, 1.25],
+  [8, 0.95],
+  [20, 0.72],
+  [45, 0.62],
+];
+
+/**
+ * How much saturation is put back after the curve, by the sun's altitude.
+ *
+ * AgX trades saturation for its highlight roll-off, which is why Blender's own
+ * "AgX - Punchy" adds some back, and 0.16 is that by day. At dusk the sky is
+ * already at the far end of its own gamut and the Preetham model turns the
+ * upper sky a bottle green when the sun is under the horizon, so the same
+ * addition there paints the artefact rather than the picture. Look choices.
+ */
+const SATURATION: ReadonlyArray<readonly [number, number]> = [
+  [-6, 0.0],
+  [4, 0.08],
+  [15, 0.16],
+];
+
+/** Exposure at an altitude, linear between the two anchors either side of it. */
+export function exposureAt(altitudeDeg: number): number {
+  return table(EXPOSURE, altitudeDeg);
+}
+
+/** Saturation added after the curve at an altitude, through the same shape. */
+export function saturationAt(altitudeDeg: number): number {
+  return table(SATURATION, altitudeDeg);
+}
+
+/** A value from a table of (altitude, value) anchors, flat outside its ends. */
+function table(rows: ReadonlyArray<readonly [number, number]>, altitudeDeg: number): number {
+  const first = rows[0]!;
+  const last = rows[rows.length - 1]!;
+  if (altitudeDeg <= first[0]) return first[1];
+  if (altitudeDeg >= last[0]) return last[1];
+  for (let i = 1; i < rows.length; i++) {
+    const hi = rows[i]!;
+    const lo = rows[i - 1]!;
+    if (altitudeDeg > hi[0]) continue;
+    const t = (altitudeDeg - lo[0]) / (hi[0] - lo[0]);
+    return lo[1] + t * (hi[1] - lo[1]);
+  }
+  return last[1];
 }
 
 /**
@@ -201,14 +250,24 @@ function Shadows({ sun, quality }: { sun: Sun; quality: Quality }): null {
 /**
  * The sun's strength by altitude, and its colour with it. A look table, not a
  * measurement: it stands in for the air the light has come through, which the
- * scene does not model. Below civil twilight the sun is off; at the horizon
- * it is dim and deep orange; by sixty degrees it is near white.
+ * scene does not model.
+ *
+ * The sun goes out a degree under the horizon rather than at civil twilight,
+ * because that is where it actually goes: the last of the direct light is the
+ * upper limb at about -0.8 degrees, and everything after it is the sky's. The
+ * old table kept a fifth of the sun burning to -6, which put a low rim light
+ * on faces the renders have in flat shadow. What carries the picture from
+ * there is `SKY_LOOK`'s fill and `EXPOSURE`, not an invented sun.
+ *
+ * The foot is gentler too: a fifth of noon at 2 degrees, deep orange, which is
+ * the light in docs/progress/0007-blender-akhet.png a few minutes earlier.
  */
 const SUN_LOOK: ReadonlyArray<readonly [number, number, Color]> = [
   [-6, 0.0, new Color('#2c3d63')],
-  [-0.833, 0.18, new Color('#c4541f')],
-  [3, 1.0, new Color('#e8853a')],
-  [10, 1.9, new Color('#f7bb78')],
+  [-1, 0.0, new Color('#b4431a')],
+  [2, 0.64, new Color('#d05a1c')],
+  [6, 1.35, new Color('#e8853a')],
+  [12, 2.1, new Color('#f7bb78')],
   [20, 2.5, new Color('#ffdcae')],
   [45, 3.0, new Color('#fff1dc')],
   [70, 3.2, new Color('#fffaf0')],
