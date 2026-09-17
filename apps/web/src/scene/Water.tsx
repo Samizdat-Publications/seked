@@ -77,11 +77,13 @@ import type { TerrainProps } from './Terrain';
  * along the shoreline.
  */
 const LOOK = {
-  colour: '#1d4b47',
+  // Bluer and less mirrored than the first try, which went to milk where the
+  // bright dusk sky lay on it from a low stand (director, 2026-09-17).
+  colour: '#1a3e46',
   roughness: 0.26,
   metalness: 0.1,
-  mirror: 0.8,
-  mixStrength: 1.15,
+  mirror: 0.55,
+  mixStrength: 0.7,
   mixBlur: 1.2,
   blur: [220, 70] as [number, number],
   resolution: 512,

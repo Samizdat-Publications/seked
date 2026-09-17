@@ -84,7 +84,7 @@ const LOOK = {
      * through it from above: at 4e-4 the Eastern Cemetery went to a smear from
      * the Sphinx's stand, which is the fault this task exists to fix.
      */
-    density: 2.0e-4,
+    density: 1.3e-4,
     base: 15,
     scaleHeight: 28,
   },
