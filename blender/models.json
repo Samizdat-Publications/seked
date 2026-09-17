@@ -123,7 +123,10 @@
           "target_formats": [
             "glb"
           ]
-        }
+        },
+        "task": "01a0ad3a-cb0c-705b-a7f7-491f8bd1a0fb",
+        "image_task": "01a0ad34-48c8-723d-9d3e-dbb0e9096f2c, 01a0ad35-0675-719a-a8a1-4f495adce8e9, 01a0ad37-9400-77b4-80fe-ba106f5020d6, 01a0ad38-5657-7605-b166-1e75896d3d9b",
+        "sha256": "a16d9ce632a86625fbc7bcf8fb57aaef041e66f423b2cf0e1fe54924182b8382"
       },
       "material": "texture"
     },
