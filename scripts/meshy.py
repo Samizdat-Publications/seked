@@ -111,6 +111,16 @@ def generate(args):
     photos, uris = [], []
     if endpoint == "restyle" and args.image:
         sys.exit("restyle takes its photographs from the manifest")
+    if spec.get("from_made"):
+        # Start from images an earlier restyle made (kept under ~/.seked/models/<name>/made-*.png),
+        # when one of those already has the pose and the carving right and only a part should change.
+        folder = os.path.join(KEEP, spec["from_made"])
+        for name in sorted(n for n in os.listdir(folder) if n.startswith("made-") and n.endswith(".png")):
+            data = open(os.path.join(folder, name), "rb").read()
+            photos.append({"file": f"{spec['from_made']}/{name}", "page": None, "license": "generated"})
+            uris.append("data:image/png;base64," + base64.b64encode(data).decode())
+            print(f"made image {spec['from_made']}/{name}, {len(data) / 1e6:.1f} MB")
+        return finish(args, spec, *restyled(spec, uris), photos=photos)
     if args.image and not args.tag:
         sys.exit("--image tries other photographs, so give it a --tag to keep the result apart")
     for title in args.image or spec["images"]:

@@ -28,6 +28,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -49,9 +50,17 @@ def read(path):
 
 def write(path, value):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    tmp = path + ".tmp"
+    tmp = f"{path}.{os.getpid()}.tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(value, f, indent=2, ensure_ascii=False)
+    # The runner and its parent can write the same record at once, and Windows refuses a
+    # replace while the other side has the file open, so try again for a moment.
+    for attempt in range(50):
+        try:
+            os.replace(tmp, path)
+            return
+        except PermissionError:
+            time.sleep(0.1)
     os.replace(tmp, path)
 
 
