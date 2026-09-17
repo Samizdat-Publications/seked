@@ -8,3 +8,4 @@ export * from './terrain';
 export * from './environment';
 export * from './datum';
 export * from './footprints';
+export * from './pyramidion';
