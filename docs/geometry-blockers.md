@@ -208,6 +208,57 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
    (gltf-transform), as docs/plan.html always intended, so the browser is not
    the poor relation of the renders.
 
+## Part 3. The plateau as it was built (asked 2026-09-16)
+
+Stewart, 2026-09-16: the end result models the plateau as it stands today
+and also pristine, as first built: polished limestone casing, the apex stones,
+everything fully modelled, and the Sphinx "back when it was a lion". More
+creative liberty is allowed here than for today's state, because less
+survives, and every piece is said to be a reconstruction.
+
+What already exists: `render.py --state built|today`. `built` is only the
+three pyramids' geometry, cased and pointed, from the database. The rest of
+the scene has one state, today's.
+
+What `built` has to become, most visible first:
+
+1. **The casing as finished.** Polished Tura limestone as a material of its
+   own, near white, with a sheen that catches the sun, fine joints and none of
+   the weathering the today textures carry; Aswan granite where the records
+   say (Menkaure's lower sixteen courses, Khafre's first). Geometry already
+   comes from the database.
+2. **The pyramidions.** Khufu's and Khafre's are lost. Surviving ones fix the
+   form: Amenemhat III's black granite pyramidion from Dahshur (Cairo), the
+   limestone one of the Red Pyramid, and the one found in 1992 at Khufu's
+   satellite pyramid G1-d, the only pyramidion from Khufu's complex. Sized
+   to each pyramid's apex from the database's own slope, so the cap cannot
+   disagree with the angle. Plain stone by default; a gilded cap is later
+   tradition and goes in as a switchable variant at the `claimed` tier.
+3. **The Sphinx as carved, c. 2500 BCE.** Nose, uraeus and beard (the
+   fragments in the British Museum and Cairo fix the beard's form), the
+   nemes striped, the traces of red paint on the face, no scaffolding and no
+   Graeco-Roman or modern repair masonry; the Sphinx Temple whole in front.
+   Stand-in from Meshy (text and image prompts from CC0 photographs of the
+   beard fragment and the head), fitted to the same outline.
+4. **The lion Sphinx, as a claim.** A recumbent lion with a lion's head in
+   proportion to the body, for the hypothesis that the present head was
+   recut from one (Temple, Schoch, Hancock and Bauval; C5). It is a
+   `claimed` structure in `data/structures.json`, drawn as a claim, switched
+   separately (`--sphinx carved|lion|today`) and never the default.
+5. **The complexes whole.** Valley and mortuary temples roofed and walled,
+   the causeways covered, the enclosure walls, the queens' pyramids cased,
+   boat pits closed, the harbour basin in front of the valley temples. On
+   their OSM outlines, from published plans where the plans exist (Hölscher
+   and Ricke for Khafre, Reisner for Menkaure, Lehner's AERA plans), Meshy
+   stand-ins where they do not, every one labelled a reconstruction.
+6. **The ground.** The quarries unexcavated or open as the builders left
+   them, the Sphinx's enclosure cut, no modern road, village or car park.
+
+The state and the epoch stay independent. The epoch is a choice for the sky,
+the state a choice for the buildings, so a render or the film can show the
+built plateau under the sky of 2450 BCE or of 10,500 BCE, or the lion Sphinx
+under either, and the caption says which of those is a claim.
+
 ## Order of work
 
 Done on 2026-09-16: the hero film (snapshot 0016), the well shaft (from the
@@ -222,7 +273,9 @@ Milky Way (snapshots 0017 to 0020). What is left, in order:
 3. The second materials pass: displacement on the stepped core, granite and
    basalt, the mastabas' stone.
 4. The viewer's textures, and the film re-rendered over the new materials and
-   the Milky Way.
+   the Milky Way. Done 2026-09-16 (0023).
+5. Part 3, the plateau as built: casing and pyramidions first, then the
+   carved Sphinx and the lion variant, then the complexes and the ground.
 
 ## Links
 
