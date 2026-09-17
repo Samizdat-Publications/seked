@@ -38,29 +38,68 @@ const AIR: Record<string, IUniform> = {
   airSunColour: { value: new Color('#e9b784') },
   /** What it glows everywhere else. */
   airSkyColour: { value: new Color('#9fb6cf') },
+  /** What the low dust glows, which is warmer than either. */
+  airDustColour: { value: new Color('#e8c79a') },
   /** Extinction per metre at the datum, which is the Great Pyramid's base. */
   airDensity: { value: 0 },
   /** Metres over which the air thins to a third: the scale height. */
   airScaleHeight: { value: 800 },
+  /** Extinction per metre inside the dust layer, which is nothing at noon. */
+  airDustDensity: { value: 0 },
+  /** Metres above the datum the dust holds full strength to. */
+  airDustBase: { value: 15 },
+  /** And the metres it thins to a third over above that. */
+  airDustScale: { value: 28 },
 };
 
 /**
  * Look choices, carried across from `blender/render_sky.py`, which gives the
- * plateau a haze volume of 2e-4 per metre and scales it per view. Density
- * here is per metre at the datum: at 1.2e-4 a face 1,500 m off has lost about
- * a sixth of its contrast, which is roughly what the panorama shows across
- * the same distance. The render's separate dust layer, which pools in the
- * first forty metres above the ground, is not modelled here yet.
+ * plateau a haze volume and a separate dust layer and scales both per view.
+ *
+ * Density here is per metre at the datum. Stage 1 set it at 1.2e-4, which
+ * reads right along the panorama's kilometre and a half and washes the
+ * foreground from a stand 260 m up, where the ray is short and steep and
+ * ought to be clear. Both come down by about a third and the scale height
+ * comes down with them, from 700 m to 500, so that climbing buys clarity
+ * faster: that is the shape of the fault, not its size.
+ *
+ * What the foreground lost by that is given back by the dust, which is the
+ * render's second volume and was not modelled here at all: 6e-4 per metre
+ * from 15 m above the datum, thinning to a third by 43 m, in a warm sand
+ * colour. It is strongest at dawn and dusk, when the ground has given up its
+ * heat and nothing is lifting it, and gone by noon; and it is what puts a
+ * causeway in front of a mastaba field instead of level with it.
  */
 const LOOK = {
-  density: 1.2e-4,
+  density: 0.8e-4,
   /** Dawn and dusk are hazier, which is when the renders look best. */
-  lowSunDensity: 2.6e-4,
+  lowSunDensity: 1.75e-4,
   /** At night the air stops carrying light and only takes it away. */
-  nightDensity: 0.5e-4,
-  scaleHeight: 700,
-  sun: { high: new Color('#dfe6ee'), low: new Color('#e8a163') },
-  sky: { high: new Color('#9db9d8'), low: new Color('#b7a48f'), night: new Color('#1b2740') },
+  nightDensity: 0.35e-4,
+  scaleHeight: 500,
+  dust: {
+    /**
+     * Per metre inside the layer at dawn and dusk. The render's own is 6e-4,
+     * but the render's camera stands in it and this one often looks down
+     * through it from above: at 4e-4 the Eastern Cemetery went to a smear from
+     * the Sphinx's stand, which is the fault this task exists to fix.
+     */
+    density: 2.0e-4,
+    base: 15,
+    scaleHeight: 28,
+  },
+  sun: { high: new Color('#eef2f6'), low: new Color('#e8a163') },
+  /**
+   * What the air glows away from the sun. Brighter and less blue than stage
+   * 1's: the photographs of this place under a high sun have a whitish band
+   * along the horizon, not an even grey veil, and since the in-scattered
+   * colour only arrives in the share the ray has lost, brightening it whitens
+   * the horizon strongly and leaves the near ground alone. Greying the sand
+   * was the other way the same number could have gone and is the wrong one.
+   */
+  sky: { high: new Color('#c6d6e6'), low: new Color('#bfab92'), night: new Color('#1b2740') },
+  /** The render's DUST_COLOUR, which is sand lit through sand. */
+  dustGlow: new Color('#e8c79a'),
 } as const;
 
 /**
@@ -101,9 +140,16 @@ export function setAtmosphere(sun: Sun, state: StateId): void {
     .copy(scratch.lerpColors(LOOK.sky.high, LOOK.sky.low, low))
     .lerp(CLEAR_SKY, era.cool * (1 - night))
     .lerp(LOOK.sky.night, night);
+  (AIR.airDustColour!.value as Color).copy(scratch.copy(LOOK.dustGlow).lerp(LOOK.sky.night, night));
   const day = LOOK.density + (LOOK.lowSunDensity - LOOK.density) * low;
   AIR.airDensity!.value = (day + (LOOK.nightDensity - day) * night) * era.density;
   AIR.airScaleHeight!.value = LOOK.scaleHeight;
+  // The dust follows the same low-sun ramp as the haze and goes out with the
+  // light: what holds it up is the day's own heat leaving the ground, and by
+  // the time the stars are out there is nothing in the air to see.
+  AIR.airDustDensity!.value = LOOK.dust.density * low * (1 - night) * era.density;
+  AIR.airDustBase!.value = LOOK.dust.base;
+  AIR.airDustScale!.value = LOOK.dust.scaleHeight;
 }
 
 /**
@@ -128,7 +174,7 @@ export function useAtmosphere(sun: Sun): void {
  * transfer function is what makes a sky band.
  */
 export function applyAtmosphere(material: Material): void {
-  patchMaterial(material, 'air', 'v1', (shader) => {
+  patchMaterial(material, 'air', 'v2', (shader) => {
     for (const [name, uniform] of Object.entries(AIR)) shader.uniforms[name] = uniform;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vAirWorld;')
@@ -143,7 +189,8 @@ export function applyAtmosphere(material: Material): void {
 }
 
 /**
- * The model, in GLSL.
+ * The model, in GLSL: two layers of air, one over the whole view and one
+ * pooled low, exactly as `build_atmosphere` gives the render.
  *
  * The optical depth along a ray between two heights, for air whose density
  * falls off as exp(-z/H), has a closed form: the path length times H times
@@ -151,10 +198,17 @@ export function applyAtmosphere(material: Material): void {
  * the two heights are within a hair of each other the expression is 0/0, so
  * the flat-air case is taken instead.
  *
+ * The dust has a flat top rather than a peak at the datum: full strength up to
+ * `airDustBase` and exponential above it. Its integral in height is therefore
+ * the ramp plus the exponential's own, and the average over a segment is the
+ * difference of that integral over the height difference, which is the same
+ * trick and the same 0/0 case.
+ *
  * The in-scattered colour is the sky's, swinging to the sun's own colour as
- * the ray points at it. The fourth power is a cheap forward-scattering lobe,
- * not Henyey-Greenstein: what it has to do is make the air glow around a low
- * sun, and it does.
+ * the ray points at it, and then toward the dust's warm sand in the share of
+ * the extinction the dust is responsible for. The fourth power is a cheap
+ * forward-scattering lobe, not Henyey-Greenstein: what it has to do is make
+ * the air glow around a low sun, and it does.
  *
  * The world's up here is three's, +Y, because this runs on world positions
  * and not on the data frame.
@@ -164,8 +218,12 @@ varying vec3 vAirWorld;
 uniform vec3 airSun;
 uniform vec3 airSunColour;
 uniform vec3 airSkyColour;
+uniform vec3 airDustColour;
 uniform float airDensity;
 uniform float airScaleHeight;
+uniform float airDustDensity;
+uniform float airDustBase;
+uniform float airDustScale;
 
 float sekedOpticalDepth(float fromY, float toY, float distance) {
   float scale = max(airScaleHeight, 1.0);
@@ -175,14 +233,35 @@ float sekedOpticalDepth(float fromY, float toY, float distance) {
   return airDensity * distance * scale * (near - exp(-toY / scale)) / drop;
 }
 
+float sekedDustProfile(float y) {
+  return exp(-max(y - airDustBase, 0.0) / max(airDustScale, 1.0));
+}
+
+float sekedDustIntegral(float y) {
+  float scale = max(airDustScale, 1.0);
+  return min(y, airDustBase) + scale * (1.0 - sekedDustProfile(y));
+}
+
+float sekedDustDepth(float fromY, float toY, float distance) {
+  if (airDustDensity <= 0.0) return 0.0;
+  float drop = toY - fromY;
+  if (abs(drop) < 1.0) return airDustDensity * distance * sekedDustProfile(fromY);
+  return airDustDensity * distance * (sekedDustIntegral(toY) - sekedDustIntegral(fromY)) / drop;
+}
+
 vec3 sekedAir(vec3 colour, vec3 world) {
   vec3 ray = world - cameraPosition;
   float distance = length(ray);
-  if (distance < 1e-3 || airDensity <= 0.0) return colour;
+  if (distance < 1e-3) return colour;
+  float haze = sekedOpticalDepth(cameraPosition.y, world.y, distance);
+  float dust = sekedDustDepth(cameraPosition.y, world.y, distance);
+  float depth = haze + dust;
+  if (depth <= 0.0) return colour;
   vec3 direction = ray / distance;
-  float transmittance = exp(-sekedOpticalDepth(cameraPosition.y, world.y, distance));
+  float transmittance = exp(-depth);
   float towardSun = max(dot(direction, normalize(airSun)), 0.0);
   vec3 inscatter = mix(airSkyColour, airSunColour, pow(towardSun, 4.0) * 0.8);
+  inscatter = mix(inscatter, airDustColour, (dust / depth) * 0.8);
   return colour * transmittance + inscatter * (1.0 - transmittance);
 }
 `;

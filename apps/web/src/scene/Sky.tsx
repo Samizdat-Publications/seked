@@ -46,6 +46,7 @@ import { DOME_RADIUS, type DomeBuffers, type NamedDomeStar } from '../sky';
 import { useView } from '../store';
 import { sceneEpoch, type StateId } from '../view';
 import { useStateTransition } from './fade';
+import { setCasingCorona } from './materials/casing';
 import { SkyDome } from './SkyDome';
 
 /** Where the plateau is, which is the Great Pyramid's own centre. */
@@ -118,11 +119,27 @@ interface SkyLook {
   ambient: number;
 }
 
+/**
+ * The anchors are close together from -6 to +10 degrees because that band is
+ * where a picture of this place is decided and the first pass had nothing in
+ * it: the akhet moment sits at -1.6 degrees, between the old -6 and 0, and
+ * the plateau came out nearly black.
+ *
+ * What the renders show at that moment (0007 and 0015) is that after sunset
+ * the sun is not what lights the plateau at all: the pyramids are flat
+ * lavender shapes and the ground is warm cream, both of them lit only by a
+ * sky that is still bright. So the fill is held at 0.15 at civil twilight and
+ * climbs from there rather than falling away with the sun, which is what a
+ * sky whose whole western half is still alight actually does. Only past civil
+ * twilight, where the renders go dark too, does it go out.
+ */
 const SKY_LOOK: ReadonlyArray<SkyLook> = [
   { altitude: -18, turbidity: 3.0, rayleigh: 0.35, mie: 0.004, mieG: 0.8, fill: 0.03, ambient: 0.025 },
-  { altitude: -6, turbidity: 4.0, rayleigh: 1.4, mie: 0.006, mieG: 0.82, fill: 0.08, ambient: 0.04 },
-  { altitude: 0, turbidity: 8.0, rayleigh: 3.2, mie: 0.02, mieG: 0.88, fill: 0.22, ambient: 0.07 },
-  { altitude: 8, turbidity: 6.0, rayleigh: 2.4, mie: 0.012, mieG: 0.84, fill: 0.34, ambient: 0.09 },
+  { altitude: -6, turbidity: 4.4, rayleigh: 0.7, mie: 0.016, mieG: 0.78, fill: 0.15, ambient: 0.055 },
+  { altitude: -3, turbidity: 5.2, rayleigh: 0.95, mie: 0.022, mieG: 0.76, fill: 0.19, ambient: 0.065 },
+  { altitude: 0, turbidity: 5.6, rayleigh: 1.25, mie: 0.024, mieG: 0.76, fill: 0.24, ambient: 0.075 },
+  { altitude: 2, turbidity: 5.8, rayleigh: 1.6, mie: 0.02, mieG: 0.78, fill: 0.28, ambient: 0.08 },
+  { altitude: 10, turbidity: 5.4, rayleigh: 2.2, mie: 0.011, mieG: 0.82, fill: 0.37, ambient: 0.095 },
   { altitude: 25, turbidity: 4.2, rayleigh: 1.6, mie: 0.006, mieG: 0.8, fill: 0.5, ambient: 0.12 },
   { altitude: 60, turbidity: 3.4, rayleigh: 1.1, mie: 0.005, mieG: 0.8, fill: 0.62, ambient: 0.14 },
 ];
@@ -174,6 +191,63 @@ export function stateSky(look: SkyLook, state: StateId): SkyLook {
   return { ...look, turbidity: look.turbidity * era.turbidity, mie: look.mie * era.mie };
 }
 
+/**
+ * The sun's strength by altitude, and its colour with it. A look table, not a
+ * measurement: it stands in for the air the light has come through, which the
+ * scene does not model. It lives beside the sky because it is the same sun,
+ * and because the environment map's own ground needs it; `Renderer.tsx` reads
+ * it from here for the cascades' lights.
+ *
+ * The sun goes out a degree under the horizon rather than at civil twilight,
+ * because that is where it actually goes: the last of the direct light is the
+ * upper limb at about -0.8 degrees, and everything after it is the sky's. The
+ * old table kept a fifth of the sun burning to -6, which put a rim light on
+ * faces the renders have in flat shadow. What carries the picture from there
+ * is `SKY_LOOK`'s fill and the renderer's exposure, not an invented sun.
+ *
+ * The foot is gentler too: a fifth of noon at 2 degrees, deep orange, which is
+ * the light in docs/progress/0007-blender-akhet.png a few minutes earlier.
+ */
+const SUN_LOOK: ReadonlyArray<readonly [number, number, Color]> = [
+  [-6, 0.0, new Color('#2c3d63')],
+  [-1, 0.0, new Color('#b4431a')],
+  [2, 0.64, new Color('#d05a1c')],
+  [6, 1.35, new Color('#e8853a')],
+  [12, 2.1, new Color('#f7bb78')],
+  [20, 2.5, new Color('#ffdcae')],
+  [45, 3.0, new Color('#fff1dc')],
+  [70, 3.2, new Color('#fffaf0')],
+];
+
+/** The sun's strength with it overhead, which everything else is a share of. */
+const SUN_NOON = SUN_LOOK[SUN_LOOK.length - 1]![1];
+
+function between(altitudeDeg: number): { lo: (typeof SUN_LOOK)[number]; hi: (typeof SUN_LOOK)[number]; t: number } {
+  const first = SUN_LOOK[0]!;
+  const last = SUN_LOOK[SUN_LOOK.length - 1]!;
+  if (altitudeDeg <= first[0]) return { lo: first, hi: first, t: 0 };
+  if (altitudeDeg >= last[0]) return { lo: last, hi: last, t: 0 };
+  for (let i = 1; i < SUN_LOOK.length; i++) {
+    const hi = SUN_LOOK[i]!;
+    const lo = SUN_LOOK[i - 1]!;
+    if (altitudeDeg > hi[0]) continue;
+    return { lo, hi, t: (altitudeDeg - lo[0]) / (hi[0] - lo[0]) };
+  }
+  return { lo: last, hi: last, t: 0 };
+}
+
+/** Intensity of the sun's light at an altitude, interpolated through `SUN_LOOK`. */
+export function sunIntensity(altitudeDeg: number): number {
+  const { lo, hi, t } = between(altitudeDeg);
+  return lo[1] + t * (hi[1] - lo[1]);
+}
+
+/** The sun's colour at an altitude, interpolated through the same table. */
+export function sunColour(altitudeDeg: number): Color {
+  const { lo, hi, t } = between(altitudeDeg);
+  return new Color().lerpColors(lo[2], hi[2], t);
+}
+
 /** The colour of the sky's own light and of the ground's bounce. Look choices. */
 const ZENITH = new Color('#82a9da');
 const DUSK_ZENITH = new Color('#45577f');
@@ -181,6 +255,28 @@ const NIGHT_ZENITH = new Color('#111c35');
 const BOUNCE = new Color('#6b5a3e');
 const NIGHT_AMBIENT = new Color('#16243f');
 const DAY_AMBIENT = new Color('#bcccdf');
+
+/**
+ * What the lit half of the sky is when the sun is at the horizon. A look
+ * choice, read off the band in docs/progress/0015-blender-akhet-causeway.png.
+ *
+ * A hemisphere light has one colour for everything facing up, and taking that
+ * colour to the zenith's blue at sunset is what made the akhet plateau read
+ * cold and dead: at that moment the greater part of the light falling on the
+ * ground has come out of the orange west, not out of the blue overhead.
+ */
+const DUSK_GLOW = new Color('#c9885a');
+
+/** How far the fill is allowed to be pulled to that glow at its strongest. A look choice. */
+const DUSK_GLOW_SHARE = 0.55;
+
+/**
+ * How near the horizon the sun has to be for that glow to count, in degrees
+ * either side. A look choice: the panorama's own moment has the sun at 10.7
+ * degrees and the render of it is warm, so the band has to reach past that
+ * before the sky goes back to being the ordinary blue one.
+ */
+const DUSK_GLOW_BAND = 16;
 
 /**
  * How far down the sun is before the sky is called night, and the band it
@@ -192,6 +288,67 @@ const TWILIGHT = { top: -2, bottom: -14 } as const;
 /** 0 by day, 1 in full night, interpolated through the twilight band. */
 export function nightness(altitudeDeg: number): number {
   return Math.min(1, Math.max(0, (TWILIGHT.top - altitudeDeg) / (TWILIGHT.top - TWILIGHT.bottom)));
+}
+
+/**
+ * The light the stars themselves put on the plateau.
+ *
+ * With the sun down the viewer had the pyramids as flat black cut-outs: the
+ * only lights left were a hemisphere at 0.03 in the night sky's near-black
+ * blue and an ambient at 0.025, and the renders' own night view
+ * (docs/progress/0020-blender-night-milky-way.png) is not that. It has the
+ * silhouettes reading against a lit sky and the ground faintly there.
+ *
+ * So the dome pays for it. The catalogue's own colours, which `sky.ts` writes
+ * from each star's magnitude and colour index, are averaged: their mean
+ * luminance is the strength and their mean hue is the colour, pulled most of
+ * the way to the night sky's blue because what reaches a face at night has
+ * been scattered by the same air that makes the sky blue by day. Only the
+ * gain is chosen here, and no star is typed twice.
+ */
+const STARLIGHT = {
+  /**
+   * What the dome's mean luminance is worth as a hemisphere light. Small on
+   * purpose: the render's own night has the ground near black and the
+   * pyramids as silhouettes, and all this has to do is keep a face from being
+   * the same black as the one beside it.
+   */
+  gain: 0.05,
+  /** How far the dome's own hue is pulled to the night sky's. A look choice. */
+  blue: 0.7,
+  /** With nothing loaded, a night that is dark but not black. */
+  fallback: { colour: new Color('#7f90b4'), intensity: 0.02 },
+} as const;
+
+/** The ground's bounce under the stars, which is next to nothing. */
+const NIGHT_BOUNCE = new Color('#0b1018');
+
+/** Rec. 709 luminance, which is what separates a light's colour from its strength. */
+function luminanceOf(colour: Color): number {
+  return 0.2126 * colour.r + 0.7152 * colour.g + 0.0722 * colour.b;
+}
+
+/** The hemisphere light the star dome is worth, or the fallback with no dome. */
+export function starlightOf(buffers: DomeBuffers | undefined): { colour: Color; intensity: number } {
+  if (!buffers || buffers.count === 0) return { colour: STARLIGHT.fallback.colour, intensity: STARLIGHT.fallback.intensity };
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  for (let i = 0; i < buffers.count; i++) {
+    r += buffers.colours[i * 3] ?? 0;
+    g += buffers.colours[i * 3 + 1] ?? 0;
+    b += buffers.colours[i * 3 + 2] ?? 0;
+  }
+  const mean = new Color(r / buffers.count, g / buffers.count, b / buffers.count);
+  const luminance = luminanceOf(mean);
+  // Hue and strength are separated, so that pulling the colour toward the
+  // night sky's blue tints the light without also dimming it: the strength is
+  // the dome's own mean and the gain, and nothing else.
+  const blue = NIGHT_SKY.zenith.clone();
+  blue.multiplyScalar(1 / Math.max(luminanceOf(blue), 1e-6));
+  const colour = mean.multiplyScalar(1 / Math.max(luminance, 1e-6)).lerp(blue, STARLIGHT.blue);
+  colour.multiplyScalar(1 / Math.max(luminanceOf(colour), 1e-6));
+  return { colour, intensity: luminance * STARLIGHT.gain };
 }
 
 /** The stars of the epoch, as `App.tsx` hands them to the scene. */
@@ -224,21 +381,43 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
   const night = nightness(sun.altitudeDeg);
 
   // The fill goes from the daylit zenith through dusk to a deep blue, which
-  // is the one colour a shadowed face takes when the sun has gone.
+  // is the one colour a shadowed face takes when the sun has gone; and while
+  // the sun is within a few degrees of the horizon it is pulled toward the
+  // glow of the lit west, which is what keeps the akhet plateau warm.
   const fill = useMemo(() => {
     const dusk = Math.min(1, Math.max(0, (8 - sun.altitudeDeg) / 14));
-    return new Color().lerpColors(ZENITH, DUSK_ZENITH, dusk).lerp(NIGHT_ZENITH, night);
+    const glow = Math.max(0, 1 - Math.abs(sun.altitudeDeg) / DUSK_GLOW_BAND) * (1 - night);
+    return new Color()
+      .lerpColors(ZENITH, DUSK_ZENITH, dusk)
+      .lerp(DUSK_GLOW, glow * DUSK_GLOW_SHARE)
+      .lerp(NIGHT_ZENITH, night);
   }, [sun.altitudeDeg, night]);
   const ambient = useMemo(() => new Color().lerpColors(DAY_AMBIENT, NIGHT_AMBIENT, night), [night]);
+  const starlight = useMemo(() => starlightOf(stars?.buffers), [stars]);
+
+  // The corona's light on the casing, which is the First Time's alone and is a
+  // claim. `Pyramids.tsx` draws the sprite at each apex on its own band from
+  // -6 to -12 degrees; this uses the scene's one night ramp, which starts a
+  // little earlier and ends a little later, so the glow is up before the
+  // sprite and outlasts it rather than switching with it.
+  useEffect(() => setCasingCorona(state === 'ancient' ? night : 0), [state, night]);
 
   return (
     <group>
-      <Atmosphere sun={sun} look={look} night={night} />
+      <Atmosphere sun={sun} look={look} night={night} fill={fill} />
       {/* A hemisphere light's up is the direction of its own position in the
           world, and this group has already been turned, so what it is given
           here is the data frame's up. */}
       <hemisphereLight position={[0, 0, 1]} color={fill} groundColor={BOUNCE} intensity={look.fill} />
       <ambientLight color={ambient} intensity={look.ambient} />
+      {night > 0 && (
+        <hemisphereLight
+          position={[0, 0, 1]}
+          color={starlight.colour}
+          groundColor={NIGHT_BOUNCE}
+          intensity={starlight.intensity * night}
+        />
+      )}
       <CairoHaze night={night} />
       {night > 0.02 && <NightSky epoch={epoch} latitudeDeg={observer.latitudeDeg} lstDeg={lst} opacity={night} />}
       {stars && night > 0.02 && <SkyDome {...stars} radius={DOME_RADIUS} opacity={night} furniture={furniture} />}
@@ -256,13 +435,74 @@ const SKY_SCALE = 100000;
 const ENVIRONMENT_STRENGTH = 0.2;
 
 /**
+ * The ground the environment map stands on.
+ *
+ * Until now the map was the sky alone, so the lower half of every reflection
+ * was whatever three's Preetham shader returns for a direction under the
+ * horizon, which is a dark blue. That is what put a cool cast on the polished
+ * casing's faces toward a low sun and what turned the electrum caps to soot at
+ * dusk: half of what a mirror sees at Giza is sand.
+ *
+ * So the probe scene gains a hemisphere under the sky, in one flat colour: the
+ * sand's own albedo times the light falling on it, which is the sun's colour
+ * at its own strength foreshortened by its altitude, plus the sky's fill. It
+ * is a mean and not a picture; nothing about the plateau's shape is in it, and
+ * every number here is a look choice.
+ */
+const GROUND = {
+  /** The mean the desert reflects, across the sand, the bedrock and the stone. */
+  albedo: new Color('#c9ab7e'),
+  /**
+   * The share of the sun's own light that comes back up. Over one, because
+   * this is not a radiometric bounce: the foreshortening is already in the
+   * sine, and what the reflections want is the sand as the eye reads it at
+   * that hour, which is the sand the exposure table is set for.
+   */
+  bounce: 2.2,
+  /** And of the sky's, which is what is left when the sun has gone. */
+  skyShare: 1.0,
+  /** How far down the probe sphere the ground is drawn, as a share of the sky box. */
+  scale: 0.45,
+} as const;
+
+const groundScratch = new Color();
+
+/**
+ * The flat colour the environment's ground is drawn in, from the sun and the
+ * sky the scene is already using. Exported so it can be read at a glance.
+ */
+export function environmentGround(altitudeDeg: number, look: SkyLook, fill: Color): Color {
+  // The light on a horizontal surface falls off with the cosine of the sun's
+  // angle from the vertical, which is the sine of its altitude; under the
+  // horizon there is none of it left.
+  const facing = Math.max(0, Math.sin((altitudeDeg * Math.PI) / 180));
+  const lit = (sunIntensity(altitudeDeg) / SUN_NOON) * facing * GROUND.bounce;
+  return new Color()
+    .copy(sunColour(altitudeDeg))
+    .multiplyScalar(lit)
+    .add(groundScratch.copy(fill).multiplyScalar(look.fill * GROUND.skyShare))
+    .multiply(GROUND.albedo);
+}
+
+/**
  * The sky itself: three's Preetham model on a box drawn at the far plane, and
  * a pre-filtered map of the same shader set as the scene's environment, so
  * every standard material reflects the sky it is standing under. The
  * environment is what puts light on a north face at noon, and what the
  * polished casing will want in the ancient state.
  */
-function Atmosphere({ sun, look, night }: { sun: Sun; look: SkyLook; night: number }): React.JSX.Element {
+function Atmosphere({
+  sun,
+  look,
+  night,
+  fill,
+}: {
+  sun: Sun;
+  look: SkyLook;
+  night: number;
+  /** The sky's own colour, which is half of what the environment's ground is lit by. */
+  fill: Color;
+}): React.JSX.Element {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
   const mesh = useMemo(() => new PreethamSky(), []);
@@ -304,8 +544,16 @@ function Atmosphere({ sun, look, night }: { sun: Sun; look: SkyLook; night: numb
     u.mieCoefficient!.value = look.mie;
     u.mieDirectionalG!.value = look.mieG;
     u.showSunDisc!.value = 0;
+    // The ground under it: the lower half of a sphere, seen from inside,
+    // which is where the probe camera sits. It is drawn unlit and untone-
+    // mapped, because what the map wants is the radiance itself.
+    const ground = new Mesh(
+      new SphereGeometry(SKY_SCALE * GROUND.scale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+      new MeshBasicMaterial({ color: environmentGround(sun.altitudeDeg, look, fill), side: BackSide, fog: false }),
+    );
     const world = new ThreeScene();
     world.add(probe);
+    world.add(ground);
     let target: WebGLRenderTarget | undefined;
     try {
       target = pmrem.fromScene(world, 0, 1, SKY_SCALE);
@@ -320,9 +568,11 @@ function Atmosphere({ sun, look, night }: { sun: Sun; look: SkyLook; night: numb
       target?.dispose();
       probe.geometry.dispose();
       probe.material.dispose();
+      ground.geometry.dispose();
+      ground.material.dispose();
       pmrem.dispose();
     };
-  }, [gl, scene, sun, look, rayleigh, night]);
+  }, [gl, scene, sun, look, rayleigh, night, fill]);
 
   return <primitive object={mesh} scale={SKY_SCALE} renderOrder={-10} />;
 }
