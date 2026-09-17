@@ -1,9 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { bore, buildEnvironment, chamber, courseHeights, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidMesh, steppedPyramidMesh } from '@seked/geometry';
-import type { GroundPyramid, Point, SectionPair, Solid } from '@seked/geometry';
-import { loadDatabase, REPO_ROOT, resolve } from './index';
+import { bore, buildEnvironment, chamber, courseHeights, extrudedSection, groundHeight, interiorSolidInputs, interiorSolids, interiorStructures, meshVolume, passage, pyramidionMesh, pyramidionProfile, pyramidMesh, smallPyramidMesh, smallPyramidProfile, steppedPyramidMesh } from '@seked/geometry';
+import type { Footprint, GroundPyramid, Mesh, Point, PyramidionProfile, SectionPair, SmallPyramidProfile, Solid } from '@seked/geometry';
+import { loadDatabase, loadFootprints, REPO_ROOT, resolve } from './index';
 
 function python(): string | undefined {
   for (const bin of ['python3', 'python']) {
@@ -443,5 +443,155 @@ describe.skipIf(!py)('blender/seked_data.py stacks the same courses as @seked/ge
     expect(worst, `worst at ${where || 'nowhere'}`).toBeLessThan(1e-3);
     expect(Math.abs(meshVolume(ours) - stepped.volume) / stepped.volume, 'volume').toBeLessThan(1e-5);
     expect(stepped.top).toBeCloseTo(courses.reduce((sum, h) => sum + h, 0), 9);
+  });
+});
+
+
+interface PySolid {
+  verts: [number, number, number][];
+  faces: number[][];
+  volume: number;
+}
+
+interface PyPyramidion extends PySolid {
+  height: number;
+  base_side: number;
+  face_angle_deg: number;
+  apex: [number, number, number];
+  angle_measured: boolean;
+}
+
+interface PySmallPyramid {
+  side: number;
+  centre: [number, number];
+  angle_deg: number;
+  height: number;
+  base: number;
+  face_angle_deg: number;
+  slope_measured: boolean;
+  cased?: PySolid;
+  stepped?: PySolid;
+}
+
+/**
+ * The worst difference between our float32 positions and their doubles, in
+ * metres, over the first `count` vertices. Our positions are float32, so a
+ * coordinate 146 m up is only good to about ten micrometres, which is why
+ * nothing here is compared any tighter than a millimetre.
+ */
+function worstVertex(theirs: readonly number[][], ours: Mesh, count: number): { worst: number; where: string } {
+  let worst = 0;
+  let where = '';
+  for (let i = 0; i < count; i++) {
+    for (let axis = 0; axis < 3; axis++) {
+      const difference = Math.abs((ours.positions[i * 3 + axis] as number) - ((theirs[i] as number[])[axis] as number));
+      if (difference > worst) {
+        worst = difference;
+        where = `vertex ${i} axis ${axis}`;
+      }
+    }
+  }
+  return { worst, where };
+}
+
+/** A Blender polygon face list as the triangles packages/geometry emits, fanned the same way. */
+function fanned(faces: readonly number[][]): number[] {
+  const out: number[] = [];
+  for (const face of faces) {
+    for (let i = 1; i + 1 < face.length; i++) out.push(face[0] as number, face[i] as number, face[i + 1] as number);
+  }
+  return out;
+}
+
+/**
+ * The two state builders Blender draws as well as the viewer: the capstone
+ * and the queens' pyramids. Both sides read the same records and the same
+ * footprint file, so the only way they can differ is by one of them being
+ * changed without the other.
+ */
+describe.skipIf(!py)('blender/seked_data.py builds the same capstones and small pyramids as @seked/geometry', () => {
+  const db = loadDatabase();
+  const file = loadFootprints();
+  const { values } = resolve(db, file.preset);
+  const env = buildEnvironment(values);
+  const features = file.features as Footprint[];
+  const out = execFileSync(py as string, [join(REPO_ROOT, 'blender', 'seked_data.py'), file.preset, '--builders'], {
+    encoding: 'utf8',
+    maxBuffer: 256 * 1024 * 1024,
+  });
+  const theirs = JSON.parse(lastLine(out)) as {
+    pyramidions: Record<string, PyPyramidion>;
+    small_pyramids: Record<string, PySmallPyramid>;
+  };
+
+  it('builds a capstone for the same structures', () => {
+    const ours = ['g1', 'g2', 'g3'].filter((s) => pyramidionMesh(env, s as 'g1') !== undefined);
+    expect(Object.keys(theirs.pyramidions).sort()).toEqual(ours.sort());
+    expect(ours.length).toBe(3);
+  });
+
+  for (const structure of ['g1', 'g2', 'g3'] as const) {
+    it(`${structure}: the same capstone numbers, vertices and volume`, () => {
+      const mirror = theirs.pyramidions[structure] as PyPyramidion;
+      const profile = pyramidionProfile(env, structure) as PyramidionProfile;
+      expect(mirror.height).toBeCloseTo(profile.height, 12);
+      expect(mirror.base_side).toBeCloseTo(profile.baseSide, 12);
+      expect(mirror.face_angle_deg).toBeCloseTo(profile.faceAngleDeg, 12);
+      expect(mirror.angle_measured).toBe(profile.angleMeasured);
+      for (let axis = 0; axis < 3; axis++) expect(mirror.apex[axis]).toBeCloseTo(profile.apex[axis] as number, 9);
+      // Both lay out the base ring as vertices 0 to 7 and the apex as 8;
+      // ours carries a base centre after that, theirs closes the base with a
+      // single eight-sided face, so only the nine are compared.
+      const ours = pyramidionMesh(env, structure) as Mesh;
+      const { worst, where } = worstVertex(mirror.verts, ours, 9);
+      expect(worst, `worst at ${where || 'nowhere'}`).toBeLessThan(1e-3);
+      expect(Math.abs(meshVolume(ours) - mirror.volume) / mirror.volume, 'volume').toBeLessThan(1e-4);
+    });
+  }
+
+  it('builds a small pyramid for the same footprints', () => {
+    const ours = features.filter((f) => smallPyramidProfile(f, env) !== undefined).map((f) => f.id);
+    expect(Object.keys(theirs.small_pyramids).sort()).toEqual(ours.sort());
+    expect(ours.length).toBeGreaterThan(0);
+  });
+
+  it('reads every outline as the same square, and stands it in the same place', () => {
+    for (const [id, mirror] of Object.entries(theirs.small_pyramids)) {
+      const f = features.find((x) => x.id === id) as Footprint;
+      const profile = smallPyramidProfile(f, env) as SmallPyramidProfile;
+      expect(mirror.side, id).toBeCloseTo(profile.side, 9);
+      expect(mirror.angle_deg, id).toBeCloseTo(profile.angleDeg, 9);
+      expect(mirror.height, id).toBeCloseTo(profile.height, 9);
+      expect(mirror.base, id).toBeCloseTo(profile.base, 9);
+      expect(mirror.face_angle_deg, id).toBeCloseTo(profile.faceAngleDeg, 9);
+      expect(mirror.slope_measured, id).toBe(profile.slopeMeasured);
+      expect(mirror.centre[0], id).toBeCloseTo(profile.centre[0], 9);
+      expect(mirror.centre[1], id).toBeCloseTo(profile.centre[1], 9);
+    }
+  });
+
+  it('cases every one of them with the same vertices and the same volume', () => {
+    for (const [id, mirror] of Object.entries(theirs.small_pyramids)) {
+      const f = features.find((x) => x.id === id) as Footprint;
+      const ours = smallPyramidMesh(f, env, 'cased') as Mesh;
+      expect(mirror.cased, id).toBeDefined();
+      const { worst, where } = worstVertex((mirror.cased as PySolid).verts, ours, 9);
+      expect(worst, `${id} worst at ${where || 'nowhere'}`).toBeLessThan(1e-3);
+      expect(Math.abs(meshVolume(ours) - (mirror.cased as PySolid).volume) / (mirror.cased as PySolid).volume, id).toBeLessThan(1e-4);
+    }
+  });
+
+  it('steps every one of them the same way, vertex for vertex and triangle for triangle', () => {
+    for (const [id, mirror] of Object.entries(theirs.small_pyramids)) {
+      const f = features.find((x) => x.id === id) as Footprint;
+      const ours = smallPyramidMesh(f, env, 'stepped') as Mesh;
+      const stepped = mirror.stepped as PySolid;
+      expect(stepped, id).toBeDefined();
+      expect(stepped.verts.length, `${id} vertices`).toBe(ours.vertexCount);
+      expect(fanned(stepped.faces), `${id} triangles`).toEqual([...ours.indices]);
+      const { worst, where } = worstVertex(stepped.verts, ours, ours.vertexCount);
+      expect(worst, `${id} worst at ${where || 'nowhere'}`).toBeLessThan(1e-3);
+      expect(Math.abs(meshVolume(ours) - stepped.volume) / stepped.volume, id).toBeLessThan(1e-4);
+    }
   });
 });
