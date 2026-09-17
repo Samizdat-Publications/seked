@@ -9,13 +9,14 @@
  * western end.
  *
  * What is missing is its plan. This builds it as the outlines OSM traced for
- * the body, the paws and the head, taken together and pushed out by
- * `sphinx.enclosure.margin`, which is a record no source in this database has
- * supplied yet. Until one does, this returns nothing at all: a trench at a
- * margin picked to look right would be a position guessed from how a picture
- * looks, which CLAUDE.md rules out.
+ * the body, the paws and the head, taken together and pushed out by a margin.
+ * The margin comes from `sphinx.enclosure.margin` where the database carries
+ * that record, and no source in this database has supplied it yet; failing
+ * that, from the caller, which is then a look choice and never a measurement.
+ * The label says which of the two it was, in those words, wherever the trench
+ * is shown.
  *
- * The margin would come off a published plan, read with `scripts/plate.py`
+ * The record would come off a published plan, read with `scripts/plate.py`
  * against its own scale bar, with a sigma and `method: "scaled from plate"`,
  * never verified. `arce-sphinx-1991` is already a source in the database and
  * is the obvious plan to read.
@@ -98,12 +99,19 @@ export function capMesh(ring: readonly Xy[], z: number): Mesh {
   return toMesh(ring.map(([x, y]) => [x, y, z]), triangulate(ring));
 }
 
-/** The side of a cut: the outline carried from `bottom` to `top`, facing into the cut. */
-export function cutWallMesh(ring: readonly Xy[], bottom: number, top: number): Mesh {
+/**
+ * The side of a cut: the outline carried from `bottom` to `top`, facing into
+ * the cut. `top` may be one level for the whole ring or one per vertex, which
+ * is what a cut into sloping ground needs: the wall then meets the surface it
+ * was quarried out of all the way round instead of standing proud of it at
+ * the low end and being buried at the high one.
+ */
+export function cutWallMesh(ring: readonly Xy[], bottom: number, top: number | readonly number[]): Mesh {
   const n = ring.length;
+  const level = (i: number): number => (typeof top === 'number' ? top : (top[i] as number));
   const verts: number[][] = [];
   for (const [x, y] of ring) verts.push([x, y, bottom]);
-  for (const [x, y] of ring) verts.push([x, y, top]);
+  for (const [i, [x, y]] of ring.entries()) verts.push([x, y, level(i)]);
   const tris: number[] = [];
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
@@ -116,7 +124,26 @@ export function cutWallMesh(ring: readonly Xy[], bottom: number, top: number): M
 export interface SphinxTrench {
   floor: Mesh;
   walls: Mesh;
+  /** The cut's plan, counter-clockwise seen from above: what a ground grid has to lose. */
+  outline: Xy[];
+  /** The floor's level, which is the lowest of the outlines' own base levels. */
+  floorLevel: number;
   label: string;
+}
+
+export interface SphinxTrenchOptions {
+  /**
+   * The plateau's surface round the statue: one level, or the ground's own
+   * height as a function of east and north, which gives the walls a top per
+   * vertex. A record under `SPHINX_RIM_KEY` is preferred to either.
+   */
+  groundLevel?: number | ((x: number, y: number) => number);
+  /**
+   * The margin to push the outlines out by where the database carries no
+   * `sphinx.enclosure.margin`. It is a look choice, it is never a
+   * measurement, and the label says so.
+   */
+  margin?: number;
 }
 
 /**
@@ -125,30 +152,72 @@ export interface SphinxTrench {
  * `groundLevel` is the plateau's surface round the statue, which is a terrain
  * question and not a measurement, so the caller passes it; a record under
  * `SPHINX_RIM_KEY` would answer it instead and is preferred where one exists.
- * Without `SPHINX_MARGIN_KEY`, and without a rim from either place, nothing
- * is built.
+ * Passing the ground as a function rather than a level gives each wall vertex
+ * its own top, so the cut follows the slope the plateau actually has here,
+ * which falls twelve metres from the Sphinx's back to its paws.
+ *
+ * Without a margin, from the database or from the caller, and without a rim
+ * from either place, nothing is built.
  */
-export function sphinxTrenchMesh(env: Environment, features: readonly Footprint[], groundLevel?: number): SphinxTrench | undefined {
-  const margin = env[SPHINX_MARGIN_KEY];
-  const rim = env[SPHINX_RIM_KEY] ?? groundLevel;
-  if (margin === undefined || !(margin > 0) || rim === undefined || !Number.isFinite(rim)) return undefined;
+export function sphinxTrenchMesh(
+  env: Environment,
+  features: readonly Footprint[],
+  options: SphinxTrenchOptions = {},
+): SphinxTrench | undefined {
+  const recorded = env[SPHINX_MARGIN_KEY];
+  const margin = recorded ?? options.margin;
+  if (margin === undefined || !(margin > 0)) return undefined;
 
   const parts = features.filter((f) => SPHINX_PARTS.includes(f.id));
   if (parts.length === 0) return undefined;
   const floorLevel = Math.min(...parts.map((f) => f.base));
-  if (!(rim > floorLevel)) return undefined;
 
   const hull = convexHull(parts.flatMap((f) => f.ring as Xy[]));
   if (hull.length < 3) return undefined;
   const outline = dilateHull(hull, margin);
+
+  const rimRecord = env[SPHINX_RIM_KEY];
+  const ground = options.groundLevel;
+  const rim =
+    rimRecord !== undefined
+      ? outline.map(() => rimRecord)
+      : typeof ground === 'function'
+        ? outline.map(([x, y]) => ground(x, y))
+        : ground === undefined
+          ? undefined
+          : outline.map(() => ground);
+  if (rim === undefined || !rim.every((z) => Number.isFinite(z))) return undefined;
+  const highest = Math.max(...rim);
+  if (!(highest > floorLevel)) return undefined;
+  // A wall stands from the floor to the surface it was quarried out of, and
+  // the plateau here falls below that floor before it reaches the valley
+  // temples. So the tops never go under the floor, which is what the eye
+  // reads as the cut, and the wall's foot goes down to the lowest ground on
+  // the plan, which plugs the step from the floor's edge to a ground that
+  // has already fallen past it. The floor cap hides whatever is below it.
+  const tops = rim.map((z) => Math.max(floorLevel, z));
+  const bottom = Math.min(floorLevel, ...rim);
+
+  const rimWord =
+    rimRecord !== undefined
+      ? `a rim at ${rimRecord} m from ${SPHINX_RIM_KEY}`
+      : typeof ground === 'function'
+        ? `a rim following the ground the caller gave, ${Math.min(...rim).toFixed(2)} to ${highest.toFixed(2)} m round the cut`
+        : `a rim at ${highest} m, the ground the caller gave`;
+  const marginWord =
+    recorded !== undefined
+      ? `${margin} m from ${SPHINX_MARGIN_KEY}`
+      : `${margin} m, a look choice and not a measurement, because the database carries no ${SPHINX_MARGIN_KEY}`;
+
   return {
     floor: capMesh(outline, floorLevel),
-    walls: cutWallMesh(outline, floorLevel, rim),
+    walls: cutWallMesh(outline, bottom, tops),
+    outline,
+    floorLevel,
     label:
       `Reconstruction: the Sphinx enclosure, the outlines of ${parts.map((f) => f.id).join(', ')} taken ` +
-      `together and pushed out by ${margin} m from ${SPHINX_MARGIN_KEY}, its floor at ${floorLevel} m, ` +
-      `which is the lowest of their own base levels, and its walls vertical to ${rim} m` +
-      `${env[SPHINX_RIM_KEY] === undefined ? ', the ground the caller gave' : ` from ${SPHINX_RIM_KEY}`}. ` +
+      `together and pushed out by ${marginWord}, its floor at ${floorLevel} m, ` +
+      `which is the lowest of their own base levels, and its walls vertical to ${rimWord}. ` +
       'Look choices: the three outlines read as their convex hull rather than their true union, and walls ' +
       'cut vertically rather than following the quarried steps.',
   };

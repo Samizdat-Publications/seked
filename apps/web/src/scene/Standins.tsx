@@ -13,8 +13,8 @@
  * Which model a state shows is `render_standins.chosen` again, in the same
  * words: a model belongs to the states it names, a variant is shown only when
  * asked for, and a variant that names a state in `default_in` is that state's
- * ordinary model. Stage 1 asks for no variant, so every state shows its
- * default.
+ * ordinary model. The variant the reader has asked for is the view's own
+ * `sphinx`, which `ui/Sphinx.tsx` sets and the URL carries.
  *
  * Nothing here is required. Where the manifest is missing, because Blender has
  * not been run on this machine, the viewer draws the OSM prisms as before and
@@ -78,7 +78,7 @@ const LINE_PX = 19;
 let manifest: Promise<StandinEntry[]> | undefined;
 
 /** The manifest, once, and an empty list when there is none to be had. */
-function loadManifest(): Promise<StandinEntry[]> {
+export function loadManifest(): Promise<StandinEntry[]> {
   manifest ??= fetch(`${import.meta.env.BASE_URL}models/manifest.json`)
     .then((r) => (r.ok ? (r.json() as Promise<StandinEntry[]>) : []))
     .catch(() => []);
@@ -166,6 +166,7 @@ export function firstSentence(text: string, limit = 120): string {
 
 export function Standins(): React.JSX.Element | null {
   const state = useView((s) => s.state);
+  const variant = useView((s) => s.sphinx);
   const setHiddenMasses = useView((s) => s.setHiddenMasses);
   const [entries, setEntries] = useState<StandinEntry[]>([]);
   const [models, setModels] = useState<{ entry: StandinEntry; scene: Group }[]>([]);
@@ -180,9 +181,10 @@ export function Standins(): React.JSX.Element | null {
     };
   }, []);
 
-  // Stage 1 asks for no variant, so each state shows the model it makes its
-  // default. The claim variants are in the manifest and wait for their control.
-  const wanted = useMemo(() => chosen(entries, state, null), [entries, state]);
+  // A variant asked for wins over the state's own model; null is the state's
+  // own, which for `ancient` is itself a claim variant (the black Anubis) by
+  // way of `default_in`.
+  const wanted = useMemo(() => chosen(entries, state, variant), [entries, state, variant]);
 
   useEffect(() => {
     let alive = true;
@@ -209,7 +211,7 @@ export function Standins(): React.JSX.Element | null {
   return (
     <>
       {models.map(({ entry, scene }) => (
-        <Standin key={entry.id} entry={entry} scene={scene} />
+        <Standin key={entry.id} entry={entry} scene={scene} state={state} />
       ))}
     </>
   );
@@ -235,9 +237,21 @@ function localBounds(scene: Group): Box3 {
 }
 
 /** One fitted model: its levels of detail swapped by distance, and its label on hover. */
-function Standin({ entry, scene }: { entry: StandinEntry; scene: Group }): React.JSX.Element {
+function Standin({ entry, scene, state }: { entry: StandinEntry; scene: Group; state: string }): React.JSX.Element {
   const [hovered, setHovered] = useState(false);
   const world = useMemo(() => new Vector3(), []);
+
+  // What the pointer is told this is. Track H's `Hover.tsx` reads the same
+  // `userData.seked` off every object in the scene, so a stand-in says the
+  // same thing whether the sprite below or the hover tag is showing.
+  useEffect(() => {
+    scene.userData.seked = {
+      name: entry.name,
+      tier: 'stand-in',
+      note: `${entry.evidence ?? 'stand-in'}${entry.finish ? `, ${entry.finish}` : ''}. ${entry.attribution}`,
+      state,
+    };
+  }, [scene, entry, state]);
 
   const { lods, centre, top } = useMemo(() => {
     const found: Object3D[] = [];

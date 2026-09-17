@@ -19,6 +19,8 @@ import { NorthArrow } from './NorthArrow';
 import { Masses } from './Masses';
 import { Pyramids } from './Pyramids';
 import { Standins } from './Standins';
+import { Sand } from './Sand';
+import { Trench } from './Trench';
 import { Plateau, type TerrainProps } from './Terrain';
 
 /** The stars of the moment, or undefined when the sky layer is off. */
@@ -92,6 +94,8 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
           {layers.pyramids && <Masses massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
           {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
           <Standins />
+          <Trench env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
+          <Sand terrain={terrain} clippingPlanes={groundPlanes} />
         </FadeScope>
         {/* Names whatever the pointer rests on; draws nothing itself. */}
         <Hover />
