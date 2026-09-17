@@ -4,8 +4,9 @@ import { BufferGeometry, DoubleSide, FrontSide, type MeshPhysicalMaterial, type 
 import type { PyramidParams } from '../model';
 import { useView } from '../store';
 import type { StateId } from '../view';
-import { pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
 import { CASING_COLOUR, applyCasing } from './materials/casing';
+import { ELECTRUM_COLOUR, applyElectrum } from './materials/metal';
 import { useStoneMaterial } from './materials/useStoneMaterial';
 
 /**
@@ -94,12 +95,71 @@ export function casingCourseLevels(params: PyramidParams, fallbackCourse: number
 }
 
 function Pyramid(props: PyramidPartProps): React.JSX.Element {
-  if (isCased(props.state)) return <CasedPyramid {...props} />;
+  if (isCased(props.state)) {
+    return (
+      <>
+        <CasedPyramid {...props} />
+        <Pyramidion {...props} />
+      </>
+    );
+  }
   return (
     <>
       <StandingCore {...props} />
       <CasingCap {...props} />
     </>
+  );
+}
+
+/**
+ * The capstone, in the states that have one: plain casing stone as built, and
+ * electrum in the First Time, which is the claim the spec makes of that state.
+ * Nothing about its form is chosen here. `pyramidionMesh` builds it from
+ * `<id>.pyramidion.height` and the pyramid's own face angle and hands it back
+ * already standing in the site frame with its apex at the pyramid's apex, so
+ * it is drawn without a transform of its own and cannot drift off the top.
+ */
+function Pyramidion({ params, state, clippingPlanes }: PyramidPartProps): React.JSX.Element | null {
+  const capstone = params.pyramidion;
+  const geometry = useGeometry(
+    () => (capstone ? meshGeometry(capstone) : new BufferGeometry()),
+    `pyramidion:${params.id}:${capstone?.vertexCount ?? 0}:${capstone?.positions[2] ?? 0}`,
+  );
+  const electrum = state === 'ancient';
+  // The stone is the casing's, faintly, for the built state; electrum takes
+  // its colour from what it reflects and wants no photograph over it.
+  const standard = useStoneMaterial(electrum ? undefined : 'casing', { strength: electrum ? 0 : 0.3, relief: 0.2 });
+  const material = standard as RefObject<MeshPhysicalMaterial | null>;
+  useEffect(() => {
+    const m = material.current;
+    if (!m) return;
+    if (electrum) applyElectrum(m);
+    else applyCasing(m, { courses: [], pristine: false });
+  }, [material, electrum]);
+  if (!capstone) return null;
+  return (
+    <mesh
+      geometry={geometry}
+      userData={{
+        seked: {
+          name: `${params.label}: the capstone`,
+          tier: 'reconstruction',
+          note: capstone.label,
+          state,
+        },
+      }}
+      castShadow
+      receiveShadow
+    >
+      <meshPhysicalMaterial
+        key={electrum ? 'electrum' : 'stone'}
+        ref={material}
+        color={electrum ? ELECTRUM_COLOUR : CASING_COLOUR}
+        flatShading
+        side={sideFor(clippingPlanes)}
+        clippingPlanes={clippingPlanes}
+      />
+    </mesh>
   );
 }
 
