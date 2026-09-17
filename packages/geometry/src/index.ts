@@ -13,3 +13,4 @@ export * from './smallpyramid';
 export * from './mastaba';
 export * from './temple';
 export * from './enclosure';
+export * from './trench';
