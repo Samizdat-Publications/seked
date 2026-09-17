@@ -124,7 +124,8 @@
             "glb"
           ]
         }
-      }
+      },
+      "material": "texture"
     },
     {
       "replaces": [
@@ -178,8 +179,12 @@
           "target_formats": [
             "glb"
           ]
-        }
-      }
+        },
+        "task": "01a0ad38-fcdd-717a-9eea-4413cdb04500",
+        "image_task": "01a0ad34-5a08-707b-9fd9-014d551211aa, 01a0ad36-a133-703b-8ffc-a5c70943e76c, 01a0ad37-5571-75ba-a885-b67e04c80bcd, 01a0ad38-3bc7-7377-afe1-4806316e0176",
+        "sha256": "c56972a987d6d4b8adf3e821ffaa1328ee55432805e14138995a64f3a0ab09c2"
+      },
+      "material": "casing"
     }
   ]
 }

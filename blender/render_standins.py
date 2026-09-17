@@ -28,7 +28,7 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
-from render_materials import bedrock_material, core_material
+from render_materials import bedrock_material, casing_material, core_material
 from seked_data import load_footprints
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -59,16 +59,22 @@ def extent(points, axis):
     return hi - lo, mid
 
 
-def import_model(path, name):
-    """The GLB's meshes as one object with its transforms applied."""
+def import_model(path, name, keep_materials=False):
+    """The GLB's meshes as one object with its transforms applied, keeping their materials only when asked."""
     before = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=path)
     new = [o for o in bpy.data.objects if o not in before]
     meshes = [o for o in new if o.type == "MESH"]
     bm = bmesh.new()
+    materials = []
     for obj in meshes:
         part = obj.data.copy()
         part.transform(obj.matrix_world)
+        # Material indices are per mesh; shift them onto the combined list.
+        offset = len(materials)
+        materials.extend(part.materials)
+        for poly in part.polygons:
+            poly.material_index += offset
         bm.from_mesh(part)
         bpy.data.meshes.remove(part)
     for obj in new:
@@ -77,6 +83,9 @@ def import_model(path, name):
     bm.to_mesh(mesh)
     bm.free()
     mesh.materials.clear()
+    if keep_materials:
+        for mat in materials:
+            mesh.materials.append(mat)
     return mesh
 
 
@@ -208,9 +217,16 @@ def build_standins(scene, state="today", variants=()):
             continue
         path = os.path.join(os.path.dirname(INDEX), entry["file"])
         name = f"{model['name']} (stand-in)"
-        obj = cut_and_reduce(import_model(path, name), model["cut_z"], model["faces"], model.get("largest_part_only", False))
+        # "texture" keeps the model's own surface, which is the point of a painted
+        # reconstruction; "casing" is fresh dressed limestone; the default is the
+        # weathered, banded core stone a stand-in for today's plateau wants.
+        finish = model.get("material", "core")
+        obj = cut_and_reduce(import_model(path, name, finish == "texture"), model["cut_z"], model["faces"], model.get("largest_part_only", False))
         done = fit(obj, model, features)
-        obj.data.materials.append(core_material(True))
+        if finish == "casing":
+            obj.data.materials.append(casing_material())
+        elif finish != "texture":
+            obj.data.materials.append(core_material(True))
         obj["seked_standin"] = model["attribution"]
         obj["seked_license"] = model["license"]
         obj["seked_replaces"] = ", ".join(model["replaces"])
