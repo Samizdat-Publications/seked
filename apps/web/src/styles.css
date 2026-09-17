@@ -178,6 +178,101 @@ ul.inputs .value,
   color: var(--ink-soft);
 }
 
+/*
+ * The loading line. Smaller and dimmer than the aside, because it is about
+ * the machine rather than about the plateau, and it goes as soon as the last
+ * file is in. The dot pulses so that a line which is not changing still reads
+ * as something in progress.
+ */
+.caption-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: rgba(236, 230, 216, 0.5);
+}
+
+.caption-loading::before {
+  content: '';
+  width: 0.34rem;
+  height: 0.34rem;
+  border-radius: 999px;
+  background: var(--sand);
+  animation: caption-loading-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes caption-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caption-loading::before {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/*
+ * The hover tag. Dark glass beside the pointer, in the shell's own tokens,
+ * naming what the pointer rests on and what kind of evidence it is. It never
+ * takes a pointer event, so it can never come between the reader and the
+ * thing it is naming.
+ */
+.hover-tag {
+  position: fixed;
+  z-index: 8;
+  max-width: 19rem;
+  padding: 0.5rem 0.7rem 0.55rem;
+  background: var(--glass-raised);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
+  border-radius: 0.6rem;
+  box-shadow: var(--lift);
+  pointer-events: none;
+}
+
+.hover-name {
+  margin: 0;
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.hover-tier {
+  margin: 0.22rem 0 0;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+}
+
+.hover-tier.is-survey {
+  color: var(--sand);
+}
+
+.hover-tier.is-claim {
+  color: #7ea6e0;
+}
+
+.hover-note {
+  margin: 0.3rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
 /* The rail */
 
 .rail {

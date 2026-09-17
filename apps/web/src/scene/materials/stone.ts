@@ -35,6 +35,7 @@ import {
   type MeshStandardMaterial,
   type Texture,
 } from 'three';
+import { useView } from '../../store';
 import { patchMaterial } from './patch';
 
 export type StoneRole = 'core' | 'casing' | 'sand' | 'gravel' | 'granite' | 'bedrock';
@@ -90,6 +91,11 @@ function loadMap(file: string, data: boolean): Promise<Texture | undefined> {
 function loadStone(role: StoneRole): Promise<Stone | undefined> {
   let promise = loaded.get(role);
   if (!promise) {
+    // A set of maps is several megabytes on a cold cache, which is most of the
+    // fifteen seconds before the plateau has its surfaces. The caption says so
+    // while it happens rather than leaving a reader with flat grey stone and
+    // no reason for it.
+    useView.getState().setLoading(`stone:${role}`, true);
     promise = stoneIndex().then(async (entries) => {
       const entry = entries?.[role];
       if (!entry) return undefined;
@@ -101,7 +107,7 @@ function loadStone(role: StoneRole): Promise<Stone | undefined> {
       ]);
       if (!colour) return undefined;
       return { colour, normal, roughness, tileMetres: entry.tileMetres, meanLinear: entry.meanLinear, attribution: entry.attribution };
-    });
+    }).finally(() => useView.getState().setLoading(`stone:${role}`, false));
     loaded.set(role, promise);
   }
   return promise;

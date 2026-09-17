@@ -19,13 +19,17 @@
  * shader's `sunPosition` is in the world frame, because that shader reads a
  * world position out of its vertex stage rather than a local one.
  */
-import { useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { enuDirection, equatorialToHorizon, ltpb, sunAt, type Mat3, type SunPosition } from '@seked/sky/browser';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BackSide,
+  BufferAttribute,
+  BufferGeometry,
   Color,
+  DoubleSide,
   Mesh,
+  MeshBasicMaterial,
   PMREMGenerator,
   RepeatWrapping,
   Scene as ThreeScene,
@@ -40,7 +44,8 @@ import {
 import { Sky as PreethamSky } from 'three/examples/jsm/objects/Sky.js';
 import { DOME_RADIUS, type DomeBuffers, type NamedDomeStar } from '../sky';
 import { useView } from '../store';
-import { sceneEpoch } from '../view';
+import { sceneEpoch, type StateId } from '../view';
+import { useStateTransition } from './fade';
 import { SkyDome } from './SkyDome';
 
 /** Where the plateau is, which is the Great Pyramid's own centre. */
@@ -147,6 +152,28 @@ export function skyLook(altitudeDeg: number): SkyLook {
   return last;
 }
 
+/**
+ * What each stop of the timeline does to the sky itself, as multipliers on the
+ * look the sun's altitude gives. Look choices, following the spec's section 3:
+ * the First Time has clearer air, so its scattering haze comes down a fifth,
+ * which reads as a deeper blue overhead and a cleaner horizon. The other three
+ * stops are the sky the renders were set against. `today`'s own difference is
+ * the Cairo haze, which is a band rather than a change to the whole sky and is
+ * drawn by `CairoHaze` below.
+ */
+const STATE_SKY: Record<StateId, { turbidity: number; mie: number }> = {
+  ancient: { turbidity: 0.8, mie: 0.8 },
+  built: { turbidity: 1, mie: 1 },
+  stripped: { turbidity: 1, mie: 1 },
+  today: { turbidity: 1, mie: 1 },
+};
+
+/** The look of a stop's own sky at that altitude. */
+export function stateSky(look: SkyLook, state: StateId): SkyLook {
+  const era = STATE_SKY[state];
+  return { ...look, turbidity: look.turbidity * era.turbidity, mie: look.mie * era.mie };
+}
+
 /** The colour of the sky's own light and of the ground's bounce. Look choices. */
 const ZENITH = new Color('#82a9da');
 const DUSK_ZENITH = new Color('#45577f');
@@ -191,8 +218,9 @@ export interface SkyProps {
 export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.Element {
   const lst = useView((s) => s.lst);
   const override = useView((s) => s.epoch);
+  const state = useView((s) => s.state);
   const epoch = sceneEpoch(override, undefined);
-  const look = skyLook(sun.altitudeDeg);
+  const look = stateSky(skyLook(sun.altitudeDeg), state);
   const night = nightness(sun.altitudeDeg);
 
   // The fill goes from the daylit zenith through dusk to a deep blue, which
@@ -211,6 +239,7 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
           here is the data frame's up. */}
       <hemisphereLight position={[0, 0, 1]} color={fill} groundColor={BOUNCE} intensity={look.fill} />
       <ambientLight color={ambient} intensity={look.ambient} />
+      <CairoHaze night={night} />
       {night > 0.02 && <NightSky epoch={epoch} latitudeDeg={observer.latitudeDeg} lstDeg={lst} opacity={night} />}
       {stars && night > 0.02 && <SkyDome {...stars} radius={DOME_RADIUS} opacity={night} furniture={furniture} />}
     </group>
@@ -296,6 +325,116 @@ function Atmosphere({ sun, look, night }: { sun: Sun; look: SkyLook; night: numb
   }, [gl, scene, sun, look, rayleigh, night]);
 
   return <primitive object={mesh} scale={SKY_SCALE} renderOrder={-10} />;
+}
+
+/**
+ * The Cairo haze: a faint warm-grey band low in the east, drawn in `today` and
+ * in no other state.
+ *
+ * Cairo is real and it is downwind, and from the plateau at dusk the city
+ * stands under a brown lift that the desert to the west does not have. It is
+ * the one thing about the modern sky that is not the same sky the other stops
+ * stand under, and the spec asks for it in section 3.4.
+ *
+ * Every number here is a look choice and none of them is a measurement: the
+ * city is a direction and a colour, not a figure in the database. It is kept
+ * faint on purpose, so that a reader who did not know Cairo was there would
+ * take it for dust.
+ */
+const HAZE = {
+  /** Degrees of azimuth, from north through east, the band is drawn across. */
+  fromAzimuth: 40,
+  toAzimuth: 140,
+  /** Degrees of altitude. It starts a little below the horizon so it has no edge there. */
+  fromAltitude: -1.5,
+  toAltitude: 8,
+  /** Degrees over which it fades out at each end of the arc. */
+  taper: 24,
+  /** The brown-grey a city's own light and dust lift a horizon to. */
+  colour: new Color('#a08a6e'),
+  /** How strong it is at its strongest, which is at the horizon by day. */
+  opacity: 0.3,
+  /** And at night, when the sky behind it is dark and a lift shows more. */
+  nightOpacity: 0.16,
+  /** Sat just inside the star dome, beyond anything the plateau draws. */
+  radius: DOME_RADIUS * 0.985,
+  segments: { azimuth: 64, altitude: 8 },
+} as const;
+
+/** The band, as a strip of triangles carrying their own alpha. */
+function hazeGeometry(): BufferGeometry {
+  const { fromAzimuth, toAzimuth, fromAltitude, toAltitude, taper, radius, segments } = HAZE;
+  const columns = segments.azimuth + 1;
+  const rows = segments.altitude + 1;
+  const position = new Float32Array(columns * rows * 3);
+  const colour = new Float32Array(columns * rows * 4);
+  const index: number[] = [];
+  for (let c = 0; c < columns; c++) {
+    const u = c / segments.azimuth;
+    const azimuth = fromAzimuth + (toAzimuth - fromAzimuth) * u;
+    // Out to nothing at each end of the arc, so the band has no vertical edge.
+    const ends = Math.min(azimuth - fromAzimuth, toAzimuth - azimuth) / taper;
+    const across = Math.min(1, Math.max(0, ends));
+    for (let r = 0; r < rows; r++) {
+      const v = r / segments.altitude;
+      const altitude = fromAltitude + (toAltitude - fromAltitude) * v;
+      const a = (azimuth * Math.PI) / 180;
+      const h = (altitude * Math.PI) / 180;
+      const i = c * rows + r;
+      // The data frame: +X east, +Y north, +Z up, azimuth from north through east.
+      position[i * 3] = radius * Math.cos(h) * Math.sin(a);
+      position[i * 3 + 1] = radius * Math.cos(h) * Math.cos(a);
+      position[i * 3 + 2] = radius * Math.sin(h);
+      // Densest at the bottom and gone by the top, which is what a layer of
+      // air held down by its own weight looks like from outside it.
+      const up = Math.max(0, (altitude - fromAltitude) / (toAltitude - fromAltitude));
+      colour[i * 4] = 1;
+      colour[i * 4 + 1] = 1;
+      colour[i * 4 + 2] = 1;
+      colour[i * 4 + 3] = across * across * (1 - up) * (1 - up);
+      if (c < segments.azimuth && r < segments.altitude) {
+        const next = (c + 1) * rows + r;
+        index.push(i, next, i + 1, next, next + 1, i + 1);
+      }
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(position, 3));
+  geometry.setAttribute('color', new BufferAttribute(colour, 4));
+  geometry.setIndex(index);
+  return geometry;
+}
+
+function CairoHaze({ night }: { night: number }): React.JSX.Element {
+  const transition = useStateTransition();
+  const geometry = useMemo(() => hazeGeometry(), []);
+  const material = useMemo(
+    () =>
+      new MeshBasicMaterial({
+        color: HAZE.colour,
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+        side: DoubleSide,
+        fog: false,
+      }),
+    [],
+  );
+  useEffect(() => () => {
+    geometry.dispose();
+    material.dispose();
+  }, [geometry, material]);
+
+  // The band comes and goes with the timeline's own dissolve rather than
+  // cutting, which is the same eight tenths of a second everything else takes.
+  useFrame(() => {
+    const { from, to, t } = transition;
+    const presence = (to === 'today' ? t : 0) + (from === 'today' ? 1 - t : 0);
+    material.opacity = presence * (HAZE.opacity + (HAZE.nightOpacity - HAZE.opacity) * night);
+    material.visible = material.opacity > 0.002;
+  });
+
+  return <mesh geometry={geometry} material={material} frustumCulled={false} renderOrder={-8} />;
 }
 
 /** The deep blue a clear desert night actually is, and the lift at the horizon. Look choices. */

@@ -55,6 +55,13 @@ export interface ViewStore extends View {
    */
   hiddenMasses: Set<string>;
   setHiddenMasses: (ids: Set<string>) => void;
+  /**
+   * What the viewer is still fetching, as ids of the form `kind:what`, which
+   * the caption turns into its loading line. It is a property of the network
+   * and not of the view, so it is not in the URL.
+   */
+  loading: Set<string>;
+  setLoading: (id: string, on: boolean) => void;
   setPreset: (preset: string) => void;
   setCubit: (cubit: number | null) => void;
   setEpoch: (epoch: number | null) => void;
@@ -98,6 +105,19 @@ export const useView = create<ViewStore>((set, get) => ({
   krupp: true,
   hiddenMasses: new Set<string>(),
   setHiddenMasses: (hiddenMasses) => set({ hiddenMasses }),
+  loading: new Set<string>(),
+  // A set is replaced rather than mutated, because a mutated one is the same
+  // object and nothing subscribed would hear of it. Reporting what is already
+  // reported changes nothing at all, which keeps a loader that calls this on
+  // every retry from waking the caption.
+  setLoading: (id, on) =>
+    set((s) => {
+      if (s.loading.has(id) === on) return {};
+      const loading = new Set(s.loading);
+      if (on) loading.add(id);
+      else loading.delete(id);
+      return { loading };
+    }),
   setPreset: (preset) => set({ preset }),
   setCubit: (cubit) => set({ cubit: cubit === null ? null : clamp(cubit, CUBIT_MIN, CUBIT_MAX) }),
   setEpoch: (epoch) => set({ epoch: epoch === null ? null : clamp(epoch, EPOCH_MIN, EPOCH_MAX) }),
