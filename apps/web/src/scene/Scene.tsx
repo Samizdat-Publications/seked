@@ -13,6 +13,7 @@ import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
 import { Pyramids } from './Pyramids';
 import { SkyDome } from './SkyDome';
+import { Standins } from './Standins';
 import { Plateau, type TerrainProps } from './Terrain';
 
 /** The stars of the moment, or undefined when the sky layer is off. */
@@ -84,6 +85,7 @@ export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): Rea
         <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
         {layers.pyramids && <Pyramids pyramids={model.pyramids} massings={model.massings} plateau={model.plateau} today={layers.today} clippingPlanes={planes} />}
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
+        <Standins />
         {layers.north && <NorthArrow />}
         {layers.overlay && overlay && <ClaimOverlay overlay={overlay} pyramids={model.pyramids} clippingPlanes={planes} />}
       </group>

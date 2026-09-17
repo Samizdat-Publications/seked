@@ -8,7 +8,11 @@ import { TOUR, applyStep } from './tour';
 import {
   CUBIT_MAX,
   CUBIT_MIN,
+  DAY_MAX,
+  DAY_MIN,
   DEFAULT_VIEW,
+  HOUR_MAX,
+  HOUR_MIN,
   EPOCH_MAX,
   EPOCH_MIN,
   SECTION_MAX,
@@ -21,8 +25,11 @@ import {
   type CameraMode,
   type CameraView,
   type LayerId,
+  type Moment,
   type Section,
+  type StateId,
   type View,
+  stateById,
 } from './view';
 
 export interface ViewStore extends View {
@@ -65,6 +72,12 @@ export interface ViewStore extends View {
   /** Close the tour and leave the reader with the view the last step set. */
   endTour: () => void;
   goToStep: (index: number) => void;
+  /**
+   * Move the timeline. The sky follows the stop's own epoch unless the reader
+   * has overridden it, which is the same rule opening a claim uses.
+   */
+  setState: (state: StateId) => void;
+  setMoment: (moment: Partial<Moment>) => void;
 }
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
@@ -127,6 +140,12 @@ export const useView = create<ViewStore>((set, get) => ({
     applyStep(step, get());
     set({ tour: index });
   },
+  setState: (state) => set((s) => ({ state, epoch: s.epoch === null ? null : stateById(state).epoch })),
+  setMoment: (moment) =>
+    set((s) => {
+      const next = { ...s.moment, ...moment };
+      return { moment: { day: clamp(Math.round(next.day), DAY_MIN, DAY_MAX), hour: clamp(next.hour, HOUR_MIN, HOUR_MAX) } };
+    }),
 }));
 
 /** Adopt the view in the address bar. Call once, before the first render. */

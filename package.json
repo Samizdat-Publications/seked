@@ -22,12 +22,18 @@
     "deploy": "pnpm build:web && pnpm site && cd site && npx --yes wrangler@4.20.0 pages deploy . --project-name seked --branch main --commit-dirty=true"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.5.0",
+    "@gltf-transform/core": "^4.5.0",
+    "@gltf-transform/extensions": "^4.5.0",
+    "@gltf-transform/functions": "^4.5.0",
     "@seked/claims": "workspace:*",
     "@seked/data": "workspace:*",
     "@seked/geometry": "workspace:*",
     "@seked/sky": "workspace:*",
     "@seked/units": "workspace:*",
     "@types/node": "^26.5.1",
+    "meshoptimizer": "^1.2.0",
+    "sharp": "^0.35.4",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0"

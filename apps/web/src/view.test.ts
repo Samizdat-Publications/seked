@@ -28,6 +28,21 @@ describe('encodeView and decodeView', () => {
     expect(decodeView(encodeView(DEFAULT_VIEW), PRESETS)).toEqual(DEFAULT_VIEW);
   });
 
+  it('round-trips the timeline stop and the moment', () => {
+    const wanted = view({ state: 'ancient', moment: { day: 79, hour: 7.25 } });
+    expect(decodeView(encodeView(wanted), PRESETS)).toEqual(wanted);
+    expect(encodeView(wanted)).toContain('state=ancient');
+    expect(encodeView(wanted)).toContain('moment=79%2C7.25');
+  });
+
+  it('falls back to today and the default moment on nonsense', () => {
+    const decoded = decodeView('?state=atlantis&moment=x,y', PRESETS);
+    expect(decoded.state).toBe('today');
+    expect(decoded.moment).toEqual(DEFAULT_VIEW.moment);
+    expect(decodeView('?moment=400,30', PRESETS).moment).toEqual({ day: 366, hour: 24 });
+    expect(decodeView('?moment=0,-3', PRESETS).moment).toEqual({ day: 1, hour: 0 });
+  });
+
   it('round-trips a section, a camera mode and a speed', () => {
     const wanted = view({
       mode: 'fly',

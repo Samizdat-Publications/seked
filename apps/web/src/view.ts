@@ -19,6 +19,51 @@ export const LAYERS = [
 
 export type LayerId = (typeof LAYERS)[number]['id'];
 
+/**
+ * The timeline's four stops. Each is a whole look for every structure and
+ * the ground, and carries the epoch the sky defaults to at that stop. `kind`
+ * is the honesty word the caption ends with: what the reader is looking at
+ * is the survey, a reconstruction, or a claim. Epochs are astronomical years
+ * (10,500 BCE is -10499).
+ */
+export const STATES = [
+  { id: 'ancient', label: 'The First Time', kind: 'claim', epoch: -10499 },
+  { id: 'built', label: 'As built', kind: 'reconstruction', epoch: -2449 },
+  { id: 'stripped', label: 'Stripped and buried', kind: 'reconstruction', epoch: 1500 },
+  { id: 'today', label: 'As it stands', kind: 'survey', epoch: 2026 },
+] as const;
+
+export type StateId = (typeof STATES)[number]['id'];
+
+export const stateById = (id: StateId): (typeof STATES)[number] => STATES.find((s) => s.id === id) ?? STATES[3];
+
+/**
+ * When in the year and the day the sun is looked at: the day of the year
+ * (1 to 366) and local mean solar time in hours (0 to 24). The sun's place
+ * for it is the sky package's business, never typed here.
+ */
+export interface Moment {
+  day: number;
+  hour: number;
+}
+
+/**
+ * Named moments, the ones the Blender views were rendered at, as days and
+ * hours. The days are the 2026 calendar's for the equinoxes and solstices,
+ * which is a day or so off in other years and is only a preset.
+ */
+export const MOMENTS = [
+  { id: 'equinox-dawn', label: 'Equinox, an hour after sunrise', moment: { day: 79, hour: 7.1 } },
+  { id: 'winter-dusk', label: 'December solstice, an hour before sunset', moment: { day: 355, hour: 16.0 } },
+  { id: 'summer-sunset', label: 'June solstice, sunset', moment: { day: 172, hour: 19.0 } },
+  { id: 'midnight', label: 'Equinox, midnight', moment: { day: 79, hour: 0 } },
+] as const;
+
+export const DAY_MIN = 1;
+export const DAY_MAX = 366;
+export const HOUR_MIN = 0;
+export const HOUR_MAX = 24;
+
 export type Vec3 = [number, number, number];
 
 /**
@@ -81,6 +126,10 @@ export interface View {
   section: Section;
   /** Which tour step is showing, or null when no tour is running. */
   tour: number | null;
+  /** The timeline stop every structure is drawn at. */
+  state: StateId;
+  /** The day and hour the sun is drawn for. */
+  moment: Moment;
 }
 
 export const CUBIT_MIN = 0.52;
@@ -137,7 +186,21 @@ export const DEFAULT_VIEW: View = {
   speed: 40,
   section: { on: false, axis: 'ns', at: 0, ground: false },
   tour: null,
+  state: 'today',
+  moment: { day: 355, hour: 16.0 },
 };
+
+const isStateId = (id: string | null): id is StateId => STATES.some((s) => s.id === id);
+
+/** `day,hour` as `encodeView` writes it, falling back field by field. */
+export function decodeMoment(text: string | null): Moment {
+  if (text === null) return DEFAULT_VIEW.moment;
+  const [d, h] = text.split(',').map(Number);
+  return {
+    day: Number.isFinite(d) ? clamp(Math.round(d as number), DAY_MIN, DAY_MAX) : DEFAULT_VIEW.moment.day,
+    hour: Number.isFinite(h) ? clamp(h as number, HOUR_MIN, HOUR_MAX) : DEFAULT_VIEW.moment.hour,
+  };
+}
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
@@ -220,6 +283,8 @@ export function decodeView(search: string, presetIds: string[]): View {
     speed: Number.isFinite(speed) ? clamp(speed, SPEED_MIN, SPEED_MAX) : DEFAULT_VIEW.speed,
     section: decodeSection(q.get('cut')),
     tour,
+    state: isStateId(q.get('state')) ? (q.get('state') as StateId) : DEFAULT_VIEW.state,
+    moment: decodeMoment(q.get('moment')),
   };
 }
 
@@ -242,5 +307,7 @@ export function encodeView(view: View): string {
   q.set('speed', round(view.speed, 0));
   q.set('cut', view.section.on ? `${view.section.axis},${round(view.section.at, 1)},${view.section.ground ? '1' : '0'}` : 'off');
   if (view.tour !== null) q.set('tour', String(view.tour));
+  q.set('state', view.state);
+  q.set('moment', `${round(view.moment.day, 0)},${round(view.moment.hour, 2)}`);
   return `?${q.toString()}`;
 }
