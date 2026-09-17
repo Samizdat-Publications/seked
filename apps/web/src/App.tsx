@@ -90,8 +90,11 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   // ascensions.
   const catalogue = useMemo(() => brightStarsOf(bundle), [bundle]);
   const named = useMemo(() => namedOnDome(bundle.stars, epoch), [bundle.stars, epoch]);
-  const buffers = useMemo(() => (layers.sky ? domeBuffers(catalogue, epoch) : undefined), [layers.sky, catalogue, epoch]);
-  const sky = buffers ? { buffers, named, latitudeDeg: model.latitudeDeg, lstDeg: lst } : undefined;
+  // The dome is built for every epoch, sky layer or not, because the stars
+  // come up on their own once the sun is down; the layer only shows the
+  // horizon ring and the labels.
+  const buffers = useMemo(() => domeBuffers(catalogue, epoch), [catalogue, epoch]);
+  const sky = { buffers, named, latitudeDeg: model.latitudeDeg, lstDeg: lst };
 
   const overlayContext = useMemo<OverlayContext>(
     () => ({
@@ -112,7 +115,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   return (
     <div className="shell">
       <main className="stage">
-        <Scene model={model} terrain={terrain} layers={layers} overlay={overlay} sky={sky} />
+        <Scene model={model} terrain={terrain} layers={layers} overlay={overlay} sky={sky} epoch={epoch} />
       </main>
 
       <Caption epoch={epoch} claimId={selected} />

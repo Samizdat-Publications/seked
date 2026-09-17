@@ -37,6 +37,7 @@ void main() {
 `;
 
 const FRAGMENT = `
+uniform float uOpacity;
 varying vec3 vColour;
 void main() {
   vec2 d = gl_PointCoord - vec2(0.5);
@@ -44,7 +45,7 @@ void main() {
   if (r2 > 0.25) discard;
   // GLSL leaves smoothstep undefined when the edges are the wrong way
   // round, so the fall-off is written forwards and inverted.
-  gl_FragColor = vec4(vColour, 1.0 - smoothstep(0.015, 0.25, r2));
+  gl_FragColor = vec4(vColour, (1.0 - smoothstep(0.015, 0.25, r2)) * uOpacity);
 }
 `;
 
@@ -62,9 +63,17 @@ export interface SkyDomeProps {
   latitudeDeg: number;
   lstDeg: number;
   radius: number;
+  /**
+   * How far the stars have come up, 0 at civil twilight and 1 in full night.
+   * A star does not appear the instant the sun is down, and a dome drawn at
+   * full strength over a lit sky is a picture of nothing.
+   */
+  opacity?: number;
+  /** The horizon ring, the quarters and the star labels, which the sky layer toggles. */
+  furniture?: boolean;
 }
 
-export function SkyDome({ buffers, named, latitudeDeg, lstDeg, radius }: SkyDomeProps): React.JSX.Element {
+export function SkyDome({ buffers, named, latitudeDeg, lstDeg, radius, opacity = 1, furniture = true }: SkyDomeProps): React.JSX.Element {
   const geometry = useMemo(() => {
     const g = new BufferGeometry();
     g.setAttribute('position', new BufferAttribute(buffers.positions, 3));
@@ -82,7 +91,7 @@ export function SkyDome({ buffers, named, latitudeDeg, lstDeg, radius }: SkyDome
   const material = useMemo(
     () =>
       new ShaderMaterial({
-        uniforms: { uScale: { value: radius * pixelRatio } },
+        uniforms: { uScale: { value: radius * pixelRatio }, uOpacity: { value: 1 } },
         vertexShader: VERTEX,
         fragmentShader: FRAGMENT,
         transparent: true,
@@ -92,6 +101,9 @@ export function SkyDome({ buffers, named, latitudeDeg, lstDeg, radius }: SkyDome
     [radius, pixelRatio],
   );
   useEffect(() => () => material.dispose(), [material]);
+  useEffect(() => {
+    material.uniforms.uOpacity!.value = opacity;
+  }, [material, opacity]);
 
   // The whole sphere turns with sidereal time. Three's own frame is Y-up and
   // the scene group has already turned the data frame into it, so this
@@ -131,8 +143,8 @@ export function SkyDome({ buffers, named, latitudeDeg, lstDeg, radius }: SkyDome
         <primitive object={geometry} attach="geometry" />
         <primitive object={material} attach="material" />
       </points>
-      <Horizon radius={radius} />
-      {visible.map(({ star, at }) => (
+      {furniture && <Horizon radius={radius} />}
+      {furniture && visible.map(({ star, at }) => (
         <Label
           key={star.id}
           text={star.name}

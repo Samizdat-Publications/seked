@@ -8,6 +8,7 @@ export * from './frames';
 export * from './horizon';
 export * from './calendar';
 export * from './solar';
+export * from './sunpath';
 export * from './sun';
 export * from './dome';
 export * from './stars';

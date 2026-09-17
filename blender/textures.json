@@ -1,7 +1,7 @@
 {
   "about": "PBR texture sets the renders use. Every one is CC0 from Poly Haven and none is a measurement: they give the stones a surface, never a size or a place. `python scripts/textures.py` downloads the maps named here into build/textures/ (gitignored), checks each against the md5 the Poly Haven API publishes, and writes build/textures/index.json with the files and the real-world tile size the API states, which is what render_materials.py scales them by.",
   "resolution": "2k",
-  "maps": ["Diffuse", "Rough", "Displacement"],
+  "maps": ["Diffuse", "Rough", "Displacement", "nor_gl"],
   "sets": [
     {
       "id": "worn_rock_natural_01",

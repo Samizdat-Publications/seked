@@ -4,15 +4,37 @@ import { DoubleSide, FrontSide, type MeshStandardMaterial, type Plane } from 'th
 import type { MassingParams, PlateauMass, PyramidParams } from '../model';
 import { useView } from '../store';
 import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
-import { applyStone, useStone, type StoneRole } from './stone';
+import { applyAtmosphere } from './Atmosphere';
+import { forgetCascades, receiveCascades } from './materials/shadows';
+import { applyStone, useStone, type StoneOptions, type StoneRole } from './materials/stone';
 
-/** A standard material that takes a role's photographed stone once it has loaded, and flat colour until then. */
-function useStoneMaterial(role: StoneRole | undefined, strength: number): React.RefObject<MeshStandardMaterial | null> {
+/**
+ * Typical length of a block along a course, in metres: a look choice, and the
+ * only part of the block variation that is not the database's. Reisner's and
+ * Petrie's course heights give the other axis.
+ */
+const BLOCK_LENGTH_M = 2.5;
+
+/**
+ * A standard material that takes a role's photographed stone once it has
+ * loaded, flat colour until then, and a cascade of the sun's shadow map and
+ * the air between it and the camera either way.
+ */
+function useStoneMaterial(role: StoneRole | undefined, options: StoneOptions): React.RefObject<MeshStandardMaterial | null> {
   const ref = useRef<MeshStandardMaterial>(null);
   const stone = useStone(role ?? 'core');
+  const key = JSON.stringify(options);
   useEffect(() => {
-    if (ref.current && role) applyStone(ref.current, stone, strength);
-  }, [stone, role, strength]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (ref.current && role) applyStone(ref.current, stone, JSON.parse(key) as StoneOptions);
+  }, [stone, role, key]);
+  useEffect(() => {
+    const material = ref.current;
+    if (!material) return;
+    applyAtmosphere(material);
+    receiveCascades(material);
+    return () => forgetCascades(material);
+  });
   return ref;
 }
 
@@ -76,10 +98,10 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
       : mass.id === 'khafre.valley_temple' ? MASS_GRANITE
         : mass.id === 'khufu.basalt_pavement' ? MASS_BASALT
           : MASS_LIMESTONE;
-  const material = useStoneMaterial(color === MASS_LIMESTONE ? 'core' : undefined, 0.85);
+  const material = useStoneMaterial(color === MASS_LIMESTONE ? 'core' : undefined, { strength: 0.85, relief: 0.7 });
   if (useView((s) => s.hiddenMasses).has(mass.id)) return null; // a fitted stand-in model stands here instead
   return (
-    <mesh geometry={geometry} name={mass.id}>
+    <mesh geometry={geometry} name={mass.id} castShadow receiveShadow>
       <meshStandardMaterial ref={material} color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />
     </mesh>
   );
@@ -93,10 +115,11 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
  */
 function Massing({ params, clippingPlanes }: { params: MassingParams; clippingPlanes: Plane[] }): React.JSX.Element {
   const { length, width, height, offsetEast, offsetNorth } = params;
+  const material = useStoneMaterial(undefined, { strength: 0 });
   return (
-    <mesh position={[offsetEast, offsetNorth, height / 2]}>
+    <mesh position={[offsetEast, offsetNorth, height / 2]} castShadow receiveShadow>
       <boxGeometry args={[length, width, height]} />
-      <meshStandardMaterial color="#9c9078" roughness={0.97} metalness={0} flatShading clippingPlanes={clippingPlanes} />
+      <meshStandardMaterial ref={material} color="#9c9078" roughness={0.97} metalness={0} flatShading clippingPlanes={clippingPlanes} />
     </mesh>
   );
 }
@@ -133,11 +156,20 @@ function Pyramid({
   // A section leaves the far side of the masonry facing away from the reader,
   // so the cut only reads if the back faces are drawn.
   // Cased, a face takes the fine pale stone faintly; standing, the coarse core.
-  const material = useStoneMaterial(standing ? 'core' : 'casing', standing ? 0.9 : 0.45);
+  // The coursing is the database's: the mean of the courses this pyramid
+  // carries, which is what a block is high, and what the joints on a dressed
+  // face are spaced by. A pyramid with no courses recorded gets neither.
+  const courseHeight = courses && courses.length > 0 ? courses.reduce((a, b) => a + b, 0) / courses.length : 0;
+  const material = useStoneMaterial(
+    standing ? 'core' : 'casing',
+    standing
+      ? { strength: 0.9, relief: 1, block: courseHeight > 0 ? { length: BLOCK_LENGTH_M, height: courseHeight } : undefined }
+      : { strength: 0.45, relief: 0.35, course: courseHeight },
+  );
   const cut = clippingPlanes.length > 0 && clippingPlanes[0]?.constant !== undefined && Math.abs(clippingPlanes[0].constant) < 1e6;
 
   return (
-    <mesh geometry={geometry} position={[params.offsetEast, params.offsetNorth, params.offsetUp]} rotation={[0, 0, orientationDeg * DEG]}>
+    <mesh geometry={geometry} position={[params.offsetEast, params.offsetNorth, params.offsetUp]} rotation={[0, 0, orientationDeg * DEG]} castShadow receiveShadow>
       <meshStandardMaterial
         key={standing ? 'standing' : 'cased'}
         ref={material}

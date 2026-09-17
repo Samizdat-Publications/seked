@@ -5,7 +5,7 @@
  * stay exactly as the reader left them.
  */
 import { useView } from '../store';
-import { LOOKS } from './looks';
+import { LOOKS } from '../looks';
 import { clock, dateWords } from './moment';
 
 export function Views(): React.JSX.Element {
