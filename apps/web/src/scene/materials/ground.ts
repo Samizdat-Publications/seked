@@ -50,6 +50,10 @@ import { after, patchMaterial } from './patch';
  * mixed towards and `dry` what the scrub is; both are laid over the sand's own
  * photograph rather than in place of it, so the ground keeps its grain.
  *
+ * `aboveWaterMetres` is how far above the waterline the green starts: nothing
+ * grows in the harbour or out in the flood, and a tussock standing in the
+ * basin is the one mistake this mask can make that a reader sees at once.
+ *
  * `wetMetres` is how far above the water's level the green is still full
  * strength before it falls away, and `dryMetres` how far above it the flood's
  * own term has gone altogether. Fifty-five metres is about the plateau's
@@ -69,9 +73,10 @@ import { after, patchMaterial } from './patch';
  * is drawn on.
  */
 export const GREEN = {
-  strength: { ancient: 1, built: 0.3, stripped: 0, today: 0 } as Record<StateId, number>,
+  strength: { ancient: 1, built: 0.22, stripped: 0, today: 0 } as Record<StateId, number>,
   colour: new Vector3(0.34, 0.41, 0.18),
   dry: new Vector3(0.45, 0.42, 0.26),
+  aboveWaterMetres: 1.2,
   wetMetres: 8,
   dryMetres: 55,
   uplandShare: 0.7,
@@ -274,8 +279,9 @@ export function greenAt(
   const wet = level === undefined
     ? 0
     : 1 - smoothstep(GREEN.wetMetres, GREEN.dryMetres, z - level);
+  const above = level === undefined ? 1 : smoothstep(0, GREEN.aboveWaterMetres, z - level);
   const cover = Math.min(1, mottle + wet * (1 - mottle));
-  return strength * cover * clear * smoothstep(GREEN.slope.from, GREEN.slope.to, upness);
+  return strength * cover * clear * above * smoothstep(GREEN.slope.from, GREEN.slope.to, upness);
 }
 
 export interface GreenOptions {
@@ -352,9 +358,10 @@ float sekedGreen() {
   float mottle = smoothstep(0.42, 0.72, baked.r) * ${GREEN.uplandShare.toFixed(3)};
   float wet = greenHasWater * (1.0 - smoothstep(${GREEN.wetMetres.toFixed(1)}, ${GREEN.dryMetres.toFixed(1)}, vGreenWorld.y - greenLevel));
   float cover = min(1.0, mottle + wet * (1.0 - mottle));
+  float above = mix(1.0, smoothstep(0.0, ${GREEN.aboveWaterMetres.toFixed(2)}, vGreenWorld.y - greenLevel), greenHasWater);
   vec3 face = normalize(cross(dFdx(vGreenWorld), dFdy(vGreenWorld)));
   float upness = abs(face.y);
   float slope = smoothstep(${GREEN.slope.from.toFixed(2)}, ${GREEN.slope.to.toFixed(2)}, upness);
-  return greenStrength * cover * baked.g * slope;
+  return greenStrength * cover * baked.g * above * slope;
 }
 `;

@@ -50,6 +50,7 @@ import {
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { rectangleContains } from '@seked/geometry';
 import { useView } from '../store';
 import { applyAtmosphere } from './Atmosphere';
 import { patchMaterial } from './materials/patch';
@@ -89,6 +90,12 @@ const LOOK = {
   greens: ['#4f6b28', '#67853a', '#87995a'],
   tipFade: 0.55,
   cardPixels: 128,
+  /**
+   * What the card's own greens are multiplied by at each stop: the First Time
+   * as drawn, `built` a dry straw, the two late stops never reached because
+   * their strength is zero and nothing is scattered.
+   */
+  tint: { ancient: '#ffffff', built: '#a89968', stripped: '#a89968', today: '#a89968' } as Record<string, string>,
 } as const;
 
 /** How many of a plant kind stand per square metre of full mask, by its own kind. */
@@ -237,6 +244,11 @@ export interface Scattered {
  * The mask is `greenAt`, which is the ground's own tint read on the CPU. The
  * ground's steepness comes from the terrain sampler, four metres either side,
  * which is as fine as a twenty-metre grid can answer.
+ *
+ * The harbour basin is skipped outright. Its ground stands above its own
+ * waterline on the surface model, which is exactly why `Terrain.tsx` cuts a
+ * hole there, and the mask cannot see a hole: without this the plateau grows
+ * a meadow standing in the harbour.
  */
 function scatter(
   mask: GreenMask,
@@ -246,6 +258,7 @@ function scatter(
   density: number,
   cap: number,
   seed: number,
+  basin: readonly (readonly [number, number])[] | undefined,
 ): Scattered {
   const places: Scattered['places'] = [];
   if (strength <= 0 || density <= 0) return { places };
@@ -277,6 +290,7 @@ function scatter(
     const j = Math.floor(cell / cells);
     const cx = x0 + (i + 0.5) * step;
     const cy = y0 + (j + 0.5) * step;
+    if (basin && rectangleContains(basin, cx, cy)) continue;
     const z = ground(cx, cy);
     const dx = (ground(cx + 4, cy) - ground(cx - 4, cy)) / 8;
     const dy = (ground(cx, cy + 4) - ground(cx, cy - 4)) / 8;
@@ -289,6 +303,7 @@ function scatter(
     for (let k = 0; k < n && places.length < cap; k++) {
       const x = cx + (random() - 0.5) * step;
       const y = cy + (random() - 0.5) * step;
+      if (basin && rectangleContains(basin, x, y)) continue;
       places.push({
         x,
         y,
@@ -377,10 +392,11 @@ export function Vegetation({ terrain, clippingPlanes }: VegetationProps): React.
   const ground = useMemo(() => groundSampler(terrain), [terrain]);
   const strength = GREEN.strength[state];
   const level = water?.level;
+  const basin = water?.kind === 'basin' ? water.outline : undefined;
 
   const blades = useMemo(
-    () => (mask ? scatter(mask, ground, level, strength, LOOK.perSquareMetre, LOOK.cap, 90210) : undefined),
-    [mask, ground, level, strength],
+    () => (mask ? scatter(mask, ground, level, strength, LOOK.perSquareMetre, LOOK.cap, 90210, basin) : undefined),
+    [mask, ground, level, strength, basin],
   );
 
   const geometry = useMemo(() => cardGeometry(), []);
@@ -409,12 +425,12 @@ export function Vegetation({ terrain, clippingPlanes }: VegetationProps): React.
       side: DoubleSide,
       roughness: 0.85,
       metalness: 0,
-      color: '#ffffff',
+      color: LOOK.tint[state] ?? '#ffffff',
     });
     applyBlades(m, clock);
     applyAtmosphere(m);
     return m;
-  }, [texture, clock]);
+  }, [texture, clock, state]);
   useEffect(() => {
     material.clippingPlanes = clippingPlanes;
     material.needsUpdate = true;
@@ -449,6 +465,7 @@ export function Vegetation({ terrain, clippingPlanes }: VegetationProps): React.
           ground={ground}
           level={level}
           strength={strength}
+          basin={basin}
           clippingPlanes={clippingPlanes}
           clock={clock}
           state={state}
@@ -499,6 +516,7 @@ interface PlantsProps {
   ground: (x: number, y: number) => number;
   level: number | undefined;
   strength: number;
+  basin: readonly (readonly [number, number])[] | undefined;
   clippingPlanes: Plane[];
   clock: { value: number };
   state: string;
@@ -509,7 +527,7 @@ interface PlantsProps {
  * this renders nothing at all and says nothing, which is the state it ships
  * in until that track lands.
  */
-function Plants({ mask, ground, level, strength, clippingPlanes, clock, state }: PlantsProps): React.JSX.Element | null {
+function Plants({ mask, ground, level, strength, basin, clippingPlanes, clock, state }: PlantsProps): React.JSX.Element | null {
   const [entries, setEntries] = useState<PropEntry[]>([]);
   useEffect(() => {
     let alive = true;
@@ -531,6 +549,7 @@ function Plants({ mask, ground, level, strength, clippingPlanes, clock, state }:
           ground={ground}
           level={level}
           strength={strength}
+          basin={basin}
           clippingPlanes={clippingPlanes}
           clock={clock}
           state={state}
@@ -546,7 +565,7 @@ interface PlantProps extends PlantsProps {
   seed: number;
 }
 
-function Plant({ entry, mask, ground, level, strength, clippingPlanes, clock, state, seed }: PlantProps): React.JSX.Element | null {
+function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, clock, state, seed }: PlantProps): React.JSX.Element | null {
   const [source, setSource] = useState<Mesh | undefined>(undefined);
   useEffect(() => {
     let alive = true;
@@ -560,8 +579,8 @@ function Plant({ entry, mask, ground, level, strength, clippingPlanes, clock, st
 
   const density = PLANT_DENSITY[plantKindOf(entry)] ?? PLANT_DENSITY_DEFAULT;
   const places = useMemo(
-    () => scatter(mask, ground, level, strength, density, 4000, seed).places,
-    [mask, ground, level, strength, density, seed],
+    () => scatter(mask, ground, level, strength, density, 4000, seed, basin).places,
+    [mask, ground, level, strength, density, seed, basin],
   );
 
   const material = useMemo(() => {
