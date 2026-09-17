@@ -13,6 +13,7 @@ import { useView } from './store';
 import { About } from './ui/About';
 import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
+import { HoverTag } from './ui/HoverTag';
 import { Rail } from './ui/Rail';
 import { SunDial } from './ui/SunDial';
 import { Timeline } from './ui/Timeline';
@@ -164,6 +165,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
       </div>
 
       <Rail />
+      <HoverTag />
     </div>
   );
 }

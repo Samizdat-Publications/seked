@@ -10,6 +10,7 @@ import type { LayerId } from '../view';
 import { useAtmosphere } from './Atmosphere';
 import { ClaimOverlay } from './ClaimOverlay';
 import { FadeScope } from './fade';
+import { Hover } from './Hover';
 import { Renderer } from './Renderer';
 import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
@@ -92,6 +93,8 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
           {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
           <Standins />
         </FadeScope>
+        {/* Names whatever the pointer rests on; draws nothing itself. */}
+        <Hover />
         {layers.north && <NorthArrow />}
         {layers.overlay && overlay && <ClaimOverlay overlay={overlay} pyramids={model.pyramids} clippingPlanes={planes} />}
       </group>

@@ -220,6 +220,59 @@ ul.inputs .value,
   }
 }
 
+/*
+ * The hover tag. Dark glass beside the pointer, in the shell's own tokens,
+ * naming what the pointer rests on and what kind of evidence it is. It never
+ * takes a pointer event, so it can never come between the reader and the
+ * thing it is naming.
+ */
+.hover-tag {
+  position: fixed;
+  z-index: 8;
+  max-width: 19rem;
+  padding: 0.5rem 0.7rem 0.55rem;
+  background: var(--glass-raised);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
+  border-radius: 0.6rem;
+  box-shadow: var(--lift);
+  pointer-events: none;
+}
+
+.hover-name {
+  margin: 0;
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.hover-tier {
+  margin: 0.22rem 0 0;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+}
+
+.hover-tier.is-survey {
+  color: var(--sand);
+}
+
+.hover-tier.is-claim {
+  color: #7ea6e0;
+}
+
+.hover-note {
+  margin: 0.3rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
 /* The rail */
 
 .rail {
