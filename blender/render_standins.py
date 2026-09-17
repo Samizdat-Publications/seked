@@ -225,3 +225,63 @@ def build_standins(scene, state="today", variants=()):
               f"{done['osm_height_m']:.1f} m. {model['license']}: {model['author']}")
         built.append(obj)
     return built
+
+
+# --- The Sphinx's enclosure ------------------------------------------------
+#
+# The Sphinx was carved by quarrying the bedrock away around it, and it lies in
+# the hollow that left, open to the east where its temple stands. The ground
+# grid is GLO-30 at twenty metres, which smooths that hollow away and lets the
+# rock to its west rise up its flanks. This cuts the hollow back at render time:
+# a box around the OSM outlines of the Sphinx, with a corridor of stated width
+# on the north, south and west and open well past the paws to the east, floored
+# at the lowest base the outlines carry. The corridor widths are look choices
+# read off photographs of the enclosure, not measurements, and are printed as
+# such; the walls take the banded core limestone, which is what the cut bedrock
+# is. Nothing here changes the .blend or the viewer's ground.
+
+ENCLOSURE_MARGIN_M = {"north": 9.0, "south": 14.0, "west": 12.0, "east": 60.0}
+ENCLOSURE_FOOTPRINTS = ("sphinx.body", "sphinx.head", "sphinx.paws")
+
+
+def cut_enclosure(scene):
+    """The hollow the Sphinx lies in, cut out of the ground grid; returns the cutter, or None."""
+    features = [f for f in (load_footprints() or {}).get("features", []) if f["id"] in ENCLOSURE_FOOTPRINTS]
+    ground = bpy.data.objects.get("Terrain (ground)")
+    if not features or ground is None:
+        print("enclosure: no Sphinx outlines or no ground grid, so nothing is cut")
+        return None
+    points = [pt for f in features for pt in (f["ring"] if isinstance(f["ring"][0][0], (int, float)) else f["ring"][0])]
+    west = min(p[0] for p in points) - ENCLOSURE_MARGIN_M["west"]
+    east = max(p[0] for p in points) + ENCLOSURE_MARGIN_M["east"]
+    south = min(p[1] for p in points) - ENCLOSURE_MARGIN_M["south"]
+    north = max(p[1] for p in points) + ENCLOSURE_MARGIN_M["north"]
+    floor = min(f["base"] for f in features)
+    top = floor + 80.0
+
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    for v in bm.verts:
+        v.co.x = west if v.co.x < 0 else east
+        v.co.y = south if v.co.y < 0 else north
+        v.co.z = floor if v.co.z < 0 else top
+    mesh = bpy.data.meshes.new("Sphinx enclosure (cutter)")
+    bm.to_mesh(mesh)
+    bm.free()
+    cutter = bpy.data.objects.new(mesh.name, mesh)
+    scene.collection.objects.link(cutter)
+    cutter.data.materials.append(core_material(True))
+    cutter.hide_render = True
+    cutter.hide_set(True)
+
+    mod = ground.modifiers.new("Sphinx enclosure", "BOOLEAN")
+    mod.operation = "DIFFERENCE"
+    mod.solver = "EXACT"
+    mod.object = cutter
+    if hasattr(mod, "material_mode"):
+        mod.material_mode = "TRANSFER"
+    if not any(m.name == core_material(True).name for m in ground.data.materials):
+        ground.data.materials.append(core_material(True))
+    print(f"enclosure: cut {east - west:.0f} by {north - south:.0f} m to {floor:.2f} m around the Sphinx's outlines, "
+          f"corridors {ENCLOSURE_MARGIN_M} m (look choices, not measurements), walls in the banded core limestone")
+    return cutter

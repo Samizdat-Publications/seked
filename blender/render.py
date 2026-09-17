@@ -34,7 +34,7 @@ if HERE not in sys.path:
 import bpy  # noqa: E402  (only available inside Blender)
 
 from render_materials import CAPSTONE, STRUCTURE_LABELS, assign_materials, dress_as_built, draw_as_section, make_translucent  # noqa: E402
-from render_standins import build_standins  # noqa: E402
+from render_standins import build_standins, cut_enclosure  # noqa: E402
 from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_milky_way, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
 # Where the akhet view stands relative to the Sphinx: back along the line it
@@ -532,6 +532,7 @@ def main():
     dress_as_built(opts["state"])
     if not drawing and opts["standins"] != "off":
         build_standins(scene, opts["state"], [v for v in (opts["sphinx"],) if v])
+        cut_enclosure(scene)
     if drawing:
         draw_as_section(view["drawing_structure"], view["casing_alpha"])
     show_ground_only(drawing)

@@ -160,12 +160,21 @@ def from_text(spec):
 
 def restyled(spec, uris):
     """The photographs changed by the image model, then built into a mesh; the made images ride along on the task."""
-    body = dict(spec.get("image_options", {}), prompt=spec["image_prompt"], reference_image_urls=uris)
-    image_task = call("POST", "image-to-image", body)["result"]
-    print(f"image-to-image task {image_task} created")
-    images = wait("image-to-image", image_task)
-    urls = images["image_urls"]
-    print(f"image-to-image {image_task}: {len(urls)} images, {images.get('consumed_credits')} credits")
+    options = dict(spec.get("image_options", {}))
+    # One photograph at a time keeps each restored image on its own photograph's
+    # camera and proportions; all of them at once lets the model invent a statuette.
+    batches = [[u] for u in uris] if options.pop("per_image", False) else [uris]
+    urls, credits, image_tasks = [], 0, []
+    for batch in batches:
+        image_task = call("POST", "image-to-image", dict(options, prompt=spec["image_prompt"], reference_image_urls=batch))["result"]
+        print(f"image-to-image task {image_task} created")
+        images = wait("image-to-image", image_task)
+        urls.extend(images["image_urls"][:1] if len(batches) > 1 else images["image_urls"])
+        credits += images.get("consumed_credits") or 0
+        image_tasks.append(image_task)
+    print(f"image-to-image: {len(urls)} images, {credits} credits")
+    images = {"consumed_credits": credits}
+    image_task = ", ".join(image_tasks)
     mesh_body = dict(spec.get("options", {}), image_urls=urls[:4])
     mesh_task = call("POST", "multi-image-to-3d", mesh_body)["result"]
     print(f"multi-image-to-3d task {mesh_task} created")
