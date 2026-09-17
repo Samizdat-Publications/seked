@@ -7,48 +7,70 @@ import { applyAtmosphere } from './Atmosphere';
 import { before, patchMaterial } from './materials/patch';
 import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone } from './materials/stone';
+import { applyGreen, GREEN, useGreenMask } from './materials/ground';
+import { useView } from '../store';
 import { useSphinxCut } from './Trench';
+import { useWater } from './Water';
 
 /**
- * The ground inside the Sphinx's enclosure, thrown away in the fragment
- * shader rather than dug out of the grid.
+ * The ground that is not drawn: the Sphinx's enclosure, and the harbour basin.
  *
- * The plan is convex, so a fragment is inside it exactly when it is left of
- * every edge of it taken counter-clockwise, which is a handful of
- * instructions and needs not one vertex moved. The alternative, pulling the
- * samples inside the plan down to the trench's floor, cannot work at
+ * Both are holes in the grid, thrown away in the fragment shader rather than
+ * dug out of it. A plan here is convex, so a fragment is inside it exactly
+ * when it is left of every edge of it taken counter-clockwise, which is a
+ * handful of instructions and needs not one vertex moved. The alternative,
+ * pulling the samples inside a plan down to the cut's floor, cannot work at
  * GLO-30's twenty metres: a cut a hundred metres across has five samples in
- * it, and the funnel between them and their neighbours would bury the west
- * wall and leave the east one standing in the air. `Trench.tsx` draws the
- * floor and the walls that fill the hole.
+ * it, and the funnel between them and their neighbours would bury one wall
+ * and leave the other standing in the air. `Trench.tsx` draws the enclosure's
+ * floor and walls; `Water.tsx` draws the basin's water and its quay.
+ *
+ * The basin's hole comes and goes with the timeline, and the ground is a
+ * fixture of every state, so it is not dissolved: the hole appears the frame
+ * the stop changes while the water fades in over the dissolve. That is the
+ * one place this track's work does not cross-fade, and the water arriving
+ * over it covers most of it.
  */
-function applyTrenchCut(material: MeshStandardMaterial, outline: readonly (readonly [number, number])[] | undefined): void {
-  const n = outline && outline.length >= 3 ? outline.length : 0;
-  const key = `v1:${n}:${outline?.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ') ?? ''}`;
+function applyGroundCuts(material: MeshStandardMaterial, cuts: readonly (readonly (readonly [number, number])[])[]): void {
+  const plans = cuts.filter((c) => c.length >= 3);
+  const key = `v2:${plans.map((c) => c.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')).join('|')}`;
   patchMaterial(material, 'trench', key, (shader) => {
-    if (n === 0 || !outline) return;
-    shader.uniforms.uTrench = { value: outline.map(([x, y]) => new Vector2(x, y)) };
+    if (plans.length === 0) return;
+    const flat = plans.flat();
+    shader.uniforms.uTrench = { value: flat.map(([x, y]) => new Vector2(x, y)) };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
 varying vec2 vTrenchPos;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
 vTrenchPos = transformed.xy;`);
+    let start = 0;
+    const tests = plans.map((plan) => {
+      const first = start;
+      const n = plan.length;
+      start += n;
+      return `
+      {
+        bool inside = true;
+        for (int i = 0; i < ${n}; i++) {
+          vec2 a = uTrench[${first} + i];
+          vec2 b = uTrench[${first} + (i == ${n} - 1 ? 0 : i + 1)];
+          if ((b.x - a.x) * (vTrenchPos.y - a.y) - (b.y - a.y) * (vTrenchPos.x - a.x) < 0.0) inside = false;
+        }
+        if (inside) sekedCut = true;
+      }`;
+    });
     shader.fragmentShader = before(
       shader.fragmentShader.replace(
         '#include <common>',
         `#include <common>
-uniform vec2 uTrench[${n}];
+uniform vec2 uTrench[${flat.length}];
 varying vec2 vTrenchPos;`,
       ),
       'clipping_planes_fragment',
       `
-      bool sekedInTrench = true;
-      for (int i = 0; i < ${n}; i++) {
-        vec2 a = uTrench[i];
-        vec2 b = uTrench[i == ${n} - 1 ? 0 : i + 1];
-        if ((b.x - a.x) * (vTrenchPos.y - a.y) - (b.y - a.y) * (vTrenchPos.x - a.x) < 0.0) sekedInTrench = false;
-      }
-      if (sekedInTrench) discard;
+      bool sekedCut = false;
+      ${tests.join('')}
+      if (sekedCut) discard;
       `,
     );
   });
@@ -108,11 +130,35 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
     if (!groundMaterial.current) return;
     applyStone(groundMaterial.current, sand, { strength: 0.8, scale: 3, relief: 0.6, mix: gravel, mixMetres: 120 });
   }, [sand, gravel]);
-  // The Sphinx's enclosure, where one is standing, is a hole in this grid.
-  const cut = useSphinxCut();
+  // The green of the African Humid Period, laid over the sand by the one mask
+  // `Vegetation.tsx` stands its grass on, so the tint and the blades cannot
+  // disagree about where the meadow is. Its strength is the stop's own, which
+  // is what makes the First Time green, `built` a dry scrub and the two late
+  // stops bare.
+  const state = useView((s) => s.state);
+  const water = useWater();
+  const mask = useGreenMask(header);
   useEffect(() => {
-    if (groundMaterial.current) applyTrenchCut(groundMaterial.current, cut?.outline);
-  }, [cut]);
+    const material = groundMaterial.current;
+    if (!material || !mask) return;
+    applyGreen(material, {
+      mask,
+      level: water?.level,
+      strength: GREEN.strength[state],
+      colour: state === 'built' ? GREEN.dry : GREEN.colour,
+    });
+  }, [mask, water, state]);
+  // The Sphinx's enclosure, where one is standing, and the harbour basin,
+  // where the timeline has one, are holes in this grid.
+  const cut = useSphinxCut();
+  const cuts = useMemo(
+    () => [cut?.outline, water?.kind === 'basin' ? water.outline : undefined]
+      .filter((o): o is readonly (readonly [number, number])[] => o !== undefined),
+    [cut, water],
+  );
+  useEffect(() => {
+    if (groundMaterial.current) applyGroundCuts(groundMaterial.current, cuts);
+  }, [cuts]);
   // The ground takes the sun's shadows and casts none of its own worth having.
   useEffect(() => {
     const material = groundMaterial.current;

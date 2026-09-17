@@ -14,3 +14,4 @@ export * from './mastaba';
 export * from './temple';
 export * from './enclosure';
 export * from './trench';
+export * from './water';
