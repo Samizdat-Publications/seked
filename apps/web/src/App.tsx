@@ -14,6 +14,7 @@ import { About } from './ui/About';
 import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
 import { Rail } from './ui/Rail';
+import { SphinxControl } from './ui/Sphinx';
 import { SunDial } from './ui/SunDial';
 import { Timeline } from './ui/Timeline';
 import { useUi } from './ui/ui';
@@ -130,6 +131,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
           <Views />
         </Drawer>
         <Drawer id="layers">
+          <SphinxControl />
           <LayerToggles />
         </Drawer>
         {/*
