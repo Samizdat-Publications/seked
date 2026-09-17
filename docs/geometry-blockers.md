@@ -272,6 +272,15 @@ What `built` has to become, most visible first:
 6. **The ground.** The quarries unexcavated or open as the builders left
    them, the Sphinx's enclosure cut, no modern road, village or car park.
 
+Added the same night: `--state ancient`, the built plateau with a freshly
+carved recumbent Anubis as its Sphinx (Temple's reading, which Stewart preferred
+to the lion for the long forepaws), and a freshly carved lion beside it to
+choose between by rendering both. Weathered versions of both stand in today's
+state. **Later, Stewart's idea:** intermediate Sphinxes between the freshly
+carved one and today's, showing the erosion and the recutting of the head over
+time (for the proponents' sequence, lion or jackal to an older face to the
+present one), each restored from the stage before it so the body stays one body.
+
 The state and the epoch stay independent. The epoch is a choice for the sky,
 the state a choice for the buildings, so a render or the film can show the
 built plateau under the sky of 2450 BCE or of 10,500 BCE, or the lion Sphinx
