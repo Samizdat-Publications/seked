@@ -46,6 +46,7 @@ import { DOME_RADIUS, type DomeBuffers, type NamedDomeStar } from '../sky';
 import { useView } from '../store';
 import { sceneEpoch, type StateId } from '../view';
 import { useStateTransition } from './fade';
+import { setCasingCorona } from './materials/casing';
 import { SkyDome } from './SkyDome';
 
 /** Where the plateau is, which is the Great Pyramid's own centre. */
@@ -289,6 +290,67 @@ export function nightness(altitudeDeg: number): number {
   return Math.min(1, Math.max(0, (TWILIGHT.top - altitudeDeg) / (TWILIGHT.top - TWILIGHT.bottom)));
 }
 
+/**
+ * The light the stars themselves put on the plateau.
+ *
+ * With the sun down the viewer had the pyramids as flat black cut-outs: the
+ * only lights left were a hemisphere at 0.03 in the night sky's near-black
+ * blue and an ambient at 0.025, and the renders' own night view
+ * (docs/progress/0020-blender-night-milky-way.png) is not that. It has the
+ * silhouettes reading against a lit sky and the ground faintly there.
+ *
+ * So the dome pays for it. The catalogue's own colours, which `sky.ts` writes
+ * from each star's magnitude and colour index, are averaged: their mean
+ * luminance is the strength and their mean hue is the colour, pulled most of
+ * the way to the night sky's blue because what reaches a face at night has
+ * been scattered by the same air that makes the sky blue by day. Only the
+ * gain is chosen here, and no star is typed twice.
+ */
+const STARLIGHT = {
+  /**
+   * What the dome's mean luminance is worth as a hemisphere light. Small on
+   * purpose: the render's own night has the ground near black and the
+   * pyramids as silhouettes, and all this has to do is keep a face from being
+   * the same black as the one beside it.
+   */
+  gain: 0.05,
+  /** How far the dome's own hue is pulled to the night sky's. A look choice. */
+  blue: 0.7,
+  /** With nothing loaded, a night that is dark but not black. */
+  fallback: { colour: new Color('#7f90b4'), intensity: 0.02 },
+} as const;
+
+/** The ground's bounce under the stars, which is next to nothing. */
+const NIGHT_BOUNCE = new Color('#0b1018');
+
+/** Rec. 709 luminance, which is what separates a light's colour from its strength. */
+function luminanceOf(colour: Color): number {
+  return 0.2126 * colour.r + 0.7152 * colour.g + 0.0722 * colour.b;
+}
+
+/** The hemisphere light the star dome is worth, or the fallback with no dome. */
+export function starlightOf(buffers: DomeBuffers | undefined): { colour: Color; intensity: number } {
+  if (!buffers || buffers.count === 0) return { colour: STARLIGHT.fallback.colour, intensity: STARLIGHT.fallback.intensity };
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  for (let i = 0; i < buffers.count; i++) {
+    r += buffers.colours[i * 3] ?? 0;
+    g += buffers.colours[i * 3 + 1] ?? 0;
+    b += buffers.colours[i * 3 + 2] ?? 0;
+  }
+  const mean = new Color(r / buffers.count, g / buffers.count, b / buffers.count);
+  const luminance = luminanceOf(mean);
+  // Hue and strength are separated, so that pulling the colour toward the
+  // night sky's blue tints the light without also dimming it: the strength is
+  // the dome's own mean and the gain, and nothing else.
+  const blue = NIGHT_SKY.zenith.clone();
+  blue.multiplyScalar(1 / Math.max(luminanceOf(blue), 1e-6));
+  const colour = mean.multiplyScalar(1 / Math.max(luminance, 1e-6)).lerp(blue, STARLIGHT.blue);
+  colour.multiplyScalar(1 / Math.max(luminanceOf(colour), 1e-6));
+  return { colour, intensity: luminance * STARLIGHT.gain };
+}
+
 /** The stars of the epoch, as `App.tsx` hands them to the scene. */
 export interface StarsProps {
   buffers: DomeBuffers;
@@ -331,6 +393,14 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
       .lerp(NIGHT_ZENITH, night);
   }, [sun.altitudeDeg, night]);
   const ambient = useMemo(() => new Color().lerpColors(DAY_AMBIENT, NIGHT_AMBIENT, night), [night]);
+  const starlight = useMemo(() => starlightOf(stars?.buffers), [stars]);
+
+  // The corona's light on the casing, which is the First Time's alone and is a
+  // claim. `Pyramids.tsx` draws the sprite at each apex on its own band from
+  // -6 to -12 degrees; this uses the scene's one night ramp, which starts a
+  // little earlier and ends a little later, so the glow is up before the
+  // sprite and outlasts it rather than switching with it.
+  useEffect(() => setCasingCorona(state === 'ancient' ? night : 0), [state, night]);
 
   return (
     <group>
@@ -340,6 +410,14 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
           here is the data frame's up. */}
       <hemisphereLight position={[0, 0, 1]} color={fill} groundColor={BOUNCE} intensity={look.fill} />
       <ambientLight color={ambient} intensity={look.ambient} />
+      {night > 0 && (
+        <hemisphereLight
+          position={[0, 0, 1]}
+          color={starlight.colour}
+          groundColor={NIGHT_BOUNCE}
+          intensity={starlight.intensity * night}
+        />
+      )}
       <CairoHaze night={night} />
       {night > 0.02 && <NightSky epoch={epoch} latitudeDeg={observer.latitudeDeg} lstDeg={lst} opacity={night} />}
       {stars && night > 0.02 && <SkyDome {...stars} radius={DOME_RADIUS} opacity={night} furniture={furniture} />}

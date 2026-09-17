@@ -19,10 +19,12 @@
  */
 import {
   ClampToEdgeWrapping,
+  Color,
   DataTexture,
   FloatType,
   NearestFilter,
   RedFormat,
+  type IUniform,
   type MeshPhysicalMaterial,
 } from 'three';
 import { after, patchMaterial } from './patch';
@@ -75,6 +77,42 @@ const LOOK = {
   ancient: { roughness: 0.26, clearcoat: 0.25, clearcoatRoughness: 0.07 },
 } as const;
 
+/**
+ * The corona's own light on the casing under it, as uniforms every cased face
+ * shares, in the shape `Atmosphere.ts` shares the air's.
+ *
+ * The spec's one exception, section 3.1.3, is a faint corona at the apexes at
+ * night in the First Time, and `Pyramids.tsx` draws it as a sprite. A sprite
+ * lights nothing: with the sun down the pyramid under it was a flat black
+ * silhouette with a dot on top. What is missing is the light it would throw
+ * on the stone below it, and that is this: a warm emissive lift on the last
+ * stretch of casing under the cap.
+ *
+ * It is here rather than as a point light at each apex because the apexes are
+ * `Pyramids.tsx`'s and this track does not have them; the casing shader knows
+ * where its own top course is, which is the same place. It is a claim, it is
+ * off in every state but `ancient`, and `Sky.tsx` sets it.
+ */
+const CORONA: Record<string, IUniform> = {
+  /** 0 by day and in every state but the First Time; 1 in full night there. */
+  casingCorona: { value: 0 },
+  /** Warm white, as a discharge over stone would read. A look choice. */
+  casingCoronaColour: { value: new Color('#ffd9a8') },
+  /** Metres under the top course it reaches down. A look choice. */
+  casingCoronaReach: { value: 40 },
+};
+
+/** Radiance at the very top of the casing at full strength. A look choice. */
+const CORONA_RADIANCE = 0.05;
+
+/**
+ * How strong the corona's light on the casing is now. Called once, where the
+ * sun and the timeline's stop are both known; every cased face follows.
+ */
+export function setCasingCorona(strength: number): void {
+  CORONA.casingCorona!.value = Math.min(1, Math.max(0, strength)) * CORONA_RADIANCE;
+}
+
 export interface CasingOptions {
   /**
    * The height above the base each course tops out at, bottom up, in metres.
@@ -124,8 +162,9 @@ export function applyCasing(material: MeshPhysicalMaterial, { courses, pristine 
   material.metalness = 0;
 
   const jointed = courses.length > 0;
-  patchMaterial(material, 'casing', jointed ? 'jointed' : 'plain', (shader) => {
+  patchMaterial(material, 'casing', jointed ? 'jointed-corona' : 'plain', (shader) => {
     if (!jointed) return;
+    for (const [name, uniform] of Object.entries(CORONA)) shader.uniforms[name] = uniform;
     shader.uniforms.casingCourses = { value: courseTexture(courses) };
     shader.uniforms.casingCourseCount = { value: courses.length };
     shader.uniforms.casingJointWidth = { value: LOOK.joint };
@@ -142,6 +181,14 @@ export function applyCasing(material: MeshPhysicalMaterial, { courses, pristine 
     );
     shader.fragmentShader = after(shader.fragmentShader, 'common', `${CASING_VARYINGS}\n${CASING_CHUNK}`);
     shader.fragmentShader = after(shader.fragmentShader, 'map_fragment', '  diffuseColor.rgb = sekedCasing(diffuseColor.rgb);');
+    // The corona goes into the emissive term rather than the albedo, because
+    // at night there is no light for an albedo to reflect; and there rather
+    // than into the final colour, so that the air still gets to cover it.
+    shader.fragmentShader = after(
+      shader.fragmentShader,
+      'emissivemap_fragment',
+      '  totalEmissiveRadiance += sekedCasingCorona();',
+    );
   });
 }
 
@@ -173,6 +220,9 @@ uniform float casingJointDark;
 uniform float casingBlockLength;
 uniform float casingBlockTone;
 uniform vec2 casingFade;
+uniform float casingCorona;
+uniform vec3 casingCoronaColour;
+uniform float casingCoronaReach;
 
 float sekedCasingLevel(float i) {
   return texture2D(casingCourses, vec2(0.5, (i + 0.5) / casingCourseCount)).r;
@@ -212,5 +262,16 @@ vec3 sekedCasing(vec3 colour) {
   float joint = max(horizontal, vertical) * fade;
   float tone = sekedCasingHash(vec3(floor(t), course, northSouth));
   return colour * (1.0 - casingBlockTone * tone) * (1.0 - casingJointDark * joint);
+}
+
+// The corona's light on the stone under it. The top course is the last texel
+// of the course table, which is the casing's own summit and therefore where
+// the cap sits; the glow falls away under it over casingCoronaReach metres,
+// squared, so it is mostly the last dozen.
+vec3 sekedCasingCorona() {
+  if (casingCorona <= 0.0) return vec3(0.0);
+  float apex = sekedCasingLevel(casingCourseCount - 1.0);
+  float near = smoothstep(apex - max(casingCoronaReach, 1.0), apex, vCasingObject.z);
+  return casingCoronaColour * (casingCorona * near * near);
 }
 `;
