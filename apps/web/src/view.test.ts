@@ -35,6 +35,13 @@ describe('encodeView and decodeView', () => {
     expect(encodeView(wanted)).toContain('moment=79%2C7.25');
   });
 
+  it('round-trips a claimed Sphinx and leaves it out when it is the state\'s own', () => {
+    const wanted = view({ sphinx: 'anubis' });
+    expect(decodeView(encodeView(wanted), PRESETS)).toEqual(wanted);
+    expect(encodeView(DEFAULT_VIEW)).not.toContain('sphinx=');
+    expect(decodeView('?sphinx=griffin', PRESETS).sphinx).toBeNull();
+  });
+
   it('falls back to today and the default moment on nonsense', () => {
     const decoded = decodeView('?state=atlantis&moment=x,y', PRESETS);
     expect(decoded.state).toBe('today');

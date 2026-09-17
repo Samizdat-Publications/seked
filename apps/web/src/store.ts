@@ -27,6 +27,7 @@ import {
   type LayerId,
   type Moment,
   type Section,
+  type SphinxVariant,
   type StateId,
   type View,
   stateById,
@@ -86,6 +87,7 @@ export interface ViewStore extends View {
    */
   setState: (state: StateId) => void;
   setMoment: (moment: Partial<Moment>) => void;
+  setSphinx: (sphinx: SphinxVariant | null) => void;
 }
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
@@ -156,6 +158,7 @@ export const useView = create<ViewStore>((set, get) => ({
       const next = { ...s.moment, ...moment };
       return { moment: { day: clamp(Math.round(next.day), DAY_MIN, DAY_MAX), hour: clamp(next.hour, HOUR_MIN, HOUR_MAX) } };
     }),
+  setSphinx: (sphinx) => set({ sphinx }),
 }));
 
 /** Adopt the view in the address bar. Call once, before the first render. */

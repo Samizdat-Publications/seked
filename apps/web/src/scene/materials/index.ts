@@ -6,3 +6,4 @@
 export * from './patch';
 export * from './shadows';
 export * from './stone';
+export * from './useStoneMaterial';

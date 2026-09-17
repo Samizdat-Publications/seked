@@ -59,6 +59,19 @@ export const MOMENTS = [
   { id: 'midnight', label: 'Equinox, midnight', moment: { day: 79, hour: 0 } },
 ] as const;
 
+/**
+ * The claims about the Sphinx's first form, shown in place of the state's
+ * own Sphinx when asked for and never by default: the lion (Hancock and
+ * Bauval among others) and the recumbent Anubis (Temple). Null is the state's
+ * ordinary Sphinx. Each is a `claimed` structure and is drawn as one.
+ */
+export const SPHINX_VARIANTS = [
+  { id: 'lion', label: 'A lion (claim)' },
+  { id: 'anubis', label: 'Anubis (claim)' },
+] as const;
+
+export type SphinxVariant = (typeof SPHINX_VARIANTS)[number]['id'];
+
 export const DAY_MIN = 1;
 export const DAY_MAX = 366;
 export const HOUR_MIN = 0;
@@ -130,6 +143,8 @@ export interface View {
   state: StateId;
   /** The day and hour the sun is drawn for. */
   moment: Moment;
+  /** A claim's Sphinx in place of the state's own, or null for the state's. */
+  sphinx: SphinxVariant | null;
 }
 
 export const CUBIT_MIN = 0.52;
@@ -188,7 +203,10 @@ export const DEFAULT_VIEW: View = {
   tour: null,
   state: 'today',
   moment: { day: 355, hour: 16.0 },
+  sphinx: null,
 };
+
+const isSphinxVariant = (id: string | null): id is SphinxVariant => SPHINX_VARIANTS.some((v) => v.id === id);
 
 const isStateId = (id: string | null): id is StateId => STATES.some((s) => s.id === id);
 
@@ -286,6 +304,7 @@ export function decodeView(search: string, presetIds: string[]): View {
     tour,
     state: isStateId(q.get('state')) ? (q.get('state') as StateId) : DEFAULT_VIEW.state,
     moment: decodeMoment(q.get('moment')),
+    sphinx: isSphinxVariant(q.get('sphinx')) ? (q.get('sphinx') as SphinxVariant) : null,
   };
 }
 
@@ -310,5 +329,6 @@ export function encodeView(view: View): string {
   if (view.tour !== null) q.set('tour', String(view.tour));
   q.set('state', view.state);
   q.set('moment', `${round(view.moment.day, 0)},${round(view.moment.hour, 2)}`);
+  if (view.sphinx !== null) q.set('sphinx', view.sphinx);
   return `?${q.toString()}`;
 }

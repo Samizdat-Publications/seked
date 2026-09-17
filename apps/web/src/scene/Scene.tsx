@@ -14,6 +14,7 @@ import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
 import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
+import { Masses } from './Masses';
 import { Pyramids } from './Pyramids';
 import { Standins } from './Standins';
 import { Plateau, type TerrainProps } from './Terrain';
@@ -82,7 +83,8 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
       <group rotation={[-Math.PI / 2, 0, 0]}>
         <Sky sun={sun} observer={observer} stars={sky} furniture={layers.sky} />
         <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
-        {layers.pyramids && <Pyramids pyramids={model.pyramids} massings={model.massings} plateau={model.plateau} today={layers.today} clippingPlanes={planes} />}
+        {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} clippingPlanes={planes} />}
+        {layers.pyramids && <Masses massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
         <Standins />
         {layers.north && <NorthArrow />}
