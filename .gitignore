@@ -34,6 +34,9 @@ apps/web/public/sky/
 # Written by `pnpm web-assets` from the GLBs blender/export_web.py bakes
 apps/web/public/models/
 
+# Written by the props pass of `pnpm web-assets` from build/props/
+apps/web/public/props/
+
 # Local
 .env
 .env.*

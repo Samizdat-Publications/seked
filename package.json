@@ -20,6 +20,7 @@
     "sky-rollback": "tsx scripts/sky-rollback.ts",
     "stars": "tsx scripts/stars.ts",
     "footprints": "tsx scripts/footprints.ts",
+    "props": "python scripts/props.py && tsx scripts/web-assets.ts",
     "deploy": "pnpm build:web && pnpm site && cd site && npx --yes wrangler@4.20.0 pages deploy . --project-name seked --branch main --commit-dirty=true"
   },
   "devDependencies": {
