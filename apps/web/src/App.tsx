@@ -10,6 +10,7 @@ import { Tour } from './panels/Tour';
 import { Scene } from './scene/Scene';
 import { domeBuffers, namedOnDome } from './sky';
 import { useView } from './store';
+import { About } from './ui/About';
 import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
 import { Rail } from './ui/Rail';
@@ -154,7 +155,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
           <Tour />
         </Drawer>
         <Drawer id="about">
-          <p className="note">What this is, and where its surfaces come from, arrives here.</p>
+          <About />
         </Drawer>
       </div>
 

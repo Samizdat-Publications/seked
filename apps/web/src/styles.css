@@ -826,6 +826,60 @@ code {
   font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* About */
+
+.lede {
+  margin: 0;
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+}
+
+ol.rules {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: rule;
+}
+
+ol.rules li {
+  position: relative;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  counter-increment: rule;
+}
+
+ol.rules li::before {
+  content: counter(rule);
+  position: absolute;
+  left: 0;
+  top: 0.05rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--sand);
+}
+
+ul.credits li {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.drawer a {
+  color: var(--sand);
+  text-underline-offset: 0.18em;
+}
+
+.drawer a:hover {
+  color: var(--ink);
+}
+
 /* Views */
 
 ul.looks {
