@@ -252,7 +252,7 @@ def chosen(models, state, variants):
     return picked
 
 
-def build_standins(scene, state="today", variants=()):
+def build_standins(scene, state="today", variants=(), finish=None):
     """The stand-ins for this state and these variants, fitted and labelled; the OSM solids they replace hidden."""
     if not os.path.exists(INDEX):
         print(f"no {INDEX}: no stand-in models; run python scripts/models.py")
@@ -269,6 +269,11 @@ def build_standins(scene, state="today", variants=()):
             print(f"stand-in {model['id']}: none of {model['replaces']} is in the footprints, so it has nowhere to stand")
             continue
         path = os.path.join(os.path.dirname(INDEX), entry["file"])
+        # A named finish (a retexture kept as build/models/<id>-<finish>/) replaces the pinned surface when it exists.
+        finished = os.path.join(os.path.dirname(INDEX), f"{model['id']}-{finish}", "model.glb") if finish else None
+        if finished and os.path.exists(finished):
+            path = finished
+            print(f"stand-in {model['id']}: finish {finish}")
         name = f"{model['name']} (stand-in)"
         # "texture" keeps the model's own surface, which is the point of a painted
         # reconstruction, and "texture+stone" lays real stone grain over it;
