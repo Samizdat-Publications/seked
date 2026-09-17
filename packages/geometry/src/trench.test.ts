@@ -74,9 +74,9 @@ describe('capMesh and cutWallMesh', () => {
 });
 
 describe('sphinxTrenchMesh', () => {
-  it('builds nothing while the database carries no enclosure margin', () => {
-    // This is the state of data/measurements today.
-    expect(sphinxTrenchMesh(buildEnvironment({}), SPHINX, -10)).toBeUndefined();
+  it('builds nothing while neither the database nor the caller gives a margin', () => {
+    // The database is the first half of this today: no sphinx.enclosure.margin.
+    expect(sphinxTrenchMesh(buildEnvironment({}), SPHINX, { groundLevel: -10 })).toBeUndefined();
   });
 
   it('builds nothing without a rim, from a record or from the caller', () => {
@@ -85,15 +85,16 @@ describe('sphinxTrenchMesh', () => {
 
   it('builds nothing with no Sphinx footprints, or with a rim below the floor', () => {
     const env = buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 });
-    expect(sphinxTrenchMesh(env, [], -10)).toBeUndefined();
-    expect(sphinxTrenchMesh(env, SPHINX, -50)).toBeUndefined();
+    expect(sphinxTrenchMesh(env, [], { groundLevel: -10 })).toBeUndefined();
+    expect(sphinxTrenchMesh(env, SPHINX, { groundLevel: -50 })).toBeUndefined();
   });
 
   it('cuts the floor to the lowest of their bases and the walls up to the ground given', () => {
-    const trench = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, -10);
+    const trench = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, { groundLevel: -10 });
     expect(trench).toBeDefined();
     expect(wellFormed(trench?.floor as Mesh)).toBe(true);
     expect(wellFormed(trench?.walls as Mesh)).toBe(true);
+    expect(trench?.floorLevel).toBeCloseTo(-39.71, 4);
     expect(extent(trench?.floor as Mesh, 2)[0]).toBeCloseTo(-39.71, 4);
     expect(extent(trench?.floor as Mesh, 2)[1]).toBeCloseTo(-39.71, 4);
     expect(extent(trench?.walls as Mesh, 2)[0]).toBeCloseTo(-39.71, 4);
@@ -103,15 +104,50 @@ describe('sphinxTrenchMesh', () => {
     expect(extent(trench?.walls as Mesh, 0)[0]).toBeCloseTo(-12, 3);
   });
 
+  it('hands back the plan it cut, which is what a ground grid has to lose', () => {
+    const trench = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, { groundLevel: -10 });
+    const outline = trench?.outline as [number, number][];
+    expect(outline.length).toBe(6);
+    expect(Math.min(...outline.map(([x]) => x))).toBeCloseTo(-12, 3);
+    expect(Math.max(...outline.map(([x]) => x))).toBeCloseTo(82, 3);
+  });
+
+  it('takes the margin from the caller when the database has none, and says it is a look choice', () => {
+    const trench = sphinxTrenchMesh(buildEnvironment({}), SPHINX, { groundLevel: -10, margin: 6 });
+    expect(trench).toBeDefined();
+    expect(extent(trench?.walls as Mesh, 0)[1]).toBeCloseTo(76, 3);
+    expect(trench?.label).toContain('a look choice and not a measurement');
+    // A record in the database wins over the caller's, and is named as a record.
+    const recorded = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, { groundLevel: -10, margin: 6 });
+    expect(extent(recorded?.walls as Mesh, 0)[1]).toBeCloseTo(82, 3);
+    expect(recorded?.label).toContain(SPHINX_MARGIN_KEY);
+    expect(recorded?.label).not.toContain('a look choice and not a measurement');
+  });
+
+  it('gives each wall vertex the height of the ground over it when the ground is a function', () => {
+    // A plateau falling one metre every ten eastward, as the real one does
+    // from the Sphinx's back to its paws.
+    const ground = (x: number): number => -20 - x / 10;
+    const trench = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, { groundLevel: ground });
+    expect(trench).toBeDefined();
+    const tops = extent(trench?.walls as Mesh, 2);
+    expect(tops[0]).toBeCloseTo(-39.71, 4);
+    // West end at x = -12 is the highest ground; the east end has fallen below
+    // the floor and the wall is cut off at it rather than going under it.
+    expect(tops[1]).toBeCloseTo(ground(-12), 4);
+    const zs = [...(trench?.walls as Mesh).positions.filter((_, i) => i % 3 === 2)];
+    expect(Math.min(...zs)).toBeGreaterThanOrEqual(-39.711);
+  });
+
   it('prefers a recorded rim to the one the caller passes, and says which it used', () => {
     const env = buildEnvironment({ [SPHINX_MARGIN_KEY]: 12, [SPHINX_RIM_KEY]: -8 });
-    const trench = sphinxTrenchMesh(env, SPHINX, -10);
+    const trench = sphinxTrenchMesh(env, SPHINX, { groundLevel: -10 });
     expect(extent(trench?.walls as Mesh, 2)[1]).toBeCloseTo(-8, 4);
     expect(trench?.label).toContain(SPHINX_RIM_KEY);
   });
 
   it('says what it is and which of its dimensions are look choices', () => {
-    const label = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, -10)?.label as string;
+    const label = sphinxTrenchMesh(buildEnvironment({ [SPHINX_MARGIN_KEY]: 12 }), SPHINX, { groundLevel: -10 })?.label as string;
     expect(label).toContain('Reconstruction');
     expect(label).toContain(SPHINX_MARGIN_KEY);
     expect(label).toContain('Look choices');
