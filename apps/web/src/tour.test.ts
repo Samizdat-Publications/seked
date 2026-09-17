@@ -84,6 +84,7 @@ describe('applyStep', () => {
       const state = useView.getState();
       expect(state.claim, step.id).toBe(step.claim);
       for (const [id, on] of Object.entries(step.layers)) expect(state.layers[id as LayerId], `${step.id}: ${id}`).toBe(on);
+      if (step.state !== undefined) expect(state.state, step.id).toBe(step.state);
       expect(state.section.on, step.id).toBe(step.section?.on ?? false);
       if (step.section) expect(state.section, step.id).toMatchObject(step.section);
       expect(state.epoch, step.id).toBe(step.epoch ?? null);
@@ -94,6 +95,22 @@ describe('applyStep', () => {
       // orbit controls to adopt it rather than keep the one they are holding.
       expect(state.cameraEpoch, step.id).toBe(++moves);
     }
+  });
+
+  // The interior reads best inside a whole pyramid, which is a timeline stop
+  // and no longer a layer: the step has to move the timeline itself.
+  it('stands the timeline at "as built" for the step that goes inside', () => {
+    reset();
+    useView.setState({ state: 'today' });
+    applyStep(TOUR.find((s) => s.id === 'inside') as (typeof TOUR)[number], useView.getState());
+    expect(useView.getState().state).toBe('built');
+  });
+
+  it('leaves the timeline where the reader had it for a step that names no stop', () => {
+    reset();
+    useView.setState({ state: 'ancient' });
+    applyStep(TOUR.find((s) => s.id === 'plateau') as (typeof TOUR)[number], useView.getState());
+    expect(useView.getState().state).toBe('ancient');
   });
 
   it('leaves a claim open when the same step is applied twice, since setClaim toggles', () => {

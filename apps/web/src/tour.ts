@@ -12,7 +12,7 @@
  * here says what to look at and what the number on screen means.
  */
 import type { ViewStore } from './store';
-import type { CameraView, LayerId, Section, Vec3 } from './view';
+import type { CameraView, LayerId, Section, StateId, Vec3 } from './view';
 
 export interface TourStep {
   id: string;
@@ -22,6 +22,8 @@ export interface TourStep {
   claim: string | null;
   /** The layers the step depends on. Any the step does not name are left alone. */
   layers: Partial<Record<LayerId, boolean>>;
+  /** The timeline stop the step needs, or absent to leave the timeline where the reader had it. */
+  state?: StateId;
   camera: CameraView;
   /** The epoch to hold the sky at, or absent to follow whichever claim is open. */
   epoch?: number;
@@ -151,7 +153,10 @@ export const TOUR: TourStep[] = [
       "frame is the King's Chamber. Its measured length, width and height are the three numbers the comparisons below are built from. " +
       "The cubit that turns those metres into the claimed whole numbers is this claim's one free choice, and the slider moves it.",
     claim: 'A4',
-    layers: { pyramids: true, interior: true, today: false, overlay: true, sky: false },
+    layers: { pyramids: true, interior: true, overlay: true, sky: false },
+    // The chambers read best inside a whole pyramid, so this step stands the
+    // timeline at "as built" as the section block's own button does.
+    state: 'built',
     camera: cameraFrom(KINGS_CHAMBER, 90, 8, 240),
     section: PASSAGE_PLANE,
   },
@@ -254,6 +259,7 @@ export function applyStep(step: TourStep, store: ViewStore): void {
   for (const [id, on] of Object.entries(step.layers) as [LayerId, boolean][]) {
     if (store.layers[id] !== on) store.toggleLayer(id);
   }
+  if (step.state !== undefined) store.setState(step.state);
   store.setSection({ on: false, ...step.section });
   store.setEpoch(step.epoch ?? null);
   if (step.lst !== undefined) store.setLst(step.lst);

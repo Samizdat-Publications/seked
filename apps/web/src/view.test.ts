@@ -111,6 +111,20 @@ describe('encodeView and decodeView', () => {
     expect(decodeView('?epoch=nonsense&lst=nonsense', PRESETS).lst).toBe(DEFAULT_VIEW.lst);
   });
 
+  // The timeline retired the `today` layer, and links to the viewer were
+  // shared while it existed. An id LAYERS does not know is dropped, and the
+  // layers the URL does name still decide the rest.
+  it('decodes an old link carrying the retired today layer', () => {
+    const decoded = decodeView('?layers=pyramids,today,north', PRESETS);
+    expect(Object.keys(decoded.layers)).not.toContain('today');
+    expect(decoded.layers.pyramids).toBe(true);
+    expect(decoded.layers.north).toBe(true);
+    expect(decoded.layers.interior).toBe(false);
+    // `state=today` is the timeline stop and stays; the layer list is what
+    // the retired id has gone from.
+    expect(encodeView(decoded)).toContain('layers=pyramids%2Cnorth');
+  });
+
   it('keeps the new layers in the layer list', () => {
     const off = view({ layers: { ...DEFAULT_VIEW.layers, interior: false, ground: false, terrain: true } });
     const decoded = decodeView(encodeView(off), PRESETS);
