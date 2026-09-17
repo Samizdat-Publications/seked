@@ -46,6 +46,14 @@ export interface ViewStore extends View {
    * it is not in the URL.
    */
   krupp: boolean;
+  /**
+   * The footprint ids a loaded stand-in model stands in place of, published by
+   * `scene/Standins.tsx` and read by `scene/Pyramids.tsx`, which leaves those
+   * OSM prisms out. It follows what has loaded rather than what the reader
+   * asked for, so it is not in the URL.
+   */
+  hiddenMasses: Set<string>;
+  setHiddenMasses: (ids: Set<string>) => void;
   setPreset: (preset: string) => void;
   setCubit: (cubit: number | null) => void;
   setEpoch: (epoch: number | null) => void;
@@ -86,6 +94,8 @@ export const useView = create<ViewStore>((set, get) => ({
   ...DEFAULT_VIEW,
   cameraEpoch: 0,
   krupp: true,
+  hiddenMasses: new Set<string>(),
+  setHiddenMasses: (hiddenMasses) => set({ hiddenMasses }),
   setPreset: (preset) => set({ preset }),
   setCubit: (cubit) => set({ cubit: cubit === null ? null : clamp(cubit, CUBIT_MIN, CUBIT_MAX) }),
   setEpoch: (epoch) => set({ epoch: epoch === null ? null : clamp(epoch, EPOCH_MIN, EPOCH_MAX) }),
