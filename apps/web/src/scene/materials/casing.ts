@@ -54,6 +54,16 @@ export const CASING_COLOUR = '#ece6d9';
  * its own Fresnel, and the environment map is the sky alone with no warm
  * ground in it, so at a grazing angle the cream went and the sky stayed. Half
  * a coat keeps the limestone under the shine (director, 2026-09-17).
+ *
+ * The second retune pulls it further off the mirror still (director,
+ * 2026-09-17, against a restored-pyramid reference under a high sun). A cased
+ * face there is matte to satin white with the faintest cream, the lit and the
+ * shaded faces separating by shade alone, and no sky in it: the polish reads
+ * as a sun highlight and a soft lift near the arrises, not as a reflection.
+ * So the coat comes down to a quarter and the roughness goes up, which widens
+ * the sun's own highlight and narrows what the sky can do; and `Sky.tsx` now
+ * puts a warm ground in the lower half of the environment, so what does get in
+ * at a grazing angle is sand and not blue.
  */
 const LOOK = {
   joint: 0.02,
@@ -61,8 +71,8 @@ const LOOK = {
   blockLength: 1.7,
   blockTone: 0.07,
   fade: [140, 340] as const,
-  built: { roughness: 0.25, clearcoat: 0.35, clearcoatRoughness: 0.12 },
-  ancient: { roughness: 0.2, clearcoat: 0.45, clearcoatRoughness: 0.08 },
+  built: { roughness: 0.32, clearcoat: 0.18, clearcoatRoughness: 0.14 },
+  ancient: { roughness: 0.26, clearcoat: 0.25, clearcoatRoughness: 0.07 },
 } as const;
 
 export interface CasingOptions {

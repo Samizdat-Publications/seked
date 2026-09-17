@@ -14,10 +14,10 @@ import { Bloom, EffectComposer, HueSaturation, N8AO, SMAA, ToneMapping, Vignette
 import { useFrame, useThree } from '@react-three/fiber';
 import { ToneMappingMode } from 'postprocessing';
 import { useEffect, useState } from 'react';
-import { Color, HalfFloatType, NoToneMapping, PCFShadowMap, Vector3 } from 'three';
+import { HalfFloatType, NoToneMapping, PCFShadowMap, Vector3 } from 'three';
 import { CSM } from 'three/examples/jsm/csm/CSM.js';
 import { setCascades } from './materials/shadows';
-import { worldDirection, type Sun } from './Sky';
+import { sunColour, sunIntensity, worldDirection, type Sun } from './Sky';
 
 /**
  * Look choices, all of them. Exposure is the stop the AgX curve is fed at:
@@ -245,56 +245,4 @@ function Shadows({ sun, quality }: { sun: Sun; quality: Quality }): null {
   useFrame(() => csm?.update());
 
   return null;
-}
-
-/**
- * The sun's strength by altitude, and its colour with it. A look table, not a
- * measurement: it stands in for the air the light has come through, which the
- * scene does not model.
- *
- * The sun goes out a degree under the horizon rather than at civil twilight,
- * because that is where it actually goes: the last of the direct light is the
- * upper limb at about -0.8 degrees, and everything after it is the sky's. The
- * old table kept a fifth of the sun burning to -6, which put a low rim light
- * on faces the renders have in flat shadow. What carries the picture from
- * there is `SKY_LOOK`'s fill and `EXPOSURE`, not an invented sun.
- *
- * The foot is gentler too: a fifth of noon at 2 degrees, deep orange, which is
- * the light in docs/progress/0007-blender-akhet.png a few minutes earlier.
- */
-const SUN_LOOK: ReadonlyArray<readonly [number, number, Color]> = [
-  [-6, 0.0, new Color('#2c3d63')],
-  [-1, 0.0, new Color('#b4431a')],
-  [2, 0.64, new Color('#d05a1c')],
-  [6, 1.35, new Color('#e8853a')],
-  [12, 2.1, new Color('#f7bb78')],
-  [20, 2.5, new Color('#ffdcae')],
-  [45, 3.0, new Color('#fff1dc')],
-  [70, 3.2, new Color('#fffaf0')],
-];
-
-function between(altitudeDeg: number): { lo: (typeof SUN_LOOK)[number]; hi: (typeof SUN_LOOK)[number]; t: number } {
-  const first = SUN_LOOK[0]!;
-  const last = SUN_LOOK[SUN_LOOK.length - 1]!;
-  if (altitudeDeg <= first[0]) return { lo: first, hi: first, t: 0 };
-  if (altitudeDeg >= last[0]) return { lo: last, hi: last, t: 0 };
-  for (let i = 1; i < SUN_LOOK.length; i++) {
-    const hi = SUN_LOOK[i]!;
-    const lo = SUN_LOOK[i - 1]!;
-    if (altitudeDeg > hi[0]) continue;
-    return { lo, hi, t: (altitudeDeg - lo[0]) / (hi[0] - lo[0]) };
-  }
-  return { lo: last, hi: last, t: 0 };
-}
-
-/** Intensity of the sun's light at an altitude, interpolated through `SUN_LOOK`. */
-export function sunIntensity(altitudeDeg: number): number {
-  const { lo, hi, t } = between(altitudeDeg);
-  return lo[1] + t * (hi[1] - lo[1]);
-}
-
-/** The sun's colour at an altitude, interpolated through the same table. */
-export function sunColour(altitudeDeg: number): Color {
-  const { lo, hi, t } = between(altitudeDeg);
-  return new Color().lerpColors(lo[2], hi[2], t);
 }

@@ -32,18 +32,26 @@ const LOOK = {
    * little of the alloy's own warmth survives when the sky it reflects is dim.
    * The environment map is the sky alone, with no lit ground in it, and a
    * true metal under it at dusk was soot (director, 2026-09-17).
+   *
+   * Since then `Sky.tsx` has put a warm ground in the lower half of that map,
+   * which is where a capstone standing 146 m up sees most of its world, so the
+   * alloy has something gold to reflect and the metalness can go back up
+   * toward the true metal electrum is. What the cap should read as from a
+   * kilometre is a small warm glint, not a lamp, so the roughness stays wide
+   * and the environment share comes down with the ground's arrival.
    */
-  roughness: 0.3,
-  metalness: 0.85,
+  roughness: 0.28,
+  metalness: 0.92,
   /**
    * How much of the scene's environment map this material takes, against the
    * one everything else takes. A metal has no diffuse at all: what it is not
    * reflecting, it is black. The scene holds its environment well down so the
    * sky does not wash every shadow out of a desert at noon, and at that
-   * strength a capstone reads as a lump of soot. Four times it is a look
-   * choice, and the smallest one that leaves electrum looking like metal.
+   * strength a capstone reads as a lump of soot. Three and a half times it is
+   * a look choice, and the smallest that leaves the cap reading gold from the
+   * panorama stand now that half of what it reflects is lit sand.
    */
-  environment: 2.5,
+  environment: 3.5,
 } as const;
 
 /**
