@@ -328,5 +328,25 @@
     "kept": false,
     "note": "ancient state, Anubis in the paint-black2 finish with gilding, 256 samples",
     "bytes": 2336294
+  },
+  {
+    "file": "2026-09-17T19-02-45Z--panorama--478046f.png",
+    "taken": "2026-09-17T19:02:45+00:00",
+    "view": "panorama",
+    "commit": "478046f",
+    "tree": "clean",
+    "kept": false,
+    "note": "Track A, stage 1: the viewer's own panorama under the low December sun, with the physical sky, cascaded shadows, AgX and aerial perspective. Browser at 1600 by 900, not Blender.",
+    "bytes": 3071451
+  },
+  {
+    "file": "2026-09-17T19-02-53Z--night--478046f-dirty.png",
+    "taken": "2026-09-17T19:02:53+00:00",
+    "view": "night",
+    "commit": "478046f",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Track A, stage 1: the viewer at midnight, epoch -2449, sidereal time 205 deg. The star dome, the deep blue night sky and NASA's Milky Way turned by the precession and the horizon frame. Browser at 1600 by 900, not Blender.",
+    "bytes": 1705438
   }
 ]
