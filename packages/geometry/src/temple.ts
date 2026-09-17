@@ -173,3 +173,220 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
   if (pillars !== undefined) temple.pillars = pillars;
   return temple;
 }
+
+// --- The temples a published plan has been read for -------------------------
+//
+// Above this line nothing about a temple is known but its outline and one
+// massing height. Below it, a temple whose plan someone has scaled off a
+// drawing is built from that plan instead: the hall where the plan puts it,
+// the pillars on the pitch the plan draws, the statue plinths on the sockets
+// it marks. Every number comes from `data/measurements` under the footprint's
+// own prefix, so adding a temple is data and never code.
+
+/** How thick the granite lining of a plan-driven hall is drawn, metres. A look choice. */
+export const HALL_LINING = 0.4;
+
+/** How tall a statue plinth is drawn, and how far it stands out of its wall, metres. Look choices. */
+export const PLINTH = { height: 0.6, depth: 1.2, width: 1.6 };
+
+/** The measurement prefix a footprint's plan is recorded under: `khafre.valley_temple` -> `khafre_valley_temple`. */
+export function planPrefix(id: string): string {
+  return id.replace(/\./g, '_');
+}
+
+/** One room of a plan, in metres from the footprint's centroid, east and north. */
+export interface PlanRoom {
+  west: number;
+  east: number;
+  north: number;
+  south: number;
+}
+
+/** What a plan says, read out of the environment under one footprint's prefix. */
+export interface TemplePlanRecords {
+  prefix: string;
+  hall: PlanRoom;
+  pillar?: { across: number; pitchEast: number; pitchNorth: number; rowNorth: number; firstEast: number };
+  statues: { east: number; north: number }[];
+}
+
+/**
+ * The plan the database holds for one footprint, or nothing. The hall is what
+ * makes a plan: without its four faces there is no plan to build, and the
+ * generic massing temple stands instead.
+ */
+export function templePlan(f: Footprint, env: Environment): TemplePlanRecords | undefined {
+  const p = planPrefix(f.id);
+  const room = (['west', 'east', 'north', 'south'] as const).map((side) => env[`${p}.hall.stem.${side}`]);
+  if (room.some((v) => v === undefined || !Number.isFinite(v))) return undefined;
+  const [west, east, north, south] = room as [number, number, number, number];
+  if (!(east > west) || !(north > south)) return undefined;
+
+  const plan: TemplePlanRecords = { prefix: p, hall: { west, east, north, south }, statues: [] };
+  const across = env[`${p}.pillar.across`];
+  const pitchEast = env[`${p}.pillar.pitch.east`];
+  const pitchNorth = env[`${p}.pillar.pitch.north`];
+  const rowNorth = env[`${p}.hall.pillar.row.north`];
+  const firstEast = env[`${p}.hall.pillar.first.east`];
+  if (
+    across !== undefined && across > 0 && pitchEast !== undefined && pitchEast > 0 &&
+    pitchNorth !== undefined && pitchNorth > 0 && rowNorth !== undefined && firstEast !== undefined
+  ) {
+    plan.pillar = { across, pitchEast, pitchNorth, rowNorth, firstEast };
+  }
+  for (let i = 1; ; i++) {
+    const east2 = env[`${p}.statue.${i}.east`];
+    const north2 = env[`${p}.statue.${i}.north`];
+    if (east2 === undefined || north2 === undefined) break;
+    plan.statues.push({ east: east2, north: north2 });
+  }
+  return plan;
+}
+
+/** Where a plan's pillars stand, stepped out from the recorded one on the recorded pitch. */
+export function planPillars(plan: TemplePlanRecords): Xy[] {
+  const p = plan.pillar;
+  if (p === undefined) return [];
+  const half = p.across / 2;
+  const out: Xy[] = [];
+  for (const north of [p.rowNorth, p.rowNorth - p.pitchNorth]) {
+    if (north - half < plan.hall.south || north + half > plan.hall.north) continue;
+    const firstIndex = Math.ceil((plan.hall.west + half - p.firstEast) / p.pitchEast);
+    const lastIndex = Math.floor((plan.hall.east - half - p.firstEast) / p.pitchEast);
+    for (let i = firstIndex; i <= lastIndex; i++) out.push([p.firstEast + i * p.pitchEast, north] as Xy);
+  }
+  return out;
+}
+
+/** One part of a plan-driven temple, with the stone a renderer should give it. */
+export interface TemplePart {
+  name: string;
+  material: 'granite' | 'core';
+  mesh: Mesh;
+}
+
+export interface TemplePlanBuild {
+  parts: TemplePart[];
+  /** The hall's plan, counter-clockwise seen from above, in the frame. */
+  hall: Xy[];
+  label: string;
+}
+
+function rect(cx: number, cy: number, plan: PlanRoom): Xy[] {
+  return [
+    [cx + plan.west, cy + plan.south],
+    [cx + plan.east, cy + plan.south],
+    [cx + plan.east, cy + plan.north],
+    [cx + plan.west, cy + plan.north],
+  ];
+}
+
+function prism(name: string, material: 'granite' | 'core', ring: readonly Xy[], bottom: number, top: number, env: Environment): TemplePart | undefined {
+  const mesh = footprintMesh(
+    { id: name, name, kind: 'prism', group: 'temples', base: bottom, height: top - bottom, area: 0, ring: ring as [number, number][] },
+    env,
+  );
+  return mesh === undefined ? undefined : { name, material, mesh };
+}
+
+/**
+ * One temple built from the plan the database holds for it.
+ *
+ * The mass is the footprint's own solid with the hall left out of it: an
+ * outer wall on the traced outline and four blocks filling what is left
+ * between that wall and the hall, so the hall is a void and not a room drawn
+ * on top of a block. The hall is lined with granite, its pillars stand on the
+ * plan's own pitch, and a statue plinth stands on each socket the plan marks.
+ * `whole` roofs it; `ruined` takes everything to a quarter of its height and
+ * leaves the roof off. Nothing here is a reconstruction of anything the plan
+ * does not draw, and the label says which parts the plan gave.
+ */
+export function templePlanMesh(f: Footprint, env: Environment, state: 'whole' | 'ruined'): TemplePlanBuild | undefined {
+  if (f.group !== 'temples') return undefined;
+  const plan = templePlan(f, env);
+  if (plan === undefined) return undefined;
+  const span = footprintSpan(f, env);
+  if (span === undefined) return undefined;
+  const standing = span.top - span.bottom;
+  const built = env[TEMPLE_BUILT_HEIGHT_KEY];
+  const fromBuilt = state === 'whole' && built !== undefined && built > 0;
+  const height = state === 'whole' ? (fromBuilt ? (built as number) : standing) : TEMPLE_RUIN_FRACTION * standing;
+  if (!(height > 0)) return undefined;
+  const bottom = span.bottom;
+  const top = bottom + height;
+
+  const [cx, cy] = ringCentroid(f.ring);
+  const hall = rect(cx, cy, plan.hall);
+  const inner = insetRing(f.ring, WALL_THICKNESS);
+  const xs = inner.map(([x]) => x);
+  const ys = inner.map(([, y]) => y);
+  const box: PlanRoom = {
+    west: Math.min(...xs) - cx, east: Math.max(...xs) - cx,
+    south: Math.min(...ys) - cy, north: Math.max(...ys) - cy,
+  };
+
+  const parts: TemplePart[] = [];
+  const outer = annulusMesh(f.ring, inner, bottom, top);
+  if (outer === undefined) return undefined;
+  parts.push({ name: 'wall.outer', material: 'core', mesh: outer });
+
+  // What is left of the mass once the hall is taken out of it, as four blocks
+  // between the hall and the outer wall's inner face. Squaring that face off
+  // to its bounding box is a look choice; the traced outlines are near square.
+  const blocks: [string, PlanRoom][] = [
+    ['mass.north', { west: box.west, east: box.east, south: plan.hall.north, north: box.north }],
+    ['mass.south', { west: box.west, east: box.east, south: box.south, north: plan.hall.south }],
+    ['mass.west', { west: box.west, east: plan.hall.west, south: plan.hall.south, north: plan.hall.north }],
+    ['mass.east', { west: plan.hall.east, east: box.east, south: plan.hall.south, north: plan.hall.north }],
+  ];
+  for (const [name, room] of blocks) {
+    if (!(room.east > room.west) || !(room.north > room.south)) continue;
+    const part = prism(name, 'core', rect(cx, cy, room), bottom, top, env);
+    if (part !== undefined) parts.push(part);
+  }
+
+  const lining = annulusMesh(hall, insetRing(hall, HALL_LINING), bottom, top);
+  if (lining !== undefined) parts.push({ name: 'hall.lining', material: 'granite', mesh: lining });
+
+  const pillars = planPillars(plan);
+  const half = (plan.pillar?.across ?? 0) / 2;
+  for (const [i, [east, north]] of pillars.entries()) {
+    const x = cx + east;
+    const y = cy + north;
+    const part = prism(`pillar.${i + 1}`, 'granite',
+      [[x - half, y - half], [x + half, y - half], [x + half, y + half], [x - half, y + half]], bottom, top, env);
+    if (part !== undefined) parts.push(part);
+  }
+
+  for (const [i, s] of plan.statues.entries()) {
+    const x = cx + s.east;
+    const y = cy + s.north;
+    const part = prism(`statue.${i + 1}`, 'granite',
+      [[x - PLINTH.width / 2, y - PLINTH.depth / 2], [x + PLINTH.width / 2, y - PLINTH.depth / 2],
+        [x + PLINTH.width / 2, y + PLINTH.depth / 2], [x - PLINTH.width / 2, y + PLINTH.depth / 2]],
+      bottom, bottom + PLINTH.height, env);
+    if (part !== undefined) parts.push(part);
+  }
+
+  if (state === 'whole') {
+    const roof = footprintMesh({ ...f, base: top, height: ROOF_THICKNESS, heightKey: undefined, batterKey: undefined, bases: undefined }, env);
+    if (roof !== undefined) parts.push({ name: 'roof', material: 'core', mesh: roof });
+  }
+
+  const source = state === 'ruined'
+    ? `${TEMPLE_RUIN_FRACTION} of the ${standing} m of the footprint's own height key`
+    : fromBuilt
+      ? `${height} m from ${TEMPLE_BUILT_HEIGHT_KEY}`
+      : `${height} m from the footprint's own height key`;
+  const label =
+    `Reconstruction: ${f.name} ${state}, built from the plan the database holds under ${plan.prefix}. ` +
+    `The hall stands on ${plan.prefix}.hall.stem.west, .east, .north and .south, ${pillars.length} pillars on ` +
+    `${plan.prefix}.pillar.across and .pitch.east and .pitch.north stepped out from ` +
+    `${plan.prefix}.hall.pillar.first.east and .row.north, and ${plan.statues.length} statue plinths on ` +
+    `${plan.prefix}.statue.<n>.east and .north. Walls to ${source}. Look choices: walls ${WALL_THICKNESS} m ` +
+    `thick, the hall lined ${HALL_LINING} m in granite, plinths ${PLINTH.width} by ${PLINTH.depth} by ` +
+    `${PLINTH.height} m, the mass round the hall squared off to the outline's own bounding box` +
+    (state === 'whole' ? `, and a flat roof slab ${ROOF_THICKNESS} m thick.` : `, and ${TEMPLE_RUIN_FRACTION} of the height as the ruin.`);
+
+  return { parts, hall, label };
+}

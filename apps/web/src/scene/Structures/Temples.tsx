@@ -9,6 +9,12 @@
  * for. The colonnades are granite everywhere, which is a look choice: the
  * monolithic red granite pillars of that temple are the model for all of them
  * and nothing in the database says what the other five were columned with.
+ *
+ * A temple the database holds a plan for arrives with `parts` instead, one
+ * mesh per piece with the stone that piece takes, and is drawn from those:
+ * the mass in its own limestone or granite and the hall's lining, pillars and
+ * statue plinths in granite. Khafre's valley temple is the one so far, from
+ * Hölscher's Blatt XVII. Everything else is still the generic massing.
  */
 import type { Plane } from 'three';
 import type { TempleStructure } from '../../model';
@@ -35,6 +41,25 @@ export function Temples({
         const granite = GRANITE.has(temple.id);
         const role = granite ? 'granite' : whole ? 'casing' : 'core';
         const colour = granite ? COLOURS.granite : whole ? COLOURS.casing : COLOURS.limestone;
+        if (temple.parts !== undefined) {
+          return (
+            <group key={temple.id}>
+              {temple.parts.map((part) => (
+                <Built
+                  key={part.name}
+                  built={temple}
+                  state={state}
+                  clippingPlanes={clippingPlanes}
+                  role={part.material === 'granite' ? 'granite' : role}
+                  colour={part.material === 'granite' ? COLOURS.granite : colour}
+                  stone={{ strength: part.material === 'granite' ? 0.85 : 0.75, relief: part.material === 'granite' ? 0.5 : 0.8 }}
+                  mesh={part.mesh}
+                  part={part.name}
+                />
+              ))}
+            </group>
+          );
+        }
         return (
           <group key={temple.id}>
             <Built

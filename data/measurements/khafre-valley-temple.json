@@ -1,0 +1,132 @@
+[
+  {
+    "key": "khafre_valley_temple.hall.floor.below_g2_base",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 52.67,
+    "unit": "m",
+    "source": "hoelscher-1912",
+    "method": "printed on the plate",
+    "note": "Printed in the lower left corner of Blatt XVII: \"Das Pflaster im Pfeilersaal liegt 51,32 m tiefer als das Pflaster des Statuenhofs im Totentempel, oder 52,67 m tiefer als die Basis der Pyramide.\" This record is the second of the two, the pavement of the pillared hall below the base of the Second Pyramid; khafre_valley_temple.hall.floor.below_g2_mortuary_court is the first. Transcribed, not scaled. Left unverified because the decimals are set as small superscript figures and the Heidelberg scan is 4949 px across the sheet, which puts each of them at about ten pixels; the whole figures 51 and 52 are plain, the decimals were read at the scan's own resolution and should be checked against a better copy.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.floor.below_g2_mortuary_court",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 51.32,
+    "unit": "m",
+    "source": "hoelscher-1912",
+    "method": "printed on the plate",
+    "note": "Printed in the lower left corner of Blatt XVII, the first of the two figures quoted under khafre_valley_temple.hall.floor.below_g2_base: the pavement of the pillared hall lies this far below the pavement of the statue court in Khafre's mortuary temple. Transcribed, not scaled, and unverified for the same reason.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.pillar.across",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 1.01,
+    "unit": "m",
+    "sigma": 0.19,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The side of one of the square monolithic granite pillars of the Pfeilersaal, scaled off Blatt XVII with scripts/plate.py against the plate's own Maßstab. The metre bar's zero stands at x 698 of the scan and its 15 m tick at x 1474, 776 px, so 0.0193299 m per pixel; the cubit bar below it puts 30 ägyptische Ellen at 817 px, 15.79 m, against 15.708 m for a royal cubit of 0.5236 m, 0.53 per cent long, and that is the shrinkage term. The bar's three 5 m intervals are 259, 259 and 258 px. Hölscher prints the pillars in red as well as in stone, and the red lines are what is measured: the north row's pillars stand between red verticals at x 2321 and 2374, 2488 and 2542, 2655 and 2709, 2851 and 2903, a mean width of 53.0 px, and the same row's red horizontals at y 1514 and 1565 give 51.5 px. The value is the mean of the two, 52.25 px. Sigma sums the pixel term 0.109 m (4 px at each end of a drafted line), the drafting tolerance 0.075 m and the shrinkage 0.005 m. The drafting term is half a millimetre on the sheet: the scan carries its own 198 dpi, which makes 776 px 99.5 mm and the plate 1:151, so half a millimetre is 0.075 m on the ground.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.pillar.pitch.east",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 3.233,
+    "unit": "m",
+    "sigma": 0.2,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "How far apart the pillars of the Pfeilersaal's east-west arm stand along that arm, scaled off Blatt XVII with the same bar and shrinkage as khafre_valley_temple.pillar.across. The red verticals bounding the north row's pillars give centres at x 2347.5, 2515.0 and 2682.0 of the scan, two intervals of 167.5 and 167.0 px, mean 167.25 px. Sigma sums the pixel term 0.109 m, the drafting tolerance 0.075 m and the shrinkage 0.016 m.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.pillar.pitch.north",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 3.663,
+    "unit": "m",
+    "sigma": 0.2,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "How far apart the two rows of pillars of the Pfeilersaal's east-west arm stand across it, scaled off Blatt XVII with the same bar and shrinkage as khafre_valley_temple.pillar.across. The red horizontals bounding the north row lie at y 1514 and 1565 of the scan and those bounding the south row at y 1703 and 1755, so the rows' centres are 1539.5 and 1729.0, 189.5 px apart. Sigma sums the pixel term 0.109 m, the drafting tolerance 0.075 m and the shrinkage 0.018 m.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.stem.west",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": -14.38,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The convention for every khafre_valley_temple.hall.* position in this file: metres east (this key and .east) or north (.north and .south) of the centroid of the temple's OSM footprint, data/footprints/giza.json feature khafre.valley_temple, whose centroid is east 392.603, north -493.732 in the project frame; the axes are the frame's own east and north, because Blatt XVII is drawn north up (its magnetic north rose, März 1910, leans about 5 degrees west of the sheet's up) and the registration below turns the plate onto them. Blatt XVII was registered onto that footprint with scripts/plate.py register, fitting rotation, translation and scale on the four corners of the temple's outline: the plate's red ermittelter Grundriß gives the north side at y 471.5, the west side at x 1617.5 and the south side at y 2786, and the east front's outer face is at x 3985, so the corners (1617.5, 471.5), (3985, 471.5), (3985, 2786) and (1617.5, 2786) were paired with the footprint's (371.79, -470.30), (414.60, -471.41), (413.41, -517.17) and (370.61, -516.05). The fit turns the plate -1.488 degrees, scales it at 0.0189118 m per pixel and leaves a residual of 1.394, 1.398, 1.398 and 1.401 m at the four corners, 1.398 m rms: the plate's rectangle is 45.9 m east to west by 44.7 m north to south against the traced outline's 44.0 by 46.9, and a similarity fit splits that difference. That residual, not the plate, is what limits every position here. This record is the west face of the pillared hall's east-west arm, the west end of the red horizontals that draw the hall's own lines, at x 2041 of the scan. Sigma is the registration's 1.398 m rms plus the pixel term 0.107 m (4 px at each end) and the drafting tolerance 0.075 m.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.stem.east",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 0.94,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The east end of the pillared hall's east-west arm, where it opens into the north-south arm, at x 2851 of the scan, the first of the red verticals that draw the north-south arm's western row of pillars. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.stem.north",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 3.74,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The inner face of the north wall of the pillared hall's east-west arm, taken at the inner edge of the row of statue sockets Hölscher draws in red along it, y 1440 of the scan. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.stem.south",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": -3.76,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The inner face of the south wall of the pillared hall's east-west arm, taken at the inner edge of the row of statue sockets Hölscher draws in red along it, y 1837 of the scan. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.pillar.row.north",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 1.91,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The north row of the pillared hall's pillars, its centre line at y 1539.5 of the scan. With khafre_valley_temple.pillar.pitch.north it fixes the south row too, which is why that row is not recorded separately. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.hall.pillar.first.east",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": -8.54,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The westernmost pillar of the east-west arm whose red outline can be read whole on the scan, its centre at x 2347.5. With khafre_valley_temple.pillar.pitch.east it steps the row out east and west inside the hall, which is why the other pillars are not recorded one by one; the plate's pillars stand on a regular pitch and repeating the same interval as sixteen coordinates would be typing one number many times. The twenty-three statue sockets Hölscher draws in red along the hall's walls, the two east entrances and the north-south arm's own walls are not scaled here for want of time, only the north row's socket centres having been detected, at x 2103, 2238, 2361, 2484, 2609, 2739 and 2868 of the scan. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention.",
+    "verified": false
+  }
+]

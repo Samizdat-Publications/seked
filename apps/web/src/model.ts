@@ -18,11 +18,13 @@ import {
   smallPyramidMesh,
   surveyFootprints,
   templeMesh,
+  templePlanMesh,
   type Environment,
   type Footprint,
   type LabelledMesh,
   type Mesh,
   type Solid,
+  type TemplePart,
 } from '@seked/geometry';
 import { databaseOf, type SekedBundle } from './bundle';
 import type { StateId } from './view';
@@ -213,6 +215,13 @@ export interface TempleStructure {
   walls: Mesh;
   roof: Mesh | undefined;
   pillars: Mesh | undefined;
+  /**
+   * The parts of a temple built from a published plan, each with the stone it
+   * takes, where the database holds a plan for this footprint. A temple with
+   * parts is drawn from them and its walls, roof and pillars are the generic
+   * massing that stands in for it when no plan is read.
+   */
+  parts: TemplePart[] | undefined;
 }
 
 /** Everything the scene draws for one state, beside the pyramids and the stand-ins. */
@@ -340,9 +349,12 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
       continue;
     }
     if (f.group === 'temples' && !NOT_A_TEMPLE.has(f.id)) {
+      const planned = templePlanMesh(f, env, whole ? 'whole' : 'ruined');
       const temple = templeMesh(f, env, whole ? 'whole' : 'ruined');
-      if (temple !== undefined) {
-        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: temple.label, walls: temple.walls, roof: temple.roof, pillars: temple.pillars });
+      if (planned !== undefined) {
+        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: planned.label, walls: planned.parts[0]?.mesh ?? (temple?.walls as Mesh), roof: undefined, pillars: undefined, parts: planned.parts });
+      } else if (temple !== undefined) {
+        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: temple.label, walls: temple.walls, roof: temple.roof, pillars: temple.pillars, parts: undefined });
       }
       continue;
     }

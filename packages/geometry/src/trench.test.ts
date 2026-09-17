@@ -3,7 +3,8 @@ import { buildEnvironment } from './environment';
 import type { Footprint } from './footprints';
 import type { Mesh } from './mesh';
 import {
-  capMesh, convexHull, cutWallMesh, dilateHull, SPHINX_MARGIN_KEY, SPHINX_RIM_KEY, sphinxTrenchMesh,
+  capMesh, convexHull, cutWallMesh, dilateHull, edgeMargin, SPHINX_MARGIN_KEY, SPHINX_MARGIN_SIDE_KEYS,
+  SPHINX_RIM_KEY, sphinxTrenchMesh,
 } from './trench';
 
 /** Invented outlines, not measurements: three overlapping boxes standing in for the Sphinx. */
@@ -56,6 +57,27 @@ describe('convexHull and dilateHull', () => {
     expect(out[0]?.[1]).toBeCloseTo(-2, 9);
     expect(out[2]?.[0]).toBeCloseTo(12, 9);
     expect(out[2]?.[1]).toBeCloseTo(12, 9);
+  });
+
+  it('pushes each side of a square out by its own margin', () => {
+    const square: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10]];
+    const out = dilateHull(square, { north: 5, east: 3, south: 1, west: 7 });
+    // Corner i of a counter-clockwise square meets the side before and after it.
+    expect(out[0]).toEqual([expect.closeTo(-7, 9), expect.closeTo(-1, 9)]);
+    expect(out[1]).toEqual([expect.closeTo(13, 9), expect.closeTo(-1, 9)]);
+    expect(out[2]).toEqual([expect.closeTo(13, 9), expect.closeTo(15, 9)]);
+    expect(out[3]).toEqual([expect.closeTo(-7, 9), expect.closeTo(15, 9)]);
+  });
+
+  it('takes a corner edge in the proportion its normal leans', () => {
+    const margins = { north: 10, east: 4, south: 2, west: 6 };
+    expect(edgeMargin(0, 1, margins)).toBeCloseTo(10, 9);
+    expect(edgeMargin(1, 0, margins)).toBeCloseTo(4, 9);
+    expect(edgeMargin(-1, 0, margins)).toBeCloseTo(6, 9);
+    expect(edgeMargin(0, -1, margins)).toBeCloseTo(2, 9);
+    // Due north-east leans equally on both, so it takes their mean.
+    const r = Math.SQRT1_2;
+    expect(edgeMargin(r, r, margins)).toBeCloseTo(7, 9);
   });
 });
 
@@ -144,6 +166,37 @@ describe('sphinxTrenchMesh', () => {
     const trench = sphinxTrenchMesh(env, SPHINX, { groundLevel: -10 });
     expect(extent(trench?.walls as Mesh, 2)[1]).toBeCloseTo(-8, 4);
     expect(trench?.label).toContain(SPHINX_RIM_KEY);
+  });
+
+  it('cuts each side to its own record and names the record side by side', () => {
+    const env = buildEnvironment({
+      [SPHINX_MARGIN_SIDE_KEYS.north]: 14.12,
+      [SPHINX_MARGIN_SIDE_KEYS.west]: 4.19,
+    });
+    const trench = sphinxTrenchMesh(env, SPHINX, { groundLevel: -10, margin: 6 });
+    expect(trench).toBeDefined();
+    // North and west from the database, east and south from the caller's look choice.
+    expect(extent(trench?.walls as Mesh, 1)[1]).toBeCloseTo(20 + 14.12, 3);
+    expect(extent(trench?.walls as Mesh, 0)[0]).toBeCloseTo(-4.19, 3);
+    expect(extent(trench?.walls as Mesh, 0)[1]).toBeCloseTo(70 + 6, 3);
+    expect(extent(trench?.walls as Mesh, 1)[0]).toBeCloseTo(-6, 3);
+    expect(trench?.label).toContain(`north 14.12 m from ${SPHINX_MARGIN_SIDE_KEYS.north}`);
+    expect(trench?.label).toContain(`west 4.19 m from ${SPHINX_MARGIN_SIDE_KEYS.west}`);
+    expect(trench?.label).toContain('south 6 m, a look choice and not a measurement');
+  });
+
+  it('falls back to the uniform record on a side that has none, and says which', () => {
+    const env = buildEnvironment({ [SPHINX_MARGIN_KEY]: 12, [SPHINX_MARGIN_SIDE_KEYS.north]: 14.12 });
+    const trench = sphinxTrenchMesh(env, SPHINX, { groundLevel: -10 });
+    expect(extent(trench?.walls as Mesh, 1)[1]).toBeCloseTo(20 + 14.12, 3);
+    expect(extent(trench?.walls as Mesh, 1)[0]).toBeCloseTo(-12, 3);
+    expect(trench?.label).toContain(`south 12 m from ${SPHINX_MARGIN_KEY}`);
+    expect(trench?.label).not.toContain('a look choice and not a measurement');
+  });
+
+  it('builds nothing when one side is left without any margin at all', () => {
+    const env = buildEnvironment({ [SPHINX_MARGIN_SIDE_KEYS.north]: 14.12 });
+    expect(sphinxTrenchMesh(env, SPHINX, { groundLevel: -10 })).toBeUndefined();
   });
 
   it('says what it is and which of its dimensions are look choices', () => {

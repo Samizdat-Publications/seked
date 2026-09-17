@@ -2,6 +2,7 @@
 Read a drawing without reading it by eye.
 
     python scripts/plate.py render PDF PAGE [--dpi N] [--clip X0 Y0 X1 Y1]
+    python scripts/plate.py render IMAGE [--clip X0 Y0 X1 Y1]
     python scripts/plate.py grid PNG --box X0 Y0 X1 Y1 [--step 50] [--zoom 2]
     python scripts/plate.py scale --bar X0 Y0 X1 Y1 LENGTH [--check X0 Y0 X1 Y1 LENGTH ...]
     python scripts/plate.py measure --mpp M --shrink S --drafting-m D X0 Y0 X1 Y1 [--key K ...]
@@ -15,7 +16,10 @@ the printed figures of the first.
 
 `render` takes the page's embedded scan out of the PDF at its own resolution
 when the page is one image, which the archive.org scans are, so nothing is
-resampled before it is measured. `grid` burns a labelled pixel grid into a
+resampled before it is measured. A plate that arrives as an image rather than
+inside a PDF, which is what an Open Context or IIIF download is, goes through
+the same command: pass the image in place of the PDF, leave the page out, and
+it is converted to PNG at its own resolution, `--clip` then being in pixels. `grid` burns a labelled pixel grid into a
 crop, so a point is located by reading the grid rather than by guessing at a
 picture. `scale` turns a scale bar's two ends into metres per pixel and
 checks it against printed dimensions on the same sheet; how far they disagree
@@ -44,7 +48,31 @@ def cache_dir():
     return base
 
 
+IMAGE_SUFFIXES = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp")
+
+
+def render_image(args):
+    """A plate that is already an image: converted to PNG at its own resolution, `--clip` in pixels."""
+    from PIL import Image
+    Image.MAX_IMAGE_PIXELS = None
+    im = Image.open(args.pdf)
+    if im.mode not in ("RGB", "L"):
+        im = im.convert("RGB")
+    how = "image file, native resolution"
+    if args.clip:
+        im = im.crop(tuple(int(v) for v in args.clip))
+        how += f", cropped to {[int(v) for v in args.clip]} px"
+    stem = os.path.splitext(os.path.basename(args.pdf))[0].replace(" ", "_")
+    suffix = "" if not args.clip else "_clip_" + "_".join(str(int(v)) for v in args.clip)
+    out = args.out or os.path.join(cache_dir(), stem, f"native{suffix}.png")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    im.save(out)
+    print(json.dumps({"png": out, "width": im.width, "height": im.height, "how": how}))
+
+
 def render(args):
+    if args.pdf.lower().endswith(IMAGE_SUFFIXES):
+        return render_image(args)
     import pymupdf
     doc = pymupdf.open(args.pdf)
     page = doc[args.page]
@@ -185,11 +213,12 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    r = sub.add_parser("render", help="a PDF page to PNG, natively where it is one scan")
-    r.add_argument("pdf"); r.add_argument("page", type=int)
+    r = sub.add_parser("render", help="a PDF page, or an image plate, to PNG at its own resolution")
+    r.add_argument("pdf", help="a PDF, or an image file, in which case PAGE is left out")
+    r.add_argument("page", type=int, nargs="?", default=0)
     r.add_argument("--dpi", type=int); r.add_argument("--out")
     r.add_argument("--clip", type=float, nargs=4, metavar=("X0", "Y0", "X1", "Y1"),
-                   help="a region of the page in PDF points, for a page too large to rasterise whole at the dpi wanted")
+                   help="a region of the page in PDF points, or of an image plate in pixels")
     r.set_defaults(fn=render)
 
     g = sub.add_parser("grid", help="a crop with a labelled pixel grid in source coordinates")
