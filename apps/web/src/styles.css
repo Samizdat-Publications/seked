@@ -178,6 +178,48 @@ ul.inputs .value,
   color: var(--ink-soft);
 }
 
+/*
+ * The loading line. Smaller and dimmer than the aside, because it is about
+ * the machine rather than about the plateau, and it goes as soon as the last
+ * file is in. The dot pulses so that a line which is not changing still reads
+ * as something in progress.
+ */
+.caption-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: rgba(236, 230, 216, 0.5);
+}
+
+.caption-loading::before {
+  content: '';
+  width: 0.34rem;
+  height: 0.34rem;
+  border-radius: 999px;
+  background: var(--sand);
+  animation: caption-loading-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes caption-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caption-loading::before {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
 /* The rail */
 
 .rail {

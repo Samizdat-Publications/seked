@@ -21,6 +21,8 @@
  */
 import { useEffect } from 'react';
 import { Color, Vector3, type IUniform, type Material } from 'three';
+import { useView } from '../store';
+import type { StateId } from '../view';
 import { patchMaterial } from './materials/patch';
 import { nightness, type Sun } from './Sky';
 
@@ -61,28 +63,58 @@ const LOOK = {
   sky: { high: new Color('#9db9d8'), low: new Color('#b7a48f'), night: new Color('#1b2740') },
 } as const;
 
+/**
+ * The air of each stop of the timeline. Look choices, and the spec's, in
+ * section 3: the First Time has clearer air, at seven tenths the density, and
+ * a cooler cast to the sky it scatters, because that is the world before the
+ * plateau was a quarry and before the city downwind of it. The other three
+ * stops keep the air the renders were set against. The Cairo haze of `today`
+ * is not here: it is a band low in the east and belongs to the sky, in
+ * `Sky.tsx`.
+ */
+const STATE_AIR: Record<StateId, { density: number; cool: number }> = {
+  ancient: { density: 0.7, cool: 0.2 },
+  built: { density: 1, cool: 0 },
+  stripped: { density: 1, cool: 0 },
+  today: { density: 1, cool: 0 },
+};
+
+/** Where the ancient state's sky colour is drawn toward. A look choice. */
+const CLEAR_SKY = new Color('#93b6dd');
+
 const scratch = new Color();
 
 /**
- * Point the air at the sun and set its colours from the sun's altitude. Call
- * it once where the sun is known; every patched material follows.
+ * Point the air at the sun and set its colours from the sun's altitude and the
+ * stop of the timeline. Call it once where the sun is known; every patched
+ * material follows.
  */
-export function setAtmosphere(sun: Sun): void {
+export function setAtmosphere(sun: Sun, state: StateId): void {
   const night = nightness(sun.altitudeDeg);
   // 1 with the sun on the horizon, 0 with it high: the same shape the sky's
   // own turbidity ramp has, and the reason dusk is the hazy hour.
   const low = Math.min(1, Math.max(0, (18 - sun.altitudeDeg) / 24));
+  const era = STATE_AIR[state];
   (AIR.airSun!.value as Vector3).copy(sun.direction);
   (AIR.airSunColour!.value as Color).copy(scratch.lerpColors(LOOK.sun.high, LOOK.sun.low, low)).lerp(LOOK.sky.night, night);
-  (AIR.airSkyColour!.value as Color).copy(scratch.lerpColors(LOOK.sky.high, LOOK.sky.low, low)).lerp(LOOK.sky.night, night);
+  (AIR.airSkyColour!.value as Color)
+    .copy(scratch.lerpColors(LOOK.sky.high, LOOK.sky.low, low))
+    .lerp(CLEAR_SKY, era.cool * (1 - night))
+    .lerp(LOOK.sky.night, night);
   const day = LOOK.density + (LOOK.lowSunDensity - LOOK.density) * low;
-  AIR.airDensity!.value = day + (LOOK.nightDensity - day) * night;
+  AIR.airDensity!.value = (day + (LOOK.nightDensity - day) * night) * era.density;
   AIR.airScaleHeight!.value = LOOK.scaleHeight;
 }
 
-/** The same, as a hook, for a component that has the sun as a prop. */
+/**
+ * The same, as a hook, for a component that has the sun as a prop. The stop is
+ * read from the store here rather than taken as a second prop, so that the
+ * scene's one call site does not have to be touched to give each state its own
+ * air.
+ */
 export function useAtmosphere(sun: Sun): void {
-  useEffect(() => setAtmosphere(sun), [sun]);
+  const state = useView((s) => s.state);
+  useEffect(() => setAtmosphere(sun, state), [sun, state]);
 }
 
 /**
