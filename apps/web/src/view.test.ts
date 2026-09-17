@@ -147,5 +147,7 @@ describe('sceneEpoch', () => {
     expect(sceneEpoch(-9000, -2449)).toBe(-9000);
     expect(sceneEpoch(null, -2449)).toBe(-2449);
     expect(sceneEpoch(null, undefined)).toBe(DEFAULT_EPOCH);
+    expect(sceneEpoch(null, undefined, 2026)).toBe(2026);
+    expect(sceneEpoch(null, -2449, 2026)).toBe(-2449);
   });
 });

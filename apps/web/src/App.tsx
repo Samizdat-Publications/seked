@@ -18,7 +18,7 @@ import { SunDial } from './ui/SunDial';
 import { Timeline } from './ui/Timeline';
 import { useUi } from './ui/ui';
 import { Views } from './ui/Views';
-import { STATES, sceneEpoch } from './view';
+import { STATES, sceneEpoch, stateById } from './view';
 
 /**
  * The stage. The scene fills the window and every control stands over it on
@@ -36,6 +36,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const layers = useView((s) => s.layers);
   const selected = useView((s) => s.claim);
   const tour = useView((s) => s.tour);
+  const state = useView((s) => s.state);
 
   /**
    * A tour index in the address bar opens the tour at that step, once, now
@@ -80,7 +81,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const claim = bundle.claims.find((c) => c.id === selected);
   // With nothing overridden the scene follows the open claim, so choosing a
   // sky claim puts the sky at the epoch that claim is stated at.
-  const epoch = sceneEpoch(epochOverride, claim?.epoch);
+  const epoch = sceneEpoch(epochOverride, claim?.epoch, stateById(state).epoch);
 
   // The catalogue is expanded once; the dome is rebuilt when the epoch moves
   // and only then, because sidereal time turns it rather than moving its

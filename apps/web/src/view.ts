@@ -215,12 +215,13 @@ export function normaliseLst(deg: number): number {
 
 /**
  * The epoch the scene is actually drawn at: the reader's override if there is
- * one, else the selected claim's own epoch, else the default. So selecting a
- * sky claim snaps the sky to the epoch that claim is stated at, and dragging
- * the slider takes it from there.
+ * one, else the selected claim's own epoch, else the timeline stop's own. So
+ * selecting a sky claim snaps the sky to the epoch that claim is stated at,
+ * moving the timeline takes the sky with it, and dragging the slider takes it
+ * from there.
  */
-export function sceneEpoch(override: number | null, claimEpoch: number | undefined): number {
-  return override ?? claimEpoch ?? DEFAULT_EPOCH;
+export function sceneEpoch(override: number | null, claimEpoch: number | undefined, stateEpoch: number = DEFAULT_EPOCH): number {
+  return override ?? claimEpoch ?? stateEpoch;
 }
 
 function numbers(text: string | null, count: number): number[] | undefined {
