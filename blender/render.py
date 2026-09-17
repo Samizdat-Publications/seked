@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|cutaway|akhet|night] [--state built|today] [--air on|off] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|cutaway|akhet|night] [--state built|today] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -33,7 +33,7 @@ if HERE not in sys.path:
 
 import bpy  # noqa: E402  (only available inside Blender)
 
-from render_materials import STRUCTURE_LABELS, assign_materials, draw_as_section, make_translucent  # noqa: E402
+from render_materials import CAPSTONE, STRUCTURE_LABELS, assign_materials, dress_as_built, draw_as_section, make_translucent  # noqa: E402
 from render_standins import build_standins  # noqa: E402
 from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_milky_way, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
@@ -88,6 +88,23 @@ VIEWS = {
         "exposure": -4.6,
         "fill": 0.0,
         "placeholder_sun": (35.0, 135.0),
+    },
+    "panorama": {
+        # The three pyramids from the desert south of them, Menkaure on the
+        # left and Khufu on the right, under the December sun an hour before it
+        # sets in the south-west: the south faces take the light full on, the
+        # east faces fall into shadow, and the west edges catch it. From here
+        # Khafre and Menkaure show their shaded east faces and Khufu a lit
+        # sliver of his west one, which is what gives the three their depth.
+        "moment": "solstice-winter-sunset-minus-hour",
+        "location": (-100.0, -1700.0, 60.0),
+        "target": (-300.0, -370.0, 58.0),
+        "lens": 45.0,
+        "air_thickness": 0.15,
+        "look": "AgX - Punchy",
+        "exposure": -3.3,
+        "fill": 0.0,
+        "placeholder_sun": (10.3, 234.5),
     },
     "akhet": {
         # Looking at the middle of the gap between the Great Pyramid's
@@ -357,10 +374,16 @@ def setup_view(scene, name, view, bake, air=True):
             make_translucent(g1, view.get("casing_alpha", 0.15))
 
     if air and backdrop is None and not view.get("stars") and view.get("air", True):
-        build_atmosphere(scene, (0.0, 0.0))
+        # A view seen across kilometres of desert thins the air so the far
+        # plateau is not lost in it; the factor is a look choice like the air itself.
+        build_atmosphere(scene, (0.0, 0.0), view.get("air_thickness", 1.0) * (air if isinstance(air, float) else 1.0))
     if view.get("stars"):
         build_star_dome(scene, bake, location)
         build_milky_way(scene, bake)
+    if view.get("look"):
+        # A grade, chosen per view like the exposure: AgX's punchy look holds the
+        # shadow side of a face down where the default leaves it grey.
+        scene.view_settings.look = view["look"]
     scene.view_settings.exposure = view.get("exposure", 0.0)
     describe_camera(location, target, view["lens"], scene.view_settings.exposure)
 
@@ -487,7 +510,7 @@ def configure_render(scene, opts):
 
 
 def main():
-    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "air": "on", "standins": "on", "location": "", "target": "", "lens": "", "bake": SKY_BAKE})
+    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "sphinx": "", "capstone": "stone", "air": "on", "standins": "on", "location": "", "target": "", "lens": "", "bake": SKY_BAKE})
     scene = bpy.context.scene
     if opts["view"] not in VIEWS:
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
@@ -503,14 +526,17 @@ def main():
         view["lens"] = float(opts["lens"])
 
     drawing = "drawing" in view
+    CAPSTONE["finish"] = opts["capstone"]
     assign_materials()
     show_state(opts["state"])
+    dress_as_built(opts["state"])
     if not drawing and opts["standins"] != "off":
-        build_standins(scene)
+        build_standins(scene, opts["state"], [v for v in (opts["sphinx"],) if v])
     if drawing:
         draw_as_section(view["drawing_structure"], view["casing_alpha"])
     show_ground_only(drawing)
-    setup_view(scene, opts["view"], view, load_bake(opts["bake"]), opts["air"] != "off")
+    air = False if opts["air"] == "off" else (True if opts["air"] == "on" else float(opts["air"]))
+    setup_view(scene, opts["view"], view, load_bake(opts["bake"]), air)
     engine, samples = configure_render(scene, opts)
     out = os.path.abspath(opts["out"])
     os.makedirs(os.path.dirname(out), exist_ok=True)

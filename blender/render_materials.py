@@ -489,6 +489,193 @@ def casing_over_granite_material(structure, label, height):
     return mat
 
 
+# --- The casing as it was finished ------------------------------------------
+#
+# The "(as built)" pyramids as they looked the day the last casing stone was
+# dressed: Tura limestone polished to a sheen, laid in courses, with joints so
+# fine Petrie measured them in fiftieths of an inch (drawn wider, so a pixel can hold them), and a capstone of the
+# pyramid's own slope. The course joints are the database's: the Great
+# Pyramid's surveyed courses carried out to the casing's face, and for a
+# pyramid without a course table, or above the last surveyed course, the mean
+# of those courses. The block lengths along a course, the capstone's height (a
+# seked-estimate) and every tone are chosen for the look and are not
+# measurements.
+
+JOINT_RESOLUTION = 0.01
+BLOCK_LENGTH = 1.7
+JOINT_WIDTH = 0.02
+CAPSTONE = {"finish": "stone"}
+
+
+def course_levels_to_apex(structure, height):
+    """Course boundaries from the base to the apex: the structure's own courses, then g1's mean course above them."""
+    values = resolved_values()
+    courses = course_heights(values, structure)
+    mean, _ = mean_course_height()
+    levels, z = [0.0], 0.0
+    for h in courses:
+        if z + h >= height:
+            break
+        z += h
+        levels.append(z)
+    surveyed = len(levels) - 1
+    while z + mean < height:
+        z += mean
+        levels.append(z)
+    return levels, surveyed
+
+
+def course_image(structure, label, height, capstone_level):
+    """
+    A one-pixel-wide image up the pyramid's height, a centimetre a pixel: red
+    marks a course joint (and the joint under the capstone), green is a number
+    drawn per course to stagger its vertical joints, blue the course's index.
+    """
+    name = f"Seked courses ({label})"
+    image = bpy.data.images.get(name)
+    if image is not None:
+        return image
+    levels, surveyed = course_levels_to_apex(structure, height)
+    rows = int(math.ceil(height / JOINT_RESOLUTION)) + 1
+    image = bpy.data.images.new(name, width=1, height=rows, alpha=False, float_buffer=True)
+    # Drawn three centimetres wide: a true joint is a fraction of a millimetre, but a
+    # course line that no pixel can hold is no line at all, and the arris of each
+    # block catches the light over about that much.
+    marks = list(levels[1:]) + ([capstone_level] if capstone_level is not None else [])
+    joints = set(int(round(z / JOINT_RESOLUTION)) + d for z in marks for d in (-1, 0, 1))
+    pixels = [0.0] * (rows * 4)
+    course = 0
+    for row in range(rows):
+        z = row * JOINT_RESOLUTION
+        while course + 1 < len(levels) and z >= levels[course + 1]:
+            course += 1
+        rand = (math.sin((course + 1) * 12.9898) * 43758.5453) % 1.0
+        pixels[row * 4:row * 4 + 4] = [1.0 if row in joints else 0.0, rand, course / max(1, len(levels)), 1.0]
+    image.pixels = pixels
+    image.pack()
+    print(f"{name}: {len(levels) - 1} courses to {height:.3f} m, {surveyed} of them surveyed courses of {structure}, the rest at g1's mean")
+    return image
+
+
+def math_node(tree, operation, a, b=None):
+    node = tree.nodes.new("ShaderNodeMath")
+    node.operation = operation
+    for i, value in enumerate((a, b)):
+        if value is None:
+            continue
+        if isinstance(value, (int, float)):
+            node.inputs[i].default_value = value
+        else:
+            tree.links.new(value, node.inputs[i])
+    return node.outputs[0]
+
+
+def wire_pristine_casing(tree, bsdf, structure, label, vector, normal, height, capstone_level):
+    """Polished Tura limestone with its course joints, staggered block joints, a tone per block and the capstone."""
+    split = tree.nodes.new("ShaderNodeSeparateXYZ")
+    tree.links.new(vector, split.inputs["Vector"])
+    z = split.outputs["Z"]
+
+    image = course_image(structure, label, height, capstone_level)
+    rows = image.size[1]
+    lookup = tree.nodes.new("ShaderNodeCombineXYZ")
+    lookup.inputs["X"].default_value = 0.5
+    tree.links.new(math_node(tree, "DIVIDE", z, rows * JOINT_RESOLUTION), lookup.inputs["Y"])
+    texture = tree.nodes.new("ShaderNodeTexImage")
+    texture.image = image
+    texture.image.colorspace_settings.name = "Non-Color"
+    texture.interpolation = "Closest"
+    texture.extension = "EXTEND"
+    tree.links.new(lookup.outputs["Vector"], texture.inputs["Vector"])
+    course = tree.nodes.new("ShaderNodeSeparateColor")
+    tree.links.new(texture.outputs["Color"], course.inputs["Color"])
+
+    # Along the course: x on the north and south faces, y on the east and west.
+    n = tree.nodes.new("ShaderNodeSeparateXYZ")
+    tree.links.new(normal, n.inputs["Vector"])
+    north_south = math_node(tree, "GREATER_THAN", math_node(tree, "ABSOLUTE", n.outputs["Y"]), math_node(tree, "ABSOLUTE", n.outputs["X"]))
+    along_face = tree.nodes.new("ShaderNodeMix")
+    along_face.data_type = "FLOAT"
+    tree.links.new(north_south, along_face.inputs["Factor"])
+    tree.links.new(split.outputs["Y"], along_face.inputs["A"])
+    tree.links.new(split.outputs["X"], along_face.inputs["B"])
+    t = math_node(tree, "DIVIDE", math_node(tree, "ADD", along_face.outputs["Result"], math_node(tree, "MULTIPLY", course.outputs["Green"], 17.3)), BLOCK_LENGTH)
+    fraction = math_node(tree, "FRACT", t)
+    edge = math_node(tree, "MULTIPLY", math_node(tree, "MINIMUM", fraction, math_node(tree, "SUBTRACT", 1.0, fraction)), BLOCK_LENGTH)
+    joint = math_node(tree, "MAXIMUM", course.outputs["Red"], math_node(tree, "LESS_THAN", edge, JOINT_WIDTH))
+
+    block = tree.nodes.new("ShaderNodeCombineXYZ")
+    tree.links.new(math_node(tree, "FLOOR", t), block.inputs["X"])
+    tree.links.new(math_node(tree, "MULTIPLY", course.outputs["Blue"], 1000.0), block.inputs["Y"])
+    tree.links.new(north_south, block.inputs["Z"])
+    tone = tree.nodes.new("ShaderNodeTexWhiteNoise")
+    tone.noise_dimensions = "3D"
+    tree.links.new(block.outputs["Vector"], tone.inputs["Vector"])
+
+    maps = photographed(tree, vector, "casing", 1.6)
+    if maps is None:
+        colour = mix_colours(tree, noise(tree, vector, 0.04), (0.80, 0.76, 0.67), (0.86, 0.82, 0.73))
+    else:
+        colour = tinted(tree, maps["colour"], (0.84, 0.79, 0.69), 0.78)
+    colour = darken(tree, colour, tone.outputs["Value"], 0.07)
+    colour = darken(tree, colour, joint, 0.45)
+    capstone = math_node(tree, "GREATER_THAN", z, capstone_level if capstone_level is not None else height + 1.0)
+
+    rough = map_range(tree, noise(tree, vector, 0.03, 3.0), 0.14, 0.26)
+    rough = math_node(tree, "MAXIMUM", rough, math_node(tree, "MULTIPLY", joint, 0.7))
+    if CAPSTONE["finish"] == "gold":
+        gold = tree.nodes.new("ShaderNodeMixRGB")
+        gold.blend_type = "MIX"
+        tree.links.new(capstone, gold.inputs["Fac"])
+        tree.links.new(colour, gold.inputs["Color1"])
+        gold.inputs["Color2"].default_value = (1.0, 0.71, 0.29, 1.0)
+        colour = gold.outputs["Color"]
+        tree.links.new(capstone, bsdf.inputs["Metallic"])
+        rough = math_node(tree, "MINIMUM", rough, math_node(tree, "SUBTRACT", 1.0, math_node(tree, "MULTIPLY", capstone, 0.8)))
+    tree.links.new(colour, bsdf.inputs["Base Color"])
+    tree.links.new(rough, bsdf.inputs["Roughness"])
+    bsdf.inputs["Coat Weight"].default_value = 0.12
+    bsdf.inputs["Coat Roughness"].default_value = 0.06
+    if maps is not None:
+        tree.links.new(bump(tree, maps["height"], 0.04, 0.01), bsdf.inputs["Normal"])
+
+
+def pristine_material(structure, label):
+    """The as-built casing for one pyramid: polished Tura limestone over granite where the database has granite."""
+    values = resolved_values()
+    height = values.get(f"{structure}.height.original")
+    capstone = values.get(f"{structure}.pyramidion.height")
+    capstone_level = None if capstone is None else height - capstone
+    granite_height = granite_casing_height(structure)
+    name = f"{CASING_NAME} as finished ({label}, capstone {CAPSTONE['finish']})"
+    mat = bpy.data.materials.get(name)
+    if mat is not None:
+        return mat
+    mat = bpy.data.materials.new(name)
+    tree = node_tree_of(mat)
+    tree.nodes.clear()
+    out = tree.nodes.new("ShaderNodeOutputMaterial")
+    coords = tree.nodes.new("ShaderNodeTexCoord")
+    vector, normal = coords.outputs["Object"], coords.outputs["Normal"]
+    casing = tree.nodes.new("ShaderNodeBsdfPrincipled")
+    wire_pristine_casing(tree, casing, structure, label, vector, normal, height, capstone_level)
+    surface = casing.outputs[0]
+    if granite_height:
+        granite = tree.nodes.new("ShaderNodeBsdfPrincipled")
+        wire_granite(tree, granite, vector)
+        split = tree.nodes.new("ShaderNodeSeparateXYZ")
+        tree.links.new(vector, split.inputs["Vector"])
+        mix = tree.nodes.new("ShaderNodeMixShader")
+        tree.links.new(math_node(tree, "GREATER_THAN", split.outputs["Z"], granite_height), mix.inputs["Fac"])
+        tree.links.new(granite.outputs[0], mix.inputs[1])
+        tree.links.new(surface, mix.inputs[2])
+        surface = mix.outputs[0]
+    tree.links.new(surface, out.inputs["Surface"])
+    capstone_text = "no capstone record" if capstone is None else f"capstone {capstone:.2f} m ({CAPSTONE['finish']}), {structure}.pyramidion.height"
+    print(f"{name}: to {height:.3f} m, {capstone_text}" + (f", granite to {granite_height:.3f} m" if granite_height else ""))
+    return mat
+
+
 def casing_cap_level(structure):
     """
     The level above a pyramid's base where the casing still standing today
@@ -585,6 +772,31 @@ def plateau_material(obj, limestone, granite, pit, basalt=None):
     return limestone
 
 
+def dress_as_built(state):
+    """
+    In the built state the plateau's lesser monuments are finished too: the
+    queens' pyramids, the mastabas, the temples and the causeways take the same
+    dressed Tura limestone as the great pyramids' casing instead of today's
+    stripped, stepped core. Granite, basalt and the pits keep their own. Their
+    forms stay the massings the footprints give; only the finish changes, and
+    that finish is the reconstruction.
+    """
+    if state != "built":
+        return 0
+    fine = casing_material()
+    dressed = 0
+    for obj in bpy.data.objects:
+        if obj.type != "MESH" or obj.get("seked_structure") != "plateau":
+            continue
+        if obj.get("seked_kind") == "pit" or obj.get("seked_footprint") in GRANITE_FOOTPRINTS or obj.get("seked_footprint") == "khufu.basalt_pavement":
+            continue
+        obj.data.materials.clear()
+        obj.data.materials.append(fine)
+        dressed += 1
+    print(f"state built: {dressed} of the plateau's masses dressed in {CASING_NAME}")
+    return dressed
+
+
 MASTABA_NAME = "Core limestone (mastaba courses)"
 
 
@@ -663,6 +875,8 @@ def assign_materials():
         height = granite_casing_height(structure)
         if height:
             cased[f"{label} (as built)"] = casing_over_granite_material(structure, label, height)
+        if resolved_values().get(f"{structure}.height.original") is not None:
+            cased[f"{label} (as built)"] = pristine_material(structure, label)
         level = casing_cap_level(structure)
         if level is not None:
             cased[f"{label} (today)"] = cap_over_core_material(structure, label, level)

@@ -578,12 +578,12 @@ def _volume_material(name, colour, extinction, falloff=None):
     return mat
 
 
-def build_atmosphere(scene, centre):
-    """Haze over the whole view and dust low over the plateau, both invisible to shadow rays."""
+def build_atmosphere(scene, centre, thickness=1.0):
+    """Haze over the whole view and dust low over the plateau, both invisible to shadow rays; `thickness` scales both."""
     haze = _box("Air (haze)", HAZE_HALF_WIDTH_M, -60.0, HAZE_TOP_M)
-    haze.data.materials.append(_volume_material("Air haze", HAZE_COLOUR, HAZE_EXTINCTION))
+    haze.data.materials.append(_volume_material("Air haze", HAZE_COLOUR, HAZE_EXTINCTION * thickness))
     dust = _box("Air (dust)", DUST_HALF_WIDTH_M, -40.0, DUST_TOP_M)
-    dust.data.materials.append(_volume_material("Air dust", DUST_COLOUR, DUST_EXTINCTION, (DUST_BASE_M, DUST_SCALE_M)))
+    dust.data.materials.append(_volume_material("Air dust", DUST_COLOUR, DUST_EXTINCTION * thickness, (DUST_BASE_M, DUST_SCALE_M)))
     for obj in (haze, dust):
         obj.location = (centre[0], centre[1], 0.0)
         scene.collection.objects.link(obj)
@@ -597,7 +597,7 @@ def build_atmosphere(scene, centre):
         # time; camera and scattered rays still see them. Shadow linking was
         # tried first and does not reach volume attenuation in Blender 5.1.
         obj.visible_shadow = False
-    print(f"air: haze {HAZE_EXTINCTION:g} per m to {HAZE_TOP_M:g} m, dust {DUST_EXTINCTION:g} per m from {DUST_BASE_M:g} m "
+    print(f"air: haze {HAZE_EXTINCTION * thickness:g} per m to {HAZE_TOP_M:g} m, dust {DUST_EXTINCTION * thickness:g} per m from {DUST_BASE_M:g} m "
           f"falling off over {DUST_SCALE_M:g} m; look choices, not measurements; invisible to shadow rays")
 
 

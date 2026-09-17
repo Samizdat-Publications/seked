@@ -57,6 +57,22 @@ describe('the sky bake', () => {
     expect(moment.sun.azimuthDeg).toBeGreaterThan(env['sun.equinox.rise.azimuth']!); // the sun swings south as it climbs
   });
 
+  it('mirrors the afternoon sun about the meridian from the morning one', () => {
+    const morning = bake.moments['equinox-sunrise-plus-hour']!.sun;
+    const afternoon = bake.moments['equinox-sunset-minus-hour']!.sun;
+    expect(afternoon.altitudeDeg).toBeCloseTo(morning.altitudeDeg, 6);
+    expect(afternoon.azimuthDeg).toBeCloseTo(360 - morning.azimuthDeg, 6);
+  });
+
+  it('sets the winter afternoon sun south of west and below the equinox one', () => {
+    const winter = bake.moments['solstice-winter-sunset-minus-hour']!.sun;
+    const equinox = bake.moments['equinox-sunset-minus-hour']!.sun;
+    expect(winter.azimuthDeg).toBeGreaterThan(180);
+    expect(winter.azimuthDeg).toBeLessThan(equinox.azimuthDeg - 20);
+    expect(winter.altitudeDeg).toBeGreaterThan(SUN_STANDARD_ALTITUDE_DEG);
+    expect(winter.altitudeDeg).toBeLessThan(equinox.altitudeDeg);
+  });
+
   it('puts the night sun below the horizon, so the night view is a night', () => {
     const moment = bake.moments['alnitak-transit']!;
     expect(moment.epoch).toBe(bake.stars.epoch);

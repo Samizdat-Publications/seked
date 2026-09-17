@@ -7,6 +7,15 @@ Generate a stand-in model with Meshy from freely licensed photographs.
 A stand-in in blender/models.json may carry a `meshy` block instead of a
 `sketchfab` id: the endpoint (`image-to-3d` or `multi-image-to-3d`), the
 photographs by Wikimedia Commons file name, and the options sent with them.
+For a form nothing photographs, because it no longer exists, the endpoint is
+`text-to-3d`: a `prompt` builds the mesh (Meshy's preview) and `refine`
+options texture it, and the prompt is the whole of what the model was told.
+For a form that is lost but whose body still stands, the endpoint is
+`restyle`: the photographs of what stands go to Meshy's image-to-image model
+with an `image_prompt` saying what to restore or change, the images it makes
+are kept beside the model, and those images are built into the mesh by
+multi-image to 3D, so the proportions come from the photographs and only the
+restored parts from the prompt.
 `generate` downloads each photograph at `width` pixels, sends them as data
 URIs, waits for the task, and writes the GLB, the task record and Meshy's
 thumbnails into build/models/<ID>/. It also keeps a copy under
@@ -42,7 +51,7 @@ MANIFEST = os.path.join(ROOT, "blender", "models.json")
 OUT = os.path.join(ROOT, "build", "models")
 KEYS = os.path.join(os.path.expanduser("~"), ".seked", "keys.env")
 KEEP = os.path.join(os.path.expanduser("~"), ".seked", "models")
-API = "https://api.meshy.ai/openapi/v1"
+API = "https://api.meshy.ai/openapi"
 AGENT = {"User-Agent": "seked/0.1 (Giza survey model; stand-in reference photographs)"}
 
 
@@ -59,7 +68,9 @@ def key():
 
 def call(method, path, body=None):
     data = json.dumps(body).encode() if body is not None else None
-    request = urllib.request.Request(f"{API}/{path}", data=data, method=method, headers={
+    # Paths name their API version only when it is not v1: text to 3D lives under v2.
+    url = f"{API}/{path}" if path.startswith("v2/") else f"{API}/v1/{path}"
+    request = urllib.request.Request(url, data=data, method=method, headers={
         "Authorization": f"Bearer {key()}", "Content-Type": "application/json"})
     try:
         return json.load(urllib.request.urlopen(request, timeout=300))
@@ -95,7 +106,11 @@ def generate(args):
         sys.exit(f"{args.id}: no model with a meshy block in {MANIFEST}")
     spec = model["meshy"]
     endpoint = spec["endpoint"]
+    if endpoint == "text-to-3d":
+        return finish(args, spec, *from_text(spec), photos=[])
     photos, uris = [], []
+    if endpoint == "restyle" and args.image:
+        sys.exit("restyle takes its photographs from the manifest")
     if args.image and not args.tag:
         sys.exit("--image tries other photographs, so give it a --tag to keep the result apart")
     for title in args.image or spec["images"]:
@@ -103,6 +118,8 @@ def generate(args):
         photos.append(record)
         uris.append("data:image/jpeg;base64," + base64.b64encode(data).decode())
         print(f"photograph {record['file']} ({record['license']}), {len(data) / 1e6:.1f} MB")
+    if endpoint == "restyle":
+        return finish(args, spec, *restyled(spec, uris), photos=photos)
     body = dict(spec.get("options", {}))
     if endpoint == "multi-image-to-3d":
         body["image_urls"] = uris
@@ -110,6 +127,10 @@ def generate(args):
         body["image_url"] = uris[0]
     task_id = call("POST", endpoint, body)["result"]
     print(f"task {task_id} created on {endpoint}")
+    return finish(args, spec, task_id, wait(endpoint, task_id), photos)
+
+
+def wait(endpoint, task_id):
     while True:
         task = call("GET", f"{endpoint}/{task_id}")
         if task["status"] in ("SUCCEEDED", "FAILED", "CANCELED"):
@@ -118,6 +139,45 @@ def generate(args):
         time.sleep(20)
     if task["status"] != "SUCCEEDED":
         sys.exit(f"task {task_id} {task['status']}: {task.get('task_error')}")
+    return task
+
+
+def from_text(spec):
+    """Meshy's two stages for a prompt: the untextured mesh, then its texture; the refine task is the result."""
+    endpoint = "v2/text-to-3d"
+    body = dict(spec.get("options", {}), mode="preview", prompt=spec["prompt"])
+    preview = call("POST", endpoint, body)["result"]
+    print(f"preview task {preview} created")
+    done = wait(endpoint, preview)
+    print(f"preview {preview}: {done.get('consumed_credits')} credits")
+    refine = call("POST", endpoint, dict(spec.get("refine", {}), mode="refine", preview_task_id=preview))["result"]
+    print(f"refine task {refine} created")
+    task = wait(endpoint, refine)
+    task["consumed_credits"] = (task.get("consumed_credits") or 0) + (done.get("consumed_credits") or 0)
+    task["preview_task"] = preview
+    return refine, task
+
+
+def restyled(spec, uris):
+    """The photographs changed by the image model, then built into a mesh; the made images ride along on the task."""
+    body = dict(spec.get("image_options", {}), prompt=spec["image_prompt"], reference_image_urls=uris)
+    image_task = call("POST", "image-to-image", body)["result"]
+    print(f"image-to-image task {image_task} created")
+    images = wait("image-to-image", image_task)
+    urls = images["image_urls"]
+    print(f"image-to-image {image_task}: {len(urls)} images, {images.get('consumed_credits')} credits")
+    mesh_body = dict(spec.get("options", {}), image_urls=urls[:4])
+    mesh_task = call("POST", "multi-image-to-3d", mesh_body)["result"]
+    print(f"multi-image-to-3d task {mesh_task} created")
+    task = wait("multi-image-to-3d", mesh_task)
+    task["consumed_credits"] = (task.get("consumed_credits") or 0) + (images.get("consumed_credits") or 0)
+    task["image_task"] = image_task
+    task["made_images"] = urls
+    return mesh_task, task
+
+
+def finish(args, spec, task_id, task, photos):
+    endpoint = spec["endpoint"]
     name = f"{args.id}-{args.tag}" if args.tag else args.id
     folder = os.path.join(OUT, name)
     os.makedirs(folder, exist_ok=True)
@@ -129,7 +189,12 @@ def generate(args):
         if url:
             with open(os.path.join(folder, f"thumb-{side}.png"), "wb") as f:
                 f.write(urllib.request.urlopen(url, timeout=120).read())
-    record = {"task": task_id, "endpoint": endpoint, "options": spec.get("options", {}), "photographs": photos,
+    for i, url in enumerate(task.get("made_images") or []):
+        with open(os.path.join(folder, f"made-{i}.png"), "wb") as f:
+            f.write(urllib.request.urlopen(url, timeout=120).read())
+    record = {"task": task_id, "preview_task": task.get("preview_task"), "image_task": task.get("image_task"), "endpoint": endpoint,
+              "prompt": spec.get("prompt"), "image_prompt": spec.get("image_prompt"), "image_options": spec.get("image_options"),
+              "options": spec.get("options", {}), "refine": spec.get("refine"), "photographs": photos,
               "consumed_credits": task.get("consumed_credits"), "finished_at": task.get("finished_at"),
               "sha256": sha256_of(path)}
     with open(os.path.join(folder, "task.json"), "w", encoding="utf-8") as f:

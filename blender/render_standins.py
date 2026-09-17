@@ -109,8 +109,9 @@ def cut_and_reduce(mesh, cut_z, faces, largest_only=False):
     bm.from_mesh(mesh)
     if largest_only:
         print(f"  dropped {largest_part(bm)} loose parts")
-    geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
-    bmesh.ops.bisect_plane(bm, geom=geom, plane_co=(0.0, 0.0, cut_z), plane_no=(0.0, 0.0, 1.0), clear_inner=True)
+    if cut_z is not None:
+        geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
+        bmesh.ops.bisect_plane(bm, geom=geom, plane_co=(0.0, 0.0, cut_z), plane_no=(0.0, 0.0, 1.0), clear_inner=True)
     bm.to_mesh(mesh)
     bm.free()
     obj = bpy.data.objects.new(mesh.name, mesh)
@@ -158,7 +159,9 @@ def fit(obj, model, features):
     base = min(f["base"] for f in rings)
     # The model's ground, where its sculpted sand meets the figure, goes on the
     # outline's base; what the cut left of its plinth below that sinks under the terrain.
-    z0 = model.get("ground_z", min(v.z for v in verts))
+    z0 = model.get("ground_z")
+    if z0 is None:
+        z0 = min(v.z for v in verts)
     rotated_mid = Matrix.Rotation(turn, 2) @ (m_mid * scale)
     obj.data.transform(Matrix.Translation((0.0, 0.0, -z0)))
     obj.scale = (scale, scale, scale)
@@ -169,17 +172,33 @@ def fit(obj, model, features):
     return {"scale": scale, "turn_deg": math.degrees(turn), "length_m": o_len, "height_m": height, "osm_height_m": tallest}
 
 
-def build_standins(scene):
-    """Every stand-in the manifest names and build/models/ holds, fitted and labelled; the OSM solids they replace hidden."""
+def chosen(models, state, variants):
+    """
+    The stand-ins a render shows. A model names the `states` it belongs to (a
+    model that names none belongs to every one) and may be a `variant`, such as
+    the lion Sphinx, which is shown only when asked for and then instead of the
+    ordinary model for the same outlines. A retired model is never shown.
+    """
+    live = [m for m in models if not m.get("retired") and state in m.get("states", [state])]
+    groups = {}
+    for model in live:
+        groups.setdefault(tuple(sorted(model["replaces"])), []).append(model)
+    picked = []
+    for group in groups.values():
+        wanted = [m for m in group if m.get("variant") in variants]
+        picked.extend(wanted[:1] if wanted else [m for m in group if not m.get("variant")][:1])
+    return picked
+
+
+def build_standins(scene, state="today", variants=()):
+    """The stand-ins for this state and these variants, fitted and labelled; the OSM solids they replace hidden."""
     if not os.path.exists(INDEX):
         print(f"no {INDEX}: no stand-in models; run python scripts/models.py")
         return []
     index = json.load(open(INDEX, encoding="utf-8"))["models"]
     features = (load_footprints() or {}).get("features", [])
     built = []
-    for model in json.load(open(MANIFEST, encoding="utf-8"))["models"]:
-        if model.get("retired"):
-            continue
+    for model in chosen(json.load(open(MANIFEST, encoding="utf-8"))["models"], state, variants):
         entry = index.get(model["id"])
         if entry is None:
             print(f"stand-in {model['id']}: not downloaded; run python scripts/models.py")
@@ -195,6 +214,8 @@ def build_standins(scene):
         obj["seked_standin"] = model["attribution"]
         obj["seked_license"] = model["license"]
         obj["seked_replaces"] = ", ".join(model["replaces"])
+        if model.get("evidence"):
+            obj["seked_evidence"] = model["evidence"]
         for other in bpy.data.objects:
             if other.get("seked_footprint") in model["replaces"]:
                 other.hide_set(True)

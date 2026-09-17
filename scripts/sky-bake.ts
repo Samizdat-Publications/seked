@@ -168,6 +168,14 @@ export function buildSkyBake(presetId = 'canonical'): SkyBake {
   // the file.
   const risenLst = required(day, 'sun.equinox.rise.lst', SKY) + DEGREES_PER_HOUR;
   const risen = altAz({ raDeg: 0, decDeg: 0, latDeg: latitudeDeg, lstDeg: risenLst });
+  // The mirror of it: the equinox sun an hour before it sets, low in the west.
+  const settingLst = required(day, 'sun.equinox.set.lst', SKY) - DEGREES_PER_HOUR;
+  const setting = altAz({ raDeg: 0, decDeg: 0, latDeg: latitudeDeg, lstDeg: settingLst });
+  // The December solstice sun an hour before it sets: declination minus the
+  // obliquity of date and right ascension 270, the same event the environment's
+  // sun.solstice.winter keys describe, so it sets far to the south of west.
+  const winterSettingLst = required(day, 'sun.solstice.winter.set.lst', SKY) - DEGREES_PER_HOUR;
+  const winterSetting = altAz({ raDeg: 270, decDeg: -required(day, 'sun.obliquity', SKY), latDeg: latitudeDeg, lstDeg: winterSettingLst });
 
   const moments: Record<string, BakedMoment> = {
     'equinox-sunrise': {
@@ -186,6 +194,26 @@ export function buildSkyBake(presetId = 'canonical'): SkyBake {
         altitude: `altAz(ra 0, dec 0) at lst = sun.equinox.rise.lst + ${DEGREES_PER_HOUR} deg`,
       },
       note: 'The equinox sun has declination zero at every epoch, so this pair does not move with the date.',
+    },
+    'equinox-sunset-minus-hour': {
+      label: 'The equinox sun an hour before it sets, low in the west-south-west',
+      epoch: SUN_EPOCH,
+      sun: { azimuthDeg: round(setting.azDeg), ...altitudes(setting.altDeg) },
+      from: {
+        azimuth: `altAz(ra 0, dec 0) at lst = sun.equinox.set.lst - ${DEGREES_PER_HOUR} deg`,
+        altitude: `altAz(ra 0, dec 0) at lst = sun.equinox.set.lst - ${DEGREES_PER_HOUR} deg`,
+      },
+      note: 'The afternoon twin of equinox-sunrise-plus-hour: the same altitude, its azimuth mirrored about the meridian.',
+    },
+    'solstice-winter-sunset-minus-hour': {
+      label: 'The December solstice sun an hour before it sets, low in the south-west',
+      epoch: SUN_EPOCH,
+      sun: { azimuthDeg: round(winterSetting.azDeg), ...altitudes(winterSetting.altDeg) },
+      from: {
+        azimuth: `altAz(ra 270, dec -sun.obliquity) at lst = sun.solstice.winter.set.lst - ${DEGREES_PER_HOUR} deg`,
+        altitude: `altAz(ra 270, dec -sun.obliquity) at lst = sun.solstice.winter.set.lst - ${DEGREES_PER_HOUR} deg`,
+      },
+      note: 'A light chosen for the as-built views: the low winter sun rakes the south faces instead of skimming them.',
     },
     'solstice-summer-sunset': {
       label: 'Summer solstice, the sun setting into the gap between the Great Pyramid and Khafre\'s, seen from the Sphinx',
