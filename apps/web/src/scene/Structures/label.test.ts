@@ -49,9 +49,15 @@ describe('what a monument says when it is pointed at', () => {
     // The queens have no recorded slope, so the label says the angle follows
     // from the square and the height rather than from a measurement.
     expect(queen?.note).toContain('tier3.queens.slope');
+    // A temple with no plan read for it says its form is the generic massing.
+    const massed = s.temples.find((t) => t.parts === undefined);
+    expect(massed?.note).toContain('tier3.temple.height.built');
+    expect(massed?.note).toContain('Not a reconstruction of this temple');
+    // Khafre's valley temple has Hölscher's Blatt XVII behind it, so its label
+    // names the plan's own keys instead.
     const temple = s.temples.find((t) => t.id === 'khafre.valley_temple');
-    expect(temple?.note).toContain('tier3.temple.height.built');
-    expect(temple?.note).toContain('Not a reconstruction of this temple');
+    expect(temple?.note).toContain('khafre_valley_temple.hall.stem.west');
+    expect(temple?.note).toContain('Look choices');
   });
 
   it('says of a massing that its extent is the monument’s and its form is not', () => {

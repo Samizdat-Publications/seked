@@ -211,9 +211,15 @@ describe('the lesser monuments per state', () => {
     const whole = model.plateau.structures('built');
     const ruined = model.plateau.structures('today');
     // The roofs, the colonnades, the causeway's roof and the pits' lids are the early states' alone.
-    expect(whole.temples.every((t) => t.roof !== undefined)).toBe(true);
-    expect(whole.temples.some((t) => t.pillars !== undefined)).toBe(true);
-    expect(ruined.temples.every((t) => t.roof === undefined && t.pillars === undefined)).toBe(true);
+    // A temple built from a published plan carries its roof and its pillars
+    // among its parts instead of on their own fields.
+    const roofed = (t: (typeof whole.temples)[number]): boolean =>
+      t.roof !== undefined || (t.parts?.some((p) => p.name === 'roof') ?? false);
+    const columned = (t: (typeof whole.temples)[number]): boolean =>
+      t.pillars !== undefined || (t.parts?.some((p) => p.name.startsWith('pillar.')) ?? false);
+    expect(whole.temples.every(roofed)).toBe(true);
+    expect(whole.temples.some(columned)).toBe(true);
+    expect(ruined.temples.every((t) => !roofed(t))).toBe(true);
     expect(whole.causewayRoof).toBeDefined();
     expect(ruined.causewayRoof).toBeUndefined();
     expect(whole.pitCovers).toBeDefined();

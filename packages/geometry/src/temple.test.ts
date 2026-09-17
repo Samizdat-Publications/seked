@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { insetRing, type Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
 import {
-  annulusMesh, colonnadeMesh, PILLAR, pointInRing, ROOF_THICKNESS, TEMPLE_BUILT_HEIGHT_KEY,
-  TEMPLE_RUIN_FRACTION, templeMesh, WALL_THICKNESS,
+  annulusMesh, colonnadeMesh, PILLAR, planPillars, planPrefix, pointInRing, ROOF_THICKNESS,
+  TEMPLE_BUILT_HEIGHT_KEY, TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh, WALL_THICKNESS,
 } from './temple';
 
 /** An invented outline, not a measurement: a 60 by 40 m court. */
@@ -146,5 +146,120 @@ describe('templeMesh', () => {
     expect(templeMesh(temple({ group: 'mastabas' }), ENV, 'whole')).toBeUndefined();
     expect(templeMesh(temple(), {}, 'whole')).toBeUndefined();
     expect(templeMesh(temple(), {}, 'ruined')).toBeUndefined();
+  });
+});
+
+// --- a temple built from a plan --------------------------------------------
+
+/** An invented plan, not a measurement: a hall in the middle of the 60 by 40 m court. */
+const PLAN_ENV: Record<string, number> = {
+  ...ENV,
+  'khafre_valley_temple.hall.stem.west': -12,
+  'khafre_valley_temple.hall.stem.east': 8,
+  'khafre_valley_temple.hall.stem.north': 5,
+  'khafre_valley_temple.hall.stem.south': -5,
+  'khafre_valley_temple.pillar.across': 1,
+  'khafre_valley_temple.pillar.pitch.east': 4,
+  'khafre_valley_temple.pillar.pitch.north': 6,
+  'khafre_valley_temple.hall.pillar.row.north': 3,
+  'khafre_valley_temple.hall.pillar.first.east': -8,
+  'khafre_valley_temple.statue.1.east': -11,
+  'khafre_valley_temple.statue.1.north': 4,
+  'khafre_valley_temple.statue.2.east': 7,
+  'khafre_valley_temple.statue.2.north': -4,
+};
+
+function planned(extra: Partial<Footprint> = {}): Footprint {
+  return temple({ id: 'khafre.valley_temple', name: 'Valley temple of Khafre', ...extra });
+}
+
+describe('templePlan and planPillars', () => {
+  it('reads the prefix off the footprint id', () => {
+    expect(planPrefix('khafre.valley_temple')).toBe('khafre_valley_temple');
+  });
+
+  it('finds no plan unless all four faces of the hall are recorded', () => {
+    expect(templePlan(planned(), ENV)).toBeUndefined();
+    const short = { ...PLAN_ENV };
+    delete short['khafre_valley_temple.hall.stem.south'];
+    expect(templePlan(planned(), short)).toBeUndefined();
+  });
+
+  it('reads the hall, the pillar grid and every statue socket in order', () => {
+    const plan = templePlan(planned(), PLAN_ENV);
+    expect(plan?.hall).toEqual({ west: -12, east: 8, north: 5, south: -5 });
+    expect(plan?.pillar?.across).toBe(1);
+    expect(plan?.statues).toHaveLength(2);
+  });
+
+  it('steps the pillars out from the recorded one and keeps them inside the hall', () => {
+    const plan = templePlan(planned(), PLAN_ENV) as NonNullable<ReturnType<typeof templePlan>>;
+    const pillars = planPillars(plan);
+    // Two rows, at north 3 and -3; along the hall, -8 stepped by 4 while the
+    // whole pillar stays between -12 and 8.
+    expect(pillars).toHaveLength(8);
+    expect(new Set(pillars.map(([, y]) => y))).toEqual(new Set([3, -3]));
+    const xs = [...new Set(pillars.map(([x]) => x))].sort((a, b) => a - b);
+    expect(xs).toEqual([-8, -4, 0, 4]);
+  });
+
+  it('drops a row the recorded pitch would push through a wall', () => {
+    const wide = { ...PLAN_ENV, 'khafre_valley_temple.pillar.pitch.north': 20 };
+    const plan = templePlan(planned(), wide) as NonNullable<ReturnType<typeof templePlan>>;
+    expect(new Set(planPillars(plan).map(([, y]) => y))).toEqual(new Set([3]));
+  });
+});
+
+describe('templePlanMesh', () => {
+  it('builds nothing without a plan, while the generic temple still builds', () => {
+    expect(templePlanMesh(planned(), ENV, 'whole')).toBeUndefined();
+    expect(templeMesh(planned(), ENV, 'whole')).toBeDefined();
+  });
+
+  it('builds the mass, the lining, a pillar apiece and a plinth apiece, each with its stone', () => {
+    const built = templePlanMesh(planned(), PLAN_ENV, 'whole') as NonNullable<ReturnType<typeof templePlanMesh>>;
+    const names = built.parts.map((p) => p.name);
+    expect(names).toContain('wall.outer');
+    expect(names.filter((n) => n.startsWith('mass.'))).toHaveLength(4);
+    expect(names).toContain('hall.lining');
+    expect(names.filter((n) => n.startsWith('pillar.'))).toHaveLength(8);
+    expect(names.filter((n) => n.startsWith('statue.'))).toHaveLength(2);
+    expect(names).toContain('roof');
+    for (const part of built.parts) expect(wellFormed(part.mesh)).toBe(true);
+    const granite = built.parts.filter((p) => p.material === 'granite').map((p) => p.name);
+    expect(granite).toContain('hall.lining');
+    expect(granite).toContain('pillar.1');
+    expect(granite).toContain('statue.1');
+    expect(granite).not.toContain('wall.outer');
+  });
+
+  it('keeps the hall inside the footprint and the pillars and plinths inside the hall', () => {
+    const built = templePlanMesh(planned(), PLAN_ENV, 'whole') as NonNullable<ReturnType<typeof templePlanMesh>>;
+    for (const corner of built.hall) expect(pointInRing(corner, insetRing(RING, WALL_THICKNESS))).toBe(true);
+    for (const part of built.parts) {
+      if (!part.name.startsWith('pillar.') && !part.name.startsWith('statue.')) continue;
+      for (let i = 0; i < part.mesh.positions.length; i += 3) {
+        const p: [number, number] = [part.mesh.positions[i] as number, part.mesh.positions[i + 1] as number];
+        expect(pointInRing(p, built.hall), `${part.name} ${p[0]}, ${p[1]}`).toBe(true);
+      }
+    }
+  });
+
+  it('leaves the roof off a ruin and takes it to a quarter of the height', () => {
+    const whole = templePlanMesh(planned(), PLAN_ENV, 'whole') as NonNullable<ReturnType<typeof templePlanMesh>>;
+    const ruin = templePlanMesh(planned(), PLAN_ENV, 'ruined') as NonNullable<ReturnType<typeof templePlanMesh>>;
+    expect(ruin.parts.map((p) => p.name)).not.toContain('roof');
+    const top = (b: typeof whole): number =>
+      Math.max(...b.parts.filter((p) => p.name === 'wall.outer').map((p) => span(p.mesh)[1]));
+    expect(top(ruin) - 4.61).toBeCloseTo(TEMPLE_RUIN_FRACTION * (top(whole) - 4.61), 6);
+  });
+
+  it('says what the plan gave it and what is a look choice', () => {
+    const built = templePlanMesh(planned(), PLAN_ENV, 'whole') as NonNullable<ReturnType<typeof templePlanMesh>>;
+    expect(built.label).toContain('Reconstruction');
+    expect(built.label).toContain('khafre_valley_temple.hall.stem.west');
+    expect(built.label).toContain('8 pillars');
+    expect(built.label).toContain('2 statue plinths');
+    expect(built.label).toContain('Look choices');
   });
 });
