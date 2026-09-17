@@ -10,16 +10,19 @@
  *
  * What is missing is its plan. This builds it as the outlines OSM traced for
  * the body, the paws and the head, taken together and pushed out by a margin.
- * The margin comes from `sphinx.enclosure.margin` where the database carries
- * that record, and no source in this database has supplied it yet; failing
- * that, from the caller, which is then a look choice and never a measurement.
- * The label says which of the two it was, in those words, wherever the trench
- * is shown.
+ * The margin is read per side, from `sphinx.enclosure.margin.north`, `.south`,
+ * `.east` and `.west`, because the ditch is not a constant offset from the
+ * statue; a side the database cannot answer falls back to the uniform
+ * `sphinx.enclosure.margin`, and failing that to the caller, which is then a
+ * look choice and never a measurement. The label says, side by side, which of
+ * those it was, wherever the trench is shown.
  *
- * The record would come off a published plan, read with `scripts/plate.py`
- * against its own scale bar, with a sigma and `method: "scaled from plate"`,
- * never verified. `arce-sphinx-1991` is already a source in the database and
- * is the obvious plan to read.
+ * The per-side records came off ARCE drawing d-gen-008, the project's inked
+ * 1:200 map of the ditch and amphitheatre, read with `scripts/plate.py`
+ * against its own scale bar: `method: "scaled from plate"`, with a sigma, and
+ * never verified. The south side is not recorded, because that plate draws
+ * the ditch's south edge hard against the statue's own foot over most of its
+ * length, so there is no floor strip there to scale.
  *
  * Frame as everywhere else: +X east, +Y north, +Z up, metres.
  */
@@ -28,8 +31,20 @@ import type { Environment } from './environment';
 import { triangulate, type Footprint } from './footprints';
 import type { Mesh } from './mesh';
 
-/** The record that would give the trench its plan. Nothing in data/measurements carries it yet. */
+/** The record that gives the trench one margin all round, where no side has its own. */
 export const SPHINX_MARGIN_KEY = 'sphinx.enclosure.margin';
+
+/** The four sides of the cut, in the order a label names them. */
+export const SPHINX_SIDES = ['north', 'east', 'south', 'west'] as const;
+export type SphinxSide = (typeof SPHINX_SIDES)[number];
+
+/** The records that give the trench a margin of its own on each side. */
+export const SPHINX_MARGIN_SIDE_KEYS: Record<SphinxSide, string> = {
+  north: `${SPHINX_MARGIN_KEY}.north`,
+  east: `${SPHINX_MARGIN_KEY}.east`,
+  south: `${SPHINX_MARGIN_KEY}.south`,
+  west: `${SPHINX_MARGIN_KEY}.west`,
+};
 
 /** The record that would give the rim its level, in place of a caller passing the terrain's. */
 export const SPHINX_RIM_KEY = 'sphinx.enclosure.rim.elevation';
@@ -65,12 +80,35 @@ export function convexHull(points: readonly Xy[]): Xy[] {
   return [...half(sorted), ...half([...sorted].reverse())];
 }
 
+/** A margin per side of the cut, or one margin for all four. */
+export type SphinxMargins = Record<SphinxSide, number>;
+
 /**
- * A convex outline pushed out by `margin` along each vertex's own bisector.
- * Only used on a hull, where every corner turns the same way and the bisector
- * cannot fold back on itself.
+ * How far an edge whose outward normal is `(nx, ny)` is pushed out. An edge
+ * facing due north takes the north margin and one facing due east the east
+ * one; a corner edge takes them in the proportion its normal leans, so the
+ * margin turns smoothly round the hull instead of jumping at 45 degrees.
  */
-export function dilateHull(hull: readonly Xy[], margin: number): Xy[] {
+export function edgeMargin(nx: number, ny: number, margins: SphinxMargins): number {
+  const ax = Math.abs(nx);
+  const ay = Math.abs(ny);
+  const sum = ax + ay;
+  if (sum === 0) return margins.north;
+  const alongX = nx >= 0 ? margins.east : margins.west;
+  const alongY = ny >= 0 ? margins.north : margins.south;
+  return (ax * alongX + ay * alongY) / sum;
+}
+
+/**
+ * A convex outline pushed out along each vertex's own bisector, by one margin
+ * all round or by a margin per side. Each vertex goes to where its two edges'
+ * offset lines cross, which for equal margins is the plain mitre. Only used
+ * on a hull, where every corner turns the same way and the bisector cannot
+ * fold back on itself.
+ */
+export function dilateHull(hull: readonly Xy[], margin: number | SphinxMargins): Xy[] {
+  const margins: SphinxMargins =
+    typeof margin === 'number' ? { north: margin, east: margin, south: margin, west: margin } : margin;
   const n = hull.length;
   return hull.map(([x, y], i) => {
     const [px, py] = hull[(i + n - 1) % n] as Xy;
@@ -83,8 +121,18 @@ export function dilateHull(hull: readonly Xy[], margin: number): Xy[] {
     const n1y = -(x - px) / l1;
     const n2x = (qy - y) / l2;
     const n2y = -(qx - x) / l2;
-    const mitre = 1 / Math.max(1e-9, 1 + n1x * n2x + n1y * n2y);
-    return [x + (n1x + n2x) * margin * mitre, y + (n1y + n2y) * margin * mitre] as Xy;
+    const m1 = edgeMargin(n1x, n1y, margins);
+    const m2 = edgeMargin(n2x, n2y, margins);
+    // Solve n1·d = m1, n2·d = m2 for the vertex's own shift.
+    const det = n1x * n2y - n1y * n2x;
+    if (Math.abs(det) < 1e-9) {
+      const mitre = 1 / Math.max(1e-9, 1 + n1x * n2x + n1y * n2y);
+      const m = (m1 + m2) / 2;
+      return [x + (n1x + n2x) * m * mitre, y + (n1y + n2y) * m * mitre] as Xy;
+    }
+    const dx = (m1 * n2y - m2 * n1y) / det;
+    const dy = (n1x * m2 - n2x * m1) / det;
+    return [x + dx, y + dy] as Xy;
   });
 }
 
@@ -139,9 +187,10 @@ export interface SphinxTrenchOptions {
    */
   groundLevel?: number | ((x: number, y: number) => number);
   /**
-   * The margin to push the outlines out by where the database carries no
+   * The margin to push the outlines out by on a side the database can answer
+   * neither from `sphinx.enclosure.margin.<side>` nor from the uniform
    * `sphinx.enclosure.margin`. It is a look choice, it is never a
-   * measurement, and the label says so.
+   * measurement, and the label says so of every side that took it.
    */
   margin?: number;
 }
@@ -156,17 +205,35 @@ export interface SphinxTrenchOptions {
  * its own top, so the cut follows the slope the plateau actually has here,
  * which falls twelve metres from the Sphinx's back to its paws.
  *
- * Without a margin, from the database or from the caller, and without a rim
- * from either place, nothing is built.
+ * Each side takes its own `sphinx.enclosure.margin.<side>` where the database
+ * has one and the uniform margin, or the caller's, where it has not. Without
+ * a margin for every side, and without a rim from either place, nothing is
+ * built.
  */
 export function sphinxTrenchMesh(
   env: Environment,
   features: readonly Footprint[],
   options: SphinxTrenchOptions = {},
 ): SphinxTrench | undefined {
-  const recorded = env[SPHINX_MARGIN_KEY];
-  const margin = recorded ?? options.margin;
-  if (margin === undefined || !(margin > 0)) return undefined;
+  const uniform = env[SPHINX_MARGIN_KEY] ?? options.margin;
+  const sources = {} as Record<SphinxSide, string>;
+  const margins = {} as SphinxMargins;
+  for (const side of SPHINX_SIDES) {
+    const key = SPHINX_MARGIN_SIDE_KEYS[side];
+    const own = env[key];
+    if (own !== undefined && own > 0) {
+      margins[side] = own;
+      sources[side] = `${own} m from ${key}`;
+    } else if (uniform !== undefined && uniform > 0) {
+      margins[side] = uniform;
+      sources[side] =
+        env[SPHINX_MARGIN_KEY] !== undefined
+          ? `${uniform} m from ${SPHINX_MARGIN_KEY}, the database carrying no ${key}`
+          : `${uniform} m, a look choice and not a measurement, because the database carries no ${key}`;
+    } else {
+      return undefined;
+    }
+  }
 
   const parts = features.filter((f) => SPHINX_PARTS.includes(f.id));
   if (parts.length === 0) return undefined;
@@ -174,7 +241,7 @@ export function sphinxTrenchMesh(
 
   const hull = convexHull(parts.flatMap((f) => f.ring as Xy[]));
   if (hull.length < 3) return undefined;
-  const outline = dilateHull(hull, margin);
+  const outline = dilateHull(hull, margins);
 
   const rimRecord = env[SPHINX_RIM_KEY];
   const ground = options.groundLevel;
@@ -204,10 +271,7 @@ export function sphinxTrenchMesh(
       : typeof ground === 'function'
         ? `a rim following the ground the caller gave, ${Math.min(...rim).toFixed(2)} to ${highest.toFixed(2)} m round the cut`
         : `a rim at ${highest} m, the ground the caller gave`;
-  const marginWord =
-    recorded !== undefined
-      ? `${margin} m from ${SPHINX_MARGIN_KEY}`
-      : `${margin} m, a look choice and not a measurement, because the database carries no ${SPHINX_MARGIN_KEY}`;
+  const marginWord = SPHINX_SIDES.map((side) => `${side} ${sources[side]}`).join(', ');
 
   return {
     floor: capMesh(outline, floorLevel),
@@ -216,7 +280,7 @@ export function sphinxTrenchMesh(
     floorLevel,
     label:
       `Reconstruction: the Sphinx enclosure, the outlines of ${parts.map((f) => f.id).join(', ')} taken ` +
-      `together and pushed out by ${marginWord}, its floor at ${floorLevel} m, ` +
+      `together and pushed out side by side, ${marginWord}, its floor at ${floorLevel} m, ` +
       `which is the lowest of their own base levels, and its walls vertical to ${rimWord}. ` +
       'Look choices: the three outlines read as their convex hull rather than their true union, and walls ' +
       'cut vertically rather than following the quarried steps.',

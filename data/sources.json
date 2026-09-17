@@ -390,5 +390,23 @@
     "url": "https://giza.fas.harvard.edu/pubdocs/128/full/",
     "license": "Free to read from Harvard's Digital Giza",
     "note": "Read from the PDF Digital Giza serves without a login, https://d1g9lvwdq3dcse.cloudfront.net/images/MFA-images/Giza/GizaImage/full/library/reisner_gn_books/giza_necropolis_1/giza_necropolis_1.pdf, which has a text layer. Page citations are Reisner's printed pages; the PDF's page index runs 48 ahead of them (index 460 is p. 412). Appendix A describes the core mastabas of the Western Field tomb by tomb. Read on 2026-09-16."
+  },
+  {
+    "id": "arce-sphinx-mapping-oc",
+    "kind": "survey",
+    "year": 2017,
+    "citation": "Lehner, M. (2017). ARCE Sphinx Project 1979-1983 Archive. Open Context, project 141e814a-ba2d-4560-879f-80f1afb019e9, https://doi.org/10.6078/M7CZ356B. Drawing d-gen-008, an inked 1:200 map of the Sphinx ditch and amphitheatre, contoured, drawn by Mark Lehner; Open Context media record e094ec21-d3c4-47bc-9cd3-158e20eeb397, cited as ark:/28722/k2ks7036q.",
+    "url": "https://opencontext.org/media/e094ec21-d3c4-47bc-9cd3-158e20eeb397",
+    "license": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0. Attribution: Mark Lehner, ARCE Sphinx Project 1979-1983 Archive, Open Context.",
+    "note": "The scale drawings of the Sphinx that the ARCE Sphinx Project made between 1979 and 1983, 6,048 media records in all, published on Open Context under CC BY 4.0 and served as full TIFFs and as a IIIF service on archive.org. Drawing d-gen-008 carries a printed scale of 1:200 in its own metadata, a scale bar ticked every 5 m from 10 m above zero to 50 m below it, and the project's own 10 m survey grid as crosses over the ditch floor. Fetched on 2026-09-17 to build/plates/ (gitignored) through https://iiif.archive.org/iiif/opencontext-101-drawing-d-gen-008/full/6726,/0/default.jpg, the full width of the scan, 6726 by 6225 pixels; nothing from it is committed but the numbers. The plate draws no dimension, so everything taken from it is scaled and never verified."
+  },
+  {
+    "id": "hoelscher-1912",
+    "kind": "survey",
+    "year": 1912,
+    "citation": "Hölscher, U. (1912). Das Grabdenkmal des Königs Chephren. Veröffentlichungen der Ernst von Sieglin Expedition in Ägypten 1. Leipzig: J. C. Hinrichs. Blatt XVII, \"Der Torbau des Königs Chephren bei Gise nach den Ausgrabungen im Jahre 1910\", surveyed U. Hölscher and O. Schultze, drawn O. Schultze, March 1910.",
+    "url": "https://digi.ub.uni-heidelberg.de/diglit/hoelscher1912",
+    "license": "Heidelberg University Library states rightsstatements.org/vocab/InC/1.0 (In Copyright) over the digitisation and asks that use follow https://www.ub.uni-heidelberg.de/helios/digi/nutzung/index.html. The 1912 text and plates are themselves out of copyright in the United States; Hölscher died in 1963, so Germany's term runs to 2034. Nothing of the scan is committed, only measurements taken from it.",
+    "note": "Hölscher's survey of Khafre's valley temple, which he calls the Torbau. Not on archive.org: searches there for the author, the title and the series all came back empty (see docs/geometry-blockers.md). Read from Heidelberg's IIIF service, which is not behind the bot challenge their HTML and their PDF download are: manifest https://digi.ub.uni-heidelberg.de/diglit/iiif/hoelscher1912/manifest, plate image https://digi.ub.uni-heidelberg.de/iiif/2/hoelscher1912%3A120a_XVII.jpg/full/max/0/default.jpg, 4949 by 3764 pixels, fetched 2026-09-17 to build/plates/ (gitignored). URN urn:nbn:de:bsz:16-diglit-267936, DOI 10.11588/diglit.26793, shelfmark Heidelberg UB C 2637-9-5 Folio::1. Blatt XVII carries a double Maßstab, metres above and Egyptian cubits below, a Zeichenerklärung naming the materials, and a magnetic-north rose dated März 1910."
   }
 ]

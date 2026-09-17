@@ -1,0 +1,26 @@
+[
+  {
+    "key": "sphinx.enclosure.margin.north",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 14.12,
+    "unit": "m",
+    "sigma": 0.57,
+    "source": "arce-sphinx-mapping-oc",
+    "method": "scaled from plate",
+    "note": "How far the floor of the Sphinx ditch reaches north of the statue, scaled off ARCE drawing d-gen-008 with scripts/plate.py. The plate's own scale bar, ticked at 10 m above zero and every 5 m below it, runs from its 10 tick at (560, 2259) to its 40 tick at (560, 4238.5) of the native scan, 1979.5 px for 50 m, so 0.0252589 m per pixel; the project's own survey grid, drawn as crosses over the ditch floor, checks it, its crosses standing 393.9 px apart on rows 3809 and 4800 where the bar makes 10 m 395.9 px, so the bar reads 0.54 per cent long and that is the shrinkage term. Measured on three columns, from the foot of the north wall to the northern foot of the statue: x 2500, 3608.5 to 4171.0; x 2750, 3591.5 to 4141.5; x 3000, 3585.0 to 4149.5, that is 562.5, 550.0 and 564.5 px. The value is their mean, 559.0 px. Sigma sums the pixel term 0.214 m (6 px at each end, the wall's foot being a rock edge and not a drafted line), the drafting tolerance 0.10 m (half a millimetre at the plate's printed 1:200), the shrinkage 0.076 m and half the columns' spread, 0.183 m. The enclosure is not a constant offset from the statue: this is the figure at the mid-body, where both the wall and the flank run straight, and packages/geometry/src/trench.ts applies it uniformly along the north side. The builder pushes out the convex hull of the OSM outlines sphinx.body, sphinx.paws and sphinx.head, and that hull is larger than the statue this plate draws: the plate's statue runs 2758 px, 69.7 m, from its western foot at x 1795 to the paws' eastern foot at x 4553, against the hull's 75.1 m, so the hull already stands about 2.7 m proud of the statue at each end. Nothing corrects for that here; the trench's label says the hull is a look choice.",
+    "verified": false
+  },
+  {
+    "key": "sphinx.enclosure.margin.west",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 4.19,
+    "unit": "m",
+    "sigma": 0.7,
+    "source": "arce-sphinx-mapping-oc",
+    "method": "scaled from plate",
+    "note": "How far the floor of the Sphinx ditch reaches west of the rump, scaled off ARCE drawing d-gen-008 with scripts/plate.py against the same scale bar and shrinkage as sphinx.enclosure.margin.north, 0.0252589 m per pixel and 0.54 per cent. Measured on the two rows through the rump's widest part, where the perpendicular to both curves runs east to west: row 4400, from the floor's outer edge at x 1622.5 to the rump's western foot at x 1803.0, 180.5 px; row 4450, 1628.0 to 1779.5, 151.5 px. The value is their mean, 166.0 px. Sigma sums the pixel term 0.214 m (6 px at each end), the drafting tolerance 0.10 m (half a millimetre at 1:200), the shrinkage 0.021 m and half the rows' spread, 0.366 m. Both the rump and the ditch's west end are round and not concentric, so the margin varies along them; row 4350 reads 235 px and row 4550 only 58 px, and those rows are left out because the perpendicular there is no longer east to west. A second curve inside the floor's outer edge, at x 1731 on row 4400, is a step in the floor and is not what is measured. No record is entered for the south: over most of the statue's length this plate draws the ditch's south side hard against the statue's own southern foot, with no floor strip to scale, and further east the rock simply falls away towards Khafre's causeway with no cut edge the plate maps.",
+    "verified": false
+  }
+]

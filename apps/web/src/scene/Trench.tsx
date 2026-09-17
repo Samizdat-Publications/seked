@@ -8,12 +8,14 @@
  * at the lowest of their own base levels and walls rising to the plateau's
  * own surface at each vertex of the plan.
  *
- * Two things here are named look choices and nothing here is a measurement.
- * The margin is one, because the database carries no `sphinx.enclosure.margin`
- * and the ARCE plan that would give one has not been read; the label the
- * geometry writes says so in those words, and the hover note carries it. The
- * other is that the walls are cut vertically rather than following the
- * quarried steps and the wider western corridor.
+ * The margin is now read per side. `sphinx.enclosure.margin.north` and
+ * `.west` are scaled off the ARCE 1:200 map of the amphitheatre; the east and
+ * the south still fall back to the look choice below, because that plate maps
+ * no floor strip on the south and the east is the Sphinx Temple's business.
+ * The label the geometry writes names, side by side, which of the two each
+ * one was, and the hover note carries it. The other named look choice is that
+ * the walls are cut vertically rather than following the quarried steps and
+ * the wider western corridor.
  *
  * The ground is not dug here. The plateau grid is Copernicus GLO-30 at 20 m
  * and a vertical cut a hundred metres across cannot live in samples that far
@@ -38,15 +40,15 @@ import { useStoneMaterial } from './materials/useStoneMaterial';
 import type { TerrainProps } from './Terrain';
 
 /**
- * How far the cut stands clear of the traced outlines, in metres, where the
- * database carries no record for it.
+ * How far the cut stands clear of the traced outlines, in metres, on a side
+ * for which the database carries no record.
  *
- * A LOOK CHOICE, not a measurement. The plan asks for four metres north and
- * south and six west; `dilateHull` pushes every side out alike, so this is
- * the one number and it is the larger of the two, which keeps the cut's east
- * edge clear of the Sphinx Temple's own outline six metres beyond the paws.
- * The figure to replace it with is `sphinx.enclosure.margin`, scaled off the
- * ARCE 1:200 map of the amphitheatre with `scripts/plate.py`.
+ * A LOOK CHOICE, not a measurement, and only the east and the south take it
+ * now. Six metres keeps the cut's east edge clear of the Sphinx Temple's own
+ * outline beyond the paws. The figures that would replace it are
+ * `sphinx.enclosure.margin.east` and `.south`; the ARCE 1:200 map of the
+ * amphitheatre gave the north and the west but draws no floor strip south of
+ * the statue to scale.
  */
 const LOOK = { marginMetres: 6 };
 
