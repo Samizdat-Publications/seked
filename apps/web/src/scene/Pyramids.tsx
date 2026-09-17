@@ -1,10 +1,23 @@
 import { DEG } from '@seked/units';
-import { useEffect, useMemo, type RefObject } from 'react';
-import { BufferGeometry, DoubleSide, FrontSide, type MeshPhysicalMaterial, type Plane } from 'three';
+import { useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, type RefObject } from 'react';
+import {
+  AdditiveBlending,
+  BufferGeometry,
+  CanvasTexture,
+  DoubleSide,
+  FrontSide,
+  SRGBColorSpace,
+  type MeshPhysicalMaterial,
+  type Plane,
+  type SpriteMaterial,
+  type Texture,
+} from 'three';
 import type { PyramidParams } from '../model';
 import { useView } from '../store';
-import type { StateId } from '../view';
+import { sceneEpoch, stateById, type StateId } from '../view';
 import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import { useSun, type Observer } from './Sky';
 import { CASING_COLOUR, applyCasing } from './materials/casing';
 import { ELECTRUM_COLOUR, applyElectrum } from './materials/metal';
 import { useStoneMaterial } from './materials/useStoneMaterial';
@@ -37,12 +50,24 @@ export const isCased = (state: StateId): boolean => CASED_STATES.includes(state)
  */
 export function Pyramids({
   pyramids,
+  observer,
   clippingPlanes,
 }: {
   pyramids: PyramidParams[];
+  /** Where the plateau is, for the sun the night corona comes up under. */
+  observer: Observer;
   clippingPlanes: Plane[];
 }): React.JSX.Element {
   const state = useView((s) => s.state);
+  const epochOverride = useView((s) => s.epoch);
+  // The corona wants to know how far the sun has gone down. Nothing in the
+  // store carries that yet, so it is worked out here out of `@seked/sky`, the
+  // same call `useSun` makes for the scene's own light, at the stop's own
+  // epoch. A selected claim's epoch is App's and does not reach this far, so
+  // the corona can be an hour of sidereal time out of step with the dome
+  // while a dated claim is open; when the sun's altitude arrives in the store
+  // this goes.
+  const sun = useSun(observer, sceneEpoch(epochOverride, undefined, stateById(state).epoch));
   // The course tops the casing's joints are drawn at, worked out once for all
   // three: a pyramid with no course table of its own is coursed at the mean of
   // the pyramid that has one, which is what render_materials.py does and says.
@@ -61,8 +86,94 @@ export function Pyramids({
           clippingPlanes={clippingPlanes}
         />
       ))}
+      {state === 'ancient' &&
+        pyramids.map((params) => <ApexCorona key={params.id} params={params} altitudeDeg={sun.altitudeDeg} />)}
     </>
   );
+}
+
+/**
+ * The one exception the spec allows itself, section 3.1.3: at night in the
+ * First Time the apexes carry a faint corona, like St Elmo's fire. It is the
+ * only nod to the pyramids-as-machines reading, it is a claim, the caption
+ * says so in that state, and it is off in every other one. Track H's
+ * `useHoverLabel` is where the words "apex glow: a claim" belong on the
+ * pyramid's own label, and it is not merged here yet.
+ *
+ * Every number is a look choice. It comes up as the sun goes from six to
+ * twelve degrees under, which is civil to nautical twilight and is when a
+ * faint thing becomes visible at all; it is forty metres across, which is
+ * about a fifth of a base and reads at a kilometre without becoming a
+ * streetlight; and it breathes on two slow sines beating against each other,
+ * so it never repeats on a count anyone could keep.
+ */
+const CORONA = {
+  metres: 40,
+  colour: '#cfe0ff',
+  strength: 0.45,
+  seconds: 7,
+  /** Sun altitude in degrees where it begins to come up, and where it is full. */
+  dusk: [-6, -12] as const,
+} as const;
+
+function ApexCorona({ params, altitudeDeg }: { params: PyramidParams; altitudeDeg: number }): React.JSX.Element | null {
+  const material = useRef<SpriteMaterial>(null);
+  const texture = useMemo(() => coronaTexture(), []);
+  const [begins, full] = CORONA.dusk;
+  const night = Math.min(1, Math.max(0, (begins - altitudeDeg) / (begins - full)));
+  useFrame(({ clock }) => {
+    const m = material.current;
+    if (!m) return;
+    const t = clock.elapsedTime;
+    const beat = Math.sin((t * 2 * Math.PI) / CORONA.seconds) * Math.sin((t * 2 * Math.PI) / (CORONA.seconds * 0.37));
+    m.opacity = CORONA.strength * night * (0.75 + 0.25 * beat);
+  });
+  if (night <= 0) return null;
+  return (
+    <sprite
+      position={[params.offsetEast, params.offsetNorth, params.offsetUp + params.height]}
+      scale={[CORONA.metres, CORONA.metres, CORONA.metres]}
+    >
+      <spriteMaterial
+        ref={material}
+        map={texture}
+        color={CORONA.colour}
+        transparent
+        depthWrite={false}
+        blending={AdditiveBlending}
+        toneMapped={false}
+      />
+    </sprite>
+  );
+}
+
+/**
+ * The corona's own falloff, drawn once into a canvas: a bright core going off
+ * fast and a long faint skirt, which is what a glow around a point looks like
+ * through air. A look choice like everything else about it.
+ */
+let CORONA_TEXTURE: Texture | undefined;
+
+function coronaTexture(): Texture {
+  if (CORONA_TEXTURE) return CORONA_TEXTURE;
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    const half = size / 2;
+    const glow = ctx.createRadialGradient(half, half, 0, half, half, half);
+    glow.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    glow.addColorStop(0.16, 'rgba(255, 255, 255, 0.5)');
+    glow.addColorStop(0.45, 'rgba(255, 255, 255, 0.11)');
+    glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, size, size);
+  }
+  CORONA_TEXTURE = new CanvasTexture(canvas);
+  CORONA_TEXTURE.colorSpace = SRGBColorSpace;
+  return CORONA_TEXTURE;
 }
 
 /**

@@ -83,7 +83,7 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
       <group rotation={[-Math.PI / 2, 0, 0]}>
         <Sky sun={sun} observer={observer} stars={sky} furniture={layers.sky} />
         <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
-        {layers.pyramids && <Pyramids pyramids={model.pyramids} clippingPlanes={planes} />}
+        {layers.pyramids && <Pyramids pyramids={model.pyramids} observer={observer} clippingPlanes={planes} />}
         {layers.pyramids && <Masses massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
         <Standins />
