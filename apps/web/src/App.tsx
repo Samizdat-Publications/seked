@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { brightStarsOf } from './bundle';
 import type { LoadedBundle } from './load';
 import { buildModel } from './model';
@@ -10,8 +10,18 @@ import { Tour } from './panels/Tour';
 import { Scene } from './scene/Scene';
 import { domeBuffers, namedOnDome } from './sky';
 import { useView } from './store';
-import { sceneEpoch } from './view';
+import { Caption } from './ui/Caption';
+import { Drawer } from './ui/Drawer';
+import { Rail } from './ui/Rail';
+import { useUi } from './ui/ui';
+import { STATES, sceneEpoch } from './view';
 
+/**
+ * The stage. The scene fills the window and every control stands over it on
+ * dark glass: the caption top left, the rail of drawers down the right edge,
+ * the instruments along the bottom. Only one drawer shows at a time, and all
+ * of them stay mounted, so the tour keeps its keys with the stage clear.
+ */
 export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const { bundle, heights } = loaded;
   const preset = useView((s) => s.preset);
@@ -21,6 +31,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const krupp = useView((s) => s.krupp);
   const layers = useView((s) => s.layers);
   const selected = useView((s) => s.claim);
+  const tour = useView((s) => s.tour);
 
   /**
    * A tour index in the address bar opens the tour at that step, once, now
@@ -31,11 +42,26 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
    * which is what `decodeView` falls back to.
    */
   useEffect(() => {
-    const { tour, camera, goToStep, showCamera } = useView.getState();
-    if (tour === null) return;
-    goToStep(tour);
+    const { tour: step, camera, goToStep, showCamera } = useView.getState();
+    if (step === null) return;
+    goToStep(step);
     showCamera(camera);
   }, []);
+
+  /**
+   * Starting the tour opens its drawer, because a tour with its narration in
+   * a shut cupboard is a slideshow. Stepping on from there leaves the drawer
+   * wherever the reader has put it.
+   */
+  const wasRunning = useRef(false);
+  const openDrawer = useUi((s) => s.open);
+  useEffect(() => {
+    const running = tour !== null;
+    if (running && !wasRunning.current) openDrawer('tour');
+    wasRunning.current = running;
+  }, [tour, openDrawer]);
+
+  useShellKeys();
 
   const model = useMemo(() => buildModel(bundle, preset, cubit, epochOverride), [bundle, preset, cubit, epochOverride]);
   const header = bundle.terrain.header;
@@ -79,23 +105,78 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const overlay = useMemo(() => overlaySpec(claim, overlayContext), [claim, overlayContext]);
 
   return (
-    <div className="app">
+    <div className="shell">
       <main className="stage">
         <Scene model={model} terrain={terrain} layers={layers} overlay={overlay} sky={sky} />
       </main>
-      <aside className="panel">
-        <header className="masthead">
-          <h1>Seked</h1>
-          <p>Giza as the measurement database has it, with the claims evaluated live against it.</p>
-        </header>
-        <Tour />
-        <PresetPicker presets={bundle.presets} />
-        <CubitSlider model={model} />
-        <SkyControls epoch={epoch} named={named} claim={claim} latitudeDeg={model.latitudeDeg} longitudeDeg={model.env['g1.center.longitude'] ?? 0} />
-        <LayerToggles />
-        <SectionControls model={model} />
-        <Claims claims={bundle.claims} model={model} context={overlayContext} />
-      </aside>
+
+      <Caption epoch={epoch} claimId={selected} />
+
+      <div className="drawers">
+        <Drawer id="views">
+          <p className="note">The hero cameras arrive here.</p>
+        </Drawer>
+        <Drawer id="layers">
+          <LayerToggles />
+        </Drawer>
+        <Drawer id="claims">
+          <PresetPicker presets={bundle.presets} />
+          <CubitSlider model={model} />
+          <Claims claims={bundle.claims} model={model} context={overlayContext} />
+        </Drawer>
+        <Drawer id="section">
+          <SectionControls model={model} />
+        </Drawer>
+        <Drawer id="sky">
+          <SkyControls
+            epoch={epoch}
+            named={named}
+            claim={claim}
+            latitudeDeg={model.latitudeDeg}
+            longitudeDeg={model.env['g1.center.longitude'] ?? 0}
+          />
+        </Drawer>
+        <Drawer id="tour">
+          <Tour />
+        </Drawer>
+        <Drawer id="about">
+          <p className="note">What this is, and where its surfaces come from, arrives here.</p>
+        </Drawer>
+      </div>
+
+      <Rail />
     </div>
   );
+}
+
+/** Whether a keystroke was meant for something the reader is typing in. */
+function typing(target: EventTarget | null): boolean {
+  const from = target as HTMLElement | null;
+  return Boolean(from?.isContentEditable) || ['INPUT', 'SELECT', 'TEXTAREA'].includes(from?.tagName ?? '');
+}
+
+/**
+ * The shell's two keys. Escape shuts the drawer, which is what Escape does
+ * everywhere; the digits move the timeline, because four states want four
+ * keys. The tour keeps its own arrows, and a slider under the reader's finger
+ * keeps whatever it is given, so neither is touched here.
+ */
+function useShellKeys(): void {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || typing(e.target)) return;
+      if (e.key === 'Escape') {
+        if (useUi.getState().drawer === null) return;
+        useUi.getState().close();
+        e.preventDefault();
+        return;
+      }
+      const stop = STATES[Number(e.key) - 1];
+      if (stop === undefined) return;
+      useView.getState().setState(stop.id);
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 }
