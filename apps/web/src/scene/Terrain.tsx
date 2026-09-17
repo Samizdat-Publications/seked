@@ -5,7 +5,7 @@ import type { MeshStandardMaterial, Plane } from 'three';
 import { gridGeometry } from './geometry';
 import { applyAtmosphere } from './Atmosphere';
 import { forgetCascades, receiveCascades } from './materials/shadows';
-import { applyStone, useStone } from './stone';
+import { applyStone, useStone } from './materials/stone';
 
 export interface TerrainProps {
   header: TerrainHeader;
@@ -55,10 +55,12 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
   // which the render mixes with a large noise, converted out of linear light:
   // a look choice carried across rather than a new one.
   const sand = useStone('sand');
+  const gravel = useStone('gravel');
   const groundMaterial = useRef<MeshStandardMaterial>(null);
   useEffect(() => {
-    if (groundMaterial.current) applyStone(groundMaterial.current, sand, 0.8, 3);
-  }, [sand]);
+    if (!groundMaterial.current) return;
+    applyStone(groundMaterial.current, sand, { strength: 0.8, scale: 3, relief: 0.6, mix: gravel, mixMetres: 120 });
+  }, [sand, gravel]);
   // The ground takes the sun's shadows and casts none of its own worth having.
   useEffect(() => {
     const material = groundMaterial.current;
