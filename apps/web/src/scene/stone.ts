@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RepeatWrapping, SRGBColorSpace, TextureLoader, type MeshStandardMaterial, type Texture } from 'three';
+import { patchMaterial } from './materials/patch';
 
 /**
  * The same CC0 stone the Blender renders use, for the viewer. The meshes carry
@@ -92,7 +93,7 @@ export function useStone(role: StoneRole): Stone | undefined {
  */
 export function applyStone(material: MeshStandardMaterial, stone: Stone | undefined, strength: number, scale = 1): void {
   if (!stone) return;
-  material.onBeforeCompile = (shader) => {
+  patchMaterial(material, 'stone', `${stone.tileMetres * scale}:${strength}`, (shader) => {
     shader.uniforms.stoneMap = { value: stone.texture };
     shader.uniforms.stoneTile = { value: stone.tileMetres * scale };
     shader.uniforms.stoneStrength = { value: strength };
@@ -134,7 +135,5 @@ vec3 stoneTriplanar(vec3 p, vec3 w, float tile) {
   diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * photo / stoneMean, stoneStrength);
 }`,
       );
-  };
-  material.customProgramCacheKey = () => `stone:${stone.tileMetres * scale}:${strength}`;
-  material.needsUpdate = true;
+  });
 }

@@ -3,15 +3,26 @@ import { useEffect, useMemo, useRef } from 'react';
 import { DoubleSide, FrontSide, type MeshStandardMaterial, type Plane } from 'three';
 import type { MassingParams, PlateauMass, PyramidParams } from '../model';
 import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone, type StoneRole } from './stone';
 
-/** A standard material that takes a role's photographed stone once it has loaded, and flat colour until then. */
+/**
+ * A standard material that takes a role's photographed stone once it has
+ * loaded, flat colour until then, and a cascade of the sun's shadow map
+ * either way.
+ */
 function useStoneMaterial(role: StoneRole | undefined, strength: number): React.RefObject<MeshStandardMaterial | null> {
   const ref = useRef<MeshStandardMaterial>(null);
   const stone = useStone(role ?? 'core');
   useEffect(() => {
     if (ref.current && role) applyStone(ref.current, stone, strength);
   }, [stone, role, strength]);
+  useEffect(() => {
+    const material = ref.current;
+    if (!material) return;
+    receiveCascades(material);
+    return () => forgetCascades(material);
+  });
   return ref;
 }
 
@@ -77,7 +88,7 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
           : MASS_LIMESTONE;
   const material = useStoneMaterial(color === MASS_LIMESTONE ? 'core' : undefined, 0.85);
   return (
-    <mesh geometry={geometry} name={mass.id}>
+    <mesh geometry={geometry} name={mass.id} castShadow receiveShadow>
       <meshStandardMaterial ref={material} color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />
     </mesh>
   );
@@ -92,7 +103,7 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
 function Massing({ params, clippingPlanes }: { params: MassingParams; clippingPlanes: Plane[] }): React.JSX.Element {
   const { length, width, height, offsetEast, offsetNorth } = params;
   return (
-    <mesh position={[offsetEast, offsetNorth, height / 2]}>
+    <mesh position={[offsetEast, offsetNorth, height / 2]} castShadow receiveShadow>
       <boxGeometry args={[length, width, height]} />
       <meshStandardMaterial color="#9c9078" roughness={0.97} metalness={0} flatShading clippingPlanes={clippingPlanes} />
     </mesh>
@@ -135,7 +146,7 @@ function Pyramid({
   const cut = clippingPlanes.length > 0 && clippingPlanes[0]?.constant !== undefined && Math.abs(clippingPlanes[0].constant) < 1e6;
 
   return (
-    <mesh geometry={geometry} position={[params.offsetEast, params.offsetNorth, params.offsetUp]} rotation={[0, 0, orientationDeg * DEG]}>
+    <mesh geometry={geometry} position={[params.offsetEast, params.offsetNorth, params.offsetUp]} rotation={[0, 0, orientationDeg * DEG]} castShadow receiveShadow>
       <meshStandardMaterial
         key={standing ? 'standing' : 'cased'}
         ref={material}

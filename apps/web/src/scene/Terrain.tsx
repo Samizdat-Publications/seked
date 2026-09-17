@@ -3,6 +3,7 @@ import { terrainGrid, type GroundPyramid } from '@seked/geometry';
 import { useEffect, useMemo, useRef } from 'react';
 import type { MeshStandardMaterial, Plane } from 'three';
 import { gridGeometry } from './geometry';
+import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone } from './stone';
 
 export interface TerrainProps {
@@ -54,11 +55,18 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
   useEffect(() => {
     if (groundMaterial.current) applyStone(groundMaterial.current, sand, 0.8, 3);
   }, [sand]);
+  // The ground takes the sun's shadows and casts none of its own worth having.
+  useEffect(() => {
+    const material = groundMaterial.current;
+    if (!material) return;
+    receiveCascades(material);
+    return () => forgetCascades(material);
+  });
 
   return (
     <>
       {ground && (
-        <mesh geometry={groundGeometry} renderOrder={-1}>
+        <mesh geometry={groundGeometry} renderOrder={-1} receiveShadow>
           {/* The flattened footprint is exactly coplanar with a pyramid's base
               cap, which is the one place two surfaces genuinely share a plane:
               the offset settles which of them the depth buffer keeps. */}

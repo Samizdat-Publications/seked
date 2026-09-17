@@ -1,5 +1,5 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import type { Model } from '../model';
 import type { OverlaySpec } from '../overlays';
@@ -8,6 +8,8 @@ import { DOME_RADIUS, type DomeBuffers, type NamedDomeStar } from '../sky';
 import { useView } from '../store';
 import type { LayerId } from '../view';
 import { ClaimOverlay } from './ClaimOverlay';
+import { Renderer } from './Renderer';
+import { useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
 import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
@@ -38,13 +40,18 @@ export interface SceneProps {
  * modelled against; with the star dome on it goes to something near black and
  * the lights come down with it, because a plateau lit like noon under a sky
  * full of stars is a picture of nothing.
+ *
+ * The sun is no longer here. It is the cascaded shadow maps' own lights in
+ * `Renderer.tsx`, placed by `@seked/sky` for the day and hour on the
+ * timeline, so the scene cannot be lit from a direction the astronomy does
+ * not put the sun in. What is left is the fill: the sky's own light from
+ * above and the ground's bounce from below.
  */
 const DAY = {
   background: '#0f1319',
   fog: [4000, 13000] as const,
   hemisphere: { sky: '#b9cbe0', ground: '#3b3327', intensity: 0.7 },
   ambient: 0.25,
-  sun: { position: [-1400, 1700, 1100] as const, intensity: 2.4, colour: '#fff3e0' },
 };
 
 const NIGHT = {
@@ -52,7 +59,6 @@ const NIGHT = {
   fog: [6000, 26000] as const,
   hemisphere: { sky: '#243448', ground: '#0a0b0f', intensity: 0.22 },
   ambient: 0.06,
-  sun: { position: [900, 1500, -1200] as const, intensity: 0.34, colour: '#aec4ea' },
 };
 
 /**
@@ -62,6 +68,9 @@ const NIGHT = {
  */
 export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): React.JSX.Element {
   const start = useRef(useView.getState().camera).current;
+  // The observer is the Great Pyramid's own centre, which is where every sky
+  // number in this project is reckoned from.
+  const sun = useSun({ latitudeDeg: model.latitudeDeg, longitudeDeg: model.env['g1.center.longitude'] ?? 0 });
   const mode = useView((s) => s.mode);
   const section = useView((s) => s.section);
   const planes = useMemo(() => sectionPlanes(section), [section]);
@@ -69,15 +78,12 @@ export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): Rea
   const light = layers.sky ? NIGHT : DAY;
 
   return (
-    <Canvas dpr={[1, 2]} camera={{ fov: 45, near: 1, far: 40000, position: start.position }}>
+    <Canvas shadows dpr={[1, 2]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: 45, near: 1, far: 40000, position: start.position }}>
       <color attach="background" args={[light.background]} />
       <fog attach="fog" args={[light.background, light.fog[0], light.fog[1]]} />
       <hemisphereLight args={[light.hemisphere.sky, light.hemisphere.ground, light.hemisphere.intensity]} />
       <ambientLight intensity={light.ambient} />
-      {/* By day, high in the south-west so the north and east faces separate. */}
-      <directionalLight position={[...light.sun.position]} intensity={light.sun.intensity} color={light.sun.colour} />
 
-      <LocalClipping />
       {layers.grid && <gridHelper args={[6000, 60, '#38475a', '#1d2630']} />}
 
       <group rotation={[-Math.PI / 2, 0, 0]}>
@@ -91,20 +97,10 @@ export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): Rea
       </group>
 
       {mode === 'fly' ? <FlyCamera /> : <Controls />}
+      {/* Last, because from here the composer does the drawing. */}
+      <Renderer sun={sun} />
     </Canvas>
   );
-}
-
-/**
- * Clipping per material rather than per scene, so the section can take the
- * masonry and leave the ground standing.
- */
-function LocalClipping(): null {
-  const gl = useThree((s) => s.gl);
-  useEffect(() => {
-    gl.localClippingEnabled = true;
-  }, [gl]);
-  return null;
 }
 
 function Controls(): React.JSX.Element {
