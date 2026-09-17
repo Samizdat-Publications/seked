@@ -238,5 +238,65 @@
     "kept": false,
     "note": "hero film 2, frame 264, 2450 BCE, with the Milky Way; rendered by seked-6c from 05d2054's scene",
     "bytes": 2240546
+  },
+  {
+    "file": "2026-09-17T03-16-04Z--sphinx--976fe19-dirty.png",
+    "taken": "2026-09-17T03:16:04+00:00",
+    "view": "sphinx",
+    "commit": "976fe19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Sphinx view at 256 samples: carved",
+    "bytes": 2087046
+  },
+  {
+    "file": "2026-09-17T03-16-04Z--sphinx--976fe19-dirty.png",
+    "taken": "2026-09-17T03:16:04+00:00",
+    "view": "sphinx",
+    "commit": "976fe19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Sphinx view at 256 samples: lion",
+    "bytes": 1705349
+  },
+  {
+    "file": "2026-09-17T03-16-04Z--sphinx--976fe19-dirty.png",
+    "taken": "2026-09-17T03:16:04+00:00",
+    "view": "sphinx",
+    "commit": "976fe19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Sphinx view at 256 samples: today",
+    "bytes": 2128544
+  },
+  {
+    "file": "2026-09-17T03-28-30Z--harbour--976fe19-dirty.png",
+    "taken": "2026-09-17T03:28:30+00:00",
+    "view": "harbour",
+    "commit": "976fe19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "as built with the L.VII.C reconstruction, 256 samples",
+    "bytes": 2334270
+  },
+  {
+    "file": "2026-09-17T03-28-31Z--panorama--976fe19-dirty.png",
+    "taken": "2026-09-17T03:28:31+00:00",
+    "view": "panorama",
+    "commit": "976fe19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "as built with the L.VII.C reconstruction, 256 samples",
+    "bytes": 1631577
+  },
+  {
+    "file": "2026-09-17T03-28-33Z--dawn--976fe19-dirty.png",
+    "taken": "2026-09-17T03:28:33+00:00",
+    "view": "dawn",
+    "commit": "976fe19",
+    "tree": "dirty",
+    "kept": false,
+    "note": "as built with the L.VII.C reconstruction, 256 samples",
+    "bytes": 1701871
   }
 ]
