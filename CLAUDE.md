@@ -36,6 +36,8 @@ pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for b
 python scripts/models.py     # fetch the stand-in models in blender/models.json from Sketchfab into build/models/ (token in ~/.seked/keys.env)
 python scripts/textures.py   # fetch the CC0 Poly Haven texture sets in blender/textures.json into build/textures/ (md5-checked)
 python scripts/plate.py render|grid|scale|measure|register   # read a drawing: native scan, pixel grid, scale bar, scaled figure with its sigma
+python scripts/meshy.py generate ID [--tag T]   # generate a stand-in in blender/models.json from CC0 photographs with Meshy (MESHY_API_KEY in ~/.seked/keys.env)
+python scripts/job.py claim|start|status        # own the repo, run a long job detached from the session, see who owns what (see "One session at a time")
 ```
 
 ## Rules that keep the project honest
@@ -92,6 +94,27 @@ python scripts/plate.py render|grid|scale|measure|register   # read a drawing: n
   dependency-free and have them read `data/` directly.
 - **Precession is Vondrák 2011**, never the IAU 2006 polynomials, for anything
   before about 1000 BCE. The tests pin the implementation to ERFA's values.
+
+## One session at a time
+
+Twice a session was continued in a new one while a render it had started
+was still running. The render was that old session's background task, so
+when it finished it woke the old session, which did the render's wrap-up in
+the same files the new session was committing (0016 got two rows). So:
+
+- **Claim the repo first.** `python scripts/job.py claim <session name>`
+  (ListAgents prints this session's name). The SessionStart hook prints the
+  owner and every job; if another session owns the repo and is still open,
+  message it to stand down before editing.
+- **Long jobs run detached, never as a session's background task.**
+  `python scripts/job.py start <name> --then "<what to do when it ends>" --
+  <command>`. Its exit wakes nobody; the owning session checks
+  `python scripts/job.py status` and does the `then`. Anything over about
+  ten minutes (film renders, hero stills, big bakes) goes through it.
+- **A session woken by a task, a monitor or a message checks the owner
+  before touching the repo**, and if it is not the owner it only reports.
+- **Commit named paths**, never `git add -A`, so one session cannot sweep
+  another's half-done files into its commit.
 
 ## Layout
 

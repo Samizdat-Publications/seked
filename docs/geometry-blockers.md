@@ -178,8 +178,11 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
    (Sketchfab API, Stewart's token) and `blender/render_standins.py`, which fits
    a model to the OSM outlines it replaces at render time and hides them. The
    Sphinx is the Watt Institution's scan of an 1903 bronze, so it is buried to
-   the chest; a scan of the excavated Sphinx should replace it. The manifest
-   lives in blender/, beside textures.json, rather than in models/ as planned.
+   the chest. Replaced the same evening (snapshot 0022) by a model Meshy
+   generated from four CC0 photographs (`scripts/meshy.py`, Stewart's key),
+   since no scan of the excavated Sphinx can be downloaded; the bronze is kept
+   in the manifest as `retired`. The manifest lives in blender/, beside
+   textures.json, rather than in models/ as planned.
    **Stand-in models for everything that is not a pyramid**, from free
    sources, each fitted to its OSM footprint (centroid, principal axis for
    orientation, a scale check against the outline) and recorded in a
@@ -213,8 +216,9 @@ first materials and atmosphere pass, the first stand-in (the Sphinx), and the
 Milky Way (snapshots 0017 to 0020). What is left, in order:
 
 1. Menkaure's chamber of the niches, a branch off the route.
-2. Mastaba heights by cemetery (hole 4), and more stand-ins: the temples, and
-   an excavated Sphinx to replace the 1903 bronze.
+2. Mastaba heights by cemetery (hole 4), and more stand-ins: the temples
+   (Meshy from photographs, as the Sphinx was), and the Sphinx's enclosure cut
+   into the ground, which the sand still fills up to its flanks.
 3. The second materials pass: displacement on the stepped core, granite and
    basalt, the mastabas' stone.
 4. The viewer's textures, and the film re-rendered over the new materials and

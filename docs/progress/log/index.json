@@ -218,5 +218,15 @@
     "kept": false,
     "note": "The mastaba field with Reisner's batter (74.8 deg, Appendix A) and his stepped course height (35 cm) for its stone banding.",
     "bytes": 1192728
+  },
+  {
+    "file": "2026-09-17T00-54-23Z--sphinx--05d2054-dirty.png",
+    "taken": "2026-09-17T00:54:23+00:00",
+    "view": "sphinx",
+    "commit": "05d2054",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Meshy-generated excavated Sphinx stand-in (task 01a0acbe), fitted by its own front, --state today, 128 samples",
+    "bytes": 1468387
   }
 ]

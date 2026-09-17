@@ -11,7 +11,8 @@ top, hiding the OSM solids each one replaces.
 The fit uses only the footprint. For each model: cut away what is below
 `cut_z` in the model's own units (a plinth), set its `ground_z` on the
 outline's base so what is left of the plinth sinks under the sand, decimate to `faces`, take the
-principal axis of what is left in plan and its length along that axis, and do
+principal axis of what is left in plan (with `largest_part_only`, after
+dropping every loose part but the biggest) and its length along that axis, and do
 the same for the OSM outlines it replaces. The scale is the ratio of the two
 lengths, the rotation turns one axis onto the other with the model's `front`
 toward the outline named `front_to` from the one named `front_from`, the
@@ -79,9 +80,35 @@ def import_model(path, name):
     return mesh
 
 
-def cut_and_reduce(mesh, cut_z, faces):
+def largest_part(bm):
+    """Delete every loose part but the one with the most vertices, after welding the UV seams a GLB splits."""
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    seen, parts = set(), []
+    for start in bm.verts:
+        if start in seen:
+            continue
+        seen.add(start)
+        stack, part = [start], []
+        while stack:
+            v = stack.pop()
+            part.append(v)
+            for e in v.link_edges:
+                w = e.other_vert(v)
+                if w not in seen:
+                    seen.add(w)
+                    stack.append(w)
+        parts.append(part)
+    parts.sort(key=len, reverse=True)
+    drop = [v for part in parts[1:] for v in part]
+    bmesh.ops.delete(bm, geom=drop, context="VERTS")
+    return len(parts) - 1
+
+
+def cut_and_reduce(mesh, cut_z, faces, largest_only=False):
     bm = bmesh.new()
     bm.from_mesh(mesh)
+    if largest_only:
+        print(f"  dropped {largest_part(bm)} loose parts")
     geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
     bmesh.ops.bisect_plane(bm, geom=geom, plane_co=(0.0, 0.0, cut_z), plane_no=(0.0, 0.0, 1.0), clear_inner=True)
     bm.to_mesh(mesh)
@@ -106,7 +133,10 @@ def fit(obj, model, features):
     front = Vector((0.0, 1.0)) if model["front"].endswith("y") else Vector((1.0, 0.0))
     if model["front"].startswith("-"):
         front = -front
-    if m_axis.dot(front) < 0:
+    if model.get("axis_from_front"):
+        # A generated model comes squared to its own axes, and scaffolding or rubble can pull its principal axis askew.
+        m_axis = front
+    elif m_axis.dot(front) < 0:
         m_axis = -m_axis
     m_len, m_mid = extent(plan, m_axis)
 
@@ -148,6 +178,8 @@ def build_standins(scene):
     features = (load_footprints() or {}).get("features", [])
     built = []
     for model in json.load(open(MANIFEST, encoding="utf-8"))["models"]:
+        if model.get("retired"):
+            continue
         entry = index.get(model["id"])
         if entry is None:
             print(f"stand-in {model['id']}: not downloaded; run python scripts/models.py")
@@ -157,7 +189,7 @@ def build_standins(scene):
             continue
         path = os.path.join(os.path.dirname(INDEX), entry["file"])
         name = f"{model['name']} (stand-in)"
-        obj = cut_and_reduce(import_model(path, name), model["cut_z"], model["faces"])
+        obj = cut_and_reduce(import_model(path, name), model["cut_z"], model["faces"], model.get("largest_part_only", False))
         done = fit(obj, model, features)
         obj.data.materials.append(core_material(True))
         obj["seked_standin"] = model["attribution"]
