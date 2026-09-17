@@ -28,6 +28,7 @@ import { useView } from '../../store';
 import type { StateId } from '../../view';
 import { useStoneMaterial } from '../materials/useStoneMaterial';
 import { Built, COLOURS } from './Built';
+import { sekedUserData } from './label';
 import { Causeway } from './Causeway';
 import { Mastabas } from './Mastabas';
 import { Pits } from './Pits';
@@ -100,13 +101,19 @@ function Massing({ params, state, clippingPlanes }: { params: MassingParams; sta
   const { length, width, height, offsetEast, offsetNorth } = params;
   const material = useStoneMaterial(undefined, { strength: 0 });
   const seked = useMemo(
-    () => ({
-      name: params.label,
-      tier: 'excavated' as const,
-      note: 'Massing: a box of the surveyed length, width and height on the cited centre. A volume, not a statue.',
-      state,
-    }),
-    [params.label, state],
+    () =>
+      sekedUserData(
+        {
+          id: params.id,
+          name: params.label,
+          tier: 'excavated',
+          note:
+            'Massing: a box of the surveyed length, width and height, on the centre its cited coordinates ' +
+            'derive. A volume, not a statue, and drawn only where the footprint import has no Sphinx.',
+        },
+        state,
+      ),
+    [params.id, params.label, state],
   );
   return (
     <mesh position={[offsetEast, offsetNorth, height / 2]} userData={{ seked }} castShadow receiveShadow>

@@ -10,7 +10,6 @@
  */
 import { useEffect, useMemo } from 'react';
 import { DoubleSide, FrontSide, type Plane } from 'three';
-import type { StructureMesh, StructureTier } from '../../model';
 import { useView } from '../../store';
 import type { StateId } from '../../view';
 import { meshGeometry } from '../geometry';
@@ -18,15 +17,7 @@ import { useStoneMaterial } from '../materials/useStoneMaterial';
 import type { StoneRole } from '../materials/stone';
 import type { StoneOptions } from '../materials/stone';
 import type { Mesh as GeometryMesh } from '@seked/geometry';
-
-/** What Track H's `Hover.tsx` reads off any object in the scene. */
-export interface SekedUserData {
-  name: string;
-  tier: StructureTier;
-  /** The builder's own label: what was built, from which keys, with which look choices. */
-  note: string;
-  state: StateId;
-}
+import { sekedUserData, type Labelled } from './label';
 
 /**
  * The flat colours a surface keeps until its photograph has loaded, and after
@@ -41,11 +32,8 @@ export const COLOURS = {
   pit: '#3a3128',
 } as const;
 
-/** What any structure has to say about itself, with or without a single mesh of its own. */
-export type Labelled = Omit<StructureMesh, 'mesh'> & { mesh?: GeometryMesh };
-
 export interface BuiltProps {
-  built: Labelled;
+  built: Labelled & { mesh?: GeometryMesh };
   state: StateId;
   clippingPlanes: Plane[];
   role: StoneRole | undefined;
@@ -75,9 +63,10 @@ export function Built({ built, state, clippingPlanes, role, colour, stone, mesh,
   const geometry = useMemo(() => (solid === undefined ? undefined : meshGeometry(solid)), [key]);
   useEffect(() => () => geometry?.dispose(), [geometry]);
   const material = useStoneMaterial(role, stone);
-  const seked = useMemo<SekedUserData>(
-    () => ({ name: built.name, tier: built.tier, note: built.note, state }),
-    [built.name, built.tier, built.note, state],
+  const seked = useMemo(
+    () => sekedUserData(built, state),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [built.id, built.name, built.tier, built.note, state],
   );
   const hidden = useView((s) => s.hiddenMasses).has(built.id);
   // A section leaves the far side of the masonry facing away from the reader,
