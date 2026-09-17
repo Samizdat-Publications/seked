@@ -316,6 +316,19 @@ Still open from this list: stand-ins for the temples and mastabas of today's
 plateau (item 2), the second materials pass (item 3, and the reconstruction's
 parts, which are still flat colours), and Stewart's intermediate Sphinxes.
 
+**Planned and started the same day.** The design is
+`docs/superpowers/specs/2026-09-17-realtime-plateau-design.md` (four states on
+one timeline, the look of each, where every asset comes from, Blender as the
+asset baker) and the first plan is
+`docs/superpowers/plans/2026-09-17-stage-1-light-air-stone.md`. Stage 1 landed
+on 2026-09-17 (snapshot 0028): the sun of any moment from the sky package, a
+physical sky, air, shadows, stone with relief and the post chain; the new
+interface; the fitted stand-ins exported from Blender and loaded in the
+browser; the builders for Stage 2. Open from Stage 1: the course joints from
+the real courses (a mean is used), the render's low dust layer, the section
+cut's drawing treatment, the queens' slope and the enclosure keys the builders
+wait for.
+
 **Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
 modern and ancient states and the transitional steps between, with models
