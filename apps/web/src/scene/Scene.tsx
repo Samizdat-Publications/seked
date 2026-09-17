@@ -9,6 +9,7 @@ import { useView } from '../store';
 import type { LayerId } from '../view';
 import { useAtmosphere } from './Atmosphere';
 import { ClaimOverlay } from './ClaimOverlay';
+import { FadeScope } from './fade';
 import { Renderer } from './Renderer';
 import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
@@ -82,11 +83,15 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
 
       <group rotation={[-Math.PI / 2, 0, 0]}>
         <Sky sun={sun} observer={observer} stars={sky} furniture={layers.sky} />
-        <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
-        {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} clippingPlanes={planes} />}
-        {layers.pyramids && <Masses massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
-        {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
-        <Standins />
+        {/* Everything the timeline changes dissolves between stops; the sky
+            and the annotations outside the scope do not. */}
+        <FadeScope>
+          <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
+          {layers.pyramids && <Pyramids pyramids={model.pyramids} today={layers.today} clippingPlanes={planes} />}
+          {layers.pyramids && <Masses massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
+          {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
+          <Standins />
+        </FadeScope>
         {layers.north && <NorthArrow />}
         {layers.overlay && overlay && <ClaimOverlay overlay={overlay} pyramids={model.pyramids} clippingPlanes={planes} />}
       </group>
