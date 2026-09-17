@@ -18,6 +18,7 @@ import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
 import { Structures } from './Structures';
 import { Pyramids } from './Pyramids';
+import { Props } from './Props';
 import { Standins } from './Standins';
 import { Sand } from './Sand';
 import { Trench } from './Trench';
@@ -94,6 +95,7 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
           {layers.pyramids && <Structures massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
           {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
           <Standins />
+          <Props env={model.env} />
           <Trench env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
           <Sand terrain={terrain} clippingPlanes={groundPlanes} />
         </FadeScope>
