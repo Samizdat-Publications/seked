@@ -68,6 +68,32 @@ describe('enclosureWallMesh', () => {
     expect(enclosureWallMesh(env, 'g1')?.label).toContain('g1.enclosure.thickness');
   });
 
+  it('takes the wall’s thickness off a distance measured to its outer face', () => {
+    // Petrie's peribolus figures are to the outer face, so the ring's far side
+    // lands on the distance and its near side stands the thickness inside it.
+    const env = buildEnvironment({
+      ...G1,
+      'g1.enclosure.distance.outer': 30, 'g1.enclosure.height': 6, 'g1.enclosure.thickness': 8,
+    });
+    const mesh = enclosureWallMesh(env, 'g1') as Mesh;
+    expect(wellFormed(mesh)).toBe(true);
+    expect(extent(mesh, 0)).toEqual([-(115 + 30), 115 + 30]);
+    expect(extent(mesh, 2)).toEqual([0, 6]);
+    expect(enclosureWallMesh(env, 'g1')?.label).toContain('outer face');
+    // A near-face distance is preferred to an outer-face one, and says so.
+    const both = buildEnvironment({ ...env, 'g1.enclosure.distance': 30 });
+    expect(extent(enclosureWallMesh(both, 'g1') as Mesh, 0)).toEqual([-(115 + 30 + 8), 115 + 30 + 8]);
+    expect(enclosureWallMesh(both, 'g1')?.label).toContain('inner face');
+  });
+
+  it('builds nothing when the wall would be thicker than its own stand-off', () => {
+    const env = buildEnvironment({
+      ...G1,
+      'g1.enclosure.distance.outer': 8, 'g1.enclosure.height': 6, 'g1.enclosure.thickness': 8,
+    });
+    expect(enclosureWallMesh(env, 'g1')).toBeUndefined();
+  });
+
   it('puts the wall on the structure’s own centre, elevation and orientation', () => {
     const env = buildEnvironment({
       'g2.base.side.mean': 215, 'g2.height.original': 143.5,

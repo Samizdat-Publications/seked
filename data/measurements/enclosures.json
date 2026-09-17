@@ -1,0 +1,38 @@
+[
+  {
+    "key": "g2.enclosure.distance.outer",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 129.6543,
+    "unit": "m",
+    "sigma": 1.5621,
+    "source": "petrie-1883",
+    "method": "stated in the text",
+    "note": "How far the peribolus wall of the Second Pyramid stands off the Pyramid, measured to the wall's outer face, which is why the key says outer. Petrie, section 71, p. 101: the outer face of the N. wall \"is 5,043 from near the N.E. corner of the Pyramid\", and the S. wall \"is 5,166 at its outer side, from the S.E corner of the Pyramid\", whence \"the N. and S walls were equidistant from the Pyramid\". The value is the mean of his two figures, 5,104.5 British inches, and the sigma is half their spread, 61.5 inches. His W. wall is not included: he says it was set as far from the edge of the levelled area as the N. wall is, not from the Pyramid, and he gives it at 2,795 to 2,923 inches from the area. Only the N. and S. walls are a distance from the monument, so only they are averaged here.",
+    "verified": false
+  },
+  {
+    "key": "g2.enclosure.thickness",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 8.1788,
+    "unit": "m",
+    "sigma": 0.5588,
+    "source": "petrie-1883",
+    "method": "stated in the text",
+    "note": "The width of the peribolus wall of the Second Pyramid. Petrie, section 71, p. 100, on the N. side: \"This substructure is 300 ± 3 inches wide near the E. end, and 344 at the W. end\". The value is the mean of those two, 322 British inches, and the sigma is half their spread, 22 inches. The crest of wall carried on top of the substructure is narrower, 108 inches near the E. end and 206 near the W., and Petrie says he could not make certain of the original width without largely uncovering it; the viewer draws one slab of the substructure's width, not the two stages.",
+    "verified": false
+  },
+  {
+    "key": "g2.enclosure.height",
+    "structure": "g2",
+    "quantity": "length",
+    "value": 6.096,
+    "unit": "m",
+    "sigma": 2.0,
+    "source": "petrie-1883",
+    "method": "lower bound stated in the text",
+    "note": "A floor under the height of the peribolus wall of the Second Pyramid, not a measurement of it. Petrie, section 71, p. 100: \"Its original height cannot be easily settled; probably 20 feet would be below the mark.\" Twenty feet is 240 British inches, and the wall is drawn at Petrie's floor because that is the only figure he states; it stood higher by his own reading, so the sigma is wide and one-sided in truth. Nothing should be concluded from the height of this wall in any render.",
+    "verified": false
+  }
+]
