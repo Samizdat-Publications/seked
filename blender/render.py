@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today|ancient] [--sphinx lion|anubis] [--finish <retexture tag>] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--reconstruction on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today|ancient] [--sphinx lion|anubis] [--finish <retexture tag, else the model's finish_in for the state>] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--reconstruction on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so

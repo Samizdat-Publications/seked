@@ -305,6 +305,23 @@ Milky Way (snapshots 0017 to 0020). What is left, in order:
    the Milky Way. Done 2026-09-16 (0023).
 5. Part 3, the plateau as built: casing and pyramidions first, then the
    carved Sphinx and the lion variant, then the complexes and the ground.
+   Done 2026-09-16 and 17 as far as Blender goes (snapshots 0024 to 0027):
+   pristine casing and caps, the carved, lion and Anubis Sphinxes fresh and
+   weathered, L.VII.C's reconstruction for the complexes, the enclosure cut,
+   and `--state ancient`. On 2026-09-17 Stewart chose the ancient Anubis's
+   finish: matt black all over (the Meshy retexture `paint-black2`, named in
+   `finish_in`), its gold leaf made metallic at render time by `add_gilding`.
+
+Still open from this list: stand-ins for the temples and mastabas of today's
+plateau (item 2), the second materials pass (item 3, and the reconstruction's
+parts, which are still flat colours), and Stewart's intermediate Sphinxes.
+
+**Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
+realtime plateau in the web viewer, as beautiful as it can be made, in its
+modern and ancient states and the transitional steps between, with models
+downloaded or generated for every building if that is what it takes. The
+Blender renders proved the look; the next phases carry it to realtime. Those
+phases are to be planned, not assumed from this list.
 
 ## Links
 
