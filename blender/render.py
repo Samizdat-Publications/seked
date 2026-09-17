@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|cutaway|akhet|night] [--state built|today] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -34,6 +34,7 @@ if HERE not in sys.path:
 import bpy  # noqa: E402  (only available inside Blender)
 
 from render_materials import CAPSTONE, STRUCTURE_LABELS, assign_materials, dress_as_built, draw_as_section, make_translucent  # noqa: E402
+from render_reconstruction import build_reconstructions  # noqa: E402
 from render_standins import build_standins, cut_enclosure  # noqa: E402
 from render_sky import DOME_RADIUS_M, SKY_BAKE, baked_sun, build_atmosphere, build_milky_way, build_star_dome, build_sun, build_world, load_bake  # noqa: E402
 
@@ -105,6 +106,19 @@ VIEWS = {
         "exposure": -3.3,
         "fill": 0.0,
         "placeholder_sun": (10.3, 234.5),
+    },
+    "harbour": {
+        # From the air north-east of the Sphinx, looking down across the harbour
+        # basin and the valley temples to the Sphinx in its enclosure and the
+        # causeway climbing to Khafre. Made for the built state, where the
+        # reconstruction supplies the temples, the basin and the causeways.
+        "moment": "equinox-sunrise-plus-hour",
+        "location": (520.0, -330.0, 45.0),
+        "target": (320.0, -450.0, -35.0),
+        "lens": 30.0,
+        "exposure": -4.2,
+        "fill": 0.0,
+        "placeholder_sun": (6.0, 90.0),
     },
     "akhet": {
         # Looking at the middle of the gap between the Great Pyramid's
@@ -530,6 +544,8 @@ def main():
     assign_materials()
     show_state(opts["state"])
     dress_as_built(opts["state"])
+    if not drawing and opts["standins"] != "off":
+        build_reconstructions(scene, opts["state"], standin_sphinx=True)
     if not drawing and opts["standins"] != "off":
         build_standins(scene, opts["state"], [v for v in (opts["sphinx"],) if v])
         cut_enclosure(scene)

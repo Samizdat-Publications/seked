@@ -57,7 +57,8 @@ def main():
     manifest = json.load(open(MANIFEST, encoding="utf-8"))
     index = {"models": {}}
     auth = None
-    for model in manifest["models"]:
+    # A whole-plateau reconstruction downloads like any Sketchfab stand-in.
+    for model in manifest["models"] + manifest.get("reconstructions", []):
         if model.get("retired"):
             continue
         folder = os.path.join(OUT, model["id"])

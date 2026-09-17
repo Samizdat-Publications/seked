@@ -189,5 +189,58 @@
       },
       "material": "casing"
     }
+  ],
+  "reconstructions": [
+    {
+      "id": "plateau-lviic",
+      "sketchfab": "c2fa66b666c043f4b8cec419b4663e32",
+      "name": "Giza Plateau by L.VII.C",
+      "author": "gwenajello (Sketchfab), after L.VII.C on the 3D Warehouse",
+      "url": "https://sketchfab.com/3d-models/giza-plateau-by-lviic-c2fa66b666c043f4b8cec419b4663e32",
+      "license": "CC BY 4.0",
+      "attribution": "\"Giza Plateau by L.VII.C\" by gwenajello on Sketchfab, credited to L.VII.C on the SketchUp 3D Warehouse: a reconstruction of the plateau as built, registered onto the survey through its three pyramids, which are dropped for the database's.",
+      "states": [
+        "built"
+      ],
+      "pyramids": {
+        "g1": [
+          "Object_4551",
+          "Object_3957"
+        ],
+        "g2": [
+          "Object_4082",
+          "Object_3971"
+        ],
+        "g3": [
+          "Object_4838",
+          "Object_9"
+        ]
+      },
+      "ground_materials": [
+        "sand",
+        "ground",
+        "GroundlCracke",
+        "rock2",
+        "Color__0_0_0"
+      ],
+      "drop_material_prefixes_with_standin_sphinx": [
+        "sph_",
+        "rock.sph."
+      ],
+      "replaces_groups": [
+        "mastabas",
+        "queens",
+        "temples",
+        "causeways",
+        "walls",
+        "tombs",
+        "pits"
+      ],
+      "why": "The as-built state wants the complexes whole, and this model has them: the temples roofed, the causeways covered, the enclosure walls, the harbour basins and the cased queens' pyramids and mastabas, laid out after the Egyptological plans. Registered by its pyramids it lands within a few metres of the survey. Its forms are a reconstructor's; its Sphinx is dropped while a Sphinx stand-in is shown.",
+      "surface_materials": [
+        "sand",
+        "ground"
+      ]
+    }
   ]
 }

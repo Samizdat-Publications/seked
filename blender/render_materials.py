@@ -817,10 +817,15 @@ def dress_as_built(state):
     if state != "built":
         return 0
     fine = casing_material()
+    values = resolved_values()
     dressed = 0
     for obj in bpy.data.objects:
         if obj.type != "MESH" or obj.get("seked_structure") != "plateau":
             continue
+        if obj.get("seked_group") == "temples":
+            raise_to(obj, values.get("tier3.temple.height"), values.get("tier3.temple.height.built"), "tier3.temple.height.built")
+        if obj.get("seked_group") == "causeways":
+            roof_over(obj, values.get("tier3.causeway.corridor.height"))
         if obj.get("seked_kind") == "pit" or obj.get("seked_footprint") in GRANITE_FOOTPRINTS or obj.get("seked_footprint") == "khufu.basalt_pavement":
             continue
         obj.data.materials.clear()
@@ -828,6 +833,35 @@ def dress_as_built(state):
         dressed += 1
     print(f"state built: {dressed} of the plateau's masses dressed in {CASING_NAME}")
     return dressed
+
+
+def raise_to(obj, today, built, key):
+    """A temple massing drawn at the height it was built to: every vertex's height above its base scaled from today's figure to the built one."""
+    if not today or not built or obj.get("seked_height") != "tier3.temple.height":
+        return
+    zs = [v.co.z for v in obj.data.vertices]
+    base = min(zs)
+    for v in obj.data.vertices:
+        v.co.z = base + (v.co.z - base) * built / today
+    print(f"state built: {obj.name} raised from {today:g} m to {built:g} m, {key}")
+
+
+def roof_over(obj, height):
+    """The roofed corridor on a causeway: its upward faces carried up by `height`, which closes it into a walled and roofed passage."""
+    import bmesh
+
+    if not height:
+        return
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    tops = [f for f in bm.faces if f.normal.z > 0.9]
+    grown = bmesh.ops.extrude_face_region(bm, geom=tops)
+    moved = [e for e in grown["geom"] if isinstance(e, bmesh.types.BMVert)]
+    bmesh.ops.translate(bm, verts=moved, vec=(0.0, 0.0, height))
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+    print(f"state built: {obj.name} roofed over, its corridor {height:g} m high, tier3.causeway.corridor.height")
 
 
 MASTABA_NAME = "Core limestone (mastaba courses)"
