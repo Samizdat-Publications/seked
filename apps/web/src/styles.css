@@ -325,8 +325,8 @@ ul.inputs .value,
 .stop {
   display: grid;
   grid-template-rows: auto 2.5rem auto;
-  justify-items: center;
   align-items: start;
+  min-width: 0;
   width: 6.2rem;
   padding: 0;
   border: 0;
@@ -338,6 +338,7 @@ ul.inputs .value,
 }
 
 .stop-dot {
+  justify-self: center;
   width: 0.62rem;
   height: 0.62rem;
   margin-bottom: 0.4rem;
@@ -358,6 +359,7 @@ ul.inputs .value,
   align-self: end;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
+  text-align: center;
   color: rgba(169, 162, 148, 0.75);
 }
 
@@ -1407,9 +1409,14 @@ button.step.is-primary:hover {
     width: 100%;
   }
 
-  .stop {
-    width: auto;
+  /* The list items are the flex children, so the share is set on them. */
+  .timeline-stops > li {
     flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .stop {
+    width: 100%;
   }
 
   .stop-label {
