@@ -30,6 +30,9 @@ apps/web/public/seked.json
 apps/web/public/terrain/
 apps/web/public/textures/
 
+# Written by `pnpm web-assets` from the GLBs blender/export_web.py bakes
+apps/web/public/models/
+
 # Local
 .env
 .env.*
