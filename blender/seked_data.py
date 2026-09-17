@@ -2299,3 +2299,217 @@ if __name__ == "__main__" and "--footprints" in sys.argv:
         if _g is not None:
             _out[_f["id"]] = {"verts": [list(v) for v in _g[0]], "faces": [list(f) for f in _g[1]]}
     print(json.dumps(_out))
+
+
+# --- The capstone and the small pyramids -----------------------------------
+# Mirrors packages/geometry/src/pyramidion.ts and smallpyramid.ts, the two
+# builders Blender draws as well as the viewer, and a parity test in
+# packages/data pins the two sides to each other. The rest of the state
+# builders (mastabas, temples, enclosure walls, the Sphinx trench) are
+# web-only reconstructions for now and are not mirrored here.
+
+RUIN_FRACTION = 0.8
+QUEENS_SLOPE_KEY = "tier3.queens.slope"
+
+
+def environment(values):
+    """
+    Values plus the offsets derived from a coordinate, which is the part of
+    buildEnvironment in packages/geometry these builders read. The face angle
+    a structure carries no record for is derived in face_angle_deg.
+    """
+    env = dict(values)
+    env.update(centre_offsets(values))
+    return env
+
+
+def face_angle_deg(env, structure):
+    """The measured face angle, else the one the base and the height give, else None."""
+    angle = env.get(structure + ".face.angle")
+    if angle is not None:
+        return angle
+    base = env.get(structure + ".base.side.mean")
+    height = env.get(structure + ".height.original")
+    if base is None or height is None or base <= 0:
+        return None
+    return math.degrees(math.atan2(height, base / 2.0))
+
+
+def structure_placement(env, structure):
+    """Where a structure's base centre stands, and how far it is turned. Mirrors structurePlacement."""
+    east = env.get(structure + ".centre.offset.east")
+    if east is None:
+        east = -(env.get(structure + ".centre.offset.west") or 0.0)
+    north = env.get(structure + ".centre.offset.north")
+    if north is None:
+        north = -(env.get(structure + ".centre.offset.south") or 0.0)
+    return {
+        "east": east,
+        "north": north,
+        "up": env.get(structure + ".base.elevation.relative", 0.0),
+        "orientation_deg": env.get(structure + ".orientation", 0.0),
+    }
+
+
+def place_verts(verts, east, north, up, orientation_deg):
+    """Every vertex turned about the vertical through the origin, then moved. Mirrors placeMesh."""
+    cos = math.cos(orientation_deg * math.pi / 180.0)
+    sin = math.sin(orientation_deg * math.pi / 180.0)
+    return [(x * cos - y * sin + east, x * sin + y * cos + north, z + up) for x, y, z in verts]
+
+
+def pyramidion_profile(env, structure):
+    """The capstone's height, base and angle, and where its apex stands. Mirrors pyramidionProfile."""
+    height = env.get(structure + ".pyramidion.height")
+    apex_height = env.get(structure + ".height.original")
+    angle = face_angle_deg(env, structure)
+    if height is None or apex_height is None or angle is None:
+        return None
+    if not height > 0 or not 0 < angle < 90 or not apex_height > height:
+        return None
+    place = structure_placement(env, structure)
+    return {
+        "height": height,
+        "base_side": 2.0 * height / math.tan(angle * math.pi / 180.0),
+        "face_angle_deg": angle,
+        "apex": (place["east"], place["north"], place["up"] + apex_height),
+        "angle_measured": env.get(structure + ".face.angle") is not None,
+    }
+
+
+def pyramidion_geometry(env, structure):
+    """The capstone standing on the pyramid's apex, in the site frame, or None."""
+    profile = pyramidion_profile(env, structure)
+    if profile is None:
+        return None
+    verts, faces = pyramid_geometry(profile["base_side"], profile["height"])
+    place = structure_placement(env, structure)
+    moved = place_verts(
+        verts, place["east"], place["north"], profile["apex"][2] - profile["height"], place["orientation_deg"]
+    )
+    return moved, faces
+
+
+def ring_area(ring):
+    """The area a closed outline encloses, metres squared. Mirrors ringArea."""
+    a = 0.0
+    for i, (x0, y0) in enumerate(ring):
+        x1, y1 = ring[(i + 1) % len(ring)]
+        a += x0 * y1 - x1 * y0
+    return abs(a) / 2.0
+
+
+def square_fit(ring):
+    """The square an outline is read as: its area, its centroid, its principal axis. Mirrors squareFit."""
+    if len(ring) < 3:
+        return None
+    area = ring_area(ring)
+    if not area > 0:
+        return None
+    c = s = 0.0
+    for i, (x0, y0) in enumerate(ring):
+        x1, y1 = ring[(i + 1) % len(ring)]
+        dx, dy = x1 - x0, y1 - y0
+        length = math.hypot(dx, dy)
+        if length == 0:
+            continue
+        theta = math.atan2(dy, dx)
+        c += length * math.cos(4 * theta)
+        s += length * math.sin(4 * theta)
+    angle = 0.0 if c == 0 and s == 0 else math.atan2(s, c) / 4.0
+    return {"centre": ring_centroid(ring), "side": math.sqrt(area), "angle_deg": math.degrees(angle)}
+
+
+def small_pyramid_profile(feature, env):
+    """One queen's or satellite pyramid's square, height and face angle. Mirrors smallPyramidProfile."""
+    if feature.get("group") != "queens":
+        return None
+    ring = [tuple(p) for p in feature["ring"]]
+    fit = square_fit(ring)
+    span = footprint_span(feature, env)
+    if fit is None or span is None:
+        return None
+    slope = env.get(QUEENS_SLOPE_KEY)
+    measured = slope is not None and 0 < slope < 90
+    height = (fit["side"] / 2.0) * math.tan(slope * math.pi / 180.0) if measured else span[1] - span[0]
+    if not height > 0:
+        return None
+    out = dict(fit)
+    out["height"] = height
+    out["base"] = span[0]
+    out["face_angle_deg"] = slope if measured else math.degrees(math.atan2(height, fit["side"] / 2.0))
+    out["slope_measured"] = measured
+    return out
+
+
+def small_pyramid_geometry(feature, env, state):
+    """A small pyramid cased or as a stepped ruin, standing where it stands, or None."""
+    p = small_pyramid_profile(feature, env)
+    if p is None:
+        return None
+    if state == "cased":
+        verts, faces = pyramid_geometry(p["side"], p["height"])
+    else:
+        course = env.get("tier3.mastaba.course.height")
+        if course is None or not course > 0:
+            return None
+        count = int(math.floor(RUIN_FRACTION * p["height"] / course))
+        if count < 1:
+            return None
+        verts, faces = stepped_pyramid_geometry(p["side"], p["height"], [course] * count)
+    return place_verts(verts, p["centre"][0], p["centre"][1], p["base"], p["angle_deg"]), faces
+
+
+def builder_cases(values, structures=("g1", "g2", "g3"), features=()):
+    """Everything the parity test in packages/data compares, for one preset."""
+    env = environment(values)
+    out = {"pyramidions": {}, "small_pyramids": {}}
+    for structure in structures:
+        profile = pyramidion_profile(env, structure)
+        geometry = pyramidion_geometry(env, structure)
+        if profile is None or geometry is None:
+            continue
+        out["pyramidions"][structure] = {
+            "height": profile["height"],
+            "base_side": profile["base_side"],
+            "face_angle_deg": profile["face_angle_deg"],
+            "apex": list(profile["apex"]),
+            "angle_measured": profile["angle_measured"],
+            "verts": [list(v) for v in geometry[0]],
+            "faces": [list(f) for f in geometry[1]],
+            "volume": polyhedron_volume(geometry[0], geometry[1]),
+        }
+    for feature in features:
+        if feature.get("group") != "queens":
+            continue
+        profile = small_pyramid_profile(feature, env)
+        if profile is None:
+            continue
+        row = {
+            "side": profile["side"],
+            "centre": list(profile["centre"]),
+            "angle_deg": profile["angle_deg"],
+            "height": profile["height"],
+            "base": profile["base"],
+            "face_angle_deg": profile["face_angle_deg"],
+            "slope_measured": profile["slope_measured"],
+        }
+        for state in ("cased", "stepped"):
+            geometry = small_pyramid_geometry(feature, env, state)
+            if geometry is None:
+                continue
+            row[state] = {
+                "verts": [list(v) for v in geometry[0]],
+                "faces": [list(f) for f in geometry[1]],
+                "volume": polyhedron_volume(geometry[0], geometry[1]),
+            }
+        out["small_pyramids"][feature["id"]] = row
+    return out
+
+
+if __name__ == "__main__" and "--builders" in sys.argv:
+    # Appended, so the file only ever grows; this is the last line printed.
+    _preset = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("-") else "canonical"
+    _values = resolve(load_database(), _preset)["values"]
+    _file = load_footprints()
+    print(json.dumps(builder_cases(_values, features=(_file or {}).get("features", []))))
