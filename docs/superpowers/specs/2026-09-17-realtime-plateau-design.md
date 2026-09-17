@@ -206,9 +206,12 @@ The Sphinx variants need no new generation. Every generation is logged in
   dedup, weld, meshopt compression, textures resized to 2k and encoded as
   WebP, and writes `apps/web/public/models/<id>.glb` and
   `apps/web/public/models/manifest.json` (id, states, variant, evidence,
-  attribution, bytes, sha256). Every file stays under 20 MB because
-  Cloudflare Pages refuses files over 25 MiB; if the set outgrows the site,
-  the models move to an R2 bucket and the manifest carries the base URL.
+  attribution, bytes, sha256). Every file stays under 20 MB by default,
+  because Cloudflare Pages refuses files over 25 MiB and a fast first load
+  matters; the limit is a preference and never a reason to cut an asset
+  down (Stewart, 2026-09-17). If something needs more, the large files move
+  to an R2 bucket and the manifest carries the base URL, or the site moves
+  to GitHub Pages or a premium GitHub plan.
 - **The viewer** loads the manifest and streams the models a state needs.
 
 ### 5.2 The viewer's scene
