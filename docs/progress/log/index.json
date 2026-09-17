@@ -228,5 +228,15 @@
     "kept": false,
     "note": "Meshy-generated excavated Sphinx stand-in (task 01a0acbe), fitted by its own front, --state today, 128 samples",
     "bytes": 1468387
+  },
+  {
+    "file": "2026-09-17T01-14-53Z--rollback-hero--9162cfd-dirty.png",
+    "taken": "2026-09-17T01:14:53+00:00",
+    "view": "rollback-hero",
+    "commit": "9162cfd",
+    "tree": "dirty",
+    "kept": false,
+    "note": "hero film 2, frame 264, 2450 BCE, with the Milky Way; rendered by seked-6c from 05d2054's scene",
+    "bytes": 2240546
   }
 ]
