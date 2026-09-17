@@ -17,6 +17,7 @@ import { NorthArrow } from './NorthArrow';
 import { Masses } from './Masses';
 import { Pyramids } from './Pyramids';
 import { Standins } from './Standins';
+import { Sand } from './Sand';
 import { Trench } from './Trench';
 import { Plateau, type TerrainProps } from './Terrain';
 
@@ -89,6 +90,7 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
         <Standins />
         <Trench env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
+        <Sand terrain={terrain} clippingPlanes={groundPlanes} />
         {layers.north && <NorthArrow />}
         {layers.overlay && overlay && <ClaimOverlay overlay={overlay} pyramids={model.pyramids} clippingPlanes={planes} />}
       </group>

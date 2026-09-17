@@ -71,7 +71,8 @@
       "largest_part_only": true,
       "axis_from_front": true,
       "states": [
-        "today"
+        "today",
+        "stripped"
       ]
     },
     {
@@ -147,7 +148,8 @@
       "id": "sphinx-lion",
       "name": "The Sphinx as a lion (hypothesis)",
       "states": [
-        "today"
+        "today",
+        "stripped"
       ],
       "variant": "lion",
       "license": "generated (Meshy paid plan: the output belongs to the account holder); photographs CC0",
@@ -266,7 +268,8 @@
       "id": "sphinx-anubis",
       "name": "The Sphinx as Anubis (hypothesis)",
       "states": [
-        "today"
+        "today",
+        "stripped"
       ],
       "variant": "anubis",
       "license": "generated (Meshy paid plan: the output belongs to the account holder); photographs CC0",

@@ -30,9 +30,10 @@
 import { groundHeight, sphinxTrenchMesh, type Footprint, type GroundPyramid, type SphinxTrench } from '@seked/geometry';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import type { Environment } from '@seked/geometry';
-import type { Plane } from 'three';
+import { DoubleSide, FrontSide, type BufferGeometry, type Plane } from 'three';
 import { useView } from '../store';
 import { meshGeometry } from './geometry';
+import type { StoneOptions, StoneRole } from './materials/stone';
 import { useStoneMaterial } from './materials/useStoneMaterial';
 import type { TerrainProps } from './Terrain';
 
@@ -122,6 +123,55 @@ export function groundSampler({ header, heights, datum, pyramids }: {
   };
 }
 
+/** What the hover tag and the dissolve read off a mesh this track draws. */
+export interface SekedTag {
+  name: string;
+  tier: 'stand-in' | 'reconstruction';
+  note: string;
+  state: string;
+}
+
+export interface StoneSurfaceProps {
+  geometry: BufferGeometry;
+  name: string;
+  role: StoneRole;
+  options: StoneOptions;
+  colour: string;
+  roughness: number;
+  seked: SekedTag;
+  clippingPlanes: Plane[];
+  castShadow?: boolean;
+  /** A surface with no inside, such as the sand, is drawn from both sides. */
+  both?: boolean;
+}
+
+/**
+ * One surface with its photographed stone on it.
+ *
+ * It is its own component because `useStoneMaterial` lays the stone on in an
+ * effect keyed on the stone, and a parent that returns null until its geometry
+ * is ready would have run that effect with no material to lay it on and never
+ * run it again. Mounting the mesh and the hook together cannot go wrong that
+ * way.
+ */
+export function StoneSurface({
+  geometry, name, role, options, colour, roughness, seked, clippingPlanes, castShadow, both,
+}: StoneSurfaceProps): React.JSX.Element {
+  const material = useStoneMaterial(role, options);
+  return (
+    <mesh geometry={geometry} name={name} userData={{ seked }} castShadow={castShadow ?? false} receiveShadow>
+      <meshStandardMaterial
+        ref={material}
+        color={colour}
+        roughness={roughness}
+        metalness={0}
+        side={both ? DoubleSide : FrontSide}
+        clippingPlanes={clippingPlanes}
+      />
+    </mesh>
+  );
+}
+
 export interface TrenchProps {
   env: Environment;
   terrain: TerrainProps;
@@ -169,24 +219,36 @@ export function Trench({ env, terrain, clippingPlanes }: TrenchProps): React.JSX
     wallGeometry?.dispose();
   }, [floorGeometry, wallGeometry]);
 
-  // The floor is the quarry's own bedrock under a skin of sand blown into it,
-  // which is the fine sand the ground takes; the walls are the cut rock face.
-  const floorMaterial = useStoneMaterial('sand', { strength: 0.8, scale: 3, relief: 0.5 });
-  const wallMaterial = useStoneMaterial('bedrock', { strength: 0.9, relief: 1 });
-
   const seked = trench
     ? { name: 'The Sphinx enclosure', tier: 'reconstruction' as const, note: trench.label, state }
     : undefined;
 
-  if (!trench || !standing || !floorGeometry || !wallGeometry) return null;
+  if (!trench || !standing || !floorGeometry || !wallGeometry || !seked) return null;
   return (
     <>
-      <mesh geometry={floorGeometry} name="sphinx.enclosure.floor" userData={{ seked }} receiveShadow>
-        <meshStandardMaterial ref={floorMaterial} color="#a1927a" roughness={1} metalness={0} clippingPlanes={clippingPlanes} />
-      </mesh>
-      <mesh geometry={wallGeometry} name="sphinx.enclosure.walls" userData={{ seked }} castShadow receiveShadow>
-        <meshStandardMaterial ref={wallMaterial} color="#9a8a6d" roughness={0.97} metalness={0} clippingPlanes={clippingPlanes} />
-      </mesh>
+      {/* The floor is the quarried bedrock under the sand blown into it, which
+          is the fine sand the plateau itself takes; the walls are the cut rock. */}
+      <StoneSurface
+        geometry={floorGeometry}
+        name="sphinx.enclosure.floor"
+        role="sand"
+        options={{ strength: 0.8, scale: 3, relief: 0.5 }}
+        colour="#a1927a"
+        roughness={1}
+        seked={seked}
+        clippingPlanes={clippingPlanes}
+      />
+      <StoneSurface
+        geometry={wallGeometry}
+        name="sphinx.enclosure.walls"
+        role="bedrock"
+        options={{ strength: 0.9, relief: 1 }}
+        colour="#9a8a6d"
+        roughness={0.97}
+        seked={seked}
+        clippingPlanes={clippingPlanes}
+        castShadow
+      />
     </>
   );
 }
