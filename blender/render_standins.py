@@ -113,6 +113,55 @@ def largest_part(bm):
     return len(parts) - 1
 
 
+def add_stone_detail(mat, recolour=True):
+    """
+    Real stone under a generated surface. A generated model's texture is a few
+    thousand pixels stretched over a statue tens of metres long, so its colour
+    and any paint are right but its grain is centimetres wide at best. This lays
+    the photographed core limestone over it at that set's real tile size,
+    projected from world space: its tone soft-lights the generated colour, which
+    is also pulled back from the saturation the generator gives stone, and its
+    height map bumps the surface on top of the generated normal map.
+    """
+    from render_materials import bump, darken, node_tree_of, noise, photographed, ramp
+
+    tree = node_tree_of(mat)
+    bsdf = next((n for n in tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+    if bsdf is None or getattr(mat, "seked_stone_detail", False):
+        return
+    geometry = tree.nodes.new("ShaderNodeNewGeometry")
+    maps = photographed(tree, geometry.outputs["Position"], "core", 3.0)
+    if maps is None:
+        return
+    base = bsdf.inputs["Base Color"]
+    source = base.links[0].from_socket if base.is_linked else None
+    muted = tree.nodes.new("ShaderNodeHueSaturation")
+    # Generators paint limestone salmon-pink; a nudge of hue toward yellow and less saturation make it honey.
+    # A painted model keeps its pigments as generated (recolour off).
+    muted.inputs["Hue"].default_value = 0.52 if recolour else 0.5
+    muted.inputs["Saturation"].default_value = 0.72 if recolour else 1.0
+    if source is not None:
+        tree.links.new(source, muted.inputs["Color"])
+    else:
+        muted.inputs["Color"].default_value = base.default_value
+    grey = tree.nodes.new("ShaderNodeRGBToBW")
+    tree.links.new(maps["colour"], grey.inputs["Color"])
+    light = tree.nodes.new("ShaderNodeMixRGB")
+    light.blend_type = "SOFT_LIGHT"
+    light.inputs["Fac"].default_value = 0.85
+    tree.links.new(muted.outputs["Color"], light.inputs["Color1"])
+    tree.links.new(grey.outputs["Val"], light.inputs["Color2"])
+    # Broader mottling, metres across, so a face of the rock is not one even tone.
+    mottle = darken(tree, light.outputs["Color"], ramp(tree, noise(tree, geometry.outputs["Position"], 0.25, 4.0), 0.4, 0.75), 0.12)
+    tree.links.new(mottle, base)
+    normal = bsdf.inputs["Normal"]
+    generated_normal = normal.links[0].from_socket if normal.is_linked else None
+    relief = bump(tree, maps["height"], 0.35, 0.04)
+    if generated_normal is not None:
+        tree.links.new(generated_normal, relief.node.inputs["Normal"])
+    tree.links.new(relief, normal)
+
+
 def cut_and_reduce(mesh, cut_z, faces, largest_only=False):
     bm = bmesh.new()
     bm.from_mesh(mesh)
@@ -222,10 +271,15 @@ def build_standins(scene, state="today", variants=()):
         path = os.path.join(os.path.dirname(INDEX), entry["file"])
         name = f"{model['name']} (stand-in)"
         # "texture" keeps the model's own surface, which is the point of a painted
-        # reconstruction; "casing" is fresh dressed limestone; the default is the
+        # reconstruction, and "texture+stone" lays real stone grain over it;
+        # "casing" is fresh dressed limestone; the default is the
         # weathered, banded core stone a stand-in for today's plateau wants.
         finish = model.get("material", "core")
-        obj = cut_and_reduce(import_model(path, name, finish == "texture"), model["cut_z"], model["faces"], model.get("largest_part_only", False))
+        keep = finish in ("texture", "texture+stone")
+        obj = cut_and_reduce(import_model(path, name, keep), model["cut_z"], model["faces"], model.get("largest_part_only", False))
+        if finish == "texture+stone":
+            for mat in obj.data.materials:
+                add_stone_detail(mat, model.get("stone_recolour", True))
         done = fit(obj, model, features)
         if finish == "casing":
             obj.data.materials.append(casing_material())

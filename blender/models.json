@@ -129,7 +129,7 @@
         "image_task": "01a0ad34-48c8-723d-9d3e-dbb0e9096f2c, 01a0ad35-0675-719a-a8a1-4f495adce8e9, 01a0ad37-9400-77b4-80fe-ba106f5020d6, 01a0ad38-5657-7605-b166-1e75896d3d9b",
         "sha256": "a16d9ce632a86625fbc7bcf8fb57aaef041e66f423b2cf0e1fe54924182b8382"
       },
-      "material": "texture"
+      "material": "texture+stone"
     },
     {
       "replaces": [
@@ -188,7 +188,7 @@
         "image_task": "01a0ad85-a1ed-772b-befc-65902d9740d7, 01a0ad86-aaf6-70b9-aae7-6392e6348fa5, 01a0ad87-c753-71c8-a22b-23ebd07d6e24, 01a0ad88-e59b-71c0-939e-ae667286e247",
         "sha256": "7aa2656a4c4dc29f4a15cea3aad1ad2f1be15b3a3fa62258bca4e1993e400cc8"
       },
-      "material": "texture"
+      "material": "texture+stone"
     },
     {
       "replaces": [
@@ -248,7 +248,7 @@
         "image_task": "01a0ad90-88d4-745b-b1f6-b5fccc0eb30d, 01a0ad92-9d3c-7685-b1ff-3d1c05e3cdc8, 01a0ad93-4a30-7280-b8cd-6fd9305b3a71, 01a0ad94-4570-74eb-b4bb-2c1d711bf324",
         "sha256": "b8ab9b28a4d30b1ed43f8a9ce32b432a4331aa569d906f098a45682c8b0027e8"
       },
-      "material": "texture"
+      "material": "texture+stone"
     },
     {
       "replaces": [
@@ -306,7 +306,7 @@
         "image_task": "01a0ad7a-22de-7230-9beb-2963135c3ff4, 01a0ad7b-2802-775f-8e25-ffea3a9ea2be, 01a0ad7e-12a1-74ab-a33b-ab59b67bbc86, 01a0ad7f-1993-7085-a5a2-096f08288117",
         "sha256": "a9da62069c44f7b08326b39dc1a65fbef04544be0b1c976b9af12ffe62b902dc"
       },
-      "material": "texture"
+      "material": "texture+stone"
     },
     {
       "replaces": [
@@ -364,12 +364,33 @@
         "from_made": "sphinx-anubis",
         "task": "01a0ad8e-7d72-71b5-8581-ed831ec0312d",
         "image_task": "01a0ad8a-e648-7633-9b8f-891d309751ed, 01a0ad8c-0e8c-7583-be47-c78913de990c, 01a0ad8c-d801-714b-9ccb-2134f60d9738, 01a0ad8d-d529-7390-8701-ba1eb4dae40c",
-        "sha256": "36871b86c7c5e44117e73c1829c3e8a78e36769be7c0f5e5d2dd24140c025bd2"
+        "sha256": "36871b86c7c5e44117e73c1829c3e8a78e36769be7c0f5e5d2dd24140c025bd2",
+        "retexture": {
+          "text_style_prompt": "Ancient Egyptian monumental sculpture newly finished in honey-toned Giza limestone, photographed in desert sun: realistic stone texture with grain, pitting and subtle colour variation, sharp chisel-cut edges, deep shadows in carved grooves, faint tool marks on the broad planes of the body, the headdress pleats and ear edges picked out by slightly darker stone. Natural, unpainted, freshly quarried stone, no weathering damage.",
+          "options": {
+            "ai_model": "meshy-7",
+            "enable_pbr": true,
+            "texture_resolution": "4k",
+            "target_formats": [
+              "glb"
+            ]
+          }
+        },
+        "retexture_tries": {
+          "retex2": "Freshly carved colossal statue in warm golden-cream limestone with a clearly visible natural stone grain: fine speckles, tiny fossil flecks and pores, soft mottled tonal variation from pale cream to light honey, and faint horizontal bedding lines running through the rock. Every carved detail is crisp and deeply cut with slightly darker recesses: the pleats of the headdress, the eyes, the collar, the ribs, the toes. Dressed matte stone, not painted, not plastic, no erosion, no cracks, no dirt.",
+          "retex3": "Ancient Egyptian monumental sculpture newly finished in honey-toned Giza limestone, photographed in desert sun: realistic stone texture with grain, pitting and subtle colour variation, sharp chisel-cut edges, deep shadows in carved grooves, faint tool marks on the broad planes of the body, the headdress pleats and ear edges picked out by slightly darker stone. Natural, unpainted, freshly quarried stone, no weathering damage.",
+          "paint-black": "Colossal ancient Egyptian statue of the jackal god Anubis on the day it was finished, carved in limestone and painted in rich matt mineral pigments: the whole jackal, head, body, legs and tail, painted deep glossy black like the Nile's fertile silt; the headdress lappets painted in bands of gold and deep lapis blue; a broad collar necklace on the chest in gold, turquoise, lapis blue and carnelian red beads; the eyes and inner ears outlined in gold; a gold band on the tail. Crisp carved detail, fine stone grain visible under the paint on the broad surfaces. No weathering, no cracks.",
+          "paint-head": "Colossal ancient Egyptian statue of the jackal god Anubis on the day it was finished: the body, legs and tail left as fine honey-coloured dressed limestone with visible stone grain, while the jackal head and neck are painted matt black with the eyes lined in gold and kohl, the headdress lappets painted in alternating gold and lapis blue stripes, and a broad painted collar on the chest in gold, turquoise and carnelian red bands. Crisp carved detail, no weathering, no cracks.",
+          "paint-pale": "Colossal ancient Egyptian statue of the jackal god Anubis on the day it was finished, carved in pale limestone with visible grain and painted in the restrained Old Kingdom manner: the jackal's face in dark charcoal black with a red ochre tongue line and eyes outlined in black and white, the headdress lappets striped in muted yellow ochre and faded blue, a broad collar in red ochre, blue and yellow bands, the body left in natural limestone with a faint warm wash. Matt pigments, crisp carved detail, no weathering.",
+          "paint-black2": "Colossal ancient Egyptian statue of the jackal god Anubis on the day it was finished, carved from limestone and painted: the whole jackal in deep matt charcoal-black mineral paint with a soft stone texture showing through, not glossy and not ceramic; the headdress lappets striped in real gold leaf and deep lapis-lazuli blue; a broad collar of gold, turquoise and carnelian bands on the chest; the eyes inlaid white and black and outlined in gold; thin gold bands on the ears' edges and the tail. Rich but restrained, like a royal temple statue. Crisp carved detail, no weathering.",
+          "paint-pale2": "Colossal ancient Egyptian statue of the jackal god Anubis on the day it was finished, carved in warm pale limestone with visible grain and painted in matt earth pigments: the jackal's head and neck in soft charcoal black, the eyes outlined in black with white, the headdress lappets striped in yellow ochre and Egyptian blue, a broad collar in red ochre, Egyptian blue and yellow ochre bands, a thin red ochre line on the tail; the body left in natural limestone. Matt, slightly chalky pigments, crisp carved detail, no weathering."
+        }
       },
-      "material": "texture",
+      "material": "texture+stone",
       "default_in": [
         "ancient"
-      ]
+      ],
+      "stone_recolour": false
     }
   ],
   "reconstructions": [

@@ -224,6 +224,40 @@ def finish(args, spec, task_id, task, photos):
     print(f"kept a copy in {keep}")
 
 
+def retexture(args):
+    """
+    A pinned model's surface painted again by Meshy's retexture from the manifest's
+    `meshy.retexture` block: its `text_style_prompt` and options. The model goes in as
+    its own generation task where Meshy accepts that, and as the GLB itself where not.
+    The result lands in build/models/<ID>-<TAG>/ like any generation, and is kept.
+    """
+    model = next((m for m in json.load(open(MANIFEST, encoding="utf-8"))["models"] if m["id"] == args.id), None)
+    if not model or "retexture" not in model.get("meshy", {}):
+        sys.exit(f"{args.id}: no meshy.retexture block in {MANIFEST}")
+    spec = dict(model["meshy"]["retexture"])
+    if args.style:
+        # A named prompt from `retexture_tries`, so tries started together cannot pick up each other's edits to the manifest.
+        spec["text_style_prompt"] = model["meshy"]["retexture_tries"][args.style]
+    body = dict(spec.get("options", {}), text_style_prompt=spec["text_style_prompt"])
+    body["input_task_id"] = model["meshy"]["task"]
+    request = urllib.request.Request(f"{API}/v1/retexture", data=json.dumps(body).encode(), method="POST",
+                                     headers={"Authorization": f"Bearer {key()}", "Content-Type": "application/json"})
+    try:
+        task_id = json.load(urllib.request.urlopen(request, timeout=300))["result"]
+    except urllib.error.HTTPError as error:
+        print(f"retexture by task refused ({error.code}: {error.read().decode(errors='replace')[:200]}); sending the GLB")
+        path = os.path.join(OUT, args.id, "model.glb")
+        body.pop("input_task_id")
+        body["model_url"] = "data:application/octet-stream;base64," + base64.b64encode(open(path, "rb").read()).decode()
+        task_id = call("POST", "retexture", body)["result"]
+    print(f"retexture task {task_id} created")
+    task = wait("retexture", task_id)
+    spec["endpoint"] = "retexture"
+    spec["prompt"] = spec["text_style_prompt"]
+    args.tag = args.tag or "retextured"
+    return finish(args, spec, task_id, task, photos=[])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="action", required=True)
@@ -232,6 +266,11 @@ def main():
     p.add_argument("--tag")
     p.add_argument("--image", action="append")
     p.set_defaults(func=generate)
+    p = sub.add_parser("retexture")
+    p.add_argument("id")
+    p.add_argument("--tag")
+    p.add_argument("--style")
+    p.set_defaults(func=retexture)
     sub.add_parser("balance").set_defaults(func=lambda args: print(f"{call('GET', 'balance')['balance']} credits"))
     args = parser.parse_args()
     args.func(args)
