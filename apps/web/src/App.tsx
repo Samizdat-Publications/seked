@@ -13,6 +13,8 @@ import { useView } from './store';
 import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
 import { Rail } from './ui/Rail';
+import { SunDial } from './ui/SunDial';
+import { Timeline } from './ui/Timeline';
 import { useUi } from './ui/ui';
 import { STATES, sceneEpoch } from './view';
 
@@ -111,6 +113,11 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
       </main>
 
       <Caption epoch={epoch} claimId={selected} />
+
+      <div className="instruments">
+        <Timeline />
+        <SunDial />
+      </div>
 
       <div className="drawers">
         <Drawer id="views">

@@ -52,10 +52,13 @@ export const momentWords = (moment: Moment): string => `${dateWords(moment.day)}
 /**
  * A year as a caption says it. Astronomical year numbering counts a year zero,
  * so -10499 is 10,500 BCE; a year of our own era is left as the bare number,
- * which is how the timeline's stops are written in the design.
+ * which is how the timeline's stops are written in the design. Five figures
+ * are grouped and four are not, so the stops read 10,500 BCE and 2450 BCE the
+ * way the spec writes them.
  */
 export function yearWords(epoch: number): string {
   const year = Math.round(epoch);
+  const bce = 1 - year;
   if (year >= 1) return String(year);
-  return `${(1 - year).toLocaleString('en-US')} BCE`;
+  return `${bce >= 10000 ? bce.toLocaleString('en-US') : String(bce)} BCE`;
 }
