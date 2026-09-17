@@ -104,9 +104,27 @@ route in `interiors.ts` and `seked_data.py`. Tav. 4's printed levels became the
 check instead of the input: the large chamber's floor comes out at -10.59 m
 against its [10.55]. Carried on the same day to the granite crypt (C), through
 a corridor whose slope is scaled from Tav. 6 (27.5 ± 1.8°): its floor lands at
--15.27 m against [15.55]. Still to route: the chamber of the niches (W,
-[16.95]), which branches off the horizontal passage through a door in its
-north wall and down six steps, so it needs a branch rather than a next step.
+-15.27 m against [15.55]. The chamber of the niches (W, [16.95]) was routed
+the same evening, as a branch: the stair (P) records the step of the
+horizontal passage it opens off and how far back from that passage's end its
+door stands, and the room records the bearing of its own north and is laid out
+square to itself and turned onto the site. The sense of the turn was never in
+doubt once Perring's table was read from the page scan rather than the OCR:
+Vyse's Appendix, p. 123, has the room "25' east of north" and his narrative,
+p. 85, "25° east of north", and Tav. 4, fig. 6 draws the same, the west wall
+leaning east of the north arrow by 23.7° when scaled, with Perring's [25°]
+printed between them. So the room is turned clockwise, away from the crypt,
+which is the reason Maragioglio and Rinaldi give for the turn. The same page
+gives the stair's run, drop and width and the room's plan and height; the
+door's place along the passage (2.37 ± 0.22 m back from the crypt's east wall),
+the stair's bearing (24.1 ± 1.3°) and its height (1.36 ± 0.27 m) are scaled
+from Tav. 4, figs. 5 and 6. Petrie's doorway in the room's south wall, 38.0 to
+73.9 in from its east side, then puts the stair's west wall within 2 mm of the
+room's, as the plan draws them, which nothing forced. The floor lands at
+-16.26 m against [16.95], 0.69 m high: 0.28 m is the crypt's miss carried on,
+and the other 0.41 m is Perring against himself, his table putting the room
+3 ft 3 in below the passage where the plate's two levels, both his, put it
+1.40 m below the crypt, whose floor the section draws level with the passage.
 What was planned:
 
 **Maragioglio and Rinaldi, *Tavole* 6,2 (1967)**: archive.org `Maragioglio_6-2`
@@ -266,7 +284,9 @@ plates, not Smyth), `scripts/plate.py`, Khafre's casing cap (from text), a
 first materials and atmosphere pass, the first stand-in (the Sphinx), and the
 Milky Way (snapshots 0017 to 0020). What is left, in order:
 
-1. Menkaure's chamber of the niches, a branch off the route.
+1. Menkaure's chamber of the niches, a branch off the route. Done 2026-09-16:
+   turned 25° east of north (Vyse, and Tav. 4's plan), its floor 0.69 m above
+   the printed [16.95].
 2. Mastaba heights by cemetery (hole 4), and more stand-ins: the temples
    (Meshy from photographs, as the Sphinx was), and the Sphinx's enclosure cut
    into the ground, which the sand still fills up to its flanks.

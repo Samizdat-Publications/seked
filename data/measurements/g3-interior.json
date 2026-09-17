@@ -571,7 +571,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.loculus.door.begin.from_east_side",
+    "key": "g3.chamber.loculus.door.south.begin.from_east_wall",
     "structure": "g3",
     "quantity": "length",
     "value": 0.9652,
@@ -582,7 +582,7 @@
     "verified": true
   },
   {
-    "key": "g3.chamber.loculus.door.end.from_east_side",
+    "key": "g3.chamber.loculus.door.south.end.from_east_wall",
     "structure": "g3",
     "quantity": "length",
     "value": 1.87706,
@@ -1085,7 +1085,7 @@
     "unit": "deg",
     "source": "maragioglio-rinaldi-1967",
     "method": "published-plan",
-    "note": "Of the cellar (W) at the foot of that stair, “non è orientato come gli altri passaggi e camere, ma forma col nord un angolo di circa 25°”, p. 47. p. 47 gives the angle without saying which way it is turned, so it is stored unsigned and nothing is built from it; the chambers here are all axis-aligned boxes and this one is not. p. 47 puts four recesses in its east side and two small chambers in its north side, which are the six Petrie tabulates in §88. No error stated.",
+    "note": "Of the cellar (W) at the foot of that stair, “non è orientato come gli altri passaggi e camere, ma forma col nord un angolo di circa 25°”, p. 47. p. 47 gives the angle without saying which way it is turned, so it is stored unsigned; the sense is Vyse's, 25 deg east of north, and the route builds the room from g3.chamber.loculus.direction. p. 47 puts four recesses in its east side and two small chambers in its north side, which are the six Petrie tabulates in §88. No error stated.",
     "verified": true
   },
   {

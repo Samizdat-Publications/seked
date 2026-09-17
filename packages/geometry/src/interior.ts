@@ -289,20 +289,45 @@ export interface ChamberOptions {
   max: Point;
   /** Optional pitched roof above the wall tops. */
   gable?: Gable;
+  /** Optional turn off the cardinal axes; `min` and `max` are then in the chamber's own frame. */
+  turn?: ChamberTurn;
   /** Optional prefix, e.g. "g1.queen", producing keys like "g1.queen.centre". */
   prefix?: string;
+}
+
+/**
+ * A chamber laid out square to its own walls and turned onto the site. The
+ * chamber's +y, its "north", points along `azimuthDeg`, degrees clockwise from
+ * north seen from above, and its +x, its "east", along `azimuthDeg + 90`; its
+ * origin is the plan point `about`. Heights are not turned.
+ */
+export interface ChamberTurn {
+  about: readonly [number, number];
+  azimuthDeg: number;
+}
+
+/** A point in a turned chamber's own frame, put on the site. */
+function turned(p: V3, turn: ChamberTurn): V3 {
+  const a = (turn.azimuthDeg * Math.PI) / 180;
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  return [turn.about[0] + p[0] * c + p[1] * s, turn.about[1] - p[0] * s + p[1] * c, p[2]];
 }
 
 /** Corner order, the same ring the pyramid landmarks use. */
 const CORNERS = ['NE', 'NW', 'SW', 'SE'] as const;
 
 /**
- * An axis-aligned chamber, optionally with a gabled roof.
+ * A box chamber, optionally with a gabled roof, square to the site's axes or
+ * turned onto it.
  *
  * Vertices: 0-3 the floor ring and 4-7 the wall-top ring, both counter-
  * clockwise seen from above starting north-east, matching `CORNERS`; then, when
  * gabled, the two ridge ends, the east one first for a ridge along x and the
- * north one first for a ridge along y.
+ * north one first for a ridge along y. In a turned chamber the corners are
+ * named in its own frame, so its "NE" is the corner between the walls it calls
+ * north and east, and every vertex and landmark is turned after it is laid out.
+ * A turn is a rotation, so the winding and the volume are unchanged.
  */
 export function chamber(o: ChamberOptions): Solid {
   const { min, max, gable } = o;
@@ -351,5 +376,8 @@ export function chamber(o: ChamberOptions): Solid {
     landmarks[`${p}corner.${name}.ceiling`] = [...(verts[i + 4] as V3)];
   });
   if (gable) landmarks[`${p}ridge.mid`] = [cx, cy, z0 + gable.ridgeHeight];
-  return toMesh(verts, tris, landmarks);
+  const turn = o.turn;
+  if (!turn) return toMesh(verts, tris, landmarks);
+  for (const name of Object.keys(landmarks)) landmarks[name] = turned(landmarks[name] as V3, turn);
+  return toMesh(verts.map((v) => turned(v, turn)), tris, landmarks);
 }

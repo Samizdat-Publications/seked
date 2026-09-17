@@ -187,9 +187,11 @@ describe('the discovered interiors on the canonical preset', () => {
       'g3.passage.granite_foot',
       'g3.passage.granite_horizontal',
       'g3.passage.granite_portcullis',
+      'g3.passage.loculus_stair',
       'g3.passage.portcullis',
       'g3.chamber.first',
       'g3.chamber.granite',
+      'g3.chamber.loculus',
       'g3.chamber.second',
     ]);
     const solid = built['g3.passage.descending'];
@@ -296,10 +298,76 @@ describe("Menkaure's route on the canonical preset", () => {
     for (const keys of Object.values(inputs)) expect(keys.some((k) => k.endsWith('.floor.depth'))).toBe(false);
   });
 
+  const corner = (name: string, which: string) => built[name]?.landmarks[`${name}.corner.${which}.floor`] as [number, number, number];
+  const azimuth = (from: readonly number[], to: readonly number[]) =>
+    (((Math.atan2((to[0] as number) - (from[0] as number), (to[1] as number) - (from[1] as number)) * 180) / Math.PI) + 360) % 360;
+
+  it('opens the stair to the chamber of the niches in the north wall of the horizontal passage, where Tav. 4 draws its door', () => {
+    const [ex, ey, ez] = floorEnd('g3.passage.granite_horizontal');
+    const [x, y, z] = floorBegin('g3.passage.loculus_stair');
+    // The passage (Z) runs due west, so its end is its west end and its north wall half its width north of its axis.
+    expect(x).toBeCloseTo(ex + v('g3.passage.loculus_stair.branch.from_end'), 4);
+    expect(y).toBeCloseTo(ey + v('g3.passage.granite_horizontal.width') / 2, 4);
+    expect(z).toBeCloseTo(ez, 6);
+    const [fx, fy, fz] = floorEnd('g3.passage.loculus_stair');
+    expect(Math.hypot(fx - x, fy - y)).toBeCloseTo(v('g3.passage.loculus_stair.run'), 4);
+    expect(z - fz).toBeCloseTo(v('g3.passage.loculus_stair.drop'), 4);
+    expect(azimuth([x, y], [fx, fy])).toBeCloseTo(v('g3.passage.loculus_stair.direction'), 4);
+  });
+
+  it('turns the chamber of the niches 25 degrees east of north, the sense Vyse states and Tav. 4 draws', () => {
+    const name = 'g3.chamber.loculus';
+    // Its west wall runs from its south-west corner to its north-west one.
+    expect(azimuth(corner(name, 'SW'), corner(name, 'NW'))).toBeCloseTo(v('g3.chamber.loculus.direction'), 4);
+    expect(azimuth(corner(name, 'SE'), corner(name, 'NE'))).toBeCloseTo(25, 4);
+    expect(azimuth(corner(name, 'SW'), corner(name, 'SE'))).toBeCloseTo(115, 4);
+    // Turned, not stretched: Petrie's walls are still its walls.
+    expect(Math.hypot(...corner(name, 'SW').slice(0, 2).map((c, i) => c - (corner(name, 'NW')[i] as number)))).toBeCloseTo(
+      (v('g3.chamber.loculus.width.east') + v('g3.chamber.loculus.width.west')) / 2, 4);
+    // And away from the crypt, which is what Maragioglio and Rinaldi give as the reason for the turn.
+    expect(corner(name, 'NW')[0]).toBeGreaterThan(corner(name, 'SW')[0]);
+    expect(bounds(name).lo[0] as number).toBeGreaterThan(bounds('g3.chamber.granite').hi[0] as number);
+  });
+
+  it('enters the chamber of the niches on its south wall through Petrie’s doorway, at the foot of the stair', () => {
+    const name = 'g3.chamber.loculus';
+    const [x, y, z] = floorEnd('g3.passage.loculus_stair');
+    const se = corner(name, 'SE');
+    const sw = corner(name, 'SW');
+    const middle = (v('g3.chamber.loculus.door.south.begin.from_east_wall') + v('g3.chamber.loculus.door.south.end.from_east_wall')) / 2;
+    expect(Math.hypot(x - (se[0] as number), y - (se[1] as number))).toBeCloseTo(middle, 4);
+    // On the south wall's line, not just that far from its corner.
+    const along = Math.hypot((sw[0] as number) - (se[0] as number), (sw[1] as number) - (se[1] as number));
+    expect(Math.hypot(x - (sw[0] as number), y - (sw[1] as number)) + middle).toBeCloseTo(along, 4);
+    expect(se[2]).toBeCloseTo(z, 6);
+    // The stair is Vyse's 3 ft 3 in wide and the doorway's middle is Petrie's, and together they put the stair's
+    // west wall within a few millimetres of the room's, which is how Tav. 4, fig. 6 draws the two.
+    expect(Math.abs(Math.hypot(x - (sw[0] as number), y - (sw[1] as number)) - v('g3.passage.loculus_stair.width') / 2)).toBeLessThan(0.01);
+  });
+
+  it('puts the floor of the chamber of the niches within 0.75 m of the level Tav. 4 prints for it, and says where the miss comes from', () => {
+    const floor = bounds('g3.chamber.loculus').lo[2] as number;
+    const miss = floor - -v('g3.chamber.loculus.floor.depth');
+    // It lands at -16.26 m against [16.95], 0.69 m high. The crypt carries 0.28 m of that down the scaled slope of
+    // the corridor (R); the rest is Perring's own: his table puts the room 3 ft 3 in below the passage (Z), and the
+    // plate's two levels, [15.55] and [16.95], which are his too, put it 1.40 m below the crypt, whose floor the
+    // plate's section draws level with the passage's.
+    expect(miss).toBeGreaterThan(0);
+    expect(miss).toBeLessThan(0.75);
+    const crypt = bounds('g3.chamber.granite').lo[2] as number;
+    expect(crypt - floor).toBeCloseTo(v('g3.passage.loculus_stair.drop'), 4);
+    const printedDrop = v('g3.chamber.loculus.floor.depth') - v('g3.chamber.granite.floor.depth');
+    expect(miss - (crypt - -v('g3.chamber.granite.floor.depth'))).toBeCloseTo(printedDrop - v('g3.passage.loculus_stair.drop'), 4);
+  });
+
   it('names the whole chain behind a routed chamber', () => {
     const keys = inputs['g3.chamber.second'] as readonly string[];
     for (const k of ['g3.entrance.floor.begin.up', 'g3.passage.descending.length', 'g3.passage.foot.length', 'g3.chamber.first.door.south.from_east_wall', 'g3.passage.portcullis.length', 'g3.passage.first_to_second.angle', 'g3.chamber.second.door.begin.from_east_wall']) {
       expect(keys, k).toContain(k);
+    }
+    const niches = inputs['g3.chamber.loculus'] as readonly string[];
+    for (const k of ['g3.passage.granite.angle', 'g3.passage.granite_horizontal.length', 'g3.passage.granite_horizontal.width', 'g3.passage.loculus_stair.branch.step', 'g3.passage.loculus_stair.branch.from_end', 'g3.passage.loculus_stair.drop', 'g3.chamber.loculus.direction']) {
+      expect(niches, k).toContain(k);
     }
   });
 });

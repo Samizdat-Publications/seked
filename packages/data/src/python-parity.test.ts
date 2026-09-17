@@ -89,6 +89,8 @@ function interiorShapes(): Record<string, Solid> {
       from: [0, 0, 21], to: [0, -38.7, 21], width: 1.05, height: 1.17, heightMode: 'vertical',
     }),
     box_chamber: chamber({ min: [-5.235, -2.615, 43], max: [5.235, 2.615, 48.85] }),
+    // A chamber turned off the axes, the way the chamber of the niches is.
+    turned_chamber: chamber({ min: [-1.4, 0, -16.3], max: [0.5, 5.3, -14.3], turn: { about: [-4.2, -1.1], azimuthDeg: 25 } }),
     gabled_chamber: chamber({
       min: [-2.615, -2.875, 21], max: [2.615, 2.875, 21 + walls],
       gable: { ridgeHeight: ridge, axis: 'x' },
@@ -213,6 +215,12 @@ describe.skipIf(!py)('blender/seked_data.py builds the same interiors as @seked/
     it(`${structure}: the same solids, in the same order, vertex for vertex`, () => {
       if (structure === 'g1') expect(solids.length).toBeGreaterThanOrEqual(10);
       expectSameSolids(solids, interiorSolids(env, { structure }));
+      // A discovered interior is placed by its route, branches and turned
+      // chambers included, so both sides must also name the same chain.
+      if (structure !== 'g1') {
+        const inputs = interiorSolidInputs(env, { structure });
+        for (const solid of solids) expect(solid.keys, `${solid.name} records`).toEqual(inputs[solid.name]);
+      }
     });
   }
 });

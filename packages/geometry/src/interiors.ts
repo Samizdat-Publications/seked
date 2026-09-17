@@ -28,7 +28,7 @@
 
 import type { Environment } from './environment';
 import { bore, chamber, extrudedSection, passage, runEnd } from './interior';
-import type { BoreSegment, Gable, SectionPair, Solid } from './interior';
+import type { BoreSegment, ChamberTurn, Gable, SectionPair, Solid } from './interior';
 import type { Point } from './landmarks';
 
 /** The structures whose interiors are looked for, when a caller names none. */
@@ -1154,7 +1154,7 @@ function chamberBuilder(env: Environment, prefix: string, name: string, half: nu
   return {
     name: base,
     keys,
-    build: () => (gable ? chamber({ min, max, gable, prefix: base }) : chamber({ min, max, prefix: base })),
+    build: () => chamber({ min, max, prefix: base, ...(gable ? { gable } : {}), ...(routed?.turn ? { turn: routed.turn } : {}) }),
   };
 }
 
@@ -1171,11 +1171,23 @@ function chamberBuilder(env: Environment, prefix: string, name: string, half: nu
 // A routed passage begins at its own `floor.begin` if it records one; else,
 // straight after a chamber, at `floor.begin.from_east_wall` metres west of that
 // chamber's east wall on its north-south centre line and at its floor, which
-// is how a source says "from the middle of the floor"; else where the member
-// before it ends; else at the entrance. It runs its `length`, and whatever it
-// does not record of its section, slope or bearing it continues from the
-// passage before it, which is how a source describes "a short stretch of the
-// same width" or a portcullis slot in the same incline.
+// is how a source says "from the middle of the floor"; else, if it records a
+// branch, on the passage it branches from; else where the member before it
+// ends; else at the entrance. It runs its `length`, and whatever it does not
+// record of its section, slope or bearing it continues from the passage before
+// it, which is how a source describes "a short stretch of the same width" or a
+// portcullis slot in the same incline.
+//
+//   <id>.passage.<name>.branch.step       the step of the passage it opens off
+//   <id>.passage.<name>.branch.from_end   metres back along that passage's floor from its end
+//
+// A branch is a door in the side of another passage, "in the north wall of the
+// corridor": it begins that far back from the parent's end, on the parent's
+// floor, and half the parent's width out to the side its own bearing heads
+// for. A passage stated as a flight of steps records `run`, the horizontal
+// length, and `drop`, how far its floor goes down, instead of a length along
+// the floor and a slope; a run and a drop of its own take precedence over a
+// slope carried from the passage before.
 //
 // A routed chamber with no stored walls is entered on the wall facing the
 // arriving passage, at the level it arrives at unless `floor.up` is recorded.
@@ -1183,11 +1195,23 @@ function chamberBuilder(env: Environment, prefix: string, name: string, half: nu
 // from the east wall: `door.north.from_east_wall` and half `door.north.width`,
 // or the middle of `door.begin.from_east_wall` and `door.end.from_east_wall`.
 // Arriving westwards it is entered on its east wall, whose door is placed from
-// the south wall: `door.east.from_south_wall` and half `door.east.width`. A
-// chamber entered from the north is left through `door.south` if one is
-// recorded. Other arrivals end the route, because no chamber on a route at
-// Giza is entered any other way. Every coordinate a route produces is derived,
-// so none is stored, and every routed member names the whole chain behind it.
+// the south wall: `door.east.from_south_wall` and half `door.east.width`.
+// Arriving northwards it is entered on its south wall, whose door is placed
+// from the east wall like the north one. A door given as its two edges,
+// `door.<wall>.begin.<from>` and `door.<wall>.end.<from>`, is placed at their
+// middle. A chamber entered from the north is left through `door.south` if one
+// is recorded. Other arrivals end the route, because no chamber on a route at
+// Giza is entered any other way.
+//
+//   <id>.chamber.<name>.direction   azimuth of the chamber's own north
+//
+// A chamber that records a direction is not square with the pyramid. It is
+// laid out in its own frame, whose north is that azimuth, pivoted on the point
+// the passage arrives at: the arriving bearing is read in that frame to choose
+// the wall, the door is placed along that wall, and the finished box is turned
+// onto the site. Nothing is routed on out of a turned chamber. Every coordinate
+// a route produces is derived, so none is stored, and every routed member names
+// the whole chain behind it.
 
 interface Placed {
   point: Point;
@@ -1212,6 +1236,14 @@ interface Routed {
   section?: Section;
   derived?: Record<string, number>;
   keys?: string[];
+  turn?: ChamberTurn;
+}
+
+/** A passage the route has laid, kept by step so a later branch can open off it. */
+interface Leg {
+  begin: Placed;
+  end: Placed;
+  section: Section;
 }
 
 interface Room {
@@ -1219,6 +1251,15 @@ interface Room {
   centreNorth: number;
   floor: number;
   keys: string[];
+}
+
+/** The middle of a door given by its two edges, `<door>.begin.<from>` and `<door>.end.<from>`. */
+function doorEdges(env: Environment, door: string, from: string): Carried | undefined {
+  const beginKey = `${door}.begin.${from}`;
+  const endKey = `${door}.end.${from}`;
+  const begin = numberAt(env, beginKey);
+  const end = numberAt(env, endKey);
+  return begin !== undefined && end !== undefined ? { value: (begin + end) / 2, keys: [beginKey, endKey] } : undefined;
 }
 
 /** A chamber door's middle, as metres from the wall it is placed from, on the wall named, and the records it came from. */
@@ -1229,12 +1270,45 @@ function doorOffset(env: Environment, base: string, wall: 'north' | 'south' | 'e
   const offset = numberAt(env, fromKey);
   const width = numberAt(env, widthKey);
   if (offset !== undefined && width !== undefined) return { value: offset + width / 2, keys: [fromKey, widthKey] };
-  if (wall !== 'north') return undefined;
-  const beginKey = `${base}.door.begin.from_east_wall`;
-  const endKey = `${base}.door.end.from_east_wall`;
-  const begin = numberAt(env, beginKey);
-  const end = numberAt(env, endKey);
-  return begin !== undefined && end !== undefined ? { value: (begin + end) / 2, keys: [beginKey, endKey] } : undefined;
+  const edges = doorEdges(env, `${base}.door.${wall}`, from);
+  if (edges || wall !== 'north') return edges;
+  return doorEdges(env, `${base}.door`, 'from_east_wall');
+}
+
+/**
+ * Where a branch begins: `branch.from_end` metres back from the end of the
+ * passage laid at `branch.step`, on its floor, and half its width out to the
+ * side `heading` points to. Undefined unless the passage records a branch and
+ * the route has laid the passage it names.
+ */
+function branchBegin(env: Environment, base: string, legs: Map<number, Leg>, heading: Carried | undefined): Placed | undefined {
+  const stepKey = `${base}.branch.step`;
+  const fromEndKey = `${base}.branch.from_end`;
+  const step = numberAt(env, stepKey);
+  const fromEnd = numberAt(env, fromEndKey);
+  const parent = step === undefined ? undefined : legs.get(step);
+  if (!parent || fromEnd === undefined) return undefined;
+  const [bx, by, bz] = parent.begin.point;
+  const [ex, ey, ez] = parent.end.point;
+  const run = Math.hypot(ex - bx, ey - by, ez - bz);
+  const flat = Math.hypot(ex - bx, ey - by);
+  if (run < MIN_RUN || flat < MIN_RUN) return undefined;
+  const along = (run - fromEnd) / run;
+  // Square to the parent in plan, on its right-hand side unless the branch heads left.
+  let sideX = (ey - by) / flat;
+  let sideY = -(ex - bx) / flat;
+  if (heading) {
+    const azimuth = (heading.value * Math.PI) / 180;
+    if (sideX * Math.sin(azimuth) + sideY * Math.cos(azimuth) < 0) {
+      sideX = -sideX;
+      sideY = -sideY;
+    }
+  }
+  const out = parent.section.width / 2;
+  return {
+    point: [bx + (ex - bx) * along + sideX * out, by + (ey - by) * along + sideY * out, bz + (ez - bz) * along],
+    keys: [...parent.begin.keys, ...parent.end.keys, ...parent.section.widthKeys, stepKey, fromEndKey],
+  };
 }
 
 interface RouteMember {
@@ -1271,15 +1345,18 @@ function walkRoute(env: Environment, structure: string, prefix: string, half: nu
   let bearing: Carried | undefined;
   let slope: Carried | undefined;
   let section: Section | undefined;
+  const legs = new Map<number, Leg>();
   for (const member of routeMembers(env, prefix)) {
     const { base } = member;
     const stepKey = `${base}.step`;
     if (member.kind === 'passage') {
       const inRoomKey = `${base}.floor.begin.from_east_wall`;
       const inRoom = numberAt(env, inRoomKey);
+      const heading = carry(env, `${base}.direction`, bearing);
       const begin =
         storedPoint(env, `${base}.floor.begin`, half) ??
         (room && inRoom !== undefined ? { point: [room.east - inRoom, room.centreNorth, room.floor] as Point, keys: [...room.keys, inRoomKey] } : undefined) ??
+        branchBegin(env, base, legs, heading) ??
         exit ??
         entranceBegin(env, structure, prefix, member.name, half);
       room = undefined;
@@ -1299,11 +1376,21 @@ function walkRoute(env: Environment, structure: string, prefix: string, half: nu
       };
       const start: Placed = { point: begin.point, keys: [...begin.keys, stepKey] };
       const angle = carry(env, `${base}.angle`, slope);
-      const heading = carry(env, `${base}.direction`, bearing);
       const lengthKey = `${base}.length`;
       const length = numberAt(env, lengthKey);
+      const runKey = `${base}.run`;
+      const dropKey = `${base}.drop`;
+      const flight = numberAt(env, runKey);
+      const drop = numberAt(env, dropKey);
       const stored = storedPoint(env, `${base}.floor.end`, half);
       let end: Placed | undefined = stored;
+      if (!end && flight !== undefined && drop !== undefined && flight > 0) {
+        const azimuth = ((heading?.value ?? DUE_SOUTH) * Math.PI) / 180;
+        end = {
+          point: [begin.point[0] + flight * Math.sin(azimuth), begin.point[1] + flight * Math.cos(azimuth), begin.point[2] - drop],
+          keys: [runKey, dropKey, ...(heading?.keys ?? [])],
+        };
+      }
       if (!end && length !== undefined && length > 0 && angle) {
         const azimuth = ((heading?.value ?? DUE_SOUTH) * Math.PI) / 180;
         const tilt = (angle.value * Math.PI) / 180;
@@ -1332,13 +1419,18 @@ function walkRoute(env: Environment, structure: string, prefix: string, half: nu
       if (angle) slope = angle;
       exit = { point: end.point, keys: [...start.keys, ...end.keys] };
       section = here;
+      legs.set(member.step, { begin: start, end, section: here });
       continue;
     }
     room = undefined;
     if (!exit) continue;
-    const towards = bearing?.value ?? DUE_SOUTH;
+    // A turned chamber is laid out in its own frame, pivoted on the arrival point.
+    const turnKey = `${base}.direction`;
+    const turnBy = numberAt(env, turnKey);
+    const at: Point = turnBy === undefined ? exit.point : [0, 0, exit.point[2]];
+    const towards = ((bearing?.value ?? DUE_SOUTH) - (turnBy ?? 0) + 360) % 360;
     const off = (target: number) => Math.abs(((towards - target + 540) % 360) - 180);
-    const wall = off(180) <= 45 ? 'north' : off(270) <= 45 ? 'east' : undefined;
+    const wall = off(180) <= 45 ? 'north' : off(270) <= 45 ? 'east' : off(0) <= 45 ? 'south' : undefined;
     const door = wall ? doorOffset(env, base, wall) : undefined;
     if (!wall || !door) {
       exit = undefined;
@@ -1347,23 +1439,33 @@ function walkRoute(env: Environment, structure: string, prefix: string, half: nu
     const recordedFloor = numberAt(env, `${base}.floor.up`);
     const floor = recordedFloor ?? exit.point[2];
     const derived: Record<string, number> = {};
-    const keys = [...exit.keys, stepKey, ...door.keys];
+    const keys = [...exit.keys, stepKey, ...door.keys, ...(turnBy === undefined ? [] : [turnKey])];
     let east: number;
     let centreNorth: number | undefined;
     const depth = dimension(env, `${base}.width`, ['east', 'west']);
     if (wall === 'north') {
-      east = exit.point[0] + door.value;
-      derived[`${base}.wall.north.north`] = exit.point[1];
+      east = at[0] + door.value;
+      derived[`${base}.wall.north.north`] = at[1];
       derived[`${base}.wall.east.east`] = east;
-      if (depth) centreNorth = exit.point[1] - depth.value / 2;
+      if (depth) centreNorth = at[1] - depth.value / 2;
+    } else if (wall === 'south') {
+      east = at[0] + door.value;
+      derived[`${base}.wall.south.north`] = at[1];
+      derived[`${base}.wall.east.east`] = east;
+      if (depth) centreNorth = at[1] + depth.value / 2;
     } else {
-      east = exit.point[0];
-      const south = exit.point[1] - door.value;
+      east = at[0];
+      const south = at[1] - door.value;
       derived[`${base}.wall.east.east`] = east;
       derived[`${base}.wall.south.north`] = south;
       if (depth) centreNorth = south + depth.value / 2;
     }
     if (recordedFloor === undefined) derived[`${base}.floor.up`] = floor;
+    if (turnBy !== undefined) {
+      out.set(base, { derived, keys, turn: { about: [exit.point[0], exit.point[1]], azimuthDeg: turnBy } });
+      exit = undefined;
+      continue;
+    }
     out.set(base, { derived, keys });
     room = depth && centreNorth !== undefined ? { east, centreNorth, floor, keys: [...keys, ...depth.keys] } : undefined;
     const leave = wall === 'north' ? doorOffset(env, base, 'south') : undefined;
