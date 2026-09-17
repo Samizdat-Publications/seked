@@ -2,6 +2,7 @@ import { DEG } from '@seked/units';
 import { useEffect, useMemo, useRef } from 'react';
 import { DoubleSide, FrontSide, type MeshStandardMaterial, type Plane } from 'three';
 import type { MassingParams, PlateauMass, PyramidParams } from '../model';
+import { useView } from '../store';
 import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
 import { applyStone, useStone, type StoneRole } from './stone';
 
@@ -64,7 +65,7 @@ const MASS_BASALT = '#3b3c3d';
  * on what could actually move it, the vertex count and the solid's vertical
  * extent, so a cubit tick does not rebuild six hundred tombs.
  */
-function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Plane[] }): React.JSX.Element {
+function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Plane[] }): React.JSX.Element | null {
   const zs = mass.mesh.positions;
   const key = `${mass.mesh.vertexCount}:${zs[2]}:${zs[zs.length - 1]}`;
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,6 +77,7 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
         : mass.id === 'khufu.basalt_pavement' ? MASS_BASALT
           : MASS_LIMESTONE;
   const material = useStoneMaterial(color === MASS_LIMESTONE ? 'core' : undefined, 0.85);
+  if (useView((s) => s.hiddenMasses).has(mass.id)) return null; // a fitted stand-in model stands here instead
   return (
     <mesh geometry={geometry} name={mass.id}>
       <meshStandardMaterial ref={material} color={color} roughness={0.96} metalness={0} flatShading clippingPlanes={clippingPlanes} />
