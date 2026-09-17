@@ -26,7 +26,15 @@ export const ELECTRUM_COLOUR = '#e6d7a3';
  * jeweller's polish, which keeps the sun in it a disc and not a star.
  */
 const LOOK = {
-  roughness: 0.18,
+  /**
+   * Burnished rather than mirror-polished, so the sun spreads into a glint a
+   * viewer can see from more than one stand; and not quite a pure metal, so a
+   * little of the alloy's own warmth survives when the sky it reflects is dim.
+   * The environment map is the sky alone, with no lit ground in it, and a
+   * true metal under it at dusk was soot (director, 2026-09-17).
+   */
+  roughness: 0.3,
+  metalness: 0.85,
   /**
    * How much of the scene's environment map this material takes, against the
    * one everything else takes. A metal has no diffuse at all: what it is not
@@ -35,7 +43,7 @@ const LOOK = {
    * strength a capstone reads as a lump of soot. Four times it is a look
    * choice, and the smallest one that leaves electrum looking like metal.
    */
-  environment: 4,
+  environment: 2.5,
 } as const;
 
 /**
@@ -45,7 +53,7 @@ const LOOK = {
  * this material is for.
  */
 export function applyElectrum(material: MeshPhysicalMaterial): void {
-  material.metalness = 1;
+  material.metalness = LOOK.metalness;
   material.roughness = LOOK.roughness;
   material.clearcoat = 0;
   material.envMapIntensity = LOOK.environment;

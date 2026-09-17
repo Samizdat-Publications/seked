@@ -46,10 +46,14 @@ export const CASING_COLOUR = '#ece6d9';
  * pixel and the face would go grey. `fade` is where they begin to go and where
  * they are gone, in metres.
  *
- * `built` is a dressed face; `ancient` is the mirror the spec asks for, where
- * the clearcoat carries the sky's own reflection at a grazing angle. Blender's
- * coat is 0.12 at 0.06 roughness, which is a still frame with a full path
- * trace behind it; the viewer has one environment map and has to say it louder.
+ * `built` is a dressed face; `ancient` is the polish the spec asks for, where
+ * the sun glints off the faces and the sky shows in them at a grazing angle.
+ * Blender's coat is 0.12 at 0.06 roughness, which is a still frame with a full
+ * path trace behind it. The viewer's first try (roughness 0.12, a full coat)
+ * turned the faces to blue steel: a coat attenuates the diffuse under it by
+ * its own Fresnel, and the environment map is the sky alone with no warm
+ * ground in it, so at a grazing angle the cream went and the sky stayed. Half
+ * a coat keeps the limestone under the shine (director, 2026-09-17).
  */
 const LOOK = {
   joint: 0.02,
@@ -58,7 +62,7 @@ const LOOK = {
   blockTone: 0.07,
   fade: [140, 340] as const,
   built: { roughness: 0.25, clearcoat: 0.35, clearcoatRoughness: 0.12 },
-  ancient: { roughness: 0.12, clearcoat: 1.0, clearcoatRoughness: 0.05 },
+  ancient: { roughness: 0.2, clearcoat: 0.45, clearcoatRoughness: 0.08 },
 } as const;
 
 export interface CasingOptions {
