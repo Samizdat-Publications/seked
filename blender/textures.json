@@ -22,6 +22,16 @@
       "id": "dry_ground_rocks",
       "role": "gravel",
       "why": "Dry ground strewn with limestone chips, mixed into the sand by a large noise so the plateau is not one sheet of sand."
+    },
+    {
+      "id": "granite_wall",
+      "role": "granite",
+      "why": "Weathered outdoor granite with its crystal grain, under a stated colour for the red Aswan granite of the King's Chamber, Menkaure's lower casing and the valley temple."
+    },
+    {
+      "id": "quarry_wall",
+      "role": "bedrock",
+      "why": "A quarried rock face with its tool-cut and bedded relief, for the walls of the Sphinx's enclosure, which are the bedrock the quarrymen cut back."
     }
   ]
 }

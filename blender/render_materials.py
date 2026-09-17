@@ -318,10 +318,43 @@ def wire_casing(tree, bsdf, vector, weathered=False):
 
 
 def wire_granite(tree, bsdf, vector):
-    """Aswan granite, the dark red-brown of the King's Chamber, with a fine noise for its grain."""
-    grain = noise(tree, vector, 14.0, 6.0)
-    tree.links.new(mix_colours(tree, grain, (0.20, 0.13, 0.12), (0.38, 0.24, 0.21)), bsdf.inputs["Base Color"])
-    tree.links.new(map_range(tree, grain, 0.32, 0.55), bsdf.inputs["Roughness"])
+    """
+    Aswan granite, the dark red-brown of the King's Chamber: the photographed
+    granite's crystal grain pulled toward that colour, or a fine noise where
+    the set has not been fetched.
+    """
+    maps = photographed(tree, vector, "granite")
+    if maps is None:
+        grain = noise(tree, vector, 14.0, 6.0)
+        tree.links.new(mix_colours(tree, grain, (0.20, 0.13, 0.12), (0.38, 0.24, 0.21)), bsdf.inputs["Base Color"])
+        tree.links.new(map_range(tree, grain, 0.32, 0.55), bsdf.inputs["Roughness"])
+        return
+    colour = tinted(tree, maps["colour"], (0.30, 0.18, 0.15), 0.55)
+    tree.links.new(colour, bsdf.inputs["Base Color"])
+    tree.links.new(map_range(tree, maps["rough"], 0.30, 0.60), bsdf.inputs["Roughness"])
+    tree.links.new(bump(tree, maps["height"], 0.15, 0.02), bsdf.inputs["Normal"])
+
+
+BEDROCK_NAME = "Quarried bedrock"
+
+
+def bedrock_material():
+    """
+    The bedrock the quarrymen cut back, for the walls of the Sphinx's enclosure:
+    the core limestone's banding, so the walls show the same beds the Sphinx's
+    body is carved from, with the photographed quarry face's relief over it.
+    """
+    mat = bpy.data.materials.get(BEDROCK_NAME)
+    if mat is not None:
+        return mat
+    mat, tree, bsdf = new_material(BEDROCK_NAME)
+    vector = object_coordinates(tree)
+    wire_core(tree, bsdf, vector, mean_course_height()[0])
+    maps = photographed(tree, vector, "bedrock", 3.0)
+    if maps is not None:
+        # The core's bands and colour, with the quarry face's tool-cut relief laid over them.
+        tree.links.new(bump(tree, maps["height"], 0.6, 0.25), bsdf.inputs["Normal"])
+    return mat
 
 
 def wire_core(tree, bsdf, vector, course=None):

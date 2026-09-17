@@ -28,7 +28,7 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
-from render_materials import core_material
+from render_materials import bedrock_material, core_material
 from seked_data import load_footprints
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -237,8 +237,7 @@ def build_standins(scene, state="today", variants=()):
 # on the north, south and west and open well past the paws to the east, floored
 # at the lowest base the outlines carry. The corridor widths are look choices
 # read off photographs of the enclosure, not measurements, and are printed as
-# such; the walls take the banded core limestone, which is what the cut bedrock
-# is. Nothing here changes the .blend or the viewer's ground.
+# such; the walls take the quarried bedrock material. Nothing here changes the .blend or the viewer's ground.
 
 ENCLOSURE_MARGIN_M = {"north": 9.0, "south": 14.0, "west": 12.0, "east": 60.0}
 ENCLOSURE_FOOTPRINTS = ("sphinx.body", "sphinx.head", "sphinx.paws")
@@ -270,7 +269,7 @@ def cut_enclosure(scene):
     bm.free()
     cutter = bpy.data.objects.new(mesh.name, mesh)
     scene.collection.objects.link(cutter)
-    cutter.data.materials.append(core_material(True))
+    cutter.data.materials.append(bedrock_material())
     cutter.hide_render = True
     cutter.hide_set(True)
 
@@ -280,8 +279,8 @@ def cut_enclosure(scene):
     mod.object = cutter
     if hasattr(mod, "material_mode"):
         mod.material_mode = "TRANSFER"
-    if not any(m.name == core_material(True).name for m in ground.data.materials):
-        ground.data.materials.append(core_material(True))
+    if not any(m.name == bedrock_material().name for m in ground.data.materials):
+        ground.data.materials.append(bedrock_material())
     print(f"enclosure: cut {east - west:.0f} by {north - south:.0f} m to {floor:.2f} m around the Sphinx's outlines, "
-          f"corridors {ENCLOSURE_MARGIN_M} m (look choices, not measurements), walls in the banded core limestone")
+          f"corridors {ENCLOSURE_MARGIN_M} m (look choices, not measurements), walls in the quarried bedrock")
     return cutter
