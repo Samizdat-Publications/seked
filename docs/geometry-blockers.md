@@ -345,6 +345,20 @@ Lehner 1997 is not readable here), Khufu's and Menkaure's enclosures, the
 akhet moment rendering dark at sunset, the heavy haze at aerial stands, the
 polished casing's cool cast toward the sun.
 
+Stage 3 landed the same night (snapshot 0030, plan
+`docs/superpowers/plans/2026-09-17-stage-3-the-first-time.md`): the harbour
+and the flood plain, the green mask and the plant scatter, a second light
+and air pass (sunset legible, dust low, a ground in the reflections, the
+night by starlight), a props pipeline (`blender/props.json`,
+`scripts/props.py`, `scene/Props.tsx`) with the seated Khafre, the jackals
+and the plants, and two plans read: the ARCE 1:200 map of the Sphinx ditch
+(Open Context, CC BY, `arce-sphinx-mapping-oc`; north and west margins
+scaled) and Hoelscher's Blatt XVII of the valley temple (Heidelberg IIIF,
+`hoelscher-1912`; the hall, pillars and floor levels). Open from stage 3:
+the hall's 23 statue sockets and east entrances, the T's north-south arm,
+Reisner's Menkaure plans, a mesh for Khufu's ship, the water at dusk, and
+Stewart's reference look (spec 3.1) as the yardstick for the next pass.
+
 **Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
 modern and ancient states and the transitional steps between, with models
