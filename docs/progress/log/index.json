@@ -298,5 +298,35 @@
     "kept": false,
     "note": "as built with the L.VII.C reconstruction, 256 samples",
     "bytes": 1701871
+  },
+  {
+    "file": "2026-09-17T17-14-21Z--ancient-front--b148576.png",
+    "taken": "2026-09-17T17:14:21+00:00",
+    "view": "ancient-front",
+    "commit": "b148576",
+    "tree": "clean",
+    "kept": false,
+    "note": "ancient state, Anubis in the paint-black2 finish with gilding, 256 samples",
+    "bytes": 2026511
+  },
+  {
+    "file": "2026-09-17T17-14-21Z--ancient-high--b148576-dirty.png",
+    "taken": "2026-09-17T17:14:21+00:00",
+    "view": "ancient-high",
+    "commit": "b148576",
+    "tree": "dirty",
+    "kept": false,
+    "note": "ancient state, Anubis in the paint-black2 finish with gilding, 256 samples",
+    "bytes": 2651627
+  },
+  {
+    "file": "2026-09-17T17-14-22Z--ancient-harbour--b148576-dirty.png",
+    "taken": "2026-09-17T17:14:22+00:00",
+    "view": "ancient-harbour",
+    "commit": "b148576",
+    "tree": "dirty",
+    "kept": false,
+    "note": "ancient state, Anubis in the paint-black2 finish with gilding, 256 samples",
+    "bytes": 2336294
   }
 ]
