@@ -10,3 +10,4 @@ export * from './datum';
 export * from './footprints';
 export * from './pyramidion';
 export * from './smallpyramid';
+export * from './mastaba';
