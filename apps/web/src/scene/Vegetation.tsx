@@ -369,13 +369,29 @@ function loadPlant(file: string): Promise<Group | undefined> {
   return promise;
 }
 
-/** The first mesh in a loaded model, which is what a plant is instanced from. */
-function firstMesh(group: Group): Mesh | undefined {
-  let found: Mesh | undefined;
-  group.traverse((object) => {
-    if (!found && (object as Mesh).isMesh) found = object as Mesh;
+/**
+ * The meshes a plant is instanced from: everything under the model's first
+ * level of detail (the node `lods[0]` names, or the whole model where a file
+ * carries no levels), each with the transform it carries inside that node.
+ * The props pipeline has already turned the model into the data frame and
+ * scaled it to `scale_to`, so nothing is scaled or turned again here; a palm
+ * is a trunk and a crown in two materials, so every primitive is kept.
+ */
+interface PlantPart {
+  mesh: Mesh;
+  local: Matrix4;
+}
+
+function partsOf(group: Group, level: string | undefined): PlantPart[] {
+  const node = (level ? group.getObjectByName(level) : undefined) ?? group;
+  node.updateMatrixWorld(true);
+  const inverse = new Matrix4().copy(node.matrixWorld).invert();
+  const parts: PlantPart[] = [];
+  node.traverse((child) => {
+    if (!(child as Mesh).isMesh) return;
+    parts.push({ mesh: child as Mesh, local: new Matrix4().multiplyMatrices(inverse, child.matrixWorld) });
   });
-  return found;
+  return parts;
 }
 
 // --- The component ---------------------------------------------------------
@@ -566,11 +582,11 @@ interface PlantProps extends PlantsProps {
 }
 
 function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, clock, state, seed }: PlantProps): React.JSX.Element | null {
-  const [source, setSource] = useState<Mesh | undefined>(undefined);
+  const [parts, setParts] = useState<PlantPart[] | undefined>(undefined);
   useEffect(() => {
     let alive = true;
-    void loadPlant(entry.lods?.[0] ?? entry.file).then((group) => {
-      if (alive && group) setSource(firstMesh(group));
+    void loadPlant(entry.file).then((group) => {
+      if (alive && group) setParts(partsOf(group, entry.lods?.[0]));
     });
     return () => {
       alive = false;
@@ -582,16 +598,52 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
     () => scatter(mask, ground, level, strength, density, 4000, seed, basin).places,
     [mask, ground, level, strength, density, seed, basin],
   );
+  const matrices = useMemo(() => instanceMatrices(places), [places]);
 
+  const tag = useMemo(
+    () => ({
+      name: entry.name,
+      tier: 'claim',
+      note:
+        `A claim: ${entry.name} standing in the First Time's grassland, a stand-in model scattered by the green mask and not by any record. `
+        + 'The science behind the staging is the African Humid Period, about 12,500 to 3,500 BCE. '
+        + (entry.note ?? ''),
+      state,
+    }),
+    [entry, state],
+  );
+
+  if (!parts || parts.length === 0 || places.length === 0) return null;
+  return (
+    <group name={`vegetation.${entry.id}`} userData={{ seked: tag }}>
+      {parts.map((part, k) => (
+        <PlantPrimitive key={`${entry.id}:${k}:${places.length}`} part={part} matrices={matrices} clippingPlanes={clippingPlanes} clock={clock} />
+      ))}
+    </group>
+  );
+}
+
+/** One primitive of a plant, instanced at every place with the part's own transform inside the model applied first. */
+function PlantPrimitive({
+  part,
+  matrices,
+  clippingPlanes,
+  clock,
+}: {
+  part: PlantPart;
+  matrices: Matrix4[];
+  clippingPlanes: Plane[];
+  clock: { value: number };
+}): React.JSX.Element | null {
   const material = useMemo(() => {
-    const held = source?.material;
+    const held = part.mesh.material;
     const m = (Array.isArray(held) ? held[0] : held) as MeshStandardMaterial | undefined;
     if (!m) return undefined;
     const copy = m.clone();
     applyBlades(copy, clock);
     applyAtmosphere(copy);
     return copy;
-  }, [source, clock]);
+  }, [part, clock]);
   useEffect(() => {
     if (!material) return;
     material.clippingPlanes = clippingPlanes;
@@ -605,36 +657,13 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
   const [mesh, setMesh] = useState<InstancedMesh | null>(null);
   useEffect(() => {
     if (!mesh) return;
-    const scale = entry.scale_to ?? 1;
-    instanceMatrices(places).forEach((m, i) => {
-      mesh.setMatrixAt(i, m.clone().multiply(new Matrix4().makeScale(scale, scale, scale)));
-    });
+    matrices.forEach((m, i) => mesh.setMatrixAt(i, m.clone().multiply(part.local)));
     mesh.instanceMatrix.needsUpdate = true;
     mesh.frustumCulled = false;
-  }, [mesh, places, entry]);
+  }, [mesh, matrices, part]);
 
-  if (!source || !material || places.length === 0) return null;
-  return (
-    <instancedMesh
-      ref={setMesh}
-      args={[source.geometry, material, places.length]}
-      key={`${entry.id}:${places.length}`}
-      name={`vegetation.${entry.id}`}
-      userData={{
-        seked: {
-          name: entry.name,
-          tier: 'claim',
-          note:
-            `A claim: ${entry.name} standing in the First Time's grassland, a stand-in model scattered by the green mask and not by any record. `
-            + 'The science behind the staging is the African Humid Period, about 12,500 to 3,500 BCE. '
-            + (entry.note ?? ''),
-          state,
-        },
-      }}
-      castShadow
-      receiveShadow
-    />
-  );
+  if (!material) return null;
+  return <instancedMesh ref={setMesh} args={[part.mesh.geometry, material, matrices.length]} castShadow receiveShadow />;
 }
 
 /**
