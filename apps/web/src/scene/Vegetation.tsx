@@ -111,6 +111,9 @@ const PLANT_DENSITY: Record<string, number> = {
 /** The density for a plant the manifest names something this file has not met. */
 const PLANT_DENSITY_DEFAULT = 0.0006;
 
+/** The most of one plant that stands at once, a look choice set by what the coarse level costs. */
+const PLANT_CAP = 700;
+
 // --- The card --------------------------------------------------------------
 
 /**
@@ -585,8 +588,12 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
   const [parts, setParts] = useState<PlantPart[] | undefined>(undefined);
   useEffect(() => {
     let alive = true;
+    // A scattered plant stands hundreds of times, so it is instanced from the
+    // coarsest level the pipeline made, not the first: the first level of an
+    // acacia is hundreds of thousands of triangles, and a few thousand of
+    // those stalled the GPU outright (director, 2026-09-17).
     void loadPlant(entry.file).then((group) => {
-      if (alive && group) setParts(partsOf(group, entry.lods?.[0]));
+      if (alive && group) setParts(partsOf(group, entry.lods?.[entry.lods.length - 1]));
     });
     return () => {
       alive = false;
@@ -595,7 +602,7 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
 
   const density = PLANT_DENSITY[plantKindOf(entry)] ?? PLANT_DENSITY_DEFAULT;
   const places = useMemo(
-    () => scatter(mask, ground, level, strength, density, 4000, seed, basin).places,
+    () => scatter(mask, ground, level, strength, density, PLANT_CAP, seed, basin).places,
     [mask, ground, level, strength, density, seed, basin],
   );
   const matrices = useMemo(() => instanceMatrices(places), [places]);
