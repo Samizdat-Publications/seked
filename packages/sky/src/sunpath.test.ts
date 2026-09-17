@@ -18,10 +18,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { REPO_ROOT } from '@seked/data';
-import { calendarYearOfEpoch, deltaT, julianDay } from './calendar';
+import { calendarYearOfEpoch, deltaT } from './calendar';
 import { equationOfTime, seasonInstant, solarDeclinationAndRa, type SeasonEvent } from './solar';
 import { hourAngleAtAltitude, SUN_STANDARD_ALTITUDE_DEG } from './sun';
-import { sunAt } from './sunpath';
+import { EQUINOX_DAY, sunAt } from './sunpath';
 
 interface Bake {
   observer: { latitudeDeg: number; longitudeDeg: number };
@@ -34,25 +34,27 @@ const bake: Bake | undefined = existsSync(BAKE_PATH) ? (JSON.parse(readFileSync(
 /** How far apart the two roads to the same sun are allowed to land. */
 const TOLERANCE_DEG = 0.3;
 
+/** Local midnight of the day a seasonal event falls on where the observer is, as a Julian Day in TT. */
+function eventMidnight(year: number, event: SeasonEvent, longitudeDeg: number): number {
+  const drift = deltaT(year) / 86400;
+  const meridian = longitudeDeg / 360;
+  return Math.floor(seasonInstant(year, event) - drift + meridian + 0.5) - 0.5 - meridian + drift;
+}
+
 /**
- * The day of the year a seasonal event falls on where the observer stands,
- * and the local mean time of that day's sunrise and sunset. This is the
- * arithmetic `datedSunEnvironment` does, done here so the test says out loud
- * which day and which hour it is asking `sunAt` about.
+ * The day a seasonal event falls on, counted from the March equinox's day as
+ * `sunAt` counts, and the local mean time of that day's sunrise and sunset.
+ * This is the arithmetic `datedSunEnvironment` does, done here so the test
+ * says out loud which day and which hour it is asking `sunAt` about.
  */
 function eventDay(epoch: number, event: SeasonEvent, latitudeDeg: number, longitudeDeg: number): { day: number; rise: number; set: number } {
   const year = calendarYearOfEpoch(epoch);
-  const drift = deltaT(year) / 86400;
-  const meridian = longitudeDeg / 360;
-  const jde = seasonInstant(year, event);
-  // Local midnight of the day the event falls on where the observer is, as a
-  // Julian Day in TT, and local mean noon half a day after it.
-  const midnight = Math.floor(jde - drift + meridian + 0.5) - 0.5 - meridian + drift;
+  const midnight = eventMidnight(year, event, longitudeDeg);
   const noon = midnight + 0.5;
   const minutes = equationOfTime(noon);
   const hourAngleDeg = hourAngleAtAltitude(solarDeclinationAndRa(noon).decDeg, latitudeDeg, SUN_STANDARD_ALTITUDE_DEG);
   return {
-    day: Math.round(midnight - drift + meridian - julianDay(year, 1, 1)) + 1,
+    day: EQUINOX_DAY + Math.round(midnight - eventMidnight(year, 'march-equinox', longitudeDeg)),
     rise: 12 - hourAngleDeg / 15 - minutes / 60,
     set: 12 + hourAngleDeg / 15 - minutes / 60,
   };
@@ -76,6 +78,23 @@ describe('sunAt', () => {
     const sun = sunAt({ epoch: target.epoch, day, hour: set - 1, latitudeDeg, longitudeDeg });
     expect(Math.abs(sun.azimuthDeg - target.sun.azimuthDeg)).toBeLessThan(TOLERANCE_DEG);
     expect(Math.abs(sun.altitudeDeg - target.sun.altitudeDeg)).toBeLessThan(TOLERANCE_DEG);
+  });
+
+  it('keeps a season a season at every epoch, because the day counts from the equinox', () => {
+    const giza = { latitudeDeg: 29.979167, longitudeDeg: 31.134167 };
+    // The December sun an hour before it sets, the panorama's moment: the same
+    // low sun in the south-west in 10,500 BCE as in 2026, to a few degrees,
+    // where the calendar's own day would have put it below the horizon.
+    const now = sunAt({ epoch: 2026, day: 355, hour: 16, ...giza });
+    const then = sunAt({ epoch: -10499, day: 355, hour: 16, ...giza });
+    expect(Math.abs(then.altitudeDeg - now.altitudeDeg)).toBeLessThan(3);
+    expect(Math.abs(then.azimuthDeg - now.azimuthDeg)).toBeLessThan(4);
+    // At noon on the equinox's own day the sun's declination is near zero, so
+    // it stands at the colatitude, at every epoch.
+    for (const epoch of [2026, -2449, -10499]) {
+      const noon = sunAt({ epoch, day: EQUINOX_DAY, hour: 12, ...giza });
+      expect(Math.abs(noon.altitudeDeg - (90 - giza.latitudeDeg)), `epoch ${epoch}`).toBeLessThan(1.5);
+    }
   });
 
   it('puts the sun below the horizon at every midnight of the year', () => {

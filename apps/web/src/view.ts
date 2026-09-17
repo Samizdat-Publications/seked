@@ -54,8 +54,10 @@ export interface Moment {
 
 /**
  * Named moments, the ones the Blender views were rendered at, as days and
- * hours. The days are the 2026 calendar's for the equinoxes and solstices,
- * which is a day or so off in other years and is only a preset.
+ * hours. A day counts from the March equinox of the epoch's own year (day 79
+ * is the equinox at every epoch; see `EQUINOX_DAY` in the sky package), so
+ * "21 December" is the low December sun in 10,500 BCE as in 2026, where the
+ * calendar's own day would be months out.
  */
 export const MOMENTS = [
   { id: 'equinox-dawn', label: 'Equinox, an hour after sunrise', moment: { day: 79, hour: 7.1 } },

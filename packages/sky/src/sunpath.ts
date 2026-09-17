@@ -33,9 +33,9 @@
  * Angles are degrees, azimuth from north through east, to match `horizon.ts`
  * and the project's +X east, +Y north, +Z up frame.
  */
-import { calendarYearOfEpoch, deltaT, julianDay } from './calendar';
+import { calendarYearOfEpoch, deltaT } from './calendar';
 import { altAz, apparentAltitude, normalizeDeg } from './horizon';
-import { equationOfTime, solarDeclinationAndRa } from './solar';
+import { equationOfTime, seasonInstant, solarDeclinationAndRa } from './solar';
 import { SUN_STANDARD_ALTITUDE_DEG } from './sun';
 
 export interface SunPosition {
@@ -57,7 +57,12 @@ export interface SunPosition {
 export interface SunAtOptions {
   /** Julian epoch in astronomical year numbering: 2450 BCE is -2449. */
   epoch: number;
-  /** Day of the year, 1 to 366, in the calendar `calendar.ts` keeps. */
+  /**
+   * Day of the year, 1 to 366, counted so that `EQUINOX_DAY` is the day the
+   * March equinox falls on in the epoch's own year. In 2026 that is the
+   * calendar's day of the year to within a day; at 10,500 BCE it is still the
+   * season, where the calendar's day would be months out.
+   */
   day: number;
   /** Local mean solar time in hours, 0 to 24. */
   hour: number;
@@ -68,25 +73,47 @@ export interface SunAtOptions {
 }
 
 /**
+ * The day of the year the March equinox falls on in the modern calendar, and
+ * so the day a moment's `day` counts from at every epoch: day 79 is the
+ * equinox, day 172 the June solstice, day 355 the December solstice, in
+ * 10,500 BCE as in 2026.
+ *
+ * Why not the calendar: the proleptic Julian year is eleven minutes longer
+ * than the tropical one, so its dates drift through the seasons by a day
+ * every 128 years, three months by 10,500 BCE, and delta T adds days more.
+ * A reader who sets "21 December, 16:00" wants the low December sun, which
+ * is a season and not a page of a calendar nobody kept. The epoch's own
+ * equinox instant comes from `seasonInstant`, which is extrapolated that far
+ * back and says so; the day it lands on is uncertain by days there, which is
+ * nothing beside the months the calendar would be out by.
+ */
+export const EQUINOX_DAY = 79;
+
+/**
  * The Julian Day in UT1 of a day of the year and an hour of local mean solar
- * time, in the calendar year the epoch falls in. January 1 is day 1, and the
- * longitude carries the clock from the observer's meridian back to Greenwich.
+ * time. The day counts from the local midnight that begins the March
+ * equinox's own day in the epoch's year, and the longitude carries the clock
+ * from the observer's meridian back to Greenwich.
  */
 export function julianDayOfMoment({ epoch, day, hour, longitudeDeg }: Omit<SunAtOptions, 'latitudeDeg'>): number {
   const year = calendarYearOfEpoch(epoch);
-  return julianDay(year, 1, 1) + (day - 1) + hour / 24 - longitudeDeg / 360;
+  const meridian = longitudeDeg / 360;
+  const equinox = seasonInstant(year, 'march-equinox') - deltaT(year) / 86400;
+  const midnight = Math.floor(equinox + meridian + 0.5) - 0.5 - meridian;
+  return midnight + (day - EQUINOX_DAY) + hour / 24;
 }
 
 /**
  * Where the sun stands over an observer at a Julian epoch, on a day of that
- * epoch's calendar year, at an hour of local mean solar time.
+ * epoch's year counted from its March equinox, at an hour of local mean solar
+ * time.
  *
  * The sun's own place comes from `solarDeclinationAndRa`, which is Meeus
  * chapter 25 at its low-precision setting: about 0.01 degrees, far inside
  * anything a picture or a reader could tell. What is not inside anything is
  * delta T, which is sixteen hours at 2450 BCE and six days at 10,500 BCE; it
- * is applied, and it is the reason a day of the year at those epochs is a
- * label rather than a season.
+ * is applied, and counting the day from the equinox is what keeps a season a
+ * season through it.
  */
 export function sunAt(options: SunAtOptions): SunPosition {
   const { epoch, hour, latitudeDeg } = options;
