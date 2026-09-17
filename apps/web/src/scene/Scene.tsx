@@ -16,7 +16,7 @@ import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
 import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
-import { Masses } from './Masses';
+import { Structures } from './Structures';
 import { Pyramids } from './Pyramids';
 import { Standins } from './Standins';
 import { Sand } from './Sand';
@@ -91,7 +91,7 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
         <FadeScope>
           <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
           {layers.pyramids && <Pyramids pyramids={model.pyramids} observer={observer} clippingPlanes={planes} />}
-          {layers.pyramids && <Masses massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
+          {layers.pyramids && <Structures massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
           {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
           <Standins />
           <Trench env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />

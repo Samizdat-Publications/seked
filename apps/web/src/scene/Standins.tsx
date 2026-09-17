@@ -20,7 +20,7 @@
  * not been run on this machine, the viewer draws the OSM prisms as before and
  * says nothing.
  */
-import { useFrame, type ThreeEvent } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box3,
@@ -37,7 +37,6 @@ import {
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { useView } from '../store';
-import { Label } from './Label';
 
 /** One line of `apps/web/public/models/manifest.json`, as `scripts/web-assets.ts` writes it. */
 export interface StandinEntry {
@@ -72,8 +71,6 @@ export interface StandinEntry {
  */
 const LOD_METRES = [400, 1500];
 
-/** Line spacing of the hover plaque, in CSS pixels, so the lines keep their spacing at any distance. */
-const LINE_PX = 19;
 
 let manifest: Promise<StandinEntry[]> | undefined;
 
@@ -92,13 +89,17 @@ function loadModel(file: string): Promise<Group | undefined> {
   let promise = loaded.get(file);
   if (!promise) {
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    // The caption's loading line says "the Sphinx" for `sphinx:` ids, which is
+    // what every model in the manifest is so far.
+    useView.getState().setLoading(`sphinx:${file}`, true);
     promise = loader
       .loadAsync(`${import.meta.env.BASE_URL}models/${file}`)
       .then((gltf) => gltf.scene)
       .catch((error: unknown) => {
         console.warn(`stand-in ${file} did not load`, error);
         return undefined;
-      });
+      })
+      .finally(() => useView.getState().setLoading(`sphinx:${file}`, false));
     loaded.set(file, promise);
   }
   return promise;
@@ -238,12 +239,11 @@ function localBounds(scene: Group): Box3 {
 
 /** One fitted model: its levels of detail swapped by distance, and its label on hover. */
 function Standin({ entry, scene, state }: { entry: StandinEntry; scene: Group; state: string }): React.JSX.Element {
-  const [hovered, setHovered] = useState(false);
   const world = useMemo(() => new Vector3(), []);
 
-  // What the pointer is told this is. Track H's `Hover.tsx` reads the same
-  // `userData.seked` off every object in the scene, so a stand-in says the
-  // same thing whether the sprite below or the hover tag is showing.
+  // What the pointer is told this is: `Hover.tsx` reads `userData.seked` off
+  // every object in the scene and shows the tag, so the stand-in carries its
+  // name, its tier and its attribution here and draws no label of its own.
   useEffect(() => {
     scene.userData.seked = {
       name: entry.name,
@@ -285,51 +285,5 @@ function Standin({ entry, scene, state }: { entry: StandinEntry; scene: Group; s
     for (const [i, node] of lods.entries()) node.visible = i === active;
   });
 
-  const hover = (on: boolean) => (event: ThreeEvent<PointerEvent>) => {
-    event.stopPropagation();
-    setHovered(on);
-  };
-
-  return (
-    <>
-      <primitive object={scene} onPointerOver={hover(true)} onPointerOut={hover(false)} />
-      {hovered && (
-        <Plaque
-          anchor={[top.x, top.y, top.z]}
-          lines={[
-            `${entry.name} (stand-in)`,
-            `${entry.finish ? `${entry.finish}, ` : ''}evidence: ${entry.evidence ?? 'stand-in'}`,
-            firstSentence(entry.attribution),
-          ]}
-        />
-      )}
-    </>
-  );
-}
-
-/**
- * Several lines of Label, stacked. Each sprite keeps a constant height on
- * screen for itself; the spacing between them has to be given the same
- * treatment, or the lines pile up as the camera pulls away. The offsets are in
- * the data frame's own up, which is near enough screen-up from every viewpoint
- * the plateau is looked at from.
- */
-function Plaque({ anchor, lines }: { anchor: [number, number, number]; lines: string[] }): React.JSX.Element {
-  const group = useRef<Group>(null);
-  const world = useMemo(() => new Vector3(), []);
-  useFrame(({ camera, size }) => {
-    const node = group.current;
-    if (!node) return;
-    node.getWorldPosition(world);
-    const fov = camera instanceof PerspectiveCamera ? camera.fov : 50;
-    const perPixel = (2 * world.distanceTo(camera.position) * Math.tan((fov * Math.PI) / 360)) / size.height;
-    node.children.forEach((child, i) => child.position.set(0, 0, perPixel * LINE_PX * (lines.length - 1 - i)));
-  });
-  return (
-    <group ref={group} position={anchor}>
-      {lines.map((text, i) => (
-        <Label key={text} text={text} position={[0, 0, 0]} px={i === 0 ? 15 : 12} colour={i === 0 ? '#f2e6cf' : '#c8d2de'} />
-      ))}
-    </group>
-  );
+  return <primitive object={scene} />;
 }
