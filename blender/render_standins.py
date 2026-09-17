@@ -162,6 +162,75 @@ def add_stone_detail(mat, recolour=True):
     tree.links.new(relief, normal)
 
 
+def add_gilding(mat):
+    """
+    Gold leaf that reads as metal. A retexture paints gold as a bright orange
+    colour and marks it only faintly metallic, so under the sun it looks like
+    ochre. This finds the gold by its colour, bright (value above about 0.55),
+    saturated and orange to yellow in hue, which the black paint, the lapis blue
+    and the stone showing through are not, and there makes the surface fully
+    metallic, smoother, and a little yellower and brighter, as gold's own
+    reflectance is. The thresholds were read off the black2 retexture's colour
+    histogram; they are look choices, not measurements.
+    """
+    tree = mat.node_tree
+    bsdf = next((n for n in tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+    base = bsdf.inputs["Base Color"] if bsdf else None
+    if base is None or not base.is_linked or mat.get("seked_gilded"):
+        return
+    mat["seked_gilded"] = True
+    source = base.links[0].from_socket
+    hsv = tree.nodes.new("ShaderNodeSeparateColor")
+    hsv.mode = "HSV"
+    tree.links.new(source, hsv.inputs["Color"])
+
+    def step(socket, lo, hi):
+        node = tree.nodes.new("ShaderNodeMapRange")
+        node.inputs["From Min"].default_value = lo
+        node.inputs["From Max"].default_value = hi
+        tree.links.new(socket, node.inputs["Value"])
+        return node.outputs["Result"]
+
+    def times(a, b, op="MULTIPLY"):
+        node = tree.nodes.new("ShaderNodeMath")
+        node.operation = op
+        tree.links.new(a, node.inputs[0])
+        tree.links.new(b, node.inputs[1])
+        return node.outputs["Value"]
+
+    hue = times(step(hsv.outputs["Red"], 0.03, 0.055), step(hsv.outputs["Red"], 0.18, 0.14))
+    mask = times(times(step(hsv.outputs["Blue"], 0.5, 0.62), step(hsv.outputs["Green"], 0.32, 0.44)), hue)
+
+    gold = tree.nodes.new("ShaderNodeHueSaturation")
+    gold.inputs["Hue"].default_value = 0.515
+    gold.inputs["Saturation"].default_value = 1.4
+    gold.inputs["Value"].default_value = 1.2
+    tree.links.new(source, gold.inputs["Color"])
+    colour = tree.nodes.new("ShaderNodeMix")
+    colour.data_type = "RGBA"
+    tree.links.new(mask, colour.inputs["Factor"])
+    tree.links.new(source, colour.inputs["A"])
+    tree.links.new(gold.outputs["Color"], colour.inputs["B"])
+    tree.links.new(colour.outputs["Result"], base)
+
+    metal = bsdf.inputs["Metallic"]
+    if metal.is_linked:
+        tree.links.new(times(metal.links[0].from_socket, mask, "MAXIMUM"), metal)
+    else:
+        metal.default_value = 0.0
+        tree.links.new(mask, metal)
+    rough = bsdf.inputs["Roughness"]
+    smooth = tree.nodes.new("ShaderNodeMix")
+    smooth.data_type = "FLOAT"
+    tree.links.new(mask, smooth.inputs["Factor"])
+    if rough.is_linked:
+        tree.links.new(rough.links[0].from_socket, smooth.inputs["A"])
+    else:
+        smooth.inputs["A"].default_value = rough.default_value
+    smooth.inputs["B"].default_value = 0.32
+    tree.links.new(smooth.outputs["Result"], rough)
+
+
 def cut_and_reduce(mesh, cut_z, faces, largest_only=False):
     bm = bmesh.new()
     bm.from_mesh(mesh)
@@ -269,26 +338,35 @@ def build_standins(scene, state="today", variants=(), finish=None):
             print(f"stand-in {model['id']}: none of {model['replaces']} is in the footprints, so it has nowhere to stand")
             continue
         path = os.path.join(os.path.dirname(INDEX), entry["file"])
-        # A named finish (a retexture kept as build/models/<id>-<finish>/) replaces the pinned surface when it exists.
-        finished = os.path.join(os.path.dirname(INDEX), f"{model['id']}-{finish}", "model.glb") if finish else None
+        # A finish is a retexture kept as build/models/<id>-<finish>/: the one asked for
+        # with --finish, else the one the manifest names for this state in `finish_in`.
+        tag = finish or model.get("finish_in", {}).get(state)
+        surface = model.get("finishes", {}).get(tag, {}) if tag else {}
+        finished = os.path.join(os.path.dirname(INDEX), f"{model['id']}-{tag}", "model.glb") if tag else None
         if finished and os.path.exists(finished):
             path = finished
-            print(f"stand-in {model['id']}: finish {finish}")
+            print(f"stand-in {model['id']}: finish {tag}")
+        elif tag:
+            print(f"stand-in {model['id']}: finish {tag} not on disk, so the pinned surface; run python scripts/models.py")
+            surface = {}
         name = f"{model['name']} (stand-in)"
         # "texture" keeps the model's own surface, which is the point of a painted
         # reconstruction, and "texture+stone" lays real stone grain over it;
         # "casing" is fresh dressed limestone; the default is the
         # weathered, banded core stone a stand-in for today's plateau wants.
-        finish = model.get("material", "core")
-        keep = finish in ("texture", "texture+stone")
+        material = model.get("material", "core")
+        keep = material in ("texture", "texture+stone")
         obj = cut_and_reduce(import_model(path, name, keep), model["cut_z"], model["faces"], model.get("largest_part_only", False))
-        if finish == "texture+stone":
+        if keep and surface.get("gilded"):
+            for mat in obj.data.materials:
+                add_gilding(mat)
+        if material == "texture+stone":
             for mat in obj.data.materials:
                 add_stone_detail(mat, model.get("stone_recolour", True))
         done = fit(obj, model, features)
-        if finish == "casing":
+        if material == "casing":
             obj.data.materials.append(casing_material())
-        elif finish != "texture":
+        elif material not in ("texture", "texture+stone"):
             obj.data.materials.append(core_material(True))
         obj["seked_standin"] = model["attribution"]
         obj["seked_license"] = model["license"]

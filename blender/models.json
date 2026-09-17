@@ -390,6 +390,17 @@
       "default_in": [
         "ancient"
       ],
+      "finish_in": {
+        "ancient": "paint-black2"
+      },
+      "finishes": {
+        "paint-black2": {
+          "why": "Chosen by Stewart on 2026-09-17 for the ancient state: the whole jackal in matt black paint, with gold leaf and lapis on the lappets and collar. Anubis is black in Egyptian painting and statuary; that this colossus was painted so is part of the claim, not evidence.",
+          "task": "01a0adc9-44ee-753a-8992-41c239735462",
+          "sha256": "ceaaad275d60d18cf068aac9910df101929f40424a6f56173d2b1484281e9fae",
+          "gilded": true
+        }
+      },
       "stone_recolour": false
     }
   ],

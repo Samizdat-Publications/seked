@@ -74,6 +74,17 @@ def main():
             want = model["meshy"].get("sha256")
             if want and sha256_of(path) != want:
                 sys.exit(f"{model['id']}: {path} is not the generation the manifest names (task {model['meshy'].get('task')})")
+            # A finish the manifest names is a retexture kept beside the model as <id>-<finish>/.
+            for tag, surface in model.get("finishes", {}).items():
+                name = f"{model['id']}-{tag}"
+                glb = os.path.join(OUT, name, "model.glb")
+                if not os.path.exists(glb) and os.path.exists(os.path.join(KEEP, name, "model.glb")):
+                    shutil.copytree(os.path.join(KEEP, name), os.path.join(OUT, name), dirs_exist_ok=True)
+                    print(f"{name}: copied from {os.path.join(KEEP, name)}")
+                if not os.path.exists(glb):
+                    print(f"{name}: not on disk; run python scripts/meshy.py retexture {model['id']} --style {tag} --tag {tag}")
+                elif surface.get("sha256") and sha256_of(glb) != surface["sha256"]:
+                    sys.exit(f"{name}: {glb} is not the retexture the manifest names (task {surface.get('task')})")
         elif not os.path.exists(path):
             auth = auth or {"Authorization": f"Token {token()}"}
             request = urllib.request.Request(f"https://api.sketchfab.com/v3/models/{model['sketchfab']}/download", headers=auth)
