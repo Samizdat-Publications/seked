@@ -22,6 +22,7 @@ import { Standins } from './Standins';
 import { Sand } from './Sand';
 import { Trench } from './Trench';
 import { Plateau, type TerrainProps } from './Terrain';
+import { Vegetation } from './Vegetation';
 import { Water } from './Water';
 
 /** The stars of the moment, or undefined when the sky layer is off. */
@@ -98,6 +99,7 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
           <Trench env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
           <Sand terrain={terrain} clippingPlanes={groundPlanes} />
           <Water env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
+          <Vegetation terrain={terrain} clippingPlanes={groundPlanes} />
         </FadeScope>
         {/* Names whatever the pointer rests on; draws nothing itself. */}
         <Hover />
