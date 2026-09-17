@@ -16,6 +16,7 @@ import { Rail } from './ui/Rail';
 import { SunDial } from './ui/SunDial';
 import { Timeline } from './ui/Timeline';
 import { useUi } from './ui/ui';
+import { Views } from './ui/Views';
 import { STATES, sceneEpoch } from './view';
 
 /**
@@ -121,12 +122,18 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
 
       <div className="drawers">
         <Drawer id="views">
-          <p className="note">The hero cameras arrive here.</p>
+          <Views />
         </Drawer>
         <Drawer id="layers">
           <LayerToggles />
         </Drawer>
+        {/*
+          The preset and the cubit are not claims, but every residual below
+          them moves when either does, so they stand at the head of this
+          drawer under a word saying what they are.
+        */}
         <Drawer id="claims">
+          <h3 className="drawer-section">The basis</h3>
           <PresetPicker presets={bundle.presets} />
           <CubitSlider model={model} />
           <Claims claims={bundle.claims} model={model} context={overlayContext} />

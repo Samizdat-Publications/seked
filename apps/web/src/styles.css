@@ -651,6 +651,17 @@ button.moment.is-chosen {
 
 /* The panel vocabulary, in the new palette */
 
+/* A word over a run of blocks, where a drawer holds more than one thing. */
+.drawer-section {
+  margin: 0.95rem 0 -0.35rem;
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
 .block {
   padding: 0.95rem 0;
   border-bottom: 1px solid var(--hairline-soft);
@@ -815,18 +826,79 @@ code {
   font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* Views */
+
+ul.looks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.looks li + li {
+  margin-top: 0.3rem;
+}
+
+button.look {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.1rem 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.look:hover {
+  border-color: rgba(217, 181, 106, 0.4);
+  background: rgba(236, 230, 216, 0.06);
+}
+
+.look-label {
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.look-moment {
+  align-self: baseline;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--sand);
+}
+
+.look-note {
+  grid-column: 1 / -1;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
 /* Claims */
 
 .group + .group {
-  margin-top: 1rem;
+  margin-top: 1.1rem;
 }
 
-.group h3 {
-  margin: 0 0 0.35rem;
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
+/*
+ * A group's own heading only. The claim detail's heading is a descendant of
+ * the group too, and inherits whatever is set here if the selector is loose.
+ */
+.group > h3 {
+  margin: 0 0 0.4rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--hairline-soft);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
   color: var(--ink-soft);
 }
 
@@ -908,12 +980,21 @@ button.claim.is-selected {
 
 /* Detail */
 
+.claim-open {
+  margin: 0.15rem 0 0.5rem;
+}
+
 .detail {
-  margin-top: 0.8rem;
   padding: 0.85rem;
   background: var(--glass-raised);
   border: 1px solid var(--hairline);
-  border-radius: 0.65rem;
+  border-left: 2px solid var(--sand);
+  border-radius: 0.25rem 0.65rem 0.65rem 0.25rem;
+}
+
+.detail-head {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--hairline-soft);
 }
 
 .detail h3 {
@@ -921,8 +1002,11 @@ button.claim.is-selected {
   font-family: var(--display);
   font-optical-sizing: auto;
   font-weight: 400;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   line-height: 1.3;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--ink);
 }
 
 .detail h3 .chip {
@@ -979,8 +1063,12 @@ ul.inputs li {
   font-size: 0.88rem;
 }
 
+/* A tolerance reads as a sentence, not as a shout. */
 .comparison-head .chip {
   grid-area: auto;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 0.7rem;
 }
 
 .formula {

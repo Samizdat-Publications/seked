@@ -33,7 +33,7 @@ export function ClaimDetail({
 
   return (
     <article className="detail">
-      <header>
+      <header className="detail-head">
         <h3>
           {claim.id} · {claim.title} <Fit result={result} />
         </h3>
