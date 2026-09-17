@@ -119,11 +119,15 @@ export const useView = create<ViewStore>((set, get) => ({
   /**
    * The one compound move: open the Great Pyramid. Cut the north-south plane
    * through the passages, show the interior, and put the camera east of the
-   * cut looking west, which is the view Petrie draws Plate I from.
+   * cut looking west, which is the view Petrie draws Plate I from. The
+   * timeline goes to `built`, because the passages read best inside a whole
+   * pyramid rather than inside a stepped core.
    */
   lookInside: (at, camera) =>
     set((s) => ({
-      layers: { ...s.layers, pyramids: true, interior: true, today: false },
+      layers: { ...s.layers, pyramids: true, interior: true },
+      state: 'built',
+      epoch: s.epoch === null ? null : stateById('built').epoch,
       section: { on: true, axis: 'ns', at: clamp(at, SECTION_MIN, SECTION_MAX), ground: false },
       mode: 'orbit',
       camera,

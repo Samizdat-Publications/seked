@@ -14,11 +14,13 @@ import {
   footprintMesh,
   interiorSolids,
   mastabaMesh,
+  pyramidionMesh,
   smallPyramidMesh,
   surveyFootprints,
   templeMesh,
   type Environment,
   type Footprint,
+  type LabelledMesh,
   type Mesh,
   type Solid,
 } from '@seked/geometry';
@@ -47,6 +49,15 @@ export interface PyramidParams {
   /** Today's truncated height, where the database has one. */
   heightToday: number | undefined;
   /**
+   * Where the casing that still stands begins, in metres above the base, for a
+   * pyramid whose casing survives only under its summit: the present height
+   * less the depth of casing a source records there. Derived and never stored,
+   * the way `casing_cap_level` in blender/render_materials.py derives it, and
+   * undefined for a pyramid with no such record, which is all of them but
+   * Khafre.
+   */
+  casingCapLevel: number | undefined;
+  /**
    * The course heights the database has for it, bottom up and in metres,
    * where it has any. They are what the pyramid as it stands is drawn from,
    * and a pyramid without them falls back to the flat truncation.
@@ -56,6 +67,15 @@ export interface PyramidParams {
   concavity: number;
   /** Degrees east of north; a few arcminutes at Giza. */
   orientationDeg: number;
+  /**
+   * The capstone, already standing in the site frame with its apex at the
+   * pyramid's own, or undefined where the preset carries no
+   * `<id>.pyramidion.height` or no face angle to give it its slope. It is a
+   * reconstruction and its own label says so; `pyramidParams`, which is handed
+   * resolved values rather than the derived environment, cannot build it, so
+   * `buildModel` attaches it.
+   */
+  pyramidion?: LabelledMesh;
   offsetEast: number;
   offsetNorth: number;
   offsetUp: number;
@@ -66,12 +86,15 @@ export function pyramidParams(values: Record<string, number>, id: StructureId): 
   const height = values[`${id}.height.original`];
   if (base === undefined || height === undefined) return undefined;
   const courses = courseHeights(values, id);
+  const heightToday = values[`${id}.height.today`];
+  const capDepth = values[`${id}.casing.cap.depth`];
   return {
     id,
     label: STRUCTURE_LABELS[id],
     base,
     height,
-    heightToday: values[`${id}.height.today`],
+    heightToday,
+    casingCapLevel: heightToday === undefined || capDepth === undefined ? undefined : heightToday - capDepth,
     courses: courses.length > 0 ? courses : undefined,
     concavity: values[`${id}.concavity`] ?? 0,
     orientationDeg: values[`${id}.orientation`] ?? 0,
@@ -487,6 +510,12 @@ export interface Model {
   values: Record<string, number>;
   env: Environment;
   pyramids: PyramidParams[];
+  /**
+   * The three capstones, the same meshes the pyramids carry, gathered for
+   * anything that wants them on their own. A pyramid whose preset gives it no
+   * capstone is simply not in here.
+   */
+  pyramidions: LabelledMesh[];
   /** The Sphinx's box, when the preset carries the size and the position for it and the footprint import has no Sphinx. */
   massings: MassingParams[];
   /**
@@ -527,7 +556,12 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
   const measuredCubit = resolved.values['cubit.royal'] ?? 0.5236;
   const values = cubit === null ? resolved.values : { ...resolved.values, 'cubit.royal': cubit };
   const env = buildEnvironment(values);
-  const pyramids = STRUCTURES.map((id) => pyramidParams(values, id)).filter((p): p is PyramidParams => p !== undefined);
+  const pyramids = STRUCTURES.map((id) => pyramidParams(values, id))
+    .filter((p): p is PyramidParams => p !== undefined)
+    // The capstone stands on the pyramid's own slope, which is derived, so it
+    // is built from the environment rather than from the resolved values.
+    .map((p) => ({ ...p, pyramidion: pyramidionMesh(env, p.id) }));
+  const pyramidions = pyramids.map((p) => p.pyramidion).filter((m): m is LabelledMesh => m !== undefined);
   // The offsets the box is placed by are derived, so it reads `env` and not
   // the resolved values: `buildEnvironment` is where a coordinate becomes a
   // position in the frame.
@@ -550,6 +584,7 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
     values,
     env,
     pyramids,
+    pyramidions,
     massings,
     plateau,
     interiors,

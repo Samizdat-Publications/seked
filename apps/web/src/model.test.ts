@@ -73,10 +73,54 @@ describe('the pyramid as it stands', () => {
     expect(Math.abs(top - (g1.heightToday as number))).toBeLessThan(0.01);
   });
 
+  it("gives Khafre alone the level his surviving casing begins at, and never stores it", () => {
+    const g2 = model.pyramids.find((p) => p.id === 'g2') as PyramidParams;
+    // M&R put the cap 40 to 45 m down from the top, stored as 42.5 m; the
+    // level is his present height less that, and is in no record.
+    expect(g2.casingCapLevel).toBeCloseTo((g2.heightToday as number) - 42.5, 9);
+    expect(model.values['g2.casing.cap.lower_edge.up']).toBeUndefined();
+    expect(g1.casingCapLevel).toBeUndefined();
+    expect(model.pyramids.find((p) => p.id === 'g3')?.casingCapLevel).toBeUndefined();
+  });
+
   it('is left undefined rather than empty for a preset with no courses at all', () => {
     const bare = pyramidParams({ 'g1.base.side.mean': 230.33, 'g1.height.original': 146.59 }, 'g1');
     expect(bare?.courses).toBeUndefined();
     expect(bare?.heightToday).toBeUndefined();
+  });
+});
+
+describe('the capstones', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+
+  /** The vertex highest up in a mesh. */
+  const apex = (mesh: { positions: Float32Array }): [number, number, number] => {
+    let best: [number, number, number] = [0, 0, -Infinity];
+    for (let i = 0; i < mesh.positions.length; i += 3) {
+      const z = mesh.positions[i + 2] as number;
+      if (z > best[2]) best = [mesh.positions[i] as number, mesh.positions[i + 1] as number, z];
+    }
+    return best;
+  };
+
+  it('stands one on each of the three, its apex at the pyramid’s own', () => {
+    expect(model.pyramidions).toHaveLength(3);
+    for (const p of model.pyramids) {
+      const capstone = p.pyramidion;
+      expect(capstone, p.id).toBeDefined();
+      const [east, north, up] = apex(capstone as NonNullable<typeof capstone>);
+      expect(east, p.id).toBeCloseTo(p.offsetEast, 3);
+      expect(north, p.id).toBeCloseTo(p.offsetNorth, 3);
+      expect(up, p.id).toBeCloseTo(p.offsetUp + p.height, 3);
+      // It is a reconstruction and its own label is what says so.
+      expect(capstone?.label, p.id).toContain('Reconstruction');
+    }
+    expect(model.pyramidions).toEqual(model.pyramids.map((p) => p.pyramidion));
+  });
+
+  it('builds none where the preset carries no capstone height', () => {
+    const bare = pyramidParams({ 'g1.base.side.mean': 230.33, 'g1.height.original': 146.59 }, 'g1');
+    expect(bare?.pyramidion).toBeUndefined();
   });
 });
 

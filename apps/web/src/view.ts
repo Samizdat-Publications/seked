@@ -5,9 +5,14 @@
  */
 import { TOUR } from './tour';
 
+/**
+ * The things a reader turns on and off. Whether the pyramids stand cased or
+ * stripped is no longer one of them: that is the timeline's to say, and the
+ * `today` layer retired with `STATES` below. An old link that still carries
+ * it decodes without error, because an id `LAYERS` does not know is ignored.
+ */
 export const LAYERS = [
-  { id: 'pyramids', label: 'Pyramids as built' },
-  { id: 'today', label: 'Today (truncated)' },
+  { id: 'pyramids', label: 'Pyramids' },
   { id: 'interior', label: 'Interior' },
   { id: 'ground', label: 'Ground (flattened)' },
   { id: 'terrain', label: 'Terrain (GLO-30 context)' },
@@ -186,7 +191,6 @@ export const DEFAULT_VIEW: View = {
   lst: 0,
   layers: {
     pyramids: true,
-    today: false,
     interior: true,
     ground: true,
     terrain: false,
