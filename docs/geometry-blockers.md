@@ -329,6 +329,22 @@ the real courses (a mean is used), the render's low dust layer, the section
 cut's drawing treatment, the queens' slope and the enclosure keys the builders
 wait for.
 
+Stage 2 landed the same evening (snapshot 0029, plan
+`docs/superpowers/plans/2026-09-17-stage-2-states-and-timeline.md`): every
+structure in its four states from the geometry package's builders, Khafre's
+enclosure wall from Petrie's section 71, the pristine casing with its
+surveyed joints and electrum caps, the Sphinx per state with the lion and
+Anubis claims switchable, the enclosure trench cut into the ground (margin a
+look choice: the ARCE Sphinx Mapping Digital Database on Open Context, CC BY,
+has the 1:50 plan to scale it from), burial to the neck in `stripped`, the
+dissolve between stops, the loading line, the air per state and hover tags.
+A moment's day now counts from the March equinox of its own epoch, since the
+proleptic calendar's 21 December had drifted months from the solstice by
+10,500 BCE. Still open from stage 2: the queens' slopes (Petrie states none;
+Lehner 1997 is not readable here), Khufu's and Menkaure's enclosures, the
+akhet moment rendering dark at sunset, the heavy haze at aerial stands, the
+polished casing's cool cast toward the sun.
+
 **Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
 modern and ancient states and the transitional steps between, with models
