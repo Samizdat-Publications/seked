@@ -7,6 +7,8 @@ import { applyAtmosphere } from './Atmosphere';
 import { before, patchMaterial } from './materials/patch';
 import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone } from './materials/stone';
+import { applyGreen, GREEN, useGreenMask } from './materials/ground';
+import { useView } from '../store';
 import { useSphinxCut } from './Trench';
 import { useWater } from './Water';
 
@@ -128,10 +130,27 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
     if (!groundMaterial.current) return;
     applyStone(groundMaterial.current, sand, { strength: 0.8, scale: 3, relief: 0.6, mix: gravel, mixMetres: 120 });
   }, [sand, gravel]);
+  // The green of the African Humid Period, laid over the sand by the one mask
+  // `Vegetation.tsx` stands its grass on, so the tint and the blades cannot
+  // disagree about where the meadow is. Its strength is the stop's own, which
+  // is what makes the First Time green, `built` a dry scrub and the two late
+  // stops bare.
+  const state = useView((s) => s.state);
+  const water = useWater();
+  const mask = useGreenMask(header);
+  useEffect(() => {
+    const material = groundMaterial.current;
+    if (!material || !mask) return;
+    applyGreen(material, {
+      mask,
+      level: water?.level,
+      strength: GREEN.strength[state],
+      colour: state === 'built' ? GREEN.dry : GREEN.colour,
+    });
+  }, [mask, water, state]);
   // The Sphinx's enclosure, where one is standing, and the harbour basin,
   // where the timeline has one, are holes in this grid.
   const cut = useSphinxCut();
-  const water = useWater();
   const cuts = useMemo(
     () => [cut?.outline, water?.kind === 'basin' ? water.outline : undefined]
       .filter((o): o is readonly (readonly [number, number])[] => o !== undefined),
