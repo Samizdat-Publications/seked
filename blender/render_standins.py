@@ -186,7 +186,8 @@ def chosen(models, state, variants):
     The stand-ins a render shows. A model names the `states` it belongs to (a
     model that names none belongs to every one) and may be a `variant`, such as
     the lion Sphinx, which is shown only when asked for and then instead of the
-    ordinary model for the same outlines. A retired model is never shown.
+    ordinary model for the same outlines, and a variant that names a state in
+    `default_in` is that state's ordinary model. A retired model is never shown.
     """
     live = [m for m in models if not m.get("retired") and state in m.get("states", [state])]
     groups = {}
@@ -195,7 +196,10 @@ def chosen(models, state, variants):
     picked = []
     for group in groups.values():
         wanted = [m for m in group if m.get("variant") in variants]
-        picked.extend(wanted[:1] if wanted else [m for m in group if not m.get("variant")][:1])
+        # A variant can be a state's own default (the Anubis Sphinx in "ancient"),
+        # which a render still overrides by asking for another variant.
+        default = [m for m in group if state in m.get("default_in", [])] or [m for m in group if not m.get("variant")]
+        picked.extend(wanted[:1] if wanted else default[:1])
     return picked
 
 

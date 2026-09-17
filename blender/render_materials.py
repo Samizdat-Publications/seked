@@ -814,7 +814,7 @@ def dress_as_built(state):
     forms stay the massings the footprints give; only the finish changes, and
     that finish is the reconstruction.
     """
-    if state != "built":
+    if state not in ("built", "ancient"):
         return 0
     fine = casing_material()
     values = resolved_values()

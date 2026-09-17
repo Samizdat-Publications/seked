@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today|ancient] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -433,8 +433,11 @@ def show_state(state):
     "(today)" object for it, and as built where it does not, which is said.
     Khafre's today carries his cap of casing; Khufu's is his stepped core.
     """
-    if state not in ("built", "today"):
-        raise SystemExit(f"unknown state {state!r}; choose built or today")
+    if state not in ("built", "today", "ancient"):
+        raise SystemExit(f"unknown state {state!r}; choose built, today or ancient")
+    # "ancient" is the built plateau with the claims about its age shown in place of the
+    # mainstream Sphinx, so the pyramids are drawn exactly as they are for "built".
+    state = "built" if state == "ancient" else state
     for label in STRUCTURE_LABELS.values():
         built, today = bpy.data.objects.get(f"{label} (as built)"), bpy.data.objects.get(f"{label} (today)")
         use_today = state == "today" and today is not None
