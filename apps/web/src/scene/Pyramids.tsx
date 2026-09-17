@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { DoubleSide, FrontSide, type MeshStandardMaterial, type Plane } from 'three';
 import type { MassingParams, PlateauMass, PyramidParams } from '../model';
 import { meshGeometry, pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import { applyAtmosphere } from './Atmosphere';
 import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone, type StoneRole } from './stone';
 
@@ -20,6 +21,7 @@ function useStoneMaterial(role: StoneRole | undefined, strength: number): React.
   useEffect(() => {
     const material = ref.current;
     if (!material) return;
+    applyAtmosphere(material);
     receiveCascades(material);
     return () => forgetCascades(material);
   });
@@ -102,10 +104,11 @@ function Mass({ mass, clippingPlanes }: { mass: PlateauMass; clippingPlanes: Pla
  */
 function Massing({ params, clippingPlanes }: { params: MassingParams; clippingPlanes: Plane[] }): React.JSX.Element {
   const { length, width, height, offsetEast, offsetNorth } = params;
+  const material = useStoneMaterial(undefined, 0);
   return (
     <mesh position={[offsetEast, offsetNorth, height / 2]} castShadow receiveShadow>
       <boxGeometry args={[length, width, height]} />
-      <meshStandardMaterial color="#9c9078" roughness={0.97} metalness={0} flatShading clippingPlanes={clippingPlanes} />
+      <meshStandardMaterial ref={material} color="#9c9078" roughness={0.97} metalness={0} flatShading clippingPlanes={clippingPlanes} />
     </mesh>
   );
 }

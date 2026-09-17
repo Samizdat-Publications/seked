@@ -3,6 +3,7 @@ import { terrainGrid, type GroundPyramid } from '@seked/geometry';
 import { useEffect, useMemo, useRef } from 'react';
 import type { MeshStandardMaterial, Plane } from 'three';
 import { gridGeometry } from './geometry';
+import { applyAtmosphere } from './Atmosphere';
 import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone } from './stone';
 
@@ -49,7 +50,10 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
     groundGeometry.dispose();
   }, [contextGeometry, groundGeometry]);
   // The ground takes the renders' fine sand, three times its tile so the
-  // twenty-metre grid does not show it repeating at the distances it is seen from.
+  // twenty-metre grid does not show it repeating at the distances it is seen
+  // from. Its tint is the mean of `render_materials.py`'s two sand colours,
+  // which the render mixes with a large noise, converted out of linear light:
+  // a look choice carried across rather than a new one.
   const sand = useStone('sand');
   const groundMaterial = useRef<MeshStandardMaterial>(null);
   useEffect(() => {
@@ -59,6 +63,7 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
   useEffect(() => {
     const material = groundMaterial.current;
     if (!material) return;
+    applyAtmosphere(material);
     receiveCascades(material);
     return () => forgetCascades(material);
   });
@@ -72,7 +77,7 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
               the offset settles which of them the depth buffer keeps. */}
           <meshStandardMaterial
             ref={groundMaterial}
-            color="#6a6152"
+            color="#a1927a"
             roughness={1}
             metalness={0}
             polygonOffset
