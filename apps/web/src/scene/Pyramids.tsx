@@ -1,10 +1,11 @@
 import { DEG } from '@seked/units';
-import { useEffect, useMemo } from 'react';
-import { BufferGeometry, DoubleSide, FrontSide, type Plane } from 'three';
+import { useEffect, useMemo, type RefObject } from 'react';
+import { BufferGeometry, DoubleSide, FrontSide, type MeshPhysicalMaterial, type Plane } from 'three';
 import type { PyramidParams } from '../model';
 import { useView } from '../store';
 import type { StateId } from '../view';
 import { pyramidGeometry, steppedPyramidGeometry } from './geometry';
+import { CASING_COLOUR, applyCasing } from './materials/casing';
 import { useStoneMaterial } from './materials/useStoneMaterial';
 
 /**
@@ -41,53 +42,97 @@ export function Pyramids({
   clippingPlanes: Plane[];
 }): React.JSX.Element {
   const state = useView((s) => s.state);
+  // The course tops the casing's joints are drawn at, worked out once for all
+  // three: a pyramid with no course table of its own is coursed at the mean of
+  // the pyramid that has one, which is what render_materials.py does and says.
+  const casing = useMemo(() => {
+    const fallback = meanCourse(pyramids.find((p) => p.courses !== undefined)?.courses);
+    return new Map(pyramids.map((p) => [p.id, casingCourseLevels(p, fallback)]));
+  }, [pyramids]);
   return (
     <>
       {pyramids.map((params) => (
-        <Pyramid key={params.id} params={params} state={state} clippingPlanes={clippingPlanes} />
+        <Pyramid
+          key={params.id}
+          params={params}
+          state={state}
+          casingCourses={casing.get(params.id) ?? []}
+          clippingPlanes={clippingPlanes}
+        />
       ))}
     </>
   );
 }
 
-function Pyramid({
-  params,
-  state,
-  clippingPlanes,
-}: {
-  params: PyramidParams;
-  state: StateId;
-  clippingPlanes: Plane[];
-}): React.JSX.Element {
-  if (isCased(state)) return <CasedPyramid params={params} state={state} clippingPlanes={clippingPlanes} />;
+/**
+ * The height above the base each course of the casing tops out at, bottom up.
+ *
+ * The same list `course_levels_to_apex` in blender/render_materials.py builds,
+ * and for the same reason: the database carries a course table for the Great
+ * Pyramid alone, and it stops short of the apex. So a pyramid is coursed by
+ * its own courses as far as they go, and above them, or for a pyramid with no
+ * table at all, at the mean course of the one that has. That mean is a number
+ * out of the database rather than a number chosen here, but which pyramid it
+ * is taken from is a look choice, and it is the one the render makes. A
+ * preset carrying no courses at all draws no joints rather than invented ones.
+ */
+export function casingCourseLevels(params: PyramidParams, fallbackCourse: number): number[] {
+  const levels: number[] = [];
+  let z = 0;
+  for (const h of params.courses ?? []) {
+    if (z + h >= params.height) break;
+    z += h;
+    levels.push(z);
+  }
+  const mean = meanCourse(params.courses) || fallbackCourse;
+  if (!(mean > 0)) return levels;
+  while (z + mean < params.height) {
+    z += mean;
+    levels.push(z);
+  }
+  return levels;
+}
+
+function Pyramid(props: PyramidPartProps): React.JSX.Element {
+  if (isCased(props.state)) return <CasedPyramid {...props} />;
   return (
     <>
-      <StandingCore params={params} state={state} clippingPlanes={clippingPlanes} />
-      <CasingCap params={params} state={state} clippingPlanes={clippingPlanes} />
+      <StandingCore {...props} />
+      <CasingCap {...props} />
     </>
   );
 }
 
-/** The pyramid as it was finished: the smooth solid, hollowed faces and all. */
-function CasedPyramid({ params, state, clippingPlanes }: PyramidPartProps): React.JSX.Element {
+/**
+ * The pyramid as it was finished: the smooth solid, hollowed faces and all,
+ * dressed in polished Tura limestone with the database's own courses laid on
+ * it. `ancient` polishes it to the mirror the spec asks of the First Time;
+ * `built` leaves it a dressed face.
+ */
+function CasedPyramid({ params, state, casingCourses, clippingPlanes }: PyramidPartProps): React.JSX.Element {
   const { base, height, concavity } = params;
   const geometry = useGeometry(
     () => pyramidGeometry({ base, height, concavity }),
     `cased:${base}:${height}:${concavity}`,
   );
-  // Cased, a face takes the fine pale stone faintly. The coursing is the
-  // database's: the mean of the courses this pyramid carries, which is what
-  // the joints on a dressed face are spaced by. A pyramid with no courses
-  // recorded gets none.
-  const material = useStoneMaterial('casing', { strength: 0.45, relief: 0.35, course: meanCourse(params.courses) });
+  // Cased, a face takes the fine pale stone faintly: the photograph is the
+  // grain of the limestone, and the masonry on top of it is `applyCasing`'s.
+  // A look choice, as the other strengths are.
+  const standard = useStoneMaterial('casing', { strength: 0.35, relief: 0.25 });
+  const material = standard as RefObject<MeshPhysicalMaterial | null>;
+  const pristine = state === 'ancient';
+  const coursesKey = `${casingCourses.length}:${casingCourses[casingCourses.length - 1] ?? 0}`;
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (material.current) applyCasing(material.current, { courses: casingCourses, pristine });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [material, coursesKey, pristine]);
   return (
     <PyramidMesh params={params} state={state} geometry={geometry} clippingPlanes={clippingPlanes}>
-      <meshStandardMaterial
+      <meshPhysicalMaterial
         key="cased"
         ref={material}
-        color="#d6c49c"
-        roughness={0.94}
-        metalness={0}
+        color={CASING_COLOUR}
         flatShading
         side={sideFor(clippingPlanes)}
         clippingPlanes={clippingPlanes}
@@ -181,6 +226,8 @@ function CasingCap({ params, state, clippingPlanes }: PyramidPartProps): React.J
 interface PyramidPartProps {
   params: PyramidParams;
   state: StateId;
+  /** The course tops the casing's joints are drawn at, from `casingCourseLevels`. */
+  casingCourses: number[];
   clippingPlanes: Plane[];
 }
 
@@ -195,7 +242,13 @@ function PyramidMesh({
   geometry,
   clippingPlanes,
   children,
-}: PyramidPartProps & { geometry: BufferGeometry; children: React.ReactNode }): React.JSX.Element {
+}: {
+  params: PyramidParams;
+  state: StateId;
+  clippingPlanes: Plane[];
+  geometry: BufferGeometry;
+  children: React.ReactNode;
+}): React.JSX.Element {
   return (
     <mesh
       geometry={geometry}
