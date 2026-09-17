@@ -1,7 +1,7 @@
 """
 Render a still of the generated scene, headless:
 
-    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today|ancient] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
+    blender -b build/seked.blend -P blender/render.py -- --out build/dawn.png [--view dawn|panorama|harbour|cutaway|akhet|night] [--state built|today|ancient] [--sphinx lion] [--capstone stone|gold] [--air on|off|<thickness>] [--standins on|off] [--reconstruction on|off] [--location x,y,z --target x,y,z --lens mm] [--width 1600 --height 900 --samples 128]
 
 Four views, each one a moment the sky package can date. "dawn" is the plan's
 first hero shot: the equinox sun an hour up, seen from the east-north-east, so
@@ -527,7 +527,7 @@ def configure_render(scene, opts):
 
 
 def main():
-    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "sphinx": "", "capstone": "stone", "air": "on", "standins": "on", "location": "", "target": "", "lens": "", "bake": SKY_BAKE})
+    opts = parse_args({"out": "build/hero.png", "width": "1600", "height": "900", "samples": "128", "engine": "", "device": "auto", "view": "dawn", "state": "built", "sphinx": "", "capstone": "stone", "air": "on", "standins": "on", "reconstruction": "on", "location": "", "target": "", "lens": "", "bake": SKY_BAKE})
     scene = bpy.context.scene
     if opts["view"] not in VIEWS:
         raise SystemExit(f"unknown view {opts['view']!r}; choose from {sorted(VIEWS)}")
@@ -548,7 +548,8 @@ def main():
     show_state(opts["state"])
     dress_as_built(opts["state"])
     if not drawing and opts["standins"] != "off":
-        build_reconstructions(scene, opts["state"], standin_sphinx=True)
+        if opts["reconstruction"] != "off":
+            build_reconstructions(scene, opts["state"], standin_sphinx=True)
     if not drawing and opts["standins"] != "off":
         build_standins(scene, opts["state"], [v for v in (opts["sphinx"],) if v])
         cut_enclosure(scene)
