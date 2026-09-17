@@ -18,12 +18,19 @@ recorded and do not constrain the choice (Stewart, 2026-09-16).
 | Small sphinx for an avenue or a door | Small sphinx, Alexandria | bb9eb7d8a3ec4ae4ae4e0925fd2e0071 | PolarNick239 | 250k | CC BY |
 | Guardian for the ancient temple doors (Assyrian, wrong culture: last resort) | Saluting Protective Spirit, 883 to 859 BC | e059aaa709694929abcd87c2411c1a06 | Cleveland Museum of Art | 919k | CC0 |
 
-No scan of a recumbent Anubis (Tutankhamun's shrine jackal is the form) came
-up; search again with "Anubis shrine" and "jackal recumbent", and if nothing
-downloadable exists, that is the one Meshy generation the ancient temples
-need (about 35 credits, restyle from Commons photographs of the Cairo piece).
-Khufu's solar boat: no downloadable scan found under "Khufu solar boat";
-try "Khufu ship" and "solar barque".
+Second search the same evening, for the guardians and the boat:
+
+| Use | Model | uid | Author | Faces | Licence |
+|---|---|---|---|---|---|
+| Guardian jackal for the ancient temple doors | Recumbent Jackal Final Model | a2c4b91186874cdcbd1ecd80c821c9e0 | camcolab | 169k | CC BY |
+| Same, second choice | Anubis | f75756aa97704f2784c97bb7c00b2ac3 | lovadahn | 101k | CC BY |
+| Khufu's solar ship, for the boat pits opened and for the harbour | Khufu solar ship - EGYPT | 5c56a4feeb8e4c67b5a4d903b4a96e5a | juanbrualla | (not stated) | CC BY |
+| Quarry faces and scoop marks for the Aswan look of the granite | Aswan Unfinished Obelisk Tip, Quarry Scoop Marks | 61ea7351f46941a69f7cf6089e1f7a13, d0789b64b2734c01bcb6d6299bffc6de | zeptepi | 48k, 39k | CC BY-NC-SA |
+
+So the guardian jackal need not be generated unless the two scans turn out
+to be poor when fetched; look at them before spending credits. Meshy stays
+for what no scan gives once the temples are built (Stewart lifted the credit
+ceiling on 2026-09-17: generate when the scene needs it and ask him to top up).
 
 ## Vegetation
 
