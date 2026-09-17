@@ -63,6 +63,16 @@ describe('the pyramid as it stands', () => {
     expect(Math.abs(top - (g1.heightToday as number))).toBeLessThan(0.01);
   });
 
+  it("gives Khafre alone the level his surviving casing begins at, and never stores it", () => {
+    const g2 = model.pyramids.find((p) => p.id === 'g2') as PyramidParams;
+    // M&R put the cap 40 to 45 m down from the top, stored as 42.5 m; the
+    // level is his present height less that, and is in no record.
+    expect(g2.casingCapLevel).toBeCloseTo((g2.heightToday as number) - 42.5, 9);
+    expect(model.values['g2.casing.cap.lower_edge.up']).toBeUndefined();
+    expect(g1.casingCapLevel).toBeUndefined();
+    expect(model.pyramids.find((p) => p.id === 'g3')?.casingCapLevel).toBeUndefined();
+  });
+
   it('is left undefined rather than empty for a preset with no courses at all', () => {
     const bare = pyramidParams({ 'g1.base.side.mean': 230.33, 'g1.height.original': 146.59 }, 'g1');
     expect(bare?.courses).toBeUndefined();

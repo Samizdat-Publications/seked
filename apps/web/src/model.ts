@@ -31,6 +31,15 @@ export interface PyramidParams {
   /** Today's truncated height, where the database has one. */
   heightToday: number | undefined;
   /**
+   * Where the casing that still stands begins, in metres above the base, for a
+   * pyramid whose casing survives only under its summit: the present height
+   * less the depth of casing a source records there. Derived and never stored,
+   * the way `casing_cap_level` in blender/render_materials.py derives it, and
+   * undefined for a pyramid with no such record, which is all of them but
+   * Khafre.
+   */
+  casingCapLevel: number | undefined;
+  /**
    * The course heights the database has for it, bottom up and in metres,
    * where it has any. They are what the pyramid as it stands is drawn from,
    * and a pyramid without them falls back to the flat truncation.
@@ -50,12 +59,15 @@ export function pyramidParams(values: Record<string, number>, id: StructureId): 
   const height = values[`${id}.height.original`];
   if (base === undefined || height === undefined) return undefined;
   const courses = courseHeights(values, id);
+  const heightToday = values[`${id}.height.today`];
+  const capDepth = values[`${id}.casing.cap.depth`];
   return {
     id,
     label: STRUCTURE_LABELS[id],
     base,
     height,
-    heightToday: values[`${id}.height.today`],
+    heightToday,
+    casingCapLevel: heightToday === undefined || capDepth === undefined ? undefined : heightToday - capDepth,
     courses: courses.length > 0 ? courses : undefined,
     concavity: values[`${id}.concavity`] ?? 0,
     orientationDeg: values[`${id}.orientation`] ?? 0,

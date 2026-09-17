@@ -19,8 +19,39 @@ export function meshGeometry(mesh: Mesh): BufferGeometry {
   return geometry;
 }
 
-export function pyramidGeometry(options: PyramidMeshOptions): BufferGeometry {
-  return meshGeometry(pyramidMesh(options));
+export interface PyramidGeometryOptions extends PyramidMeshOptions {
+  /**
+   * Draw only the part above this height above the base, which is how a cap
+   * of surviving casing is cut off a whole pyramid. A pyramid is a linear
+   * taper, so what stands above a level is itself a pyramid: the base shrinks
+   * by the same fraction the height does, and so does the concavity, which is
+   * an indent of the base ring. A value outside the pyramid leaves it whole.
+   */
+  fromHeight?: number;
+}
+
+export function pyramidGeometry(options: PyramidGeometryOptions): BufferGeometry {
+  return meshGeometry(pyramidPart(options));
+}
+
+/**
+ * The mesh `pyramidGeometry` draws, before it becomes a buffer: the whole
+ * pyramid, or the frustum-shaped part of it above `fromHeight`, standing at
+ * the same place on the same faces as the whole one.
+ */
+export function pyramidPart(options: PyramidGeometryOptions): Mesh {
+  const { fromHeight, ...whole } = options;
+  if (fromHeight === undefined || !(fromHeight > 0) || !(fromHeight < whole.height)) return pyramidMesh(whole);
+  const k = (whole.height - fromHeight) / whole.height;
+  const part = pyramidMesh({
+    base: whole.base * k,
+    height: whole.height - fromHeight,
+    concavity: (whole.concavity ?? 0) * k,
+    truncateAt: whole.truncateAt === undefined ? undefined : whole.truncateAt - fromHeight,
+  });
+  const positions = Float32Array.from(part.positions);
+  for (let i = 2; i < positions.length; i += 3) positions[i] = (positions[i] as number) + fromHeight;
+  return { ...part, positions };
 }
 
 /**
