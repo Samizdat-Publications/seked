@@ -23,7 +23,12 @@
  * a renderer does it. The plane stands a named number of metres above the
  * harbour's own waterline, because the modern plain east of Giza carries
  * five thousand years of alluvium and the GLO-30 surface under it is not the
- * surface of 10,500 BCE. That number is a look choice.
+ * surface of 10,500 BCE. That number is a look choice, and what it draws on
+ * that surface is braided water in the low ground with land between it,
+ * which is what a watered valley looks like and not what a lake does. It
+ * cannot be anything better: no model of the ground of 10,500 BCE exists
+ * here, so the shoreline is the modern one at a chosen level and nothing
+ * more.
  *
  * `stripped` and `today` have no water at all.
  *
@@ -56,10 +61,12 @@ export const VALLEY_TEMPLES = ['khafre.valley_temple', 'sphinx.temple'];
  * outline.
  *
  * `floodRiseMetres` is how far the First Time's flood plain stands above the
- * harbour's waterline. Its job is to put the shore a few hundred metres east
- * of the plateau's foot on the modern surface model, which is the only
- * surface this project has; on the surface of 10,500 BCE the same shore
- * would want a different number.
+ * harbour's waterline. Three metres puts water in about a third of the plain
+ * east of the plateau on the modern surface model, which reads as channels
+ * and marsh with land between them; much more and the plain becomes an
+ * archipelago, much less and it dries up. The modern surface is the only one
+ * this project has, so on the ground of 10,500 BCE the same picture would
+ * want a different number.
  *
  * `plainReachMetres` is how far the flood plain is carried east, north and
  * south of the temples before it is left to the haze. The terrain itself
@@ -69,7 +76,7 @@ export const LOOK = {
   basinDepthMetres: 2,
   basinReachMetres: 250,
   basinMarginMetres: 60,
-  floodRiseMetres: 6,
+  floodRiseMetres: 3,
   plainReachMetres: 6000,
 } as const;
 
@@ -184,9 +191,10 @@ export function waterExtent(features: readonly Footprint[], env: Environment, st
       Math.max(...boxes.map((b) => b.north)) + reach,
     ),
     label:
-      'A claim: the flood plain of the First Time, drawn east of the valley temples as one surface that the ground hides wherever the ground is higher. ' +
+      'A claim: the flood plain of the First Time, drawn east of the valley temples as one surface that the ground hides wherever the ground is higher, ' +
+      'so what stands is water in the low ground and land between it. ' +
       'The science behind the staging is the African Humid Period, about 12,500 to 3,500 BCE, when North Africa was wet and the Nile ran high; ' +
-      'how far its flood reached at Giza in 10,500 BCE is not known. ' +
+      'how far its flood reached at Giza in 10,500 BCE is not known, and the ground it is drawn on is the modern surface model. ' +
       `Look choices: the surface stands ${LOOK.floodRiseMetres} m above the harbour’s own waterline, which is the valley temples’ floor level, ` +
       `and is carried ${reach} m out. Neither is a measurement, and the ground it is laid over is the modern surface model.`,
   };
