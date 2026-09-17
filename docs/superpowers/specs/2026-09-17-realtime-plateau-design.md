@@ -100,6 +100,20 @@ with light on a surface, with one restrained exception noted below.
 Everything above that is not survey is labelled a claim in the caption. The
 Anubis stays as chosen on 2026-09-17: matt black with metallic gold leaf.
 
+**A reference for the two ends (Stewart, 2026-09-17).** Budget Direct's
+"Great Pyramid restored" pair, the cased pyramid against today's, aerial from
+the north-east under a high sun, is the look to aim at, and Stewart likes
+both halves. The cased face there is bright matte-to-satin white with the
+faintest cream, its lit and shaded faces separating by shade (near white
+against light grey-blue), sharp arrises, no joints visible at that distance,
+no mirror of the sky, and one small warm glint at the gold apex. The standing
+core reads as individual blocks in warm tan with deep shadow in every course.
+The sky is deep blue overhead with a bright whitish haze band on the horizon
+where Cairo sits, not an even veil, and the sand by the pyramids is bright,
+almost white, under the sun. So the polish of item 1 is a sheen and a lift
+at the arrises, not a reflection, and the air whitens the horizon rather than
+greying the ground.
+
 ### 3.2 As built (`built`)
 
 The mainstream reconstruction, c. 2450 BCE: cased pyramids with plain stone
