@@ -174,16 +174,20 @@ to download and consistent across states. Sculpture is not.
   and as a stopgap for `built` until the procedural temples land; it is
   baked to GLB parts by group through the same pipeline as the stand-ins.
 
-### 4.3 Generated with Meshy (450 credits, about 35 a model, 10 a retexture)
+### 4.3 Generated with Meshy (about 35 a model, 10 a retexture)
 
-Only what no scan gives and no builder can make:
+What no scan gives and no builder can make. The balance (450 on 2026-09-17)
+is not a ceiling: Stewart said the same day that he will buy credits when a
+generation is worth it, so the table below is the first spend and not the
+limit. A real scan still comes first where one exists, because it is a real
+object and not a guess.
 
 | Item | Credits | Why |
 |---|---|---|
 | A seated king for the valley temple's 23 emplacements, if no scan is good enough | 35 | Sculpture that repeats, so one model instances 23 times |
 | A guardian jackal pair for the ancient temple doors, if no scan is good enough | 35 | The Anubis theme carried into the architecture |
 | Retakes of either | 70 | Last night's rate was three tries a model |
-| Reserve, spent only on what the first renders show is missing | 310 | Nothing pre-committed |
+| Whatever the first renders show is missing | as needed | Stewart tops up the balance on request |
 
 The Sphinx variants need no new generation. Every generation is logged in
 `blender/models.json` as now.
