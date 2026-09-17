@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../scripts/bundle';
-import { meshVolume } from '@seked/geometry';
-import { SPHINX_MASSING_LABEL, buildModel, massingParams, mergeMeshes, pyramidParams, type Model, type PyramidParams } from './model';
+import { meshVolume, type Footprint, type Mesh } from '@seked/geometry';
+import {
+  SPHINX_MASSING_LABEL,
+  buildModel,
+  isWholeState,
+  massingParams,
+  mergeMeshes,
+  pyramidParams,
+  structuresFor,
+  type Model,
+  type PyramidParams,
+} from './model';
 
 /**
  * The epoch override is the cubit slider's move applied to time, and the
@@ -76,16 +86,16 @@ describe('the plateau and the Sphinx', () => {
   it('builds every footprint in the import, the mastabas as one field', () => {
     const features = bundle.footprints.features;
     const named = features.filter((f) => f.group !== 'mastabas');
-    const field = model.plateau.find((m) => m.id === 'mastabas');
+    const field = model.plateau.masses.find((m) => m.id === 'mastabas');
     // Plus the one built from Petrie's records at build time: Khufu's basalt pavement.
-    expect(model.plateau.length).toBe(named.length + 1 + 1);
-    expect(model.plateau.some((m) => m.id === 'khufu.basalt_pavement')).toBe(true);
-    expect(model.plateau.some((m) => m.id === 'khafre.causeway')).toBe(true);
+    expect(model.plateau.masses.length).toBe(named.length + 1 + 1);
+    expect(model.plateau.masses.some((m) => m.id === 'khufu.basalt_pavement')).toBe(true);
+    expect(model.plateau.masses.some((m) => m.id === 'khafre.causeway')).toBe(true);
     expect(field?.count).toBe(features.length - named.length);
   });
 
   it('draws the Sphinx from OSM and drops the box, as the Blender generator does', () => {
-    for (const id of ['sphinx.body', 'sphinx.head', 'sphinx.paws']) expect(model.plateau.some((m) => m.id === id), id).toBe(true);
+    for (const id of ['sphinx.body', 'sphinx.head', 'sphinx.paws']) expect(model.plateau.masses.some((m) => m.id === id), id).toBe(true);
     expect(model.massings).toEqual([]);
   });
 
@@ -103,9 +113,9 @@ describe('the plateau and the Sphinx', () => {
   });
 
   it('merges meshes without losing a triangle or a cubic metre', () => {
-    const field = model.plateau.find((m) => m.id === 'mastabas');
+    const field = model.plateau.masses.find((m) => m.id === 'mastabas');
     expect(field).toBeDefined();
-    const parts = model.plateau.filter((m) => m.group === 'queens').map((m) => m.mesh);
+    const parts = model.plateau.masses.filter((m) => m.group === 'queens').map((m) => m.mesh);
     const merged = mergeMeshes(parts);
     expect(merged.triangleCount).toBe(parts.reduce((a, m) => a + m.triangleCount, 0));
     expect(meshVolume(merged)).toBeCloseTo(parts.reduce((a, m) => a + meshVolume(m), 0), 0);
@@ -118,5 +128,87 @@ describe('the plateau and the Sphinx', () => {
       const { [key]: _dropped, ...without } = full;
       expect(massingParams(without, 'x', 'X'), `without ${key}`).toBeUndefined();
     }
+  });
+});
+
+describe('the lesser monuments per state', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const features = bundle.footprints.features as Footprint[];
+  const count = (group: string): number => features.filter((f) => f.group === group).length;
+
+  it('builds every group the plateau has, in both of the builders’ states', () => {
+    for (const state of ['built', 'today'] as const) {
+      const s = model.plateau.structures(state);
+      expect(s.queens.length, state).toBe(count('queens') - 1); // Khentkawes is not a pyramid
+      expect(s.temples.length, state).toBe(count('temples'));
+      expect(s.pits.length, state).toBe(count('pits'));
+      expect(s.walls.length, state).toBe(count('walls'));
+      expect(s.tombs.length, state).toBe(count('tombs'));
+      expect(s.causeway?.id, state).toBe('khafre.causeway');
+      // The Sphinx's three parts, Khentkawes and Khufu's basalt pavement.
+      expect(s.fallback.map((f) => f.id).sort(), state).toEqual([
+        'khentkawes', 'khufu.basalt_pavement', 'sphinx.body', 'sphinx.head', 'sphinx.paws',
+      ]);
+    }
+  });
+
+  it('draws the mastaba fields as one geometry and not as one mesh each', () => {
+    const field = model.plateau.structures('built').mastabas;
+    expect(field?.id).toBe('mastabas');
+    expect(field?.mesh.triangleCount).toBeGreaterThan(count('mastabas') * 12);
+    expect(field?.note).toContain(`${count('mastabas')} tombs`);
+  });
+
+  it('stands the early states whole and leaves the late ones as ruins', () => {
+    expect(isWholeState('ancient')).toBe(true);
+    expect(isWholeState('built')).toBe(true);
+    expect(isWholeState('stripped')).toBe(false);
+    expect(isWholeState('today')).toBe(false);
+    const whole = model.plateau.structures('built');
+    const ruined = model.plateau.structures('today');
+    // The roofs, the colonnades, the causeway's roof and the pits' lids are the early states' alone.
+    expect(whole.temples.every((t) => t.roof !== undefined)).toBe(true);
+    expect(whole.temples.some((t) => t.pillars !== undefined)).toBe(true);
+    expect(ruined.temples.every((t) => t.roof === undefined && t.pillars === undefined)).toBe(true);
+    expect(whole.causewayRoof).toBeDefined();
+    expect(ruined.causewayRoof).toBeUndefined();
+    expect(whole.pitCovers).toBeDefined();
+    expect(ruined.pitCovers).toBeUndefined();
+    // And the cased field of tombs stands above the ruined one on the same outlines.
+    expect(meshVolume(whole.mastabas?.mesh as Mesh)).toBeGreaterThan(meshVolume(ruined.mastabas?.mesh as Mesh));
+  });
+
+  it('draws an enclosure wall only where the database gives one, and only whole', () => {
+    // Petrie's section 71 gives Khafre's peribolus; nothing gives the other two.
+    expect(model.plateau.structures('built').enclosureWalls.map((w) => w.id)).toEqual(['g2.enclosure']);
+    expect(model.plateau.structures('today').enclosureWalls).toEqual([]);
+    const wall = model.plateau.structures('built').enclosureWalls[0];
+    expect(wall?.note).toContain('g2.enclosure.distance.outer');
+    expect(wall?.note).toContain('outer face');
+  });
+
+  it('says of every solid what it is and how far it is a reconstruction', () => {
+    const s = model.plateau.structures('built');
+    const all = [...s.queens, ...s.tombs, ...s.walls, ...s.enclosureWalls, ...s.pits, ...s.fallback, ...s.temples];
+    expect(all.length).toBeGreaterThan(10);
+    for (const one of all) {
+      expect(one.name.length, one.id).toBeGreaterThan(0);
+      expect(one.note.length, one.id).toBeGreaterThan(20);
+      expect(['reconstruction', 'excavated'], one.id).toContain(one.tier);
+    }
+    // A massing is what is there; a builder's account of how it stood is not.
+    expect(s.fallback.every((f) => f.tier === 'excavated')).toBe(true);
+    expect(s.queens.every((q) => q.tier === 'reconstruction')).toBe(true);
+  });
+
+  it('keeps one build of a state and hands the same one back', () => {
+    expect(model.plateau.structures('built')).toBe(model.plateau.structures('built'));
+    expect(model.plateau.structures('built')).not.toBe(model.plateau.structures('today'));
+  });
+
+  it('builds nothing for a pyramid the environment cannot give a height', () => {
+    const one = features.find((f) => f.id === 'g2a') as Footprint;
+    expect(structuresFor([one], {}, 'built').queens).toEqual([]);
+    expect(structuresFor([one], { 'tier3.satellite_pyramid.height': 3 }, 'built').queens.length).toBe(1);
   });
 });

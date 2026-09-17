@@ -54,10 +54,21 @@ function square(half: number): [number, number][] {
  * edge by the recorded distance, on the structure's own centre, elevation and
  * orientation. Undefined unless the database carries both the distance and the
  * height, under the structure's own key or the plateau-wide one.
+ *
+ * A distance is to the wall's near face unless the key it came from ends in
+ * `.outer`, in which case it is to the far one and the wall's own thickness is
+ * taken off it. Petrie measured the peribolus of the Second Pyramid to its
+ * outer face, and a record should carry the number he wrote rather than one
+ * moved to suit this function.
  */
 export function enclosureWallMesh(env: Environment, structure: string): LabelledMesh | undefined {
   const side = env[`${structure}.base.side.mean`];
-  const distance = firstOf(env, [`${structure}.enclosure.distance`, 'tier3.enclosure.distance']);
+  const distance = firstOf(env, [
+    `${structure}.enclosure.distance`,
+    'tier3.enclosure.distance',
+    `${structure}.enclosure.distance.outer`,
+    'tier3.enclosure.distance.outer',
+  ]);
   const height = firstOf(env, [`${structure}.enclosure.height`, 'tier3.enclosure.height']);
   if (side === undefined || !(side > 0) || distance === undefined || height === undefined) return undefined;
   if (!(distance.value > 0) || !(height.value > 0)) return undefined;
@@ -65,7 +76,9 @@ export function enclosureWallMesh(env: Environment, structure: string): Labelled
   const wall = thickness?.value ?? ENCLOSURE_THICKNESS;
   if (!(wall > 0)) return undefined;
 
-  const inner = side / 2 + distance.value;
+  const toOuter = distance.key.endsWith('.outer');
+  const inner = side / 2 + distance.value - (toOuter ? wall : 0);
+  if (!(inner > side / 2)) return undefined;
   const mesh = annulusMesh(square(inner + wall), square(inner), 0, height.value);
   if (mesh === undefined) return undefined;
   const place = structurePlacement(env, structure);
@@ -73,8 +86,9 @@ export function enclosureWallMesh(env: Environment, structure: string): Labelled
     ...placeMesh(mesh, place.east, place.north, place.up, place.orientationDeg),
     label:
       `Reconstruction: the enclosure wall of ${structure.toUpperCase()}, ${distance.value} m off the base ` +
-      `edge from ${distance.key} and ${height.value} m high from ${height.key}, on the structure's own ` +
-      `centre, base elevation and orientation. Look choices: a square ring, and a thickness of ${wall} m` +
+      `edge to its ${toOuter ? 'outer' : 'inner'} face from ${distance.key} and ${height.value} m high from ` +
+      `${height.key}, on the structure's own centre, base elevation and orientation. Look choices: a square ` +
+      `ring, and a thickness of ${wall} m` +
       `${thickness === undefined ? ', the database naming none' : ` from ${thickness.key}`}.`,
   };
 }
