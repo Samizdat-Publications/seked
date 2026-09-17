@@ -218,7 +218,12 @@ export interface Structures {
 export const STRUCTURE_LOOK = {
   /** How deep the slab over a boat pit is drawn, metres. */
   pitCoverThickness: 0.8,
-  /** How far that slab sits above the ground it covers, metres, so it does not fight the surface for pixels. */
+  /**
+   * How far the top of that slab stands above the ground it covers, metres.
+   * The blocks over Khufu's southern pit were laid flush with the rock, so the
+   * slab is sunk into the cut and only a lip of it shows, which is enough to
+   * keep it from fighting the ground for pixels.
+   */
   pitCoverLip: 0.02,
   /**
    * The tomb of Khentkawes I is a two-stepped rock-cut block, not a pyramid,
@@ -265,7 +270,7 @@ function pitCoverMesh(f: Footprint, env: Environment): Mesh | undefined {
       ...f,
       id: `${f.id}.cover`,
       kind: 'prism',
-      base: f.base + STRUCTURE_LOOK.pitCoverLip,
+      base: f.base + STRUCTURE_LOOK.pitCoverLip - STRUCTURE_LOOK.pitCoverThickness,
       height: STRUCTURE_LOOK.pitCoverThickness,
       depthKey: undefined,
       heightKey: undefined,
@@ -399,10 +404,11 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
             name: 'Boat pits, covering slabs',
             tier: 'reconstruction',
             note:
-              'Reconstruction: slabs laid over the boat pits at ground level. Khufu’s southern pit was ' +
-              'found closed by forty-one limestone blocks, so a covered pit is the documented condition of ' +
-              `one of them; the slab here is ${STRUCTURE_LOOK.pitCoverThickness} m deep over every pit, and ` +
-              'its depth, its single piece and which pits are covered are all look choices.',
+              'Reconstruction: slabs laid over the boat pits, flush with the rock they are cut into. ' +
+              'Khufu’s southern pit was found closed by forty-one limestone blocks, so a covered pit is ' +
+              `the documented condition of one of them; the slab here is ${STRUCTURE_LOOK.pitCoverThickness} ` +
+              'm deep over every pit, and its depth, its single piece and which pits are covered are all ' +
+              'look choices.',
             mesh: mergeMeshes(covers),
           },
     fallback,
