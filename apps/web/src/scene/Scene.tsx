@@ -4,17 +4,17 @@ import { useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import type { Model } from '../model';
 import type { OverlaySpec } from '../overlays';
 import { sectionPlanes } from '../section';
-import { DOME_RADIUS, type DomeBuffers, type NamedDomeStar } from '../sky';
+import type { DomeBuffers, NamedDomeStar } from '../sky';
 import { useView } from '../store';
 import type { LayerId } from '../view';
+import { useAtmosphere } from './Atmosphere';
 import { ClaimOverlay } from './ClaimOverlay';
 import { Renderer } from './Renderer';
-import { useSun } from './Sky';
+import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
 import { Interiors } from './Interior';
 import { NorthArrow } from './NorthArrow';
 import { Pyramids } from './Pyramids';
-import { SkyDome } from './SkyDome';
 import { Standins } from './Standins';
 import { Plateau, type TerrainProps } from './Terrain';
 
@@ -36,30 +36,18 @@ export interface SceneProps {
 }
 
 /**
- * Two skies. By day the background is the flat slate the monuments were
- * modelled against; with the star dome on it goes to something near black and
- * the lights come down with it, because a plateau lit like noon under a sky
- * full of stars is a picture of nothing.
+ * Behind the sky box there is nothing to see, and the sky box covers every
+ * direction, so the background only shows through the one frame before the
+ * shader compiles. It is near black because a flash of slate is worse than a
+ * flash of night.
  *
- * The sun is no longer here. It is the cascaded shadow maps' own lights in
- * `Renderer.tsx`, placed by `@seked/sky` for the day and hour on the
- * timeline, so the scene cannot be lit from a direction the astronomy does
- * not put the sun in. What is left is the fill: the sky's own light from
- * above and the ground's bounce from below.
+ * Neither the sun nor the sky's own light is chosen here any more. The sun is
+ * the cascaded shadow maps' lights in `Renderer.tsx` and the fill is the
+ * hemisphere and ambient in `Sky.tsx`, both placed by `@seked/sky` for the
+ * day and hour on the timeline, so the scene cannot be lit from a direction
+ * the astronomy does not put the sun in.
  */
-const DAY = {
-  background: '#0f1319',
-  fog: [4000, 13000] as const,
-  hemisphere: { sky: '#b9cbe0', ground: '#3b3327', intensity: 0.7 },
-  ambient: 0.25,
-};
-
-const NIGHT = {
-  background: '#04070d',
-  fog: [6000, 26000] as const,
-  hemisphere: { sky: '#243448', ground: '#0a0b0f', intensity: 0.22 },
-  ambient: 0.06,
-};
+const BACKGROUND = '#05070c';
 
 /**
  * The data is +X east, +Y north, +Z up; three is Y-up. One rotation of the
@@ -70,24 +58,27 @@ export function Scene({ model, terrain, layers, overlay, sky }: SceneProps): Rea
   const start = useRef(useView.getState().camera).current;
   // The observer is the Great Pyramid's own centre, which is where every sky
   // number in this project is reckoned from.
-  const sun = useSun({ latitudeDeg: model.latitudeDeg, longitudeDeg: model.env['g1.center.longitude'] ?? 0 });
+  const observer = useMemo(
+    () => ({ latitudeDeg: model.latitudeDeg, longitudeDeg: model.env['g1.center.longitude'] ?? 0 }),
+    [model],
+  );
+  const sun = useSun(observer);
+  // The air is shared uniforms rather than a component, because every material
+  // in the scene reads the same ones.
+  useAtmosphere(sun);
   const mode = useView((s) => s.mode);
   const section = useView((s) => s.section);
   const planes = useMemo(() => sectionPlanes(section), [section]);
   const groundPlanes = useMemo(() => sectionPlanes(section, section.ground), [section]);
-  const light = layers.sky ? NIGHT : DAY;
 
   return (
     <Canvas shadows dpr={[1, 2]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: 45, near: 1, far: 40000, position: start.position }}>
-      <color attach="background" args={[light.background]} />
-      <fog attach="fog" args={[light.background, light.fog[0], light.fog[1]]} />
-      <hemisphereLight args={[light.hemisphere.sky, light.hemisphere.ground, light.hemisphere.intensity]} />
-      <ambientLight intensity={light.ambient} />
+      <color attach="background" args={[BACKGROUND]} />
 
       {layers.grid && <gridHelper args={[6000, 60, '#38475a', '#1d2630']} />}
 
       <group rotation={[-Math.PI / 2, 0, 0]}>
-        {layers.sky && sky && <SkyDome {...sky} radius={DOME_RADIUS} />}
+        <Sky sun={sun} observer={observer} stars={sky} furniture={layers.sky} />
         <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
         {layers.pyramids && <Pyramids pyramids={model.pyramids} massings={model.massings} plateau={model.plateau} today={layers.today} clippingPlanes={planes} />}
         {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}

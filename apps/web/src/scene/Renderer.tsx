@@ -10,14 +10,14 @@
  * measurement; the only quantity from outside is the sun's direction, which
  * comes from `@seked/sky` by way of `useSun`.
  */
-import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing';
+import { Bloom, EffectComposer, HueSaturation, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing';
 import { useFrame, useThree } from '@react-three/fiber';
 import { ToneMappingMode } from 'postprocessing';
 import { useEffect, useState } from 'react';
 import { Color, HalfFloatType, NoToneMapping, PCFShadowMap, Vector3 } from 'three';
 import { CSM } from 'three/examples/jsm/csm/CSM.js';
 import { setCascades } from './materials/shadows';
-import { worldDirection, type Sun } from './Sky';
+import { nightness, worldDirection, type Sun } from './Sky';
 
 /**
  * Look choices, all of them. Exposure is the stop the AgX curve is fed at:
@@ -26,14 +26,25 @@ import { worldDirection, type Sun } from './Sky';
  * the sun is doing.
  */
 const LOOK = {
-  /** Stops of exposure before the tone curve. Set against the Blender panorama. */
+  /** Exposure before the tone curve, by day. Set against the Blender panorama. */
   exposure: 0.62,
+  /**
+   * And at night, which is a photograph taken with the aperture open: the
+   * render's own night view does the same thing with its camera. Starlight is
+   * this faint, and a picture of it is not.
+   */
+  nightExposure: 2.4,
   /** How far ambient occlusion reaches, in metres of world space. */
   aoRadius: 14,
   aoIntensity: 1.6,
   /** Only the sky and the specular glints are meant to bloom, so the threshold is high. */
   bloom: { threshold: 0.92, smoothing: 0.35, intensity: 0.28 },
   vignette: { offset: 0.34, darkness: 0.42 },
+  /**
+   * AgX trades saturation for its highlight roll-off, which is why Blender's
+   * own "AgX - Punchy" adds some back. This is that, after the curve.
+   */
+  saturation: 0.16,
   shadows: {
     /** Cascades over the distance the plateau fills: near the camera, mid, and the far pyramids. */
     cascades: 3,
@@ -63,7 +74,7 @@ export interface RendererProps {
 export function Renderer({ sun, quality = 'full' }: RendererProps): React.JSX.Element {
   return (
     <>
-      <Settings />
+      <Settings sun={sun} />
       <Shadows sun={sun} quality={quality} />
       <EffectComposer
         enableNormalPass={false}
@@ -86,6 +97,7 @@ export function Renderer({ sun, quality = 'full' }: RendererProps): React.JSX.El
         <Vignette offset={LOOK.vignette.offset} darkness={LOOK.vignette.darkness} eskil={false} />
         <SMAA />
         <ToneMapping mode={ToneMappingMode.AGX} />
+        <HueSaturation saturation={LOOK.saturation} />
       </EffectComposer>
     </>
   );
@@ -98,17 +110,18 @@ export function Renderer({ sun, quality = 'full' }: RendererProps): React.JSX.El
  * still hands `toneMappingExposure` to every shader, which is what the AgX
  * effect reads, so the exposure lives here.
  */
-function Settings(): null {
+function Settings({ sun }: { sun: Sun }): null {
   const gl = useThree((s) => s.gl);
+  const night = nightness(sun.altitudeDeg);
   useEffect(() => {
     gl.localClippingEnabled = true;
     gl.toneMapping = NoToneMapping;
-    gl.toneMappingExposure = LOOK.exposure;
+    gl.toneMappingExposure = LOOK.exposure + (LOOK.nightExposure - LOOK.exposure) * night;
     gl.shadowMap.enabled = true;
     // Three 0.186 removed PCFSoftShadowMap; the cascades carry the sharpness
     // a wider filter would otherwise have had to make up for.
     gl.shadowMap.type = PCFShadowMap;
-  }, [gl]);
+  }, [gl, night]);
   return null;
 }
 
