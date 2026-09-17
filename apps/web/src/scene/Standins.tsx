@@ -132,7 +132,10 @@ export function chosen(entries: readonly StandinEntry[], state: string, variant:
   const live = entries.filter((e) => e.states.length === 0 || e.states.includes(state));
   const groups = new Map<string, StandinEntry[]>();
   for (const entry of live) {
-    const key = [...entry.replaces].sort().join(' ');
+    // The grouping exists so that only one model ever stands on a given set of
+    // outlines. An entry that replaces none, such as a part of the whole-plateau
+    // reconstruction, competes with nothing and is its own group.
+    const key = entry.replaces.length > 0 ? [...entry.replaces].sort().join(' ') : `id:${entry.id}`;
     groups.set(key, [...(groups.get(key) ?? []), entry]);
   }
   const picked: StandinEntry[] = [];
