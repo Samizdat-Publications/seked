@@ -37,7 +37,7 @@ export function Claims({ claims, model, context }: { claims: Claim[]; model: Mod
                     onSelect={() => setClaim(claim.id)}
                   />
                   {claim.id === chosen?.id && (
-                    <li>
+                    <li className="claim-open">
                       <ClaimDetail
                         claim={claim}
                         result={model.results.get(claim.id) as FailedClaim}

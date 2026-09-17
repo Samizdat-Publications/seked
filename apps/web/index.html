@@ -2,8 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#06080a" />
     <title>Seked</title>
+    <!-- A drawn mark rather than a file, so the build carries no binary for it. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%2306080a'/%3E%3Cpath%20d='M16%207.5%2027%2024.5H5z'%20fill='%23d9b56a'/%3E%3C/svg%3E"
+    />
+    <!--
+      A serif display face for the titles and a humanist sans for the controls,
+      as the design asks. Both fall back to what the machine already has, so a
+      viewer with no network still reads.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap"
+    />
   </head>
   <body>
     <div id="root"></div>
