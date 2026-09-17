@@ -29,6 +29,7 @@ data/footprints/overpass-giza.json
 apps/web/public/seked.json
 apps/web/public/terrain/
 apps/web/public/textures/
+apps/web/public/sky/
 
 # Local
 .env

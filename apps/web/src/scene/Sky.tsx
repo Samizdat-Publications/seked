@@ -304,7 +304,7 @@ function Atmosphere({ sun, look, night }: { sun: Sun; look: SkyLook; night: numb
 const NIGHT_SKY = { zenith: new Color('#1b2436'), horizon: new Color('#2b3448') };
 
 /** How bright the Milky Way is drawn over that. A look choice. */
-const MILKY_WAY_STRENGTH = 0.35;
+const MILKY_WAY_STRENGTH = 0.9;
 
 /**
  * The night sky: a deep blue dome with NASA's Milky Way laid over it.
@@ -379,6 +379,11 @@ function NightSky({
   useEffect(() => () => material.dispose(), [material]);
   useEffect(() => {
     material.uniforms.milkyWay!.value = texture ?? null;
+    // The material is first compiled with nothing in that sampler, because
+    // the blue behind the galaxy should be up before the galaxy has loaded.
+    // Three binds its own empty texture for a null sampler and will not go
+    // back to look again, so the arrival is a recompile.
+    material.needsUpdate = true;
     material.uniforms.milkyWayStrength!.value = MILKY_WAY_STRENGTH;
     // The blue comes up through twilight with the stars, so the sunset is not
     // painted over while it is still a sunset.
