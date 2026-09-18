@@ -36,6 +36,7 @@ import { useMotion } from '../motion/store';
 import { sequenceSeconds, type Sequence } from '../motion/types';
 import { useView } from '../store';
 import { r3f } from './handle';
+import { holdSize } from './size';
 
 export interface FilmOptions {
   sequence: Sequence;
@@ -121,17 +122,18 @@ interface ClockHold {
  * run leaves a live scene rather than a frozen one.
  */
 export async function renderFilm(options: FilmOptions): Promise<void> {
-  const { sequence, fps, onFrame, signal } = options;
+  const { sequence, fps, width, height, onFrame, signal } = options;
   const root = r3f();
   if (!root) throw new Error('The film has no renderer: the scene is not mounted.');
 
   const canvas = root.getState().gl.domElement;
   const stage = canvas.closest('.stage') as HTMLElement | null;
+  if (!stage) throw new Error('The film cannot find the stage the canvas stands on.');
   // The rail and the instruments come off the stage for the run. They are not
   // in the film either way, which is drawn off the canvas and not off the
   // page, but a reader watching a long run should see the frame and not the
   // furniture. The class goes on by hand because `App.tsx` is the trunk's.
-  const shell = stage?.closest('.shell') ?? null;
+  const shell = stage.closest('.shell');
   shell?.classList.add('is-filming');
 
   const motion = useMotion.getState();
@@ -141,6 +143,10 @@ export async function renderFilm(options: FilmOptions): Promise<void> {
   // with `frameloop="never"`, one for that to reach the store.
   await nextFrame();
   await nextFrame();
+
+  // The size after the frameloop, so R3F's own re-measure of the container on
+  // that render cannot land on top of it.
+  const size = await holdSize(root, stage, width, height);
 
   const clock = root.getState().clock;
   const held: ClockHold = {
@@ -159,6 +165,7 @@ export async function renderFilm(options: FilmOptions): Promise<void> {
       useMotion.getState().advance(1 / fps);
       await waitForLoaded(signal);
       stopIfAsked(signal);
+      size.hold();
       root.getState().advance(frameTimestamp(frame, fps));
       await onFrame(frame, total);
     }
@@ -170,6 +177,7 @@ export async function renderFilm(options: FilmOptions): Promise<void> {
     clock.start();
     clock.elapsedTime = held.elapsedTime;
     if (!held.running) clock.stop();
+    size.restore();
     const after = useMotion.getState();
     after.setClock('wall');
     after.stop();

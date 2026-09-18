@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import type { CameraView } from '../view';
 import type { Sequence, Shot } from '../motion/types';
 import { frameCount, frameTimestamp } from './run';
+import { cssSizeFor, dprFor } from './size';
 
 const STAND: CameraView = { position: [0, 100, 1000], target: [0, 70, 0] };
 
@@ -52,5 +53,24 @@ describe('frameTimestamp', () => {
   it('is in seconds: a second of film is a second on the clock', () => {
     expect(frameTimestamp(23, 24)).toBeCloseTo(1, 12);
     expect(frameTimestamp(29, 30)).toBeCloseTo(1, 12);
+  });
+});
+
+describe("the frame's size", () => {
+  it('draws exactly the size asked for, whatever the window is', () => {
+    for (const cssWidth of [1600, 1279.5, 843.19, 3840]) {
+      for (const [width, height] of [[1920, 1080], [2560, 1440], [3840, 2160]] as const) {
+        const dpr = dprFor(cssWidth, width);
+        const css = cssSizeFor(width, height, dpr);
+        // What three does with the two: floor the product, per dimension.
+        expect(Math.floor(css.width * dpr)).toBe(width);
+        expect(Math.floor(css.height * dpr)).toBe(height);
+      }
+    }
+  });
+
+  it('aims over rather than under, because a pixel short is a pixel short', () => {
+    expect(dprFor(1920, 1920)).toBeGreaterThan(1);
+    expect(dprFor(1920, 1920)).toBeLessThan(1.001);
   });
 });

@@ -1542,3 +1542,41 @@ button.step.is-primary:hover {
     transform: translateX(-50%);
   }
 }
+
+/* ===== Stage 4, Track O: the film ===== */
+
+/*
+ * While a film is recording, the stage is the frame and nothing else. The
+ * furniture is not in the file either way, which is cut from the canvas and
+ * not from the page, but a reader watching a run of a thousand frames should
+ * see the picture being made rather than the rail in front of it. The Film
+ * drawer itself stays, because it carries the progress and the Cancel.
+ */
+.is-filming .rail,
+.is-filming .instruments,
+.is-filming .caption,
+.is-filming .hover-tag,
+.is-filming::before,
+.is-filming::after {
+  display: none;
+}
+
+/*
+ * The frame's own box. The drawing buffer has to be exactly the size asked
+ * for, and that is the CSS box times the pixel ratio, so the box has to be
+ * the film's shape whatever shape the window is: `--film-ratio` is the width
+ * over the height, set by `film/size.ts` for the run and taken off after.
+ * The box is the largest of that shape that fits, centred, with the plate
+ * behind it showing where the frame ends.
+ */
+.stage.is-film-frame {
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: min(100%, calc(100vh * var(--film-ratio, 1.7778)));
+  height: auto;
+  aspect-ratio: var(--film-ratio, 1.7778);
+  translate: -50% -50%;
+  box-shadow: 0 0 0 1px var(--hairline), var(--lift);
+}

@@ -119,8 +119,8 @@ Branch `stage4/film`. Owns `apps/web/src/film/` (new), `apps/web/src/ui/Film.tsx
 
 ### Task O2: the size
 
-- [ ] `film/size.ts`: the drawing buffer must be exactly `width` by `height` whatever the window is. The stage keeps its CSS size; the canvas's device pixel ratio is set through R3F's `setDpr` so that `cssWidth * dpr === width`, and the Canvas's aspect is forced by giving the stage a fixed-aspect box for the run (a class on `.stage` with `aspect-ratio` and centred; O's styles section). The composer follows the renderer's size on its own. Restore both after the run. Resolutions offered: 1920 by 1080, 2560 by 1440, 3840 by 2160; a 4k run on the 5070 Ti is expected to take a few seconds a frame with N8AO at full, which is fine for a film.
-- [ ] Commit: "Draw a film frame at the size asked for, whatever the window is".
+- [x] `film/size.ts`: the drawing buffer must be exactly `width` by `height` whatever the window is. The stage keeps its CSS size; the canvas's device pixel ratio is set through R3F's `setDpr` so that `cssWidth * dpr === width`, and the Canvas's aspect is forced by giving the stage a fixed-aspect box for the run (a class on `.stage` with `aspect-ratio` and centred; O's styles section). The composer follows the renderer's size on its own. Restore both after the run. Resolutions offered: 1920 by 1080, 2560 by 1440, 3840 by 2160; a 4k run on the 5070 Ti is expected to take a few seconds a frame with N8AO at full, which is fine for a film.
+- [x] Commit: "Draw a film frame at the size asked for, whatever the window is".
 
 ### Task O3: the encoder and the file
 
