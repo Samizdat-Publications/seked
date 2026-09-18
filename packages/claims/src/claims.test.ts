@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadDatabase, resolve } from '@seked/data';
+import { isContext, loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
 import { skyEnvironment } from '@seked/sky';
 import { evaluateClaim, worstComparison, type ComparisonResult } from './evaluate';
@@ -315,5 +315,20 @@ describe('a proposed claim', () => {
 
   it('is never what a file in data/claims says it is', () => {
     for (const c of claims) expect(c.origin, c.id).toBe('filed');
+  });
+});
+
+describe('a claim never cites the scenery', () => {
+  it('names no key belonging to a context structure', () => {
+    const context = new Set(db.structures.filter(isContext).map((s) => s.id));
+    // Nothing is context yet; the guard is here so the modern city cannot
+    // quietly become evidence the day it lands.
+    for (const c of claims) {
+      for (const cmp of c.comparisons) {
+        for (const id of [...identifiers(cmp.formula), ...identifiers(cmp.target)]) {
+          expect(context.has(id.slice(0, id.indexOf('.'))), `${c.id} cites ${id}`).toBe(false);
+        }
+      }
+    }
   });
 });

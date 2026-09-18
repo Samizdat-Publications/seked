@@ -51,15 +51,35 @@ export type Site = z.infer<typeof SiteSchema>;
  * one can share the scene without sharing credibility.
  */
 export const EVIDENCE_TIERS = ['excavated', 'instrumented', 'claimed', 'legendary'] as const;
-export const StructureSchema = z.object({
-  id: z.string(),
-  site: z.string(),
-  name: z.string(),
-  evidence: z.enum(EVIDENCE_TIERS),
-  source: z.string().optional(),
-  note: z.string().optional(),
-});
+
+/**
+ * Context is the other thing a structure can be, and it is not a fifth tier.
+ * The four tiers above say how we know an ancient structure existed, which is
+ * a question the modern city behind the plateau does not raise: a block of
+ * flats in Giza is the view, not evidence, and giving it a tier would invite
+ * a reader to weigh it against a chamber somebody dug. So a context structure
+ * carries `context: true` and no `evidence` at all, and nothing may cite it.
+ */
+export const StructureSchema = z
+  .object({
+    id: z.string(),
+    site: z.string(),
+    name: z.string(),
+    evidence: z.enum(EVIDENCE_TIERS).optional(),
+    /** True for scenery: imported, attributed, drawn, and never evidence for anything. */
+    context: z.literal(true).optional(),
+    source: z.string().optional(),
+    note: z.string().optional(),
+  })
+  .refine((s) => (s.context === true) !== (s.evidence !== undefined), {
+    message: 'a structure is either evidence at a tier or context, never both and never neither',
+  });
 export type Structure = z.infer<typeof StructureSchema>;
+
+/** Scenery rather than evidence: drawn, attributed, and never cited by a claim. */
+export function isContext(structure: Structure): boolean {
+  return structure.context === true;
+}
 
 export const PresetSchema = z.object({
   id: z.string(),

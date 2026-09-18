@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MeasurementSchema, loadDatabase, resolve } from './index';
+import { MeasurementSchema, StructureSchema, isContext, loadDatabase, resolve } from './index';
 
 const db = loadDatabase();
 
@@ -68,4 +68,25 @@ describe('presets', () => {
   it('rejects an unknown preset', () => {
     expect(() => resolve(db, 'nope')).toThrow(/unknown preset/);
   });
+});
+
+describe('context is not a fifth evidence tier', () => {
+  const bare = { id: 'giza.city', site: 'giza', name: 'Giza and Cairo' };
+
+  it('takes context with no evidence, and evidence with no context', () => {
+    expect(StructureSchema.parse({ ...bare, context: true }).context).toBe(true);
+    expect(StructureSchema.parse({ ...bare, evidence: 'excavated' }).evidence).toBe('excavated');
+  });
+
+  it('refuses a structure that is both, or neither', () => {
+    expect(() => StructureSchema.parse({ ...bare, context: true, evidence: 'excavated' })).toThrow();
+    expect(() => StructureSchema.parse(bare)).toThrow();
+  });
+
+  it('is what isContext reads, and every structure filed today is evidence', () => {
+    expect(isContext(StructureSchema.parse({ ...bare, context: true }))).toBe(true);
+    expect(isContext(StructureSchema.parse({ ...bare, evidence: 'claimed' }))).toBe(false);
+    for (const s of db.structures) expect(isContext(s), s.id).toBe(false);
+  });
+
 });

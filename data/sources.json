@@ -408,5 +408,23 @@
     "url": "https://digi.ub.uni-heidelberg.de/diglit/hoelscher1912",
     "license": "Heidelberg University Library states rightsstatements.org/vocab/InC/1.0 (In Copyright) over the digitisation and asks that use follow https://www.ub.uni-heidelberg.de/helios/digi/nutzung/index.html. The 1912 text and plates are themselves out of copyright in the United States; Hölscher died in 1963, so Germany's term runs to 2034. Nothing of the scan is committed, only measurements taken from it.",
     "note": "Hölscher's survey of Khafre's valley temple, which he calls the Torbau. Not on archive.org: searches there for the author, the title and the series all came back empty (see docs/geometry-blockers.md). Read from Heidelberg's IIIF service, which is not behind the bot challenge their HTML and their PDF download are: manifest https://digi.ub.uni-heidelberg.de/diglit/iiif/hoelscher1912/manifest, plate image https://digi.ub.uni-heidelberg.de/iiif/2/hoelscher1912%3A120a_XVII.jpg/full/max/0/default.jpg, 4949 by 3764 pixels, fetched 2026-09-17 to build/plates/ (gitignored). URN urn:nbn:de:bsz:16-diglit-267936, DOI 10.11588/diglit.26793, shelfmark Heidelberg UB C 2637-9-5 Folio::1. Blatt XVII carries a double Maßstab, metres above and Egyptian cubits below, a Zeichenerklärung naming the materials, and a magnetic-north rose dated März 1910."
+  },
+  {
+    "id": "open-buildings-v3",
+    "kind": "reference",
+    "year": 2023,
+    "citation": "Sirko, W. and others. Continental-scale building detection from high resolution satellite imagery. Google Research, Open Buildings dataset version 3. Building outlines inferred from satellite imagery across Africa, South Asia, South-East Asia, Latin America and the Caribbean, distributed as WKT polygons in CSV, one file per S2 level-4 cell, each row carrying a centroid, an area, a confidence and a Plus Code.",
+    "url": "https://sites.research.google/gr/open-buildings/",
+    "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) or ODbL 1.0, at the user's choice. Attribution: Open Buildings, Google Research.",
+    "note": "The tile covering Giza is 145, at https://storage.googleapis.com/open-buildings-data/v3/polygons_s2_level_4_gzip/145_buildings.csv.gz, 1,315 MB gzipped and 13,308,407 rows. It is not spatially sorted, so scripts/city.ts streams it whole and keeps only the rows inside the plateau's box. Outlines are inferred from imagery, not surveyed: this is the modern city, which the project draws as context and never as evidence. The archive is cached outside the repo and is not committed."
+  },
+  {
+    "id": "open-buildings-25d-temporal",
+    "kind": "reference",
+    "year": 2024,
+    "citation": "Google Research. Open Buildings 2.5D Temporal dataset, version 1. Annual rasters of building presence, building height and fractional building count from 2016 to 2023, each centred on 30 June, inferred from satellite imagery at about 4 m effective resolution and distributed at 50 cm.",
+    "url": "https://sites.research.google/gr/open-buildings/temporal/",
+    "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) or ODbL 1.0, at the user's choice. Attribution: Open Buildings 2.5D Temporal, Google Research.",
+    "note": "Building height carries a stated mean absolute error of 1.5 m and is capped at 100 m, and is only meaningful where the presence band agrees. The tile containing the Great Pyramid is v1/geotiffs/14584_2023_06_30/tile_ZEIX66sm0PA.tif in the public bucket open-buildings-temporal-data, 25,000 by 25,000 px at 0.5 m in UTM 36N with its origin at 319912, 3321468; Giza sits near its north-west corner, so the north of the plateau's box needs a neighbouring tile, found by extent from v1/manifests/15_EPSG_32636_2023_06_30.json. A height from this raster is a measurement with an error bar, not a look choice. The tiles are cached outside the repo and are not committed."
   }
 ]
