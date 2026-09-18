@@ -359,6 +359,24 @@ the hall's 23 statue sockets and east entrances, the T's north-south arm,
 Reisner's Menkaure plans, a mesh for Khufu's ship, the water at dusk, and
 Stewart's reference look (spec 3.1) as the yardstick for the next pass.
 
+Stage 4 landed later the same night (snapshot 0031, plan
+`docs/superpowers/plans/2026-09-17-stage-4-motion.md`): a motion engine
+(`apps/web/src/motion/`: eased keys, camera arcs that clear the plateau, a
+shot applied through the view store's own actions, two clocks), the tour
+rebuilt as eleven shots through the eras with narration over the stage
+(`tour.ts`, `sequences.ts`, `ui/Tour.tsx`, `ui/Narration.tsx`), a film
+exporter that steps the clock frame by frame at any size into an mp4 with
+subtitles (`apps/web/src/film/`, `ui/Film.tsx`), and the scene held up under
+motion (the sky's reflections rebuilt only when the sun has moved, LOD
+hysteresis, vegetation dissolving with the rest, water and haze cleared at
+dusk from low stands). The ground's cut uniform is now a fixed capacity,
+after a cached program read past a shorter array during a film. Open from
+stage 4: the built and ancient states draw at about 5 fps at 1600 by 900 on
+the 5070 Ti against about 180 in today, so the wall-clock tour needs a cost
+pass before it reads as motion; the water's flat edge at the horizon from
+the night stand; the frame rate of the film run (about 4 frames a second at
+1080p in the heavy states) is the same cost.
+
 **Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
 modern and ancient states and the transitional steps between, with models

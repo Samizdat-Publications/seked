@@ -348,5 +348,55 @@
     "kept": false,
     "note": "Track A, stage 1: the viewer at midnight, epoch -2449, sidereal time 205 deg. The star dome, the deep blue night sky and NASA's Milky Way turned by the precession and the horizon frame. Browser at 1600 by 900, not Blender.",
     "bytes": 1705438
+  },
+  {
+    "file": "2026-09-18T03-04-24Z--tour--08fe432-dirty.png",
+    "taken": "2026-09-18T03:04:24+00:00",
+    "view": "tour",
+    "commit": "08fe432",
+    "tree": "dirty",
+    "kept": true,
+    "note": "Stage 4: the tour's first shot on the wall clock, the plateau today at dawn with the narration band and the Tour drawer's list of eleven shots. Browser at 1600 by 900.",
+    "bytes": 1405380
+  },
+  {
+    "file": "2026-09-18T03-04-26Z--tour--08fe432-dirty.png",
+    "taken": "2026-09-18T03:04:26+00:00",
+    "view": "tour",
+    "commit": "08fe432",
+    "tree": "dirty",
+    "kept": true,
+    "note": "Stage 4: a frame of the film the viewer recorded of its own tour, the second shot part way through, the camera arriving over the Great Pyramid's east face with the casing back on and claim A1's ghost. 1080p, stepped clock.",
+    "bytes": 2210822
+  },
+  {
+    "file": "2026-09-18T03-04-27Z--tour--08fe432-dirty.png",
+    "taken": "2026-09-18T03:04:27+00:00",
+    "view": "tour",
+    "commit": "08fe432",
+    "tree": "dirty",
+    "kept": true,
+    "note": "Stage 4: the end of the second shot of the opening film, the east face stand in the built state, A1's ghost profile over the survey slope. 1080p, stepped clock.",
+    "bytes": 2779846
+  },
+  {
+    "file": "2026-09-18T03-04-29Z--rollback--08fe432-dirty.png",
+    "taken": "2026-09-18T03:04:29+00:00",
+    "view": "rollback",
+    "commit": "08fe432",
+    "tree": "dirty",
+    "kept": true,
+    "note": "Stage 4: the rollback film recorded from the viewer, at 2450 BCE with Alnitak held on the meridian by the sky package, the King's Chamber's south shaft at 45 degrees. 1080p, 24 fps.",
+    "bytes": 1256568
+  },
+  {
+    "file": "2026-09-18T03-04-31Z--rollback--08fe432-dirty.png",
+    "taken": "2026-09-18T03:04:31+00:00",
+    "view": "rollback",
+    "commit": "08fe432",
+    "tree": "dirty",
+    "kept": true,
+    "note": "Stage 4: the rollback film's last second, 10,500 BCE, Alnitak transiting just above the apex, the Milky Way turned with the epoch. The water's flat edge shows at the left horizon from this low stand.",
+    "bytes": 1525887
   }
 ]
