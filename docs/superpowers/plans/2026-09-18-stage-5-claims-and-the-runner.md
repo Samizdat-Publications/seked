@@ -50,21 +50,29 @@ Branch `stage5/cost`. Owns `scripts/web-assets.ts`, `blender/props.json` (the `s
 **The baseline (2026-09-18, Chromium at 1600 by 900 on the RTX 5070 Ti, the
 median of three two-second counts at each stand, `scripts/frames.md`).**
 Triangles are the per-frame total over every pass including the shadow
-cascades, read off `gl.info` with its auto-reset turned off.
+cascades, read off `gl.info` with its auto-reset turned off. Taken in a
+browser nobody else was driving; the first run was taken in the session's
+shared one and every number in the heavy states came out about a third low.
 
 | Look | today | built | ancient | built calls | built triangles |
 |---|---|---|---|---|---|
-| dawn | 202.0 | 4.1 | 4.3 | 391 | 1,373,214,166 |
-| panorama | 206.1 | 4.5 | 4.4 | 395 | 1,373,214,512 |
-| harbour | 169.2 | 4.6 | 4.4 | 363 | 1,374,477,258 |
-| akhet | 187.1 | 7.9 | 4.4 | 189 | 667,808,171 |
-| night | 228.0 | 8.0 | 8.1 | 172 | 667,346,339 |
+| dawn | 237.0 | 4.3\* | 4.8\* | 391 | 1,373,214,166 |
+| panorama | 231.5 | 4.3 | 4.8 | 395 | 1,373,214,512 |
+| harbour | 240.0 | 4.7 | 4.8 | 363 | 1,374,477,258 |
+| akhet | 237.5 | 8.2 | 4.6 | 189 | 667,808,171 |
+| night | 239.5 | 7.4 | 7.6 | 179 | 667,346,339 |
 
-Today draws between 0.27 and 1.45 million triangles a frame at the same five
-stands. So the heavy states cost about a thousand times the geometry of the
-light one, and the two stands that are twice as fast as the others (`akhet`
-and `night`) are the two where half the plateau is behind the camera, which
-is the shape of a geometry cost and not of a shading one.
+\* The first stand measured after a change of state reads 0.6 and 0.7,
+because it carries the shader compilation of everything the new state just
+brought in. The steady rate at that stand is the panorama's, which is the same
+camera load; the compile figure is not the state's cost and is not quoted.
+
+Today is at the display's own 240 Hz at four of the five stands, so those are
+floors and not ceilings. It draws between 0.27 and 1.45 million triangles a
+frame at the same five stands, so the heavy states cost about a thousand times
+the geometry of the light one, and the two stands that run at twice the rest
+(`akhet` and `night`) are the two with half the plateau behind the camera,
+which is the shape of a geometry cost and not of a shading one.
 
 ### Task Q2: a scatter level baked to a budget
 
@@ -75,10 +83,10 @@ is the shape of a geometry cost and not of a shading one.
 
 ### Task Q3: the far ring is cards
 
-- [ ] Beyond `LOOK.cardMetres` (a look choice; start at 900 m from the camera) a plant is a cross of two textured quads facing the camera's yaw, the texture baked by `scripts/web-assets.ts` from the plant's own textures at 256 px (a front and a side of the scatter level rendered with `@gltf-transform`'s scene, or, if a render is more than the script should carry, the crown's leaf texture on two quads scaled to the plant's `size` from the manifest). Which the baker does is the track's call and is said in the file. Near and far are two instanced meshes per plant kind with a shared placement list and a hysteresis band of 60 m (`lod.ts`'s pattern), so a slow move does not flicker a tree between mesh and card.
-- [ ] The cards dissolve with everything else (stage 4's fade) and are clipped by the section like the meshes.
-- [ ] Verify at `panorama` and `dawn`, where most of the plants are far: the number, and a screenshot at each with the cards on and, for comparison, off.
-- [ ] Commit: "Draw the far plants as cards, with a band so a tree does not flicker".
+- [x] Beyond `LOOK.cardMetres` (a look choice; start at 900 m from the camera) a plant is a cross of two textured quads facing the camera's yaw, the texture baked by `scripts/web-assets.ts` from the plant's own textures at 256 px (a front and a side of the scatter level rendered with `@gltf-transform`'s scene, or, if a render is more than the script should carry, the crown's leaf texture on two quads scaled to the plant's `size` from the manifest). Which the baker does is the track's call and is said in the file. Near and far are two instanced meshes per plant kind with a shared placement list and a hysteresis band of 60 m (`lod.ts`'s pattern), so a slow move does not flicker a tree between mesh and card.
+- [x] The cards dissolve with everything else (stage 4's fade) and are clipped by the section like the meshes.
+- [x] Verify at `panorama` and `dawn`, where most of the plants are far: the number, and a screenshot at each with the cards on and, for comparison, off.
+- [x] Commit: "Draw the far plants as cards, with a band so a tree does not flicker".
 
 ### Task Q4: shadows near, none far
 

@@ -31,7 +31,7 @@
  * +Z up, metres.
  */
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BufferAttribute,
   BufferGeometry,
@@ -45,9 +45,11 @@ import {
   MeshStandardMaterial,
   Object3D,
   SRGBColorSpace,
+  TextureLoader,
   Vector3,
   type Material,
   type Plane,
+  type Texture,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
@@ -97,6 +99,33 @@ const LOOK = {
    * their strength is zero and nothing is scattered.
    */
   tint: { ancient: '#ffffff', built: '#a89968', stripped: '#a89968', today: '#a89968' } as Record<string, string>,
+  /**
+   * How far out a scattered plant stops being a model and becomes a card, in
+   * metres from the camera.
+   *
+   * A look choice, and a new one (2026-09-18). Nine hundred metres is where a
+   * twelve-metre palm is about fifteen pixels tall at this field of view,
+   * which is a silhouette and nothing more, and a silhouette is what a card
+   * draws. Below it every plant is its own model at full size, which is
+   * itself a change: the plants used to take the grass's own fade and were
+   * squashed to nothing from four hundred metres out, so they were paid for
+   * in full and not seen at all.
+   */
+  cardMetres: 900,
+  /**
+   * How far inside that line the camera has to come back before the model
+   * returns. A look choice, and `lod.ts`'s own pattern: sixty metres is wide
+   * enough that no move at a walking pace crosses it twice and narrow enough
+   * that nothing is a card where it fills the frame.
+   */
+  cardBandMetres: 60,
+  /**
+   * How far out a card has shrunk to nothing. A look choice. Two and a half
+   * kilometres carries the savanna out to where the haze takes it, and stops
+   * short of the scatter's own edge, which would otherwise read as a line of
+   * trees ruled across the horizon.
+   */
+  cardFadeMetres: 2500,
 } as const;
 
 /** How many of a plant kind stand per square metre of full mask, by its own kind. */
@@ -225,15 +254,15 @@ function cardGeometry(): BufferGeometry {
  * `fade.ts`'s hash as it is given, and nothing here has to know that a
  * dissolve is running.
  */
-function applyBlades(material: Material, clock: { value: number }, geometry: BufferGeometry): void {
+function applyBlades(material: Material, clock: { value: number }, geometry: BufferGeometry, fadeMetres: number): void {
   if (!geometry.boundingSphere) geometry.computeBoundingSphere();
   const centre = geometry.boundingSphere?.center ?? new Vector3();
   // Through `patchMaterial` and not by assigning the hook, because the air
   // and the cascaded shadow maps both want the same one, and the cascades
   // assign theirs from outside whenever the sun is rebuilt.
-  patchMaterial(material, 'blades', 'v2', (shader) => {
+  patchMaterial(material, 'blades', 'v3', (shader) => {
     shader.uniforms.bladeTime = clock;
-    shader.uniforms.bladeFade = { value: LOOK.fadeMetres };
+    shader.uniforms.bladeFade = { value: fadeMetres };
     shader.uniforms.bladeSway = { value: (LOOK.swayDegrees * Math.PI) / 180 };
     shader.uniforms.bladeCentre = { value: centre.clone() };
     shader.vertexShader = shader.vertexShader
@@ -247,7 +276,10 @@ function applyBlades(material: Material, clock: { value: number }, geometry: Buf
         {
           vec3 anchor = (modelMatrix * instanceMatrix * vec4(bladeCentre, 1.0)).xyz;
           float far = distance(anchor, cameraPosition);
-          float near = 1.0 - smoothstep(bladeFade * 0.6, bladeFade, far);
+          // A fade of nothing is no fade at all: a plant inside the card line
+          // is drawn at its own size and is swapped for a card rather than
+          // shrunk away, which is what the grass alone is still shrunk by.
+          float near = bladeFade > 0.0 ? 1.0 - smoothstep(bladeFade * 0.6, bladeFade, far) : 1.0;
           // The card is modelled standing in +Z, which inside the rotated
           // group is up, so its height is its own z and the lean is in xy.
           float up = transformed.z;
@@ -385,6 +417,8 @@ export interface PropEntry {
   lods?: string[];
   /** How many triangles each level draws, by node name, as the baker measured them. */
   levels?: Record<string, number>;
+  /** The far ring's billboard: the file beside the GLB, and the metres its square stands for. */
+  card?: { file: string; metres: number };
   scale_to?: number;
   evidence?: string;
   note?: string;
@@ -441,6 +475,123 @@ function partsOf(group: Group, level: string | undefined): PlantPart[] {
   return parts;
 }
 
+// --- The near ring and the far ring ----------------------------------------
+//
+// A plant within `LOOK.cardMetres` of the camera is its own model; beyond it,
+// it is two crossed quads carrying a picture of that model, baked from two
+// sides by `scripts/web-assets.ts`. The two are separate instanced meshes over
+// one placement list, and this is the bookkeeping that says which draws what.
+//
+// It is done as two lists of indices and not as a flag the shader reads,
+// because a flag still pays for every vertex of every instance: seven hundred
+// island trees at three thousand triangles is two million triangles of vertex
+// work whether they end up on screen or collapsed to nothing. Cutting the
+// mesh's `count` down to the near ones is the only thing that stops the work
+// being done, and that is the whole saving.
+//
+// The band is `lod.ts`'s rule in its simplest form. Going out, the card takes
+// over at the line; coming in, the model does not return until the camera is
+// `cardBandMetres` inside it, so a camera loitering on the line stays on
+// whichever side it arrived from and no tree flickers.
+
+/** Which of the two meshes draws each place, and the two lists that follow from it. */
+interface Partition {
+  /** 0 where the place is drawn as a model, 1 where it is drawn as a card. */
+  side: Uint8Array;
+  /** The place indices each mesh draws, and how many of each are live. */
+  near: Uint32Array;
+  far: Uint32Array;
+  nearCount: number;
+  farCount: number;
+  /** Bumped when the lists change, which is the only time a mesh rewrites its matrices. */
+  version: number;
+}
+
+function newPartition(n: number): Partition {
+  return { side: new Uint8Array(n), near: new Uint32Array(n), far: new Uint32Array(n), nearCount: 0, farCount: 0, version: 0 };
+}
+
+/**
+ * Sort the places into the two rings for this frame, and rebuild the lists
+ * only when something actually crossed. The distance is to the place itself,
+ * in the data frame, which is where both the places and the camera are put.
+ */
+function repartition(partition: Partition, places: Scattered['places'], at: Vector3, line: number, band: number): void {
+  let changed = partition.version === 0;
+  for (let i = 0; i < places.length; i++) {
+    const p = places[i] as Scattered['places'][number];
+    const distance = Math.hypot(p.x - at.x, p.y - at.y, p.z - at.z);
+    const was = partition.side[i] as number;
+    const now = was === 0 ? (distance > line ? 1 : 0) : (distance < line - band ? 0 : 1);
+    if (now === was) continue;
+    partition.side[i] = now;
+    changed = true;
+  }
+  if (!changed) return;
+  let near = 0;
+  let far = 0;
+  for (let i = 0; i < places.length; i++) {
+    if ((partition.side[i] as number) === 0) partition.near[near++] = i;
+    else partition.far[far++] = i;
+  }
+  partition.nearCount = near;
+  partition.farCount = far;
+  partition.version++;
+}
+
+/**
+ * The card: two quads crossed at a right angle, one in the data frame's XZ
+ * plane and one in its YZ plane, standing on the ground and rising in +Z.
+ *
+ * The baker's picture holds two views side by side, the plant seen from the
+ * south in the left half and from the west in the right, so the quad whose
+ * width runs east takes the left half and the one whose width runs north
+ * takes the right, and each quad shows the view that belongs to it. Both are
+ * drawn from either side, because half of a crossed pair always faces away.
+ *
+ * The cross is not turned to face the camera. A cross does not need to be:
+ * that is what the second quad is for, and a card that turns pops as the
+ * camera swings while a card that does not simply changes which of its two
+ * pictures is nearer the front. It is also seven hundred matrices a frame
+ * that are never written.
+ */
+function cardGeometryFor(metres: number): BufferGeometry {
+  const w = metres / 2;
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const quad = (east: boolean, u0: number): void => {
+    const base = positions.length / 3;
+    if (east) positions.push(-w, 0, 0, w, 0, 0, w, 0, metres, -w, 0, metres);
+    else positions.push(0, -w, 0, 0, w, 0, 0, w, metres, 0, -w, metres);
+    uvs.push(u0, 0, u0 + 0.5, 0, u0 + 0.5, 1, u0, 1);
+    indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+  };
+  quad(true, 0);
+  quad(false, 0.5);
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(Float32Array.from(positions), 3));
+  geometry.setAttribute('uv', new BufferAttribute(Float32Array.from(uvs), 2));
+  geometry.setIndex(new BufferAttribute(Uint16Array.from(indices), 1));
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+const cardTextures = new Map<string, Texture>();
+
+/** The card's picture, once per plant and shared between every instance of it. */
+function loadCard(file: string): Texture {
+  let texture = cardTextures.get(file);
+  if (!texture) {
+    texture = new TextureLoader().load(`${import.meta.env.BASE_URL}props/${file}`);
+    texture.colorSpace = SRGBColorSpace;
+    texture.anisotropy = 4;
+    cardTextures.set(file, texture);
+  }
+  return texture;
+}
+
 // --- The component ---------------------------------------------------------
 
 export interface VegetationProps {
@@ -490,7 +641,7 @@ export function Vegetation({ terrain, clippingPlanes }: VegetationProps): React.
       metalness: 0,
       color: LOOK.tint[state] ?? '#ffffff',
     });
-    applyBlades(m, clock, geometry);
+    applyBlades(m, clock, geometry, LOOK.fadeMetres);
     applyAtmosphere(m);
     return m;
   }, [texture, clock, state]);
@@ -668,6 +819,21 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
   );
   const matrices = useMemo(() => instanceMatrices(places), [places]);
 
+  // Which ring each place is in this frame. It is held here and read by both
+  // meshes, so the two can never disagree about which of them draws a plant.
+  const partition = useMemo(() => newPartition(places.length), [places]);
+  const here = useRef(new Vector3()).current;
+  const group = useRef<Group>(null);
+  useFrame(({ camera }) => {
+    const node = group.current;
+    if (!node || places.length === 0) return;
+    // The camera in the data frame. Taken through the group's own inverse
+    // rather than by turning the axes here, so nothing in this file has to
+    // know which way the one rotated group is turned.
+    node.worldToLocal(here.copy(camera.position));
+    repartition(partition, places, here, LOOK.cardMetres, LOOK.cardBandMetres);
+  });
+
   const tag = useMemo(
     () => ({
       name: entry.name,
@@ -683,23 +849,49 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
 
   if (!parts || parts.length === 0 || places.length === 0) return null;
   return (
-    <group name={`vegetation.${entry.id}`} userData={{ seked: tag }}>
+    <group ref={group} name={`vegetation.${entry.id}`} userData={{ seked: tag }}>
       {parts.map((part, k) => (
-        <PlantPrimitive key={`${entry.id}:${k}:${places.length}`} part={part} matrices={matrices} clippingPlanes={clippingPlanes} clock={clock} />
+        <PlantPrimitive
+          key={`${entry.id}:${k}:${places.length}`}
+          part={part}
+          matrices={matrices}
+          partition={partition}
+          clippingPlanes={clippingPlanes}
+          clock={clock}
+        />
       ))}
+      {entry.card && (
+        <PlantCards
+          key={`${entry.id}:card:${places.length}`}
+          card={entry.card}
+          matrices={matrices}
+          partition={partition}
+          clippingPlanes={clippingPlanes}
+          clock={clock}
+        />
+      )}
     </group>
   );
 }
 
-/** One primitive of a plant, instanced at every place with the part's own transform inside the model applied first. */
+/**
+ * One primitive of a plant, instanced at every place in the near ring with the
+ * part's own transform inside the model applied first.
+ *
+ * The matrices are combined once, when the scatter changes, and the frame's
+ * work is a copy of sixteen floats per instance that moved between the rings,
+ * done only on the frames the partition says something moved.
+ */
 function PlantPrimitive({
   part,
   matrices,
+  partition,
   clippingPlanes,
   clock,
 }: {
   part: PlantPart;
   matrices: Matrix4[];
+  partition: Partition;
   clippingPlanes: Plane[];
   clock: { value: number };
 }): React.JSX.Element | null {
@@ -708,7 +900,9 @@ function PlantPrimitive({
     const m = (Array.isArray(held) ? held[0] : held) as MeshStandardMaterial | undefined;
     if (!m) return undefined;
     const copy = m.clone();
-    applyBlades(copy, clock, part.mesh.geometry);
+    // No fade of its own: inside the card line a plant is drawn at its own
+    // size, and outside it the card has taken over.
+    applyBlades(copy, clock, part.mesh.geometry, 0);
     applyAtmosphere(copy);
     return copy;
   }, [part, clock]);
@@ -723,15 +917,108 @@ function PlantPrimitive({
   }, [material, clippingPlanes]);
 
   const [mesh, setMesh] = useState<InstancedMesh | null>(null);
+  const combined = useMemo(() => {
+    const out = new Float32Array(matrices.length * 16);
+    const m = new Matrix4();
+    matrices.forEach((x, i) => {
+      m.copy(x).multiply(part.local);
+      out.set(m.elements, i * 16);
+    });
+    return out;
+  }, [matrices, part]);
+  const drawn = useRef(-1);
   useEffect(() => {
-    if (!mesh) return;
-    matrices.forEach((m, i) => mesh.setMatrixAt(i, m.clone().multiply(part.local)));
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.frustumCulled = false;
-  }, [mesh, matrices, part]);
+    drawn.current = -1;
+    if (mesh) mesh.frustumCulled = false;
+  }, [mesh, combined]);
+  useFrame(() => {
+    if (!mesh || drawn.current === partition.version) return;
+    drawn.current = partition.version;
+    writeRing(mesh, combined, partition.near, partition.nearCount);
+  });
 
   if (!material) return null;
   return <instancedMesh ref={setMesh} args={[part.mesh.geometry, material, matrices.length]} castShadow receiveShadow />;
+}
+
+/**
+ * The far ring: one instanced mesh of crossed quads per plant, carrying the
+ * baker's two views of it.
+ *
+ * It never casts a shadow. A card is a flat cross and its shadow is a flat
+ * cross, which at nine hundred metres is a smudge on the sand that nobody can
+ * read as a tree; the near ring is where the shadows are, and Q4 is where
+ * that is settled.
+ */
+function PlantCards({
+  card,
+  matrices,
+  partition,
+  clippingPlanes,
+  clock,
+}: {
+  card: NonNullable<PropEntry['card']>;
+  matrices: Matrix4[];
+  partition: Partition;
+  clippingPlanes: Plane[];
+  clock: { value: number };
+}): React.JSX.Element {
+  const geometry = useMemo(() => cardGeometryFor(card.metres), [card.metres]);
+  const texture = useMemo(() => loadCard(card.file), [card.file]);
+  const material = useMemo(() => {
+    const m = new MeshStandardMaterial({
+      map: texture,
+      // Alpha test and not blending, as the grass is, so nothing has to be
+      // sorted and the dissolve between stops is left to the alpha hash.
+      alphaTest: 0.4,
+      transparent: false,
+      side: DoubleSide,
+      roughness: 0.9,
+      metalness: 0,
+    });
+    applyBlades(m, clock, geometry, LOOK.cardFadeMetres);
+    applyAtmosphere(m);
+    return m;
+  }, [texture, clock, geometry]);
+  useEffect(() => {
+    material.clippingPlanes = clippingPlanes;
+    receiveCascades(material);
+    return () => {
+      forgetCascades(material);
+      material.dispose();
+    };
+  }, [material, clippingPlanes]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  const [mesh, setMesh] = useState<InstancedMesh | null>(null);
+  const flat = useMemo(() => {
+    const out = new Float32Array(matrices.length * 16);
+    matrices.forEach((m, i) => out.set(m.elements, i * 16));
+    return out;
+  }, [matrices]);
+  const drawn = useRef(-1);
+  useEffect(() => {
+    drawn.current = -1;
+    if (mesh) mesh.frustumCulled = false;
+  }, [mesh, flat]);
+  useFrame(() => {
+    if (!mesh || drawn.current === partition.version) return;
+    drawn.current = partition.version;
+    writeRing(mesh, flat, partition.far, partition.farCount);
+  });
+
+  return <instancedMesh ref={setMesh} args={[geometry, material, matrices.length]} castShadow={false} receiveShadow />;
+}
+
+/** Copy one ring's matrices into a mesh and draw exactly that many instances. */
+function writeRing(mesh: InstancedMesh, from: Float32Array, which: Uint32Array, count: number): void {
+  const array = mesh.instanceMatrix.array as Float32Array;
+  for (let i = 0; i < count; i++) {
+    const at = (which[i] as number) * 16;
+    array.set(from.subarray(at, at + 16), i * 16);
+  }
+  mesh.count = count;
+  mesh.instanceMatrix.needsUpdate = true;
 }
 
 /**
