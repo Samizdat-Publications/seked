@@ -324,7 +324,7 @@ const STARLIGHT = {
 const NIGHT_BOUNCE = new Color('#0b1018');
 
 /** Rec. 709 luminance, which is what separates a light's colour from its strength. */
-function luminanceOf(colour: Color): number {
+export function luminanceOf(colour: Color): number {
   return 0.2126 * colour.r + 0.7152 * colour.g + 0.0722 * colour.b;
 }
 
@@ -369,6 +369,34 @@ export interface SkyProps {
 }
 
 /**
+ * The sky as it stands this frame, for a material that is lit by the sky but
+ * is not the sky and has no way to be handed the sun.
+ *
+ * The water is the one that needs it: it is drawn inside the same rotated
+ * group, it is a drei material that keeps its own uniforms, and the sun
+ * reaches it through neither a prop nor the store, because `Scene.tsx` hands
+ * the sun to `Sky` and to `Renderer` and to nothing else. Rather than compute
+ * a second sun, which would be the same number typed twice and could drift
+ * from this one, the sky writes what it has here and whoever needs it reads
+ * it inside `useFrame`.
+ *
+ * The object is the same one every frame and its fields are written in place,
+ * for the reason `fade.ts` gives for its own: a value that changes with the
+ * hour would re-render the scene to animate something no component draws.
+ */
+const STAND = { altitudeDeg: 90, colour: new Color('#ffffff') };
+
+/** What the sky is doing. Read it in a frame loop, never in a render body. */
+export function skyStand(): { readonly altitudeDeg: number; readonly colour: Color } {
+  return STAND;
+}
+
+function setSkyStand(altitudeDeg: number, colour: Color): void {
+  STAND.altitudeDeg = altitudeDeg;
+  STAND.colour.copy(colour);
+}
+
+/**
  * The sky, the fill light, the environment map, and the night behind them.
  * Mounts inside the rotated group.
  */
@@ -402,9 +430,13 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
   // sprite and outlasts it rather than switching with it.
   useEffect(() => setCasingCorona(state === 'ancient' ? night : 0), [state, night]);
 
+  // And what the water reads to know the hour: the sun's altitude and the
+  // colour the sky itself has taken at it.
+  useEffect(() => setSkyStand(sun.altitudeDeg, fill), [sun.altitudeDeg, fill]);
+
   return (
     <group>
-      <Atmosphere sun={sun} look={look} night={night} fill={fill} />
+      <Atmosphere sun={sun} look={look} night={night} fill={fill} state={state} />
       {/* A hemisphere light's up is the direction of its own position in the
           world, and this group has already been turned, so what it is given
           here is the data frame's up. */}
@@ -433,6 +465,46 @@ const SKY_SCALE = 100000;
 
 /** How much of the sky's own light reaches a material through the environment map. A look choice. */
 const ENVIRONMENT_STRENGTH = 0.2;
+
+/**
+ * How far the sun has to move before the environment map is worth building
+ * again. Look choices, both of them.
+ *
+ * Half a degree of altitude is the sun's own disc, which is the smallest move
+ * that changes where the bright band sits on the horizon; two degrees of
+ * azimuth swings the lit quarter of the sky by less than the blur of the
+ * roughest mip anything in the scene samples. Under either the map comes back
+ * a picture no eye can tell from the last one, and a moment tweened twelve
+ * times a second would pay for twelve of them a second.
+ *
+ * The look itself and the fill and the night are all functions of the same
+ * altitude, so these two gates cover them; the stop of the timeline is not,
+ * and is checked on its own.
+ */
+const ENVIRONMENT_STEP = { altitudeDeg: 0.5, azimuthDeg: 2 } as const;
+
+/**
+ * The cube the map is taken off. A look choice, and three's own default.
+ *
+ * Stage 4 asked for this to be halved while a sequence is playing, if a
+ * rebuild still cost more than 4 ms once the generator was kept. Measured on a
+ * 5070 Ti at the dawn stand, 1600 by 900 at a device ratio of 1.5: a build
+ * costs about 290 ms when the generator is made fresh for it, which is what it
+ * used to be, and about 0.4 ms when the generator, the probe and its ground
+ * are kept, which is well under the 4 ms. Halving the cube was tried anyway
+ * and measured no better (4.8 frames a second against 4.9 through the same
+ * sweep), because changing the size makes `PMREMGenerator` throw its ping-pong
+ * target away and recompile its blur and GGX shaders, which costs more than a
+ * sequence saves and is paid again on the way back up. So there is one size,
+ * and no scene file reads the motion store.
+ */
+const ENVIRONMENT_CUBE = 256;
+
+/** The difference of two azimuths, the short way round the compass, in degrees. */
+function azimuthApart(a: number, b: number): number {
+  const d = Math.abs(a - b) % 360;
+  return d > 180 ? 360 - d : d;
+}
 
 /**
  * The ground the environment map stands on.
@@ -496,12 +568,15 @@ function Atmosphere({
   look,
   night,
   fill,
+  state,
 }: {
   sun: Sun;
   look: SkyLook;
   night: number;
   /** The sky's own colour, which is half of what the environment's ground is lit by. */
   fill: Color;
+  /** The stop of the timeline, which changes the sky's own turbidity under a still sun. */
+  state: StateId;
 }): React.JSX.Element {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
@@ -531,48 +606,80 @@ function Atmosphere({
 
   // The environment map is taken off a second copy of the same shader, in a
   // scene of its own: the mesh in the graph cannot be rendered while the
-  // renderer is drawing the graph. It is rebuilt when the sun moves, which is
-  // only when the reader moves the timeline.
-  useEffect(() => {
-    const pmrem = new PMREMGenerator(gl);
+  // renderer is drawing the graph.
+  //
+  // The generator, the probe and its ground are built once and kept. Building
+  // them per change was most of what a rebuild cost, because a new
+  // `PMREMGenerator` compiles its own blur and GGX shaders before it can
+  // render anything, and a moment tweened through a shot paid that twelve
+  // times a second.
+  const rig = useMemo(() => {
     const probe = new PreethamSky();
     probe.scale.setScalar(SKY_SCALE);
-    const u = probe.material.uniforms;
+    // The ground under it: the lower half of a sphere, seen from inside,
+    // which is where the probe camera sits. It is drawn unlit and untone-
+    // mapped, because what the map wants is the radiance itself.
+    const ground = new Mesh(
+      new SphereGeometry(SKY_SCALE * GROUND.scale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
+      new MeshBasicMaterial({ side: BackSide, fog: false }),
+    );
+    const world = new ThreeScene();
+    world.add(probe);
+    world.add(ground);
+    return { pmrem: new PMREMGenerator(gl), probe, ground, world, target: undefined as WebGLRenderTarget | undefined };
+  }, [gl]);
+
+  useEffect(
+    () => () => {
+      scene.environment = null;
+      rig.target?.dispose();
+      rig.probe.geometry.dispose();
+      rig.probe.material.dispose();
+      rig.ground.geometry.dispose();
+      rig.ground.material.dispose();
+      rig.pmrem.dispose();
+    },
+    [rig, scene],
+  );
+
+  // What the map standing in the scene was built from, so the next render can
+  // tell whether the sun has moved far enough to be worth another.
+  const built = useRef<{ altitudeDeg: number; azimuthDeg: number; state: StateId } | null>(null);
+
+  // No dependency list: this runs after every render and decides for itself.
+  useEffect(() => {
+    // Free, so it follows every change however small: it is one number on the
+    // scene and the shaders read it as they stand.
+    scene.environmentIntensity = ENVIRONMENT_STRENGTH * (1 - night * 0.85);
+
+    const was = built.current;
+    const worth =
+      was === null
+      || was.state !== state
+      || Math.abs(sun.altitudeDeg - was.altitudeDeg) > ENVIRONMENT_STEP.altitudeDeg
+      || azimuthApart(sun.azimuthDeg, was.azimuthDeg) > ENVIRONMENT_STEP.azimuthDeg;
+    if (!worth) return;
+
+    const u = rig.probe.material.uniforms;
     u.sunPosition!.value.copy(sun.direction);
     u.turbidity!.value = look.turbidity;
     u.rayleigh!.value = rayleigh;
     u.mieCoefficient!.value = look.mie;
     u.mieDirectionalG!.value = look.mieG;
     u.showSunDisc!.value = 0;
-    // The ground under it: the lower half of a sphere, seen from inside,
-    // which is where the probe camera sits. It is drawn unlit and untone-
-    // mapped, because what the map wants is the radiance itself.
-    const ground = new Mesh(
-      new SphereGeometry(SKY_SCALE * GROUND.scale, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
-      new MeshBasicMaterial({ color: environmentGround(sun.altitudeDeg, look, fill), side: BackSide, fog: false }),
-    );
-    const world = new ThreeScene();
-    world.add(probe);
-    world.add(ground);
-    let target: WebGLRenderTarget | undefined;
+    (rig.ground.material as MeshBasicMaterial).color.copy(environmentGround(sun.altitudeDeg, look, fill));
+    const previous = rig.target;
     try {
-      target = pmrem.fromScene(world, 0, 1, SKY_SCALE);
-      scene.environment = target.texture;
-      // At full strength the sky washes every shadow out of a desert at noon.
-      scene.environmentIntensity = ENVIRONMENT_STRENGTH * (1 - night * 0.85);
+      if (import.meta.env.DEV) console.time('seked: sky environment');
+      rig.target = rig.pmrem.fromScene(rig.world, 0, 1, SKY_SCALE, { size: ENVIRONMENT_CUBE });
+      if (import.meta.env.DEV) console.timeEnd('seked: sky environment');
+      scene.environment = rig.target.texture;
+      previous?.dispose();
+      built.current = { altitudeDeg: sun.altitudeDeg, azimuthDeg: sun.azimuthDeg, state };
     } catch (error) {
       console.warn('seked: could not build the sky environment map', error);
     }
-    return () => {
-      scene.environment = null;
-      target?.dispose();
-      probe.geometry.dispose();
-      probe.material.dispose();
-      ground.geometry.dispose();
-      ground.material.dispose();
-      pmrem.dispose();
-    };
-  }, [gl, scene, sun, look, rayleigh, night, fill]);
+  });
 
   return <primitive object={mesh} scale={SKY_SCALE} renderOrder={-10} />;
 }

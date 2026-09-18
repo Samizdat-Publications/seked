@@ -42,6 +42,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useView } from '../store';
 import { applyAtmosphere } from './Atmosphere';
+import { chooseLod, newLod, type Lod } from './lod';
 import { forgetCascades, receiveCascades } from './materials/shadows';
 import { prepareStandinMaterial } from './Standins';
 
@@ -81,7 +82,9 @@ export interface PropEntry {
 /**
  * Camera distances at which the next level down takes over, in metres. Look
  * choices: a prop is a statue or a bush, not a pyramid, so the finest level is
- * worth carrying only while one fills a good part of the frame.
+ * worth carrying only while one fills a good part of the frame. Where the
+ * swap actually happens, which is not quite on the line in a slow move, is
+ * `lod.ts`'s.
  */
 const LOD_METRES = [120, 600];
 
@@ -310,8 +313,11 @@ function Prop({
   }, [levels]);
 
   // Which level each placement is drawn at, rewritten only when the camera has
-  // moved far enough to change one of them.
+  // moved far enough to change one of them. Each emplacement keeps its own
+  // hysteresis, so a row of kings along a causeway is not swapped as one and
+  // none of them is swapped on the frame the line is crossed.
   const chosen = useMemo(() => places.map(() => -1), [places]);
+  const lods = useMemo(() => places.map(() => newLod()), [places]);
   const scratch = useMemo(() => new Matrix4(), []);
   const world = useMemo(() => new Vector3(), []);
 
@@ -322,8 +328,7 @@ function Prop({
       // The camera is in three's frame, which is this one turned Y-up, so the
       // placement is read across rather than the camera brought back.
       const distance = world.set(place.east, place.up, -place.north).distanceTo(camera.position);
-      const found = LOD_METRES.findIndex((limit) => distance < limit);
-      const level = found === -1 ? instanced.length - 1 : Math.min(found, instanced.length - 1);
+      const level = chooseLod(lods[i] as Lod, distance, LOD_METRES, instanced.length);
       if (chosen[i] !== level) {
         chosen[i] = level;
         changed = true;
