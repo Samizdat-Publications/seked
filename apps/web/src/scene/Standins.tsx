@@ -37,6 +37,7 @@ import {
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { useView } from '../store';
+import { chooseLod, newLod } from './lod';
 
 /** One line of `apps/web/public/models/manifest.json`, as `scripts/web-assets.ts` writes it. */
 export interface StandinEntry {
@@ -67,7 +68,8 @@ export interface StandinEntry {
 /**
  * Camera distances at which the next level down takes over, in metres. Look
  * choices: 300k faces are worth carrying while the statue fills the frame and
- * are wasted from across the plateau.
+ * are wasted from across the plateau. Where the swap actually happens, which
+ * is not quite on the line in a slow move, is `lod.ts`'s.
  */
 const LOD_METRES = [400, 1500];
 
@@ -277,11 +279,15 @@ function Standin({ entry, scene, state }: { entry: StandinEntry; scene: Group; s
     return { lods: found, centre: middle, top: new Vector3(middle.x, middle.y, box.max.z) };
   }, [scene, entry.lods]);
 
+  // Which level is drawn, hysteresed so a camera creeping up on the statue
+  // does not swap it between two frames that are otherwise the same. It is
+  // remembered per model, and thrown away with the model.
+  const lod = useMemo(() => newLod(), [scene]);
+
   useFrame(({ camera }) => {
     if (lods.length === 0) return;
     const distance = scene.localToWorld(world.copy(centre)).distanceTo(camera.position);
-    const level = LOD_METRES.findIndex((limit) => distance < limit);
-    const active = level === -1 ? lods.length - 1 : Math.min(level, lods.length - 1);
+    const active = chooseLod(lod, distance, LOD_METRES, lods.length);
     for (const [i, node] of lods.entries()) node.visible = i === active;
   });
 

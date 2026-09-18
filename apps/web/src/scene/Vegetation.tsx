@@ -45,6 +45,7 @@ import {
   MeshStandardMaterial,
   Object3D,
   SRGBColorSpace,
+  Vector3,
   type Material,
   type Plane,
 } from 'three';
@@ -195,41 +196,76 @@ function cardGeometry(): BufferGeometry {
 }
 
 /**
- * The wind and the distance fade, patched into the card's own material.
+ * The wind, the distance fade and the dissolve, patched into the card's own
+ * material.
  *
- * Both are the vertex shader's business: the sway leans the top of the card
- * about its foot, and the fade takes the card's height to nothing as it goes
- * out, which is cheaper than any transparency and leaves nothing to sort. The
- * instance's own foot in world space gives both the phase and the distance,
- * and it comes out of the instance matrix rather than an extra attribute.
+ * The wind and the fade are the vertex shader's business: the sway leans the
+ * top of the card about its foot, and the fade takes the card's height to
+ * nothing as it goes out, which is cheaper than any transparency and leaves
+ * nothing to sort. Both are read once per instance and never per vertex, so a
+ * card bends and shrinks as one thing and cannot shimmer along its own edge.
+ *
+ * The distance is measured to the instance's own centre and not to its
+ * origin. They are the same point for a grass card, which stands on its foot
+ * at the middle of its own spread, and metres apart for a plant, whose parts
+ * each carry their place inside the model in their instance matrix: measured
+ * to the origin, an acacia's crown and its trunk fade at different distances
+ * and the tree comes apart as a camera creeps up on it. The centre comes off
+ * the geometry's own bounding sphere, so no distance is typed here.
+ *
+ * The dissolve is the fragment shader's. `fade.ts` stipples the plateau
+ * between stops by turning three's alpha hash on and taking the material's
+ * opacity down, and an alpha-tested material fights that: the test compares
+ * the map's alpha times the opacity against a fixed bar, so as the opacity
+ * falls the bar effectively rises, and the card is eaten in from its thin
+ * edges and gone long before the hash has stippled anything. Dividing the
+ * opacity back out of the test leaves the cut-out exactly where it was drawn
+ * and hands the whole of the dissolve to the hash, which is what every stone
+ * in the scene is dissolved by. So the cards keep their alpha test, take
+ * `fade.ts`'s hash as it is given, and nothing here has to know that a
+ * dissolve is running.
  */
-function applyBlades(material: Material, clock: { value: number }): void {
+function applyBlades(material: Material, clock: { value: number }, geometry: BufferGeometry): void {
+  if (!geometry.boundingSphere) geometry.computeBoundingSphere();
+  const centre = geometry.boundingSphere?.center ?? new Vector3();
   // Through `patchMaterial` and not by assigning the hook, because the air
   // and the cascaded shadow maps both want the same one, and the cascades
   // assign theirs from outside whenever the sun is rebuilt.
-  patchMaterial(material, 'blades', 'v1', (shader) => {
+  patchMaterial(material, 'blades', 'v2', (shader) => {
     shader.uniforms.bladeTime = clock;
     shader.uniforms.bladeFade = { value: LOOK.fadeMetres };
     shader.uniforms.bladeSway = { value: (LOOK.swayDegrees * Math.PI) / 180 };
+    shader.uniforms.bladeCentre = { value: centre.clone() };
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nuniform float bladeTime;\nuniform float bladeFade;\nuniform float bladeSway;')
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform float bladeTime;\nuniform float bladeFade;\nuniform float bladeSway;\nuniform vec3 bladeCentre;',
+      )
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
         {
-          vec3 foot = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-          float far = distance(foot, cameraPosition);
+          vec3 anchor = (modelMatrix * instanceMatrix * vec4(bladeCentre, 1.0)).xyz;
+          float far = distance(anchor, cameraPosition);
           float near = 1.0 - smoothstep(bladeFade * 0.6, bladeFade, far);
           // The card is modelled standing in +Z, which inside the rotated
           // group is up, so its height is its own z and the lean is in xy.
           float up = transformed.z;
-          float phase = foot.x * 0.21 + foot.z * 0.17;
+          float phase = anchor.x * 0.21 + anchor.z * 0.17;
           float lean = sin(bladeTime * ${(Math.PI * 2 / LOOK.swaySeconds).toFixed(4)} + phase) * bladeSway * up;
           transformed.x += lean;
           transformed.y += lean * 0.6;
           transformed.z = up * near;
         }`,
       );
+    // Three's own chunk, with the opacity divided back out of the bar. Its
+    // other branch, `ALPHA_TO_COVERAGE`, is not on anywhere in this scene.
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <alphatest_fragment>',
+      `#ifdef USE_ALPHATEST
+        if ( diffuseColor.a < alphaTest * opacity ) discard;
+      #endif`,
+    );
   });
 }
 
@@ -446,7 +482,7 @@ export function Vegetation({ terrain, clippingPlanes }: VegetationProps): React.
       metalness: 0,
       color: LOOK.tint[state] ?? '#ffffff',
     });
-    applyBlades(m, clock);
+    applyBlades(m, clock, geometry);
     applyAtmosphere(m);
     return m;
   }, [texture, clock, state]);
@@ -647,7 +683,7 @@ function PlantPrimitive({
     const m = (Array.isArray(held) ? held[0] : held) as MeshStandardMaterial | undefined;
     if (!m) return undefined;
     const copy = m.clone();
-    applyBlades(copy, clock);
+    applyBlades(copy, clock, part.mesh.geometry);
     applyAtmosphere(copy);
     return copy;
   }, [part, clock]);

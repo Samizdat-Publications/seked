@@ -141,8 +141,8 @@ Branch `stage4/steady`. Owns `apps/web/src/scene/Sky.tsx`, `scene/Water.tsx`, `s
 
 ### Task P2: no popping in a slow move
 
-- [ ] `Standins.tsx` and `Props.tsx` swap LODs at a hard distance, which pops in a slow move. Add hysteresis: switch down at the distance and back up at 0.85 times it (a look choice), and swap only when the level has been on the other side of its line for at least two frames. `Vegetation.tsx`: check the grass and the scatter dissolve with `fade.ts` (instanced meshes carry a material; if the cards' alpha-tested material fights the hash, give it `alphaHash` off and a `fadeAlpha` uniform instead, and say so), and that the distance fade in the vertex shader does not shimmer when the camera moves slowly (use the camera's distance to the instance centre, not to its origin). Screenshots at two frames of a slow approach to the valley temple.
-- [ ] Commit: "Swap detail with hysteresis and dissolve the vegetation with everything else".
+- [x] `Standins.tsx` and `Props.tsx` swap LODs at a hard distance, which pops in a slow move. Add hysteresis: switch down at the distance and back up at 0.85 times it (a look choice), and swap only when the level has been on the other side of its line for at least two frames. `Vegetation.tsx`: check the grass and the scatter dissolve with `fade.ts` (instanced meshes carry a material; if the cards' alpha-tested material fights the hash, give it `alphaHash` off and a `fadeAlpha` uniform instead, and say so), and that the distance fade in the vertex shader does not shimmer when the camera moves slowly (use the camera's distance to the instance centre, not to its origin). Screenshots at two frames of a slow approach to the valley temple.
+- [x] Commit: "Swap detail with hysteresis and dissolve the vegetation with everything else".
 
 ### Task P3: dusk from low stands
 
