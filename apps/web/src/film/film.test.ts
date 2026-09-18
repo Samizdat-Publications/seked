@@ -11,6 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CameraView } from '../view';
 import type { Sequence, Shot } from '../motion/types';
+import { ffmpegLine, srtClock, srtOf } from './encode';
 import { frameCount, frameTimestamp } from './run';
 import { cssSizeFor, dprFor } from './size';
 
@@ -72,5 +73,45 @@ describe("the frame's size", () => {
   it('aims over rather than under, because a pixel short is a pixel short', () => {
     expect(dprFor(1920, 1920)).toBeGreaterThan(1);
     expect(dprFor(1920, 1920)).toBeLessThan(1.001);
+  });
+});
+
+describe('the subtitles', () => {
+  it('times an entry from the shots before it, and only the shots with words', () => {
+    const film = sequenceOf(
+      shot('opening', 12, { title: 'The plateau', text: 'Everything here is placed from the database.' }),
+      shot('travel', 8),
+      shot('close', 20.5, { title: 'The dossier', text: 'Every claim, and what it comes to.' }),
+    );
+    expect(srtOf(film)).toBe(
+      [
+        '1',
+        '00:00:00,000 --> 00:00:12,000',
+        'The plateau',
+        'Everything here is placed from the database.',
+        '',
+        '2',
+        '00:00:20,000 --> 00:00:40,500',
+        'The dossier',
+        'Every claim, and what it comes to.',
+        '',
+      ].join('\n'),
+    );
+  });
+
+  it('is empty when a sequence says nothing', () => {
+    expect(srtOf(sequenceOf(shot('a', 10), shot('b', 10)))).toBe('');
+  });
+
+  it('counts hours and milliseconds the way an srt does', () => {
+    expect(srtClock(0)).toBe('00:00:00,000');
+    expect(srtClock(3661.25)).toBe('01:01:01,250');
+  });
+});
+
+describe('the frames fallback', () => {
+  it('writes the line that joins the frames back at the rate they were drawn at', () => {
+    expect(ffmpegLine(24, 'seked-tour-1080p24')).toContain('-framerate 24');
+    expect(ffmpegLine(24, 'seked-tour-1080p24')).toContain('frame-%06d.png');
   });
 });

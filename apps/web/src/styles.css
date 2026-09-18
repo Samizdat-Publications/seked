@@ -1580,3 +1580,38 @@ button.step.is-primary:hover {
   translate: -50% -50%;
   box-shadow: 0 0 0 1px var(--hairline), var(--lift);
 }
+
+/* The drawer: the button, and the progress line under it while a run goes. */
+
+.film-buttons {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.2rem;
+}
+
+.film-progress {
+  margin: 0.7rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+/* The rule runs under the words, the width of the drawer, like the timeline's. */
+.film-rule {
+  display: block;
+  height: 2px;
+  margin-top: 0.4rem;
+  background: var(--hairline-soft);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.film-run {
+  display: block;
+  height: 100%;
+  background: var(--sand);
+}
+
+.film-trouble {
+  color: var(--misses);
+}

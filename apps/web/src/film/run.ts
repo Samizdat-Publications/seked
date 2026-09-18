@@ -73,14 +73,25 @@ export function frameTimestamp(frame: number, fps: number): number {
   return (frame + 1) / fps;
 }
 
-/** One turn of the browser's own loop, for waiting on layout and on loads. */
-const nextFrame = (): Promise<void> => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-
 /**
- * How many turns of the browser's loop a frame may wait for its assets. About
- * half a minute at sixty hertz. Counted in frames rather than read off a
- * clock, because this file reads no clock at all.
+ * Hand the browser back its turn, so it can lay out, fetch and paint.
+ *
+ * An animation frame is the natural way to wait for a browser and is what
+ * this was, until a window behind another window turned out to have its
+ * animation frames throttled to a standstill: the film stopped whenever the
+ * reader looked at something else. A task does not care where the window is.
+ * Nothing is timed by it either way. The film's own clock is the frame
+ * number, and no delta anywhere is read from how long a wait took.
  */
+const pause = (ms = 0): Promise<void> =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/** How often a frame that is waiting on its assets looks again. */
+const LOADING_LOOK_MS = 16;
+
+/** How many looks it gives them: about half a minute, and then it draws anyway. */
 const LOADING_PATIENCE = 1800;
 
 /** Thrown when the reader presses Cancel. */
@@ -104,7 +115,7 @@ async function waitForLoaded(signal: AbortSignal): Promise<void> {
   for (let tick = 0; tick < LOADING_PATIENCE; tick++) {
     stopIfAsked(signal);
     if (useView.getState().loading.size === 0) return;
-    await nextFrame();
+    await pause(LOADING_LOOK_MS);
   }
 }
 
@@ -139,10 +150,10 @@ export async function renderFilm(options: FilmOptions): Promise<void> {
   const motion = useMotion.getState();
   motion.setClock('stepped');
   motion.play(sequence);
-  // Two turns of the browser's loop: one for React to re-render the Canvas
-  // with `frameloop="never"`, one for that to reach the store.
-  await nextFrame();
-  await nextFrame();
+  // Two turns of the browser's own loop: one for React to re-render the
+  // Canvas with `frameloop="never"`, one for that to reach the store.
+  await pause();
+  await pause();
 
   // The size after the frameloop, so R3F's own re-measure of the container on
   // that render cannot land on top of it.

@@ -52,7 +52,11 @@ export interface HeldSize {
   restore: () => void;
 }
 
-const nextFrame = (): Promise<void> => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+/** A turn of the browser's own loop. A task rather than an animation frame, as in `run.ts`. */
+const pause = (): Promise<void> =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
 
 /**
  * Put the stage in a box of the film's aspect and the canvas at the film's
@@ -65,7 +69,7 @@ export async function holdSize(root: RootStore, stage: HTMLElement, width: numbe
   stage.classList.add('is-film-frame');
   // One turn of the loop for the browser to lay the box out, so the measure
   // below is of the box and not of what was there before it.
-  await nextFrame();
+  await pause();
 
   const box = stage.getBoundingClientRect();
   if (box.width < 1) throw new Error('The film has no stage to draw on.');
