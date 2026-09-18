@@ -86,9 +86,9 @@ Branch `stage5/drawer`. Owns `apps/web/src/panels/Claims.tsx`, `apps/web/src/pan
 
 ### Task R2: the detail
 
-- [ ] The detail pane reads top down: the summary; the comparisons as a small table (formula, value, target, residual, with the worst one marked); the free choices as a list with the word `assumed`; the epoch where there is one, formatted as the caption line formats it; the sources split `for`, `context`, `against` with the source's short title from `data/sources.json`; the records the numbers came from, each with its `verified` flag as a glyph and its `method` where it is not a transcription. A proposed claim adds its `prose` in quotation marks at the top and a `Move into data/claims` note that says what to do by hand (there is no button that does it).
-- [ ] The overlay note and the `drawn` state stay; the button that toggles the overlay is the drawer's button style.
-- [ ] Commit: "Read a claim top down: what it compares, what it assumed, who says so".
+- [x] The detail pane reads top down: the summary; the comparisons as a small table (formula, value, target, residual, with the worst one marked); the free choices as a list with the word `assumed`; the epoch where there is one, formatted as the caption line formats it; the sources split `for`, `context`, `against` with the source's short title from `data/sources.json`; the records the numbers came from, each with its `verified` flag as a glyph and its `method` where it is not a transcription. A proposed claim adds its `prose` in quotation marks at the top and a `Move into data/claims` note that says what to do by hand (there is no button that does it).
+- [x] The overlay note and the `drawn` state stay; the button that toggles the overlay is the drawer's button style.
+- [x] Commit: "Read a claim top down: what it compares, what it assumed, who says so".
 
 ### Task R3: the honesty word
 
