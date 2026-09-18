@@ -391,7 +391,73 @@ overlay in the new look with a style for a proposed claim; T is
 evaluator, with a CLI that writes to `build/claims/` and never to `data/`;
 U mounts it in the viewer with the reader's own key.
 
-**Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
+Stage 5 landed on 2026-09-18 (snapshot 0032, same plan, director plus five
+Opus tracks in worktrees). The heavy states are light: the scattered plants
+are baked to a triangle budget rather than a ratio (the acacia's coarsest
+level was 169,160 triangles and is now 3,341), the ring past 900 m is a cross
+of two cards rasterised from the plant's own textures with a 60 m hysteresis
+band, and only the plants inside the first shadow cascade cast. Measured on
+the merged tree at 1600 by 900, built runs 110 to 192 fps and ancient 70 to
+162 across the five hero looks, against a bar of 45 and against 4 to 8 the
+day before; the tour plays on the wall clock and a film records at about 84
+frames a second where it managed 4. Diagnosing it found a second fault worth
+as much: the plants were shrunk to nothing past 400 m in the vertex shader
+rather than skipped, so the savanna was paid for and never seen. The flood
+plain's hard edge at the night horizon now dissolves into the atmosphere's
+own in-scatter where the water leaves the terrain. The claims drawer grades
+by a dot and a word and reads top down; every overlay is drawn in one palette
+(lapis for what a claim asserts, the warm sand for the survey it is asserted
+against, green and red only for the ring that says whether it fits), with a
+proposed claim dashed and prefixed. `@seked/runner` turns prose into a claim
+file on `claude-opus-5`, checks every identifier against the environment
+before grading anything, repairs once, and is graded by the same evaluator as
+the filed claims; the CLI writes `build/claims/` and there is no argument that
+could aim it at `data/`.
+
+Open from stage 5, in the order they matter:
+
+1. **Nobody has put a real proposal to the model.** There is no
+   `ANTHROPIC_API_KEY` in the environment or in `~/.seked/keys.env`, so
+   `pnpm claim -- --example 1`, the viewer's own round trip and the prompt's
+   token count are all still to be done. Everything behind the key is covered
+   by tests with a fake client, which is not the same thing.
+2. Two assets whose levels do nothing, the same fault track Q fixed for the
+   plants: `khafre-seated`'s lod1 and lod2 are both 316,745 triangles against
+   lod0's 359,327, and `boulder`'s are 62,272 against 66,122. That is
+   `Props.tsx`'s cost and it is not yet paid for.
+3. `island-tree`'s leaf material is `BLEND` with a three-channel JPEG, so the
+   leaves carry no alpha at all and draw as solid quads.
+4. The island tree and the date palm miss their triangle budgets (3,341
+   against 3,000; 5,090 against 2,500) because a frond and a leaf card are
+   separate shells and the simplifier will not collapse a shell's border.
+
+**Where this goes next (Stewart, 2026-09-18).** Two directions, in this
+order, both settled with him on the day stage 5 landed and both about content
+rather than the renderer. The viewer already runs on the GPU through WebGL2;
+a desktop build would buy lower draw-call overhead and no download ceiling
+but would not buy the picture, and WebGPU (`WebGPURenderer` and TSL, already
+in the three version this uses) is the better lever when the scene is
+actually GPU-bound, which after stage 5 it is not.
+
+1. **The modern city.** The `today` state needs Giza and Cairo behind it, the
+   valley green and the Nile east, which is what makes the then-and-now read.
+   `scripts/footprints.ts` already asks Overpass for every way in its bbox and
+   then keeps only what is ancient, so the city is downloaded on every run and
+   discarded: widen the bbox east and north (the city runs to about 31.21 E
+   against the present 31.145), add a `city` kind with height from `height` or
+   `building:levels`, merge them the way the 577 mastabas already are, and
+   gate them to `today`. CLAUDE.md now carries the carve-out this needs: the
+   city is context, not evidence, and an untagged storey height is a look
+   choice rather than a measurement key.
+2. **The architecture pass.** The ancient state's temples are extruded
+   footprints, and Stewart's reference is a reconstruction with fluted
+   columns, an architrave and cornice, a decorated facade, a roofed causeway
+   and a quay. That is parameterised builders in `@seked/geometry` beside
+   `templeMesh` and `enclosureWallMesh`, labelled reconstructions like
+   everything else. It is the bigger job and it is second because the city is
+   the cheaper change and the more visible one.
+
+**Where this goes (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
 modern and ancient states and the transitional steps between, with models
 downloaded or generated for every building if that is what it takes. The

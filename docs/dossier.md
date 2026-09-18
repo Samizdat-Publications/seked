@@ -1,6 +1,6 @@
 # Seked claims dossier
 
-Generated 2026-09-17 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
+Generated 2026-09-18 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
 
 ## Summary
 

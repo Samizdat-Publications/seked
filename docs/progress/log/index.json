@@ -398,5 +398,35 @@
     "kept": true,
     "note": "Stage 4: the rollback film's last second, 10,500 BCE, Alnitak transiting just above the apex, the Milky Way turned with the epoch. The water's flat edge shows at the left horizon from this low stand.",
     "bytes": 1525887
+  },
+  {
+    "file": "2026-09-18T17-45-40Z--claim-drawer--d6cb7a4-dirty.png",
+    "taken": "2026-09-18T17:45:40+00:00",
+    "view": "claim-drawer",
+    "commit": "d6cb7a4",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Stage 5 merged: A1 open in the restyled claims drawer, its ghost profile in lapis with the fit ring at the apex",
+    "bytes": 1041233
+  },
+  {
+    "file": "2026-09-18T17-45-59Z--proposed-claim--d6cb7a4-dirty.png",
+    "taken": "2026-09-18T17:45:59+00:00",
+    "view": "proposed-claim",
+    "commit": "d6cb7a4",
+    "tree": "dirty",
+    "kept": false,
+    "note": "A proposed claim in the viewer: P1 tagged in lapis at the head of its group, its prose quoted, the overlay label prefixed PROPOSED",
+    "bytes": 1050518
+  },
+  {
+    "file": "2026-09-18T17-46-00Z--tour-ancient--d6cb7a4-dirty.png",
+    "taken": "2026-09-18T17:46:00+00:00",
+    "view": "tour-ancient",
+    "commit": "d6cb7a4",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The tour's Behind the Sphinx shot in the ancient state, playing on the wall clock at over 100 fps",
+    "bytes": 961823
   }
 ]
