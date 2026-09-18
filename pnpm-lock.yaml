@@ -29,6 +29,9 @@ importers:
       '@seked/geometry':
         specifier: workspace:*
         version: link:packages/geometry
+      '@seked/runner':
+        specifier: workspace:*
+        version: link:packages/runner
       '@seked/sky':
         specifier: workspace:*
         version: link:packages/sky
