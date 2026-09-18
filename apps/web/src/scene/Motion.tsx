@@ -32,6 +32,7 @@ import { useMotion } from '../motion/store';
 import type { StateChange } from '../motion/types';
 import { useView } from '../store';
 import { resetDissolveSeconds, setDissolveSeconds } from './fade';
+import { measureFrames } from './frames';
 
 /** The handle the console gets in development, and nothing in the app reads. */
 export interface SekedHandle {
@@ -40,6 +41,8 @@ export interface SekedHandle {
   looks: typeof LOOKS;
   /** The R3F root, for reading the renderer and the scene from the console. */
   r3f: typeof r3f;
+  /** The one frame counter, so every rate this project quotes was taken the same way. */
+  frames: typeof measureFrames;
 }
 
 declare global {
@@ -140,4 +143,4 @@ export function Motion(): null {
 // A handle for the console, in development only: the two stores and the hero
 // stands, so a sequence can be played by hand before the drawers that drive
 // it exist.
-if (import.meta.env.DEV) window.__seked = { motion: useMotion, view: useView, looks: LOOKS, r3f };
+if (import.meta.env.DEV) window.__seked = { motion: useMotion, view: useView, looks: LOOKS, r3f, frames: measureFrames };

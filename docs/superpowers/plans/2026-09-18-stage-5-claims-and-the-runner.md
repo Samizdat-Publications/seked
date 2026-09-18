@@ -43,9 +43,28 @@ Branch `stage5/cost`. Owns `scripts/web-assets.ts`, `blender/props.json` (the `s
 
 ### Task Q1: measure and pin
 
-- [ ] Add `apps/web/src/scene/frames.ts`: `measureFrames(seconds = 2): Promise<number>` counting `requestAnimationFrame` calls, exported on the dev handle as `__seked.frames`. A `scripts/frames.md` note (ten lines) says how the number in every commit of this track was taken.
-- [ ] Record the baseline: built and ancient at the five looks, and today at the same, in a table in the commit message and in `docs/superpowers/plans/2026-09-18-stage-5-claims-and-the-runner.md` under this task (the director's numbers above are one stand; these are five).
-- [ ] Commit: "Count the frames the same way every time".
+- [x] Add `apps/web/src/scene/frames.ts`: `measureFrames(seconds = 2): Promise<number>` counting `requestAnimationFrame` calls, exported on the dev handle as `__seked.frames`. A `scripts/frames.md` note (ten lines) says how the number in every commit of this track was taken.
+- [x] Record the baseline: built and ancient at the five looks, and today at the same, in a table in the commit message and in `docs/superpowers/plans/2026-09-18-stage-5-claims-and-the-runner.md` under this task (the director's numbers above are one stand; these are five).
+- [x] Commit: "Count the frames the same way every time".
+
+**The baseline (2026-09-18, Chromium at 1600 by 900 on the RTX 5070 Ti, the
+median of three two-second counts at each stand, `scripts/frames.md`).**
+Triangles are the per-frame total over every pass including the shadow
+cascades, read off `gl.info` with its auto-reset turned off.
+
+| Look | today | built | ancient | built calls | built triangles |
+|---|---|---|---|---|---|
+| dawn | 202.0 | 4.1 | 4.3 | 391 | 1,373,214,166 |
+| panorama | 206.1 | 4.5 | 4.4 | 395 | 1,373,214,512 |
+| harbour | 169.2 | 4.6 | 4.4 | 363 | 1,374,477,258 |
+| akhet | 187.1 | 7.9 | 4.4 | 189 | 667,808,171 |
+| night | 228.0 | 8.0 | 8.1 | 172 | 667,346,339 |
+
+Today draws between 0.27 and 1.45 million triangles a frame at the same five
+stands. So the heavy states cost about a thousand times the geometry of the
+light one, and the two stands that are twice as fast as the others (`akhet`
+and `night`) are the two where half the plateau is behind the camera, which
+is the shape of a geometry cost and not of a shading one.
 
 ### Task Q2: a scatter level baked to a budget
 
