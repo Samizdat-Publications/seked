@@ -13,17 +13,30 @@ const ENTRIES: Record<string, string> = {
   '@seked/data/browser': join(REPO_ROOT, 'packages', 'data', 'src', 'browser.ts'),
   '@seked/claims/browser': join(REPO_ROOT, 'packages', 'claims', 'src', 'browser.ts'),
   '@seked/sky/browser': join(REPO_ROOT, 'packages', 'sky', 'src', 'browser.ts'),
+  '@seked/runner/browser': join(REPO_ROOT, 'packages', 'runner', 'src', 'browser.ts'),
   '@seked/geometry': join(REPO_ROOT, 'packages', 'geometry', 'src', 'index.ts'),
   '@seked/units': join(REPO_ROOT, 'packages', 'units', 'src', 'index.ts'),
 };
 
 /** Packages the browser may pull in besides the workspace's own. */
-const ALLOWED_DEPENDENCIES = new Set(['zod']);
+/**
+ * What a browser entry may reach for. `zod` types the claim files; the
+ * Claude SDK and `yaml` are the runner's, which is a browser entry because
+ * a reader puts a claim to the model from the viewer with their own key,
+ * and it writes the file they download. Nothing here reads a disk.
+ */
+const ALLOWED_DEPENDENCIES = new Set(['zod', '@anthropic-ai/sdk', 'yaml']);
 
 const WORKSPACE = /^@seked\/([a-z]+)(?:\/([a-z]+))?$/;
 // `import x from 's'`, `export { x } from 's'` and bare `import 's'`, minus the
 // type-only forms, which never reach the bundle.
 const SPECIFIER = /(?:^|\n)\s*(?:import|export)\s+(?!type\s)[^;]*?from\s*'([^']+)'|(?:^|\n)\s*import\s+'([^']+)'/g;
+
+/** The package a specifier names, scope included. */
+function packageOf(spec: string): string {
+  const parts = spec.split('/');
+  return spec.startsWith('@') ? parts.slice(0, 2).join('/') : (parts[0] as string);
+}
 
 function specifiersOf(file: string): string[] {
   const src = readFileSync(file, 'utf8');
@@ -63,7 +76,9 @@ function walk(entry: string): Walk {
       if (spec.startsWith('node:')) builtins.push(`${file} imports ${spec}`);
       const next = fileFor(spec, file);
       if (next) queue.push(next);
-      else if (!spec.startsWith('node:')) dependencies.add(spec.split('/')[0] as string);
+      // A scoped package's name is its first two segments, so `@anthropic-ai/sdk`
+      // is named whole rather than reported as `@anthropic-ai`.
+      else if (!spec.startsWith('node:')) dependencies.add(packageOf(spec));
     }
   }
   return { files: [...seen], dependencies, builtins };

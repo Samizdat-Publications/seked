@@ -145,7 +145,18 @@ export class ProposalFailed extends Error {
   }
 }
 
+/**
+ * What the runner is doing, in the order it does it. A caller with a line to
+ * keep running says these words to a reader; a caller without one passes no
+ * hook and the runner is silent. The runner reports its own stages rather
+ * than letting a drawer guess at them, because only the runner knows whether
+ * an answer came back whole or had to go round again.
+ */
+export type ProposeStage = 'asking' | 'checking' | 'repairing once';
+
 export interface ProposeOptions {
+  /** Told what the runner is doing as it does it. */
+  onStage?: (stage: ProposeStage) => void;
   model?: string;
   maxTokens?: number;
   /** The id to give the claim. Default: `P` and the next number free in the bundle. */
@@ -325,7 +336,10 @@ export async function proposeClaim(
   const attempts: ProposalAttempt[] = [];
   const messages: Anthropic.MessageParam[] = [{ role: 'user', content: firstTurn(prose) }];
 
+  const say = options.onStage ?? ((): void => {});
+
   for (let round = 0; round < rounds; round++) {
+    say(round === 0 ? 'asking' : 'repairing once');
     const reply = await client.messages.parse({
       model: options.model ?? RUNNER_MODEL,
       max_tokens: options.maxTokens ?? RUNNER_MAX_TOKENS,
@@ -338,6 +352,7 @@ export async function proposeClaim(
     usage.input += reply.usage.input_tokens;
     usage.output += reply.usage.output_tokens;
 
+    say('checking');
     const answered = ProposedClaimSchema.safeParse(reply.parsed_output);
     if (!answered.success) {
       attempts.push({

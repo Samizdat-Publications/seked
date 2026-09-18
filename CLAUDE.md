@@ -30,6 +30,7 @@ pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
 pnpm run footprints # re-import the plateau's lesser monuments from OSM into data/footprints/
+pnpm claim -- "<prose>"      # put a claim in somebody's own words to the model; writes build/claims/ only, never data/ (ANTHROPIC_API_KEY in ~/.seked/keys.env)
 pnpm run deploy     # build the viewer, assemble site/, upload to Cloudflare Pages (https://seked.pages.dev); pnpm owns the bare `pnpm deploy`
 pnpm sky-bake       # bake the sun and the star dome into build/ for blender/render.py
 pnpm sky-rollback   # bake the cinematic's star positions, frame by frame, for blender/rollback.py
@@ -58,6 +59,14 @@ python scripts/job.py claim|start|status        # own the repo, run a long job d
   from the same rows so the two cannot disagree. The raw CSV is gitignored and
   `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
   attribution the licence requires.
+- **The modern city is context, not evidence.** The buildings of Giza and
+  Cairo behind the `today` state are imported from OSM under the same ODbL
+  attribution as the footprints, with storey counts where OSM tags them and a
+  stated look choice for the storey height where it does not. They are marked
+  context and carry no evidence tier, and nothing about them is a measurement
+  or needs a source to read: an apartment block is scenery. This is the one
+  carve-out from the rule below, and it exists because that rule asks for a
+  citation the world cannot supply. (Agreed with Stewart 2026-09-18.)
 - **Footprints are imported, never typed.** `data/footprints/giza.json` is
   written by `pnpm run footprints` from OpenStreetMap, fitted onto the three
   surveyed pyramids (its header carries the residuals) and set on the scene's
