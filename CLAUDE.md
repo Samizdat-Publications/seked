@@ -60,13 +60,20 @@ python scripts/job.py claim|start|status        # own the repo, run a long job d
   `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
   attribution the licence requires.
 - **The modern city is context, not evidence.** The buildings of Giza and
-  Cairo behind the `today` state are imported from OSM under the same ODbL
-  attribution as the footprints, with storey counts where OSM tags them and a
-  stated look choice for the storey height where it does not. They are marked
-  context and carry no evidence tier, and nothing about them is a measurement
-  or needs a source to read: an apartment block is scenery. This is the one
-  carve-out from the rule below, and it exists because that rule asks for a
-  citation the world cannot supply. (Agreed with Stewart 2026-09-18.)
+  Cairo behind the `today` state carry no evidence tier and are never cited
+  by a claim: the plateau is what this project is about, and an apartment
+  block is the view behind it. But context is still imported and never
+  invented. Footprints come from Google's Open Buildings v3 (CC BY 4.0 or
+  ODbL, Egypt covered) rather than OSM, which has only about 7,300 buildings
+  in the whole 9 by 11 km box east of the plateau and 98 per cent of those
+  with no height of any kind; heights come from the Open Buildings 2.5D
+  Temporal height raster, 4 m effective resolution and a stated mean absolute
+  error of 1.5 m, which is a measurement with an error bar like any other.
+  OSM keeps the ancient monuments it already carries. A building the height
+  raster cannot give is drawn at a stated look-choice height or not at all,
+  and which of those it is, is said in the file. (Agreed with Stewart
+  2026-09-18; the sources found and the rule narrowed the same day, after the
+  first version of it assumed every height would have to be invented.)
 - **Footprints are imported, never typed.** `data/footprints/giza.json` is
   written by `pnpm run footprints` from OpenStreetMap, fitted onto the three
   surveyed pyramids (its header carries the residuals) and set on the scene's

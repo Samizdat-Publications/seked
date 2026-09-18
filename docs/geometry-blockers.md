@@ -441,14 +441,31 @@ actually GPU-bound, which after stage 5 it is not.
 
 1. **The modern city.** The `today` state needs Giza and Cairo behind it, the
    valley green and the Nile east, which is what makes the then-and-now read.
-   `scripts/footprints.ts` already asks Overpass for every way in its bbox and
-   then keeps only what is ancient, so the city is downloaded on every run and
-   discarded: widen the bbox east and north (the city runs to about 31.21 E
-   against the present 31.145), add a `city` kind with height from `height` or
-   `building:levels`, merge them the way the 577 mastabas already are, and
-   gate them to `today`. CLAUDE.md now carries the carve-out this needs: the
-   city is context, not evidence, and an untagged storey height is a look
-   choice rather than a measurement key.
+
+   **OSM is the wrong source for it, and that was measured before anything was
+   planned (2026-09-18).** Overpass was asked what is actually there. In the
+   present bbox, 989 buildings; widened to the canal, 1,410; widened all the
+   way to the Nile, a 9.4 by 11.1 km box, 7,274. Of those 7,274, fifteen carry
+   a `height` and 122 a `building:levels`: **98 per cent have no height of any
+   kind.** They are also clustered, nearly a quarter of them in one square
+   kilometre around 29.99, 31.21, five to eight kilometres east of the
+   plateau, with thin coverage between. Extruded, that is not a city behind
+   the pyramids, it is a few well-mapped districts on an empty plain, and
+   every height in it would have been invented.
+
+   **Use Google's Open Buildings instead**, keeping OSM for the ancient
+   monuments it already carries. Open Buildings v3 gives dense ML-derived
+   footprints for Egypt as WKT polygons in CSV per S2 level-4 cell, CC BY 4.0
+   or ODbL. The companion **Open Buildings 2.5D Temporal** raster gives
+   building height at about 4 m effective resolution with a mean absolute
+   error of 1.5 m, annually from 2016 to 2023, same licence, downloadable from
+   Google Cloud Storage without an Earth Engine account. So a modern building
+   gets a real outline and a real height with a stated error bar, which is how
+   everything else in this project is entered, rather than a look choice per
+   storey. Sample the raster at each footprint, merge the prisms the way the
+   577 mastabas already are, and gate them to `today`. CLAUDE.md carries the
+   rule: the city is context and carries no evidence tier, but it is still
+   imported and never invented.
 2. **The architecture pass.** The ancient state's temples are extruded
    footprints, and Stewart's reference is a reconstruction with fluted
    columns, an architrave and cornice, a decorated facade, a roofed causeway
