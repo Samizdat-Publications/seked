@@ -100,10 +100,10 @@ Branch `stage4/tour`. Owns `apps/web/src/tour.ts` (rewritten), `apps/web/src/tou
 
 ### Task N2: the narration and the drawer
 
-- [ ] `ui/Narration.tsx`: a band across the bottom of the stage above the instruments, dark glass, the shot's title in the serif face and its text in the sans, shown while a sequence with text is loaded, fading in at a shot's start (CSS transition on a key of the shot id). Below the text a thin progress rule for the shot and "3 of 11". It reads `useMotion`.
-- [ ] `ui/Tour.tsx`: the drawer: "Take the tour" when nothing is loaded; while running, play/pause, back, next, end, and the list of shots by title (click seeks); the arrow keys and space as the old panel had arrows, with the same typing guard. Mounted in `App.tsx` in place of `panels/Tour.tsx` (one import, one element). The film presets are not here; the Film drawer lists them.
-- [ ] Styles appended under the track's banner. Screenshots: the narration band over the harbour stand mid-shot; the drawer with the list.
-- [ ] Commit: "Narrate the tour over the stage, and drive it from its drawer".
+- [x] `ui/Narration.tsx`: a band across the bottom of the stage above the instruments, dark glass, the shot's title in the serif face and its text in the sans, shown while a sequence with text is loaded, fading in at a shot's start (CSS transition on a key of the shot id). Below the text a thin progress rule for the shot and "3 of 11". It reads `useMotion`.
+- [x] `ui/Tour.tsx`: the drawer: "Take the tour" when nothing is loaded; while running, play/pause, back, next, end, and the list of shots by title (click seeks); the arrow keys and space as the old panel had arrows, with the same typing guard. Mounted in `App.tsx` in place of `panels/Tour.tsx` (one import, one element). The film presets are not here; the Film drawer lists them.
+- [x] Styles appended under the track's banner. Screenshots: the narration band over the harbour stand mid-shot; the drawer with the list.
+- [x] Commit: "Narrate the tour over the stage, and drive it from its drawer".
 
 ---
 

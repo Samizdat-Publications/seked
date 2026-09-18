@@ -1542,3 +1542,177 @@ button.step.is-primary:hover {
     transform: translateX(-50%);
   }
 }
+
+/* ===== Stage 4, Track N: the tour ===== */
+
+/*
+  The narration band: the shot's own words, across the bottom of the stage
+  over the instruments. It takes no pointer events, so the plateau underneath
+  stays draggable while the tour is running.
+*/
+.narration {
+  position: absolute;
+  left: 50%;
+  bottom: 8.75rem;
+  z-index: 3;
+  width: min(46rem, calc(100vw - 9rem));
+  transform: translateX(-50%);
+  padding: 0.85rem 1.25rem 0.7rem;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
+  border-radius: 1rem;
+  box-shadow: var(--lift);
+  pointer-events: none;
+}
+
+/* Keyed on the shot, so this runs again at every cut. */
+.narration-body {
+  animation: narration-in 0.55s ease-out both;
+}
+
+@keyframes narration-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.narration-title {
+  margin: 0 0 0.3rem;
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.narration-text {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.narration-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.7rem 0 0;
+}
+
+/* The rule the shot fills as it runs. The fill is scaled, not resized, so a
+   frame of the player costs one composited transform and no layout. */
+.narration-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+  overflow: hidden;
+}
+
+.narration-rule-fill {
+  display: block;
+  height: 100%;
+  background: var(--sand);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.narration-count {
+  flex: none;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* The running order in the drawer: one row a shot, the one showing lit. */
+.tour-list {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+.tour-list > li {
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.tour-shot {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.42rem 0.2rem;
+  background: none;
+  border: 0;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tour-shot:hover {
+  color: var(--ink);
+}
+
+.tour-shot.is-showing {
+  color: var(--sand);
+}
+
+.tour-shot-number {
+  flex: none;
+  width: 1.2rem;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.tour-shot.is-showing .tour-shot-number {
+  color: var(--sand);
+}
+
+.tour-shot-title {
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+/* At phone width the instruments stack and the rail lies along the bottom, so
+   the band stands clear of both and gives its text more of the screen. The
+   breakpoint is the shell's own. */
+@media (max-width: 40rem) {
+  .narration {
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 12.5rem;
+    width: auto;
+    transform: none;
+    padding: 0.7rem 0.85rem 0.55rem;
+  }
+
+  .narration-title {
+    font-size: 1.05rem;
+  }
+
+  .narration-text {
+    font-size: 0.78rem;
+  }
+}
+
+/* A reader who has asked for less motion gets the words without the fade. */
+@media (prefers-reduced-motion: reduce) {
+  .narration-body {
+    animation: none;
+  }
+}
