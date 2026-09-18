@@ -8,4 +8,5 @@
  */
 export * from './claim-file';
 export * from './context';
+export * from './examples';
 export * from './propose';

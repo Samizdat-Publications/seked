@@ -138,8 +138,8 @@ Branch `stage5/runner`. Owns `packages/runner/` and `scripts/claim.ts`.
 
 ### Task T3: the Hancock examples
 
-- [ ] `packages/runner/src/examples.ts`: five claims in the proponent's own kind of words, paraphrased and not quoted (Hancock 1995 on the shafts and Orion's belt, the 10,500 BCE lion and Leo, the Great Pyramid as a scale model of the northern hemisphere, the site plan's Orion correlation, the equinox sun on the Sphinx), each with a sentence saying which filed claim it is near and what to expect the runner to do with it. These are the viewer's buttons in track U and the CLI's `--example` list.
-- [ ] Commit: "Five things a proponent says, ready to be put to the model".
+- [x] `packages/runner/src/examples.ts`: five claims in the proponent's own kind of words, paraphrased and not quoted (Hancock 1995 on the shafts and Orion's belt, the 10,500 BCE lion and Leo, the Great Pyramid as a scale model of the northern hemisphere, the site plan's Orion correlation, the equinox sun on the Sphinx), each with a sentence saying which filed claim it is near and what to expect the runner to do with it. These are the viewer's buttons in track U and the CLI's `--example` list.
+- [x] Commit: "Five things a proponent says, ready to be put to the model".
 
 ### Task T4: the CLI
 
