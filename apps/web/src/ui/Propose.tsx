@@ -31,6 +31,7 @@ import {
   type Stage,
 } from '../runner';
 import { useView } from '../store';
+import { ClaimVerdict } from './ClaimVerdict';
 import { useUi } from './ui';
 
 /** A key's tail, for saying one is held without putting it on the screen. */
@@ -42,6 +43,8 @@ export function Propose(): React.JSX.Element {
   const [key, setKey] = useState(() => readerKey());
   const [typed, setTyped] = useState('');
   const [prose, setProse] = useState('');
+  /** The words that were actually sent, which are not always the ones in the box: an example is asked without taking it over. */
+  const [asked, setAsked] = useState('');
   const [stage, setStage] = useState<Stage | null>(null);
   const [done, setDone] = useState<Proposed | null>(null);
   const [trouble, setTrouble] = useState<string | null>(null);
@@ -65,7 +68,7 @@ export function Propose(): React.JSX.Element {
   };
 
   const ask = async (words: string): Promise<void> => {
-    setProse(words);
+    setAsked(words);
     setDone(null);
     setTrouble(null);
     setAttempt(null);
@@ -148,6 +151,58 @@ export function Propose(): React.JSX.Element {
         </p>
       </section>
 
+      {done && (
+        <section className="block propose-result">
+          <h2>{done.result.fits ? 'It holds' : 'It does not hold'}</h2>
+          <p className="propose-outcome">
+            <span className="claim-id num">{done.claim.id}</span> {done.claim.title}
+          </p>
+          {asked !== '' && <p className="prose">{'“' + asked + '”'}</p>}
+          <ClaimVerdict result={done.result} claim={done.claim} />
+          <p className="propose-buttons">
+            <button
+              type="button"
+              className="step is-primary"
+              onClick={() => {
+                selectClaim(done.claim.id);
+                openDrawer('claims');
+              }}
+            >
+              Read the whole thing
+            </button>
+            <button
+              type="button"
+              className="link"
+              onClick={() => {
+                dropProposed(done.claim.id);
+                setDone(null);
+              }}
+            >
+              Throw it away
+            </button>
+          </p>
+          <p className="note">
+            It is drawn on the plateau now, dashed, because nobody has checked it against a source.{' '}
+            {done.repairs > 0
+              ? 'The first answer named something that is not in the database, so it went back once with the errors.'
+              : 'It parsed and evaluated first time.'}
+          </p>
+          <details className="propose-keep">
+            <summary>Keep it in the project</summary>
+            <p className="note">
+              A proposal is gone when you reload. To make it permanent, download the claim file and move it into{' '}
+              <code>data/claims/</code> once you have checked every figure against the page it cites. It is YAML, which is plain
+              text: any editor opens it. Nothing here does that step for you, on purpose.
+            </p>
+            <p className="propose-buttons">
+              <button type="button" className="link" onClick={() => downloadClaim(done.file)}>
+                Download the claim file
+              </button>
+            </p>
+          </details>
+        </section>
+      )}
+
       {EXAMPLES.length > 0 && (
         <section className="block">
           <h2>Or something a proponent says</h2>
@@ -162,52 +217,6 @@ export function Propose(): React.JSX.Element {
               </li>
             ))}
           </ul>
-        </section>
-      )}
-
-      {done && (
-        <section className="block">
-          <h2>What came back</h2>
-          <p className="propose-outcome">
-            <span className="claim-id num">{done.claim.id}</span> {done.claim.title}
-          </p>
-          <p className="note">
-            {done.repairs > 0
-              ? 'The first answer named something that is not in the database, so it was put back once with the errors.'
-              : 'It parsed and evaluated first time.'}{' '}
-            It read <span className="num">{done.usage.input.toLocaleString()}</span> tokens and wrote{' '}
-            <span className="num">{done.usage.output.toLocaleString()}</span>.
-          </p>
-          <p className="propose-buttons">
-            <button
-              type="button"
-              className="step"
-              onClick={() => {
-                selectClaim(done.claim.id);
-                openDrawer('claims');
-              }}
-            >
-              Read it in Claims
-            </button>
-            <button type="button" className="link" onClick={() => downloadClaim(done.file)}>
-              Download as YAML
-            </button>
-            <button
-              type="button"
-              className="link"
-              onClick={() => {
-                dropProposed(done.claim.id);
-                setDone(null);
-              }}
-            >
-              Throw it away
-            </button>
-          </p>
-          <p className="note">
-            The file is the one the shell would have written, under <code>build/claims/</code>. Read it against its sources and
-            move it into <code>data/claims/</code> yourself if it belongs there. Nothing here does that for you, and a proposal is
-            gone when you reload.
-          </p>
         </section>
       )}
 

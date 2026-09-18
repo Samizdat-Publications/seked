@@ -67,15 +67,28 @@ export function CubitSlider({ model }: { model: Model }): React.JSX.Element {
       </label>
       <p className="note">
         {cubit === null ? (
-          <>Measured: {(model.measuredCubit * 1000).toFixed(2)} mm under this preset.</>
+          <>
+            Measured at {(model.measuredCubit * 1000).toFixed(2)} mm under this preset. Nobody knows the royal cubit exactly: it
+            is worked back out of the monuments themselves, and the usual estimates run from about 520 to 530 mm.
+          </>
         ) : (
           <>
-            Overriding the measured {(model.measuredCubit * 1000).toFixed(2)} mm.{' '}
+            Set by hand, over the {(model.measuredCubit * 1000).toFixed(2)} mm this preset measures.{' '}
             <button type="button" className="link" onClick={() => setCubit(null)}>
               use the measurement
             </button>
           </>
         )}
+      </p>
+      {/*
+        The slider is the sensitivity test the dossier cannot do on paper, so
+        the panel has to say what it is for. A reader who does not know will
+        read a claim changing its grade as the model being unreliable, when it
+        is the claim being shown to rest on a number nobody has.
+      */}
+      <p className="note">
+        Drag it to see which claims lean on that figure. A claim that only holds at one setting is resting on a number nobody
+        has; one that holds across the whole range is not.
       </p>
     </section>
   );

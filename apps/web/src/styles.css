@@ -2258,3 +2258,171 @@ button.propose-example:disabled {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* Director, 2026-09-18: the residual chart, the verdict and the propose result */
+
+/*
+ * The residual chart. Colour carries nothing on its own here: the band, the
+ * hatch and the words do the work, because the fits green and the misses
+ * terracotta are 6.2 apart in OKLab under deuteranopia, inside the band where
+ * colour may not be the only encoding.
+ */
+.residuals {
+  margin: 0.9rem 0 0.4rem;
+}
+
+.residuals figcaption {
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  margin-bottom: 0.7rem;
+}
+
+.residual-row + .residual-row {
+  margin-top: 0.7rem;
+}
+
+.residual-head {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin: 0 0 0.22rem;
+}
+
+.residual-label {
+  color: var(--ink-soft);
+  flex: 1;
+  font-size: 0.74rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.residual-worst {
+  border: 1px solid var(--sand);
+  border-radius: 0.5rem;
+  color: var(--sand);
+  flex: none;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  padding: 0 0.28rem;
+  text-transform: uppercase;
+}
+
+.residual-figure {
+  color: var(--ink);
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.residual-track {
+  background: var(--hairline-soft);
+  border-radius: 2px;
+  height: 11px;
+  position: relative;
+}
+
+/* The allowance the claim gave itself. */
+.residual-band {
+  background: var(--sand);
+  border-radius: 2px;
+  bottom: 0;
+  opacity: 0.22;
+  position: absolute;
+  top: 0;
+}
+
+/* The target itself. */
+.residual-zero {
+  background: var(--hairline);
+  bottom: -2px;
+  left: 50%;
+  position: absolute;
+  top: -2px;
+  width: 1px;
+}
+
+.residual-bar {
+  border-radius: 3px;
+  bottom: 1px;
+  position: absolute;
+  top: 1px;
+}
+
+.residual-bar.is-within {
+  background: var(--fits);
+}
+
+/* A miss is hatched as well as coloured, so it reads with no colour vision at all. */
+.residual-bar.is-outside {
+  background-color: var(--misses);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(18, 21, 26, 0.55) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+/* Where a residual runs off the end of its own track. */
+.residual-over {
+  border-bottom: 5px solid transparent;
+  border-top: 5px solid transparent;
+  position: absolute;
+  top: 0.5px;
+}
+
+.residual-over.is-right {
+  border-left: 5px solid var(--misses);
+  right: -7px;
+}
+
+.residual-over.is-left {
+  border-right: 5px solid var(--misses);
+  left: -7px;
+}
+
+/* The three numbers that decide a claim, side by side. */
+.verdict-figures {
+  display: flex;
+  gap: 1rem;
+  margin: 0.7rem 0;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--hairline-soft);
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.verdict-figures div {
+  flex: 1;
+}
+
+.verdict-figures dt {
+  color: var(--ink-soft);
+  font-size: 0.66rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.verdict-figures dd {
+  font-size: 1.02rem;
+  margin: 0.18rem 0 0;
+}
+
+/* The result stands directly under the ask, so nobody has to scroll to learn it worked. */
+.propose-result h2 {
+  color: var(--sand);
+}
+
+.propose-keep {
+  margin-top: 0.7rem;
+}
+
+.propose-keep summary {
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.propose-keep summary:hover {
+  color: var(--ink);
+}

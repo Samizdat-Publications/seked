@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
 import { cornerMissWords, overlayNote, overlaySpec, parallelOffsetWords, type OverlayContext, type OverlaySpec } from '../overlays';
 import { useView } from '../store';
+import { Residuals } from './Residuals';
 import { yearWords } from '../ui/moment';
 import { Fit } from './Claims';
 
@@ -60,6 +61,7 @@ export function ClaimDetail({
 
       {result.error && <p className="warning">This preset cannot evaluate the claim: {result.error}</p>}
 
+      {result.comparisons.length > 0 && <Residuals comparisons={result.comparisons} worstIndex={worst} />}
       {result.comparisons.length > 0 && <Comparisons comparisons={result.comparisons} worst={worst} />}
 
       {result.comparisons.length === 0 && !result.error && (
