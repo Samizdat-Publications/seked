@@ -53,6 +53,24 @@ import type { StateId } from '../view';
  */
 export const DISSOLVE_SECONDS = 0.8;
 
+/**
+ * How long the dissolve running now takes. The default above is what a reader
+ * pressing a number key gets; a shot whose change of world wants longer (the
+ * plateau greening while the camera settles) states its own and the player
+ * sets it here just before the change lands, then puts it back. It is a
+ * module-level value rather than a prop because the dissolve is driven from
+ * outside React by the frame clock.
+ */
+let dissolveSeconds = DISSOLVE_SECONDS;
+
+export function setDissolveSeconds(seconds: number): void {
+  if (seconds > 0) dissolveSeconds = seconds;
+}
+
+export function resetDissolveSeconds(): void {
+  dissolveSeconds = DISSOLVE_SECONDS;
+}
+
 /** A dissolve in progress, or a finished one with `t` at 1. */
 export interface Transition {
   /** The stop being left, or null when nothing is dissolving. */
@@ -87,7 +105,7 @@ export function useStateTransition(): Transition {
   }
   useFrame((_, delta) => {
     if (live.t >= 1) return;
-    live.t = Math.min(1, live.t + delta / DISSOLVE_SECONDS);
+    live.t = Math.min(1, live.t + delta / dissolveSeconds);
     if (live.t >= 1) live.from = null;
   });
   return live;

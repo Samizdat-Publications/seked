@@ -40,18 +40,27 @@ export interface CameraKey extends Key<CameraView> {
   lift?: number;
 }
 
+/**
+ * A change of the timeline's stop inside a shot: the stop arrived at and the
+ * second the dissolve starts. `dissolveSeconds` lengthens the dissolve for
+ * this change only; absent takes the default.
+ */
+export interface StateChange {
+  to: StateId;
+  at: number;
+  dissolveSeconds?: number;
+}
+
 export interface Shot {
   id: string;
   /** How long the shot runs, in seconds. */
   seconds: number;
   /** The camera along the shot. Never empty. */
   camera: CameraKey[];
-  /**
-   * The timeline stop the shot arrives at, and the second the dissolve
-   * starts. Absent leaves the timeline where it was. `dissolveSeconds`
-   * lengthens the dissolve for this change only; absent takes the default.
-   */
-  state?: { to: StateId; at: number; dissolveSeconds?: number };
+  /** The timeline stop the shot arrives at. Absent leaves the timeline where it was. */
+  state?: StateChange;
+  /** Further changes of stop in the same shot. */
+  states?: StateChange[];
   /** The sun: the day and hour tweened between keys. Absent leaves the moment alone. */
   moment?: Key<Moment>[];
   /**
