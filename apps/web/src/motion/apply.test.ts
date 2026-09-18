@@ -141,7 +141,7 @@ describe('applyShot', () => {
     const shot: Shot = { ...move, state: { to: 'ancient', at: 3, dissolveSeconds: 2.5 } };
     const { store, calls } = fakeStore();
     const announced: number[] = [];
-    play(shot, store, 10, 60, { onStateChange: (s: Shot) => announced.push(s.state?.dissolveSeconds ?? 0) });
+    play(shot, store, 10, 60, { onStateChange: (c: { dissolveSeconds?: number }) => announced.push(c.dissolveSeconds ?? 0) });
     expect(calls.state).toEqual(['ancient']);
     expect(announced).toEqual([2.5]);
     expect(store.state).toBe('ancient');
@@ -153,6 +153,26 @@ describe('applyShot', () => {
     const scratch = newScratch();
     applyShot(shot, 0, store, scratch);
     expect(calls.state).toEqual(['built']);
+  });
+
+  it('makes every further change of state the shot asks for, in order and once each', () => {
+    // The tour's close: the plateau stripped and buried, then as it stands,
+    // inside one stand.
+    const shot: Shot = {
+      ...move,
+      state: { to: 'built', at: 0 },
+      states: [
+        { to: 'today', at: 8, dissolveSeconds: 1.2 },
+        { to: 'stripped', at: 3 },
+      ],
+    };
+    const { store, calls } = fakeStore();
+    const announced: (number | undefined)[] = [];
+    play(shot, store, 10, 60, { onStateChange: (c: { dissolveSeconds?: number }) => announced.push(c.dissolveSeconds) });
+    // Stated out of order, made in the order they come due.
+    expect(calls.state).toEqual(['built', 'stripped', 'today']);
+    expect(announced).toEqual([undefined, undefined, 1.2]);
+    expect(store.state).toBe('today');
   });
 
   it("rolls the epoch and hands it back when it lands on the stop's own", () => {

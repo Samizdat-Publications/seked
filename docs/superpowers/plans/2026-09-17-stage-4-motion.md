@@ -79,10 +79,10 @@ Branch `stage4/engine`. Owns `apps/web/src/motion/ease.ts`, `motion/path.ts`, `m
 
 ### Task M4: the player
 
-- [ ] `scene/Motion.tsx` replaces the trunk's: `useFrame((_, delta) => ...)`: if `clock === 'wall'` and `playing`, `advance(delta)`; then, whatever the clock, if a sequence is loaded, `applyShot(shots[shot], time, useView.getState(), scratch)`. The trunk's `advance` already rolls a finished shot into the next and stops at the end; keep its semantics (read `store.ts`). When a sequence stops, the reader is left where the last shot put them, as the old tour did.
-- [ ] `fade.ts`: `DISSOLVE_SECONDS` becomes the default of a module-level `let` with `setDissolveSeconds(s)` and `resetDissolveSeconds()` exported; the player calls the setter just before a shot's state change and the reset after the dissolve has run (`t` reached 1). Nothing else in `fade.ts` changes.
-- [ ] Verify in the browser with a throwaway sequence in the console: `useMotion.getState().play({...})` from a `window.__seked` handle you add in `Motion.tsx` under `import.meta.env.DEV` only. A move from the panorama stand to the harbour stand over 8 s with the state going built to ancient at 3 s and the moment from dawn to dusk: smooth, no popping of the sun, the dissolve at the named second. Two screenshots.
-- [ ] Commit: "A player for the shots, on the wall clock or stepped by the film".
+- [x] `scene/Motion.tsx` replaces the trunk's: `useFrame((_, delta) => ...)`: if `clock === 'wall'` and `playing`, `advance(delta)`; then, whatever the clock, if a sequence is loaded, `applyShot(shots[shot], time, useView.getState(), scratch)`. The trunk's `advance` already rolls a finished shot into the next and stops at the end; keep its semantics (read `store.ts`). When a sequence stops, the reader is left where the last shot put them, as the old tour did.
+- [x] `fade.ts`: `DISSOLVE_SECONDS` becomes the default of a module-level `let` with `setDissolveSeconds(s)` and `resetDissolveSeconds()` exported; the player calls the setter just before a shot's state change and the reset after the dissolve has run (`t` reached 1). Nothing else in `fade.ts` changes.
+- [~] Verify in the browser with a throwaway sequence in the console: `useMotion.getState().play({...})` from a `window.__seked` handle you add in `Motion.tsx` under `import.meta.env.DEV` only. A move from the panorama stand to the harbour stand over 8 s with the state going built to ancient at 3 s and the moment from dawn to dusk: smooth, no popping of the sun, the dissolve at the named second. Two screenshots.
+- [x] Commit: "A player for the shots, on the wall clock or stepped by the film".
 
 ---
 

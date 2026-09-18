@@ -30,7 +30,7 @@ import type { ViewStore } from '../store';
 import { EPOCH_STEP, LST_STEP, stateById, type CameraView, type LayerId, type Moment } from '../view';
 import { lerpAngleDeg, lerpMoment, lerpNumber, sample } from './ease';
 import { cameraAt } from './path';
-import type { Shot } from './types';
+import type { Shot, StateChange } from './types';
 
 /** How often a shot may move the sun or the epoch, per second of its own time. */
 export const WRITES_PER_SECOND = 12;
@@ -47,8 +47,10 @@ const HOUR_EPSILON = 1 / 240;
 export interface Scratch {
   /** The shot these values belong to, by its id, or null before any shot has begun. */
   shot: string | null;
-  /** Whether the shot's change of state has landed. */
+  /** Whether the shot's own change of state has landed. */
   stateDone: boolean;
+  /** Which of the shot's further changes of state have landed, by their index. */
+  statesDone: boolean[];
   /** Whether the epoch has been handed back to the view (see `applyShot`). */
   epochHandedBack: boolean;
   moment: Moment | null;
@@ -60,7 +62,7 @@ export interface Scratch {
 }
 
 export function newScratch(): Scratch {
-  return { shot: null, stateDone: false, epochHandedBack: false, moment: null, momentAt: 0, epoch: null, epochAt: 0, lst: null };
+  return { shot: null, stateDone: false, statesDone: [], epochHandedBack: false, moment: null, momentAt: 0, epoch: null, epochAt: 0, lst: null };
 }
 
 /** Forget everything, in place, so the player can keep one scratch for the whole run. */
@@ -77,10 +79,35 @@ export interface ApplyOptions {
    */
   meridianLst?: (starId: string, epoch: number) => number | undefined;
   /**
-   * Called immediately before the shot's change of state lands, which is
-   * where the player lengthens the dissolve for a shot that asks for it.
+   * Called immediately before a change of state lands, which is where the
+   * player lengthens the dissolve for a change that asks for it.
    */
-  onStateChange?: (shot: Shot) => void;
+  onStateChange?: (change: StateChange, shot: Shot) => void;
+}
+
+/**
+ * The changes of state this shot has come due for and not yet made, in the
+ * order they are stated to happen. A shot has at most one `state` and any
+ * number of further `states`; a frame long enough to pass two of them makes
+ * both, in order, so the last one is the one left standing.
+ */
+function dueChanges(shot: Shot, time: number, scratch: Scratch): { change: StateChange; index: number }[] {
+  const due: { change: StateChange; index: number }[] = [];
+  if (shot.state && !scratch.stateDone && time >= shot.state.at) due.push({ change: shot.state, index: -1 });
+  (shot.states ?? []).forEach((change, index) => {
+    if (!scratch.statesDone[index] && time >= change.at) due.push({ change, index });
+  });
+  return due.sort((a, b) => a.change.at - b.change.at);
+}
+
+/** Make them, telling the player about each one first so the dissolve can be set. */
+function changeState(shot: Shot, time: number, store: ViewStore, scratch: Scratch, options: ApplyOptions): void {
+  for (const { change, index } of dueChanges(shot, time, scratch)) {
+    options.onStateChange?.(change, shot);
+    store.setState(change.to);
+    if (index < 0) scratch.stateDone = true;
+    else scratch.statesDone[index] = true;
+  }
 }
 
 /**
@@ -109,11 +136,9 @@ function beginShot(shot: Shot, time: number, store: ViewStore, scratch: Scratch,
   }
   store.setSection({ on: false, ...shot.section });
   if (shot.sphinx !== undefined) store.setSphinx(shot.sphinx);
-  if (shot.state && shot.state.at <= time) {
-    options.onStateChange?.(shot);
-    store.setState(shot.state.to);
-    scratch.stateDone = true;
-  }
+  // Before the epoch below, because `setState` takes the epoch with it when
+  // the reader has one overridden, and the shot's own keys must win.
+  changeState(shot, time, store, scratch, options);
   if (shot.epoch && shot.epoch.length > 0) {
     const epoch = sample(shot.epoch, time, lerpNumber);
     store.setEpoch(epoch);
@@ -162,11 +187,7 @@ export function applyShot(shot: Shot, time: number, store: ViewStore, scratch: S
     beginShot(shot, time, store, scratch, options);
   }
 
-  if (shot.state && !scratch.stateDone && time >= shot.state.at) {
-    options.onStateChange?.(shot);
-    store.setState(shot.state.to);
-    scratch.stateDone = true;
-  }
+  changeState(shot, time, store, scratch, options);
 
   const camera: CameraView = cameraAt(shot.camera, time);
   store.showCamera(camera);
