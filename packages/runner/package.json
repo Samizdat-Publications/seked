@@ -11,6 +11,7 @@
     "@seked/claims": "workspace:*",
     "@seked/data": "workspace:*",
     "@seked/geometry": "workspace:*",
+    "yaml": "^2.5.0",
     "zod": "^4.0.0"
   }
 }

@@ -29,6 +29,9 @@ importers:
       '@seked/geometry':
         specifier: workspace:*
         version: link:packages/geometry
+      '@seked/runner':
+        specifier: workspace:*
+        version: link:packages/runner
       '@seked/sky':
         specifier: workspace:*
         version: link:packages/sky
@@ -162,6 +165,9 @@ importers:
       '@seked/geometry':
         specifier: workspace:*
         version: link:../geometry
+      yaml:
+        specifier: ^2.5.0
+        version: 2.9.1
       zod:
         specifier: ^4.0.0
         version: 4.6.4

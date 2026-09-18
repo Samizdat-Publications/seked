@@ -6,12 +6,7 @@
  * it. Loading `data/` and writing `build/claims/` is `./index`, which stays
  * behind in Node.
  */
-import type { Claim } from '@seked/claims/browser';
-
-/**
- * Prose in, a graded claim out. The stub throws until track T lands; the
- * signature is here so the drawer and the CLI can be written against it.
- */
-export function proposeClaim(_prose: string): Promise<{ claim: Claim }> {
-  return Promise.reject(new Error('the claims runner is not here yet'));
-}
+export * from './claim-file';
+export * from './context';
+export * from './examples';
+export * from './propose';
