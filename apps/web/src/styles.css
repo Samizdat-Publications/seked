@@ -1789,3 +1789,81 @@ button.step.is-primary:hover {
 .film-trouble {
   color: var(--misses);
 }
+
+/* ===== Stage 5, Track R: the claims drawer ===== */
+
+:root {
+  /*
+   * The lapis the stage says a claim in. The token at the head of this file is
+   * the pigment, which is too dark to read as text on dark glass; this is the
+   * ink that pigment makes. The muted sand is the warm sand held back, for a
+   * grade the engine has not been able to decide.
+   */
+  --lapis-ink: #7ea6e0;
+  --sand-muted: rgba(217, 181, 106, 0.74);
+}
+
+/*
+ * A group's heading takes the display face the drawer's own heading has, so
+ * the five groups read as headings rather than as the first line of the block
+ * beneath them.
+ */
+.group > h3 {
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-size: 0.98rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/*
+ * A grade is a dot and a word: the green for a fit, the red for a miss, the
+ * muted sand for a claim the engine cannot yet decide. The pill it replaces
+ * shouted at one size whatever it had to say, and there are four rows of these
+ * to a group.
+ */
+.grade {
+  grid-area: fit;
+  justify-self: end;
+  align-self: center;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.36rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  color: var(--sand-muted);
+}
+
+.grade-dot {
+  align-self: center;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.grade.is-fits {
+  color: var(--fits);
+}
+
+.grade.is-misses {
+  color: var(--misses);
+}
+
+/* The proposed tag: lapis, small, and inline with the title it qualifies. */
+.claim-tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.02rem 0.34rem 0.06rem;
+  border: 1px solid rgba(126, 166, 224, 0.45);
+  border-radius: 0.3rem;
+  background: rgba(45, 95, 168, 0.3);
+  font-size: 0.6rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--lapis-ink);
+  vertical-align: 0.08em;
+}

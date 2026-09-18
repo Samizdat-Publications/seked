@@ -81,8 +81,8 @@ Branch `stage5/drawer`. Owns `apps/web/src/panels/Claims.tsx`, `apps/web/src/pan
 
 ### Task R1: the list
 
-- [ ] The list in the drawer's type and colour: the group heading in the serif display face, each row the id in tabular numerals, the title, and the grade as a dot and a word (`fits` in the existing green, `misses` in the existing red, `needs sky` and `needs site` in the muted sand) rather than a paragraph. A `proposed` claim's row carries a small `proposed` tag in lapis and sorts to the top of its group. The selected row stays open with the detail under it, as now. Keyboard: up and down move, enter opens, escape closes the detail.
-- [ ] Commit: "List the claims in the drawer's own type".
+- [x] The list in the drawer's type and colour: the group heading in the serif display face, each row the id in tabular numerals, the title, and the grade as a dot and a word (`fits` in the existing green, `misses` in the existing red, `needs sky` and `needs site` in the muted sand) rather than a paragraph. A `proposed` claim's row carries a small `proposed` tag in lapis and sorts to the top of its group. The selected row stays open with the detail under it, as now. Keyboard: up and down move, enter opens, escape closes the detail.
+- [x] Commit: "List the claims in the drawer's own type".
 
 ### Task R2: the detail
 
