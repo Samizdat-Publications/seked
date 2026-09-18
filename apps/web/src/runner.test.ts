@@ -1,28 +1,50 @@
 /**
  * The propose drawer's work, driven by a fake client and a fake runner.
  *
- * Nothing here touches the network and nothing here carries a real key: the
- * one below is a string typed for the test. The runner's own parts are
- * arguments for the same reason its client is, so the drawer can be driven
- * without the model on the other end of it.
+ * Nothing here touches the network and nothing here carries a key. The one
+ * test that does call the API counts tokens and nothing else, and it is
+ * skipped unless a key is already in the environment, which is the same rule
+ * the CLI reads its key under.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type AnthropicClient from '@anthropic-ai/sdk';
 import type { ClaimFile } from '@seked/claims/browser';
+import type { SekedBundle } from './bundle';
 import {
   KEY_NAME,
   claimYaml,
+  countContextTokens,
   failureWords,
   forgetReaderKey,
+  holdBundle,
+  proposeContext,
   proposedPath,
   putToModel,
   readerKey,
+  resetContext,
   setReaderKey,
   type Proposal,
   type RunnerContext,
   type Stage,
 } from './runner';
 import { useView } from './store';
+
+/**
+ * The runner stands in, so the context can be counted as it is built. The one
+ * test that wants the real package asks for it with `importActual`.
+ */
+const built = vi.hoisted(() => ({ times: 0 }));
+vi.mock('@seked/runner/browser', () => ({
+  runnerContext: () => {
+    built.times += 1;
+    return { system: 'the grammar, the keys and the rules' };
+  },
+  proposeClaim: () => Promise.reject(new Error('the fake runner is never asked for a claim')),
+  // Named although it is nothing: reading a key a mock factory left out is an
+  // error in vitest, where reading one off a real module is only undefined.
+  ProposalFailed: undefined,
+  EXAMPLES: [],
+}));
 
 /** Local storage as a browser would have it, since vitest runs in Node. */
 function fakeStorage(): Storage {
@@ -191,5 +213,48 @@ describe('the file the reader downloads', () => {
   it('is written under build, never under data', () => {
     expect(proposedPath('P7')).toBe('build/claims/P7.yaml');
     expect(proposedPath('P7')).not.toContain('data/');
+  });
+});
+
+describe('the context the model is given', () => {
+  it('is built once from the bundle the viewer loaded, and again only when that bundle changes', () => {
+    resetContext();
+    built.times = 0;
+    expect(() => proposeContext()).toThrow(/bundle is not loaded/);
+
+    holdBundle({} as SekedBundle);
+    const first = proposeContext();
+    expect(proposeContext()).toBe(first);
+    expect(built.times).toBe(1);
+
+    // A second bundle is a second context; nothing else rebuilds it.
+    holdBundle({} as SekedBundle);
+    expect(proposeContext()).not.toBe(first);
+    expect(built.times).toBe(2);
+
+    resetContext();
+    expect(() => proposeContext()).toThrow(/bundle is not loaded/);
+  });
+});
+
+/**
+ * The one test that spends money, and only a token count of it. It runs when
+ * a key is already in the environment and is skipped otherwise, so nobody has
+ * to hold a key for the suite to be green, and the key never leaves the
+ * environment it was read from.
+ */
+describe.skipIf(!process.env.ANTHROPIC_API_KEY)('the size of what the model is told', () => {
+  it('counts the context’s tokens', async () => {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const { buildBundle } = await import('../../../scripts/bundle');
+    const runner = (await vi.importActual('@seked/runner/browser')) as {
+      runnerContext(bundle: ReturnType<typeof buildBundle>): RunnerContext;
+    };
+    const client = new Anthropic();
+    const of = runner.runnerContext(buildBundle());
+    const tokens = await countContextTokens(client, of, FILE.prose ?? '');
+    // Printed so the number can go in the commit message; the plan asks for it.
+    console.log(`the runner's context is ${tokens} tokens`);
+    expect(tokens).toBeGreaterThan(0);
   });
 });

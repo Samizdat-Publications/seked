@@ -139,6 +139,7 @@ export async function runnerClient(key: string): Promise<AnthropicClient> {
 /* -------------------------------------------------------------- the context */
 
 let held: SekedBundle | null = null;
+let context: RunnerContext | null = null;
 
 /**
  * The bundle the viewer loaded, handed over by `load.ts` so the runner builds
@@ -147,18 +148,53 @@ let held: SekedBundle | null = null;
  */
 export function holdBundle(bundle: SekedBundle): void {
   held = bundle;
+  context = null;
 }
 
 /**
- * The model's context: every key in the environment, the expression language
- * and the worked examples.
+ * The model's context, built once and kept. It is every key in the
+ * environment, the expression language and the worked examples, which is a
+ * large and entirely static thing, so building it per proposal would be
+ * wasted work on every key the reader types.
  */
 export function proposeContext(): RunnerContext {
+  if (context !== null) return context;
   if (held === null) throw new Error('The bundle is not loaded yet, so the model has nothing to be told about.');
   // Track T's runner is what builds this. Until it lands, the package is the
   // trunk's stub and the drawer should say so rather than throw a type error.
   if (typeof runner.runnerContext !== 'function') throw new Error('The claims runner is not in this build of the viewer yet.');
-  return runner.runnerContext(held);
+  context = runner.runnerContext(held);
+  return context;
+}
+
+/** Forget the built context. For the tests, and for a reader who reloads nothing. */
+export function resetContext(): void {
+  held = null;
+  context = null;
+}
+
+/**
+ * The words of the context, for counting its tokens. The plan fixes what the
+ * context contains and not the shape it is carried in, so this reads the
+ * system prompt where there is one and falls back to the whole thing.
+ */
+export function contextText(of: RunnerContext): string {
+  return typeof of.system === 'string' ? of.system : JSON.stringify(of);
+}
+
+/**
+ * How many tokens the model is asked to read before it writes anything. Used
+ * by the test that runs only when a key is in the environment; the drawer
+ * never calls it, because a reader does not need a token count to ask a
+ * question.
+ */
+export async function countContextTokens(client: AnthropicClient, of: RunnerContext, prose: string): Promise<number> {
+  const counted = await client.messages.countTokens({
+    model: 'claude-opus-5',
+    system: contextText(of),
+    messages: [{ role: 'user', content: prose }],
+  });
+  return counted.input_tokens;
 }
 
 /* ------------------------------------------------------------- the proposal */
@@ -179,7 +215,7 @@ export interface Failure {
  */
 export function failedProposal(raised: unknown): Failure | null {
   if (typeof raised !== 'object' || raised === null) return null;
-  const known = runner.ProposalFailed !== undefined && raised instanceof runner.ProposalFailed;
+  const known = typeof runner.ProposalFailed === 'function' && raised instanceof runner.ProposalFailed;
   const carried = raised as { errors?: unknown; claim?: unknown };
   if (!known && !Array.isArray(carried.errors)) return null;
   const errors = Array.isArray(carried.errors) ? carried.errors.map((e) => String(e)) : [String((raised as Error).message)];
