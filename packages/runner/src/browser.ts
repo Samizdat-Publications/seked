@@ -8,6 +8,9 @@
  */
 import type { Claim } from '@seked/claims/browser';
 
+export * from './claim-file';
+export * from './context';
+
 /**
  * Prose in, a graded claim out. The stub throws until track T lands; the
  * signature is here so the drawer and the CLI can be written against it.
