@@ -1789,3 +1789,34 @@ button.step.is-primary:hover {
 .film-trouble {
   color: var(--misses);
 }
+
+/* Track S: the overlays */
+
+/*
+ * The palette the claim overlays are drawn in, as tokens anything in the
+ * interface can reach for when it has to match a line in the scene.
+ *
+ * Two families, and the whole of the overlays is in them. Lapis is the
+ * claim's own geometry: the ghost at the claimed slope, the star a shaft is
+ * said to point at, the rectangle somebody says was set out. Sand is the
+ * survey the claim is drawn against. Each is a ladder of four climbing
+ * towards the ink, so the four shafts of C2 and the three slopes of A3 can be
+ * told apart without leaving the family, and the bottom rung of each is
+ * `--lapis` and `--sand` themselves. Green and red are the claim's grade and
+ * are `--fits` and `--misses` unchanged.
+ *
+ * `overlays.ts` holds the same values, because a three material cannot read a
+ * stylesheet and a canvas label cannot either. They are the one thing in this
+ * project written down twice on purpose; if a rung moves here it moves there,
+ * and `PALETTE` says so at the top of that file.
+ */
+:root {
+  --claim-1: #8fb4e8;
+  --claim-2: #cbdcf6;
+  --claim-3: #5b86cf;
+  --claim-4: var(--lapis);
+  --survey-1: var(--sand);
+  --survey-2: #f2ddb0;
+  --survey-3: #bf8f4c;
+  --survey-4: #eccf93;
+}

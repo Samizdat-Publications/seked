@@ -11,7 +11,7 @@
  * claims, so a new overlay is a spec builder and a component and never a
  * special case in the panel.
  */
-import { evaluate, type Claim, type Comparison } from '@seked/claims/browser';
+import { evaluate, evaluateClaim, type Claim, type Comparison } from '@seked/claims/browser';
 import { egypt1907FromWgs84, type Environment, type Point } from '@seked/geometry';
 import {
   lowerCulminationAltitude,
@@ -50,11 +50,47 @@ export const BUILT_OVERLAYS = new Set([
   'map-inset',
 ]);
 
-/** Enough colours for the three slopes A3 puts side by side. */
-const GHOST_COLOURS = ['#7fd1ff', '#ffcf70', '#ff9bc2'];
+/**
+ * The one palette every overlay draws in. It is the interface's own: the
+ * values here are `styles.css`'s `--lapis`, `--sand`, `--ink-soft`, `--fits`
+ * and `--misses`, in the form a three material wants, and nothing in an
+ * overlay is a colour somebody liked the look of.
+ *
+ * Two families carry all sixteen types, and a reader who learns only this
+ * much can read any of them. Lapis is the claim's own geometry: the ghost at
+ * the claimed slope, the star a shaft is said to point at, the rectangle
+ * somebody says was set out. Sand is the survey the claim is drawn against:
+ * the line Petrie measured, the corner the pyramid actually has. The green
+ * and the red are a verdict and never a line.
+ *
+ * Each family is a ladder of four, so the four shafts of C2 and the three
+ * slopes of A3 can be told apart without leaving the family. They climb
+ * towards the ink rather than away from it, because a line over the night sky
+ * has to be lighter than a panel's fill: `--lapis` itself is the bottom rung.
+ *
+ * The same two ladders are in `styles.css` as `--claim-1` to `--claim-4` and
+ * `--survey-1` to `--survey-4`, for anything in the interface that has to
+ * match a line in the scene. That is the one set of values this project
+ * writes down twice on purpose, because a three material cannot read a
+ * stylesheet; move a rung here and move it there.
+ */
+export const PALETTE = {
+  /** The claim's own geometry, in the drawer's lapis. Index 0 is the one a single-line overlay takes; `--lapis` itself is the bottom rung. */
+  claim: ['#8fb4e8', '#cbdcf6', '#5b86cf', '#2d5fa8'],
+  /** The survey the claim is drawn against, in the caption's warm sand, `--sand` first. Paired by index with `claim`, so a measured ray and the star it is put against share a rung. */
+  survey: ['#d9b56a', '#f2ddb0', '#bf8f4c', '#eccf93'],
+  /** The scaffolding that is neither: a rose's ring, the ghost Earth's graticule, a base outline under a set of parallels. `--ink-soft`, and always dim. */
+  frame: '#a9a294',
+  /** A claim that sits inside its own tolerance. `--fits`, and nothing in an overlay is green for any other reason. */
+  fits: '#6fbf8a',
+  /** A claim that does not. `--misses`, and nothing in an overlay is red for any other reason. */
+  misses: '#d97b62',
+  /** The label's own text, on glass, as `--ink`. The line's colour is carried by the rule down the label's edge and by the leader to the point it names. */
+  ink: '#ece6d8',
+} as const;
 
-/** One colour per ray, so a shaft and the star it is aimed at share it. */
-export const RAY_COLOURS = ['#7fd1ff', '#ffcf70', '#ff9bc2', '#9ae6a0'];
+/** A rung of a family, wrapping round when an overlay asks for more parts than the ladder has. */
+const step = (family: readonly string[], i: number): string => family[i % family.length] as string;
 
 export interface GhostProfile {
   /** The expression as the claim file writes it, which is the honest label. */
@@ -94,7 +130,7 @@ export function ghostProfileSpec(claim: Claim, env: Environment): GhostProfileSp
     const source = asString(raw);
     if (!source) continue;
     try {
-      profiles.push({ label: source, slopeDeg: evaluate(source, env), colour: GHOST_COLOURS[profiles.length % GHOST_COLOURS.length] as string });
+      profiles.push({ label: source, slopeDeg: evaluate(source, env), colour: step(PALETTE.claim, profiles.length) });
     } catch {
       // A slope the environment cannot evaluate is simply not drawn.
     }
@@ -151,7 +187,7 @@ export interface StarMark {
   colour: string;
 }
 
-export function markStar(star: Star, ctx: OverlayContext, colour = RAY_COLOURS[0] as string): StarMark {
+export function markStar(star: Star, ctx: OverlayContext, colour = step(PALETTE.claim, 0)): StarMark {
   const placed = placeOnDome(star, { epoch: ctx.epoch, latitudeDeg: ctx.latitudeDeg, lstDeg: ctx.lstDeg });
   return {
     id: star.id,
@@ -273,8 +309,11 @@ export function shaftRaysSpec(claim: Claim, ctx: OverlayContext): ShaftRaysSpec 
     const centre = landmark(ctx, structure, `${chamber}.centre`);
     const star = starByName(ctx.stars, names[i] ?? '');
     if (angleDeg === undefined || !centre || !star) return;
-    const colour = RAY_COLOURS[rays.length % RAY_COLOURS.length] as string;
-    const mark = markStar(star, ctx, colour);
+    // The ray is a measured angle out of a measured room, so it is drawn in
+    // the survey's sand; the star the claim assigns to it is drawn in lapis on
+    // the same rung, which is what keeps the pair together across four shafts.
+    const colour = step(PALETTE.survey, rays.length);
+    const mark = markStar(star, ctx, step(PALETTE.claim, rays.length));
     rays.push({
       key,
       label: `${chamber.toUpperCase()} ${side} shaft`,
@@ -339,8 +378,8 @@ export function passageRaySpec(claim: Claim, ctx: OverlayContext): PassageRaySpe
 
   const along = normalise([mouth[0] - foot[0], mouth[1] - foot[1], mouth[2] - foot[2]]);
   const culmination = asString(params.culmination) === 'upper' ? 'upper' : 'lower';
-  const colour = RAY_COLOURS[0] as string;
-  const mark = markStar(star, ctx, colour);
+  const colour = step(PALETTE.survey, 0);
+  const mark = markStar(star, ctx, step(PALETTE.claim, 0));
   const targetAltitudeDeg = culmination === 'lower' ? mark.lowerAltitudeDeg : mark.transitAltitudeDeg;
   return {
     structure,
@@ -396,7 +435,7 @@ export function compassRoseSpec(claim: Claim, ctx: OverlayContext): CompassRoseS
   const stars = asStrings(params.stars)
     .map((name, i) => {
       const star = starByName(ctx.stars, name);
-      return star ? markStar(star, ctx, RAY_COLOURS[i % RAY_COLOURS.length] as string) : undefined;
+      return star ? markStar(star, ctx, step(PALETTE.claim, i)) : undefined;
     })
     .filter((s): s is StarMark => s !== undefined);
 
@@ -671,7 +710,7 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
     try {
       const azimuthDeg = evaluate(source, scope);
       if (!Number.isFinite(azimuthDeg)) continue;
-      bearings.push({ label, source, azimuthDeg, colour: RAY_COLOURS[bearings.length % RAY_COLOURS.length] as string });
+      bearings.push({ label, source, azimuthDeg, colour: step(PALETTE.claim, bearings.length) });
     } catch {
       // A bearing the environment cannot evaluate is simply not drawn.
     }
@@ -680,7 +719,8 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
   const sights: GroundSight[] = asStrings(params.corners)
     .map((name) => cornerOf(ctx.env, name))
     .filter((c): c is GroundCorner => c !== undefined)
-    .map((c) => ({ ...c, azimuthDeg: azimuthTo(from, c.at), colour: SIGHT_COLOUR }));
+    // A bearing to a corner the pyramid actually has is survey, not claim.
+    .map((c) => ({ ...c, azimuthDeg: azimuthTo(from, c.at), colour: step(PALETTE.survey, 0) }));
 
   if (bearings.length === 0 && sights.length === 0) return undefined;
   return {
@@ -692,9 +732,6 @@ export function groundBearingsSpec(claim: Claim, ctx: OverlayContext): GroundBea
     sights,
   };
 }
-
-/** The corner sight lines, which are ground and not sky. */
-export const SIGHT_COLOUR = '#cfd8e3';
 
 /** "1.7 m west": a signed offset said as a distance and a direction. */
 const offsetWords = (metres: number, positive: string, negative: string): string =>
@@ -782,7 +819,7 @@ export function groundOutlinesSpec(claim: Claim, ctx: OverlayContext): GroundOut
       residualPct: ((sideInches - targetInches) / targetInches) * 100,
       markCorners: line.markCorners,
       corners: outlineCorners(sideM, placed),
-      colour: RAY_COLOURS[outlines.length % RAY_COLOURS.length] as string,
+      colour: step(PALETTE.survey, outlines.length),
     });
   }
   return outlines.length === 0 ? undefined : { structure, outlines };
@@ -874,8 +911,8 @@ export function groundRectangleSpec(claim: Claim, ctx: OverlayContext): GroundRe
     missNorthM: to.at[1] - claimedSouthWest[1],
     residualEastPct: ((extentEastCubits - claimedEastCubits) / claimedEastCubits) * 100,
     residualNorthPct: ((extentNorthCubits - claimedNorthCubits) / claimedNorthCubits) * 100,
-    measuredColour: RAY_COLOURS[0] as string,
-    claimedColour: RAY_COLOURS[1] as string,
+    measuredColour: step(PALETTE.survey, 0),
+    claimedColour: step(PALETTE.claim, 0),
   };
 }
 
@@ -981,9 +1018,9 @@ export function groundLineSpec(claim: Claim, ctx: OverlayContext): GroundLineSpe
     referenceBearingDeg,
     residualToTargetDeg: cornerBearingDeg - targetBearingDeg,
     residualToReferenceDeg: referenceBearingDeg === undefined ? undefined : cornerBearingDeg - referenceBearingDeg,
-    cornerColour: RAY_COLOURS[0] as string,
-    targetColour: RAY_COLOURS[1] as string,
-    referenceColour: SIGHT_COLOUR,
+    cornerColour: step(PALETTE.survey, 0),
+    targetColour: step(PALETTE.claim, 0),
+    referenceColour: step(PALETTE.claim, 2),
   };
 }
 
@@ -1094,7 +1131,7 @@ export function chamberWireframeSpec(claim: Claim, ctx: OverlayContext): Chamber
       cubits,
       target,
       residualPct: target === undefined ? undefined : ((cubits - target) / target) * 100,
-      colour: RAY_COLOURS[diagonals.length % RAY_COLOURS.length] as string,
+      colour: step(PALETTE.claim, diagonals.length),
     });
   }
   return diagonals.length === 0 ? undefined : { structure, chamber, edges, diagonals };
@@ -1166,8 +1203,8 @@ export function ghostEarthSpec(claim: Claim, ctx: OverlayContext): GhostEarthSpe
     perimeterRadiusM,
     perimeterResidualPct: ((perimeterRadiusM - equatorRadiusM) / equatorRadiusM) * 100,
     piRatio: perimeterM / heightM,
-    earthColour: RAY_COLOURS[0] as string,
-    pyramidColour: RAY_COLOURS[1] as string,
+    earthColour: step(PALETTE.claim, 0),
+    pyramidColour: step(PALETTE.survey, 0),
   };
 }
 
@@ -1248,14 +1285,14 @@ export function mapInsetSpec(claim: Claim, ctx: OverlayContext): MapInsetSpec | 
       label: `base centre, ${datums[0] ?? 'WGS84'}`,
       latitudeDeg,
       offsetM: 0,
-      colour: RAY_COLOURS[0] as string,
+      colour: step(PALETTE.survey, 0),
     },
     {
       name: 'claimed',
       label: `${comparison.target}, the claim's latitude`,
       latitudeDeg: claimedDeg,
       offsetM: (claimedDeg - latitudeDeg) * metresPerDegree,
-      colour: RAY_COLOURS[1] as string,
+      colour: step(PALETTE.claim, 0),
     },
   ];
 
@@ -1272,7 +1309,7 @@ export function mapInsetSpec(claim: Claim, ctx: OverlayContext): MapInsetSpec | 
       label: `base centre, ${datums[1] ?? 'Old Egyptian 1907'}`,
       latitudeDeg: shifted.latDeg,
       offsetM: (shifted.latDeg - latitudeDeg) * metresPerDegree,
-      colour: RAY_COLOURS[2] as string,
+      colour: step(PALETTE.survey, 2),
     });
   }
 
@@ -1292,8 +1329,23 @@ export function mapInsetSpec(claim: Claim, ctx: OverlayContext): MapInsetSpec | 
 
 // --- What the scene is handed ---------------------------------------------
 
-export type OverlaySpec =
-  | { kind: 'ghost-profile'; spec: GhostProfileSpec }
+/**
+ * What every overlay carries besides its own geometry: where the claim came
+ * from, and how it came out. `proposed` is true for a claim the runner built
+ * from somebody's words rather than one a person filed, and the components
+ * draw it dashed, dimmer, and labelled `proposed`, so a reader can never
+ * mistake a machine's reading of Hancock for a claim with a source behind it.
+ * `fits` is the claim's own grade from the same evaluator the dossier uses,
+ * and it is the only thing in an overlay allowed to be green or red.
+ */
+export interface OverlayStyle {
+  proposed: boolean;
+  /** Undefined for a claim that cannot be computed yet, which is marked neither way. */
+  fits: boolean | undefined;
+}
+
+export type OverlaySpec = OverlayStyle &
+  ( | { kind: 'ghost-profile'; spec: GhostProfileSpec }
   | { kind: 'shaft-rays'; spec: ShaftRaysSpec }
   | { kind: 'passage-ray'; spec: PassageRaySpec }
   | { kind: 'compass-rose'; spec: CompassRoseSpec }
@@ -1304,35 +1356,53 @@ export type OverlaySpec =
   | { kind: 'ground-line'; spec: GroundLineSpec }
   | { kind: 'chamber-wireframe'; spec: ChamberWireframeSpec }
   | { kind: 'ghost-earth'; spec: GhostEarthSpec }
-  | { kind: 'map-inset'; spec: MapInsetSpec };
+  | { kind: 'map-inset'; spec: MapInsetSpec });
+
+/**
+ * How the claim came out, on the same evaluator the dossier grades it with,
+ * so the ring in the scene and the word in the drawer cannot disagree. A
+ * claim the preset cannot compute, or one whose sky the environment has not
+ * been given, grades as undefined and is marked neither way rather than
+ * guessed at.
+ */
+export function overlayStyle(claim: Claim, ctx: OverlayContext): OverlayStyle {
+  let fits: boolean | undefined;
+  try {
+    fits = evaluateClaim(claim, ctx.env).fits;
+  } catch {
+    fits = undefined;
+  }
+  return { proposed: claim.origin === 'proposed', fits };
+}
 
 /** The overlay a claim declares, resolved, or undefined when it is not built. */
 export function overlaySpec(claim: Claim | undefined, ctx: OverlayContext): OverlaySpec | undefined {
   if (!claim) return undefined;
+  const style = overlayStyle(claim, ctx);
   const ghost = ghostProfileSpec(claim, ctx.env);
-  if (ghost) return { kind: 'ghost-profile', spec: ghost };
+  if (ghost) return { ...style, kind: 'ghost-profile', spec: ghost };
   const shafts = shaftRaysSpec(claim, ctx);
-  if (shafts) return { kind: 'shaft-rays', spec: shafts };
+  if (shafts) return { ...style, kind: 'shaft-rays', spec: shafts };
   const passage = passageRaySpec(claim, ctx);
-  if (passage) return { kind: 'passage-ray', spec: passage };
+  if (passage) return { ...style, kind: 'passage-ray', spec: passage };
   const rose = compassRoseSpec(claim, ctx);
-  if (rose) return { kind: 'compass-rose', spec: rose };
+  if (rose) return { ...style, kind: 'compass-rose', spec: rose };
   const projection = skyProjectionSpec(claim, ctx);
-  if (projection) return { kind: 'sky-projection', spec: projection };
+  if (projection) return { ...style, kind: 'sky-projection', spec: projection };
   const bearings = groundBearingsSpec(claim, ctx);
-  if (bearings) return { kind: 'ground-bearings', spec: bearings };
+  if (bearings) return { ...style, kind: 'ground-bearings', spec: bearings };
   const outlines = groundOutlinesSpec(claim, ctx);
-  if (outlines) return { kind: 'ground-outlines', spec: outlines };
+  if (outlines) return { ...style, kind: 'ground-outlines', spec: outlines };
   const rectangle = groundRectangleSpec(claim, ctx);
-  if (rectangle) return { kind: 'ground-rectangle', spec: rectangle };
+  if (rectangle) return { ...style, kind: 'ground-rectangle', spec: rectangle };
   const line = groundLineSpec(claim, ctx);
-  if (line) return { kind: 'ground-line', spec: line };
+  if (line) return { ...style, kind: 'ground-line', spec: line };
   const wireframe = chamberWireframeSpec(claim, ctx);
-  if (wireframe) return { kind: 'chamber-wireframe', spec: wireframe };
+  if (wireframe) return { ...style, kind: 'chamber-wireframe', spec: wireframe };
   const earth = ghostEarthSpec(claim, ctx);
-  if (earth) return { kind: 'ghost-earth', spec: earth };
+  if (earth) return { ...style, kind: 'ghost-earth', spec: earth };
   const inset = mapInsetSpec(claim, ctx);
-  if (inset) return { kind: 'map-inset', spec: inset };
+  if (inset) return { ...style, kind: 'map-inset', spec: inset };
   return undefined;
 }
 

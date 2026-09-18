@@ -103,10 +103,10 @@ Branch `stage5/overlays`. Owns `apps/web/src/scene/ClaimOverlay.tsx`, `apps/web/
 
 ### Task S1: one palette
 
-- [ ] Every overlay type (the sixteen in `data/claims/*.yaml`: `ghost-profile`, `ghost-profiles`, `ghost-earth`, `shaft-rays`, `passage-ray`, `sky-projection`, `compass-rose`, `ground-bearings`, `ground-line`, `ground-outlines`, `ground-rectangle`, `chamber-wireframe`, `akhet`, `sun-ribbon`, `map-inset`, `panel`) draws in the stage's palette: lapis for the claim's own geometry, the warm sand for the survey it is drawn against, the existing green and red only for a fit or a miss mark. `RAY_COLOURS` and `SIGHT_COLOUR` move to a `PALETTE` in `overlays.ts` with a sentence each. Lines go through the post chain like everything else (no `depthTest: false` unless the type needs to show through the pyramid, and then the line is drawn twice, the occluded pass dimmer).
-- [ ] Labels (`Label.tsx`) match `HoverTag.tsx`: the same face, the same glass, tabular numerals, and a leader line to the point they name.
-- [ ] Screenshots: A1 (`ghost-profile`) from the east face stand, C2 (`shaft-rays`) from the night stand, B1 (`ghost-earth`) from the panorama, D3 (`ground-bearings`) from above; each in the built state and one of them at night.
-- [ ] Commit: "Draw every overlay in the stage's palette, with the labels the stage already has".
+- [x] Every overlay type (the sixteen in `data/claims/*.yaml`: `ghost-profile`, `ghost-profiles`, `ghost-earth`, `shaft-rays`, `passage-ray`, `sky-projection`, `compass-rose`, `ground-bearings`, `ground-line`, `ground-outlines`, `ground-rectangle`, `chamber-wireframe`, `akhet`, `sun-ribbon`, `map-inset`, `panel`) draws in the stage's palette: lapis for the claim's own geometry, the warm sand for the survey it is drawn against, the existing green and red only for a fit or a miss mark. `RAY_COLOURS` and `SIGHT_COLOUR` move to a `PALETTE` in `overlays.ts` with a sentence each. Lines go through the post chain like everything else (no `depthTest: false` unless the type needs to show through the pyramid, and then the line is drawn twice, the occluded pass dimmer).
+- [x] Labels (`Label.tsx`) match `HoverTag.tsx`: the same face, the same glass, tabular numerals, and a leader line to the point they name.
+- [x] Screenshots: A1 (`ghost-profile`) from the east face stand, C2 (`shaft-rays`) from the night stand, B1 (`ghost-earth`) from the panorama, D3 (`ground-bearings`) from above; each in the built state and one of them at night.
+- [x] Commit: "Draw every overlay in the stage's palette, with the labels the stage already has".
 
 ### Task S2: the proposed style
 
