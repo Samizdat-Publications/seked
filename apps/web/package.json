@@ -19,6 +19,7 @@
     "@seked/geometry": "workspace:*",
     "@seked/sky": "workspace:*",
     "@seked/units": "workspace:*",
+    "mp4-muxer": "^5.2.2",
     "postprocessing": "^6.39.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",

@@ -22,9 +22,10 @@
  * player sets it before the change and puts it back when the dissolve has
  * run, counting it down on the same delta so a film sees the same dissolve.
  */
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useStore } from '@react-three/fiber';
 import { defaultStars, positionAtEpoch, transitLst, type Star } from '@seked/sky/browser';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { setR3F } from '../film/handle';
 import { LOOKS } from '../looks';
 import { applyShot, newScratch, resetScratch } from '../motion/apply';
 import { useMotion } from '../motion/store';
@@ -73,6 +74,14 @@ function meridianLookup(): (starId: string, epoch: number) => number | undefined
 }
 
 export function Motion(): null {
+  // The film draws its own frames and needs R3F's own store to do it, which
+  // only something inside the Canvas can hand out (`film/handle.ts`).
+  const r3f = useStore();
+  useEffect(() => {
+    setR3F(r3f);
+    return () => setR3F(null);
+  }, [r3f]);
+
   const scratch = useRef(newScratch()).current;
   /** The sequence and shot last played, so a change of either begins the shot afresh. */
   const at = useRef<string>('');
