@@ -27,7 +27,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { Document, NodeIO, Primitive, type Node, type Scene } from '@gltf-transform/core';
+import { Document, NodeIO, Primitive, type Node, type Scene, type Texture } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import {
   clearNodeTransform,
@@ -191,6 +191,48 @@ const LOD_RATIOS = [1, 0.25, 0.06] as const;
 /** How far simplification may move the surface, as a share of the model's size. The plan's figure. */
 const LOD_ERROR = 0.001;
 
+/**
+ * The one extra level a scattered plant gets, baked to a triangle budget
+ * rather than to a ratio.
+ *
+ * Why it exists. A ratio and an error bound are two demands on the simplifier
+ * and the error bound wins: at `LOD_ERROR` of 0.001 it stops long before the
+ * ratio on a mesh dense enough to need it. The island tree, the acacia
+ * stand-in, came out of the coarsest ratio level at 169,160 triangles across
+ * three meshes, and `Vegetation.tsx` instances that 700 times, which is 118
+ * million triangles a frame before the shadow passes ever run. The date
+ * palm's coarsest was 9,531, another 6.7 million. Together they were why the
+ * built and ancient states drew at five frames a second and the today state
+ * at a hundred and eighty (director, 2026-09-18).
+ *
+ * So the budget leads and the error bound gives way. The ratio asked for is
+ * the budget over what the finest level actually has, and the error is
+ * relaxed until the budget is met: a plant seen from across the plateau may
+ * lose its silhouette by a twentieth of its own radius and nobody will ever
+ * see it, while a tree drawn at a hundred and sixty thousand triangles at
+ * that distance is a tree drawn at one pixel a triangle.
+ *
+ * The budgets themselves are in `blender/props.json` as `scatter_to`, with
+ * the sentence that chose each one. They are look choices and no part of any
+ * measurement.
+ *
+ * One caution. The level goes into the manifest's `lods` as the plan asks, so
+ * a prop that had both a `scatter_to` and placements of its own would gain a
+ * fourth level in `Props.tsx`'s distance swap. Only the plants carry a
+ * budget, and the plants have no placements, so that prop does not exist.
+ */
+const SCATTER_LEVEL = 'scatter';
+
+/**
+ * How far the scatter level's simplifier may move the surface, as a share of
+ * the model's radius, tried in this order until the budget is met. The plan's
+ * two figures.
+ */
+const SCATTER_ERRORS = [0.05, 0.2] as const;
+
+/** Where the budgets live, which is the manifest the props are declared in and not the index the fetch writes. */
+const PROPS_MANIFEST = join(REPO_ROOT, 'blender', 'props.json');
+
 /** Texture sizes to try for a prop, largest first. A prop is small on screen beside a stand-in. */
 const PROP_SIZES = [1024, 512] as const;
 
@@ -223,10 +265,21 @@ interface PropEntry {
 /** One line of `apps/web/public/props/manifest.json`. */
 interface WebProp extends PropEntry {
   bytes: number;
-  /** The node names in the GLB, coarsening in order, as the stand-ins' manifest uses them. */
+  /**
+   * The node names in the GLB, coarsening in order, as the stand-ins' manifest
+   * uses them, with `scatter` last where the prop has a budget.
+   */
   lods: string[];
+  /** How many triangles each of those levels draws, so the viewer's cost is a number and not a guess. */
+  levels: Record<string, number>;
   /** The baked model's extent in metres, east, north and up. */
   size: [number, number, number];
+  /**
+   * The far ring's billboard, where the prop has one: the file beside the GLB,
+   * and the metres its square stands for, so the viewer's quads are the size
+   * of the plant they replaced.
+   */
+  card?: { file: string; metres: number };
   /** The sha256 of the source file this was baked from, which `blender/props.json` pins. */
   source_sha256: string;
 }
@@ -346,18 +399,111 @@ function multiply(b: number[], a: number[]): number[] {
 }
 
 /**
- * The three levels of detail of one prop in one GLB, each under a node named
- * `lod0`, `lod1`, `lod2`, which is the same contract the stand-ins' manifest
- * uses so the viewer swaps them the same way.
+ * `scatter_to.triangles` out of `blender/props.json`, by prop id.
+ *
+ * Read from the manifest the props are declared in rather than from
+ * `build/props/index.json`, because that index carries a fixed list of fields
+ * written by `scripts/props.py`, which is the fetching half of the pipeline
+ * and has nothing to do with how heavy a level is baked. Reading the manifest
+ * here also means a budget can be changed and the props re-baked without
+ * fetching a single byte again.
  */
-async function lods(doc: Document, finest: number): Promise<Document> {
+function scatterBudgets(): Map<string, number> {
+  if (!existsSync(PROPS_MANIFEST)) return new Map();
+  const declared = JSON.parse(readFileSync(PROPS_MANIFEST, 'utf8')) as {
+    props?: { id: string; scatter_to?: { triangles?: number } }[];
+  };
+  const out = new Map<string, number>();
+  for (const prop of declared.props ?? []) {
+    const budget = prop.scatter_to?.triangles;
+    if (typeof budget === 'number' && budget > 0) out.set(prop.id, budget);
+  }
+  return out;
+}
+
+/** How many triangles a document draws, counted the way the renderer counts them: three indices to a triangle. */
+function triangleCount(doc: Document): number {
+  let total = 0;
+  for (const mesh of doc.getRoot().listMeshes()) {
+    for (const primitive of mesh.listPrimitives()) {
+      if (primitive.getMode() !== Primitive.Mode.TRIANGLES) continue;
+      const indices = primitive.getIndices();
+      const count = indices ? indices.getCount() : (primitive.getAttribute('POSITION')?.getCount() ?? 0);
+      total += Math.floor(count / 3);
+    }
+  }
+  return total;
+}
+
+/**
+ * The scatter level: the finest level simplified toward `budget` triangles,
+ * with the error bound relaxed through `SCATTER_ERRORS` until the budget is
+ * met. The ratio is the budget over what the model actually has, which is the
+ * whole difference from the ratio levels above: it is a count and not a share.
+ */
+async function scatterLevel(
+  doc: Document,
+  base: number,
+  budget: number,
+  id: string,
+): Promise<{ doc: Document; triangles: number }> {
+  const ratio = Math.min(1, budget / Math.max(base, 1));
+  let best: { doc: Document; triangles: number } | undefined;
+  for (const error of SCATTER_ERRORS) {
+    const clone = cloneDocument(doc);
+    await clone.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error, lockBorder: false }));
+    const reached = triangleCount(clone);
+    if (!best || reached < best.triangles) best = { doc: clone, triangles: reached };
+    if (reached <= budget) {
+      console.log(`${id}: ${SCATTER_LEVEL} is ${reached} triangles of ${base}, budget ${budget}, at error ${error}`);
+      return best;
+    }
+    console.log(`${id}: ${SCATTER_LEVEL} reached only ${reached} triangles at error ${error}, over the budget of ${budget}`);
+  }
+  const reached = (best as { doc: Document; triangles: number }).triangles;
+  console.log(
+    `${id}: ${SCATTER_LEVEL} is ${reached} triangles of ${base} and misses the budget of ${budget}; `
+      + 'the simplifier will not go further on this topology',
+  );
+  return best as { doc: Document; triangles: number };
+}
+
+/** What a prop's levels came to: the node names in order, the triangles in each, and the card's own triangles. */
+interface Levels {
+  names: string[];
+  triangles: Record<string, number>;
+  /**
+   * The scatter level's triangles with their textures, kept for the card
+   * baker. Read before the levels are merged, because merging empties the
+   * document the scatter level was built in.
+   */
+  card?: CardPart[];
+}
+
+/**
+ * The levels of detail of one prop in one GLB, each under a node named `lod0`,
+ * `lod1`, `lod2`, and `scatter` where the prop has a budget, which is the same
+ * contract the stand-ins' manifest uses so the viewer swaps them the same way.
+ */
+async function lods(doc: Document, finest: number, budget: number | undefined, id: string): Promise<Levels> {
   const scene = doc.getRoot().getDefaultScene() ?? (doc.getRoot().listScenes()[0] as Scene);
   if (finest < 1) await doc.transform(simplify({ simplifier: MeshoptSimplifier, ratio: finest, error: LOD_ERROR }));
-  const coarser: Document[] = [];
-  for (const ratio of LOD_RATIOS.slice(1)) {
+  const base = triangleCount(doc);
+  const triangles: Record<string, number> = { lod0: base };
+  const coarser: { name: string; doc: Document }[] = [];
+  for (const [i, ratio] of LOD_RATIOS.slice(1).entries()) {
     const clone = cloneDocument(doc);
     await clone.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error: LOD_ERROR }));
-    coarser.push(clone);
+    const name = `lod${i + 1}`;
+    triangles[name] = triangleCount(clone);
+    coarser.push({ name, doc: clone });
+  }
+  let card: CardPart[] | undefined;
+  if (budget !== undefined) {
+    const level = await scatterLevel(doc, base, budget, id);
+    triangles[SCATTER_LEVEL] = level.triangles;
+    card = await cardParts(level.doc);
+    coarser.push({ name: SCATTER_LEVEL, doc: level.doc });
   }
   const wrap = (name: string, children: Node[]): void => {
     const node = doc.createNode(name);
@@ -365,15 +511,271 @@ async function lods(doc: Document, finest: number): Promise<Document> {
     scene.addChild(node);
   };
   wrap('lod0', scene.listChildren());
-  for (const [i, clone] of coarser.entries()) {
+  for (const { name, doc: clone } of coarser) {
     const map = mergeDocuments(doc, clone);
     const merged = map.get(clone.getRoot().getDefaultScene() ?? (clone.getRoot().listScenes()[0] as Scene)) as Scene;
     const children = merged.listChildren();
     for (const child of children) merged.removeChild(child);
-    wrap(`lod${i + 1}`, children);
+    wrap(name, children);
     merged.dispose();
   }
-  return doc;
+  return { names: ['lod0', ...coarser.map((c) => c.name)], triangles, card };
+}
+
+// --- The far ring's card ---------------------------------------------------
+//
+// Beyond `LOOK.cardMetres` a scattered plant is two crossed quads carrying a
+// picture of itself, and this is where the picture is made.
+//
+// It is a render and not a swatch. The plan allowed either: a render of the
+// scatter level from two sides, or the crown's own leaf texture laid on the
+// quads. The swatch was not taken, because a plant's base colour texture is
+// an atlas of bark and leaves and laying it on a quad draws an atlas rather
+// than a tree. So the baker rasterises: the scatter level's own triangles,
+// orthographic, once along north and once along east, sampling each triangle's
+// own base colour texture at its own UVs, with a depth buffer so the near
+// surface wins. Four by four supersampling and a box filter down to
+// `CARD_PIXELS` give the silhouette its soft edge, and a pixel no triangle
+// covered stays transparent, which is what makes the card a plant shape and
+// not a square.
+//
+// Nothing here is Blender and nothing here is a GPU: it is a hundred lines of
+// edge functions, which is what an orthographic render of three thousand
+// triangles actually is. The alternative was a headless renderer in the asset
+// pipeline, which is a dependency and a driver for a 256 pixel picture.
+//
+// The two views go side by side in one image, the view from the south in the
+// left half and the view from the west in the right, so a card is one texture
+// and one draw and the crossed quads take one half each.
+
+/** The card's square, per view. A plant on the far ring is a few dozen pixels tall, so this is generous. */
+const CARD_PIXELS = 256;
+
+/** How many samples a side each card pixel is rasterised from, before the box filter. A look choice. */
+const CARD_SUPERSAMPLE = 4;
+
+/** How big a plant's own textures are decoded to for sampling. Bigger buys nothing at 256 pixels. */
+const CARD_TEXTURE_PIXELS = 512;
+
+/** One triangle soup with its texture, as the rasteriser wants it. */
+interface CardPart {
+  /** Data-frame positions, three floats a vertex, three vertices a triangle. */
+  positions: Float32Array;
+  /** The same vertices' texture coordinates, two floats each. */
+  uvs: Float32Array | undefined;
+  /** The base colour texture as straight RGBA, and its size. */
+  texture: { data: Uint8Array; width: number; height: number } | undefined;
+  /** The material's base colour factor, which multiplies the texture. */
+  factor: readonly number[];
+  /** Below this the fragment is not drawn at all. */
+  cutoff: number;
+}
+
+/**
+ * The triangles of a document, flattened with their textures decoded, ready to
+ * rasterise. Read before the levels are merged, because merging empties the
+ * clone the scatter level was built in.
+ */
+async function cardParts(doc: Document): Promise<CardPart[]> {
+  const decoded = new Map<Texture, CardPart['texture']>();
+  const parts: CardPart[] = [];
+  for (const mesh of doc.getRoot().listMeshes()) {
+    for (const primitive of mesh.listPrimitives()) {
+      if (primitive.getMode() !== Primitive.Mode.TRIANGLES) continue;
+      const position = primitive.getAttribute('POSITION');
+      if (!position) continue;
+      const indices = primitive.getIndices();
+      const count = indices ? indices.getCount() : position.getCount();
+      const positions = new Float32Array(count * 3);
+      const uv = primitive.getAttribute('TEXCOORD_0');
+      const uvs = uv ? new Float32Array(count * 2) : undefined;
+      for (let i = 0; i < count; i++) {
+        const v = indices ? indices.getScalar(i) : i;
+        positions.set(position.getElement(v, [0, 0, 0]), i * 3);
+        if (uv && uvs) uvs.set(uv.getElement(v, [0, 0]), i * 2);
+      }
+      const material = primitive.getMaterial();
+      const source = material?.getBaseColorTexture() ?? undefined;
+      let texture: CardPart['texture'];
+      if (source) {
+        if (!decoded.has(source)) {
+          const image = source.getImage();
+          const raw = image
+            ? await sharp(Buffer.from(image))
+                .resize(CARD_TEXTURE_PIXELS, CARD_TEXTURE_PIXELS, { fit: 'fill' })
+                .ensureAlpha()
+                .raw()
+                .toBuffer()
+            : undefined;
+          decoded.set(source, raw ? { data: new Uint8Array(raw), width: CARD_TEXTURE_PIXELS, height: CARD_TEXTURE_PIXELS } : undefined);
+        }
+        texture = decoded.get(source);
+      }
+      parts.push({
+        positions,
+        uvs,
+        texture,
+        factor: material?.getBaseColorFactor() ?? [1, 1, 1, 1],
+        // A leaf drawn on a transparent quad is dropped where its texture
+        // calls the quad empty, whatever the material's alpha mode says; a
+        // texture with no alpha channel at all reads 255 everywhere and is
+        // unaffected.
+        cutoff: material?.getAlphaMode() === 'MASK' ? (material.getAlphaCutoff() ?? 0.5) : 0.5,
+      });
+    }
+  }
+  return parts;
+}
+
+/** One orthographic view: which data-frame axis runs across the picture, and which runs into it. */
+interface CardView {
+  across: 0 | 1;
+  /** The axis into the picture. The nearer of two surfaces has the smaller value along it. */
+  into: 0 | 1;
+}
+
+/**
+ * Rasterise one view into straight RGBA at `side` pixels square.
+ *
+ * Orthographic, so there is no perspective divide and the barycentric weights
+ * are the edge functions themselves. The picture is `metres` across and
+ * `metres` tall with the plant's foot on the bottom edge and its middle on the
+ * vertical centre line, which is exactly where the card's quad stands in the
+ * scene, so a card is the same size as the plant it replaced.
+ */
+function rasterise(parts: readonly CardPart[], view: CardView, metres: number, side: number): Uint8Array {
+  const out = new Uint8Array(side * side * 4);
+  const depth = new Float32Array(side * side).fill(Infinity);
+  const scale = side / metres;
+  const half = side / 2;
+  for (const part of parts) {
+    const { positions, uvs, texture, factor, cutoff } = part;
+    const sx = [0, 0, 0];
+    const sy = [0, 0, 0];
+    const sz = [0, 0, 0];
+    for (let t = 0, tri = 0; t + 8 < positions.length; t += 9, tri++) {
+      for (let k = 0; k < 3; k++) {
+        sx[k] = (positions[t + k * 3 + view.across] as number) * scale + half;
+        // The image's own y runs down from the top, and the plant's foot is at
+        // z = 0, which is the bottom edge.
+        sy[k] = side - (positions[t + k * 3 + 2] as number) * scale;
+        sz[k] = positions[t + k * 3 + view.into] as number;
+      }
+      const area = ((sx[1] as number) - (sx[0] as number)) * ((sy[2] as number) - (sy[0] as number))
+        - ((sx[2] as number) - (sx[0] as number)) * ((sy[1] as number) - (sy[0] as number));
+      if (area === 0) continue;
+      const x0 = Math.max(0, Math.floor(Math.min(sx[0] as number, sx[1] as number, sx[2] as number)));
+      const x1 = Math.min(side - 1, Math.ceil(Math.max(sx[0] as number, sx[1] as number, sx[2] as number)));
+      const y0 = Math.max(0, Math.floor(Math.min(sy[0] as number, sy[1] as number, sy[2] as number)));
+      const y1 = Math.min(side - 1, Math.ceil(Math.max(sy[0] as number, sy[1] as number, sy[2] as number)));
+      const uvAt = tri * 6;
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const px = x + 0.5;
+          const py = y + 0.5;
+          const w0 = (((sx[1] as number) - px) * ((sy[2] as number) - py) - ((sx[2] as number) - px) * ((sy[1] as number) - py)) / area;
+          const w1 = (((sx[2] as number) - px) * ((sy[0] as number) - py) - ((sx[0] as number) - px) * ((sy[2] as number) - py)) / area;
+          const w2 = 1 - w0 - w1;
+          if (w0 < 0 || w1 < 0 || w2 < 0) continue;
+          const z = w0 * (sz[0] as number) + w1 * (sz[1] as number) + w2 * (sz[2] as number);
+          const at = y * side + x;
+          if (z >= (depth[at] as number)) continue;
+          let r = 255;
+          let g = 255;
+          let b = 255;
+          let a = 255;
+          if (texture && uvs) {
+            const u = w0 * (uvs[uvAt] as number) + w1 * (uvs[uvAt + 2] as number) + w2 * (uvs[uvAt + 4] as number);
+            const v = w0 * (uvs[uvAt + 1] as number) + w1 * (uvs[uvAt + 3] as number) + w2 * (uvs[uvAt + 5] as number);
+            const tx = Math.min(texture.width - 1, Math.max(0, Math.floor((u - Math.floor(u)) * texture.width)));
+            const ty = Math.min(texture.height - 1, Math.max(0, Math.floor((v - Math.floor(v)) * texture.height)));
+            const p = (ty * texture.width + tx) * 4;
+            r = texture.data[p] as number;
+            g = texture.data[p + 1] as number;
+            b = texture.data[p + 2] as number;
+            a = texture.data[p + 3] as number;
+          }
+          if (a / 255 < cutoff) continue;
+          depth[at] = z;
+          out[at * 4] = Math.round(r * (factor[0] as number));
+          out[at * 4 + 1] = Math.round(g * (factor[1] as number));
+          out[at * 4 + 2] = Math.round(b * (factor[2] as number));
+          out[at * 4 + 3] = 255;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * The box filter down to the card's own size, with the colour weighted by
+ * coverage. Averaging an empty pixel's colour in would drag every edge toward
+ * black, which is the one artefact a billboard cannot hide.
+ */
+function downsample(big: Uint8Array, side: number, factor: number): Uint8Array {
+  const small = side / factor;
+  const out = new Uint8Array(small * small * 4);
+  for (let y = 0; y < small; y++) {
+    for (let x = 0; x < small; x++) {
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      let covered = 0;
+      for (let j = 0; j < factor; j++) {
+        for (let i = 0; i < factor; i++) {
+          const p = ((y * factor + j) * side + x * factor + i) * 4;
+          if ((big[p + 3] as number) === 0) continue;
+          r += big[p] as number;
+          g += big[p + 1] as number;
+          b += big[p + 2] as number;
+          covered++;
+        }
+      }
+      if (covered === 0) continue;
+      const at = (y * small + x) * 4;
+      out[at] = Math.round(r / covered);
+      out[at + 1] = Math.round(g / covered);
+      out[at + 2] = Math.round(b / covered);
+      out[at + 3] = Math.round((covered / (factor * factor)) * 255);
+    }
+  }
+  return out;
+}
+
+/**
+ * The card for one plant: the two views side by side in one WebP, and the
+ * metres its square stands for, which is what the viewer scales the quads to.
+ */
+async function bakeCard(parts: readonly CardPart[], size: readonly number[], id: string): Promise<{ image: Uint8Array; metres: number }> {
+  // One square for both views and both axes, so the card keeps the plant's own
+  // proportions and the two quads are the same size as each other.
+  const metres = Math.max(size[0] as number, size[1] as number, size[2] as number);
+  const big = CARD_PIXELS * CARD_SUPERSAMPLE;
+  const views: CardView[] = [
+    // From the south looking north: east runs across, north runs in.
+    { across: 0, into: 1 },
+    // From the west looking east: north runs across, east runs in.
+    { across: 1, into: 0 },
+  ];
+  const halves = views.map((view) => downsample(rasterise(parts, view, metres, big), big, CARD_SUPERSAMPLE));
+  const atlas = new Uint8Array(CARD_PIXELS * 2 * CARD_PIXELS * 4);
+  for (const [k, half] of halves.entries()) {
+    for (let y = 0; y < CARD_PIXELS; y++) {
+      const from = y * CARD_PIXELS * 4;
+      atlas.set(half.subarray(from, from + CARD_PIXELS * 4), (y * CARD_PIXELS * 2 + k * CARD_PIXELS) * 4);
+    }
+  }
+  const image = await sharp(Buffer.from(atlas), { raw: { width: CARD_PIXELS * 2, height: CARD_PIXELS, channels: 4 } })
+    .webp({ quality: 90, alphaQuality: 100 })
+    .toBuffer();
+  let covered = 0;
+  for (let p = 3; p < atlas.length; p += 4) if ((atlas[p] as number) > 0) covered++;
+  console.log(
+    `${id}: card is ${CARD_PIXELS * 2} by ${CARD_PIXELS} px over ${metres.toFixed(2)} m, `
+      + `${((covered / (CARD_PIXELS * CARD_PIXELS * 2)) * 100).toFixed(0)} per cent of it covered, ${(image.byteLength / 1e3).toFixed(0)} kB`,
+  );
+  return { image: new Uint8Array(image), metres };
 }
 
 async function props(): Promise<void> {
@@ -384,6 +786,7 @@ async function props(): Promise<void> {
   }
   await MeshoptSimplifier.ready;
   const entries = (JSON.parse(readFileSync(index, 'utf8')) as { props: PropEntry[] }).props;
+  const budgets = scatterBudgets();
   if (existsSync(PROPS_OUT)) for (const f of readdirSync(PROPS_OUT)) rmSync(join(PROPS_OUT, f), { recursive: true });
   mkdirSync(PROPS_OUT, { recursive: true });
 
@@ -399,6 +802,7 @@ async function props(): Promise<void> {
     let out: Uint8Array | undefined;
     let used = 0;
     let size: [number, number, number] = [0, 0, 0];
+    let levels: Levels = { names: [], triangles: {} };
     for (const px of PROP_SIZES) {
       const doc = await io.read(source);
       dropLoosePrimitives(doc, entry.id);
@@ -428,7 +832,7 @@ async function props(): Promise<void> {
       bake(scene, matrix);
       size = [0, 1, 2].map((i) => Number(((scaled.max[i] as number) - (scaled.min[i] as number)).toFixed(3))) as [number, number, number];
 
-      await lods(doc, entry.decimate_to ?? 1);
+      levels = await lods(doc, entry.decimate_to ?? 1, budgets.get(entry.id), entry.id);
       await doc.transform(
         // The coarse levels came from documents of their own and brought
         // their buffers with them; a GLB may have only one.
@@ -450,14 +854,23 @@ async function props(): Promise<void> {
     }
     const file = `${entry.id}.glb`;
     writeFileSync(join(PROPS_OUT, file), out);
+    let card: WebProp['card'];
+    if (levels.card) {
+      const baked = await bakeCard(levels.card, size, entry.id);
+      const cardFile = `${entry.id}-card.webp`;
+      writeFileSync(join(PROPS_OUT, cardFile), baked.image);
+      card = { file: cardFile, metres: baked.metres };
+    }
     manifest.push({
       ...entry,
       file,
       bytes: out.byteLength,
       sha256: createHash('sha256').update(out).digest('hex'),
       source_sha256: entry.sha256,
-      lods: LOD_RATIOS.map((_, i) => `lod${i}`),
+      lods: levels.names,
+      levels: levels.triangles,
       size,
+      ...(card ? { card } : {}),
     });
     console.log(
       `${entry.id}: ${(sourceBytes / 1e6).toFixed(1)} MB to ${(out.byteLength / 1e6).toFixed(1)} MB, textures at ${used} px, ${size.join(' by ')} m`,

@@ -43,35 +43,62 @@ Branch `stage5/cost`. Owns `scripts/web-assets.ts`, `blender/props.json` (the `s
 
 ### Task Q1: measure and pin
 
-- [ ] Add `apps/web/src/scene/frames.ts`: `measureFrames(seconds = 2): Promise<number>` counting `requestAnimationFrame` calls, exported on the dev handle as `__seked.frames`. A `scripts/frames.md` note (ten lines) says how the number in every commit of this track was taken.
-- [ ] Record the baseline: built and ancient at the five looks, and today at the same, in a table in the commit message and in `docs/superpowers/plans/2026-09-18-stage-5-claims-and-the-runner.md` under this task (the director's numbers above are one stand; these are five).
-- [ ] Commit: "Count the frames the same way every time".
+- [x] Add `apps/web/src/scene/frames.ts`: `measureFrames(seconds = 2): Promise<number>` counting `requestAnimationFrame` calls, exported on the dev handle as `__seked.frames`. A `scripts/frames.md` note (ten lines) says how the number in every commit of this track was taken.
+- [x] Record the baseline: built and ancient at the five looks, and today at the same, in a table in the commit message and in `docs/superpowers/plans/2026-09-18-stage-5-claims-and-the-runner.md` under this task (the director's numbers above are one stand; these are five).
+- [x] Commit: "Count the frames the same way every time".
+
+**The baseline (2026-09-18, Chromium at 1600 by 900 on the RTX 5070 Ti, the
+median of three two-second counts at each stand, `scripts/frames.md`).**
+Triangles are the per-frame total over every pass including the shadow
+cascades, read off `gl.info` with its auto-reset turned off. Taken in a
+browser nobody else was driving; the first run was taken in the session's
+shared one and every number in the heavy states came out about a third low.
+
+| Look | today | built | ancient | built calls | built triangles |
+|---|---|---|---|---|---|
+| dawn | 237.0 | 4.3\* | 4.8\* | 391 | 1,373,214,166 |
+| panorama | 231.5 | 4.3 | 4.8 | 395 | 1,373,214,512 |
+| harbour | 240.0 | 4.7 | 4.8 | 363 | 1,374,477,258 |
+| akhet | 237.5 | 8.2 | 4.6 | 189 | 667,808,171 |
+| night | 239.5 | 7.4 | 7.6 | 179 | 667,346,339 |
+
+\* The first stand measured after a change of state reads 0.6 and 0.7,
+because it carries the shader compilation of everything the new state just
+brought in. The steady rate at that stand is the panorama's, which is the same
+camera load; the compile figure is not the state's cost and is not quoted.
+
+Today is at the display's own 240 Hz at four of the five stands, so those are
+floors and not ceilings. It draws between 0.27 and 1.45 million triangles a
+frame at the same five stands, so the heavy states cost about a thousand times
+the geometry of the light one, and the two stands that run at twice the rest
+(`akhet` and `night`) are the two with half the plateau behind the camera,
+which is the shape of a geometry cost and not of a shading one.
 
 ### Task Q2: a scatter level baked to a budget
 
-- [ ] `blender/props.json`: each plant gains `scatter_to: { triangles: N }`, a look choice with a sentence: island tree 3000, date palm 2500, rooibos bush 600, shrub 600 (a tree seen from across the plateau; the near ones are Q4's). `scripts/web-assets.ts` bakes one more level, `scatter`, for any prop with `scatter_to`: the simplifier run to the ratio that hits the budget with the error bound relaxed (`error: 0.05`, then `0.2` if the budget is still missed; `lockBorder` off), and a line in the console saying the triangles it reached. `props/manifest.json` reports `scatter` in `lods` and the triangle count per level (`levels: { lod0: n, ..., scatter: n }`; `triangles` was always null and goes away).
-- [ ] `Vegetation.tsx`: `partsOf(group, 'scatter')`, falling back to the last of `lods` only when `scatter` is absent, with a `console.warn` naming the prop. The comment at that line is rewritten to say what happened: the coarsest ratio level of the acacia was 169,160 triangles.
-- [ ] Verify: built and ancient at the five looks, in the commit message. Expected: the plants' triangles down from about 125 million to under 4 million; the frame rate within a third of today's.
-- [ ] Commit: "Bake the scattered plants to a triangle budget rather than a ratio".
+- [x] `blender/props.json`: each plant gains `scatter_to: { triangles: N }`, a look choice with a sentence: island tree 3000, date palm 2500, rooibos bush 600, shrub 600 (a tree seen from across the plateau; the near ones are Q4's). `scripts/web-assets.ts` bakes one more level, `scatter`, for any prop with `scatter_to`: the simplifier run to the ratio that hits the budget with the error bound relaxed (`error: 0.05`, then `0.2` if the budget is still missed; `lockBorder` off), and a line in the console saying the triangles it reached. `props/manifest.json` reports `scatter` in `lods` and the triangle count per level (`levels: { lod0: n, ..., scatter: n }`; `triangles` was always null and goes away).
+- [x] `Vegetation.tsx`: `partsOf(group, 'scatter')`, falling back to the last of `lods` only when `scatter` is absent, with a `console.warn` naming the prop. The comment at that line is rewritten to say what happened: the coarsest ratio level of the acacia was 169,160 triangles.
+- [x] Verify: built and ancient at the five looks, in the commit message. Expected: the plants' triangles down from about 125 million to under 4 million; the frame rate within a third of today's.
+- [x] Commit: "Bake the scattered plants to a triangle budget rather than a ratio".
 
 ### Task Q3: the far ring is cards
 
-- [ ] Beyond `LOOK.cardMetres` (a look choice; start at 900 m from the camera) a plant is a cross of two textured quads facing the camera's yaw, the texture baked by `scripts/web-assets.ts` from the plant's own textures at 256 px (a front and a side of the scatter level rendered with `@gltf-transform`'s scene, or, if a render is more than the script should carry, the crown's leaf texture on two quads scaled to the plant's `size` from the manifest). Which the baker does is the track's call and is said in the file. Near and far are two instanced meshes per plant kind with a shared placement list and a hysteresis band of 60 m (`lod.ts`'s pattern), so a slow move does not flicker a tree between mesh and card.
-- [ ] The cards dissolve with everything else (stage 4's fade) and are clipped by the section like the meshes.
-- [ ] Verify at `panorama` and `dawn`, where most of the plants are far: the number, and a screenshot at each with the cards on and, for comparison, off.
-- [ ] Commit: "Draw the far plants as cards, with a band so a tree does not flicker".
+- [x] Beyond `LOOK.cardMetres` (a look choice; start at 900 m from the camera) a plant is a cross of two textured quads facing the camera's yaw, the texture baked by `scripts/web-assets.ts` from the plant's own textures at 256 px (a front and a side of the scatter level rendered with `@gltf-transform`'s scene, or, if a render is more than the script should carry, the crown's leaf texture on two quads scaled to the plant's `size` from the manifest). Which the baker does is the track's call and is said in the file. Near and far are two instanced meshes per plant kind with a shared placement list and a hysteresis band of 60 m (`lod.ts`'s pattern), so a slow move does not flicker a tree between mesh and card.
+- [x] The cards dissolve with everything else (stage 4's fade) and are clipped by the section like the meshes.
+- [x] Verify at `panorama` and `dawn`, where most of the plants are far: the number, and a screenshot at each with the cards on and, for comparison, off.
+- [x] Commit: "Draw the far plants as cards, with a band so a tree does not flicker".
 
 ### Task Q4: shadows near, none far
 
-- [ ] Only the near instanced mesh of each plant casts shadows, and only when its instance is inside the first cascade's far plane (`LOOK.shadows.maxFar` split by CSM's `practical` mode; read `csm.breaks` off the cascades rather than typing a metre figure). The far cards never cast. The grass never did.
-- [ ] Verify: the number at the five looks; a screenshot at `harbour` in the ancient state at 16:00 showing the near palms' shadows still on the ground.
-- [ ] Commit: "Cast the plants' shadows near and nowhere else".
+- [x] Only the near instanced mesh of each plant casts shadows, and only when its instance is inside the first cascade's far plane (`LOOK.shadows.maxFar` split by CSM's `practical` mode; read `csm.breaks` off the cascades rather than typing a metre figure). The far cards never cast. The grass never did.
+- [x] Verify: the number at the five looks; a screenshot at `harbour` in the ancient state at 16:00 showing the near palms' shadows still on the ground.
+- [x] Commit: "Cast the plants' shadows near and nowhere else".
 
 ### Task Q5: the water's flat edge, and the film's rate
 
-- [ ] From the night stand (`night` look, the rollback film's camera) the flood plain's water shows a hard flat edge at the left horizon. Find why (the plane's extent against the terrain's, the far clip, or the water's own fade) and fix it in `Water.tsx` so the edge is under the horizon haze or inside the terrain; a screenshot from that stand at night, before and after.
-- [ ] Record "The tour, the first two shots" at 1080p and note the frames a second of the run in the commit message (it was about 4 in the heavy states on 2026-09-17; the run is bound by the same geometry).
-- [ ] Commit: "Put the water's edge under the horizon, and time the film".
+- [x] From the night stand (`night` look, the rollback film's camera) the flood plain's water shows a hard flat edge at the left horizon. Find why (the plane's extent against the terrain's, the far clip, or the water's own fade) and fix it in `Water.tsx` so the edge is under the horizon haze or inside the terrain; a screenshot from that stand at night, before and after.
+- [x] Record "The tour, the first two shots" at 1080p and note the frames a second of the run in the commit message (it was about 4 in the heavy states on 2026-09-17; the run is bound by the same geometry).
+- [x] Commit: "Put the water's edge under the horizon, and time the film".
 
 ---
 

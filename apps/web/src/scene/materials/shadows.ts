@@ -51,6 +51,25 @@ export function forgetCascades(material: Material): void {
   materials.delete(material);
 }
 
+/**
+ * Where each cascade gives way to the next, in metres from the camera, or
+ * nothing while there are no cascades.
+ *
+ * Track Q reads this so the scattered plants can cast into the first cascade
+ * and no further: past it a plant's shadow is drawn at a texel a metre or
+ * worse and is not a shadow of anything, while the plant is still paid for in
+ * every pass. CSM keeps its breaks as shares of its own far plane, so the
+ * metres are worked out here rather than typed anywhere.
+ */
+export function cascadeBreaks(): number[] | undefined {
+  if (!cascades) return undefined;
+  // CSM types its camera as the base `Camera`, and splits it by the
+  // perspective far plane it actually holds, which is the scene's one camera.
+  const camera = cascades.camera as { far?: number };
+  const far = Math.min(camera.far ?? cascades.maxFar, cascades.maxFar);
+  return cascades.breaks.map((share) => share * far);
+}
+
 /** The scene's cascaded shadow maps, or undefined while there are none. */
 export function setCascades(next: CSM | undefined): void {
   cascades = next;
