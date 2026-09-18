@@ -81,7 +81,12 @@ export type ProposedClaim = z.infer<typeof ProposedClaimSchema>;
 /** What the runner reads off a reply: the parsed answer and what the call cost. */
 export interface ProposalReply {
   parsed_output: unknown;
-  usage: { input_tokens: number; output_tokens: number };
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_creation_input_tokens?: number | null;
+    cache_read_input_tokens?: number | null;
+  };
 }
 
 /**
@@ -96,8 +101,18 @@ export interface RunnerClient {
 }
 
 export interface TokenUsage {
+  /** Uncached input. Small here, because the context is cached and the prose is short. */
   input: number;
   output: number;
+  /**
+   * Input written to the cache, billed at about 1.25 times the input rate. The
+   * context is tens of thousands of tokens and the prose beside it is a few
+   * hundred, so leaving these two out of the count understates what a proposal
+   * cost by a factor of fifty, which is the opposite of useful.
+   */
+  cacheWrite: number;
+  /** Input served from the cache, billed at about a tenth of the input rate. */
+  cacheRead: number;
 }
 
 /** One round: what the model answered, what it assembled into, and what was wrong with it. */
@@ -332,7 +347,7 @@ export async function proposeClaim(
 ): Promise<Proposal> {
   const id = options.id ?? nextProposedId([...context.claimIds, ...(options.taken ?? [])]);
   const rounds = (options.repairs ?? 1) + 1;
-  const usage: TokenUsage = { input: 0, output: 0 };
+  const usage: TokenUsage = { input: 0, output: 0, cacheWrite: 0, cacheRead: 0 };
   const attempts: ProposalAttempt[] = [];
   const messages: Anthropic.MessageParam[] = [{ role: 'user', content: firstTurn(prose) }];
 
@@ -351,6 +366,8 @@ export async function proposeClaim(
     });
     usage.input += reply.usage.input_tokens;
     usage.output += reply.usage.output_tokens;
+    usage.cacheWrite += reply.usage.cache_creation_input_tokens ?? 0;
+    usage.cacheRead += reply.usage.cache_read_input_tokens ?? 0;
 
     say('checking');
     const answered = ProposedClaimSchema.safeParse(reply.parsed_output);

@@ -100,7 +100,7 @@ describe('putting prose to the model', () => {
     expect(proposal.claim.overlay).toEqual({ type: 'ghost-profile', params: { slope: 'atan(4 / pi)' } });
     expect(proposal.result.fits).toBe(true);
     expect(proposal.result.comparisons[0]?.value).toBeCloseTo(2 * Math.PI, 2);
-    expect(proposal.usage).toEqual({ input: 1001, output: 101 });
+    expect(proposal.usage).toEqual({ input: 1001, output: 101, cacheWrite: 0, cacheRead: 0 });
   });
 
   it('asks the model the way the project says to ask it', async () => {
@@ -124,7 +124,7 @@ describe('putting prose to the model', () => {
 
     expect(client.calls).toHaveLength(2);
     expect(proposal.repairs).toBe(1);
-    expect(proposal.usage).toEqual({ input: 2003, output: 203 });
+    expect(proposal.usage).toEqual({ input: 2003, output: 203, cacheWrite: 0, cacheRead: 0 });
 
     const second = client.calls[1] as Params;
     const turns = second.messages;
@@ -148,7 +148,7 @@ describe('putting prose to the model', () => {
     expect(failure.attempts[0]?.errors.join(' ')).toContain('g1.base.circumference');
     expect(failure.attempts[1]?.errors.join(' ')).toContain('g1.height.imagined');
     expect(failure.claim?.title).toBe('The circle in the stone');
-    expect(failure.usage).toEqual({ input: 2003, output: 203 });
+    expect(failure.usage).toEqual({ input: 2003, output: 203, cacheWrite: 0, cacheRead: 0 });
     expect(failure.message).toContain('did not check out after 2 attempts');
   });
 

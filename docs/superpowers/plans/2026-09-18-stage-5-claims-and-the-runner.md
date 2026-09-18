@@ -171,7 +171,7 @@ Branch `stage5/runner`. Owns `packages/runner/` and `scripts/claim.ts`.
 ### Task T4: the CLI
 
 - [x] `scripts/claim.ts` and `"claim": "tsx scripts/claim.ts"` in the root `package.json`: `pnpm claim -- "prose"` or `pnpm claim -- --example 2`. It builds the context from the loader (Node, `@seked/data`), reads the key from the environment or `~/.seked/keys.env`, calls `proposeClaim`, writes `build/claims/P<n>.yaml` with a header comment saying the date, the model and the prose, prints the dossier's row for it (the dossier renderer on a one-claim list) and the token usage, and exits non-zero on `ProposalFailed` with the errors. It never writes under `data/`.
-- [ ] Run it once for real on example 1 and paste the printed row into the commit message. (2026-09-18: not done. No `ANTHROPIC_API_KEY` in the environment and none in `~/.seked/keys.env`, which holds only `SKETCHFAB_TOKEN` and `MESHY_API_KEY`, and there is no `ant` profile on this machine. The CLI was run to the point where it asks for the key and stops, and everything behind the key is covered by tests with a fake client. It wants one real run before the stage is closed.)
+- [x] Run it once for real on example 1 and paste the printed row into the commit message. (Done 2026-09-18, once there was a key on the account. Examples 1 and 2 both went to the model and both came back graded; the rows are in the commit that closed this box. Doing it found the CLI under-reporting its own cost by about fifty times, counting only uncached input when the whole 28,882-token context is cached, which is now fixed.)
 - [x] Commit: "A claim from the shell, into build/ and never into data/".
 
 ---

@@ -96,7 +96,7 @@ const PROPOSAL: Proposal = {
   normalised: NORMALISED,
   result: RESULT,
   repairs: 0,
-  usage: { input: 12345, output: 678 },
+  usage: { input: 12345, output: 678, cacheWrite: 0, cacheRead: 0 },
 };
 
 /** A client the fake runner is handed and never calls. Nothing here has a key. */
@@ -159,7 +159,7 @@ describe('putting a claim to the model', () => {
     );
 
     expect(stages).toEqual(['asking', 'checking']);
-    expect(done.usage).toEqual({ input: 12345, output: 678 });
+    expect(done.usage).toEqual({ input: 12345, output: 678, cacheWrite: 0, cacheRead: 0 });
     const view = useView.getState();
     expect(view.proposed.map((c) => c.id)).toEqual(['P1']);
     expect(view.claim).toBe('P1');
@@ -186,7 +186,7 @@ describe('putting a claim to the model', () => {
           errors: ['g1.base.souths is not a key in the environment', 'the formula does not parse'],
         },
       ],
-      { input: 12345, output: 678 },
+      { input: 12345, output: 678, cacheWrite: 0, cacheRead: 0 },
     );
     const proposeClaim = vi.fn().mockRejectedValue(failed);
 
@@ -199,7 +199,7 @@ describe('putting a claim to the model', () => {
   it('says a single error as the error itself, and a refused key as a refused key', () => {
     const one = new ProposalFailed(
       [{ answer: null, claim: null, errors: ['alnitak.altitude needs an epoch'] }],
-      { input: 1, output: 1 },
+      { input: 1, output: 1, cacheWrite: 0, cacheRead: 0 },
     );
     expect(failureWords(one)).toBe("The model's claim did not hold up: alnitak.altitude needs an epoch");
     // Anything else, however much it looks like one, is not a failed proposal.

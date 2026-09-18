@@ -35,6 +35,7 @@ import {
   writeProposal,
   type Proposal,
   type RunnerExample,
+  type TokenUsage,
 } from '@seked/runner';
 
 export type Request =
@@ -123,6 +124,21 @@ export function header(prose: string, example: RunnerExample | undefined, propos
 
 const tokens = (n: number): string => n.toLocaleString('en-US');
 
+/**
+ * What the call actually cost, in tokens. The context is tens of thousands of
+ * tokens and is cached, so the uncached input is a couple of hundred and
+ * reporting only that understates the bill by about fifty times. The cache is
+ * named separately because it is priced separately: a write is about 1.25
+ * times the input rate, a read about a tenth of it.
+ */
+function costLine(usage: TokenUsage): string {
+  const parts = [`${tokens(usage.input)} tokens in`];
+  if (usage.cacheWrite > 0) parts.push(`${tokens(usage.cacheWrite)} written to the cache`);
+  if (usage.cacheRead > 0) parts.push(`${tokens(usage.cacheRead)} read from it`);
+  parts.push(`${tokens(usage.output)} out`);
+  return parts.join(', ');
+}
+
 async function main(): Promise<number> {
   const request = parse(process.argv.slice(2));
   if (request.kind === 'examples') {
@@ -162,7 +178,7 @@ async function main(): Promise<number> {
     console.log(`wrote ${path}`);
     console.log(
       `${proposal.repairs === 0 ? 'one call' : `${proposal.repairs + 1} calls, one of them a repair`}: ` +
-        `${tokens(proposal.usage.input)} tokens in, ${tokens(proposal.usage.output)} out`,
+        costLine(proposal.usage),
     );
     return 0;
   } catch (e) {
@@ -172,7 +188,7 @@ async function main(): Promise<number> {
         console.error(`attempt ${i + 1}${attempt.claim ? `, titled "${attempt.claim.title}"` : ', which did not assemble into a claim'}:`);
         for (const error of attempt.errors) console.error(`  - ${error}`);
       });
-      console.error(`\n${tokens(e.usage.input)} tokens in, ${tokens(e.usage.output)} out. Nothing was written.`);
+      console.error(`\n${costLine(e.usage)}. Nothing was written.`);
       return 1;
     }
     throw e;

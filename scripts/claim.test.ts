@@ -95,7 +95,7 @@ describe('the header above a proposal', () => {
     normalised: normaliseClaim(file, 'P1.yaml'),
     result: evaluateClaim(normaliseClaim(file, 'P1.yaml'), env),
     repairs: 0,
-    usage: { input: 1, output: 1 },
+    usage: { input: 1, output: 1, cacheWrite: 0, cacheRead: 0 },
   } as Proposal;
 
   it('says the date, the model, and that nobody has read it', () => {
