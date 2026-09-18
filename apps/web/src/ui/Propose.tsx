@@ -1,19 +1,37 @@
 /**
  * The Propose drawer: somebody's words in, a claim the evaluator grades out.
  *
- * It asks for the reader's own key first and says plainly where that key goes,
- * which is the whole of this first part. The field the prose goes in, and the
- * runner behind it, come next.
+ * This is the one place in the viewer where a reader can put a thing they have
+ * read in a book to the model rather than reading a claim somebody else filed.
+ * It asks for their own key first and says plainly where that key goes, then
+ * takes prose, hands it to the runner, and puts what comes back in the store
+ * beside the filed claims: a row in the Claims drawer, a detail pane, an
+ * overlay on the plateau, all of it drawn in the style reserved for a claim
+ * nobody has checked.
  *
- * Nothing here will ever write into `data/claims/`, and there is no button
- * that would. A proposal is downloaded as a file and moved in by hand after a
- * person has read it against its sources, which is the whole of the difference
- * between a proposed claim and a filed one.
+ * Nothing here writes into `data/claims/`, and there is no button that would.
+ * A proposal is downloaded as a file and moved in by hand after a person has
+ * read it against its sources, which is the whole of the difference between a
+ * proposed claim and a filed one.
  *
  * The work is `../runner`; this file is the form in front of it.
  */
 import { useState } from 'react';
-import { forgetReaderKey, readerKey, setReaderKey } from '../runner';
+import type { ClaimFile } from '@seked/claims/browser';
+import {
+  EXAMPLES,
+  downloadClaim,
+  failedProposal,
+  failureWords,
+  forgetReaderKey,
+  putToModel,
+  readerKey,
+  setReaderKey,
+  type Proposed,
+  type Stage,
+} from '../runner';
+import { useView } from '../store';
+import { useUi } from './ui';
 
 /** A key's tail, for saying one is held without putting it on the screen. */
 function tail(key: string): string {
@@ -23,6 +41,17 @@ function tail(key: string): string {
 export function Propose(): React.JSX.Element {
   const [key, setKey] = useState(() => readerKey());
   const [typed, setTyped] = useState('');
+  const [prose, setProse] = useState('');
+  const [stage, setStage] = useState<Stage | null>(null);
+  const [done, setDone] = useState<Proposed | null>(null);
+  const [trouble, setTrouble] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState<ClaimFile | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  const openDrawer = useUi((s) => s.open);
+  const selectClaim = useView((s) => s.setClaim);
+  const dropProposed = useView((s) => s.dropProposed);
+  const running = stage !== null;
 
   const keep = (): void => {
     setReaderKey(typed);
@@ -33,6 +62,25 @@ export function Propose(): React.JSX.Element {
   const forget = (): void => {
     forgetReaderKey();
     setKey(null);
+  };
+
+  const ask = async (words: string): Promise<void> => {
+    setProse(words);
+    setDone(null);
+    setTrouble(null);
+    setAttempt(null);
+    setErrors([]);
+    setStage('asking');
+    try {
+      setDone(await putToModel(words, setStage));
+    } catch (raised) {
+      const failed = failedProposal(raised);
+      setTrouble(failureWords(raised));
+      setErrors(failed?.errors ?? []);
+      setAttempt(failed?.claim ?? null);
+    } finally {
+      setStage(null);
+    }
   };
 
   if (key === null) {
@@ -76,18 +124,125 @@ export function Propose(): React.JSX.Element {
   }
 
   return (
-    <section className="block">
-      <h2>Put a claim to the model</h2>
-      <p className="note">
-        The field the claim goes in is next. When it is here you will be able to put a claim in your own words to the model, which
-        turns it into a claim file the same evaluator grades every filed claim with, and see it drawn beside them.
-      </p>
-      <p className="note">
-        The key {tail(key)} is held in this browser.{' '}
-        <button type="button" className="link" onClick={forget}>
-          forget
-        </button>
-      </p>
-    </section>
+    <>
+      <section className="block">
+        <h2>Put a claim to the model</h2>
+        <textarea
+          className="propose-prose"
+          rows={6}
+          placeholder="Say what the claim is, in the words you read it in."
+          value={prose}
+          disabled={running}
+          onChange={(e) => setProse(e.target.value)}
+        />
+        <p className="propose-buttons">
+          <button type="button" className="step is-primary" disabled={running || prose.trim() === ''} onClick={() => void ask(prose)}>
+            Put it to the model
+          </button>
+          {running && <span className="propose-stage">{stage}</span>}
+        </p>
+        <p className="note">
+          It comes back as a claim file: a formula over the measurements, a target, a tolerance and the choices it had to make.
+          The same evaluator that grades every filed claim grades it, and it is drawn on the plateau like the rest, dashed,
+          because nobody has read it yet.
+        </p>
+      </section>
+
+      {EXAMPLES.length > 0 && (
+        <section className="block">
+          <h2>Or something a proponent says</h2>
+          <ul className="propose-examples">
+            {EXAMPLES.map((example, index) => (
+              <li key={example.label ?? index}>
+                <button type="button" className="propose-example" disabled={running} onClick={() => void ask(example.prose)}>
+                  <span className="propose-example-label">{example.label ?? `Example ${index + 1}`}</span>
+                  {example.note && <span className="propose-example-note">{example.note}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {done && (
+        <section className="block">
+          <h2>What came back</h2>
+          <p className="propose-outcome">
+            <span className="claim-id num">{done.claim.id}</span> {done.claim.title}
+          </p>
+          <p className="note">
+            {done.repairs > 0
+              ? 'The first answer named something that is not in the database, so it was put back once with the errors.'
+              : 'It parsed and evaluated first time.'}{' '}
+            It read <span className="num">{done.usage.input.toLocaleString()}</span> tokens and wrote{' '}
+            <span className="num">{done.usage.output.toLocaleString()}</span>.
+          </p>
+          <p className="propose-buttons">
+            <button
+              type="button"
+              className="step"
+              onClick={() => {
+                selectClaim(done.claim.id);
+                openDrawer('claims');
+              }}
+            >
+              Read it in Claims
+            </button>
+            <button type="button" className="link" onClick={() => downloadClaim(done.file)}>
+              Download as YAML
+            </button>
+            <button
+              type="button"
+              className="link"
+              onClick={() => {
+                dropProposed(done.claim.id);
+                setDone(null);
+              }}
+            >
+              Throw it away
+            </button>
+          </p>
+          <p className="note">
+            The file is the one the shell would have written, under <code>build/claims/</code>. Read it against its sources and
+            move it into <code>data/claims/</code> yourself if it belongs there. Nothing here does that for you, and a proposal is
+            gone when you reload.
+          </p>
+        </section>
+      )}
+
+      {trouble && (
+        <section className="block">
+          <h2>It did not hold up</h2>
+          <p className="note propose-trouble">{trouble}</p>
+          {errors.length > 1 && (
+            <ul className="propose-errors">
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          )}
+          {attempt && (
+            <>
+              <p className="note">The model's last attempt, as it stood when it was given up on:</p>
+              <pre className="propose-attempt">{JSON.stringify(attempt, null, 2)}</pre>
+            </>
+          )}
+          <p className="propose-buttons">
+            <button type="button" className="step" disabled={running || prose.trim() === ''} onClick={() => void ask(prose)}>
+              Try again
+            </button>
+          </p>
+        </section>
+      )}
+
+      <section className="block">
+        <p className="note">
+          The key {tail(key)} is held in this browser.{' '}
+          <button type="button" className="link" onClick={forget}>
+            forget
+          </button>
+        </p>
+      </section>
+    </>
   );
 }

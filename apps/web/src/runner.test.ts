@@ -1,9 +1,28 @@
 /**
- * Where the reader's key is kept. Nothing here touches the network and nothing
- * here carries a real key: the one below is a string typed for the test.
+ * The propose drawer's work, driven by a fake client and a fake runner.
+ *
+ * Nothing here touches the network and nothing here carries a real key: the
+ * one below is a string typed for the test. The runner's own parts are
+ * arguments for the same reason its client is, so the drawer can be driven
+ * without the model on the other end of it.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { KEY_NAME, forgetReaderKey, readerKey, setReaderKey } from './runner';
+import type AnthropicClient from '@anthropic-ai/sdk';
+import type { ClaimFile } from '@seked/claims/browser';
+import {
+  KEY_NAME,
+  claimYaml,
+  failureWords,
+  forgetReaderKey,
+  proposedPath,
+  putToModel,
+  readerKey,
+  setReaderKey,
+  type Proposal,
+  type RunnerContext,
+  type Stage,
+} from './runner';
+import { useView } from './store';
 
 /** Local storage as a browser would have it, since vitest runs in Node. */
 function fakeStorage(): Storage {
@@ -20,8 +39,41 @@ function fakeStorage(): Storage {
   } as Storage;
 }
 
+/**
+ * A claim file of the shape the model is asked for. The numbers are C2's, so
+ * the file is a plausible one rather than a placeholder, but nothing here is
+ * evaluated: the fake runner stands in for the evaluator as well.
+ */
+const FILE: ClaimFile = {
+  id: 'P1',
+  title: 'The King’s Chamber south shaft points at Orion’s belt',
+  group: 'sky',
+  summary: 'The south shaft of the King’s Chamber is said to point at Alnitak at its culmination in 2450 BCE.',
+  status: 'computed',
+  epoch: -2449,
+  comparisons: [
+    { label: 'South shaft against Alnitak', formula: 'kc.shaft.south.angle', target: 'alnitak.altitude', unit: 'deg', tolerance_pct: 0.5 },
+  ],
+  tolerance_pct: 0.5,
+  free_choices: ['The epoch is the proponent’s, not the survey’s.'],
+  overlay: { type: 'shaft-rays', params: { shafts: ['kc.south'] } },
+  sources: { for: ['hancock1995'], context: [], against: [] },
+  origin: 'proposed',
+  prose: 'The shafts in the Great Pyramid point at Orion’s belt.',
+};
+
+const RESULT = { id: 'P1', status: 'computed', comparisons: [], fits: true } as unknown as Proposal['result'];
+
+const PROPOSAL: Proposal = { claim: FILE, result: RESULT, repairs: 0, usage: { input: 12345, output: 678 } };
+
+/** A client the fake runner is handed and never calls. Nothing here has a key. */
+const fakeClient = { messages: { parse: vi.fn(), countTokens: vi.fn() } } as unknown as AnthropicClient;
+
+const context: RunnerContext = { system: 'the grammar, the keys and the rules' };
+
 beforeEach(() => {
   vi.stubGlobal('localStorage', fakeStorage());
+  useView.setState({ proposed: [], claim: null });
 });
 
 afterEach(() => {
@@ -47,5 +99,97 @@ describe('the reader’s key', () => {
     vi.stubGlobal('localStorage', undefined);
     expect(readerKey()).toBeNull();
     expect(() => setReaderKey('a-key')).not.toThrow();
+  });
+});
+
+describe('putting a claim to the model', () => {
+  it('puts what comes back in the store and opens it', async () => {
+    const stages: Stage[] = [];
+    const proposeClaim = vi.fn(async (prose, of, client) => {
+      expect(prose).toBe('The shafts in the Great Pyramid point at Orion’s belt.');
+      expect(of).toBe(context);
+      expect(client).toBe(fakeClient);
+      return PROPOSAL;
+    });
+
+    const done = await putToModel(
+      '  The shafts in the Great Pyramid point at Orion’s belt.  ',
+      (stage) => stages.push(stage),
+      { client: fakeClient, context, proposeClaim },
+    );
+
+    expect(stages[0]).toBe('asking');
+    expect(done.usage).toEqual({ input: 12345, output: 678 });
+    const view = useView.getState();
+    expect(view.proposed.map((c) => c.id)).toEqual(['P1']);
+    expect(view.claim).toBe('P1');
+    // The shorthand is normalised the way a filed claim's is, and the file it
+    // would be written to is under build/, never under data/.
+    expect(view.proposed[0]?.comparisons).toHaveLength(1);
+    expect(view.proposed[0]?.file).toBe('build/claims/P1.yaml');
+    expect(view.proposed[0]?.origin).toBe('proposed');
+  });
+
+  it('will not ask with nothing to ask about, or with no key', async () => {
+    const proposeClaim = vi.fn();
+    await expect(putToModel('   ', () => {}, { client: fakeClient, context, proposeClaim })).rejects.toThrow(/Say what the claim is/);
+    await expect(putToModel('a claim', () => {}, { context, proposeClaim })).rejects.toThrow(/key/);
+    expect(proposeClaim).not.toHaveBeenCalled();
+  });
+
+  it('leaves the store alone when the proposal fails, and says why in plain words', async () => {
+    const failed = Object.assign(new Error('the claim would not evaluate'), {
+      errors: ['g1.base.souths is not a key in the environment', 'the formula does not parse'],
+      claim: FILE,
+    });
+    const proposeClaim = vi.fn().mockRejectedValue(failed);
+
+    await expect(putToModel('a claim', () => {}, { client: fakeClient, context, proposeClaim })).rejects.toBe(failed);
+    expect(useView.getState().proposed).toHaveLength(0);
+    expect(useView.getState().claim).toBeNull();
+    expect(failureWords(failed)).toBe("The model's claim did not hold up on 2 counts.");
+  });
+
+  it('says a single error as the error itself, and a refused key as a refused key', () => {
+    expect(failureWords(Object.assign(new Error('no'), { errors: ['alnitak.altitude needs an epoch'] }))).toBe(
+      "The model's claim did not hold up: alnitak.altitude needs an epoch",
+    );
+    expect(failureWords(new Error('401 authentication_error'))).toMatch(/key was refused/);
+    expect(failureWords(new Error('429 rate_limit_error'))).toMatch(/rate limiting/);
+    expect(failureWords(new Error('the network went away'))).toBe('the network went away');
+  });
+});
+
+describe('the file the reader downloads', () => {
+  const yaml = claimYaml(FILE, new Date('2026-09-18T00:00:00Z'));
+
+  it('says where it came from before it says anything else', () => {
+    const lines = yaml.split('\n');
+    expect(lines[0]).toBe('# Proposed by the Seked claims runner on 2026-09-18 with claude-opus-5.');
+    expect(lines[1]).toContain('The shafts in the Great Pyramid point at Orion');
+    expect(yaml).toContain('move it into data/claims/ by hand');
+  });
+
+  it('carries the claim’s own keys, the nested ones included', () => {
+    expect(yaml).toContain('id: P1');
+    expect(yaml).toContain('group: sky');
+    expect(yaml).toContain('epoch: -2449');
+    expect(yaml).toContain('origin: proposed');
+    expect(yaml).toContain('  - label:');
+    expect(yaml).toContain('    formula: kc.shaft.south.angle');
+    expect(yaml).toContain('  type: shaft-rays');
+    expect(yaml).toContain('  context: []');
+  });
+
+  it('quotes what YAML would otherwise read as something else, and leaves plain words alone', () => {
+    const odd = claimYaml({ ...FILE, title: 'yes', notes: 'a: b', summary: 'plain words' }, new Date('2026-09-18T00:00:00Z'));
+    expect(odd).toContain("title: 'yes'");
+    expect(odd).toContain("notes: 'a: b'");
+    expect(odd).toContain('summary: plain words');
+  });
+
+  it('is written under build, never under data', () => {
+    expect(proposedPath('P7')).toBe('build/claims/P7.yaml');
+    expect(proposedPath('P7')).not.toContain('data/');
   });
 });

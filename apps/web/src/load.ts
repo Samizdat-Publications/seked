@@ -4,6 +4,7 @@
  */
 import { setDefaultStars } from '@seked/sky/browser';
 import type { SekedBundle } from './bundle';
+import { holdBundle } from './runner';
 
 export interface LoadedBundle {
   bundle: SekedBundle;
@@ -38,5 +39,8 @@ export async function loadBundle(): Promise<LoadedBundle> {
   }
   // Sky claims read their stars from here rather than from a file.
   setDefaultStars(bundle.stars);
+  // The claims runner builds the model's context out of this same bundle, so
+  // the numbers it is told about are the numbers the scene is drawn from.
+  holdBundle(bundle);
   return { bundle, heights };
 }
