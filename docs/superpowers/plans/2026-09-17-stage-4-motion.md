@@ -63,8 +63,8 @@ Branch `stage4/engine`. Owns `apps/web/src/motion/ease.ts`, `motion/path.ts`, `m
 
 ### Task M1: easing and keys
 
-- [ ] `motion/ease.ts`: `ease(kind, t)` for the four kinds (`inOut` is the smoothstep `t*t*(3-2t)`; `in` and `out` are its halves; `linear` is `t`), and `sample<T>(keys: Key<T>[], t: number, lerp: (a: T, b: T, u: number) => T): T`: before the first key hold its value, after the last hold that, between two keys ease with the later key's `ease` (default `inOut`). Lerps for a number, a `Moment` (day and hour separately, the hour the short way round a 24 hour circle only when the day also changes), a `CameraView` (position and target separately), and an angle in degrees the short way round (for `lst`). Tests: hold before and after, the midpoint of `inOut` is the midpoint, an lst from 350 to 10 passes through 0 and not 180.
-- [ ] Commit: "Ease between keys, the sidereal time the short way round".
+- [x] `motion/ease.ts`: `ease(kind, t)` for the four kinds (`inOut` is the smoothstep `t*t*(3-2t)`; `in` and `out` are its halves; `linear` is `t`), and `sample<T>(keys: Key<T>[], t: number, lerp: (a: T, b: T, u: number) => T): T`: before the first key hold its value, after the last hold that, between two keys ease with the later key's `ease` (default `inOut`). Lerps for a number, a `Moment` (day and hour separately, the hour the short way round a 24 hour circle only when the day also changes), a `CameraView` (position and target separately), and an angle in degrees the short way round (for `lst`). Tests: hold before and after, the midpoint of `inOut` is the midpoint, an lst from 350 to 10 passes through 0 and not 180.
+- [x] Commit: "Ease between keys, the sidereal time the short way round".
 
 ### Task M2: camera paths that clear the ground
 
