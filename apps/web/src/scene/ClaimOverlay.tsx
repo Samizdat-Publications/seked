@@ -221,6 +221,16 @@ const along = (from: readonly number[], direction: readonly number[], distance: 
 const onDome = (direction: readonly number[], radius = DOME_RADIUS): Point3 => along([0, 0, 0], direction, radius);
 
 /**
+ * How far up its own ray a shaft's or a passage's label stands, in metres. A
+ * little over a pyramid's height, so the label reads against the monument the
+ * ray leaves rather than against empty sky. It used to be a fraction of the
+ * dome's nine kilometres, which put it five hundred metres up and out of the
+ * top of the frame whenever the camera framed the pyramid; the tour's fifth
+ * shot at 720p is where that showed.
+ */
+const RAY_LABEL_M = 170;
+
+/**
  * How much of itself the occluded pass keeps, and how much of itself a
  * proposed claim keeps. Half rather than a third: most of what an overlay
  * draws is buried, so a third put the ghost Earth's graticule and the
@@ -386,7 +396,7 @@ function ShaftRays({ spec }: { spec: ShaftRaysSpec }): React.JSX.Element {
           <Ray points={[ray.from, along(ray.from, ray.direction, DOME_RADIUS)]} colour={ray.colour} />
           <Note
             text={`${ray.label} ${formatDms(ray.angleDeg)}`}
-            at={along(ray.from, ray.direction, DOME_RADIUS * 0.055)}
+            at={along(ray.from, ray.direction, RAY_LABEL_M)}
             offset={[0, 26 + i * 22]}
             colour={ray.colour}
           />
@@ -408,7 +418,7 @@ function PassageRay({ spec }: { spec: PassageRaySpec }): React.JSX.Element {
       <Ray points={[spec.from, along(spec.from, spec.direction, DOME_RADIUS)]} colour={spec.colour} />
       <Note
         text={`descending passage ${formatDms(spec.angleDeg)}`}
-        at={along(spec.from, spec.direction, DOME_RADIUS * 0.06)}
+        at={along(spec.from, spec.direction, RAY_LABEL_M)}
         offset={[0, 26]}
         colour={spec.colour}
       />

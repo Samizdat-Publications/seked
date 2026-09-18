@@ -24,6 +24,25 @@
  * frame the reader drags the clock, so proportional digits would make the
  * whole line breathe. Setting every digit on the widest digit's advance is
  * what tabular numerals are, and it is a dozen lines here.
+ *
+ * **A label is in a film, and that is why it is a sprite.** A film is cut
+ * from the canvas's own drawing buffer, so anything drawn as HTML over the
+ * canvas, the way `ui/HoverTag.tsx` is, is simply not in the file. A label
+ * here is a canvas texture on a sprite inside the scene, so it goes through
+ * the post chain and into every recorded frame with everything else, and the
+ * stepped clock has nothing to do for it. Checked by recording the tour's
+ * fourth and fifth shots at 1280 by 720 and reading the frames: A4's three
+ * diagonals and C2's four shafts come out named, at the size the screen
+ * gives them, with their leaders. Nothing is drawn twice for a film.
+ *
+ * That check is also why the offsets are pixels. A sprite's size here is a
+ * fixed number of CSS pixels of `state.size`, which the film's own sizing in
+ * `film/size.ts` sets to the stage's box; at 720p in a 1600 by 900 window
+ * that comes out near one for one, so a label reads in the file as it reads
+ * on the screen. Were the offsets metres, as they were, a label would sit
+ * where the last camera that framed it happened to want it, which is how
+ * C2's four labels came to be five hundred metres up their rays and out of
+ * the top of the frame.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';

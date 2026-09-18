@@ -115,8 +115,8 @@ Branch `stage5/overlays`. Owns `apps/web/src/scene/ClaimOverlay.tsx`, `apps/web/
 
 ### Task S3: the overlay in a film
 
-- [ ] Check every overlay through the stepped clock: record the tour's shot four (`Inside the Great Pyramid`) and shot five (the shafts) at 720p and confirm the overlays and labels are in the frames at full size (labels are HTML; if they are not in the canvas they are not in the film, and the fix is to say so in `Film.tsx`'s note and draw the film's labels as sprites, or to leave them out of films and say that; the track decides and writes it down).
-- [ ] Commit: "Say what an overlay is in a film, and make it so".
+- [x] Check every overlay through the stepped clock: record the tour's shot four (`Inside the Great Pyramid`) and shot five (the shafts) at 720p and confirm the overlays and labels are in the frames at full size (labels are HTML; if they are not in the canvas they are not in the film, and the fix is to say so in `Film.tsx`'s note and draw the film's labels as sprites, or to leave them out of films and say that; the track decides and writes it down).
+- [x] Commit: "Say what an overlay is in a film, and make it so".
 
 ---
 
