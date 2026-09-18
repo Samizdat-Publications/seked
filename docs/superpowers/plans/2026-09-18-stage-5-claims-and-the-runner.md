@@ -96,9 +96,9 @@ which is the shape of a geometry cost and not of a shading one.
 
 ### Task Q5: the water's flat edge, and the film's rate
 
-- [ ] From the night stand (`night` look, the rollback film's camera) the flood plain's water shows a hard flat edge at the left horizon. Find why (the plane's extent against the terrain's, the far clip, or the water's own fade) and fix it in `Water.tsx` so the edge is under the horizon haze or inside the terrain; a screenshot from that stand at night, before and after.
-- [ ] Record "The tour, the first two shots" at 1080p and note the frames a second of the run in the commit message (it was about 4 in the heavy states on 2026-09-17; the run is bound by the same geometry).
-- [ ] Commit: "Put the water's edge under the horizon, and time the film".
+- [x] From the night stand (`night` look, the rollback film's camera) the flood plain's water shows a hard flat edge at the left horizon. Find why (the plane's extent against the terrain's, the far clip, or the water's own fade) and fix it in `Water.tsx` so the edge is under the horizon haze or inside the terrain; a screenshot from that stand at night, before and after.
+- [x] Record "The tour, the first two shots" at 1080p and note the frames a second of the run in the commit message (it was about 4 in the heavy states on 2026-09-17; the run is bound by the same geometry).
+- [x] Commit: "Put the water's edge under the horizon, and time the film".
 
 ---
 

@@ -125,6 +125,36 @@ const LOOK = {
     /** How far the colour goes toward the sky's own at the bottom of the ramp. */
     skyShare: 0.7,
   },
+  /**
+   * Over how many metres past the terrain's own edge the flood plain is
+   * dissolved into the sky.
+   *
+   * The fault this fixes: the plain is one plane carried six kilometres out
+   * from the valley temples (`plainReachMetres` in `@seked/geometry`), and the
+   * terrain under it stops at three. So from the night stand there was a hard
+   * flat edge across the left horizon, which is the plane simply ending, with
+   * sky above it and nothing between. The air does not hide it: at night the
+   * haze is 0.35e-4 a metre, which over six kilometres takes a fifth of the
+   * light, so four fifths of the edge came through.
+   *
+   * It is not fixed by moving the edge. Pulling the plane in puts the edge
+   * closer and makes it plainer; pushing it out is a bigger plane with the
+   * same edge further off. What the eye objects to is that a surface ends at a
+   * line, so the line is what goes: where the water leaves the ground it is
+   * drawn further and further toward the colour the sky has taken this minute,
+   * and four hundred metres past the ground's edge it is that colour exactly.
+   * Water at its own horizon is the colour of the sky, which is the same fact
+   * the dusk ramp above is built on, and this is the haze finishing what the
+   * air was too thin to finish.
+   *
+   * It is measured from the terrain's edge and not from the plane's own
+   * middle, because the plain's west side is a shoreline against the valley
+   * temples and is meant to be seen. Everything the fade touches is water with
+   * no ground under it, which is water this project has no business drawing
+   * sharply. Four hundred metres is the look choice; the terrain's extent is
+   * read off its own header.
+   */
+  edgeSpanMetres: 400,
   resolution: 512,
   rippleTileMetres: 24,
   driftA: [0.016, 0.009] as [number, number],
@@ -235,6 +265,61 @@ function rippleNormals(size = 256): DataTexture {
 
 /** The line drei's reflector samples the normal map on, which the drift replaces. */
 const DREI_NORMAL_TAP = 'vec4 normalColor = texture2D(normalMap, vUv * normalScale);';
+
+/**
+ * The flood plain's far edge, dissolved into the air's own sky colour.
+ *
+ * The surface is drawn in the data frame's XY, so where a fragment stands on
+ * the plane is `position.xy` before anything else happens to it: the ground's
+ * box goes in as uniforms and how far past it this fragment lies comes out as
+ * a varying, in metres over `LOOK.edgeSpanMetres`. The mix runs straight after
+ * `opaque_fragment`, where the colour is still in linear light, which is the
+ * same place and the same reason `Atmosphere.ts` gives for its own.
+ *
+ * The colour it dissolves into is `airSkyColour`, which is the air's own
+ * in-scattered sky and is the colour everything else in the scene fades toward
+ * with distance. It is not declared here: the atmosphere's chunk is in the
+ * same program, because the plain is given the air before it is given this,
+ * and a second uniform holding a second opinion about what colour the sky is
+ * would be the same number twice. If that chunk is ever not there, this says
+ * so and leaves the water alone rather than failing to compile.
+ *
+ * It costs nothing over the ground: the varying is zero there and the mix is a
+ * no-op.
+ */
+function applyEdge(material: Material, edge: { centre: { value: Vector2 }; half: { value: Vector2 } }): void {
+  patchMaterial(material, 'edge', 'v3', (shader: WebGLProgramParametersWithUniforms) => {
+    shader.uniforms.waterGroundCentre = edge.centre;
+    shader.uniforms.waterGroundHalf = edge.half;
+    if (!shader.fragmentShader.includes('uniform vec3 airSkyColour;')) {
+      console.warn('seked: the water has no air, so its far edge is drawn where it ends');
+      return;
+    }
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform vec2 waterGroundCentre;\nuniform vec2 waterGroundHalf;\nvarying float vWaterOff;',
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+        {
+          // How far past the ground's own edge this corner of the water lies,
+          // over the metres the dissolve is given, and nothing at all while it
+          // is still over the ground.
+          vec2 past = max(abs(position.xy - waterGroundCentre) - waterGroundHalf, vec2(0.0));
+          vWaterOff = length(past) / ${LOOK.edgeSpanMetres.toFixed(1)};
+        }`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vWaterOff;')
+      .replace(
+        '#include <opaque_fragment>',
+        `#include <opaque_fragment>
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, airSkyColour, smoothstep(0.0, 1.0, vWaterOff));`,
+      );
+  });
+}
 
 /**
  * Two scrolling layers in place of drei's one still one.
@@ -372,6 +457,7 @@ export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.E
   const ripple = useMemo(() => rippleNormals(), []);
   useEffect(() => () => ripple.dispose(), [ripple]);
   const drift = useRef({ a: { value: new Vector2() }, b: { value: new Vector2() } }).current;
+  const edge = useRef({ centre: { value: new Vector2() }, half: { value: new Vector2(1, 1) } }).current;
   const material = useRef<ComponentRef<typeof MeshReflectorMaterial>>(null);
   const deep = useMemo(() => new Color(LOOK.colour), []);
   const tint = useMemo(() => new Color(), []);
@@ -407,11 +493,26 @@ export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.E
     if (reflector) patchMaterial(m, 'reflector', 'v1', (shader) => reflector.call(m, shader));
     applyAtmosphere(m);
     applyDrift(m, drift);
+    // Only the flood plain runs off the end of the terrain. The harbour is a
+    // basin two hundred and fifty metres across with a quay round it, and
+    // dissolving its rim would dissolve the one edge that is meant to be seen.
+    if (body.kind === 'plain') {
+      // The ground's own box, off the heightfield's header, so the water's
+      // dissolve follows the terrain and no extent is typed here.
+      const { x0, y0, spacing, nx, ny } = terrain.header;
+      const west = x0;
+      const east = x0 + (nx - 1) * spacing;
+      const south = y0;
+      const north = y0 + (ny - 1) * spacing;
+      edge.centre.value.set((west + east) / 2, (south + north) / 2);
+      edge.half.value.set((east - west) / 2, (north - south) / 2);
+      applyEdge(m, edge);
+    }
     // No cascades. `CSM.setupMaterial` assigns its own `onBeforeCompile`,
     // which `patchMaterial` adopts as the one hook it keeps from outside, and
     // that place is taken here by the reflector. A shadow on a mirror is the
     // smaller loss.
-  }, [body, drift]);
+  }, [body, drift, edge, terrain]);
 
   if (!body || !surface) return null;
   const tier = body.kind === 'basin' ? 'reconstruction' : 'claim';
