@@ -377,6 +377,20 @@ pass before it reads as motion; the water's flat edge at the horizon from
 the night stand; the frame rate of the film run (about 4 frames a second at
 1080p in the heavy states) is the same cost.
 
+Stage 5 is planned (`docs/superpowers/plans/2026-09-18-stage-5-claims-and-the-runner.md`,
+written 2026-09-18, to be run by an Opus 5 session). The cost was found
+first: the scattered acacia stand-in is instanced 700 times at 169,160
+triangles each, about 118 million triangles a frame, because the asset
+baker's coarsest ratio level stops at its error bound on a mesh that dense;
+hiding the 700-instance plants takes the built state from 5 to 78 fps.
+Track Q bakes the plants to a triangle budget, draws the far ring as cards
+and casts shadows only near; R and S put the claims drawer and every
+overlay in the new look with a style for a proposed claim; T is
+`@seked/runner`, prose to a claim file by structured outputs on
+`claude-opus-5`, checked against the expression language and graded by the
+evaluator, with a CLI that writes to `build/claims/` and never to `data/`;
+U mounts it in the viewer with the reader's own key.
+
 **Where this goes next (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
 modern and ancient states and the transitional steps between, with models
