@@ -29,11 +29,11 @@ New for this stage:
 
 ## The trunk (director, before the tracks branch)
 
-- [ ] `packages/claims/src/schema.ts`: `ClaimSchema.id` accepts `P\d+` as well as `[A-E]\d+`, and the schema gains `origin: z.enum(['filed', 'proposed']).default('filed')` and `prose: z.string().optional()` (the words the claim was proposed from; a filed claim has none). `normaliseClaim` passes both through. The dossier renderer skips `proposed` claims (there are none in `data/claims/`, and there must never be). Tests: a `P1` id parses, an `F1` id does not, `origin` defaults to `filed`.
-- [ ] `packages/runner/`: `package.json` (`@seked/runner`, `"exports": { ".": "./src/index.ts", "./browser": "./src/browser.ts" }`, dependencies `@anthropic-ai/sdk`, `@seked/claims`, `@seked/data`, `@seked/geometry`, `zod`), `tsconfig.json` like the other packages, `src/index.ts` and `src/browser.ts` exporting a stub `proposeClaim` that throws `not yet`. `pnpm install` so the lockfile carries the SDK.
-- [ ] `apps/web/src/ui/ui.ts` gains the `propose` drawer (`{ id: 'propose', label: 'Propose', hint: 'Put a claim to the model in your own words' }`) after `claims`; `Icons.tsx` its glyph (a pen nib or a question mark in the rail's line weight); `App.tsx` mounts `<Drawer id="propose"><Propose /></Drawer>` with a stub `ui/Propose.tsx` that says the runner is not here yet.
-- [ ] `apps/web/src/store.ts`: `proposed: Claim[]` and `addProposed(claim)`, `dropProposed(id)`; `model.ts`'s evaluation runs over `bundle.claims` and `proposed` together, and `panels/Claims.tsx` lists both (the restyle is track R's; here they only appear).
-- [ ] Commit: "Lay the trunk for stage 5: a proposed claim has a place to stand, and the runner has a package".
+- [x] `packages/claims/src/schema.ts`: `ClaimSchema.id` accepts `P\d+` as well as `[A-E]\d+`, and the schema gains `origin: z.enum(['filed', 'proposed']).default('filed')` and `prose: z.string().optional()` (the words the claim was proposed from; a filed claim has none). `normaliseClaim` passes both through. The dossier renderer skips `proposed` claims (there are none in `data/claims/`, and there must never be). Tests: a `P1` id parses, an `F1` id does not, `origin` defaults to `filed`.
+- [x] `packages/runner/`: `package.json` (`@seked/runner`, `"exports": { ".": "./src/index.ts", "./browser": "./src/browser.ts" }`, dependencies `@anthropic-ai/sdk`, `@seked/claims`, `@seked/data`, `@seked/geometry`, `zod`), `tsconfig.json` like the other packages, `src/index.ts` and `src/browser.ts` exporting a stub `proposeClaim` that throws `not yet`. `pnpm install` so the lockfile carries the SDK.
+- [x] `apps/web/src/ui/ui.ts` gains the `propose` drawer (`{ id: 'propose', label: 'Propose', hint: 'Put a claim to the model in your own words' }`) after `claims`; `Icons.tsx` its glyph (a pen nib or a question mark in the rail's line weight); `App.tsx` mounts `<Drawer id="propose"><Propose /></Drawer>` with a stub `ui/Propose.tsx` that says the runner is not here yet.
+- [x] `apps/web/src/store.ts`: `proposed: Claim[]` and `addProposed(claim)`, `dropProposed(id)`; `model.ts`'s evaluation runs over `bundle.claims` and `proposed` together, and `panels/Claims.tsx` lists both (the restyle is track R's; here they only appear).
+- [x] Commit: "Lay the trunk for stage 5: a proposed claim has a place to stand, and the runner has a package".
 
 ---
 
