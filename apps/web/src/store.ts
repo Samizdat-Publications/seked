@@ -4,7 +4,8 @@
  * link and the panel can never disagree.
  */
 import { create } from 'zustand';
-import { TOUR, applyStep } from './tour';
+import { useMotion } from './motion/store';
+import { TOUR } from './tour';
 import {
   CUBIT_MAX,
   CUBIT_MIN,
@@ -154,27 +155,32 @@ export const useView = create<ViewStore>((set, get) => ({
       cameraEpoch: s.cameraEpoch + 1,
     })),
   /**
-   * The tour drives the actions above and adds nothing of its own, so every
-   * step is a state a reader could have reached by hand and the address bar
-   * mirrors it the same way. An index with no step leaves the view alone.
+   * The tour is a sequence in the motion store, so these five actions load,
+   * seek and unload it and do nothing else: the player writes the view's own
+   * fields every frame from the shot it finds there. Which shot is showing is
+   * not held twice, either; the subscription below mirrors it into `tour` for
+   * the address bar. An index with no shot leaves everything alone.
    */
-  startTour: () => get().goToStep(0),
+  startTour: () => useMotion.getState().play(TOUR, 0),
   nextStep: () => {
     const { tour } = get();
     if (tour === null) return;
-    if (tour + 1 < TOUR.length) get().goToStep(tour + 1);
+    if (tour + 1 < TOUR.shots.length) get().goToStep(tour + 1);
     else get().endTour();
   },
   prevStep: () => {
     const { tour } = get();
     if (tour !== null && tour > 0) get().goToStep(tour - 1);
   },
-  endTour: () => set({ tour: null }),
+  endTour: () => {
+    useMotion.getState().stop();
+    set({ tour: null });
+  },
   goToStep: (index) => {
-    const step = TOUR[index];
-    if (!step) return;
-    applyStep(step, get());
-    set({ tour: index });
+    if (!TOUR.shots[index]) return;
+    const motion = useMotion.getState();
+    if (motion.sequence?.id === TOUR.id) motion.seek(index, 0);
+    else motion.play(TOUR, index);
   },
   setState: (state) => set((s) => ({ state, epoch: s.epoch === null ? null : stateById(state).epoch })),
   setMoment: (moment) =>
@@ -185,9 +191,21 @@ export const useView = create<ViewStore>((set, get) => ({
   setSphinx: (sphinx) => set({ sphinx }),
 }));
 
+/**
+ * The view's `tour` is a mirror of what the motion store is playing and not a
+ * second copy of it: while the tour is the sequence loaded it follows the shot
+ * index, and any other sequence, or none, leaves it null. So the address bar
+ * keeps `?tour=N` through a tour driven from anywhere, and a film preset never
+ * writes a tour step into a shared link.
+ */
+useMotion.subscribe((motion) => {
+  const index = motion.sequence?.id === TOUR.id ? motion.shot : null;
+  if (useView.getState().tour !== index) useView.setState({ tour: index });
+});
+
 /** Adopt the view in the address bar. Call once, before the first render. */
 export function readUrl(presetIds: string[]): void {
-  useView.setState(decodeView(window.location.search, presetIds));
+  useView.setState(decodeView(window.location.search, presetIds, TOUR.shots));
 }
 
 /**

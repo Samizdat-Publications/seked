@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TOUR } from './tour';
+import { TOUR_STEPS } from './tour';
 import {
   DEFAULT_EPOCH,
   DEFAULT_VIEW,
@@ -135,24 +135,29 @@ describe('encodeView and decodeView', () => {
 
   it('round-trips a tour step', () => {
     const wanted = view({ tour: 5 });
-    expect(decodeView(encodeView(wanted), PRESETS)).toEqual(wanted);
+    expect(decodeView(encodeView(wanted), PRESETS, TOUR_STEPS)).toEqual(wanted);
     expect(encodeView(wanted)).toContain('tour=5');
+  });
+
+  it('decodes no tour at all when it is handed no shots', () => {
+    expect(decodeView('?tour=3', PRESETS).tour).toBeNull();
+    expect(decodeView('?tour=3', PRESETS).camera).toEqual(DEFAULT_VIEW.camera);
   });
 
   it('leaves the tour out when no tour is running, and refuses an index with no step', () => {
     expect(encodeView(DEFAULT_VIEW)).not.toContain('tour=');
-    expect(decodeView('?lst=0', PRESETS).tour).toBeNull();
-    expect(decodeView('?tour=banana', PRESETS).tour).toBeNull();
-    expect(decodeView('?tour=1.5', PRESETS).tour).toBeNull();
-    expect(decodeView('?tour=-1', PRESETS).tour).toBeNull();
-    expect(decodeView(`?tour=${TOUR.length}`, PRESETS).tour).toBeNull();
+    expect(decodeView('?lst=0', PRESETS, TOUR_STEPS).tour).toBeNull();
+    expect(decodeView('?tour=banana', PRESETS, TOUR_STEPS).tour).toBeNull();
+    expect(decodeView('?tour=1.5', PRESETS, TOUR_STEPS).tour).toBeNull();
+    expect(decodeView('?tour=-1', PRESETS, TOUR_STEPS).tour).toBeNull();
+    expect(decodeView(`?tour=${TOUR_STEPS.length}`, PRESETS, TOUR_STEPS).tour).toBeNull();
   });
 
-  it("takes the step's camera only when the URL carries none of its own", () => {
-    const step = TOUR[7] as (typeof TOUR)[number];
-    expect(decodeView('?tour=7', PRESETS).camera).toEqual(step.camera);
-    expect(decodeView('?tour=7&cam=1,2,3,4,5,6', PRESETS).camera).toEqual({ position: [1, 2, 3], target: [4, 5, 6] });
-    expect(decodeView('?cam=1,2,3,4,5,6', PRESETS).tour).toBeNull();
+  it("takes the shot's opening camera only when the URL carries none of its own", () => {
+    const shot = TOUR_STEPS[7] as (typeof TOUR_STEPS)[number];
+    expect(decodeView('?tour=7', PRESETS, TOUR_STEPS).camera).toEqual(shot.camera[0]?.value);
+    expect(decodeView('?tour=7&cam=1,2,3,4,5,6', PRESETS, TOUR_STEPS).camera).toEqual({ position: [1, 2, 3], target: [4, 5, 6] });
+    expect(decodeView('?cam=1,2,3,4,5,6', PRESETS, TOUR_STEPS).tour).toBeNull();
   });
 
   it('carries the sky layer', () => {

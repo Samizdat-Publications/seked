@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useView } from '../store';
-import { TOUR } from '../tour';
+import { TOUR_STEPS } from '../tour';
 
 /**
  * The tour, at the top of the panel because it is the first thing a stranger
@@ -15,7 +15,7 @@ export function Tour(): React.JSX.Element {
   const nextStep = useView((s) => s.nextStep);
   const prevStep = useView((s) => s.prevStep);
   const endTour = useView((s) => s.endTour);
-  const step = index === null ? undefined : TOUR[index];
+  const step = index === null ? undefined : TOUR_STEPS[index];
   const running = step !== undefined;
 
   /**
@@ -44,20 +44,20 @@ export function Tour(): React.JSX.Element {
           Take the tour
         </button>
         <p className="note">
-          {TOUR.length} views, from what the model is built from to where the dossier is. It moves the controls below and nothing else, so
+          {TOUR_STEPS.length} views, from what the model is built from to where the dossier is. It moves the controls below and nothing else, so
           you can step off it at any point.
         </p>
       </section>
     );
   }
 
-  const last = index === TOUR.length - 1;
+  const last = index === TOUR_STEPS.length - 1;
   return (
     <section className="block tour">
       <h2>
         Tour{' '}
         <span>
-          {index + 1} of {TOUR.length}
+          {index + 1} of {TOUR_STEPS.length}
         </span>
       </h2>
       <h3>{step.title}</h3>
