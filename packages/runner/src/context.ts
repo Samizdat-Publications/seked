@@ -286,6 +286,9 @@ function renderSystem(parts: Omit<RunnerContext, 'system'>, bundle: RunnerBundle
     '- A key list is a list of what exists, not of what is relevant. If the claim needs a number this database does not carry, say so in `notes` and set `status` to `needs-site`, rather than reaching for a key that is nearly what you wanted.',
     '- Name a `star.` or a `sun.` key only in a claim that declares an `epoch`. Those keys do not exist without one.',
     '- Cite only source ids from the list below. A claim with no source for it, no context and no critique is allowed; an invented id is not.',
+    // A proposal can be moved into data/claims/ by hand, so it is held to
+    // the project's own writing rules from the moment it is written.
+    '- Never use an em dash, in a title, a summary, a label, a free choice or a note. Use a comma, a colon, a full stop or a spaced hyphen. This project forbids them everywhere and a claim file is no exception.',
     '',
     '# The expression language',
     '',

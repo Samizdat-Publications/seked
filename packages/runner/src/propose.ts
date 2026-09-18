@@ -197,6 +197,24 @@ function comparisonOf(c: ProposedClaim['comparisons'][number]): Comparison {
  * error rather than a throw, so a whole round's worth of errors can go back in
  * one turn instead of the model being corrected one field at a time.
  */
+/**
+ * The project forbids an em dash everywhere, and a proposal can be moved
+ * into `data/claims/` by hand, so it is held to that rule from the moment
+ * it is written. The prompt says so and this makes it true: a spaced hyphen
+ * reads as the dash did, so it is a typographic normalisation and not a
+ * change to what the model said.
+ */
+/** The dash and whatever spacing it came with, so the hyphen that replaces it is spaced once. */
+const EM_DASH = /[ 	]*—[ 	]*/g;
+function plainDashes<T>(value: T): T {
+  if (typeof value === 'string') return value.replace(EM_DASH, ' - ') as unknown as T;
+  if (Array.isArray(value)) return value.map(plainDashes) as unknown as T;
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, plainDashes(v)])) as unknown as T;
+  }
+  return value;
+}
+
 function assemble(answer: ProposedClaim, id: string, prose: string): { claim: ClaimFile | null; errors: string[] } {
   const errors: string[] = [];
   let params: Record<string, unknown> | undefined;
@@ -230,7 +248,10 @@ function assemble(answer: ProposedClaim, id: string, prose: string): { claim: Cl
   if (answer.notes !== null) raw['notes'] = answer.notes;
   if (answer.overlay_type !== null && params) raw['overlay'] = { type: answer.overlay_type, params };
 
-  const parsed = ClaimSchema.safeParse(raw);
+  // The reader's own prose is left exactly as they wrote it; everything the
+  // model chose to write is held to the project's rules.
+  const words = plainDashes({ ...raw, prose: undefined });
+  const parsed = ClaimSchema.safeParse({ ...words, prose });
   if (!parsed.success) {
     for (const issue of parsed.error.issues) errors.push(`${issue.path.join('.') || 'the claim'}: ${issue.message}`);
     return { claim: null, errors };

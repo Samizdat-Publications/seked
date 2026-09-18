@@ -215,3 +215,22 @@ describe('the checks a claim file has to pass', () => {
     expect(checked.errors.join(' ')).toContain('not a source in this project');
   });
 });
+
+describe('the project forbids an em dash, including in what the model writes', () => {
+  it('turns one into a spaced hyphen wherever the model put it, and leaves the prose alone', async () => {
+    const dash = String.fromCharCode(0x2014);
+    const answer = {
+      ...PI_IN_THE_PROFILE,
+      title: `1 : 43,200 ${dash} the hemisphere at scale`,
+      summary: `The height times 43,200 ${dash} the polar radius.`,
+      free_choices: [`the scale ${dash} 43,200`],
+    };
+    const said = `Somebody wrote this ${dash} with a dash in it.`;
+    const proposal = await proposeClaim(said, context, fakeClient([answer]));
+    expect(proposal.claim.title).toBe('1 : 43,200 - the hemisphere at scale');
+    expect(proposal.claim.summary).toBe('The height times 43,200 - the polar radius.');
+    expect(proposal.claim.free_choices[0]).toBe('the scale - 43,200');
+    // What the reader said is quoted, not corrected.
+    expect(proposal.claim.prose).toBe(said);
+  });
+});
