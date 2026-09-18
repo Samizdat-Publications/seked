@@ -3,7 +3,7 @@
  * here, so a URL is the whole view: preset, cubit, layers, selected claim and
  * camera. The codec is deliberately lossless and deliberately boring.
  */
-import { TOUR } from './tour';
+import type { Shot } from './motion/types';
 
 /**
  * The things a reader turns on and off. Whether the pyramids stand cased or
@@ -268,8 +268,14 @@ function decodeSection(text: string | null): Section {
   };
 }
 
-/** Read a view out of a query string, falling back to the default field by field. */
-export function decodeView(search: string, presetIds: string[]): View {
+/**
+ * Read a view out of a query string, falling back to the default field by
+ * field. The tour's shots are handed in rather than imported, because this
+ * module is the schema and the tour is content: `tour.ts` reads the timeline
+ * and the hero stands out of here, so importing it back would be a cycle.
+ * With no shots handed in, `?tour=N` decodes to no tour at all.
+ */
+export function decodeView(search: string, presetIds: string[], shots: readonly Shot[] = []): View {
   const q = new URLSearchParams(search);
   const preset = q.get('preset');
   const cubit = q.get('cubit') === null ? Number.NaN : Number(q.get('cubit'));
@@ -283,12 +289,13 @@ export function decodeView(search: string, presetIds: string[]): View {
   const mode = q.get('mode');
   const speed = q.get('speed') === null ? Number.NaN : Number(q.get('speed'));
   const index = q.get('tour') === null ? Number.NaN : Number(q.get('tour'));
-  const tour = Number.isInteger(index) && index >= 0 && index < TOUR.length ? index : null;
+  const tour = Number.isInteger(index) && index >= 0 && index < shots.length ? index : null;
   // A camera in the query string wins over the tour's, so a shared link
-  // reproduces the view its author was looking at rather than the step's
-  // canonical one. A hand-written `?tour=N` carries no camera, and then the
-  // step's own is the sensible fallback rather than the opening view.
-  const framing = (tour === null ? undefined : TOUR[tour]?.camera) ?? DEFAULT_VIEW.camera;
+  // reproduces the view its author was looking at rather than the shot's
+  // opening one. A hand-written `?tour=N` carries no camera, and then the
+  // shot's first camera key is the sensible fallback rather than the opening
+  // view: it is where the shot begins, and the player moves off it from there.
+  const framing = (tour === null ? undefined : shots[tour]?.camera[0]?.value) ?? DEFAULT_VIEW.camera;
   const layers = { ...DEFAULT_VIEW.layers };
   if (layerList !== null) {
     const on = new Set(layerList.split(',').filter(Boolean));

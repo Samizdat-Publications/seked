@@ -41,7 +41,7 @@ export interface CameraKey extends Key<CameraView> {
 }
 
 /**
- * A change of the timeline's stop inside a shot: the stop arrived at and the
+ * A change of timeline stop inside a shot: the stop to arrive at and the
  * second the dissolve starts. `dissolveSeconds` lengthens the dissolve for
  * this change only; absent takes the default.
  */
@@ -57,9 +57,17 @@ export interface Shot {
   seconds: number;
   /** The camera along the shot. Never empty. */
   camera: CameraKey[];
-  /** The timeline stop the shot arrives at. Absent leaves the timeline where it was. */
+  /**
+   * The timeline stop the shot arrives at. Absent leaves the timeline where
+   * it was.
+   */
   state?: StateChange;
-  /** Further changes of stop in the same shot. */
+  /**
+   * Further changes of stop in the same shot, after the one `state` names,
+   * in the order they happen. Added by Track N for the tour's close, which
+   * strips the pyramids and then brings them to today inside one stand; the
+   * contract as the trunk laid it down had room for one change a shot.
+   */
   states?: StateChange[];
   /** The sun: the day and hour tweened between keys. Absent leaves the moment alone. */
   moment?: Key<Moment>[];

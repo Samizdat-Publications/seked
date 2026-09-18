@@ -6,7 +6,6 @@ import { overlaySpec, type OverlayContext } from './overlays';
 import { Claims } from './panels/Claims';
 import { CubitSlider, LayerToggles, PresetPicker, SectionControls } from './panels/Controls';
 import { SkyControls } from './panels/Sky';
-import { Tour } from './panels/Tour';
 import { Scene } from './scene/Scene';
 import { domeBuffers, namedOnDome } from './sky';
 import { useView } from './store';
@@ -15,10 +14,12 @@ import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
 import { Film } from './ui/Film';
 import { HoverTag } from './ui/HoverTag';
+import { Narration } from './ui/Narration';
 import { Rail } from './ui/Rail';
 import { SphinxControl } from './ui/Sphinx';
 import { SunDial } from './ui/SunDial';
 import { Timeline } from './ui/Timeline';
+import { Tour } from './ui/Tour';
 import { useUi } from './ui/ui';
 import { Views } from './ui/Views';
 import { STATES, sceneEpoch, stateById } from './view';
@@ -122,6 +123,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
       </main>
 
       <Caption epoch={epoch} claimId={selected} />
+      <Narration />
 
       <div className="instruments">
         <Timeline />
