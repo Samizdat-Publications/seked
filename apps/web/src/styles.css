@@ -1789,3 +1789,289 @@ button.step.is-primary:hover {
 .film-trouble {
   color: var(--misses);
 }
+
+/* ===== Stage 5, Track R: the claims drawer ===== */
+
+:root {
+  /*
+   * The lapis the stage says a claim in. The token at the head of this file is
+   * the pigment, which is too dark to read as text on dark glass; this is the
+   * ink that pigment makes. The muted sand is the warm sand held back, for a
+   * grade the engine has not been able to decide.
+   */
+  --lapis-ink: #7ea6e0;
+  --sand-muted: rgba(217, 181, 106, 0.74);
+}
+
+/*
+ * A group's heading takes the display face the drawer's own heading has, so
+ * the five groups read as headings rather than as the first line of the block
+ * beneath them.
+ */
+.group > h3 {
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-size: 0.98rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/*
+ * A grade is a dot and a word: the green for a fit, the red for a miss, the
+ * muted sand for a claim the engine cannot yet decide. The pill it replaces
+ * shouted at one size whatever it had to say, and there are four rows of these
+ * to a group.
+ */
+.grade {
+  grid-area: fit;
+  justify-self: end;
+  align-self: center;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.36rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  color: var(--sand-muted);
+}
+
+.grade-dot {
+  align-self: center;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.grade.is-fits {
+  color: var(--fits);
+}
+
+.grade.is-misses {
+  color: var(--misses);
+}
+
+/* The proposed tag: lapis, small, and inline with the title it qualifies. */
+.claim-tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.02rem 0.34rem 0.06rem;
+  border: 1px solid rgba(126, 166, 224, 0.45);
+  border-radius: 0.3rem;
+  background: rgba(45, 95, 168, 0.3);
+  font-size: 0.6rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--lapis-ink);
+  vertical-align: 0.08em;
+}
+
+/*
+ * The detail. The prose a proposed claim was built from stands at the head of
+ * it, set in the display face and quoted, because it is somebody's words and
+ * not the panel's.
+ */
+.prose {
+  margin: 0 0 0.75rem;
+  padding: 0 0 0.7rem;
+  border-bottom: 1px solid var(--hairline-soft);
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/*
+ * The comparisons, as one table. A name row carries the label, the mark on
+ * the worst and the verdict against the tolerance; the figures sit under the
+ * three heads at the top of the table, so the heads are written once however
+ * many comparisons a claim makes.
+ */
+table.comparisons {
+  width: 100%;
+  margin: 0.55rem 0 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* The residual carries a figure and a percentage, so it takes the wider third. */
+table.comparisons col.value,
+table.comparisons col.target {
+  width: 28%;
+}
+
+table.comparisons col.residual {
+  width: 44%;
+}
+
+/*
+ * A formula in the table wraps rather than scrolls. Four claims in five make
+ * more than one comparison, and a scrollbar under every one of them is a
+ * row of machinery across the panel.
+ */
+.comparison-name .formula {
+  margin: 0.3rem 0 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  overflow-x: visible;
+}
+
+table.comparisons thead th {
+  padding: 0 0 0.25rem;
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-align: left;
+  color: var(--ink-soft);
+}
+
+.comparison-name th {
+  padding: 0.5rem 0 0.15rem;
+  border-top: 1px solid var(--hairline-soft);
+  font-weight: 400;
+  text-align: left;
+}
+
+.comparison-label {
+  font-size: 0.86rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+/* The claim is graded by this one, so the table says which it is. */
+.worst-mark {
+  margin-left: 0.4rem;
+  padding: 0.02rem 0.32rem 0.06rem;
+  border: 1px solid var(--sand-muted);
+  border-radius: 0.3rem;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--sand-muted);
+  white-space: nowrap;
+}
+
+.verdict {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
+.verdict.is-within {
+  color: var(--fits);
+}
+
+.verdict.is-outside {
+  color: var(--misses);
+}
+
+.comparison-figures td {
+  padding: 0.1rem 0.5rem 0.55rem 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  vertical-align: top;
+}
+
+.comparison-figures td:last-child {
+  padding-right: 0;
+}
+
+.comparison-figures td.is-outside {
+  color: var(--misses);
+}
+
+/* What the claim had to assume, each line opening on the word. */
+ul.assumed {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.assumed li {
+  margin-bottom: 0.3rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.assumed-word {
+  margin-right: 0.4rem;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--sand-muted);
+}
+
+.overlay-buttons {
+  margin: 0.6rem 0 0;
+}
+
+/* The sources: a word for the side they are on, then the short titles. */
+.citations {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.5rem;
+}
+
+.citations-label {
+  flex: 0 0 4.6rem;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}
+
+.cite {
+  color: var(--ink);
+  border-bottom: 1px dotted var(--hairline);
+  cursor: help;
+}
+
+/* Has anyone checked this figure against the page it is cited to. */
+.flag {
+  margin-left: 0.35rem;
+  cursor: help;
+}
+
+.flag.is-verified {
+  color: var(--fits);
+}
+
+.flag.is-unverified {
+  color: var(--sand-muted);
+}
+
+/* What a person does by hand with a claim the model wrote. */
+.move-note {
+  margin-top: 1rem;
+  padding: 0.1rem 0.7rem 0.7rem;
+  border: 1px solid rgba(126, 166, 224, 0.35);
+  border-radius: 0.45rem;
+  background: rgba(45, 95, 168, 0.14);
+}
+
+.move-note h4 {
+  color: var(--lapis-ink);
+}
+
+.move-note code {
+  font-size: 0.76rem;
+  color: var(--ink);
+}
+
+/*
+ * The caption's honesty word for a claim the runner wrote. Lapis like the
+ * filed claims it stands beside, and dashed like the overlay a proposed claim
+ * draws, so the two say the same thing in the same way at both ends of the
+ * screen.
+ */
+.caption-kind.is-proposed {
+  color: var(--lapis-ink);
+  border-style: dashed;
+}

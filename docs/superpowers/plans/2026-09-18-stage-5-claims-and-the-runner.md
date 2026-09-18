@@ -108,19 +108,19 @@ Branch `stage5/drawer`. Owns `apps/web/src/panels/Claims.tsx`, `apps/web/src/pan
 
 ### Task R1: the list
 
-- [ ] The list in the drawer's type and colour: the group heading in the serif display face, each row the id in tabular numerals, the title, and the grade as a dot and a word (`fits` in the existing green, `misses` in the existing red, `needs sky` and `needs site` in the muted sand) rather than a paragraph. A `proposed` claim's row carries a small `proposed` tag in lapis and sorts to the top of its group. The selected row stays open with the detail under it, as now. Keyboard: up and down move, enter opens, escape closes the detail.
-- [ ] Commit: "List the claims in the drawer's own type".
+- [x] The list in the drawer's type and colour: the group heading in the serif display face, each row the id in tabular numerals, the title, and the grade as a dot and a word (`fits` in the existing green, `misses` in the existing red, `needs sky` and `needs site` in the muted sand) rather than a paragraph. A `proposed` claim's row carries a small `proposed` tag in lapis and sorts to the top of its group. The selected row stays open with the detail under it, as now. Keyboard: up and down move, enter opens, escape closes the detail.
+- [x] Commit: "List the claims in the drawer's own type".
 
 ### Task R2: the detail
 
-- [ ] The detail pane reads top down: the summary; the comparisons as a small table (formula, value, target, residual, with the worst one marked); the free choices as a list with the word `assumed`; the epoch where there is one, formatted as the caption line formats it; the sources split `for`, `context`, `against` with the source's short title from `data/sources.json`; the records the numbers came from, each with its `verified` flag as a glyph and its `method` where it is not a transcription. A proposed claim adds its `prose` in quotation marks at the top and a `Move into data/claims` note that says what to do by hand (there is no button that does it).
-- [ ] The overlay note and the `drawn` state stay; the button that toggles the overlay is the drawer's button style.
-- [ ] Commit: "Read a claim top down: what it compares, what it assumed, who says so".
+- [x] The detail pane reads top down: the summary; the comparisons as a small table (formula, value, target, residual, with the worst one marked); the free choices as a list with the word `assumed`; the epoch where there is one, formatted as the caption line formats it; the sources split `for`, `context`, `against` with the source's short title from `data/sources.json`; the records the numbers came from, each with its `verified` flag as a glyph and its `method` where it is not a transcription. A proposed claim adds its `prose` in quotation marks at the top and a `Move into data/claims` note that says what to do by hand (there is no button that does it).
+- [x] The overlay note and the `drawn` state stay; the button that toggles the overlay is the drawer's button style.
+- [x] Commit: "Read a claim top down: what it compares, what it assumed, who says so".
 
 ### Task R3: the honesty word
 
-- [ ] The caption line's honesty word (`survey`, `reconstruction`, `claim`) already changes with the state; with a claim open it becomes `claim` and, for a proposed one, `proposed`. One line in `ui/Caption.tsx` and its test.
-- [ ] Commit: "Say proposed on the caption line when a proposed claim is open".
+- [x] The caption line's honesty word (`survey`, `reconstruction`, `claim`) already changes with the state; with a claim open it becomes `claim` and, for a proposed one, `proposed`. One line in `ui/Caption.tsx` and its test.
+- [x] Commit: "Say proposed on the caption line when a proposed claim is open".
 
 ---
 

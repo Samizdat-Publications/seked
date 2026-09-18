@@ -1,16 +1,20 @@
-import { formatEpoch, formatResidual, formatValue, identifiers, type Claim, type ComparisonResult } from '@seked/claims/browser';
-import { sourceById } from '@seked/data/browser';
+import { comparisonSize, formatResidual, formatValue, identifiers, type Claim, type ComparisonResult } from '@seked/claims/browser';
+import { sourceById, type Measurement, type Source } from '@seked/data/browser';
+import { recordsBehind } from '@seked/geometry';
 import { formatArcminutes, formatDms } from '@seked/units';
 import { useMemo } from 'react';
 import { recordsFor, type FailedClaim, type Model } from '../model';
 import { cornerMissWords, overlayNote, overlaySpec, parallelOffsetWords, type OverlayContext, type OverlaySpec } from '../overlays';
 import { useView } from '../store';
+import { yearWords } from '../ui/moment';
 import { Fit } from './Claims';
 
 /**
- * One claim in full: what it compares, how far off it is, what it had to
- * assume, who says so, and which records the numbers came from. The
- * formatters are the dossier's, so the panel and docs/dossier.md read alike.
+ * One claim in full, read top down: the words it was proposed from where it
+ * was proposed, what it compares and how far off each comparison is, what it
+ * had to assume, when it is stated for, what it draws, who says so, and which
+ * records the numbers came from. The formatters are the dossier's, so the
+ * panel and docs/dossier.md read alike.
  */
 export function ClaimDetail({
   claim,
@@ -25,49 +29,67 @@ export function ClaimDetail({
 }): React.JSX.Element {
   const overlay = overlayNote(claim, context);
   const drawn = overlaySpec(claim, context);
-  const inputs = useMemo(() => {
+  const records = useMemo(() => {
     const keys = new Set<string>();
-    for (const c of claim.comparisons) for (const id of [...identifiers(c.formula), ...identifiers(c.target)]) keys.add(id);
+    for (const c of claim.comparisons)
+      for (const id of [...identifiers(c.formula), ...identifiers(c.target)]) {
+        keys.add(id);
+        // A formula mostly names derived keys, and a derived key is not a
+        // record. The provenance the reader wants is the measurements under
+        // it, which is the same expansion the dossier's key table makes.
+        for (const behind of recordsBehind(id, model.resolved.values)) keys.add(behind);
+      }
     return recordsFor([...keys].sort(), model.resolved);
   }, [claim, model.resolved]);
+  // The claim's worst comparison is the one it is graded by, so the table
+  // marks it. With one comparison there is nothing to rank and no mark.
+  const worst = useMemo(() => worstIndex(result.comparisons), [result.comparisons]);
 
   return (
     <article className="detail">
+      {claim.origin === 'proposed' && claim.prose !== undefined && (
+        <blockquote className="prose">{`“${claim.prose}”`}</blockquote>
+      )}
+
       <header className="detail-head">
         <h3>
           {claim.id} · {claim.title} <Fit result={result} />
         </h3>
         <p className="note">{claim.summary}</p>
-        {claim.epoch !== undefined && <EpochLine claim={claim} model={model} />}
       </header>
 
       {result.error && <p className="warning">This preset cannot evaluate the claim: {result.error}</p>}
 
-      {result.comparisons.length > 0 && (
-        <ul className="comparisons">
-          {result.comparisons.map((c, i) => (
-            <Comparison key={`${c.label}-${i}`} c={c} />
-          ))}
-        </ul>
-      )}
+      {result.comparisons.length > 0 && <Comparisons comparisons={result.comparisons} worst={worst} />}
 
       {result.comparisons.length === 0 && !result.error && (
         <p className="note">Not computable yet: it {result.status === 'needs-sky' ? 'waits on the sky engine' : 'waits on the site-plan positions'}.</p>
       )}
 
-      <h4>Free choices ({claim.free_choices.length})</h4>
+      <h4>What it assumes ({claim.free_choices.length})</h4>
       {claim.free_choices.length === 0 ? (
-        <p className="note">None. The claim costs nothing to state.</p>
+        <p className="note">Nothing. The claim costs no free choice to state.</p>
       ) : (
-        <ul className="plain">
+        <ul className="assumed">
           {claim.free_choices.map((f) => (
-            <li key={f}>{f}</li>
+            <li key={f}>
+              <span className="assumed-word">assumed</span>
+              {f}
+            </li>
           ))}
         </ul>
       )}
 
+      {claim.epoch !== undefined && (
+        <>
+          <h4>Epoch</h4>
+          <EpochLine claim={claim} model={model} />
+        </>
+      )}
+
       <h4>Overlay</h4>
       <p className={overlay.built ? 'note' : 'note pending'}>{overlay.text}</p>
+      {drawn && <OverlayButton />}
       {drawn && <OverlayControls overlay={drawn} model={model} />}
 
       {claim.notes && (
@@ -82,25 +104,18 @@ export function ClaimDetail({
       <Citations label="Context" ids={claim.sources.context} model={model} />
       <Citations label="Critiques" ids={claim.sources.against} model={model} />
 
-      {inputs.length > 0 && (
+      {records.length > 0 && (
         <>
-          <h4>Inputs</h4>
+          <h4>Records</h4>
           <ul className="inputs">
-            {inputs.map((m) => (
-              <li key={m.key}>
-                <code>{m.key}</code>
-                <span className="value">
-                  {m.value} {m.unit}
-                </span>
-                <span className="note">
-                  {m.source}
-                  {m.verified ? '' : ', unverified'}
-                </span>
-              </li>
+            {records.map((m) => (
+              <Record key={m.key} record={m} model={model} />
             ))}
           </ul>
         </>
       )}
+
+      {claim.origin === 'proposed' && <MoveNote claim={claim} />}
     </article>
   );
 }
@@ -108,36 +123,168 @@ export function ClaimDetail({
 /** A residual in percent, signed and spaced the way the dossier signs one. */
 const percent = (v: number, digits = 3): string => `${v < 0 ? '−' : '+'}${Math.abs(v).toFixed(digits)} %`;
 
-function Comparison({ c }: { c: ComparisonResult }): React.JSX.Element {
-  const tolerance = c.toleranceAbs !== undefined ? `±${formatValue(c.toleranceAbs, c.unit)}` : `±${c.tolerancePct} %`;
+/**
+ * Which comparison a claim is graded by, as an index into the list the panel
+ * prints, or -1 when there is nothing to rank. The measure is the evaluator's
+ * own, so the one marked here is the one the list's grade came from.
+ */
+export function worstIndex(comparisons: ComparisonResult[]): number {
+  if (comparisons.length < 2) return -1;
+  let at = 0;
+  for (let i = 1; i < comparisons.length; i += 1) {
+    if (comparisonSize(comparisons[i] as ComparisonResult) > comparisonSize(comparisons[at] as ComparisonResult)) at = i;
+  }
+  return at;
+}
+
+/**
+ * The comparisons as one table: a name row carrying the label, the mark on the
+ * worst and the verdict against the tolerance, then the three figures under
+ * the heads they belong to. Three columns and not four, because the formula
+ * is longer than the rest of the row put together and reads better over the
+ * numbers it made than squeezed beside them.
+ */
+function Comparisons({ comparisons, worst }: { comparisons: ComparisonResult[]; worst: number }): React.JSX.Element {
   return (
-    <li className="comparison">
-      <div className="comparison-head">
-        <span>{c.label}</span>
-        <span className={`chip ${c.within ? 'chip-fits' : 'chip-misses'}`}>{c.within ? `within ${tolerance}` : `outside ${tolerance}`}</span>
-      </div>
-      <code className="formula">
-        {c.formula} vs {c.target}
-      </code>
-      <dl>
-        <div>
-          <dt>Value</dt>
-          <dd>{formatValue(c.value, c.unit)}</dd>
-        </div>
-        <div>
-          <dt>Target</dt>
-          <dd>{formatValue(c.targetValue, c.unit)}</dd>
-        </div>
-        <div>
-          <dt>Residual</dt>
-          <dd>{formatResidual(c)}</dd>
-        </div>
-      </dl>
+    <table className="comparisons">
+      <colgroup>
+        <col className="value" />
+        <col className="target" />
+        <col className="residual" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col">Value</th>
+          <th scope="col">Target</th>
+          <th scope="col">Residual</th>
+        </tr>
+      </thead>
+      {comparisons.map((c, i) => {
+        const tolerance = c.toleranceAbs !== undefined ? `±${formatValue(c.toleranceAbs, c.unit)}` : `±${c.tolerancePct} %`;
+        return (
+          <tbody key={`${c.label}-${i}`} className={`comparison${i === worst ? ' is-worst' : ''}`}>
+            <tr className="comparison-name">
+              <th colSpan={3} scope="colgroup">
+                <span className="comparison-label">
+                  {c.label}
+                  {i === worst && <span className="worst-mark">worst</span>}
+                </span>
+                <span className={`verdict ${c.within ? 'is-within' : 'is-outside'}`}>
+                  {c.within ? `within ${tolerance}` : `outside ${tolerance}`}
+                </span>
+                <code className="formula">
+                  {c.formula} vs {c.target}
+                </code>
+              </th>
+            </tr>
+            <tr className="comparison-figures">
+              <td>{formatValue(c.value, c.unit)}</td>
+              <td>{formatValue(c.targetValue, c.unit)}</td>
+              <td className={c.within ? '' : 'is-outside'}>{formatResidual(c)}</td>
+            </tr>
+          </tbody>
+        );
+      })}
+    </table>
+  );
+}
+
+/**
+ * A source in the few words a reader needs to tell it from the others: the
+ * names and the year out of the citation it is already written with, so
+ * nothing about a source is typed twice. A citation that does not begin with
+ * names and a year, which is most of the datum and coordinate entries, gives
+ * its first clause instead, cut short. The whole citation is on the title.
+ */
+export function shortTitle(source: Source): string {
+  const dated = /^(.*?)\s*\((\d{4})[^)]*\)/.exec(source.citation);
+  if (dated) {
+    const names = surnames(dated[1] as string);
+    if (names !== '') return `${clip(names, 40)} ${dated[2] as string}`;
+  }
+  return clip(firstClause(source.citation));
+}
+
+/**
+ * The surnames out of "Petrie, W. M. F." or "Lehner, M. & Hawass, Z." or
+ * "Morishima, K. et al." A citation that opens on a sentence rather than on
+ * names, and there are a few, runs past the six words any list of surnames
+ * needs and gives nothing back, so that nobody is credited with a co-author
+ * they do not have.
+ */
+function surnames(authors: string): string {
+  const bare = authors
+    .replace(/\b[A-Z]\.(\s*-?\s*[A-Z]\.)*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (bare.split(' ').length > 6) return '';
+  const etAl = /\bet al\.?/i.test(bare);
+  const names = bare
+    .replace(/\bet al\.?/gi, '')
+    .split(/\s*(?:,|&|\band\b)\s*/)
+    .map((s) => s.trim())
+    .filter((s) => s !== '');
+  if (names.length === 0) return '';
+  if (etAl || names.length > 2) return `${names[0] as string} et al.`;
+  return names.join(' & ');
+}
+
+/** The citation up to its first full stop, colon, bracket or comma. */
+function firstClause(citation: string): string {
+  const cut = /[.:(,](?=\s|$)/.exec(citation);
+  return (cut === null ? citation : citation.slice(0, cut.index)).trim();
+}
+
+const clip = (s: string, at = 46): string => (s.length <= at ? s : `${s.slice(0, s.lastIndexOf(' ', at)).trim()}…`);
+
+/**
+ * The methods that say no more than "this figure was copied from the page it
+ * is cited to". A record with one of these is a transcription, and the panel
+ * leaves the word out rather than printing a column of it; anything else, a
+ * tape run, a total station, a scaling off a plate, an estimate, is how the
+ * number was got and the reader should see it.
+ */
+const TRANSCRIBED = new Set(['tabulated', 'published-plan', 'printed on the plate', 'stated in the text', 'course-table']);
+
+/** A record's method, or nothing where the method is a transcription. */
+export function methodWords(method: string | undefined): string | undefined {
+  if (method === undefined || TRANSCRIBED.has(method)) return undefined;
+  return method;
+}
+
+/** One record behind a claim's numbers: what it says, who says it, how, and whether anyone has checked. */
+function Record({ record, model }: { record: Measurement; model: Model }): React.JSX.Element {
+  const method = methodWords(record.method);
+  return (
+    <li>
+      <code>{record.key}</code>
+      <span className="value">
+        {record.value} {record.unit}
+      </span>
+      <span className="note">
+        {sourceWords(model, record.source)}
+        {method === undefined ? '' : `, ${method}`}
+        <span
+          className={`flag ${record.verified ? 'is-verified' : 'is-unverified'}`}
+          title={record.verified ? 'checked against the cited page' : 'not yet checked against the cited page'}
+        >
+          {record.verified ? '✓' : '?'}
+        </span>
+      </span>
     </li>
   );
 }
 
-/** How a source is written out, or its id when the database has lost it. */
+/** The short title of a source, or its id when the database has lost it. */
+function sourceWords(model: Model, id: string): string {
+  try {
+    return shortTitle(sourceById(model.db, id));
+  } catch {
+    return id;
+  }
+}
+
+/** The whole citation, for the title attribute, or the id when the database has lost it. */
 function citationOf(model: Model, id: string): string {
   try {
     return sourceById(model.db, id).citation;
@@ -149,8 +296,50 @@ function citationOf(model: Model, id: string): string {
 function Citations({ label, ids, model }: { label: string; ids: string[]; model: Model }): React.JSX.Element | null {
   if (ids.length === 0) return null;
   return (
-    <p className="note">
-      <strong>{label}:</strong> {ids.map((id) => citationOf(model, id)).join(' · ')}
+    <p className="note citations">
+      <span className="citations-label">{label}</span>
+      {ids.map((id) => (
+        <span key={id} className="cite" title={citationOf(model, id)}>
+          {sourceWords(model, id)}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/**
+ * What to do with a claim the model wrote. Nothing has written it anywhere:
+ * it is in this session's memory and goes when the tab does. `data/claims/`
+ * holds only what a person has read against the sources it names, so the
+ * panel says how to file it and there is no button that files it.
+ */
+function MoveNote({ claim }: { claim: Claim }): React.JSX.Element {
+  return (
+    <div className="move-note">
+      <h4>Move into data/claims</h4>
+      <p className="note">
+        This claim was proposed, not filed, and nothing has written it to disk. To keep it: save it as{' '}
+        <code>data/claims/{claim.id}.yaml</code>, read every number and every source in it against the pages it cites, drop the{' '}
+        <code>origin</code> and <code>prose</code> lines, give it an id in its group's own series, and run <code>pnpm bundle</code>. The
+        dossier never prints a proposed claim.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Whether the claim's overlay is drawn on the plateau. The layer is the
+ * scene's and the reader may want the geometry without it, so the detail
+ * carries the switch beside the description of what it would draw.
+ */
+function OverlayButton(): React.JSX.Element {
+  const on = useView((s) => s.layers.overlay);
+  const toggleLayer = useView((s) => s.toggleLayer);
+  return (
+    <p className="overlay-buttons">
+      <button type="button" className="step" onClick={() => toggleLayer('overlay')} aria-pressed={on}>
+        {on ? 'Stop drawing it' : 'Draw it on the plateau'}
+      </button>
     </p>
   );
 }
@@ -159,17 +348,23 @@ function Citations({ label, ids, model }: { label: string; ids: string[]; model:
  * Which epoch this claim was actually evaluated at, and the way back. A dated
  * claim under an override is a different claim from the one its author
  * stated, and the panel has to say so rather than quietly showing another
- * year's numbers under the same title.
+ * year's numbers under the same title. The years are written the way the
+ * caption line writes them, so the panel and the top of the screen agree.
  */
 function EpochLine({ claim, model }: { claim: Claim; model: Model }): React.JSX.Element {
   const setEpoch = useView((s) => s.setEpoch);
   const override = model.epochOverride;
   if (override === null || claim.epoch === undefined) {
-    return <p className="note">Evaluated at epoch {formatEpoch(claim.epoch as number)}, the epoch the claim is stated at.</p>;
+    return (
+      <p className="note">
+        Evaluated at <span className="num">{yearWords(claim.epoch as number)}</span>, the epoch the claim is stated at.
+      </p>
+    );
   }
   return (
     <p className="note">
-      Evaluated at epoch {formatEpoch(override)}, not at the {formatEpoch(claim.epoch)} the claim is stated at.{' '}
+      Evaluated at <span className="num">{yearWords(override)}</span>, not at the{' '}
+      <span className="num">{yearWords(claim.epoch)}</span> the claim is stated at.{' '}
       <button type="button" className="link" onClick={() => setEpoch(null)}>
         back to the claim's epoch
       </button>

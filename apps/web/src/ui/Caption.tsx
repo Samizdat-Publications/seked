@@ -48,13 +48,27 @@ export function listWords(words: string[]): string {
   return `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
 }
 
+/**
+ * The word the caption ends on. It is the state's own until a claim is open,
+ * because what the reader is looking at then is the claim drawn over the
+ * plateau and not the plateau; and a claim the runner wrote from somebody's
+ * prose says `proposed`, so that it can never be taken for one a person has
+ * read against a source and filed.
+ */
+export function honestyWord(stateKind: string, claimId: string | null, proposed: boolean): string {
+  if (claimId === null) return stateKind;
+  return proposed ? 'proposed' : 'claim';
+}
+
 export function Caption({ epoch, claimId }: { epoch: number; claimId: string | null }): React.JSX.Element {
   const stateId = useView((s) => s.state);
   const moment = useView((s) => s.moment);
   const override = useView((s) => s.epoch);
   const loading = useView((s) => s.loading);
+  const proposed = useView((s) => s.proposed);
   const state = stateById(stateId);
   const waiting = listWords(loadingWords(loading));
+  const kind = honestyWord(state.kind, claimId, proposed.some((c) => c.id === claimId));
 
   return (
     <header className="caption">
@@ -66,7 +80,7 @@ export function Caption({ epoch, claimId }: { epoch: number; claimId: string | n
         <Dot />
         <span className="num">{momentWords(moment)}</span>
         <Dot />
-        <span className={`caption-kind is-${state.kind}`}>{state.kind}</span>
+        <span className={`caption-kind is-${kind}`}>{kind}</span>
       </p>
       {epoch !== state.epoch && (
         <p className="caption-aside">
