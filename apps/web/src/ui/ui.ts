@@ -13,6 +13,7 @@ export const DRAWERS = [
   { id: 'section', label: 'Section', hint: 'Cut the masonry open, and how the camera moves' },
   { id: 'sky', label: 'Sky', hint: 'The epoch, the sidereal time and the named stars' },
   { id: 'tour', label: 'Tour', hint: 'A narrated way through the model' },
+  { id: 'film', label: 'Film', hint: 'Record a sequence from the viewer, frame by frame' },
   { id: 'about', label: 'About', hint: 'What this is, and where its surfaces come from' },
 ] as const;
 

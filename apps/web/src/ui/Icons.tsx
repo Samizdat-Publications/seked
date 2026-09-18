@@ -78,6 +78,15 @@ const About = (): React.JSX.Element => (
   </svg>
 );
 
+/** A frame of film: the gate and its two sprocket holes a side. */
+const Film = (): React.JSX.Element => (
+  <svg {...box}>
+    <rect x="3.5" y="5" width="17" height="14" rx="1.5" />
+    <path d="M7 5v14M17 5v14" />
+    <path d="M3.5 9h3.5M3.5 15h3.5M17 9h3.5M17 15h3.5" />
+  </svg>
+);
+
 export const ICONS: Record<DrawerId, () => React.JSX.Element> = {
   views: Views,
   layers: Layers,
@@ -85,6 +94,7 @@ export const ICONS: Record<DrawerId, () => React.JSX.Element> = {
   section: Section,
   sky: Sky,
   tour: Tour,
+  film: Film,
   about: About,
 };
 

@@ -2,6 +2,7 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import type { Model } from '../model';
+import { useMotion } from '../motion/store';
 import type { OverlaySpec } from '../overlays';
 import { sectionPlanes } from '../section';
 import type { DomeBuffers, NamedDomeStar } from '../sky';
@@ -15,6 +16,7 @@ import { Renderer } from './Renderer';
 import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
 import { Interiors } from './Interior';
+import { Motion } from './Motion';
 import { NorthArrow } from './NorthArrow';
 import { Structures } from './Structures';
 import { Pyramids } from './Pyramids';
@@ -80,10 +82,21 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
   const section = useView((s) => s.section);
   const planes = useMemo(() => sectionPlanes(section), [section]);
   const groundPlanes = useMemo(() => sectionPlanes(section, section.ground), [section]);
+  // The film steps the clock itself and draws a frame only when it asks for
+  // one; everything else runs on the browser's own loop.
+  const clock = useMotion((s) => s.clock);
 
   return (
-    <Canvas shadows dpr={[1, 2]} gl={{ antialias: false, powerPreference: 'high-performance' }} camera={{ fov: 45, near: 1, far: 40000, position: start.position }}>
+    <Canvas
+      shadows
+      dpr={[1, 2]}
+      frameloop={clock === 'stepped' ? 'never' : 'always'}
+      gl={{ antialias: false, powerPreference: 'high-performance' }}
+      camera={{ fov: 45, near: 1, far: 40000, position: start.position }}
+    >
       <color attach="background" args={[BACKGROUND]} />
+      {/* Plays whatever sequence is loaded by writing the view store; draws nothing. */}
+      <Motion />
 
       {layers.grid && <gridHelper args={[6000, 60, '#38475a', '#1d2630']} />}
 

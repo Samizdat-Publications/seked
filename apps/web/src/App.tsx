@@ -13,6 +13,7 @@ import { useView } from './store';
 import { About } from './ui/About';
 import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
+import { Film } from './ui/Film';
 import { HoverTag } from './ui/HoverTag';
 import { Rail } from './ui/Rail';
 import { SphinxControl } from './ui/Sphinx';
@@ -160,6 +161,9 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
         </Drawer>
         <Drawer id="tour">
           <Tour />
+        </Drawer>
+        <Drawer id="film">
+          <Film />
         </Drawer>
         <Drawer id="about">
           <About />
