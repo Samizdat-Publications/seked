@@ -6,6 +6,16 @@
  * not of the plateau, so none of it is in the view store or in the address
  * bar. The run itself is `film/run.ts`, the file is `film/encode.ts`, and this
  * component is the form in front of them and the progress line under it.
+ *
+ * What is in a frame, since a film is cut from the canvas and not from the
+ * page. In it: everything the scene draws, and that includes the claim
+ * overlays and their labels, because `scene/Label.tsx` is a canvas texture on
+ * a sprite rather than a div over the canvas. Checked at 720p on the tour's
+ * fourth and fifth shots, where A4's three diagonals and C2's four shafts
+ * come out named and legible (Track S, 2026-09-18). Not in it: the caption,
+ * the rail, the instruments and the hover tag, which `.is-filming` takes off
+ * the stage for the run. So nothing has to be drawn twice for a film, and
+ * anything added to the interface as HTML will be missing from one.
  */
 import { useRef, useState } from 'react';
 import { r3f } from '../film/handle';

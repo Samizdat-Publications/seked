@@ -130,20 +130,20 @@ Branch `stage5/overlays`. Owns `apps/web/src/scene/ClaimOverlay.tsx`, `apps/web/
 
 ### Task S1: one palette
 
-- [ ] Every overlay type (the sixteen in `data/claims/*.yaml`: `ghost-profile`, `ghost-profiles`, `ghost-earth`, `shaft-rays`, `passage-ray`, `sky-projection`, `compass-rose`, `ground-bearings`, `ground-line`, `ground-outlines`, `ground-rectangle`, `chamber-wireframe`, `akhet`, `sun-ribbon`, `map-inset`, `panel`) draws in the stage's palette: lapis for the claim's own geometry, the warm sand for the survey it is drawn against, the existing green and red only for a fit or a miss mark. `RAY_COLOURS` and `SIGHT_COLOUR` move to a `PALETTE` in `overlays.ts` with a sentence each. Lines go through the post chain like everything else (no `depthTest: false` unless the type needs to show through the pyramid, and then the line is drawn twice, the occluded pass dimmer).
-- [ ] Labels (`Label.tsx`) match `HoverTag.tsx`: the same face, the same glass, tabular numerals, and a leader line to the point they name.
-- [ ] Screenshots: A1 (`ghost-profile`) from the east face stand, C2 (`shaft-rays`) from the night stand, B1 (`ghost-earth`) from the panorama, D3 (`ground-bearings`) from above; each in the built state and one of them at night.
-- [ ] Commit: "Draw every overlay in the stage's palette, with the labels the stage already has".
+- [x] Every overlay type (the sixteen in `data/claims/*.yaml`: `ghost-profile`, `ghost-profiles`, `ghost-earth`, `shaft-rays`, `passage-ray`, `sky-projection`, `compass-rose`, `ground-bearings`, `ground-line`, `ground-outlines`, `ground-rectangle`, `chamber-wireframe`, `akhet`, `sun-ribbon`, `map-inset`, `panel`) draws in the stage's palette: lapis for the claim's own geometry, the warm sand for the survey it is drawn against, the existing green and red only for a fit or a miss mark. `RAY_COLOURS` and `SIGHT_COLOUR` move to a `PALETTE` in `overlays.ts` with a sentence each. Lines go through the post chain like everything else (no `depthTest: false` unless the type needs to show through the pyramid, and then the line is drawn twice, the occluded pass dimmer).
+- [x] Labels (`Label.tsx`) match `HoverTag.tsx`: the same face, the same glass, tabular numerals, and a leader line to the point they name.
+- [x] Screenshots: A1 (`ghost-profile`) from the east face stand, C2 (`shaft-rays`) from the night stand, B1 (`ghost-earth`) from the panorama, D3 (`ground-bearings`) from above; each in the built state and one of them at night.
+- [x] Commit: "Draw every overlay in the stage's palette, with the labels the stage already has".
 
 ### Task S2: the proposed style
 
-- [ ] An overlay for a claim whose `origin` is `proposed` draws dashed, at three quarters the opacity, with the label prefixed `proposed`. `overlays.ts`'s spec builders take the claim and pass `proposed: boolean` through; the components read it. A test that a spec built from a `P1` claim carries the flag.
-- [ ] Commit: "Dash the overlay of a claim that was proposed rather than filed".
+- [x] An overlay for a claim whose `origin` is `proposed` draws dashed, at three quarters the opacity, with the label prefixed `proposed`. `overlays.ts`'s spec builders take the claim and pass `proposed: boolean` through; the components read it. A test that a spec built from a `P1` claim carries the flag.
+- [x] Commit: "Dash the overlay of a claim that was proposed rather than filed".
 
 ### Task S3: the overlay in a film
 
-- [ ] Check every overlay through the stepped clock: record the tour's shot four (`Inside the Great Pyramid`) and shot five (the shafts) at 720p and confirm the overlays and labels are in the frames at full size (labels are HTML; if they are not in the canvas they are not in the film, and the fix is to say so in `Film.tsx`'s note and draw the film's labels as sprites, or to leave them out of films and say that; the track decides and writes it down).
-- [ ] Commit: "Say what an overlay is in a film, and make it so".
+- [x] Check every overlay through the stepped clock: record the tour's shot four (`Inside the Great Pyramid`) and shot five (the shafts) at 720p and confirm the overlays and labels are in the frames at full size (labels are HTML; if they are not in the canvas they are not in the film, and the fix is to say so in `Film.tsx`'s note and draw the film's labels as sprites, or to leave them out of films and say that; the track decides and writes it down).
+- [x] Commit: "Say what an overlay is in a film, and make it so".
 
 ---
 
