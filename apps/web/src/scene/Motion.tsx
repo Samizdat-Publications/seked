@@ -8,8 +8,9 @@
  * one that eases the camera along the keys and tweens the sun, the epoch and
  * the sidereal time. Nothing else in the scene should notice the swap.
  */
-import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useFrame, useStore } from '@react-three/fiber';
+import { useEffect, useRef } from 'react';
+import { setR3F } from '../film/handle';
 import { useMotion } from '../motion/store';
 import type { Shot } from '../motion/types';
 import { useView, type ViewStore } from '../store';
@@ -33,6 +34,14 @@ export function cutToShot(shot: Shot, store: ViewStore): void {
 }
 
 export function Motion(): null {
+  // The film draws its own frames and needs R3F's own store to do it, which
+  // only something inside the Canvas can hand out (`film/handle.ts`).
+  const r3f = useStore();
+  useEffect(() => {
+    setR3F(r3f);
+    return () => setR3F(null);
+  }, [r3f]);
+
   /** The shot last cut to, as `sequence.id:index`, so a shot is cut to once. */
   const seen = useRef<string>('');
   const stateDone = useRef<string>('');
