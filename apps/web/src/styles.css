@@ -2064,3 +2064,14 @@ ul.assumed li {
   font-size: 0.76rem;
   color: var(--ink);
 }
+
+/*
+ * The caption's honesty word for a claim the runner wrote. Lapis like the
+ * filed claims it stands beside, and dashed like the overlay a proposed claim
+ * draws, so the two say the same thing in the same way at both ends of the
+ * screen.
+ */
+.caption-kind.is-proposed {
+  color: var(--lapis-ink);
+  border-style: dashed;
+}

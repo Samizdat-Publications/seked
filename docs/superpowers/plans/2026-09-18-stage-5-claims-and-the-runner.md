@@ -92,8 +92,8 @@ Branch `stage5/drawer`. Owns `apps/web/src/panels/Claims.tsx`, `apps/web/src/pan
 
 ### Task R3: the honesty word
 
-- [ ] The caption line's honesty word (`survey`, `reconstruction`, `claim`) already changes with the state; with a claim open it becomes `claim` and, for a proposed one, `proposed`. One line in `ui/Caption.tsx` and its test.
-- [ ] Commit: "Say proposed on the caption line when a proposed claim is open".
+- [x] The caption line's honesty word (`survey`, `reconstruction`, `claim`) already changes with the state; with a claim open it becomes `claim` and, for a proposed one, `proposed`. One line in `ui/Caption.tsx` and its test.
+- [x] Commit: "Say proposed on the caption line when a proposed claim is open".
 
 ---
 
