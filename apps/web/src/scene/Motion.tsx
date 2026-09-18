@@ -25,7 +25,7 @@
 import { useFrame, useStore } from '@react-three/fiber';
 import { defaultStars, positionAtEpoch, transitLst, type Star } from '@seked/sky/browser';
 import { useEffect, useMemo, useRef } from 'react';
-import { setR3F } from '../film/handle';
+import { r3f, setR3F } from '../film/handle';
 import { LOOKS } from '../looks';
 import { applyShot, newScratch, resetScratch } from '../motion/apply';
 import { useMotion } from '../motion/store';
@@ -38,6 +38,8 @@ export interface SekedHandle {
   motion: typeof useMotion;
   view: typeof useView;
   looks: typeof LOOKS;
+  /** The R3F root, for reading the renderer and the scene from the console. */
+  r3f: typeof r3f;
 }
 
 declare global {
@@ -138,4 +140,4 @@ export function Motion(): null {
 // A handle for the console, in development only: the two stores and the hero
 // stands, so a sequence can be played by hand before the drawers that drive
 // it exist.
-if (import.meta.env.DEV) window.__seked = { motion: useMotion, view: useView, looks: LOOKS };
+if (import.meta.env.DEV) window.__seked = { motion: useMotion, view: useView, looks: LOOKS, r3f };

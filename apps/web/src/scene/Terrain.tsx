@@ -31,13 +31,40 @@ import { useWater } from './Water';
  * one place this track's work does not cross-fade, and the water arriving
  * over it covers most of it.
  */
+/**
+ * How many outline points the cut uniform carries, whatever the cuts are: a
+ * capacity, not a measurement. The Sphinx's ditch and the harbour basin
+ * together are 23 points; 64 leaves room for another cut or a finer outline,
+ * and a plan that needs more throws rather than cutting wrongly.
+ *
+ * The size is fixed because three keeps one uniforms object per material but
+ * caches compiled programs per shader text, and hands a program back from
+ * that cache without touching the uniforms. So if the array's declared size
+ * followed the cuts, a change of stop that brought back an earlier program
+ * would upload an array of the other length into it, and an array shorter
+ * than the declaration is a crash in the upload. One array of one length,
+ * shared by every compile and rewritten in place when the cuts change, is
+ * what every program can safely read.
+ */
+const TRENCH_CAPACITY = 64;
+const trenchValues = new WeakMap<MeshStandardMaterial, Vector2[]>();
+
 function applyGroundCuts(material: MeshStandardMaterial, cuts: readonly (readonly (readonly [number, number])[])[]): void {
   const plans = cuts.filter((c) => c.length >= 3);
-  const key = `v2:${plans.map((c) => c.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')).join('|')}`;
+  const flat = plans.flat();
+  if (flat.length > TRENCH_CAPACITY) {
+    throw new Error(`seked: ${flat.length} cut points on the ground, and the trench uniform carries ${TRENCH_CAPACITY}`);
+  }
+  let values = trenchValues.get(material);
+  if (!values) {
+    values = Array.from({ length: TRENCH_CAPACITY }, () => new Vector2());
+    trenchValues.set(material, values);
+  }
+  values.forEach((v, i) => (i < flat.length ? v.set(flat[i]![0], flat[i]![1]) : v.set(0, 0)));
+  const key = `v3:${plans.map((c) => c.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')).join('|')}`;
   patchMaterial(material, 'trench', key, (shader) => {
     if (plans.length === 0) return;
-    const flat = plans.flat();
-    shader.uniforms.uTrench = { value: flat.map(([x, y]) => new Vector2(x, y)) };
+    shader.uniforms.uTrench = { value: values };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
 varying vec2 vTrenchPos;`)
@@ -63,7 +90,7 @@ vTrenchPos = transformed.xy;`);
       shader.fragmentShader.replace(
         '#include <common>',
         `#include <common>
-uniform vec2 uTrench[${flat.length}];
+uniform vec2 uTrench[${TRENCH_CAPACITY}];
 varying vec2 vTrenchPos;`,
       ),
       'clipping_planes_fragment',
