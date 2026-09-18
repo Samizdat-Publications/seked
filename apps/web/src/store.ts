@@ -3,6 +3,7 @@
  * that rewrites the query string; nothing else touches history, so a shared
  * link and the panel can never disagree.
  */
+import type { Claim } from '@seked/claims/browser';
 import { create } from 'zustand';
 import { useMotion } from './motion/store';
 import { TOUR } from './tour';
@@ -57,6 +58,16 @@ export interface ViewStore extends View {
   hiddenMasses: Set<string>;
   setHiddenMasses: (ids: Set<string>) => void;
   /**
+   * The claims the runner has built from the reader's own prose this session.
+   * They are graded and drawn beside the filed ones, and they live here and
+   * nowhere else: nothing writes them to `data/claims/`, and a shared link
+   * does not carry them, because a claim nobody has read against a source is
+   * not the model's own word.
+   */
+  proposed: Claim[];
+  addProposed: (claim: Claim) => void;
+  dropProposed: (id: string) => void;
+  /**
    * What the viewer is still fetching, as ids of the form `kind:what`, which
    * the caption turns into its loading line. It is a property of the network
    * and not of the view, so it is not in the URL.
@@ -106,6 +117,12 @@ export const useView = create<ViewStore>((set, get) => ({
   krupp: true,
   hiddenMasses: new Set<string>(),
   setHiddenMasses: (hiddenMasses) => set({ hiddenMasses }),
+  proposed: [],
+  // A second proposal under an id already standing replaces it rather than
+  // doubling it, so a reader who puts the same words twice gets one row.
+  addProposed: (claim) => set((s) => ({ proposed: [...s.proposed.filter((c) => c.id !== claim.id), claim] })),
+  dropProposed: (id) =>
+    set((s) => ({ proposed: s.proposed.filter((c) => c.id !== id), claim: s.claim === id ? null : s.claim })),
   loading: new Set<string>(),
   // A set is replaced rather than mutated, because a mutated one is the same
   // object and nothing subscribed would hear of it. Reporting what is already

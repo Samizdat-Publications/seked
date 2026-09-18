@@ -42,6 +42,16 @@ const Claims = (): React.JSX.Element => (
   </svg>
 );
 
+/** A pen nib: a claim put in the reader's own words rather than filed. */
+const Propose = (): React.JSX.Element => (
+  <svg {...box}>
+    <path d="M12 3 7 14h10z" />
+    <path d="M12 14v3.5" />
+    <circle cx="12" cy="10.5" r="1.1" />
+    <path d="M8.2 19.5h7.6" />
+  </svg>
+);
+
 /** A block with the near half cut away, which is what the section plane does. */
 const Section = (): React.JSX.Element => (
   <svg {...box}>
@@ -91,6 +101,7 @@ export const ICONS: Record<DrawerId, () => React.JSX.Element> = {
   views: Views,
   layers: Layers,
   claims: Claims,
+  propose: Propose,
   section: Section,
   sky: Sky,
   tour: Tour,

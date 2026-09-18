@@ -29,7 +29,12 @@ export const ComparisonSchema = z.object({
 export type Comparison = z.infer<typeof ComparisonSchema>;
 
 export const ClaimSchema = z.object({
-  id: z.string().regex(/^[A-E]\d+$/),
+  /**
+   * `A1` to `E9` for a claim filed in `data/claims/`; `P1` upwards for one the
+   * runner proposed from prose, which lives under `build/claims/` or in the
+   * viewer's memory until a person has read it and moved it in by hand.
+   */
+  id: z.string().regex(/^(?:[A-E]|P)\d+$/),
   title: z.string(),
   group: z.enum(Object.keys(GROUPS) as [Group, ...Group[]]),
   summary: z.string(),
@@ -54,6 +59,15 @@ export const ClaimSchema = z.object({
     against: z.array(z.string()).default([]),
   }).default({ for: [], context: [], against: [] }),
   notes: z.string().optional(),
+  /**
+   * Where the claim came from. `filed` is a file in `data/claims/` that a
+   * person wrote and a source backs; `proposed` is one the runner built from
+   * somebody's words, which the dossier never prints and the viewer draws
+   * dashed. Nothing in `data/claims/` is ever `proposed`.
+   */
+  origin: z.enum(['filed', 'proposed']).default('filed'),
+  /** The words the claim was proposed from. A filed claim has none. */
+  prose: z.string().optional(),
 });
 export type ClaimFile = z.infer<typeof ClaimSchema>;
 

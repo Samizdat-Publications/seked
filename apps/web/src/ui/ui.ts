@@ -10,6 +10,7 @@ export const DRAWERS = [
   { id: 'views', label: 'Views', hint: 'The hero cameras, each with its own moment' },
   { id: 'layers', label: 'Layers', hint: 'What is drawn and what is left out' },
   { id: 'claims', label: 'Claims', hint: 'Every claim, evaluated live against the survey' },
+  { id: 'propose', label: 'Propose', hint: 'Put a claim to the model in your own words' },
   { id: 'section', label: 'Section', hint: 'Cut the masonry open, and how the camera moves' },
   { id: 'sky', label: 'Sky', hint: 'The epoch, the sidereal time and the named stars' },
   { id: 'tour', label: 'Tour', hint: 'A narrated way through the model' },

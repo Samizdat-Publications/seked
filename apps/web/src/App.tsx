@@ -15,6 +15,7 @@ import { Drawer } from './ui/Drawer';
 import { Film } from './ui/Film';
 import { HoverTag } from './ui/HoverTag';
 import { Narration } from './ui/Narration';
+import { Propose } from './ui/Propose';
 import { Rail } from './ui/Rail';
 import { SphinxControl } from './ui/Sphinx';
 import { SunDial } from './ui/SunDial';
@@ -41,6 +42,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   const selected = useView((s) => s.claim);
   const tour = useView((s) => s.tour);
   const state = useView((s) => s.state);
+  const proposed = useView((s) => s.proposed);
 
   /**
    * A tour index in the address bar opens the tour at that step, once, now
@@ -72,7 +74,10 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
 
   useShellKeys();
 
-  const model = useMemo(() => buildModel(bundle, preset, cubit, epochOverride), [bundle, preset, cubit, epochOverride]);
+  const model = useMemo(
+    () => buildModel(bundle, preset, cubit, epochOverride, proposed),
+    [bundle, preset, cubit, epochOverride, proposed],
+  );
   const header = bundle.terrain.header;
   const datum = bundle.sites.find((s) => s.id === header.site)?.origin.elevation ?? 0;
   // The ground grid is flattened under whatever pyramids the preset places, so
@@ -82,7 +87,9 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
     [header, heights, datum, model.pyramids],
   );
 
-  const claim = bundle.claims.find((c) => c.id === selected);
+  // A proposed claim opens, reads and draws like a filed one, so the open
+  // claim is looked for in both lists.
+  const claim = bundle.claims.find((c) => c.id === selected) ?? proposed.find((c) => c.id === selected);
   // With nothing overridden the scene follows the open claim, so choosing a
   // sky claim puts the sky at the epoch that claim is stated at.
   const epoch = sceneEpoch(epochOverride, claim?.epoch, stateById(state).epoch);
@@ -147,7 +154,10 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
           <h3 className="drawer-section">The basis</h3>
           <PresetPicker presets={bundle.presets} />
           <CubitSlider model={model} />
-          <Claims claims={bundle.claims} model={model} context={overlayContext} />
+          <Claims claims={[...bundle.claims, ...proposed]} model={model} context={overlayContext} />
+        </Drawer>
+        <Drawer id="propose">
+          <Propose />
         </Drawer>
         <Drawer id="section">
           <SectionControls model={model} />

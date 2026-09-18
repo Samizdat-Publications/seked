@@ -60,7 +60,11 @@ export interface DossierOptions {
   generatedAt?: Date;
 }
 
-export function renderDossier(db: Database, claims: Claim[], opts: DossierOptions = {}): string {
+export function renderDossier(db: Database, allClaims: Claim[], opts: DossierOptions = {}): string {
+  // The dossier is the record of what is filed. A proposed claim is one the
+  // runner built from somebody's prose and nobody has yet read against a
+  // source, so it never prints here, and `data/claims/` never holds one.
+  const claims = allClaims.filter((c) => c.origin !== 'proposed');
   const presetId = opts.presetId ?? 'canonical';
   const compare = opts.comparePresets ?? db.presets.map((p) => p.id);
   const envs = new Map(compare.map((id) => [id, buildEnvironment(resolve(db, id).values)] as const));

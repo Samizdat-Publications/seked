@@ -6,6 +6,7 @@ import { evaluateClaim, worstComparison, type ComparisonResult } from './evaluat
 import { evaluate, identifiers } from './expr';
 import { loadClaims } from './registry';
 import { formatResidual, renderDossier } from './dossier';
+import { ClaimSchema, normaliseClaim } from './schema';
 
 const db = loadDatabase();
 const claims = loadClaims();
@@ -277,5 +278,42 @@ describe('C1 true north', () => {
     expect(Math.abs(cmp.absolute)).toBeLessThan(0.1); // under 6 arcminutes
     expect(cmp.within).toBe(true);
     expect(formatResidual(cmp)).toMatch(/^−\d+\.\d′$/); // arcminutes, no percentage
+  });
+});
+
+describe('a proposed claim', () => {
+  const bare = {
+    title: 'A proposal',
+    group: 'proportion',
+    summary: 'Something somebody said.',
+    formula: 'g1.base.mean',
+    target: '230.364',
+    unit: 'm',
+  };
+
+  it('takes a P id, and no other letter', () => {
+    expect(ClaimSchema.parse({ ...bare, id: 'P1' }).id).toBe('P1');
+    expect(ClaimSchema.parse({ ...bare, id: 'A1' }).id).toBe('A1');
+    expect(() => ClaimSchema.parse({ ...bare, id: 'F1' })).toThrow();
+    expect(() => ClaimSchema.parse({ ...bare, id: 'P' })).toThrow();
+  });
+
+  it('is filed unless it says otherwise, and carries the words it came from', () => {
+    expect(ClaimSchema.parse({ ...bare, id: 'A1' }).origin).toBe('filed');
+    const proposed = ClaimSchema.parse({ ...bare, id: 'P1', origin: 'proposed', prose: 'The base is 230 metres.' });
+    expect(proposed.origin).toBe('proposed');
+    expect(normaliseClaim(proposed, 'P1.yaml').prose).toBe('The base is 230 metres.');
+    expect(normaliseClaim(proposed, 'P1.yaml').origin).toBe('proposed');
+  });
+
+  it('is left out of the dossier, and the filed ones are not', () => {
+    const proposed = normaliseClaim(ClaimSchema.parse({ ...bare, id: 'P1', origin: 'proposed', prose: 'said so' }), 'P1.yaml');
+    const out = renderDossier(db, [...claims, proposed]);
+    expect(out).not.toContain('P1');
+    expect(out).toContain('A1');
+  });
+
+  it('is never what a file in data/claims says it is', () => {
+    for (const c of claims) expect(c.origin, c.id).toBe('filed');
   });
 });

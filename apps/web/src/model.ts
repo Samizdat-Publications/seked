@@ -561,8 +561,19 @@ export function atEpoch(claim: Claim, epoch: number | null): Claim {
  * the cubit slider's move applied to time: a dated claim is evaluated at the
  * epoch the reader is looking at rather than at the one its author chose, so
  * the panel's residuals move as the sky is dragged.
+ *
+ * `proposed` are the claims the runner built from the reader's prose this
+ * session. They are graded by the same evaluator and against the same
+ * environment as the filed ones, because a proposal that were graded any
+ * other way would not be a test of anything.
  */
-export function buildModel(bundle: SekedBundle, presetId: string, cubit: number | null, epoch: number | null = null): Model {
+export function buildModel(
+  bundle: SekedBundle,
+  presetId: string,
+  cubit: number | null,
+  epoch: number | null = null,
+  proposed: Claim[] = [],
+): Model {
   const db = databaseOf(bundle);
   const resolved = resolve(db, presetId);
   const measuredCubit = resolved.values['cubit.royal'] ?? 0.5236;
@@ -589,7 +600,7 @@ export function buildModel(bundle: SekedBundle, presetId: string, cubit: number 
     .map((params) => ({ params, solids: interiorSolids(env, { structure: params.id }) }))
     .filter((interior) => Object.keys(interior.solids).length > 0);
   const results = new Map<string, ClaimResult>();
-  for (const claim of bundle.claims) results.set(claim.id, evaluateClaimSafely(atEpoch(claim, epoch), env));
+  for (const claim of [...bundle.claims, ...proposed]) results.set(claim.id, evaluateClaimSafely(atEpoch(claim, epoch), env));
   return {
     db,
     resolved,
