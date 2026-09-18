@@ -155,19 +155,19 @@ Branch `stage5/propose`. Owns `apps/web/src/ui/Propose.tsx`, `apps/web/src/runne
 
 ### Task U1: the key
 
-- [ ] `runner.ts`: `readerKey()` and `setReaderKey(key)` on `localStorage` under `seked.anthropicKey`; `runnerClient()` builds `new Anthropic({ apiKey, dangerouslyAllowBrowser: true })`. The drawer's first state is a field for the key with three sentences: it stays in this browser, it goes to `api.anthropic.com` and nowhere else, and each claim costs about what a page of text costs (read the price off the `claude-api` skill's table for `claude-opus-5` and say it in words, not a figure that will go stale). A `forget` link clears it.
-- [ ] Commit: "Hold the reader's key in the browser and say where it goes".
+- [x] `runner.ts`: `readerKey()` and `setReaderKey(key)` on `localStorage` under `seked.anthropicKey`; `runnerClient()` builds `new Anthropic({ apiKey, dangerouslyAllowBrowser: true })`. The drawer's first state is a field for the key with three sentences: it stays in this browser, it goes to `api.anthropic.com` and nowhere else, and each claim costs about what a page of text costs (read the price off the `claude-api` skill's table for `claude-opus-5` and say it in words, not a figure that will go stale). A `forget` link clears it.
+- [x] Commit: "Hold the reader's key in the browser and say where it goes".
 
 ### Task U2: the drawer
 
-- [ ] `Propose.tsx`: a text area, the five example buttons from `@seked/runner/browser`'s `EXAMPLES`, a `Put it to the model` button, and a running line while it runs (`asking`, `checking`, `repairing once`). On success the claim goes into the store's `proposed`, is selected, and the Claims drawer's row and detail (track R) and its overlay (track S) show it. On `ProposalFailed` the drawer shows the model's last attempt and the errors in plain words, and offers to try again. A `Download as YAML` link on a proposed claim writes the file the CLI would have written.
-- [ ] Tests: the drawer with a fake client adds a claim to the store; a failure shows the errors.
-- [ ] Commit: "Put a claim to the model from the drawer, and see it graded".
+- [x] `Propose.tsx`: a text area, the five example buttons from `@seked/runner/browser`'s `EXAMPLES`, a `Put it to the model` button, and a running line while it runs (`asking`, `checking`, `repairing once`). On success the claim goes into the store's `proposed`, is selected, and the Claims drawer's row and detail (track R) and its overlay (track S) show it. On `ProposalFailed` the drawer shows the model's last attempt and the errors in plain words, and offers to try again. A `Download as YAML` link on a proposed claim writes the file the CLI would have written.
+- [x] Tests: the drawer with a fake client adds a claim to the store; a failure shows the errors.
+- [x] Commit: "Put a claim to the model from the drawer, and see it graded".
 
 ### Task U3: the built context
 
-- [ ] The context (T1) is built once from the loaded bundle and memoised; `scripts/bundle.ts` does not change (the runner reads the bundle the viewer already has). Check the prompt's size with `client.messages.countTokens` once in a test that is skipped without a key, and record the number in the commit message.
-- [ ] Commit: "Build the model's context from the bundle the viewer already loaded".
+- [x] The context (T1) is built once from the loaded bundle and memoised; `scripts/bundle.ts` does not change (the runner reads the bundle the viewer already has). Check the prompt's size with `client.messages.countTokens` once in a test that is skipped without a key, and record the number in the commit message.
+- [x] Commit: "Build the model's context from the bundle the viewer already loaded".
 
 ---
 
