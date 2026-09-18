@@ -466,6 +466,19 @@ actually GPU-bound, which after stage 5 it is not.
    577 mastabas already are, and gate them to `today`. CLAUDE.md carries the
    rule: the city is context and carries no evidence tier, but it is still
    imported and never invented.
+
+   **Planned 2026-09-18 as stage 6**,
+   `docs/superpowers/plans/2026-09-18-stage-6-the-city-and-the-valley.md`,
+   with both halves of the pipeline proven first. The footprint tile streams
+   and clips in 48 seconds and yields **277,266 buildings** in the box
+   `29.940, 31.100, 30.040, 31.240`, mean footprint 143 m2, thirty-eight times
+   what OSM has. The height raster's tile for Giza is
+   `v1/geotiffs/14584_2023_06_30/tile_ZEIX66sm0PA.tif`, 25000 by 25000 px at
+   0.5 m, 1,169 MB, range requests supported, and Giza sits near its
+   north-west corner so a neighbour or two is needed for the north of the box.
+   The plan stores an oriented box per building rather than a polygon, because
+   277,266 polygons as JSON is a liability and a city seen from a kilometre
+   away is boxes.
 2. **The architecture pass.** The ancient state's temples are extruded
    footprints, and Stewart's reference is a reconstruction with fluted
    columns, an architrave and cornice, a decorated facade, a roofed causeway
