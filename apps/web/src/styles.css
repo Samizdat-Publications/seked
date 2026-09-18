@@ -1789,3 +1789,42 @@ button.step.is-primary:hover {
 .film-trouble {
   color: var(--misses);
 }
+
+/* Track U: the propose drawer */
+
+/*
+ * The key field is the first place in the viewer where a reader types rather
+ * than drags, so it borrows the select's plate and hairline rather than
+ * inventing a form of its own.
+ */
+.propose-key {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--hairline);
+  border-radius: 0.4rem;
+  background: var(--glass-sunk);
+  color: var(--ink);
+  font: inherit;
+  letter-spacing: 0.12em;
+}
+
+/* The same row the tour and the film put their buttons in. */
+.propose-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0.2rem 0 0;
+}
+
+/*
+ * A primary button that cannot be pressed yet has to look it. `.step.is-primary`
+ * comes after `.step:disabled` at the same weight, so the sand wins there; this
+ * puts it back, inside this drawer only.
+ */
+.propose-buttons button.step:disabled {
+  border-color: var(--hairline);
+  background: var(--glass-sunk);
+  color: var(--ink-soft);
+}
