@@ -136,8 +136,8 @@ Branch `stage4/steady`. Owns `apps/web/src/scene/Sky.tsx`, `scene/Water.tsx`, `s
 
 ### Task P1: the sun moving
 
-- [ ] `Sky.tsx` rebuilds the PMREM environment on every `sun` change, and a tweened moment changes it twelve times a second. Measure the rebuild (`console.time` around `fromScene` at the current `SKY_SCALE`) and then: rebuild only when the sun has moved more than 0.5 degrees in altitude or 2 degrees in azimuth since the last build, or the state or the look anchors changed (look choices, named), and keep the fill and ambient lights updating every change since they are free. If a rebuild still costs more than 4 ms, halve the PMREM's source resolution during a sequence (`useMotion((s) => s.playing)` is the one motion read a scene file makes, and it is for cost, not for drawing) and restore it after. Prove it with the frame rate at the dawn stand while `useView.getState().setMoment({ hour })` is swept in a `requestAnimationFrame` loop from the console: before and after.
-- [ ] Commit: "Rebuild the sky's reflections only when the sun has moved enough to show it".
+- [x] `Sky.tsx` rebuilds the PMREM environment on every `sun` change, and a tweened moment changes it twelve times a second. Measure the rebuild (`console.time` around `fromScene` at the current `SKY_SCALE`) and then: rebuild only when the sun has moved more than 0.5 degrees in altitude or 2 degrees in azimuth since the last build, or the state or the look anchors changed (look choices, named), and keep the fill and ambient lights updating every change since they are free. If a rebuild still costs more than 4 ms, halve the PMREM's source resolution during a sequence (`useMotion((s) => s.playing)` is the one motion read a scene file makes, and it is for cost, not for drawing) and restore it after. Prove it with the frame rate at the dawn stand while `useView.getState().setMoment({ hour })` is swept in a `requestAnimationFrame` loop from the console: before and after.
+- [x] Commit: "Rebuild the sky's reflections only when the sun has moved enough to show it".
 
 ### Task P2: no popping in a slow move
 
