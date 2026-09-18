@@ -40,6 +40,7 @@ import {
   type ChamberWireframeSpec,
   type CompassRoseSpec,
   type GhostEarthSpec,
+  type GhostProfileSpec,
   type GroundBearingsSpec,
   type GroundLineSpec,
   type GroundOutlinesSpec,
@@ -100,7 +101,10 @@ function Drawing({
   switch (overlay.kind) {
     case 'ghost-profile':
       return (
-        <GhostProfiles spec={overlay.spec} pyramids={pyramids} clippingPlanes={clippingPlanes} proposed={overlay.proposed} />
+        <>
+          <GhostProfiles spec={overlay.spec} pyramids={pyramids} clippingPlanes={clippingPlanes} proposed={overlay.proposed} />
+          <GhostLabels spec={overlay.spec} pyramids={pyramids} />
+        </>
       );
     case 'shaft-rays':
       return <ShaftRays spec={overlay.spec} />;
@@ -125,6 +129,32 @@ function Drawing({
     case 'map-inset':
       return <MapInset spec={overlay.spec} />;
   }
+}
+
+/**
+ * A1 and A3. The ghosts themselves are meshes and are drawn in
+ * `GhostProfile.tsx`; what belongs here is their names, because every other
+ * overlay says in the scene what its lines are and until now these said
+ * nothing at all. Each label stands at the apex the claim's own slope puts
+ * there, which for A3 is three apexes fourteen centimetres apart, so the
+ * labels stack rather than the points parting.
+ */
+function GhostLabels({ spec, pyramids }: { spec: GhostProfileSpec; pyramids: PyramidParams[] }): React.JSX.Element | null {
+  const params = pyramids.find((p) => p.id === spec.structure);
+  if (!params) return null;
+  return (
+    <group>
+      {spec.profiles.map((profile, i) => (
+        <Note
+          key={profile.label}
+          text={`${profile.label} = ${formatDms(profile.slopeDeg)}`}
+          at={[params.offsetEast, params.offsetNorth, params.offsetUp + (params.base / 2) * Math.tan(profile.slopeDeg * DEG)]}
+          offset={[0, 30 + i * 22]}
+          colour={profile.colour}
+        />
+      ))}
+    </group>
+  );
 }
 
 /**

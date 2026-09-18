@@ -110,8 +110,8 @@ Branch `stage5/overlays`. Owns `apps/web/src/scene/ClaimOverlay.tsx`, `apps/web/
 
 ### Task S2: the proposed style
 
-- [ ] An overlay for a claim whose `origin` is `proposed` draws dashed, at three quarters the opacity, with the label prefixed `proposed`. `overlays.ts`'s spec builders take the claim and pass `proposed: boolean` through; the components read it. A test that a spec built from a `P1` claim carries the flag.
-- [ ] Commit: "Dash the overlay of a claim that was proposed rather than filed".
+- [x] An overlay for a claim whose `origin` is `proposed` draws dashed, at three quarters the opacity, with the label prefixed `proposed`. `overlays.ts`'s spec builders take the claim and pass `proposed: boolean` through; the components read it. A test that a spec built from a `P1` claim carries the flag.
+- [x] Commit: "Dash the overlay of a claim that was proposed rather than filed".
 
 ### Task S3: the overlay in a film
 

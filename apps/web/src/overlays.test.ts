@@ -487,3 +487,41 @@ describe('every overlay a claim declares is built', () => {
     expect(declared.filter((c) => c.overlay?.type === PANEL_ONLY).map((c) => c.id)).toEqual(['A5', 'B2', 'B5']);
   });
 });
+
+/**
+ * A claim the runner built from somebody's prose is drawn dashed, dimmer, and
+ * labelled `proposed`, and nothing about that is decided in a component: the
+ * flag comes off the claim file's own `origin` and rides on the spec. What is
+ * pinned here is that it rides, and that it changes nothing else. A proposed
+ * claim is graded exactly as a filed one is; where it came from says how it
+ * is drawn, never whether it fits.
+ */
+describe('a claim the runner proposed rather than a person filed', () => {
+  const model = buildModel(bundle, 'canonical', null, null);
+  const context = contextFor(model, -2449);
+  const filed = claim('C2');
+
+  it('carries the flag onto the spec, and a filed claim carries it false', () => {
+    expect(overlaySpec(filed, context)?.proposed).toBe(false);
+    const spec = overlaySpec({ ...filed, id: 'P1', origin: 'proposed' }, context);
+    expect(spec?.proposed).toBe(true);
+    expect(spec?.kind).toBe('shaft-rays');
+  });
+
+  it('is graded the same either way', () => {
+    const asFiled = overlaySpec(filed, context);
+    const asProposed = overlaySpec({ ...filed, id: 'P1', origin: 'proposed' }, context);
+    expect(asProposed?.fits).toBe(asFiled?.fits);
+    // C2 is the claim the dossier grades as a miss, so the ring at the point
+    // it lands is the red one and the test would notice if that changed.
+    expect(asFiled?.fits).toBe(false);
+  });
+
+  it('grades every filed claim the way the evaluator does, so the ring and the drawer agree', () => {
+    for (const c of bundle.claims) {
+      const spec = overlaySpec(c, contextFor(model, c.epoch ?? DEFAULT_EPOCH));
+      if (!spec) continue;
+      expect(spec.fits, `${c.id}`).toBe(model.results.get(c.id)?.fits);
+    }
+  });
+});
