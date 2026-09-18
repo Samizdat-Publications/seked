@@ -39,6 +39,7 @@ import { useFrame } from '@react-three/fiber';
 import { waterExtent, type Environment, type Footprint, type WaterBody } from '@seked/geometry';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentRef } from 'react';
 import {
+  Color,
   DataTexture,
   LinearMipmapLinearFilter,
   PlaneGeometry,
@@ -52,6 +53,7 @@ import {
 } from 'three';
 import { useView } from '../store';
 import { applyAtmosphere } from './Atmosphere';
+import { luminanceOf, skyStand } from './Sky';
 import { meshGeometry } from './geometry';
 import { patchMaterial } from './materials/patch';
 import { groundSampler, StoneSurface } from './Trench';
@@ -85,7 +87,44 @@ const LOOK = {
   mirror: 0.55,
   mixStrength: 0.7,
   mixBlur: 1.2,
-  blur: [220, 70] as [number, number],
+  // Softer than stage 3's [220, 70]. What a 512-pixel mirror gives back at a
+  // grazing angle is a smear of whatever is behind it, and the harder it is
+  // drawn the more it reads as a smear rather than as water; the blur is what
+  // buys the difference, and it costs two passes either way.
+  blur: [340, 110] as [number, number],
+  /**
+   * What a low sun does to the mirror, the mix and the colour, all of it a
+   * look choice.
+   *
+   * The fault this fixes: at dusk the sky over the west is the brightest thing
+   * in the frame, and a mirror laid over a dark green-blue at seven tenths
+   * puts that brightness on the whole surface at once. From a stand high over
+   * the harbour it reads as a sheen. From a low one, where the water fills
+   * the bottom of the frame at a grazing angle and every pixel of it is
+   * reflecting the same bright band, it reads as milk.
+   *
+   * So as the sun comes down the mirror and the mix come down with it, and the
+   * water's own colour is drawn toward the colour the sky has taken at that
+   * hour rather than staying the one fixed green-blue: water at dusk is the
+   * colour of the sky it is under, which is the whole reason a still river
+   * goes orange. It takes the sky's colour and not the sky's brightness: the
+   * tint is put back at the deep colour's own luminance first, because
+   * mixing a bright sky into the surface is the fault, not the cure.
+   *
+   * `fromDeg` is where that begins, which is about the last two hours of
+   * light and is high enough that the harbour at the December solstice, where
+   * the sun stands at nearly thirteen degrees at four o'clock, is well into
+   * it; `belowDeg` is the plan's own line, below which the water has gone as
+   * far toward flat as it goes.
+   */
+  dusk: {
+    fromDeg: 25,
+    belowDeg: 5,
+    mirror: 0.18,
+    mixStrength: 0.26,
+    /** How far the colour goes toward the sky's own at the bottom of the ramp. */
+    skyShare: 0.7,
+  },
   resolution: 512,
   rippleTileMetres: 24,
   driftA: [0.016, 0.009] as [number, number],
@@ -333,14 +372,30 @@ export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.E
   const ripple = useMemo(() => rippleNormals(), []);
   useEffect(() => () => ripple.dispose(), [ripple]);
   const drift = useRef({ a: { value: new Vector2() }, b: { value: new Vector2() } }).current;
+  const material = useRef<ComponentRef<typeof MeshReflectorMaterial>>(null);
+  const deep = useMemo(() => new Color(LOOK.colour), []);
+  const tint = useMemo(() => new Color(), []);
   useFrame((_, delta) => {
     drift.a.value.x += LOOK.driftA[0] * delta;
     drift.a.value.y += LOOK.driftA[1] * delta;
     drift.b.value.x += LOOK.driftB[0] * delta;
     drift.b.value.y += LOOK.driftB[1] * delta;
-  });
 
-  const material = useRef<ComponentRef<typeof MeshReflectorMaterial>>(null);
+    // The dusk, taken off the sky rather than computed a second time here.
+    // `mirror`, `mixStrength` and the colour are all live uniforms on drei's
+    // reflector, so this is three writes and no recompile.
+    const m = material.current;
+    if (!m) return;
+    const sky = skyStand();
+    const t = Math.min(1, Math.max(0, (LOOK.dusk.fromDeg - sky.altitudeDeg) / (LOOK.dusk.fromDeg - LOOK.dusk.belowDeg)));
+    m.mirror = LOOK.mirror + (LOOK.dusk.mirror - LOOK.mirror) * t;
+    m.mixStrength = LOOK.mixStrength + (LOOK.dusk.mixStrength - LOOK.mixStrength) * t;
+    // The sky's colour at the water's own depth: its hue, not its brightness.
+    tint.copy(sky.colour);
+    const lit = luminanceOf(tint);
+    if (lit > 0) tint.multiplyScalar(luminanceOf(deep) / lit);
+    m.color.copy(deep).lerp(tint, LOOK.dusk.skyShare * t);
+  });
   useEffect(() => {
     const m = material.current;
     if (!m || !body) return;

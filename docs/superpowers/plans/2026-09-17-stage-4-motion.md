@@ -146,8 +146,8 @@ Branch `stage4/steady`. Owns `apps/web/src/scene/Sky.tsx`, `scene/Water.tsx`, `s
 
 ### Task P3: dusk from low stands
 
-- [ ] The open items from stage 3: the water reads milky at dusk from low stands (`Water.tsx` `LOOK`: mirror and mixStrength by the sun's altitude, less mirror below 5 degrees, and the reflection's blur up; the colour toward the sky's own dusk colour through the environment rather than a fixed green-blue) and the aerial haze reads heavy at low dusk views (`Atmosphere.ts`: the low dust layer's density by altitude is right at dawn but at the akhet moment it doubles up with the horizon's own brightness; scale it by the camera's height so a stand under 10 m sees two thirds of it). Compare the harbour stand at winter dusk and the akhet stand before and after, in `built` and `ancient`.
-- [ ] Commit: "Clear the water and the air at dusk from the low stands".
+- [x] The open items from stage 3: the water reads milky at dusk from low stands (`Water.tsx` `LOOK`: mirror and mixStrength by the sun's altitude, less mirror below 5 degrees, and the reflection's blur up; the colour toward the sky's own dusk colour through the environment rather than a fixed green-blue) and the aerial haze reads heavy at low dusk views (`Atmosphere.ts`: the low dust layer's density by altitude is right at dawn but at the akhet moment it doubles up with the horizon's own brightness; scale it by the camera's height so a stand under 10 m sees two thirds of it). Compare the harbour stand at winter dusk and the akhet stand before and after, in `built` and `ancient`.
+- [x] Commit: "Clear the water and the air at dusk from the low stands".
 
 ---
 

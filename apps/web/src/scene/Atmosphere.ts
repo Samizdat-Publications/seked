@@ -50,6 +50,12 @@ const AIR: Record<string, IUniform> = {
   airDustBase: { value: 15 },
   /** And the metres it thins to a third over above that. */
   airDustScale: { value: 28 },
+  /** The height at and below which a camera sees `airDustLowShare` of the dust. */
+  airDustLowStand: { value: 10 },
+  /** And the height at which it sees all of it. */
+  airDustHighStand: { value: 100 },
+  /** What a camera standing in the dust sees of it. */
+  airDustLowShare: { value: 1 },
 };
 
 /**
@@ -87,6 +93,31 @@ const LOOK = {
     density: 1.3e-4,
     base: 15,
     scaleHeight: 28,
+    /**
+     * And what a stand low down sees of that, which is less than a stand above
+     * it. Look choices, all three.
+     *
+     * The density above is right at dawn, where the renders were set, and at
+     * the akhet moment it doubles up with the horizon's own brightness: the
+     * sun is on the horizon, every ray from a low stand runs the length of the
+     * dust layer rather than down through it, and the layer is glowing in the
+     * sun's own colour along the one direction the camera is pointed. The
+     * closed-form integral is not wrong about that. What is wrong is the
+     * density, which was chosen from a stand looking down.
+     *
+     * So the layer thins for a camera standing low: two thirds of it at ten
+     * metres above the datum and under, which is the plan's own line and is
+     * inside the dust's own flat top, rising to all of it at two hundred and
+     * fifty, which is higher than anything on the plateau but the Great
+     * Pyramid and is where a camera is unarguably looking down on the dust
+     * rather than along it. Both heights are look choices and the ramp
+     * between them is one too: what picked the top of it was that the two
+     * stands the layer was overdoing, the harbour at 45 m and the akhet in
+     * front of the Sphinx at 80, should come out at about seven tenths.
+     */
+    lowStand: 10,
+    highStand: 250,
+    lowShare: 2 / 3,
   },
   sun: { high: new Color('#eef2f6'), low: new Color('#e8a163') },
   /**
@@ -150,6 +181,9 @@ export function setAtmosphere(sun: Sun, state: StateId): void {
   AIR.airDustDensity!.value = LOOK.dust.density * low * (1 - night) * era.density;
   AIR.airDustBase!.value = LOOK.dust.base;
   AIR.airDustScale!.value = LOOK.dust.scaleHeight;
+  AIR.airDustLowStand!.value = LOOK.dust.lowStand;
+  AIR.airDustHighStand!.value = LOOK.dust.highStand;
+  AIR.airDustLowShare!.value = LOOK.dust.lowShare;
 }
 
 /**
@@ -174,7 +208,7 @@ export function useAtmosphere(sun: Sun): void {
  * transfer function is what makes a sky band.
  */
 export function applyAtmosphere(material: Material): void {
-  patchMaterial(material, 'air', 'v2', (shader) => {
+  patchMaterial(material, 'air', 'v3', (shader) => {
     for (const [name, uniform] of Object.entries(AIR)) shader.uniforms[name] = uniform;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vAirWorld;')
@@ -224,6 +258,9 @@ uniform float airScaleHeight;
 uniform float airDustDensity;
 uniform float airDustBase;
 uniform float airDustScale;
+uniform float airDustLowStand;
+uniform float airDustHighStand;
+uniform float airDustLowShare;
 
 float sekedOpticalDepth(float fromY, float toY, float distance) {
   float scale = max(airScaleHeight, 1.0);
@@ -242,11 +279,19 @@ float sekedDustIntegral(float y) {
   return min(y, airDustBase) + scale * (1.0 - sekedDustProfile(y));
 }
 
+// How much of the dust a camera at this height sees: less standing in it,
+// all of it looking down on it from above.
+float sekedDustStand(float y) {
+  float t = smoothstep(airDustLowStand, airDustHighStand, y);
+  return mix(airDustLowShare, 1.0, t);
+}
+
 float sekedDustDepth(float fromY, float toY, float distance) {
   if (airDustDensity <= 0.0) return 0.0;
+  float density = airDustDensity * sekedDustStand(cameraPosition.y);
   float drop = toY - fromY;
-  if (abs(drop) < 1.0) return airDustDensity * distance * sekedDustProfile(fromY);
-  return airDustDensity * distance * (sekedDustIntegral(toY) - sekedDustIntegral(fromY)) / drop;
+  if (abs(drop) < 1.0) return density * distance * sekedDustProfile(fromY);
+  return density * distance * (sekedDustIntegral(toY) - sekedDustIntegral(fromY)) / drop;
 }
 
 vec3 sekedAir(vec3 colour, vec3 world) {

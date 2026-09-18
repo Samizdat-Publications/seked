@@ -324,7 +324,7 @@ const STARLIGHT = {
 const NIGHT_BOUNCE = new Color('#0b1018');
 
 /** Rec. 709 luminance, which is what separates a light's colour from its strength. */
-function luminanceOf(colour: Color): number {
+export function luminanceOf(colour: Color): number {
   return 0.2126 * colour.r + 0.7152 * colour.g + 0.0722 * colour.b;
 }
 
@@ -369,6 +369,34 @@ export interface SkyProps {
 }
 
 /**
+ * The sky as it stands this frame, for a material that is lit by the sky but
+ * is not the sky and has no way to be handed the sun.
+ *
+ * The water is the one that needs it: it is drawn inside the same rotated
+ * group, it is a drei material that keeps its own uniforms, and the sun
+ * reaches it through neither a prop nor the store, because `Scene.tsx` hands
+ * the sun to `Sky` and to `Renderer` and to nothing else. Rather than compute
+ * a second sun, which would be the same number typed twice and could drift
+ * from this one, the sky writes what it has here and whoever needs it reads
+ * it inside `useFrame`.
+ *
+ * The object is the same one every frame and its fields are written in place,
+ * for the reason `fade.ts` gives for its own: a value that changes with the
+ * hour would re-render the scene to animate something no component draws.
+ */
+const STAND = { altitudeDeg: 90, colour: new Color('#ffffff') };
+
+/** What the sky is doing. Read it in a frame loop, never in a render body. */
+export function skyStand(): { readonly altitudeDeg: number; readonly colour: Color } {
+  return STAND;
+}
+
+function setSkyStand(altitudeDeg: number, colour: Color): void {
+  STAND.altitudeDeg = altitudeDeg;
+  STAND.colour.copy(colour);
+}
+
+/**
  * The sky, the fill light, the environment map, and the night behind them.
  * Mounts inside the rotated group.
  */
@@ -401,6 +429,10 @@ export function Sky({ sun, observer, stars, furniture }: SkyProps): React.JSX.El
   // little earlier and ends a little later, so the glow is up before the
   // sprite and outlasts it rather than switching with it.
   useEffect(() => setCasingCorona(state === 'ancient' ? night : 0), [state, night]);
+
+  // And what the water reads to know the hour: the sun's altitude and the
+  // colour the sky itself has taken at it.
+  useEffect(() => setSkyStand(sun.altitudeDeg, fill), [sun.altitudeDeg, fill]);
 
   return (
     <group>
