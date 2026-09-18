@@ -58,7 +58,7 @@ import { useView } from '../store';
 import { applyAtmosphere } from './Atmosphere';
 import { patchMaterial } from './materials/patch';
 import { GREEN, greenAt, useGreenMask, type GreenMask } from './materials/ground';
-import { forgetCascades, receiveCascades } from './materials/shadows';
+import { cascadeBreaks, forgetCascades, receiveCascades } from './materials/shadows';
 import { groundSampler } from './Trench';
 import type { TerrainProps } from './Terrain';
 import { useWater } from './Water';
@@ -126,6 +126,16 @@ const LOOK = {
    * trees ruled across the horizon.
    */
   cardFadeMetres: 2500,
+  /**
+   * Where the plants stop casting shadows while there are no cascades to ask.
+   *
+   * A look choice and a fallback only: the real line is the first cascade's
+   * own far plane, read off `materials/shadows.ts` every frame. Five hundred
+   * metres is about what `Renderer.tsx`'s three cascades in `practical` mode
+   * over three kilometres come to, so the picture does not jump between the
+   * scene mounting and the sun being built.
+   */
+  shadowFallbackMetres: 500,
 } as const;
 
 /** How many of a plant kind stand per square metre of full mask, by its own kind. */
@@ -475,67 +485,91 @@ function partsOf(group: Group, level: string | undefined): PlantPart[] {
   return parts;
 }
 
-// --- The near ring and the far ring ----------------------------------------
+// --- The three rings -------------------------------------------------------
 //
-// A plant within `LOOK.cardMetres` of the camera is its own model; beyond it,
-// it is two crossed quads carrying a picture of that model, baked from two
-// sides by `scripts/web-assets.ts`. The two are separate instanced meshes over
-// one placement list, and this is the bookkeeping that says which draws what.
+// A plant is drawn one of three ways by how far it is from the camera, and
+// each way is its own instanced mesh over one shared placement list.
 //
-// It is done as two lists of indices and not as a flag the shader reads,
+//   ring 0, inside the first shadow cascade: its own model, casting a shadow
+//   ring 1, out to `LOOK.cardMetres`:        its own model, casting nothing
+//   ring 2, beyond that:                     two crossed quads with a picture
+//
+// It is done as three lists of indices and not as a flag the shader reads,
 // because a flag still pays for every vertex of every instance: seven hundred
 // island trees at three thousand triangles is two million triangles of vertex
-// work whether they end up on screen or collapsed to nothing. Cutting the
-// mesh's `count` down to the near ones is the only thing that stops the work
-// being done, and that is the whole saving.
+// work whether they end up on screen or collapsed to nothing. Cutting a
+// mesh's `count` down is the only thing that stops the work being done, and
+// that is the whole saving.
 //
-// The band is `lod.ts`'s rule in its simplest form. Going out, the card takes
-// over at the line; coming in, the model does not return until the camera is
-// `cardBandMetres` inside it, so a camera loitering on the line stays on
-// whichever side it arrived from and no tree flickers.
+// The shadow line is where it is because a shadow map has a texel size. The
+// cascades cover three kilometres between them, so the second and third put a
+// texel at metres, and a tree's shadow drawn at metres a texel is a grey
+// lozenge that nothing in the picture explains, while the tree is still paid
+// for in that whole pass. Inside the first cascade the texel is fine enough
+// to read a crown, and that is where the plants cast. The metres come off the
+// cascades themselves (`materials/shadows.ts`), never typed here, so a change
+// to `LOOK.shadows` in `Renderer.tsx` moves this line with it.
+//
+// The bands are `lod.ts`'s rule in its simplest form. Going out, the next ring
+// takes over at the line; coming in, the finer one does not return until the
+// camera is a band inside it, so a camera loitering on a line stays on
+// whichever side it arrived from and nothing flickers.
 
-/** Which of the two meshes draws each place, and the two lists that follow from it. */
+/** How many rings there are: shadowed model, plain model, card. */
+const RINGS = 3;
+
+/** Which ring draws each place, and the three lists that follow from it. */
 interface Partition {
-  /** 0 where the place is drawn as a model, 1 where it is drawn as a card. */
+  /** The ring each place is in: 0 shadowed model, 1 plain model, 2 card. */
   side: Uint8Array;
-  /** The place indices each mesh draws, and how many of each are live. */
-  near: Uint32Array;
-  far: Uint32Array;
-  nearCount: number;
-  farCount: number;
+  /** The place indices each mesh draws, one array a ring, and how many of each are live. */
+  rings: Uint32Array[];
+  counts: number[];
   /** Bumped when the lists change, which is the only time a mesh rewrites its matrices. */
   version: number;
 }
 
 function newPartition(n: number): Partition {
-  return { side: new Uint8Array(n), near: new Uint32Array(n), far: new Uint32Array(n), nearCount: 0, farCount: 0, version: 0 };
+  return {
+    side: new Uint8Array(n),
+    rings: Array.from({ length: RINGS }, () => new Uint32Array(n)),
+    counts: new Array<number>(RINGS).fill(0),
+    version: 0,
+  };
 }
 
 /**
- * Sort the places into the two rings for this frame, and rebuild the lists
- * only when something actually crossed. The distance is to the place itself,
- * in the data frame, which is where both the places and the camera are put.
+ * Sort the places into the rings for this frame, and rebuild the lists only
+ * when something actually crossed. The distance is to the place itself, in the
+ * data frame, which is where both the places and the camera are put.
+ *
+ * `lines[i]` is where ring `i` gives way to ring `i + 1`, so a plant walks out
+ * one ring at a time and back in one ring at a time, which is `chooseLod`'s
+ * own shape without its per-thing state: the state here is the ring the place
+ * was in last frame, which is the same memory and one byte instead of three
+ * numbers.
  */
-function repartition(partition: Partition, places: Scattered['places'], at: Vector3, line: number, band: number): void {
+function repartition(partition: Partition, places: Scattered['places'], at: Vector3, lines: number[], band: number): void {
   let changed = partition.version === 0;
+  const last = RINGS - 1;
   for (let i = 0; i < places.length; i++) {
     const p = places[i] as Scattered['places'][number];
     const distance = Math.hypot(p.x - at.x, p.y - at.y, p.z - at.z);
     const was = partition.side[i] as number;
-    const now = was === 0 ? (distance > line ? 1 : 0) : (distance < line - band ? 0 : 1);
+    let now = was;
+    while (now < last && distance > (lines[now] as number)) now++;
+    while (now > 0 && distance < (lines[now - 1] as number) - band) now--;
     if (now === was) continue;
     partition.side[i] = now;
     changed = true;
   }
   if (!changed) return;
-  let near = 0;
-  let far = 0;
+  partition.counts.fill(0);
   for (let i = 0; i < places.length; i++) {
-    if ((partition.side[i] as number) === 0) partition.near[near++] = i;
-    else partition.far[far++] = i;
+    const ring = partition.side[i] as number;
+    (partition.rings[ring] as Uint32Array)[partition.counts[ring] as number] = i;
+    partition.counts[ring] = (partition.counts[ring] as number) + 1;
   }
-  partition.nearCount = near;
-  partition.farCount = far;
   partition.version++;
 }
 
@@ -824,14 +858,20 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
   const partition = useMemo(() => newPartition(places.length), [places]);
   const here = useRef(new Vector3()).current;
   const group = useRef<Group>(null);
+  const lines = useRef<number[]>([LOOK.shadowFallbackMetres, LOOK.cardMetres]).current;
   useFrame(({ camera }) => {
     const node = group.current;
     if (!node || places.length === 0) return;
+    // Where the first cascade ends, off the cascades themselves. It follows
+    // the camera's own far plane, so it is read every frame and not once.
+    const breaks = cascadeBreaks();
+    lines[0] = Math.min(breaks?.[0] ?? LOOK.shadowFallbackMetres, LOOK.cardMetres);
+    lines[1] = LOOK.cardMetres;
     // The camera in the data frame. Taken through the group's own inverse
     // rather than by turning the axes here, so nothing in this file has to
     // know which way the one rotated group is turned.
     node.worldToLocal(here.copy(camera.position));
-    repartition(partition, places, here, LOOK.cardMetres, LOOK.cardBandMetres);
+    repartition(partition, places, here, lines, LOOK.cardBandMetres);
   });
 
   const tag = useMemo(
@@ -875,8 +915,14 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
 }
 
 /**
- * One primitive of a plant, instanced at every place in the near ring with the
- * part's own transform inside the model applied first.
+ * One primitive of a plant, instanced at every place in the two model rings,
+ * with the part's own transform inside the model applied first.
+ *
+ * It is two meshes and not one because they differ in exactly one thing: the
+ * near one casts a shadow and the middle one does not, and `castShadow` is a
+ * property of a mesh and not of an instance. Two calls drawing between them
+ * the triangles one used to draw cost a call; the middle ring's instances not
+ * being drawn at all in the three shadow passes is the saving.
  *
  * The matrices are combined once, when the scatter changes, and the frame's
  * work is a copy of sixteen floats per instance that moved between the rings,
@@ -916,7 +962,8 @@ function PlantPrimitive({
     };
   }, [material, clippingPlanes]);
 
-  const [mesh, setMesh] = useState<InstancedMesh | null>(null);
+  const [casting, setCasting] = useState<InstancedMesh | null>(null);
+  const [plain, setPlain] = useState<InstancedMesh | null>(null);
   const combined = useMemo(() => {
     const out = new Float32Array(matrices.length * 16);
     const m = new Matrix4();
@@ -929,16 +976,23 @@ function PlantPrimitive({
   const drawn = useRef(-1);
   useEffect(() => {
     drawn.current = -1;
-    if (mesh) mesh.frustumCulled = false;
-  }, [mesh, combined]);
+    if (casting) casting.frustumCulled = false;
+    if (plain) plain.frustumCulled = false;
+  }, [casting, plain, combined]);
   useFrame(() => {
-    if (!mesh || drawn.current === partition.version) return;
+    if (!casting || !plain || drawn.current === partition.version) return;
     drawn.current = partition.version;
-    writeRing(mesh, combined, partition.near, partition.nearCount);
+    writeRing(casting, combined, partition, 0);
+    writeRing(plain, combined, partition, 1);
   });
 
   if (!material) return null;
-  return <instancedMesh ref={setMesh} args={[part.mesh.geometry, material, matrices.length]} castShadow receiveShadow />;
+  return (
+    <>
+      <instancedMesh ref={setCasting} args={[part.mesh.geometry, material, matrices.length]} castShadow receiveShadow />
+      <instancedMesh ref={setPlain} args={[part.mesh.geometry, material, matrices.length]} castShadow={false} receiveShadow />
+    </>
+  );
 }
 
 /**
@@ -1004,14 +1058,16 @@ function PlantCards({
   useFrame(() => {
     if (!mesh || drawn.current === partition.version) return;
     drawn.current = partition.version;
-    writeRing(mesh, flat, partition.far, partition.farCount);
+    writeRing(mesh, flat, partition, 2);
   });
 
   return <instancedMesh ref={setMesh} args={[geometry, material, matrices.length]} castShadow={false} receiveShadow />;
 }
 
 /** Copy one ring's matrices into a mesh and draw exactly that many instances. */
-function writeRing(mesh: InstancedMesh, from: Float32Array, which: Uint32Array, count: number): void {
+function writeRing(mesh: InstancedMesh, from: Float32Array, partition: Partition, ring: number): void {
+  const which = partition.rings[ring] as Uint32Array;
+  const count = partition.counts[ring] as number;
   const array = mesh.instanceMatrix.array as Float32Array;
   for (let i = 0; i < count; i++) {
     const at = (which[i] as number) * 16;

@@ -90,9 +90,9 @@ which is the shape of a geometry cost and not of a shading one.
 
 ### Task Q4: shadows near, none far
 
-- [ ] Only the near instanced mesh of each plant casts shadows, and only when its instance is inside the first cascade's far plane (`LOOK.shadows.maxFar` split by CSM's `practical` mode; read `csm.breaks` off the cascades rather than typing a metre figure). The far cards never cast. The grass never did.
-- [ ] Verify: the number at the five looks; a screenshot at `harbour` in the ancient state at 16:00 showing the near palms' shadows still on the ground.
-- [ ] Commit: "Cast the plants' shadows near and nowhere else".
+- [x] Only the near instanced mesh of each plant casts shadows, and only when its instance is inside the first cascade's far plane (`LOOK.shadows.maxFar` split by CSM's `practical` mode; read `csm.breaks` off the cascades rather than typing a metre figure). The far cards never cast. The grass never did.
+- [x] Verify: the number at the five looks; a screenshot at `harbour` in the ancient state at 16:00 showing the near palms' shadows still on the ground.
+- [x] Commit: "Cast the plants' shadows near and nowhere else".
 
 ### Task Q5: the water's flat edge, and the film's rate
 
