@@ -143,6 +143,10 @@
       "front": "+y",
       "ground_z": 0,
       "scale_to": {"height_m": 12},
+      "scatter_to": {
+        "triangles": 2500,
+        "note": "A look choice, not a measurement. A date palm is a bare trunk and a dozen fronds, and the fronds are what has to survive: at 2,500 each frond keeps its taper and the crown still reads as a palm from the water. The coarsest ratio level was 9,531, which at seven hundred palms was 6.7 million triangles a frame."
+      },
       "note": "No placements: Track I's Vegetation.tsx scatters the plants by its own mask. 12 m is a look choice, a mature date palm's ordinary height. Poly Haven has no palm, so this one is Sketchfab's.",
       "placements": {},
       "sha256": "0e7b711aa530489a3ae580f2bcd43843ca95abf11668041874708a6dedc9b8d6"
@@ -160,6 +164,10 @@
       "front": "+y",
       "ground_z": 0,
       "scale_to": {"height_m": 1.7},
+      "scatter_to": {
+        "triangles": 600,
+        "note": "A look choice, not a measurement. A desert shrub is a mass of small leaves and never fills more than a few dozen pixels where it is scattered, so six hundred triangles is a silhouette and a little depth in it, which is all that is ever seen of one."
+      },
       "keep_nodes": [
         "shrub_02_a"
       ],
@@ -180,6 +188,10 @@
       "front": "+y",
       "ground_z": 0,
       "scale_to": {"height_m": 0.45},
+      "scatter_to": {
+        "triangles": 600,
+        "note": "A look choice, not a measurement. The rooibos bush is the smallest plant scattered and stands at 0.45 m, so it is a handful of pixels at any distance the scatter reaches; six hundred triangles is the same budget the desert shrub has, because at that size the two cost the same and differ only in colour."
+      },
       "keep_nodes": [
         "wild_rooibos_bush_c"
       ],
@@ -201,6 +213,10 @@
       "ground_z": 0,
       "scale_to": {"height_m": 5.0},
       "decimate_to": 0.15,
+      "scatter_to": {
+        "triangles": 3000,
+        "note": "A look choice, not a measurement, and it changes only how the tree is drawn and never where one stands. Three thousand triangles is what an acacia is worth at the distance it is scattered to, which is the savanna horizon: the coarsest ratio level came out at 169,160 triangles across three meshes, and seven hundred of those is 118 million triangles a frame before the shadow passes, which is why the built and ancient states drew at five frames a second (director, 2026-09-18). It is the largest budget of the four because the island tree is the largest plant and the only one whose crown is read as a shape rather than as a smudge."
+      },
       "note": "No placements: Track I scatters it on the savanna horizon. Standing in for an acacia, which is a look choice. 5 m is the asset's own height. Poly Haven ships it at a density no browser needs for a tree seen from across the plateau, a 60 MB buffer that will not go under the 20 MB a file may be served at, so the finest level keeps a seventh of its faces.",
       "placements": {},
       "sha256": "6024cf385e9e0add29030925f8b891de264b813948f1cb9fb95633e256f50dc7"

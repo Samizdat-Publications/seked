@@ -370,6 +370,12 @@ function instanceMatrices(places: Scattered['places']): Matrix4[] {
 
 // --- Track K's plants ------------------------------------------------------
 
+/**
+ * The level a scattered plant is instanced from, baked to a triangle budget
+ * by `scripts/web-assets.ts` rather than to a ratio of the finest level.
+ */
+const SCATTER_LEVEL = 'scatter';
+
 /** One line of `public/props/manifest.json`, as far as the vegetation cares. */
 export interface PropEntry {
   id: string;
@@ -377,6 +383,8 @@ export interface PropEntry {
   name: string;
   file: string;
   lods?: string[];
+  /** How many triangles each level draws, by node name, as the baker measured them. */
+  levels?: Record<string, number>;
   scale_to?: number;
   evidence?: string;
   note?: string;
@@ -625,11 +633,28 @@ function Plant({ entry, mask, ground, level, strength, basin, clippingPlanes, cl
   useEffect(() => {
     let alive = true;
     // A scattered plant stands hundreds of times, so it is instanced from the
-    // coarsest level the pipeline made, not the first: the first level of an
-    // acacia is hundreds of thousands of triangles, and a few thousand of
-    // those stalled the GPU outright (director, 2026-09-17).
+    // level baked to a triangle budget and from no other.
+    //
+    // It used to take the coarsest of the ratio levels, on the reasoning that
+    // the coarsest is the cheapest. It is, and it was not nearly cheap
+    // enough: a ratio and an error bound are two demands on the simplifier
+    // and the error bound wins, so the island tree's coarsest ratio level was
+    // still 169,160 triangles across three meshes. Seven hundred of those is
+    // 118 million triangles a frame before the shadow passes, which is what
+    // held the built and ancient states at four frames a second while the
+    // today state ran at two hundred (director, 2026-09-18). The `scatter`
+    // level asks for a count instead and relaxes the error until it gets it.
     void loadPlant(entry.file).then((group) => {
-      if (alive && group) setParts(partsOf(group, entry.lods?.[entry.lods.length - 1]));
+      if (!alive || !group) return;
+      const scatter = entry.lods?.includes(SCATTER_LEVEL) ? SCATTER_LEVEL : undefined;
+      if (!scatter) {
+        console.warn(
+          `seked: ${entry.id} has no "${SCATTER_LEVEL}" level, so it is scattered from its coarsest ratio level, `
+            + `which may be tens of thousands of triangles times ${PLANT_CAP} instances. `
+            + 'Give it a `scatter_to` in blender/props.json and run pnpm web-assets.',
+        );
+      }
+      setParts(partsOf(group, scatter ?? entry.lods?.[entry.lods.length - 1]));
     });
     return () => {
       alive = false;

@@ -191,6 +191,48 @@ const LOD_RATIOS = [1, 0.25, 0.06] as const;
 /** How far simplification may move the surface, as a share of the model's size. The plan's figure. */
 const LOD_ERROR = 0.001;
 
+/**
+ * The one extra level a scattered plant gets, baked to a triangle budget
+ * rather than to a ratio.
+ *
+ * Why it exists. A ratio and an error bound are two demands on the simplifier
+ * and the error bound wins: at `LOD_ERROR` of 0.001 it stops long before the
+ * ratio on a mesh dense enough to need it. The island tree, the acacia
+ * stand-in, came out of the coarsest ratio level at 169,160 triangles across
+ * three meshes, and `Vegetation.tsx` instances that 700 times, which is 118
+ * million triangles a frame before the shadow passes ever run. The date
+ * palm's coarsest was 9,531, another 6.7 million. Together they were why the
+ * built and ancient states drew at five frames a second and the today state
+ * at a hundred and eighty (director, 2026-09-18).
+ *
+ * So the budget leads and the error bound gives way. The ratio asked for is
+ * the budget over what the finest level actually has, and the error is
+ * relaxed until the budget is met: a plant seen from across the plateau may
+ * lose its silhouette by a twentieth of its own radius and nobody will ever
+ * see it, while a tree drawn at a hundred and sixty thousand triangles at
+ * that distance is a tree drawn at one pixel a triangle.
+ *
+ * The budgets themselves are in `blender/props.json` as `scatter_to`, with
+ * the sentence that chose each one. They are look choices and no part of any
+ * measurement.
+ *
+ * One caution. The level goes into the manifest's `lods` as the plan asks, so
+ * a prop that had both a `scatter_to` and placements of its own would gain a
+ * fourth level in `Props.tsx`'s distance swap. Only the plants carry a
+ * budget, and the plants have no placements, so that prop does not exist.
+ */
+const SCATTER_LEVEL = 'scatter';
+
+/**
+ * How far the scatter level's simplifier may move the surface, as a share of
+ * the model's radius, tried in this order until the budget is met. The plan's
+ * two figures.
+ */
+const SCATTER_ERRORS = [0.05, 0.2] as const;
+
+/** Where the budgets live, which is the manifest the props are declared in and not the index the fetch writes. */
+const PROPS_MANIFEST = join(REPO_ROOT, 'blender', 'props.json');
+
 /** Texture sizes to try for a prop, largest first. A prop is small on screen beside a stand-in. */
 const PROP_SIZES = [1024, 512] as const;
 
@@ -223,8 +265,13 @@ interface PropEntry {
 /** One line of `apps/web/public/props/manifest.json`. */
 interface WebProp extends PropEntry {
   bytes: number;
-  /** The node names in the GLB, coarsening in order, as the stand-ins' manifest uses them. */
+  /**
+   * The node names in the GLB, coarsening in order, as the stand-ins' manifest
+   * uses them, with `scatter` last where the prop has a budget.
+   */
   lods: string[];
+  /** How many triangles each of those levels draws, so the viewer's cost is a number and not a guess. */
+  levels: Record<string, number>;
   /** The baked model's extent in metres, east, north and up. */
   size: [number, number, number];
   /** The sha256 of the source file this was baked from, which `blender/props.json` pins. */
@@ -346,18 +393,103 @@ function multiply(b: number[], a: number[]): number[] {
 }
 
 /**
- * The three levels of detail of one prop in one GLB, each under a node named
- * `lod0`, `lod1`, `lod2`, which is the same contract the stand-ins' manifest
- * uses so the viewer swaps them the same way.
+ * `scatter_to.triangles` out of `blender/props.json`, by prop id.
+ *
+ * Read from the manifest the props are declared in rather than from
+ * `build/props/index.json`, because that index carries a fixed list of fields
+ * written by `scripts/props.py`, which is the fetching half of the pipeline
+ * and has nothing to do with how heavy a level is baked. Reading the manifest
+ * here also means a budget can be changed and the props re-baked without
+ * fetching a single byte again.
  */
-async function lods(doc: Document, finest: number): Promise<Document> {
+function scatterBudgets(): Map<string, number> {
+  if (!existsSync(PROPS_MANIFEST)) return new Map();
+  const declared = JSON.parse(readFileSync(PROPS_MANIFEST, 'utf8')) as {
+    props?: { id: string; scatter_to?: { triangles?: number } }[];
+  };
+  const out = new Map<string, number>();
+  for (const prop of declared.props ?? []) {
+    const budget = prop.scatter_to?.triangles;
+    if (typeof budget === 'number' && budget > 0) out.set(prop.id, budget);
+  }
+  return out;
+}
+
+/** How many triangles a document draws, counted the way the renderer counts them: three indices to a triangle. */
+function triangleCount(doc: Document): number {
+  let total = 0;
+  for (const mesh of doc.getRoot().listMeshes()) {
+    for (const primitive of mesh.listPrimitives()) {
+      if (primitive.getMode() !== Primitive.Mode.TRIANGLES) continue;
+      const indices = primitive.getIndices();
+      const count = indices ? indices.getCount() : (primitive.getAttribute('POSITION')?.getCount() ?? 0);
+      total += Math.floor(count / 3);
+    }
+  }
+  return total;
+}
+
+/**
+ * The scatter level: the finest level simplified toward `budget` triangles,
+ * with the error bound relaxed through `SCATTER_ERRORS` until the budget is
+ * met. The ratio is the budget over what the model actually has, which is the
+ * whole difference from the ratio levels above: it is a count and not a share.
+ */
+async function scatterLevel(
+  doc: Document,
+  base: number,
+  budget: number,
+  id: string,
+): Promise<{ doc: Document; triangles: number }> {
+  const ratio = Math.min(1, budget / Math.max(base, 1));
+  let best: { doc: Document; triangles: number } | undefined;
+  for (const error of SCATTER_ERRORS) {
+    const clone = cloneDocument(doc);
+    await clone.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error, lockBorder: false }));
+    const reached = triangleCount(clone);
+    if (!best || reached < best.triangles) best = { doc: clone, triangles: reached };
+    if (reached <= budget) {
+      console.log(`${id}: ${SCATTER_LEVEL} is ${reached} triangles of ${base}, budget ${budget}, at error ${error}`);
+      return best;
+    }
+    console.log(`${id}: ${SCATTER_LEVEL} reached only ${reached} triangles at error ${error}, over the budget of ${budget}`);
+  }
+  const reached = (best as { doc: Document; triangles: number }).triangles;
+  console.log(
+    `${id}: ${SCATTER_LEVEL} is ${reached} triangles of ${base} and misses the budget of ${budget}; `
+      + 'the simplifier will not go further on this topology',
+  );
+  return best as { doc: Document; triangles: number };
+}
+
+/** What a prop's levels came to: the node names in order, and the triangles in each. */
+interface Levels {
+  names: string[];
+  triangles: Record<string, number>;
+}
+
+/**
+ * The levels of detail of one prop in one GLB, each under a node named `lod0`,
+ * `lod1`, `lod2`, and `scatter` where the prop has a budget, which is the same
+ * contract the stand-ins' manifest uses so the viewer swaps them the same way.
+ */
+async function lods(doc: Document, finest: number, budget: number | undefined, id: string): Promise<Levels> {
   const scene = doc.getRoot().getDefaultScene() ?? (doc.getRoot().listScenes()[0] as Scene);
   if (finest < 1) await doc.transform(simplify({ simplifier: MeshoptSimplifier, ratio: finest, error: LOD_ERROR }));
-  const coarser: Document[] = [];
-  for (const ratio of LOD_RATIOS.slice(1)) {
+  const base = triangleCount(doc);
+  const triangles: Record<string, number> = { lod0: base };
+  const coarser: { name: string; doc: Document }[] = [];
+  for (const [i, ratio] of LOD_RATIOS.slice(1).entries()) {
     const clone = cloneDocument(doc);
     await clone.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error: LOD_ERROR }));
-    coarser.push(clone);
+    const name = `lod${i + 1}`;
+    triangles[name] = triangleCount(clone);
+    coarser.push({ name, doc: clone });
+  }
+  if (budget !== undefined) {
+    const level = await scatterLevel(doc, base, budget, id);
+    triangles[SCATTER_LEVEL] = level.triangles;
+    coarser.push({ name: SCATTER_LEVEL, doc: level.doc });
   }
   const wrap = (name: string, children: Node[]): void => {
     const node = doc.createNode(name);
@@ -365,15 +497,15 @@ async function lods(doc: Document, finest: number): Promise<Document> {
     scene.addChild(node);
   };
   wrap('lod0', scene.listChildren());
-  for (const [i, clone] of coarser.entries()) {
+  for (const { name, doc: clone } of coarser) {
     const map = mergeDocuments(doc, clone);
     const merged = map.get(clone.getRoot().getDefaultScene() ?? (clone.getRoot().listScenes()[0] as Scene)) as Scene;
     const children = merged.listChildren();
     for (const child of children) merged.removeChild(child);
-    wrap(`lod${i + 1}`, children);
+    wrap(name, children);
     merged.dispose();
   }
-  return doc;
+  return { names: ['lod0', ...coarser.map((c) => c.name)], triangles };
 }
 
 async function props(): Promise<void> {
@@ -384,6 +516,7 @@ async function props(): Promise<void> {
   }
   await MeshoptSimplifier.ready;
   const entries = (JSON.parse(readFileSync(index, 'utf8')) as { props: PropEntry[] }).props;
+  const budgets = scatterBudgets();
   if (existsSync(PROPS_OUT)) for (const f of readdirSync(PROPS_OUT)) rmSync(join(PROPS_OUT, f), { recursive: true });
   mkdirSync(PROPS_OUT, { recursive: true });
 
@@ -399,6 +532,7 @@ async function props(): Promise<void> {
     let out: Uint8Array | undefined;
     let used = 0;
     let size: [number, number, number] = [0, 0, 0];
+    let levels: Levels = { names: [], triangles: {} };
     for (const px of PROP_SIZES) {
       const doc = await io.read(source);
       dropLoosePrimitives(doc, entry.id);
@@ -428,7 +562,7 @@ async function props(): Promise<void> {
       bake(scene, matrix);
       size = [0, 1, 2].map((i) => Number(((scaled.max[i] as number) - (scaled.min[i] as number)).toFixed(3))) as [number, number, number];
 
-      await lods(doc, entry.decimate_to ?? 1);
+      levels = await lods(doc, entry.decimate_to ?? 1, budgets.get(entry.id), entry.id);
       await doc.transform(
         // The coarse levels came from documents of their own and brought
         // their buffers with them; a GLB may have only one.
@@ -456,7 +590,8 @@ async function props(): Promise<void> {
       bytes: out.byteLength,
       sha256: createHash('sha256').update(out).digest('hex'),
       source_sha256: entry.sha256,
-      lods: LOD_RATIOS.map((_, i) => `lod${i}`),
+      lods: levels.names,
+      levels: levels.triangles,
       size,
     });
     console.log(

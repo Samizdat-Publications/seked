@@ -68,10 +68,10 @@ is the shape of a geometry cost and not of a shading one.
 
 ### Task Q2: a scatter level baked to a budget
 
-- [ ] `blender/props.json`: each plant gains `scatter_to: { triangles: N }`, a look choice with a sentence: island tree 3000, date palm 2500, rooibos bush 600, shrub 600 (a tree seen from across the plateau; the near ones are Q4's). `scripts/web-assets.ts` bakes one more level, `scatter`, for any prop with `scatter_to`: the simplifier run to the ratio that hits the budget with the error bound relaxed (`error: 0.05`, then `0.2` if the budget is still missed; `lockBorder` off), and a line in the console saying the triangles it reached. `props/manifest.json` reports `scatter` in `lods` and the triangle count per level (`levels: { lod0: n, ..., scatter: n }`; `triangles` was always null and goes away).
-- [ ] `Vegetation.tsx`: `partsOf(group, 'scatter')`, falling back to the last of `lods` only when `scatter` is absent, with a `console.warn` naming the prop. The comment at that line is rewritten to say what happened: the coarsest ratio level of the acacia was 169,160 triangles.
-- [ ] Verify: built and ancient at the five looks, in the commit message. Expected: the plants' triangles down from about 125 million to under 4 million; the frame rate within a third of today's.
-- [ ] Commit: "Bake the scattered plants to a triangle budget rather than a ratio".
+- [x] `blender/props.json`: each plant gains `scatter_to: { triangles: N }`, a look choice with a sentence: island tree 3000, date palm 2500, rooibos bush 600, shrub 600 (a tree seen from across the plateau; the near ones are Q4's). `scripts/web-assets.ts` bakes one more level, `scatter`, for any prop with `scatter_to`: the simplifier run to the ratio that hits the budget with the error bound relaxed (`error: 0.05`, then `0.2` if the budget is still missed; `lockBorder` off), and a line in the console saying the triangles it reached. `props/manifest.json` reports `scatter` in `lods` and the triangle count per level (`levels: { lod0: n, ..., scatter: n }`; `triangles` was always null and goes away).
+- [x] `Vegetation.tsx`: `partsOf(group, 'scatter')`, falling back to the last of `lods` only when `scatter` is absent, with a `console.warn` naming the prop. The comment at that line is rewritten to say what happened: the coarsest ratio level of the acacia was 169,160 triangles.
+- [x] Verify: built and ancient at the five looks, in the commit message. Expected: the plants' triangles down from about 125 million to under 4 million; the frame rate within a third of today's.
+- [x] Commit: "Bake the scattered plants to a triangle budget rather than a ratio".
 
 ### Task Q3: the far ring is cards
 
