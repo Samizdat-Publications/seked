@@ -11,54 +11,19 @@ import { useRef, useState } from 'react';
 import { r3f } from '../film/handle';
 import { RATES, RESOLUTIONS, startRecorder, type Recorder, type Saved } from '../film/encode';
 import { FilmStopped, frameCount, renderFilm } from '../film/run';
-import { sequenceSeconds, type Sequence, type Shot } from '../motion/types';
-import { TOUR, type TourStep } from '../tour';
+import { sequenceSeconds, type Sequence } from '../motion/types';
+import { SEQUENCES } from '../sequences';
 
-/**
- * How long a stand is held, in seconds.
- *
- * A stopgap, with the rest of this block. Track N's `sequences.ts` carries
- * the real sequences, whose shots have their own lengths, their camera paths
- * and their tweens; until it merges, the film has to have something to record,
- * so the tour's steps are wrapped as shots that stand still. The trunk's
- * player cuts between them, so a film made from these is a slideshow of the
- * tour's views, which is exactly what it should be before the engine lands.
- */
-const STAND_SECONDS = 6;
-
-/** One of the old tour's steps as a shot that stands still. */
-function shotOfStep(step: TourStep): Shot {
-  return {
-    id: step.id,
-    seconds: STAND_SECONDS,
-    camera: [{ at: 0, value: step.camera }],
-    claim: step.claim,
-    layers: step.layers,
-    title: step.title,
-    text: step.text,
-    ...(step.state === undefined ? {} : { state: { to: step.state, at: 0 } }),
-    ...(step.epoch === undefined ? {} : { epoch: [{ at: 0, value: step.epoch }] }),
-    ...(step.lst === undefined ? {} : { lst: [{ at: 0, value: step.lst }] }),
-    ...(step.section === undefined ? {} : { section: step.section }),
-  };
-}
-
-const TOUR_SEQUENCE: Sequence = {
-  id: 'tour',
-  label: 'The tour',
-  note: 'Every stand of the narrated tour, with its words as subtitles.',
-  shots: TOUR.map(shotOfStep),
-};
-
-/** The same, cut to its opening, for trying the machinery without waiting a minute. */
+/** The tour's first two shots on their own, for trying the settings without waiting a minute. */
 const OPENING: Sequence = {
   id: 'tour-opening',
-  label: 'The tour, the first two stands',
-  note: 'The plateau and the presets. A short film, for checking the settings.',
-  shots: TOUR_SEQUENCE.shots.slice(0, 2),
+  label: 'The tour, the first two shots',
+  note: 'The plateau today and the flight to the east face. A short film, for checking the settings.',
+  shots: SEQUENCES[0]!.shots.slice(0, 2),
 };
 
-const SEQUENCES: Sequence[] = [TOUR_SEQUENCE, OPENING];
+/** What the drawer offers: the tour and the film presets, then the short check. */
+const CHOICES: Sequence[] = [...SEQUENCES, OPENING];
 
 /** Seconds as minutes and seconds, for the progress line. */
 function mmss(seconds: number): string {
@@ -75,7 +40,7 @@ function outcome(saved: Saved): string {
 }
 
 export function Film(): React.JSX.Element {
-  const [sequenceId, setSequenceId] = useState(SEQUENCES[0]!.id);
+  const [sequenceId, setSequenceId] = useState(CHOICES[0]!.id);
   const [resolutionId, setResolutionId] = useState(RESOLUTIONS[0]!.id);
   const [fps, setFps] = useState(RATES[0]!);
   const [progress, setProgress] = useState<{ frame: number; total: number } | null>(null);
@@ -83,7 +48,7 @@ export function Film(): React.JSX.Element {
   const [trouble, setTrouble] = useState<string | null>(null);
   const stopping = useRef<AbortController | null>(null);
 
-  const sequence = SEQUENCES.find((s) => s.id === sequenceId) ?? SEQUENCES[0]!;
+  const sequence = CHOICES.find((s) => s.id === sequenceId) ?? CHOICES[0]!;
   const resolution = RESOLUTIONS.find((r) => r.id === resolutionId) ?? RESOLUTIONS[0]!;
   const running = progress !== null;
   const length = sequenceSeconds(sequence);
@@ -132,7 +97,7 @@ export function Film(): React.JSX.Element {
         <label className="field">
           <span className="field-label">Sequence</span>
           <select value={sequenceId} onChange={(e) => setSequenceId(e.target.value)} disabled={running}>
-            {SEQUENCES.map((s) => (
+            {CHOICES.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
               </option>
