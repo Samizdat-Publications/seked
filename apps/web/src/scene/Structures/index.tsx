@@ -74,6 +74,7 @@ export function Structures({
         causeway={structures.causeway}
         roof={structures.causewayRoof}
         walls={structures.causewayWalls}
+        quay={structures.quay}
         state={state}
         clippingPlanes={clippingPlanes}
       />

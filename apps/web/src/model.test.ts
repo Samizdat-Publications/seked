@@ -324,3 +324,58 @@ describe('the stone a building is drawn in', () => {
     expect(bare.temples[0]?.note).toContain('carries no row');
   });
 });
+
+/**
+ * Track D. The quay is the built front of the harbour, not the cut rim of the
+ * basin that `Water.tsx` also calls a quay. The track asks that where the
+ * causeway meets it the two agree in plan, and on this plateau the answer is
+ * that they never meet: Khafre's causeway ends at the back of his valley
+ * temple and the quay stands on the temple's far side, in the water. So what
+ * is asserted is that they do not run through each other and that the
+ * building between them is where it should be.
+ */
+describe('the quay at the harbour front', () => {
+  const model = buildModel(bundle, 'canonical', null);
+  const extent = (mesh: Mesh) => {
+    let west = Infinity;
+    let east = -Infinity;
+    for (let i = 0; i < mesh.positions.length; i += 3) {
+      west = Math.min(west, mesh.positions[i] as number);
+      east = Math.max(east, mesh.positions[i] as number);
+    }
+    return { west, east };
+  };
+
+  it('stands in the state that has a harbour, and in no other', () => {
+    expect(model.plateau.structures('built').quay).toBeDefined();
+    for (const state of ['ancient', 'stripped', 'today'] as const) {
+      expect(model.plateau.structures(state).quay, state).toBeUndefined();
+    }
+  });
+
+  it('takes the stone of the causeway and says the quay is not measured', () => {
+    const quay = model.plateau.structures('built').quay;
+    expect(quay?.stone?.core?.material).toBe('limestone.giza');
+    expect(quay?.note).toContain('Look choices, none of them measured');
+    expect(quay?.note).toContain('read off the temples');
+  });
+
+  it('agrees in plan with the causeway: the valley temple stands between them', () => {
+    const built = model.plateau.structures('built');
+    const quay = extent(built.quay?.mesh as Mesh);
+    const causeway = extent(built.causeway?.mesh as Mesh);
+    const temple = built.temples.find((t) => t.id === 'khafre.valley_temple');
+    const temples = extent(temple?.walls as Mesh);
+
+    // Nothing of the causeway reaches the quay, and the temple is in between.
+    expect(causeway.east).toBeLessThan(quay.west);
+    expect(temples.west).toBeLessThan(quay.west);
+    expect(temples.east).toBeLessThanOrEqual(quay.west + 1e-6);
+    expect(causeway.east).toBeLessThanOrEqual(temples.east);
+  });
+
+  it('is a thin front and not a second basin', () => {
+    const quay = extent(model.plateau.structures('built').quay?.mesh as Mesh);
+    expect(quay.east - quay.west).toBeLessThan(4);
+  });
+});

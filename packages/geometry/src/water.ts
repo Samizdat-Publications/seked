@@ -51,6 +51,10 @@
 
 import type { Environment } from './environment';
 import { footprintSpan, type Footprint } from './footprints';
+import type { Mesh } from './mesh';
+
+/** A point in plan, as the footprint builders use it. */
+type Xy = readonly [number, number];
 
 /** The two footprints the waterline is read off. */
 export const VALLEY_TEMPLES = ['khafre.valley_temple', 'sphinx.temple'];
@@ -293,4 +297,105 @@ export function waterExtent(features: readonly Footprint[], env: Environment, st
 export function rectangleContains(ring: readonly (readonly [number, number])[], x: number, y: number): boolean {
   const b = bounds(ring);
   return x >= b.west && x <= b.east && y >= b.south && y <= b.north;
+}
+
+// --- The quay ---------------------------------------------------------------
+//
+// What `Water.tsx` already calls a quay is the cut rim of the basin: the
+// ground's own face, from the plateau's surface down to the basin's floor,
+// filling the hole the terrain discards. It is earth, and it follows the
+// modern surface model. This is the other thing, and the one Track D of the
+// architecture pass is about: a built quay, a masonry wall standing in the
+// water along the basin's front, with its top a stated height above the
+// waterline, so a boat has something to come alongside and the valley
+// temples have a doorstep rather than a shoreline.
+
+/**
+ * LOOK CHOICES, every one. Nobody has excavated Giza's harbour front and no
+ * plate read here draws it, so what is chosen is a quay that reads as a quay:
+ * high enough out of the water to stand on, deep enough to reach the basin's
+ * floor, thick enough to be masonry and battered like everything else of its
+ * date. `batterDeg` is the temples' own 82 degrees rounded off toward the
+ * vertical, because a quay takes its load from behind and not from its own
+ * weight; it is no more measured than the temples' is.
+ */
+export const QUAY = {
+  /** How far the quay's top stands above the waterline, metres. */
+  freeboardMetres: 2,
+  /** How thick the wall is at its footing, metres, measured into the basin. */
+  thicknessMetres: 3,
+  /** The angle of its seaward face from the horizontal, degrees. Vertical behind. */
+  batterDeg: 84,
+} as const;
+
+/**
+ * The quay along the front of the harbour basin, or nothing where the state
+ * has no basin.
+ *
+ * It stands on the basin's west edge, which is the westernmost of the two
+ * valley temples' east faces, and runs the whole north-south length of the
+ * basin, so both temples and the ground between them front onto it. It is
+ * built into the water rather than into the bank: the face a boat comes
+ * alongside is the outer one, and behind it is the fill the temples stand on.
+ *
+ * Its foot is the basin's floor and its head is `QUAY.freeboardMetres` above
+ * the waterline, both of which come from the water body and are therefore
+ * read off the footprints like everything else here. Only the freeboard, the
+ * thickness and the batter are chosen, and the label says so.
+ */
+export function quayMesh(
+  water: WaterBody | undefined,
+  features: readonly Footprint[],
+): { mesh: Mesh; label: string } | undefined {
+  if (water === undefined || water.kind !== 'basin') return undefined;
+  const b = bounds(water.outline);
+  const top = water.level + QUAY.freeboardMetres;
+  const rise = top - water.floor;
+  if (!(rise > 0)) return undefined;
+  const lean = rise / Math.tan((QUAY.batterDeg * Math.PI) / 180);
+  if (!(QUAY.thicknessMetres > lean)) return undefined;
+
+  // The basin's own west edge is the WESTERNMOST of the two temples' east
+  // faces, so that neither of them stands behind the water. A wall on that
+  // line stands 1.13 m inside Khafre's valley temple, which the water never
+  // showed because the temple hid it and which a solid quay would show at
+  // once. So the quay's back is the EASTERNMOST of the two faces instead: the
+  // front is continuous, both temples stand behind it, and the metre of water
+  // that leaves between the Sphinx Temple and the quay is the metre the two
+  // temples' own footprints disagree by.
+  const faces = VALLEY_TEMPLES.map((id) => features.find((f) => f.id === id))
+    .filter((f): f is Footprint => f !== undefined)
+    .map((f) => bounds(f.ring).east);
+  const west = faces.length === VALLEY_TEMPLES.length ? Math.max(...faces) : b.west;
+  const east = west + QUAY.thicknessMetres;
+  // Counter-clockwise seen from above, so the walls face out.
+  const foot: Xy[] = [[west, b.south], [east, b.south], [east, b.north], [west, b.north]];
+  // Only the seaward face leans; the landward one is vertical against the fill.
+  const head: Xy[] = [[west, b.south], [east - lean, b.south], [east - lean, b.north], [west, b.north]];
+  const verts: number[][] = [
+    ...foot.map(([x, y]) => [x, y, water.floor]),
+    ...head.map(([x, y]) => [x, y, top]),
+  ];
+  const tris: number[] = [
+    // The bottom, facing down, and the top, facing up.
+    0, 2, 1, 0, 3, 2,
+    4, 5, 6, 4, 6, 7,
+  ];
+  for (let i = 0; i < 4; i++) {
+    const j = (i + 1) % 4;
+    tris.push(i, j, 4 + j, i, 4 + j, 4 + i);
+  }
+  const positions = new Float32Array(verts.flat());
+  return {
+    mesh: { positions, indices: new Uint32Array(tris), vertexCount: verts.length, triangleCount: tris.length / 3 },
+    label:
+      'Reconstruction: the quay along the front of the harbour basin, standing in the water on the west edge of the basin, ' +
+      `which is the westernmost of the two valley temples' east faces. Its foot is the basin's floor at ${water.floor.toFixed(2)} m ` +
+      `and its head ${QUAY.freeboardMetres} m above the waterline at ${top.toFixed(2)} m, both of them read off the temples' own ` +
+      `footprints and not typed. Look choices, none of them measured: the ${QUAY.freeboardMetres} m of freeboard, the ` +
+      `${QUAY.thicknessMetres} m thickness, and the ${QUAY.batterDeg} degree batter on its seaward face, vertical behind. ` +
+      'Its back stands on the easternmost of the two east faces rather than on the west edge of the basin, ' +
+      'which is the westernmost of them, so that neither temple has a wall standing inside it. ' +
+      'Nobody has excavated this front and no plate read here draws it.',
+  };
 }

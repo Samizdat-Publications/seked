@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { buildEnvironment } from './environment';
 import type { Footprint } from './footprints';
-import { LOOK, rectangleContains, riverBody, riverLevel, valleyTempleFloor, waterExtent, waterLevel } from './water';
+import { meshVolume, type Mesh } from './mesh';
+import { LOOK, QUAY, quayMesh, rectangleContains, riverBody, riverLevel, valleyTempleFloor, waterExtent, waterLevel } from './water';
 
 /**
  * Invented outlines, not measurements: two boxes standing in for the valley
@@ -182,5 +183,99 @@ describe('riverBody', () => {
     expect(label).toMatch(/percentile of the valley/);
     expect(label).toMatch(/Look choices/);
     expect(label).toMatch(/-45\.70 m/);
+  });
+});
+
+/**
+ * Track D. A built quay, not the cut rim of the basin: masonry standing in
+ * the water along the basin's front, with its head a stated height above the
+ * waterline and a batter on the face a boat comes alongside.
+ */
+describe('the quay at the harbour front', () => {
+  const basin = waterExtent(TEMPLES, ENV, 'built');
+  const built = quayMesh(basin, TEMPLES);
+
+  it('is built only where there is a basin to build it on', () => {
+    expect(built).toBeDefined();
+    expect(quayMesh(waterExtent(TEMPLES, ENV, 'ancient'), TEMPLES)).toBeUndefined();
+    expect(quayMesh(waterExtent(TEMPLES, ENV, 'today'), TEMPLES)).toBeUndefined();
+    expect(quayMesh(undefined, TEMPLES)).toBeUndefined();
+  });
+
+  it('is a closed solid of positive volume, wound so its faces look out', () => {
+    const mesh = (built as { mesh: Mesh }).mesh;
+    expect(meshVolume(mesh)).toBeGreaterThan(0);
+    // Every edge walked once each way, which is what closed means.
+    const edges = new Map<string, number>();
+    for (let t = 0; t < mesh.indices.length; t += 3) {
+      for (let k = 0; k < 3; k++) {
+        const a = mesh.indices[t + k] as number;
+        const b = mesh.indices[t + ((k + 1) % 3)] as number;
+        const key = a < b ? `${a}:${b}` : `${b}:${a}`;
+        edges.set(key, (edges.get(key) ?? 0) + (a < b ? 1 : -1));
+      }
+    }
+    for (const [key, net] of edges) expect(net, key).toBe(0);
+  });
+
+  it('stands from the floor of the basin to a stated freeboard above the waterline', () => {
+    const mesh = (built as { mesh: Mesh }).mesh;
+    const level = (basin as { level: number }).level;
+    const floor = (basin as { floor: number }).floor;
+    const zs: number[] = [];
+    for (let i = 2; i < mesh.positions.length; i += 3) zs.push(mesh.positions[i] as number);
+    expect(Math.min(...zs)).toBeCloseTo(floor, 4);
+    expect(Math.max(...zs)).toBeCloseTo(level + QUAY.freeboardMetres, 4);
+  });
+
+  it('leans its seaward face back and leaves the landward one upright', () => {
+    const mesh = (built as { mesh: Mesh }).mesh;
+    const level = (basin as { level: number }).level;
+    const top = level + QUAY.freeboardMetres;
+    const floor = (basin as { floor: number }).floor;
+    const at = (z: number): number[] => {
+      const xs: number[] = [];
+      for (let i = 0; i < mesh.positions.length; i += 3) {
+        if (Math.abs((mesh.positions[i + 2] as number) - z) < 1e-6) xs.push(mesh.positions[i] as number);
+      }
+      return xs;
+    };
+    const lean = (top - floor) / Math.tan((QUAY.batterDeg * Math.PI) / 180);
+    expect(Math.min(...at(floor))).toBeCloseTo(Math.min(...at(top)), 4); // upright behind
+    expect(Math.max(...at(floor)) - Math.max(...at(top))).toBeCloseTo(lean, 4); // leaning in front
+    expect(lean).toBeGreaterThan(0);
+  });
+
+  it('stands clear of both temples rather than on the west edge of the basin, and runs its whole length', () => {
+    const mesh = (built as { mesh: Mesh }).mesh;
+    const outline = (basin as { outline: [number, number][] }).outline;
+    // The basin's west edge is the westernmost east face (369 here); the quay
+    // stands on the easternmost (415), so that neither temple has a wall
+    // standing inside it. The two disagree by six metres in these fixtures.
+    const basinWest = Math.min(...outline.map(([x]) => x));
+    const west = Math.max(...TEMPLES.map((f) => Math.max(...f.ring.map(([x]) => x))));
+    expect(west).toBeGreaterThan(basinWest);
+    const south = Math.min(...outline.map(([, y]) => y));
+    const north = Math.max(...outline.map(([, y]) => y));
+    const xs: number[] = [];
+    const ys: number[] = [];
+    for (let i = 0; i < mesh.positions.length; i += 3) {
+      xs.push(mesh.positions[i] as number);
+      ys.push(mesh.positions[i + 1] as number);
+    }
+    expect(Math.min(...xs)).toBeCloseTo(west, 4);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(west + QUAY.thicknessMetres + 1e-4);
+    // No temple has any of the quay inside it, which is the whole reason.
+    for (const f of TEMPLES) expect(Math.max(...f.ring.map(([x]) => x)), f.id).toBeLessThanOrEqual(Math.min(...xs) + 1e-4);
+    expect(Math.min(...ys)).toBeCloseTo(south, 4);
+    expect(Math.max(...ys)).toBeCloseTo(north, 4);
+  });
+
+  it('says what is read off the footprints and what was chosen', () => {
+    const label = (built as { label: string }).label;
+    expect(label).toContain('Look choices, none of them measured');
+    expect(label).toContain(`${QUAY.freeboardMetres} m of freeboard`);
+    expect(label).toContain(`${QUAY.batterDeg} degree batter`);
+    expect(label).toContain('read off the temples');
   });
 });

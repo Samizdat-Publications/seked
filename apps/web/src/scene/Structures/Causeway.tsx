@@ -13,6 +13,13 @@
  * `cased.ts` turns those names into tints. The ramp itself is drawn as its
  * core, because what a reader sees of it in a ruin is its body; the walls and
  * the roof, which only the whole states carry, are drawn as its casing.
+ *
+ * The quay at the harbour front is drawn here too, for want of a better
+ * place: it is the other piece of masonry the causeway's own stone answers
+ * for, it stands at the far end of the same journey, and it exists in the one
+ * state the causeway is roofed in. What it is not is the cut rim of the basin,
+ * which `Water.tsx` also calls a quay and which is ground rather than
+ * building.
  */
 import type { Plane } from 'three';
 import type { StructureMesh } from '../../model';
@@ -28,12 +35,15 @@ export function Causeway({
   causeway,
   roof,
   walls,
+  quay,
   state,
   clippingPlanes,
 }: {
   causeway: StructureMesh | undefined;
   roof: StructureMesh | undefined;
   walls: StructureMesh | undefined;
+  /** The built quay at the harbour front, which takes the causeway's own stone. */
+  quay: StructureMesh | undefined;
   state: StateId;
   clippingPlanes: Plane[];
 }): React.JSX.Element {
@@ -61,6 +71,17 @@ export function Causeway({
           role={cased.role}
           colour={cased.colour}
           stone={{ ...cased.stone, relief: 0.7 }}
+          look={lookWords(cased)}
+        />
+      )}
+      {quay && (
+        <Built
+          built={quay}
+          state={state}
+          clippingPlanes={clippingPlanes}
+          role={cased.role}
+          colour={cased.colour}
+          stone={cased.stone}
           look={lookWords(cased)}
         />
       )}

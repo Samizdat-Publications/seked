@@ -16,10 +16,12 @@ import {
   interiorSolids,
   mastabaMesh,
   pyramidionMesh,
+  quayMesh,
   smallPyramidMesh,
   surveyFootprints,
   templeMesh,
   templePlanMesh,
+  waterExtent,
   type Environment,
   type Footprint,
   type LabelledMesh,
@@ -242,6 +244,12 @@ export interface Structures {
   causeway: StructureMesh | undefined;
   causewayRoof: StructureMesh | undefined;
   causewayWalls: StructureMesh | undefined;
+  /**
+   * The built quay along the harbour basin's front, in the one state that has
+   * a basin. Not the cut rim `Water.tsx` draws, which is ground; this is
+   * masonry, and it takes the causeway's own stone.
+   */
+  quay: StructureMesh | undefined;
   pits: StructureMesh[];
   /** The slabs over the boat pits, merged; only where a state roofs them. */
   pitCovers: StructureMesh | undefined;
@@ -455,6 +463,10 @@ export function structuresFor(
   const roof = whole ? causewayRoofMesh(env, features) : undefined;
   const corridor = whole ? causewayWallsMesh(env, features) : undefined;
   const causewayStone = stoneOf('khafre.causeway', 'the causeway of Khafre');
+  // The quay stands on the water the valley temples' own floors set, so it is
+  // built from the same `waterExtent` the scene draws the basin from and moves
+  // with the footprints rather than with a number typed here.
+  const quay = quayMesh(waterExtent(features, env, state), features);
   const enclosureWalls: StructureMesh[] = [];
   if (whole) {
     for (const id of ENCLOSED) {
@@ -504,6 +516,17 @@ export function structuresFor(
             tier: 'reconstruction',
             note: `${corridor.label} ${causewayStone.note}`,
             mesh: corridor,
+            stone: causewayStone.stone,
+          },
+    quay:
+      quay === undefined
+        ? undefined
+        : {
+            id: 'harbour.quay',
+            name: 'Harbour of Giza, the quay',
+            tier: 'reconstruction',
+            note: `${quay.label} ${causewayStone.note}`,
+            mesh: quay.mesh,
             stone: causewayStone.stone,
           },
     pits,
