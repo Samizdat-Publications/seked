@@ -76,9 +76,9 @@ Branch `stage6/geometry`. Owns the new builder in `packages/geometry` and its te
 
 ### Task W1: boxes to prisms
 
-- [ ] `cityMeshes(boxes, opts)` builds merged prisms, batched into a small number of meshes by region so the far half can be culled as a unit. Two or three levels: full boxes near, and beyond some distance a coarser pass where small buildings are dropped or merged into blocks rather than drawn individually. The distances are look choices with sentences.
-- [ ] Tests: vertex counts, that a box's prism stands on the terrain height under it, that the yaw is applied about the box's own centre.
-- [ ] Commit: "Build the city as merged prisms, in bands that can be culled together".
+- [x] `cityMeshes(boxes, opts)` builds merged prisms, batched into a small number of meshes by region so the far half can be culled as a unit. Two or three levels: full boxes near, and beyond some distance a coarser pass where small buildings are dropped or merged into blocks rather than drawn individually. The distances are look choices with sentences.
+- [x] Tests: vertex counts, that a box's prism stands on the terrain height under it, that the yaw is applied about the box's own centre.
+- [x] Commit: "Build the city as merged prisms, in bands that can be culled together".
 
 ---
 
@@ -88,10 +88,10 @@ Branch `stage6/scene`. Owns `apps/web/src/scene/City.tsx` and one section at the
 
 ### Task X1: drawn, gated and labelled
 
-- [ ] `City.tsx` draws the meshes in `today` only, dissolving with stage 2's fade, clipped by the section like everything else, its hover tag naming Open Buildings and the imagery year and the word `context`.
-- [ ] A Layers drawer toggle, because a reader looking at the plateau may want the city gone.
-- [ ] Verify: the frame rate at the five looks in `today`, before and after, in the commit message. The bar is 100 fps.
-- [ ] Commit: "Stand the city behind the plateau in the state it belongs to".
+- [x] `City.tsx` draws the meshes in `today` only, dissolving with stage 2's fade, clipped by the section like everything else, its hover tag naming Open Buildings and the imagery year and the word `context`.
+- [x] A Layers drawer toggle, because a reader looking at the plateau may want the city gone.
+- [x] Verify: the frame rate at the five looks in `today`, before and after, in the commit message. The bar is 100 fps.
+- [x] Commit: "Stand the city behind the plateau in the state it belongs to".
 
 ---
 
@@ -101,9 +101,9 @@ Branch `stage6/valley`. Owns the valley's part of `Water.tsx` and `Terrain.tsx`'
 
 ### Task Y1: the Nile and the cultivation
 
-- [ ] The river east at its present course and the cultivated strip between it and the desert edge, green in `today` and `stripped`, in the same terms stage 3 used for the flood plain rather than a second mechanism. Where the desert gives way to cultivation is a look choice and says so.
-- [ ] Verify at `panorama` and the today hero stand, with a screenshot each.
-- [ ] Commit: "Put the river and the green strip back in the valley".
+- [x] The river east at its present course and the cultivated strip between it and the desert edge, green in `today` and `stripped`, in the same terms stage 3 used for the flood plain rather than a second mechanism. Where the desert gives way to cultivation is a look choice and says so.
+- [x] Verify at `panorama` and the today hero stand, with a screenshot each.
+- [x] Commit: "Put the river and the green strip back in the valley".
 
 ---
 
@@ -113,3 +113,62 @@ Branch `stage6/valley`. Owns the valley's part of `Water.tsx` and `Terrain.tsx`'
 2. Typecheck, test, build. The frame rate at the five looks in `today`, against the 237 to 240 of stage 5.
 3. A today hero still from the panorama stand with the city behind and the valley green, against snapshot 0028's same stand, which is the before.
 4. Snapshot 0033; deploy; the blockers doc's order of work gains stage 6; memory updated; the boxes ticked.
+
+---
+
+## What was run (director, 2026-09-18)
+
+Tracks V, W, X and Y all landed on `main`, in that order, each on its own
+branch and merged with `--no-ff`.
+
+**One thing was added that this plan does not have, and it came before the
+tracks.** The ground stopped at three kilometres and the city runs to ten, so
+W had nothing to stand a prism on and X and Y had nothing to draw on.
+`terrainRing` in `@seked/geometry` draws `data/terrain/giza-glo30-far`, the
+same Copernicus product over plus or minus twelve kilometres at sixty metres,
+with the fine grid's square left out and its edge carried on as a flat skirt
+to thirty-five kilometres so the world does not end short of the horizon. It
+is committed as "Give the city, the valley and the horizon a ground to stand
+on" and merged as `stage6/ground`.
+
+**Track V's own correction stands**: no loader went into `packages/data`, and
+`city.json` describes its own binary, so `@seked/geometry` and `City.tsx` read
+it without one.
+
+**What was measured.** `today` at a 1601 by 900 buffer, three takes of two
+seconds, median, the way `scripts/frames.md` says. After track X, with the
+city then without it: dawn 189 / 201, panorama 185 / 205, harbour 177 / 178,
+akhet 189 / 189, night 200 / 209, against a bar of 100. After track Y, with
+the city, the river and the valley's green: dawn 192, panorama 188, harbour
+115, akhet 137, night 97.
+
+**So the city is nearly free and the green is not.** The river was ruled out
+by hiding it, which made the night stand *faster* (96 with it, 81 without),
+because the water's own depth write hides the city behind it. What is left is
+the green: in the two modern stops `greenFor` now gives a non-zero strength,
+so the shader that used to return at its first line on every ground fragment
+now runs in full over the plateau's grid and the desert ring both, and the
+night stand is where the ground fills the most of the frame. One stand of the
+five is three per cent under the bar.
+
+**Not measured, and it should be:** `built` and `ancient` after track Y. The
+desert ring takes the green in those stops too. No number could be taken for
+them, because this environment cannot hold a browser window in the foreground
+and Chrome throttles an occluded one to about one frame a second; the runs
+that were taken are the ones whose windows happened to be in front, and the
+throttled ones are obvious when they come back as 1.
+
+**The first thing for the next pass**, therefore: the green's per-fragment
+cost in the modern stops, with `built` and `ancient` measured alongside. The
+obvious lead is that the valley's `upland` is zero, so its mottle is dead
+arithmetic, and a fragment whose ground stands more than `dryMetres` above
+the water is provably zero before the mask is ever sampled. Neither was
+changed here, because an optimisation that cannot be measured is not one.
+
+**Found on the way and not fixed**, because it predates this stage: east of
+the plateau with a low sun the ground reads near black (17, 33, 47 at the
+panorama stand at 16:00 in `today`). It is not a hole and not a shader patch,
+both ruled out by substituting plain materials and by removing each patch in
+turn, and the same pixels are 116, 146, 160 at midsummer noon. It is ground
+in shade lit by too little else, and it wants its own look at the ambient
+term.

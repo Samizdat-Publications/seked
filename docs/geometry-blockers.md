@@ -479,6 +479,53 @@ actually GPU-bound, which after stage 5 it is not.
    The plan stores an oriented box per building rather than a polygon, because
    277,266 polygons as JSON is a liability and a city seen from a kilometre
    away is boxes.
+   **Stage 6 landed on 2026-09-18** (snapshot 0033), all four tracks, plus one
+   thing the plan did not have and needed first. The ground stopped at three
+   kilometres and the city runs to ten, so `terrainRing` now draws
+   `giza-glo30-far` as a ring with the fine grid's square left out and its
+   edge carried on as a flat skirt to thirty-five kilometres; that is what the
+   city, the valley and the horizon all stand on, and it also closed a band of
+   sky that used to sit under the horizon four kilometres out.
+
+   The city is 231,988 buildings as oriented boxes, drawn as merged prisms in
+   sixteen batches four kilometres square, each at whichever of two levels the
+   camera asks for: 1.06M triangles in sixteen draw calls from the plateau,
+   against 2.32M if every batch drew every building. It is gated to `today`,
+   dissolves with the stop, and its hover tag says `context` and names Open
+   Buildings and the year of the imagery.
+
+   The Nile is drawn for `stripped` and `today` by the flood plain's own
+   one-plane rule, and its level is not typed: GLO-30 is a surface model, so
+   the river's own flat surface is in it, and the fifth percentile of the
+   valley's heights lands on the 5.45 per cent of samples that share it. The
+   valley's cultivation is the same green the First Time uses with its mottle
+   switched off, so its one term is the height above that river.
+
+   Open from stage 6, in the order they matter:
+
+   1. **The green's per-fragment cost in the modern stops.** `today` runs 97
+      to 192 fps at 1601 by 900 across the five hero looks against a bar of
+      100. The city is nearly free (dawn 189 before it, 192 after) and the
+      river was ruled out by hiding it, which made the night stand faster.
+      What is left is the green: `greenFor` now gives the modern stops a
+      non-zero strength, so a shader that used to return at its first line on
+      every ground fragment runs in full over the plateau's grid and the
+      desert ring both. The leads are that the valley's `upland` is zero, so
+      its mottle is dead arithmetic, and that a fragment more than `dryMetres`
+      above the water is provably zero before the mask is sampled.
+   2. **`built` and `ancient` were not measured after the valley landed**, and
+      the ring takes the green in those stops too. No number could be taken:
+      this environment cannot hold a browser window in the foreground and
+      Chrome throttles an occluded one to about one frame a second.
+   3. **The ground east of the plateau reads near black under a low sun**
+      (17, 33, 47 at the panorama stand at 16:00; 116, 146, 160 at midsummer
+      noon). It predates this stage. It is not a hole and not a shader patch,
+      both ruled out by substituting plain materials and by removing each
+      patch in turn, so it is ground in shade lit by too little else and it
+      wants a look at the ambient term.
+   4. The river's shoreline is stepped at the coarse grid's sixty metres,
+      which is the heightfield showing through and not a fault.
+
 2. **The architecture pass.** The ancient state's temples are extruded
    footprints, and Stewart's reference is a reconstruction with fluted
    columns, an architrave and cornice, a decorated facade, a roofed causeway
