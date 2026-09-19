@@ -5,7 +5,7 @@
  * one number re-evaluates every claim the way a regenerated dossier would.
  */
 import { evaluateClaim, type Claim, type ClaimResult } from '@seked/claims/browser';
-import { resolve, type Database, type Measurement, type Resolved } from '@seked/data/browser';
+import { casedIn, resolve, type Cased, type Database, type Material, type MaterialPart, type Measurement, type Resolved } from '@seked/data/browser';
 import {
   buildEnvironment,
   causewayRoofMesh,
@@ -205,6 +205,8 @@ export interface StructureMesh {
   /** The builder's own label, or what the massing is. */
   note: string;
   mesh: Mesh;
+  /** What `data/materials.json` says this building is made of, part by part. Empty where the table is silent. */
+  stone?: Cased;
 }
 
 /** A temple as its parts, so each takes its own stone. */
@@ -213,6 +215,8 @@ export interface TempleStructure {
   name: string;
   tier: StructureTier;
   note: string;
+  /** What `data/materials.json` says this temple is made of, part by part. Empty where the table is silent. */
+  stone: Cased;
   walls: Mesh;
   roof: Mesh | undefined;
   pillars: Mesh | undefined;
@@ -284,6 +288,45 @@ export function isWholeState(state: StateId): boolean {
   return state === 'ancient' || state === 'built';
 }
 
+/** How a material's id reads in a label: `granite.red` as "red granite". */
+const STONE_WORDS: Record<string, string> = {
+  'limestone.giza': 'the yellow limestone of Giza',
+  'limestone.mokattam': 'white Mokattam limestone',
+  'granite.red': 'red granite from Aswan',
+  'granite.black': 'black granite',
+  alabaster: 'alabaster from Hatnub',
+  mudbrick: 'crude brick',
+  basalt: 'basalt',
+};
+
+/** The order the parts are said in, which is the order a builder works in. */
+const STONE_ORDER: MaterialPart[] = ['core', 'casing', 'pillars', 'doorways', 'floor', 'roof'];
+
+/**
+ * What a building says about its own stone.
+ *
+ * The table in `data/materials.json` is the whole of this: a part with a row
+ * is named with its material and its source, a part with none is not given a
+ * stone here, and a building with no rows at all says the table is silent
+ * rather than inventing one. Nothing in this sentence is a look choice, which
+ * is why it is separated from the builder's own, and a row nobody has checked
+ * against its page says so.
+ */
+export function stoneNote(cased: Cased, name: string): string {
+  const rows = STONE_ORDER.map((part) => [part, cased[part]] as const).filter((pair) => pair[1] !== undefined);
+  if (rows.length === 0) {
+    return `Stone: data/materials.json carries no row for ${name}, so nothing here says what it was built of and it is drawn in the builder's own default.`;
+  }
+  const said = rows.map(([part, row]) => `${part} ${STONE_WORDS[(row as Material).material] ?? (row as Material).material}`).join(', ');
+  const sources = [...new Set(rows.map((pair) => (pair[1] as Material).source))].join(', ');
+  const unchecked = rows.filter((pair) => !(pair[1] as Material).verified).length;
+  const caveat =
+    unchecked === 0
+      ? ''
+      : ` ${unchecked === rows.length ? 'None of these rows has' : `${unchecked} of these rows have`} been checked against the page cited, so ${unchecked === rows.length ? 'none is' : 'they are not'} verified.`;
+  return `Stone, from data/materials.json: ${said}. Cited to ${sources}.${caveat}`;
+}
+
 function massingNote(f: Footprint): string {
   return (
     `Massing: ${f.name} as the footprint import has it, the traced outline carried up to a height that is ` +
@@ -321,8 +364,18 @@ function pitCoverMesh(f: Footprint, env: Environment): Mesh | undefined {
  * to look at; the builder merges the parts of each tomb and this merges the
  * tombs.
  */
-export function structuresFor(features: readonly Footprint[], env: Environment, state: StateId): Structures {
+export function structuresFor(
+  features: readonly Footprint[],
+  env: Environment,
+  state: StateId,
+  materials: readonly Material[] = [],
+): Structures {
   const whole = isWholeState(state);
+  /** One building's rows, and the sentence they make, built once per structure. */
+  const stoneOf = (id: string, name: string): { stone: Cased; note: string } => {
+    const stone = casedIn(materials, id);
+    return { stone, note: stoneNote(stone, name) };
+  };
   const built = (mesh: { label: string } & Mesh, f: Footprint): StructureMesh =>
     ({ id: f.id, name: f.name, tier: 'reconstruction', note: mesh.label, mesh });
 
@@ -353,10 +406,11 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
     if (f.group === 'temples' && !NOT_A_TEMPLE.has(f.id)) {
       const planned = templePlanMesh(f, env, whole ? 'whole' : 'ruined');
       const temple = templeMesh(f, env, whole ? 'whole' : 'ruined');
+      const cased = stoneOf(f.id, f.name);
       if (planned !== undefined) {
-        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: planned.label, walls: planned.parts[0]?.mesh ?? (temple?.walls as Mesh), roof: undefined, pillars: undefined, parts: planned.parts });
+        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: `${planned.label} ${cased.note}`, stone: cased.stone, walls: planned.parts[0]?.mesh ?? (temple?.walls as Mesh), roof: undefined, pillars: undefined, parts: planned.parts });
       } else if (temple !== undefined) {
-        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: temple.label, walls: temple.walls, roof: temple.roof, pillars: temple.pillars, parts: undefined });
+        temples.push({ id: f.id, name: f.name, tier: 'reconstruction', note: `${temple.label} ${cased.note}`, stone: cased.stone, walls: temple.walls, roof: temple.roof, pillars: temple.pillars, parts: undefined });
       }
       continue;
     }
@@ -400,6 +454,7 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
 
   const roof = whole ? causewayRoofMesh(env, features) : undefined;
   const corridor = whole ? causewayWallsMesh(env, features) : undefined;
+  const causewayStone = stoneOf('khafre.causeway', 'the causeway of Khafre');
   const enclosureWalls: StructureMesh[] = [];
   if (whole) {
     for (const id of ENCLOSED) {
@@ -428,11 +483,18 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
     temples,
     enclosureWalls,
     walls,
-    causeway,
+    causeway: causeway === undefined ? undefined : { ...causeway, note: `${causeway.note} ${causewayStone.note}`, stone: causewayStone.stone },
     causewayRoof:
       roof === undefined
         ? undefined
-        : { id: 'khafre.causeway.roof', name: 'Causeway of Khafre, roof', tier: 'reconstruction', note: roof.label, mesh: roof },
+        : {
+            id: 'khafre.causeway.roof',
+            name: 'Causeway of Khafre, roof',
+            tier: 'reconstruction',
+            note: `${roof.label} ${causewayStone.note}`,
+            mesh: roof,
+            stone: causewayStone.stone,
+          },
     causewayWalls:
       corridor === undefined
         ? undefined
@@ -440,8 +502,9 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
             id: 'khafre.causeway.walls',
             name: 'Causeway of Khafre, its walls',
             tier: 'reconstruction',
-            note: corridor.label,
+            note: `${corridor.label} ${causewayStone.note}`,
             mesh: corridor,
+            stone: causewayStone.stone,
           },
     pits,
     pitCovers:
@@ -480,7 +543,7 @@ export interface Plateau {
   structures: (state: StateId) => Structures;
 }
 
-export function plateauOf(features: readonly Footprint[], env: Environment): Plateau {
+export function plateauOf(features: readonly Footprint[], env: Environment, materials: readonly Material[] = []): Plateau {
   // The traced footprints, then the solids built from survey records, some of
   // which (Khafre's causeway) are placed by the traced ones they join.
   const all = [...features, ...surveyFootprints(env, features)];
@@ -492,7 +555,7 @@ export function plateauOf(features: readonly Footprint[], env: Environment): Pla
     structures: (state) => {
       let one = cache.get(state);
       if (one === undefined) {
-        one = structuresFor(all, env, state);
+        one = structuresFor(all, env, state, materials);
         cache.set(state, one);
       }
       return one;
@@ -601,7 +664,7 @@ export function buildModel(
   // The offsets the box is placed by are derived, so it reads `env` and not
   // the resolved values: `buildEnvironment` is where a coordinate becomes a
   // position in the frame.
-  const plateau = plateauOf((bundle.footprints?.features ?? []) as Footprint[], env);
+  const plateau = plateauOf((bundle.footprints?.features ?? []) as Footprint[], env, bundle.materials ?? []);
   // The OSM Sphinx supersedes the box, as it does in blender/generate.py: an
   // outline modelled as forepaws, body and head on the ground it is cut into,
   // against a box on the datum plane forty metres above that ground.

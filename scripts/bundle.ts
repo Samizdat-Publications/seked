@@ -55,6 +55,7 @@ export function buildBundle(dataDir = DATA_DIR): SekedBundle {
     structures: db.structures,
     presets: db.presets,
     measurements: db.measurements,
+    materials: db.materials,
     claims,
     stars,
     brightStars,

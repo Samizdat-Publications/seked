@@ -262,3 +262,65 @@ describe('the lesser monuments per state', () => {
     expect(structuresFor([one], { 'tier3.satellite_pyramid.height': 3 }, 'built').queens.length).toBe(1);
   });
 });
+
+/**
+ * Track B: what each building is cased in comes from `data/materials.json`,
+ * and nothing in the scene decides it by a structure's id any more. These
+ * pin the two halves: the table reaching the built structure, and the label
+ * saying what it found and how far it has been checked.
+ */
+describe('the stone a building is drawn in', () => {
+  const model = buildModel(bundle, 'canonical', null);
+  const temples = model.plateau.structures('built').temples;
+  const temple = (id: string) => temples.find((t) => t.id === id);
+
+  it("reaches Khafre's valley temple as red granite on a limestone core", () => {
+    const valley = temple('khafre.valley_temple');
+    expect(valley?.stone.casing?.material).toBe('granite.red');
+    expect(valley?.stone.core?.material).toBe('limestone.giza');
+    expect(valley?.note).toContain('red granite from Aswan');
+    expect(valley?.note).toContain('hoelscher-1912');
+  });
+
+  it("reaches Menkaure's temples as the brick they were finished in", () => {
+    expect(temple('menkaure.mortuary_temple')?.stone.casing?.material).toBe('mudbrick');
+    expect(temple('menkaure.valley_temple')?.note).toContain('crude brick');
+  });
+
+  it('says so where the table is silent rather than inventing a stone', () => {
+    const amenhotep = temple('amenhotep2.temple');
+    expect(amenhotep?.stone).toEqual({});
+    expect(amenhotep?.note).toContain('carries no row');
+  });
+
+  it('never claims a row is verified, because none has been read against its page', () => {
+    for (const t of temples) {
+      if (Object.keys(t.stone).length === 0) continue;
+      expect(t.note, t.id).toMatch(/not verified|none is verified/);
+    }
+  });
+
+  it('gives the causeway, its walls and its roof the causeway`s own rows', () => {
+    const built = model.plateau.structures('built');
+    for (const one of [built.causeway, built.causewayWalls, built.causewayRoof]) {
+      expect(one?.stone?.core?.material, one?.id).toBe('limestone.giza');
+      expect(one?.stone?.casing?.material, one?.id).toBe('limestone.mokattam');
+    }
+  });
+
+  it('carries the table through every state, ruin or whole', () => {
+    for (const state of ['ancient', 'built', 'stripped', 'today'] as const) {
+      const valley = model.plateau.structures(state).temples.find((t) => t.id === 'khafre.valley_temple');
+      expect(valley?.stone.casing?.material, state).toBe('granite.red');
+    }
+  });
+
+  it('builds nothing different when the table is empty, but says the table is silent', () => {
+    const features = model.plateau.features.filter((f) => f.group === 'temples');
+    const bare = structuresFor(features, model.env, 'built');
+    const withTable = structuresFor(features, model.env, 'built', bundle.materials);
+    expect(bare.temples.length).toBe(withTable.temples.length);
+    for (const t of bare.temples) expect(t.stone).toEqual({});
+    expect(bare.temples[0]?.note).toContain('carries no row');
+  });
+});

@@ -8,7 +8,7 @@
  * script as well as the app, so nothing here may touch the DOM or Node.
  */
 import type { Claim } from '@seked/claims/browser';
-import type { Database, FootprintFile, Measurement, Preset, Site, Source, Structure, TerrainHeader } from '@seked/data/browser';
+import type { Database, FootprintFile, Material, Measurement, Preset, Site, Source, Structure, TerrainHeader } from '@seked/data/browser';
 import { expandBrightStars, type BrightCatalogue, type BrightStar, type Star } from '@seked/sky/browser';
 
 export interface BundledTerrain {
@@ -23,6 +23,8 @@ export interface SekedBundle {
   structures: Structure[];
   presets: Preset[];
   measurements: Measurement[];
+  /** What each building is made of, part by part, from `data/materials.json`. */
+  materials: Material[];
   /** Claims with the formula/target shorthand already normalised into comparisons. */
   claims: Claim[];
   /** The stars the claims name, with their roles: the original ten, and the four Cygnus stars C7 adds. */
@@ -59,6 +61,6 @@ export function brightStarsOf(bundle: SekedBundle): BrightStar[] {
 
 /** The bundle is a superset of a Database; this names the part `resolve` wants. */
 export function databaseOf(bundle: SekedBundle): Database {
-  const { sources, sites, structures, measurements, presets } = bundle;
-  return { sources, sites, structures, measurements, presets };
+  const { sources, sites, structures, measurements, presets, materials } = bundle;
+  return { sources, sites, structures, measurements, presets, materials };
 }

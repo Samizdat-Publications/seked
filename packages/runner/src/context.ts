@@ -28,6 +28,7 @@ import {
 import {
   resolve,
   type Database,
+  type Material,
   type Measurement,
   type Preset,
   type Site,
@@ -49,6 +50,13 @@ export interface RunnerBundle {
   presets: Preset[];
   measurements: Measurement[];
   claims: Claim[];
+  /**
+   * What the buildings are made of. The runner never reads it: a claim is a
+   * formula over measured numbers and there is no number in a material. It is
+   * here so a whole bundle satisfies this type, and so `databaseOf` can hand
+   * the resolver a database rather than a database minus one field.
+   */
+  materials?: Material[];
 }
 
 /** One identifier a formula may name, and what the number behind it is. */
@@ -191,7 +199,7 @@ function familyOf(key: string): string {
 
 function databaseOf(bundle: RunnerBundle): Database {
   const { sources, sites, structures, measurements, presets } = bundle;
-  return { sources, sites, structures, measurements, presets };
+  return { sources, sites, structures, measurements, presets, materials: bundle.materials ?? [] };
 }
 
 /**

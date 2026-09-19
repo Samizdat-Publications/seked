@@ -1,0 +1,121 @@
+[
+  {
+    "structure": "khafre.valley_temple",
+    "part": "core",
+    "material": "limestone.giza",
+    "source": "hoelscher-1912",
+    "note": "Blatt XVII's Zeichenerklaerung, first entry: \"Gelber Kalkstein von Gise\", the yellow limestone of the plateau's own quarries, which is the hatching of the temple's megalithic core."
+  },
+  {
+    "structure": "khafre.valley_temple",
+    "part": "casing",
+    "material": "granite.red",
+    "source": "hoelscher-1912",
+    "note": "Blatt XVII's Zeichenerklaerung, second entry: \"Roter Granit von Assuan\", red granite from Aswan. It is the hatching of the hall's lining and of the outer faces, and it is what Petrie's name for the building, the Granite Temple, is about."
+  },
+  {
+    "structure": "khafre.valley_temple",
+    "part": "pillars",
+    "material": "granite.red",
+    "source": "hoelscher-1912",
+    "note": "The square monolithic piers of the Pfeilersaal carry the same red-granite hatching as the lining. Their side is already recorded as khafre_valley_temple.pillar.across, scaled from this plate. No base and no capital: Blatt XVII draws none and this project adds none."
+  },
+  {
+    "structure": "khafre.valley_temple",
+    "part": "floor",
+    "material": "alabaster",
+    "source": "hoelscher-1912",
+    "note": "Blatt XVII's Zeichenerklaerung, third entry: \"Alabaster von Hat-nub\", the Egyptian calcite of the Hatnub quarries, with \"Alabasterpflaster\" among the paving hatchings. The hall's floor level is already recorded as khafre_valley_temple.hall.floor.below_g2_base."
+  },
+  {
+    "structure": "khafre.mortuary_temple",
+    "part": "core",
+    "material": "limestone.giza",
+    "source": "lehner-hawass-2017",
+    "note": "Megalithic core blocks of local limestone, as the valley temple's are. Entered from the general account and not from a page anybody here has opened: unverified, and a candidate for the next plate read."
+  },
+  {
+    "structure": "khafre.mortuary_temple",
+    "part": "casing",
+    "material": "limestone.mokattam",
+    "source": "lehner-hawass-2017",
+    "note": "The fine white limestone Hoelscher's legend calls \"Weisser Kalkstein vom Mokattam\", which is the casing stone of the complex where granite is not used. Unverified, as above."
+  },
+  {
+    "structure": "khafre.mortuary_temple",
+    "part": "doorways",
+    "material": "granite.red",
+    "source": "lehner-hawass-2017",
+    "note": "Red granite at the doorways and the lower courses, the pattern the valley temple carries throughout. This row is why the mortuary temples are not one flat colour. Unverified, as above."
+  },
+  {
+    "structure": "khafre.mortuary_temple",
+    "part": "floor",
+    "material": "alabaster",
+    "source": "lehner-hawass-2017",
+    "note": "Alabaster paving, as in the valley temple. Unverified, as above."
+  },
+  {
+    "structure": "khafre.causeway",
+    "part": "core",
+    "material": "limestone.giza",
+    "source": "lehner-hawass-2017",
+    "note": "The causeway's body is the local limestone of the ridge it is built along and cut into. Unverified, as above."
+  },
+  {
+    "structure": "khafre.causeway",
+    "part": "casing",
+    "material": "limestone.mokattam",
+    "source": "lehner-hawass-2017",
+    "note": "A cased corridor, not a bare ramp. Unverified, as above; the roof slab over it is a look choice of the builder and is named as one in its own label."
+  },
+  {
+    "structure": "sphinx.temple",
+    "part": "core",
+    "material": "limestone.giza",
+    "source": "arce-sphinx-1991",
+    "note": "The core blocks were quarried out of the Sphinx's own ditch, which is the argument that ties the temple to the carving of the statue. Entered from the general account of that survey, not from a page read here: unverified."
+  },
+  {
+    "structure": "sphinx.temple",
+    "part": "casing",
+    "material": "granite.red",
+    "source": "arce-sphinx-1991",
+    "note": "Red granite casing over the limestone core, as on Khafre's valley temple beside it. Unverified, as above."
+  },
+  {
+    "structure": "menkaure.mortuary_temple",
+    "part": "core",
+    "material": "limestone.giza",
+    "source": "reisner-1931",
+    "note": "Reisner's table of periods, p. 7: under Mycerinus, \"Foundation platform, core walls of outer temple\". The room list on p. 6 has them as \"limestone core walls\" room by room."
+  },
+  {
+    "structure": "menkaure.mortuary_temple",
+    "part": "casing",
+    "material": "mudbrick",
+    "source": "reisner-1931",
+    "note": "Reisner, p. 7: Mycerinus left an \"unfinished granite casing\" and Shepseskaf finished the building with a \"Crude-brick casing of whole temple\". So what stood is mud brick over a limestone core, with the king's own granite never completed; the blocks of it lay in a tangled mass over the inner temple when Reisner cleared it (p. 19). The temple this project draws is the one that stood, and the granite it was meant to have is this note."
+  },
+  {
+    "structure": "menkaure.mortuary_temple",
+    "part": "floor",
+    "material": "granite.black",
+    "source": "reisner-1931",
+    "note": "Reisner, p. 7: \"granite floor in inner offering room (29)\", under Mycerinus. The casing blocks he clears are black granite, not red: the quarrymen \"took out the black granite blocks of the unfinished casing of the court\" (p. 18)."
+  },
+  {
+    "structure": "menkaure.valley_temple",
+    "part": "core",
+    "material": "limestone.giza",
+    "source": "reisner-1931",
+    "note": "Pl. 29 d and e: \"exposed limestone core-wall (Mycerinus)\" in rooms (III-7) and (18), under the later brick."
+  },
+  {
+    "structure": "menkaure.valley_temple",
+    "part": "casing",
+    "material": "mudbrick",
+    "source": "reisner-1931",
+    "note": "Reisner's abbreviations, p. xxi: MVT (I) is \"the first c.b. temple, built by Shepseskaf\" and MVT (II) \"the second temple, built by Pepy II\", c.b. being crude brick, unbaked mud. The valley temple that stood was a brick building on Mycerinus' limestone core."
+  }
+]

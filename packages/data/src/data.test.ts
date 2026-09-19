@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { MeasurementSchema, StructureSchema, isContext, loadDatabase, resolve } from './index';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { z } from 'zod';
+import { MaterialSchema, MeasurementSchema, StructureSchema, DATA_DIR, casedIn, isContext, loadDatabase, loadFootprints, resolve } from './index';
 
 const db = loadDatabase();
 
@@ -89,4 +93,80 @@ describe('context is not a fifth evidence tier', () => {
     for (const s of db.structures) expect(isContext(s), s.id).toBe(false);
   });
 
+});
+
+/**
+ * The material table. It says what a building is made of, which is not a
+ * measurement and has no value, no unit and no sigma, but carries the same
+ * honesty rule: a source that exists, and `verified` false until somebody has
+ * read the row against its page.
+ */
+describe('what the buildings are made of', () => {
+  const footprints = loadFootprints();
+  const ids = new Set(footprints.features.map((f) => f.id));
+
+  it('loads, and every row is about a footprint the import carries', () => {
+    expect(db.materials.length).toBeGreaterThan(10);
+    for (const m of db.materials) expect(ids.has(m.structure), m.structure).toBe(true);
+  });
+
+  it('cites a source that exists, and is verified by nobody yet', () => {
+    const sources = new Set(db.sources.map((s) => s.id));
+    for (const m of db.materials) {
+      expect(sources.has(m.source), `${m.structure}.${m.part} cites ${m.source}`).toBe(true);
+      expect(m.verified, `${m.structure}.${m.part}`).toBe(false);
+      expect((m.note ?? '').length, `${m.structure}.${m.part} says nothing`).toBeGreaterThan(20);
+    }
+  });
+
+  it('gives Khafre red granite on a limestone core, from the plate that names them', () => {
+    const cased = casedIn(db.materials, 'khafre.valley_temple');
+    expect(cased.casing?.material).toBe('granite.red');
+    expect(cased.pillars?.material).toBe('granite.red');
+    expect(cased.core?.material).toBe('limestone.giza');
+    expect(cased.floor?.material).toBe('alabaster');
+    for (const part of ['casing', 'pillars', 'core', 'floor'] as const) expect(cased[part]?.source).toBe('hoelscher-1912');
+  });
+
+  it("gives Menkaure the brick he was finished in, not the granite he was meant to have", () => {
+    for (const id of ['menkaure.mortuary_temple', 'menkaure.valley_temple']) {
+      const cased = casedIn(db.materials, id);
+      expect(cased.casing?.material, id).toBe('mudbrick');
+      expect(cased.core?.material, id).toBe('limestone.giza');
+      expect(cased.casing?.source, id).toBe('reisner-1931');
+    }
+    // The granite that was cut and never set is a floor and a note, not a casing.
+    expect(casedIn(db.materials, 'menkaure.mortuary_temple').floor?.material).toBe('granite.black');
+  });
+
+  it('is silent where nobody has looked, and says nothing rather than something', () => {
+    expect(casedIn(db.materials, 'amenhotep2.temple')).toEqual({});
+    expect(casedIn(db.materials, 'no.such.building')).toEqual({});
+  });
+
+  it('refuses two materials for one surface, and an unknown source', () => {
+    // The schema alone cannot see the pair: one row is valid and so is the
+    // other. It is the loader that forbids them together, so the loader is
+    // what this runs, over a copy of `data/` with one row added.
+    const twice = [
+      { structure: 'x', part: 'casing', material: 'granite.red', source: 'petrie-1883' },
+      { structure: 'x', part: 'casing', material: 'mudbrick', source: 'petrie-1883' },
+    ];
+    expect(() => z.array(MaterialSchema).parse(twice)).not.toThrow();
+
+    const copy = mkdtempSync(join(tmpdir(), 'seked-materials-'));
+    cpSync(DATA_DIR, copy, { recursive: true });
+    const rows = JSON.parse(readFileSync(join(copy, 'materials.json'), 'utf8')) as unknown[];
+
+    writeFileSync(join(copy, 'materials.json'), JSON.stringify([...rows, rows[0]]));
+    expect(() => loadDatabase(copy)).toThrow(/is given a material twice/);
+
+    writeFileSync(
+      join(copy, 'materials.json'),
+      JSON.stringify([...rows, { structure: 'x', part: 'roof', material: 'basalt', source: 'no-such-book' }]),
+    );
+    expect(() => loadDatabase(copy)).toThrow(/cites unknown source "no-such-book"/);
+
+    rmSync(copy, { recursive: true, force: true });
+  });
 });

@@ -428,5 +428,15 @@
     "kept": false,
     "note": "The tour's Behind the Sphinx shot in the ancient state, playing on the wall clock at over 100 fps",
     "bytes": 961823
+  },
+  {
+    "file": "2026-09-19T07-15-01Z--valley-temples-granite--5938982-dirty.png",
+    "taken": "2026-09-19T07:15:01+00:00",
+    "view": "valley-temples-granite",
+    "commit": "5938982",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Track B: Khafre's valley temple and the Sphinx Temple in red granite from the material table, seen from the north-east over the harbour, 2450 BCE, 09:00. The courses run the right way for the first time.",
+    "bytes": 3982487
   }
 ]

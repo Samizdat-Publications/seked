@@ -81,6 +81,66 @@ export function isContext(structure: Structure): boolean {
   return structure.context === true;
 }
 
+/**
+ * The stone a building is made of, one row per part.
+ *
+ * A material is not a geometry and not a measurement: it says what a surface
+ * is, not where it is, so it has no value, no unit and no sigma. What it does
+ * share with a measurement is the honesty rule. Every row names a source that
+ * exists, and `verified` stays false until somebody has checked that row
+ * against the page or the plate it cites. Khafre's valley temple is the one
+ * building whose rows come off a plate that has been opened here: Hoelscher's
+ * Blatt XVII carries a Zeichenerklaerung that names the stone of each
+ * hatching, which is a printed legend and is transcribed like any printed
+ * figure. Menkaure's come out of Reisner's own text. The rest are entered
+ * from a general account and say so in their own notes.
+ *
+ * A part with no row is not drawn in a made-up stone: the builder falls back
+ * to its own default and the label says the table is silent about it.
+ */
+export const MATERIALS = [
+  /** The yellow nummulitic limestone of the plateau's own quarries. Hoelscher's "Gelber Kalkstein von Gise". */
+  'limestone.giza',
+  /** The fine white limestone of the Mokattam hills, which is casing stone. Hoelscher's "Weisser Kalkstein vom Mokattam". */
+  'limestone.mokattam',
+  /** Red granite from Aswan. Hoelscher's "Roter Granit von Assuan", and Petrie's reason for calling the valley temple the Granite Temple. */
+  'granite.red',
+  /** The dark Aswan granite Reisner calls black granite, the stone of Menkaure's unfinished casing. */
+  'granite.black',
+  /** Egyptian calcite from Hatnub. Hoelscher's "Alabaster von Hat-nub". */
+  'alabaster',
+  /** Unbaked mud brick. Reisner's c.b., crude-brick, which is what Menkaure's temples were actually finished in. */
+  'mudbrick',
+  /** The black stone of Khufu's mortuary temple pavement. */
+  'basalt',
+] as const;
+export type MaterialName = (typeof MATERIALS)[number];
+
+/** Which surface of a building a row is about. */
+export const MATERIAL_PARTS = ['core', 'casing', 'pillars', 'floor', 'roof', 'doorways'] as const;
+export type MaterialPart = (typeof MATERIAL_PARTS)[number];
+
+export const MaterialSchema = z.object({
+  /** The footprint or structure the row is about, as the import ids it: `khafre.valley_temple`. */
+  structure: z.string(),
+  part: z.enum(MATERIAL_PARTS),
+  material: z.enum(MATERIALS),
+  source: z.string(),
+  note: z.string().optional(),
+  verified: z.boolean().default(false),
+});
+export type Material = z.infer<typeof MaterialSchema>;
+
+/** The rows for one structure, part by part. Undefined where the table is silent. */
+export type Cased = Partial<Record<MaterialPart, Material>>;
+
+/** Every row about one structure, gathered by part. The last row for a part wins, which the loader forbids anyway. */
+export function casedIn(materials: readonly Material[], structure: string): Cased {
+  const out: Cased = {};
+  for (const row of materials) if (row.structure === structure) out[row.part] = row;
+  return out;
+}
+
 export const PresetSchema = z.object({
   id: z.string(),
   label: z.string(),
@@ -96,6 +156,8 @@ export interface Database {
   structures: Structure[];
   measurements: Measurement[];
   presets: Preset[];
+  /** What each building is made of, part by part. Never a measurement; see `MaterialSchema`. */
+  materials: Material[];
 }
 
 /**

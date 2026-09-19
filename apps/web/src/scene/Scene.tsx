@@ -69,6 +69,14 @@ const BACKGROUND = '#05070c';
  * whole group reconciles them, so no geometry is rewritten and a vertex in
  * the browser is the vertex in Blender.
  */
+/**
+ * Whether this page was opened to have a still taken off it, which is
+ * `?still=1` in the address bar. Read once, at module load, because the
+ * renderer's context options cannot change after the context is made.
+ */
+const STILL =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('still') === '1';
+
 export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: SceneProps): React.JSX.Element {
   const start = useRef(useView.getState().camera).current;
   // The observer is the Great Pyramid's own centre, which is where every sky
@@ -94,7 +102,13 @@ export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: S
       shadows
       dpr={[1, 2]}
       frameloop={clock === 'stepped' ? 'never' : 'always'}
-      gl={{ antialias: false, powerPreference: 'high-performance' }}
+      // `preserveDrawingBuffer` only when `?still=1` asks for it. Without it a
+      // canvas is empty to `toDataURL` unless the read happens inside the
+      // frame that drew it, which a session driving the viewer from outside
+      // the page cannot arrange; with it, a still can be taken at any moment
+      // and saved. It costs a copy of the framebuffer every frame, which is
+      // why it is off unless somebody has asked for a picture.
+      gl={{ antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: STILL }}
       camera={{ fov: 45, near: 1, far: 40000, position: start.position }}
     >
       <color attach="background" args={[BACKGROUND]} />

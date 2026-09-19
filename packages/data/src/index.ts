@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
-import { FootprintFileSchema, MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, type Database, type FootprintFile, type Measurement } from './core';
+import { FootprintFileSchema, MaterialSchema, MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, type Database, type FootprintFile, type Measurement } from './core';
 
 export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 export const DATA_DIR = join(REPO_ROOT, 'data');
@@ -24,6 +24,7 @@ export function loadDatabase(dataDir = DATA_DIR): Database {
   const sites = z.array(SiteSchema).parse(readJson(join(dataDir, 'sites.json')));
   const structures = z.array(StructureSchema).parse(readJson(join(dataDir, 'structures.json')));
   const presets = z.array(PresetSchema).parse(readJson(join(dataDir, 'presets.json')));
+  const materials = z.array(MaterialSchema).parse(readJson(join(dataDir, 'materials.json')));
 
   const measurements: Measurement[] = [];
   const files = readdirSync(join(dataDir, 'measurements')).filter((f) => f.endsWith('.json')).sort();
@@ -57,13 +58,25 @@ export function loadDatabase(dataDir = DATA_DIR): Database {
       throw new Error(`${m.file}: ${m.key} belongs to unregistered structure "${m.structure}" (add it to data/structures.json)`);
     }
   }
+  // A material names a source that exists, a structure that is either
+  // registered or a footprint the import carries (the temples are the latter),
+  // and says one thing per part: two rows for the same surface would leave
+  // which stone it is to whichever the loader read last.
+  const partSeen = new Set<string>();
+  for (const m of materials) {
+    if (!sourceIds.has(m.source)) throw new Error(`materials: ${m.structure}.${m.part} cites unknown source "${m.source}"`);
+    const part = `${m.structure}.${m.part}`;
+    if (partSeen.has(part)) throw new Error(`materials: ${part} is given a material twice`);
+    partSeen.add(part);
+  }
+
   const seen = new Set<string>();
   for (const m of measurements) {
     const k = `${m.key}@${m.source}`;
     if (seen.has(k)) throw new Error(`${m.file}: ${m.key} recorded twice for source ${m.source}`);
     seen.add(k);
   }
-  return { sources, sites, structures, measurements, presets };
+  return { sources, sites, structures, measurements, presets, materials };
 }
 
 /** The footprint import, validated. Written by `pnpm run footprints`. */

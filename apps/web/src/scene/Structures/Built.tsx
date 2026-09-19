@@ -22,12 +22,20 @@ import { sekedUserData, type Labelled } from './label';
 /**
  * The flat colours a surface keeps until its photograph has loaded, and after
  * that the tint the photograph is laid over. Look choices, all of them, and
- * the same four the stage 1 massings used.
+ * the same ones the stage 1 massings used.
+ *
+ * These are the tints of a structure nobody has recorded a material for: the
+ * mastabas, the enclosure walls, the boat pits, the queens. A building that
+ * `data/materials.json` does carry a row for takes its tint from `cased.ts`
+ * instead, keyed on the material the table names and not on the structure's
+ * id. `granite` left this table on 2026-09-19, when that stopped being one
+ * colour: Khafre's valley temple is red granite from Aswan and Menkaure's
+ * unfinished casing is the black granite Reisner dug out, and a single
+ * grey-mauve stood for both.
  */
 export const COLOURS = {
   limestone: '#bfb08e',
   casing: '#d6c49c',
-  granite: '#9d827b',
   basalt: '#3b3c3d',
   pit: '#3a3128',
 } as const;
@@ -43,6 +51,13 @@ export interface BuiltProps {
   mesh?: GeometryMesh;
   /** Distinguish this mesh from its structure's others, so React keeps them apart. */
   part?: string;
+  /**
+   * What the material look chose for this surface, from `cased.ts`. Appended
+   * to the structure's own note, because a reader asking what a wall is made
+   * of deserves both halves in one place: the table's cited material and the
+   * look choices drawing it.
+   */
+  look?: string;
 }
 
 /**
@@ -56,7 +71,7 @@ function geometryKey(mesh: GeometryMesh): string {
   return `${mesh.vertexCount}:${p[2]}:${p[p.length - 1]}`;
 }
 
-export function Built({ built, state, clippingPlanes, role, colour, stone, mesh, part }: BuiltProps): React.JSX.Element | null {
+export function Built({ built, state, clippingPlanes, role, colour, stone, mesh, part, look }: BuiltProps): React.JSX.Element | null {
   const solid = mesh ?? built.mesh;
   const key = solid === undefined ? '' : geometryKey(solid);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,9 +79,9 @@ export function Built({ built, state, clippingPlanes, role, colour, stone, mesh,
   useEffect(() => () => geometry?.dispose(), [geometry]);
   const material = useStoneMaterial(role, stone);
   const seked = useMemo(
-    () => sekedUserData(built, state),
+    () => sekedUserData(look === undefined ? built : { ...built, note: `${built.note} ${look}` }, state),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [built.id, built.name, built.tier, built.note, state],
+    [built.id, built.name, built.tier, built.note, state, look],
   );
   const hidden = useView((s) => s.hiddenMasses).has(built.id);
   // A section leaves the far side of the masonry facing away from the reader,

@@ -282,8 +282,23 @@ vec3 sekedStoneWeights(vec3 faceNormal) {
   return w / max(w.x + w.y + w.z, 1e-5);
 }
 
+/*
+ * The photograph on three planes at once, blended by the face's own normal.
+ *
+ * The x plane reads p.zy and not p.yz, which is the whole of a fault found on
+ * 2026-09-19 and worth writing down. The world here is three's, so y is up and
+ * z is minus north. p.yz puts up on the texture's own horizontal axis, which
+ * turns the photograph a quarter turn on every face whose normal is east or
+ * west, while the z plane's p.xy leaves it upright on every face that looks
+ * north or south. For an isotropic photograph that is invisible. granite_wall
+ * is not isotropic: it is a coursed wall, and the first red granite the valley
+ * temple ever wore had its courses running from the ground to the roof, so the
+ * building read as varnished planking. The normal map below had it right all
+ * along, sampling p.zy, so the colour and the relief were disagreeing about
+ * which way the stone was laid.
+ */
 vec3 sekedTriplanar(sampler2D map, vec3 p, vec3 w, float tile) {
-  return texture2D(map, p.yz / tile).rgb * w.x
+  return texture2D(map, p.zy / tile).rgb * w.x
        + texture2D(map, p.xz / tile).rgb * w.y
        + texture2D(map, p.xy / tile).rgb * w.z;
 }

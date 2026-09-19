@@ -4,25 +4,40 @@
  * court. The roof and the colonnade belong to the early states only; the late
  * ones show the walls at a quarter of what stands.
  *
- * Khafre's valley temple is Petrie's Granite Temple and takes granite, in
- * every state, because its core blocks and its casing are what it is known
- * for. The colonnades are granite everywhere, which is a look choice: the
- * monolithic red granite pillars of that temple are the model for all of them
- * and nothing in the database says what the other five were columned with.
+ * Which stone each surface takes is no longer decided here. Until 2026-09-19
+ * this file held a set of one id, `khafre.valley_temple`, and everything in
+ * it was granite while everything else was limestone; that was a look choice
+ * standing in for a fact, and the fact is now `data/materials.json`, where
+ * every row cites a source. Khafre's valley temple is red granite from Aswan
+ * on a yellow Giza limestone core with an alabaster floor, because
+ * Hoelscher's Blatt XVII has a Zeichenerklaerung that names each hatching;
+ * Menkaure's two temples are crude brick over limestone, because Reisner's
+ * table of periods (p. 7) says Mycerinus' granite casing was never finished
+ * and Shepseskaf cased the building in mud brick. A temple with no row in the
+ * table is drawn in the builder's own limestone and its label says the table
+ * is silent about it.
+ *
+ * The tints and the photographed sets behind those names are in `cased.ts`,
+ * which is where a look choice about a material belongs.
  *
  * A temple the database holds a plan for arrives with `parts` instead, one
  * mesh per piece with the stone that piece takes, and is drawn from those:
- * the mass in its own limestone or granite and the hall's lining, pillars and
- * statue plinths in granite. Khafre's valley temple is the one so far, from
- * Hölscher's Blatt XVII. Everything else is still the generic massing.
+ * the mass in its own stone and the hall's lining, pillars and statue plinths
+ * in whatever the table calls that temple's pillars. Khafre's valley temple
+ * is the one so far, from Hoelscher's Blatt XVII.
  */
 import type { Plane } from 'three';
 import type { TempleStructure } from '../../model';
 import type { StateId } from '../../view';
 import { Built, COLOURS } from './Built';
+import { lookFor, lookWords, type StoneLook } from './cased';
 
-/** The temples whose stone is granite rather than limestone. A look choice everywhere but the first. */
-const GRANITE = new Set(['khafre.valley_temple']);
+/**
+ * What a temple is drawn as where the table says nothing: the massing's own
+ * limestone, which is what every temple looked like before the table existed.
+ */
+const PLAIN: StoneLook = { role: 'core', colour: COLOURS.limestone, stone: { strength: 0.75, relief: 0.8 } };
+const PLAIN_CASED: StoneLook = { role: 'casing', colour: COLOURS.casing, stone: { strength: 0.75, relief: 0.8 } };
 
 export function Temples({
   temples,
@@ -38,25 +53,37 @@ export function Temples({
   return (
     <>
       {temples.map((temple) => {
-        const granite = GRANITE.has(temple.id);
-        const role = granite ? 'granite' : whole ? 'casing' : 'core';
-        const colour = granite ? COLOURS.granite : whole ? COLOURS.casing : COLOURS.limestone;
+        // An outer wall is the casing where the building has one and the core
+        // where it does not; in a ruin there is no casing left to see, so the
+        // core is asked for first.
+        const outside = whole
+          ? lookFor(temple.stone, ['casing', 'core'], PLAIN_CASED)
+          : lookFor(temple.stone, ['core', 'casing'], PLAIN);
+        const pillars = lookFor(temple.stone, ['pillars', 'casing', 'core'], outside);
+        const roof = lookFor(temple.stone, ['roof', 'casing', 'core'], PLAIN);
         if (temple.parts !== undefined) {
+          // A plan-driven temple marks each piece granite or core. Granite
+          // means "the stone this temple's pillars and lining are", which the
+          // table answers; core means its mass, which is `outside`.
           return (
             <group key={temple.id}>
-              {temple.parts.map((part) => (
-                <Built
-                  key={part.name}
-                  built={temple}
-                  state={state}
-                  clippingPlanes={clippingPlanes}
-                  role={part.material === 'granite' ? 'granite' : role}
-                  colour={part.material === 'granite' ? COLOURS.granite : colour}
-                  stone={{ strength: part.material === 'granite' ? 0.85 : 0.75, relief: part.material === 'granite' ? 0.5 : 0.8 }}
-                  mesh={part.mesh}
-                  part={part.name}
-                />
-              ))}
+              {temple.parts.map((part) => {
+                const look = part.material === 'granite' ? pillars : outside;
+                return (
+                  <Built
+                    key={part.name}
+                    built={temple}
+                    state={state}
+                    clippingPlanes={clippingPlanes}
+                    role={look.role}
+                    colour={look.colour}
+                    stone={look.stone}
+                    look={lookWords(look)}
+                    mesh={part.mesh}
+                    part={part.name}
+                  />
+                );
+              })}
             </group>
           );
         }
@@ -66,9 +93,10 @@ export function Temples({
               built={temple}
               state={state}
               clippingPlanes={clippingPlanes}
-              role={role}
-              colour={colour}
-              stone={{ strength: 0.75, relief: 0.8 }}
+              role={outside.role}
+              colour={outside.colour}
+              stone={outside.stone}
+              look={lookWords(outside)}
               mesh={temple.walls}
               part="walls"
             />
@@ -77,9 +105,10 @@ export function Temples({
                 built={temple}
                 state={state}
                 clippingPlanes={clippingPlanes}
-                role="core"
-                colour={COLOURS.limestone}
-                stone={{ strength: 0.85, relief: 0.6 }}
+                role={roof.role}
+                colour={roof.colour}
+                stone={roof.stone}
+                look={lookWords(roof)}
                 mesh={temple.roof}
                 part="roof"
               />
@@ -89,9 +118,10 @@ export function Temples({
                 built={temple}
                 state={state}
                 clippingPlanes={clippingPlanes}
-                role="granite"
-                colour={COLOURS.granite}
-                stone={{ strength: 0.85, relief: 0.5 }}
+                role={pillars.role}
+                colour={pillars.colour}
+                stone={pillars.stone}
+                look={lookWords(pillars)}
                 mesh={temple.pillars}
                 part="pillars"
               />
