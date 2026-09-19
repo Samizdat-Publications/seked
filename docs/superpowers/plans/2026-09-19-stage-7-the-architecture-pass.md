@@ -83,18 +83,22 @@ New for this stage:
 A building with no door is a box. Every temple on the plateau has one axis and
 one principal doorway, and the causeway says which side it is on.
 
-- [ ] `doorwayMesh` in `temple.ts`: a rectangular opening cut through the
-      battered wall on a given side, jambs upright, head flat. Width and
-      height are look choices named in the label; Khafre's valley temple has
-      two doorways in its east face and that is the one case where a plate can
-      say so.
-- [ ] Choose the side from the structure's own geometry rather than by hand:
-      the wall nearest the causeway's lower end, or nearest the harbour where
-      there is no causeway.
-- [ ] Tests: the opening is a hole and not a notch (the wall is still one
-      closed solid), the jambs follow the batter, and a temple with no side
-      chosen is the temple as it is now.
-- [ ] Commit, then a still at the harbour stand.
+- [x] `walledMesh` in `temple.ts`: `annulusMesh` with rectangular openings cut
+      through it, jambs square to the wall and leaning with its batter, head
+      flat. `DOORWAY` is three metres by five and is named in the label.
+- [x] The side is not chosen per building and does not need to be: every
+      temple on this plateau opens east, so the door is in the edge whose
+      middle faces east, by `edgeFacing`. A wall too short to carry a door
+      without becoming a gap between two stubs gets none, and the label says
+      so.
+- [x] Tests: `meshVolume` says the hole is exactly its width by its head by
+      the wall's thickness (this caught a splayed embrasure), the triangles
+      are walked to insist the solid is still closed (this caught a T-junction
+      at every corner), the jambs follow the batter, a ruin has no door, and
+      with no openings the wall equals `annulusMesh` vertex for vertex.
+- [x] Commit 10ec9a5, with a still east of Khafre's mortuary temple.
+- [ ] Khafre's valley temple has TWO doorways in its east face and Hoelscher's
+      plate can say where: that is Track E's, not this one's.
 
 ## Track B: the material each building is cased in
 
