@@ -88,21 +88,21 @@
     "part": "core",
     "material": "limestone.giza",
     "source": "reisner-1931",
-    "note": "Reisner's table of periods, p. 7: under Mycerinus, \"Foundation platform, core walls of outer temple\". The room list on p. 6 has them as \"limestone core walls\" room by room."
+    "note": "Reisner's table of periods, p. 7: under Mycerinus, \"Foundation platform, core walls of outer temple\". The room list on p. 6 has them as \"limestone core walls\" room by room. Plan I at the end of the volume carries its own legend in Reisner's hand, seven hatchings named: \"Crude brick casing in situ\", \"Rubble\", \"Black granite casing in situ\", \"Emplacements of red granite casing and pillars\", \"Turah limestone (Shepseskaf)\", \"Core-walls, local limestone\" and \"Walls of Dyn VI(?), local limestone\". That legend is a printed statement of materials on a survey drawing, read here the same way Hoelscher's Zeichenerklaerung on Blatt XVII is read. The legend's \"Core-walls, local limestone\" is this row."
   },
   {
     "structure": "menkaure.mortuary_temple",
     "part": "casing",
     "material": "mudbrick",
     "source": "reisner-1931",
-    "note": "Reisner, p. 7: Mycerinus left an \"unfinished granite casing\" and Shepseskaf finished the building with a \"Crude-brick casing of whole temple\". So what stood is mud brick over a limestone core, with the king's own granite never completed; the blocks of it lay in a tangled mass over the inner temple when Reisner cleared it (p. 19). The temple this project draws is the one that stood, and the granite it was meant to have is this note."
+    "note": "Reisner, p. 7: Mycerinus left an \"unfinished granite casing\" and Shepseskaf finished the building with a \"Crude-brick casing of whole temple\". So what stood is mud brick over a limestone core, with the king's own granite never completed; the blocks of it lay in a tangled mass over the inner temple when Reisner cleared it (p. 19). The temple this project draws is the one that stood, and the granite it was meant to have is this note. Plan I's legend has both \"Crude brick casing in situ\" and \"Turah limestone (Shepseskaf)\", so Shepseskaf's completion was not brick alone: the table's one casing row is the brick, which is what cased the whole temple, and the Tura limestone he used for the inner temple is not separately drawn here because this builder has no part for it."
   },
   {
     "structure": "menkaure.mortuary_temple",
     "part": "floor",
     "material": "granite.black",
     "source": "reisner-1931",
-    "note": "Reisner, p. 7: \"granite floor in inner offering room (29)\", under Mycerinus. The casing blocks he clears are black granite, not red: the quarrymen \"took out the black granite blocks of the unfinished casing of the court\" (p. 18)."
+    "note": "Reisner, p. 7: \"granite floor in inner offering room (29)\", under Mycerinus. The casing blocks he clears are black granite, not red: the quarrymen \"took out the black granite blocks of the unfinished casing of the court\" (p. 18). Plan I's legend has \"Black granite casing in situ\" as its own hatching, which is the granite that was actually set, against the \"Emplacements of red granite casing and pillars\" that mark where granite was meant to go and never did."
   },
   {
     "structure": "menkaure.valley_temple",
@@ -117,5 +117,13 @@
     "material": "mudbrick",
     "source": "reisner-1931",
     "note": "Reisner's abbreviations, p. xxi: MVT (I) is \"the first c.b. temple, built by Shepseskaf\" and MVT (II) \"the second temple, built by Pepy II\", c.b. being crude brick, unbaked mud. The valley temple that stood was a brick building on Mycerinus' limestone core."
+  },
+  {
+    "structure": "menkaure.mortuary_temple",
+    "part": "pillars",
+    "material": "granite.red",
+    "source": "reisner-1931",
+    "note": "Plan I's legend has a hatching of its own for \"Emplacements of red granite casing and pillars\", and Reisner draws it through the portico (7). So the pillars of this temple were to be red granite, which is the same stone as Khafre's valley temple and a different stone from the black granite casing that was actually set (see the floor row). This row is what red granite the temple was meant to have; that it was never finished is the casing row's business, and the pillar sockets Reisner marks are the evidence for both.",
+    "verified": false
   }
 ]
