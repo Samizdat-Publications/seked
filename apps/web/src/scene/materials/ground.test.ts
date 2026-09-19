@@ -13,7 +13,7 @@
  */
 import { MeshStandardMaterial, Vector3, type WebGLProgramParametersWithUniforms } from 'three';
 import { describe, expect, it } from 'vitest';
-import { applyGreen, buildGreenMask, GREEN, greenAt, greenFor, type GreenMask } from './ground';
+import { applyGreen, buildGreenMask, GREEN, greenAt, greenFor, sampleMask, type GreenMask } from './ground';
 
 /** A mask over a square kilometre with nothing built on it. */
 function mask(): GreenMask {
@@ -109,6 +109,74 @@ describe('greenAt', () => {
     const wall = greenAt(m, x, y, 60, 0.2, undefined, GREEN.strength.ancient);
     expect(flat).toBeGreaterThan(wall);
     expect(wall).toBe(0);
+  });
+});
+
+describe('the floor', () => {
+  it('is what makes the First Time grassland rather than patches', () => {
+    const m = mask();
+    // A place the noise left between its patches, away from any water.
+    let bare: [number, number] | undefined;
+    for (let x = -480; x < 480 && !bare; x += 20) {
+      for (let y = -480; y < 480 && !bare; y += 20) {
+        if (greenAt(m, x, y, 60, 1, undefined, 1, { floor: 0 }) < 0.01) bare = [x, y];
+      }
+    }
+    expect(bare, 'the noise covered the whole square').toBeDefined();
+    const [x, y] = bare as [number, number];
+    expect(greenAt(m, x, y, 60, 1, undefined, 1, { floor: 0 })).toBeLessThan(0.01);
+    expect(greenAt(m, x, y, 60, 1, undefined, 1, { floor: GREEN.floor.ancient })).toBeCloseTo(GREEN.floor.ancient, 2);
+    // And the two modern stops pass none, so their desert stays desert.
+    expect(greenFor('today').floor).toBe(0);
+    expect(greenFor('stripped').floor).toBe(0);
+  });
+
+  it('never takes the green past one', () => {
+    const m = mask();
+    for (const floor of [0, 0.5, 1]) {
+      const g = greenAt(m, 0, 0, 0, 1, -1, 1, { floor, upland: 1 });
+      expect(g).toBeLessThanOrEqual(1);
+      expect(g).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+describe('the town', () => {
+  const city = {
+    size: 1000,
+    cells: [
+      [0, 0, 2000],
+      [1000, 0, 300],
+    ] as ReadonlyArray<readonly [number, number, number]>,
+  };
+
+  it('keeps the fields out of the built-up ground, and only for the stop that has a city', () => {
+    const extent = { x0: -2000, y0: -2000, size: 4000 };
+    const withCity = buildGreenMask([], extent, city);
+    const without = buildGreenMask([], extent);
+    const level = -10;
+    const inTown: [number, number] = [500, 500];
+    const args = [level + 2, 1, level, 1] as const;
+    const bands = { upland: 0, wetMetres: 6, dryMetres: 14 };
+    // The same place, the same band, with and without the city weighed.
+    const fields = greenAt(without, inTown[0], inTown[1], ...args, { ...bands, built: 1 });
+    const town = greenAt(withCity, inTown[0], inTown[1], ...args, { ...bands, built: 1 });
+    const before = greenAt(withCity, inTown[0], inTown[1], ...args, { ...bands, built: 0 });
+    expect(fields).toBeGreaterThan(0.5);
+    expect(before).toBeGreaterThan(0.5);
+    expect(town).toBeLessThan(0.05);
+  });
+
+  it('is the city only in the stop that has one', () => {
+    expect(greenFor('today').built).toBe(1);
+    expect(greenFor('stripped').built).toBe(0);
+    expect(greenFor('ancient').built).toBeUndefined();
+    expect(greenFor('built').built).toBeUndefined();
+  });
+
+  it('is zero everywhere when no city was given', () => {
+    const m = buildGreenMask([], { x0: -2000, y0: -2000, size: 4000 });
+    expect(sampleMask(m, 500, 500).built).toBe(0);
   });
 });
 

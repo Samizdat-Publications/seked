@@ -34,6 +34,18 @@
       ],
       "port": 5186,
       "cwd": "apps/web"
+    },
+    {
+      "name": "web-tune",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5187",
+        "--strictPort"
+      ],
+      "port": 5187,
+      "cwd": "apps/web"
     }
   ]
 }

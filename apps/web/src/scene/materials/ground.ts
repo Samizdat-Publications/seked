@@ -17,6 +17,9 @@
  *          than uniform
  *   green  the keep-off, which is 0 within a margin of any monument's
  *          footprint and 1 in the clear
+ *   blue   how built up the ground is now, from the modern city's own count
+ *          of buildings per square kilometre. Only `today` weighs it, and it
+ *          is what stops the fields growing through Giza and Cairo.
  *
  * The shader reads that texture; `greenAt` reads the same texels through
  * `sampleMask`. The rest of the mask, the height above the water and the
@@ -74,13 +77,26 @@ import { after, patchMaterial } from './patch';
  * is drawn on.
  */
 export const GREEN = {
-  strength: { ancient: 1, built: 0.22, stripped: 0, today: 0 } as Record<StateId, number>,
-  colour: new Vector3(0.34, 0.41, 0.18),
-  dry: new Vector3(0.45, 0.42, 0.26),
+  strength: { ancient: 1, built: 0.3, stripped: 0, today: 0 } as Record<StateId, number>,
+  colour: new Vector3(0.16, 0.34, 0.07),
+  dry: new Vector3(0.32, 0.31, 0.14),
   aboveWaterMetres: 1.2,
   wetMetres: 8,
   dryMetres: 55,
   uplandShare: 0.7,
+  /**
+   * How much of the ground the stop's green covers where neither the noise's
+   * patches nor the water reach it, which on this plateau is most of it.
+   *
+   * This is the term that makes the timeline read. The African Humid Period
+   * is not a desert with green patches in it, it is grassland, so the First
+   * Time's floor is high and the mottle only says where the grass is richer.
+   * `built` is the same land drying: about a third of it, which draws as
+   * scrub between bare ground. The two modern stops have none at all, and
+   * that is what leaves their desert bare on both sides of the fields.
+   * LOOK CHOICES, all four.
+   */
+  floor: { ancient: 0.75, built: 0.28, stripped: 0, today: 0 } as Record<StateId, number>,
   slope: { from: 0.55, to: 0.85 },
   keepOffMetres: 15,
   noiseMetres: 260,
@@ -105,11 +121,11 @@ export const GREEN = {
    * a city, and full strength made the valley read as a lawn.
    */
   valley: {
-    strength: 0.85,
-    colour: new Vector3(0.24, 0.35, 0.13),
+    strength: 0.9,
+    colour: new Vector3(0.12, 0.3, 0.05),
     upland: 0,
-    wetMetres: 14,
-    dryMetres: 30,
+    wetMetres: 6,
+    dryMetres: 14,
   },
 } as const;
 
@@ -127,6 +143,56 @@ export interface GreenMask {
   /** The baked texels, four to a pixel, for the CPU to read the same values. */
   data: Uint8Array;
 }
+
+/**
+ * How built up the ground is now, off the city import's own index.
+ *
+ * `scripts/city.ts` writes `city.json` with the records sorted into cells a
+ * kilometre square and a count for each, which is a density map already made
+ * and costs fifteen kilobytes rather than the six and a half megabytes of the
+ * boxes themselves. `denseCount` is the count at which a cell is taken as
+ * fully built: it is a LOOK CHOICE, and a generous one, because a cell with
+ * six hundred buildings in it is a town whatever its remaining gardens say.
+ *
+ * Nothing here is evidence and nothing may cite it: the city is context, and
+ * this is only where the green is not allowed to grow.
+ */
+export interface BuiltUp {
+  /** Metres square, the import's own cell. */
+  size: number;
+  /** Cell corner east, cell corner north, buildings in it. */
+  cells: ReadonlyArray<readonly [number, number, number]>;
+}
+
+const DENSE_COUNT = 600;
+
+/** The share of a place that is town, 0 to 1, with a cell's edges softened. */
+function builtShare(city: BuiltUp | undefined, x: number, y: number): number {
+  if (!city || city.cells.length === 0) return 0;
+  if (!builtIndex || builtIndexFor !== city) {
+    builtIndex = new Map();
+    for (const [cx, cy, count] of city.cells) builtIndex.set(`${cx}:${cy}`, count);
+    builtIndexFor = city;
+  }
+  // Bilinear over the four cells around the point, so the town's edge is a
+  // slope across a kilometre and not a step at a cell's wall.
+  const fx = x / city.size - 0.5;
+  const fy = y / city.size - 0.5;
+  const i = Math.floor(fx);
+  const j = Math.floor(fy);
+  const tx = fx - i;
+  const ty = fy - j;
+  const at = (ci: number, cj: number): number => {
+    const count = builtIndex?.get(`${ci * city.size}:${cj * city.size}`) ?? 0;
+    return Math.min(1, count / DENSE_COUNT);
+  };
+  const a = at(i, j) * (1 - tx) + at(i + 1, j) * tx;
+  const b = at(i, j + 1) * (1 - tx) + at(i + 1, j + 1) * tx;
+  return a * (1 - ty) + b * ty;
+}
+
+let builtIndex: Map<string, number> | undefined;
+let builtIndexFor: BuiltUp | undefined;
 
 /** Smooth value noise on a lattice `metres` across, the same shape as the stone's. */
 function patches(x: number, y: number, metres: number): number {
@@ -156,7 +222,11 @@ function patches(x: number, y: number, metres: number): number {
  * one. A footprint whose area the import did not compute falls back on its
  * outline's own half-diagonal.
  */
-export function buildGreenMask(features: readonly Footprint[], extent: MaskExtent): GreenMask {
+export function buildGreenMask(
+  features: readonly Footprint[],
+  extent: MaskExtent,
+  city?: BuiltUp,
+): GreenMask {
   const n = GREEN.maskPixels;
   const metresPerTexel = extent.size / n;
   const data = new Uint8Array(n * n * 4);
@@ -167,6 +237,7 @@ export function buildGreenMask(features: readonly Footprint[], extent: MaskExten
       const p = (j * n + i) * 4;
       data[p] = Math.round(patches(x, y, GREEN.noiseMetres) * 255);
       data[p + 1] = 255;
+      data[p + 2] = Math.round(builtShare(city, x, y) * 255);
       data[p + 3] = 255;
     }
   }
@@ -223,6 +294,29 @@ export function buildGreenMask(features: readonly Footprint[], extent: MaskExten
  */
 const baked = new Map<string, GreenMask>();
 
+/**
+ * The city's cell index, for the mask's blue channel.
+ *
+ * This is the header of `city.json` and not its six and a half megabytes of
+ * boxes: fifteen kilobytes of counts per square kilometre, which is all the
+ * mask wants. It is fetched once whatever the stop, because the mask is baked
+ * once for all four and only `today` weighs the channel. A city.json that is
+ * not there is no town, and the fields grow as they did before it.
+ */
+let builtUp: Promise<BuiltUp | undefined> | undefined;
+
+export function loadBuiltUp(): Promise<BuiltUp | undefined> {
+  builtUp ??= fetch(`${import.meta.env.BASE_URL}city/city.json`)
+    .then((r) => (r.ok ? (r.json() as Promise<{ cells?: { size: number; list: [number, number, number, number][] } }>) : undefined))
+    .then((header) =>
+      header?.cells
+        ? { size: header.cells.size, cells: header.cells.list.map(([x, y, , count]) => [x, y, count] as const) }
+        : undefined,
+    )
+    .catch(() => undefined);
+  return builtUp;
+}
+
 export function useGreenMask(header: MaskHeader): GreenMask | undefined {
   const extent = useMemo(() => maskExtent(header), [header]);
   const [mask, setMask] = useState<GreenMask | undefined>(() => bakedFor(extent));
@@ -233,11 +327,11 @@ export function useGreenMask(header: MaskHeader): GreenMask | undefined {
       return;
     }
     let alive = true;
-    void loadFootprints().then((features) => {
+    void Promise.all([loadFootprints(), loadBuiltUp()]).then(([features, city]) => {
       const key = extentKey(extent);
       let mask = baked.get(key);
       if (!mask) {
-        mask = buildGreenMask(features, extent);
+        mask = buildGreenMask(features, extent, city);
         baked.set(key, mask);
       }
       if (alive) setMask(mask);
@@ -275,13 +369,17 @@ function bakedFor(extent: MaskExtent): GreenMask | undefined {
 }
 
 /** The baked noise and keep-off at a place on the ground, as the shader reads them. */
-export function sampleMask(mask: GreenMask, x: number, y: number): { noise: number; clear: number } {
+export function sampleMask(mask: GreenMask, x: number, y: number): { noise: number; clear: number; built: number } {
   const n = GREEN.maskPixels;
   const metresPerTexel = mask.extent.size / n;
   const i = Math.min(n - 1, Math.max(0, Math.floor((x - mask.extent.x0) / metresPerTexel)));
   const j = Math.min(n - 1, Math.max(0, Math.floor((y - mask.extent.y0) / metresPerTexel)));
   const p = (j * n + i) * 4;
-  return { noise: (mask.data[p] as number) / 255, clear: (mask.data[p + 1] as number) / 255 };
+  return {
+    noise: (mask.data[p] as number) / 255,
+    clear: (mask.data[p + 1] as number) / 255,
+    built: (mask.data[p + 2] as number) / 255,
+  };
 }
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
@@ -306,17 +404,20 @@ export function greenAt(
   upness: number,
   level: number | undefined,
   strength: number,
-  bands: { upland?: number; wetMetres?: number; dryMetres?: number } = {},
+  bands: { upland?: number; wetMetres?: number; dryMetres?: number; floor?: number; built?: number } = {},
 ): number {
   if (strength <= 0) return 0;
-  const { noise, clear } = sampleMask(mask, x, y);
+  const { noise, clear, built } = sampleMask(mask, x, y);
   const mottle = smoothstep(0.42, 0.72, noise) * (bands.upland ?? GREEN.uplandShare);
   const wet = level === undefined
     ? 0
     : 1 - smoothstep(bands.wetMetres ?? GREEN.wetMetres, bands.dryMetres ?? GREEN.dryMetres, z - level);
   const above = level === undefined ? 1 : smoothstep(0, GREEN.aboveWaterMetres, z - level);
-  const cover = Math.min(1, mottle + wet * (1 - mottle));
-  return strength * cover * clear * above * smoothstep(GREEN.slope.from, GREEN.slope.to, upness);
+  const floor = bands.floor ?? 0;
+  const patchy = Math.min(1, mottle + wet * (1 - mottle));
+  const cover = floor + (1 - floor) * patchy;
+  const town = 1 - (bands.built ?? 0) * built;
+  return strength * cover * clear * town * above * smoothstep(GREEN.slope.from, GREEN.slope.to, upness);
 }
 
 /**
@@ -336,9 +437,13 @@ export function greenAt(
 export function greenFor(state: StateId): Omit<GreenOptions, 'mask' | 'level'> {
   if (state === 'today' || state === 'stripped') {
     const { strength, colour, upland, wetMetres, dryMetres } = GREEN.valley;
-    return { strength, colour, upland, wetMetres, dryMetres };
+    return { strength, colour, upland, wetMetres, dryMetres, floor: 0, built: state === 'today' ? 1 : 0 };
   }
-  return { strength: GREEN.strength[state], colour: state === 'built' ? GREEN.dry : GREEN.colour };
+  return {
+    strength: GREEN.strength[state],
+    colour: state === 'built' ? GREEN.dry : GREEN.colour,
+    floor: GREEN.floor[state],
+  };
 }
 
 export interface GreenOptions {
@@ -359,6 +464,19 @@ export interface GreenOptions {
   /** Where the band above the water starts falling away, and where it is gone. */
   wetMetres?: number;
   dryMetres?: number;
+  /**
+   * How green the ground is where neither the patches nor the water reach it.
+   * The First Time's grassland is continuous, so it passes a high floor and
+   * the mottle only says where the grass is richer; the cultivated valley
+   * passes none, so the fields end and the desert begins.
+   */
+  floor?: number;
+  /**
+   * How much the modern city takes the green off the ground under it, 0 to 1.
+   * Only `today` has a city, so only `today` passes one: the other three stops
+   * stand on the same ground before it was there.
+   */
+  built?: number;
 }
 
 /**
@@ -391,6 +509,8 @@ interface GreenUniforms {
   greenUpland: IUniform;
   greenWet: IUniform;
   greenDry: IUniform;
+  greenFloor: IUniform;
+  greenBuilt: IUniform;
 }
 
 const GREEN_UNIFORMS = new WeakMap<MeshStandardMaterial, GreenUniforms>();
@@ -409,6 +529,8 @@ function greenUniforms(material: MeshStandardMaterial): GreenUniforms {
     greenUpland: { value: GREEN.uplandShare },
     greenWet: { value: GREEN.wetMetres },
     greenDry: { value: GREEN.dryMetres },
+    greenFloor: { value: 0 },
+    greenBuilt: { value: 0 },
   };
   GREEN_UNIFORMS.set(material, made);
   return made;
@@ -437,6 +559,8 @@ export function applyGreen(material: MeshStandardMaterial, options: GreenOptions
   uniforms.greenUpland.value = options.upland ?? GREEN.uplandShare;
   uniforms.greenWet.value = options.wetMetres ?? GREEN.wetMetres;
   uniforms.greenDry.value = options.dryMetres ?? GREEN.dryMetres;
+  uniforms.greenFloor.value = options.floor ?? 0;
+  uniforms.greenBuilt.value = options.built ?? 0;
   patchMaterial(material, 'green', 'v2', (shader) => {
     for (const [name, uniform] of Object.entries(uniforms)) shader.uniforms[name] = uniform;
     shader.vertexShader = shader.vertexShader
@@ -475,6 +599,8 @@ uniform vec3 greenColour;
 uniform float greenUpland;
 uniform float greenWet;
 uniform float greenDry;
+uniform float greenFloor;
+uniform float greenBuilt;
 
 float sekedGreen() {
   if (greenStrength <= 0.0) return 0.0;
@@ -485,11 +611,18 @@ float sekedGreen() {
   // a reserved word in GLSL ES.
   float mottle = smoothstep(0.42, 0.72, baked.r) * greenUpland;
   float wet = greenHasWater * (1.0 - smoothstep(greenWet, greenDry, vGreenWorld.y - greenLevel));
-  float cover = min(1.0, mottle + wet * (1.0 - mottle));
+  // The floor is how green the ground is where neither term reaches it: the
+  // grassland of the First Time is continuous and only richer in its patches,
+  // while the cultivated valley has none, which is what keeps the desert
+  // desert on either side of the fields.
+  float cover = greenFloor + (1.0 - greenFloor) * min(1.0, mottle + wet * (1.0 - mottle));
   float above = mix(1.0, smoothstep(0.0, ${GREEN.aboveWaterMetres.toFixed(2)}, vGreenWorld.y - greenLevel), greenHasWater);
   vec3 face = normalize(cross(dFdx(vGreenWorld), dFdy(vGreenWorld)));
   float upness = abs(face.y);
   float slope = smoothstep(${GREEN.slope.from.toFixed(2)}, ${GREEN.slope.to.toFixed(2)}, upness);
-  return greenStrength * cover * baked.g * above * slope;
+  // Nothing grows through a town: the blue channel is how built up the ground
+  // is now, and only the stop that has a city weighs it.
+  float town = 1.0 - greenBuilt * baked.b;
+  return greenStrength * cover * baked.g * town * above * slope;
 }
 `;

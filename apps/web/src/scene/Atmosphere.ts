@@ -134,19 +134,33 @@ const LOOK = {
 } as const;
 
 /**
- * The air of each stop of the timeline. Look choices, and the spec's, in
- * section 3: the First Time has clearer air, at seven tenths the density, and
- * a cooler cast to the sky it scatters, because that is the world before the
- * plateau was a quarry and before the city downwind of it. The other three
- * stops keep the air the renders were set against. The Cairo haze of `today`
- * is not here: it is a band low in the east and belongs to the sky, in
- * `Sky.tsx`.
+ * The air of each stop of the timeline. LOOK CHOICES, every number, and the
+ * one place the four stops are allowed to differ by more than what stands on
+ * the ground.
+ *
+ * They are spread much further apart than stage 1 spread them, because the
+ * air is what decides whether a change on the ground can be seen at all: the
+ * valley is four to eight kilometres from every stand the viewer opens on,
+ * and at stage 1's densities everything at that range arrived the same colour
+ * whatever it was made of, so the First Time and the present read alike no
+ * matter how green one of them was painted (found by sampling the frame,
+ * 2026-09-19).
+ *
+ * What motivates the spread, and it is motivation and not evidence: the
+ * African Humid Period is the interval when the Sahara was not a dust source.
+ * The marine records off west Africa carry a large drop in Saharan dust
+ * through it and a sharp return at its end, and Cairo today is one of the
+ * dustiest large cities there is. So the First Time gets air at under half
+ * the density with a cool cast, `built` nearly clear, and `today` the
+ * thickest of the four. None of those three numbers is a measurement and none
+ * may be cited; they are how much of the distance each era is allowed to
+ * hide. The Cairo haze proper is still a band low in the east in `Sky.tsx`.
  */
 const STATE_AIR: Record<StateId, { density: number; cool: number }> = {
-  ancient: { density: 0.7, cool: 0.2 },
-  built: { density: 1, cool: 0 },
+  ancient: { density: 0.45, cool: 0.35 },
+  built: { density: 0.9, cool: 0.05 },
   stripped: { density: 1, cool: 0 },
-  today: { density: 1, cool: 0 },
+  today: { density: 1.15, cool: 0 },
 };
 
 /** Where the ancient state's sky colour is drawn toward. A look choice. */

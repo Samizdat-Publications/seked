@@ -520,17 +520,30 @@ actually GPU-bound, which after stage 5 it is not.
       and the desert ring the modern valley's cultivation in every state, the
       First Time included, from stage 3 to here. The same shape of fault is
       latent in `casing.ts` and `stone.ts`.
-   2. **`built` and `ancient` measured, 2026-09-19, and the regression was a
-      unit and not a cost.** The browser can be held in the foreground after
+   2. **`built` and `ancient` measured, 2026-09-19, and there was no
+      regression at all.** The browser can be held in the foreground after
       all: a fresh Chrome under the Chrome DevTools MCP, its window sized so
-      the drawing buffer is 1601 by 900, counts honestly. At that buffer, over
-      the five hero looks: `today` 158 to 195, `built` 59 to 103, `ancient` 48
-      to 80, against bars of 100 and 45. Stage 5's `built` at 110 to 192 was
-      taken at a 2400 by 1350 buffer, 2.25 times the pixels, and is not the
-      same measurement; `scripts/frames.md` now says to print the buffer with
-      every number, which is what would have caught it. A state change also
+      the drawing buffer is 1601 by 900, counts honestly.
+
+      The first table taken this way was wrong, and it is worth saying how,
+      because it read exactly like a regression and was committed as one in
+      b3c519d. It was taken while `pnpm run deploy` was building the site in a
+      detached job on the same machine, and contention halved it. On a quiet
+      machine, same tree, same buffer, over the five hero looks
+      (dawn, panorama, harbour, akhet, night):
+
+          today    at the 240 Hz cap at every stand
+          built    122  131  109  189  194
+          ancient  108  127   96  106  168
+
+      That is at or above stage 5's `built` 110 to 192 and `ancient` 70 to
+      162, against bars of 100 and 45. Three things `scripts/frames.md` now
+      says because of this: print the drawing buffer, not the window; measure
+      nothing while one of this repo's own jobs is running; and treat any
+      number at the display's refresh as "faster than the screen" rather than
+      as a rate, which is what every `today` stand now is. A state change also
       wants five seconds to settle, not two: two reads `built` at dawn as 13
-      when it is 62.
+      when it is 122.
    3. **The ground east of the plateau reads near black under a low sun**
       (17, 33, 47 at the panorama stand at 16:00; 116, 146, 160 at midsummer
       noon). It predates this stage. It is not a hole and not a shader patch,
