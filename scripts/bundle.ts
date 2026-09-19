@@ -7,7 +7,7 @@
  * the dossier's inputs are. What lands in the browser is the database itself,
  * not a rendering of it: sources, sites, structures, presets, every
  * measurement, the normalised claims, the named stars, the bright star
- * catalogue, the terrain header and the footprint import.
+ * catalogue, both terrain headers and the footprint import.
  * The viewer resolves presets and evaluates claims for itself.
  *
  * Running it twice writes the same bytes twice.
@@ -45,7 +45,10 @@ export function buildBundle(dataDir = DATA_DIR): SekedBundle {
   const claims = loadClaims(join(dataDir, 'claims'));
   const stars = loadNamedStars(join(dataDir, 'stars', 'named.json'));
   const brightStars = limitMagnitude(loadBrightStars(join(dataDir, 'stars', 'hyg-bright.json')), BUNDLE_MAGNITUDE_LIMIT);
-  const header = TerrainHeaderSchema.parse(JSON.parse(readFileSync(join(dataDir, TERRAIN_DIR, 'giza-glo30.json'), 'utf8')));
+  const terrainHeader = (name: string) =>
+    TerrainHeaderSchema.parse(JSON.parse(readFileSync(join(dataDir, TERRAIN_DIR, `${name}.json`), 'utf8')));
+  const header = terrainHeader('giza-glo30');
+  const farHeader = terrainHeader('giza-glo30-far');
   return {
     sources: db.sources,
     sites: db.sites,
@@ -56,6 +59,7 @@ export function buildBundle(dataDir = DATA_DIR): SekedBundle {
     stars,
     brightStars,
     terrain: { header, heights: `${TERRAIN_DIR}/${header.heights}` },
+    farTerrain: { header: farHeader, heights: `${TERRAIN_DIR}/${farHeader.heights}` },
     footprints: loadFootprints(dataDir),
   };
 }
@@ -64,6 +68,7 @@ export interface WrittenBundle {
   bundle: SekedBundle;
   json: string;
   heights: string;
+  farHeights: string;
   /** The city's header and its boxes, copied as they are. */
   city: string[];
   bytes: number;
@@ -77,10 +82,15 @@ export function writeBundle(outDir = WEB_PUBLIC, dataDir = DATA_DIR): WrittenBun
   mkdirSync(join(outDir, TERRAIN_DIR), { recursive: true });
   if (!existsSync(json) || readFileSync(json, 'utf8') !== text) writeFileSync(json, text);
 
-  const from = join(dataDir, TERRAIN_DIR, bundle.terrain.header.heights);
-  const heights = join(outDir, TERRAIN_DIR, bundle.terrain.header.heights);
-  const source = readFileSync(from);
-  if (!existsSync(heights) || !source.equals(readFileSync(heights))) copyFileSync(from, heights);
+  const copyHeights = (name: string): string => {
+    const from = join(dataDir, TERRAIN_DIR, name);
+    const into = join(outDir, TERRAIN_DIR, name);
+    const source = readFileSync(from);
+    if (!existsSync(into) || !source.equals(readFileSync(into))) copyFileSync(from, into);
+    return into;
+  };
+  const heights = copyHeights(bundle.terrain.header.heights);
+  const farHeights = copyHeights(bundle.farTerrain.header.heights);
 
   mkdirSync(join(outDir, CITY_DIR), { recursive: true });
   const city = ['city.json', 'city.bin'].map((name) => {
@@ -90,7 +100,7 @@ export function writeBundle(outDir = WEB_PUBLIC, dataDir = DATA_DIR): WrittenBun
     return into;
   });
 
-  return { bundle, json, heights, city, bytes: Buffer.byteLength(text) };
+  return { bundle, json, heights, farHeights, city, bytes: Buffer.byteLength(text) };
 }
 
 function main(): void {
@@ -101,7 +111,9 @@ function main(): void {
       `${bundle.stars.length} named stars and ${bundle.brightStars.stars.length} to magnitude ${bundle.brightStars.magnitudeLimit}`,
   );
   console.log(`wrote ${written.json} (${(written.bytes / 1024).toFixed(0)} kB)`);
-  console.log(`wrote ${written.heights} (${bundle.terrain.header.nx} x ${bundle.terrain.header.ny} at ${bundle.terrain.header.spacing} m)`);
+  for (const [path, h] of [[written.heights, bundle.terrain.header], [written.farHeights, bundle.farTerrain.header]] as const) {
+    console.log(`wrote ${path} (${h.nx} x ${h.ny} at ${h.spacing} m)`);
+  }
   for (const path of written.city) console.log(`wrote ${path} (${(statSync(path).size / 1024).toFixed(0)} kB)`);
 }
 

@@ -10,6 +10,8 @@ export interface LoadedBundle {
   bundle: SekedBundle;
   /** Row-major, rows south to north, columns west to east, metres. */
   heights: Float32Array;
+  /** The same, for the coarse grid that carries the desert out to twelve kilometres. */
+  farHeights: Float32Array;
 }
 
 const PLATFORM_IS_LITTLE_ENDIAN = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
@@ -32,15 +34,18 @@ function float32(buffer: ArrayBuffer, littleEndian: boolean): Float32Array {
 
 export async function loadBundle(): Promise<LoadedBundle> {
   const bundle = (await (await get('seked.json')).json()) as SekedBundle;
-  const { header } = bundle.terrain;
-  const heights = float32(await (await get(bundle.terrain.heights)).arrayBuffer(), header.byteOrder === 'little-endian');
-  if (heights.length !== header.nx * header.ny) {
-    throw new Error(`${bundle.terrain.heights}: ${heights.length} samples, but the header says ${header.nx} x ${header.ny}`);
-  }
+  const grid = async ({ header, heights: path }: SekedBundle['terrain']): Promise<Float32Array> => {
+    const values = float32(await (await get(path)).arrayBuffer(), header.byteOrder === 'little-endian');
+    if (values.length !== header.nx * header.ny) {
+      throw new Error(`${path}: ${values.length} samples, but the header says ${header.nx} x ${header.ny}`);
+    }
+    return values;
+  };
+  const [heights, farHeights] = await Promise.all([grid(bundle.terrain), grid(bundle.farTerrain)]);
   // Sky claims read their stars from here rather than from a file.
   setDefaultStars(bundle.stars);
   // The claims runner builds the model's context out of this same bundle, so
   // the numbers it is told about are the numbers the scene is drawn from.
   holdBundle(bundle);
-  return { bundle, heights };
+  return { bundle, heights, farHeights };
 }

@@ -36,6 +36,15 @@ export interface SekedBundle {
   brightStars: BrightCatalogue;
   terrain: BundledTerrain;
   /**
+   * The same Copernicus product resampled over plus or minus twelve
+   * kilometres at sixty metres, which is the ground the modern city, the
+   * valley and the horizon stand on. The fine grid stops three kilometres
+   * out and the city runs to ten, so without this there is nothing under the
+   * far half of it. `terrainRing` draws it with the fine grid's own square
+   * left out.
+   */
+  farTerrain: BundledTerrain;
+  /**
    * The plateau's lesser monuments, from OpenStreetMap, registered onto the
    * survey and set on the ground by scripts/footprints.ts. The viewer builds
    * them with the same `footprintMesh` Blender's mirror runs.
