@@ -34,6 +34,30 @@ export const PILLAR = { across: 1.5, pitch: 5 };
 /** How much of its height a ruined temple is left standing at. A look choice. */
 export const TEMPLE_RUIN_FRACTION = 0.25;
 
+/**
+ * How far a temple's outer face leans in, as the angle its face makes with the
+ * ground. A LOOK CHOICE, and the one that does the most to stop a temple
+ * reading as a modern block.
+ *
+ * An Egyptian wall of this date is battered outside and vertical inside, and
+ * the plateau carries a surveyed figure for the shape: Reisner's mastaba
+ * batter of 74.8 degrees, which `data/measurements` holds and `mastaba.ts`
+ * builds with. That is a tomb's wall and not a temple's, so it is a precedent
+ * and not a measurement here. Eighty-two degrees is a gentler lean than a
+ * mastaba's and is what these are drawn with until somebody scales a section
+ * off a plate: over a wall eight metres high it draws the face in by a little
+ * over a metre, which is what the eye reads as Egyptian.
+ *
+ * Nothing about it enters `data/`, and the label says it is a choice.
+ */
+export const TEMPLE_BATTER_DEG = 82;
+
+/** How far in the top of a wall of this height sits, for the batter above. */
+export function batterInset(height: number, degrees = TEMPLE_BATTER_DEG): number {
+  if (!(height > 0) || !(degrees > 0) || degrees >= 90) return 0;
+  return height / Math.tan((degrees * Math.PI) / 180);
+}
+
 /** The key carrying the height the temples are drawn to in the as-built state. */
 export const TEMPLE_BUILT_HEIGHT_KEY = 'tier3.temple.height.built';
 
@@ -57,14 +81,24 @@ export function pointInRing(p: Xy, ring: readonly Xy[]): boolean {
  * from above and vertex i of one answers vertex i of the other, which is what
  * `insetRing` gives.
  */
-export function annulusMesh(outer: readonly Xy[], inner: readonly Xy[], bottom: number, top: number): Mesh | undefined {
+export function annulusMesh(
+  outer: readonly Xy[],
+  inner: readonly Xy[],
+  bottom: number,
+  top: number,
+  outerTop?: readonly Xy[],
+  innerTop?: readonly Xy[],
+): Mesh | undefined {
   const n = outer.length;
   if (n < 3 || inner.length !== n || !(top > bottom)) return undefined;
+  const head = outerTop ?? outer;
+  const lip = innerTop ?? inner;
+  if (head.length !== n || lip.length !== n) return undefined;
   const verts: number[][] = [];
   for (const [x, y] of outer) verts.push([x, y, bottom]);
-  for (const [x, y] of outer) verts.push([x, y, top]);
+  for (const [x, y] of head) verts.push([x, y, top]);
   for (const [x, y] of inner) verts.push([x, y, bottom]);
-  for (const [x, y] of inner) verts.push([x, y, top]);
+  for (const [x, y] of lip) verts.push([x, y, top]);
   const ob = 0;
   const ot = n;
   const ib = 2 * n;
@@ -147,7 +181,11 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
 
   const inner = insetRing(f.ring, WALL_THICKNESS);
   const wallTop = span.bottom + height;
-  const walls = annulusMesh(f.ring, inner, span.bottom, wallTop);
+  // Battered outside, vertical inside, which is how a wall of this date is
+  // built and which leaves the wall thinner at its head than at its footing.
+  const lean = batterInset(height);
+  const head = insetRing(f.ring, lean);
+  const walls = annulusMesh(f.ring, inner, span.bottom, wallTop, head);
   if (walls === undefined) return undefined;
 
   const source = state === 'ruined'
@@ -157,7 +195,7 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
       : `${height} m from the footprint's own height key, the database carrying no ${TEMPLE_BUILT_HEIGHT_KEY}`;
   const label =
     `Reconstruction: ${f.name} ${state}, on the OSM outline, walls to ${source}. Look choices: walls ` +
-    `${WALL_THICKNESS} m thick` +
+    `${WALL_THICKNESS} m thick, battered to ${TEMPLE_BATTER_DEG} deg outside and vertical inside` +
     (state === 'whole'
       ? `, a flat roof slab ${ROOF_THICKNESS} m thick, and a colonnade of ${PILLAR.across} m square pillars ` +
         `at ${PILLAR.pitch} m pitch. Not a reconstruction of this temple: one massing height covers all six, ` +
@@ -166,7 +204,13 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
         'massing height covers all six, and how far any of them stands is not in the database.');
 
   if (state === 'ruined') return { walls, label };
-  const roof = footprintMesh({ ...f, base: wallTop, height: ROOF_THICKNESS, heightKey: undefined, batterKey: undefined, bases: undefined }, env);
+  // The slab sits on what the battered wall leaves, not on the footing's own
+  // outline, or it would stand out past the wall head as a cornice nobody
+  // chose.
+  const roof = footprintMesh(
+    { ...f, ring: head.map(([x, y]) => [x, y] as [number, number]), base: wallTop, height: ROOF_THICKNESS, heightKey: undefined, batterKey: undefined, bases: undefined },
+    env,
+  );
   const pillars = colonnadeMesh(inner, span.bottom, wallTop, env);
   const temple: Temple = { walls, label };
   if (roof !== undefined) temple.roof = roof;

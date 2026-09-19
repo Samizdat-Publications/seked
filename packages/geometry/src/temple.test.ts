@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { insetRing, type Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
 import {
-  annulusMesh, colonnadeMesh, PILLAR, planPillars, planPrefix, pointInRing, ROOF_THICKNESS,
-  TEMPLE_BUILT_HEIGHT_KEY, TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh, WALL_THICKNESS,
+  annulusMesh, batterInset, colonnadeMesh, PILLAR, planPillars, planPrefix, pointInRing, ROOF_THICKNESS,
+  TEMPLE_BATTER_DEG, TEMPLE_BUILT_HEIGHT_KEY, TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh,
+  WALL_THICKNESS,
 } from './temple';
 
 /** An invented outline, not a measurement: a 60 by 40 m court. */
@@ -261,5 +262,72 @@ describe('templePlanMesh', () => {
     expect(built.label).toContain('8 pillars');
     expect(built.label).toContain('2 statue plinths');
     expect(built.label).toContain('Look choices');
+  });
+});
+
+
+describe('the batter', () => {
+  it('leans the face in by the height over the tangent of its angle', () => {
+    expect(batterInset(8)).toBeCloseTo(8 / Math.tan((TEMPLE_BATTER_DEG * Math.PI) / 180), 6);
+    // A metre and a bit over a wall of eight, which is the whole point of it.
+    expect(batterInset(8)).toBeGreaterThan(0.8);
+    expect(batterInset(8)).toBeLessThan(1.6);
+  });
+
+  it('is nothing for a wall of no height or a face that does not lean', () => {
+    expect(batterInset(0)).toBe(0);
+    expect(batterInset(-4)).toBe(0);
+    expect(batterInset(8, 90)).toBe(0);
+    expect(batterInset(8, 0)).toBe(0);
+  });
+
+  it('draws a temple narrower at its head than at its footing', () => {
+    const built = templeMesh(temple(), { ...ENV, [TEMPLE_BUILT_HEIGHT_KEY]: 8 }, 'whole') as { walls: Mesh };
+    const [bottom, top] = span(built.walls);
+    const widthAt = (z: number): number => {
+      let lo = Infinity;
+      let hi = -Infinity;
+      for (let i = 0; i < built.walls.positions.length; i += 3) {
+        if (Math.abs((built.walls.positions[i + 2] as number) - z) > 1e-6) continue;
+        lo = Math.min(lo, built.walls.positions[i] as number);
+        hi = Math.max(hi, built.walls.positions[i] as number);
+      }
+      return hi - lo;
+    };
+    const foot = widthAt(bottom);
+    const head = widthAt(top);
+    expect(foot).toBeCloseTo(60, 6);
+    expect(head).toBeLessThan(foot);
+    expect(foot - head).toBeCloseTo(2 * batterInset(8), 4);
+  });
+
+  it('keeps the slab on the wall head rather than out past it', () => {
+    const built = templeMesh(temple(), { ...ENV, [TEMPLE_BUILT_HEIGHT_KEY]: 8 }, 'whole') as { walls: Mesh; roof?: Mesh };
+    expect(built.roof).toBeDefined();
+    const roof = built.roof as Mesh;
+    let wide = -Infinity;
+    for (let i = 0; i < roof.positions.length; i += 3) wide = Math.max(wide, roof.positions[i] as number);
+    expect(wide).toBeLessThan(60);
+    expect(wide).toBeCloseTo(60 - batterInset(8), 4);
+  });
+
+  it('says in the label that the lean is a choice', () => {
+    const built = templeMesh(temple(), { ...ENV, [TEMPLE_BUILT_HEIGHT_KEY]: 8 }, 'whole') as { label: string };
+    expect(built.label).toContain('Look choices');
+    expect(built.label).toContain(`${TEMPLE_BATTER_DEG} deg`);
+  });
+});
+
+describe('annulusMesh with a leaning head', () => {
+  it('refuses a head that does not answer the footing vertex for vertex', () => {
+    const inner = insetRing(RING, 4);
+    expect(annulusMesh(RING, inner, 0, 8, [[0, 0], [1, 1]])).toBeUndefined();
+  });
+
+  it('is the old upright wall when no head is given', () => {
+    const inner = insetRing(RING, 4);
+    const upright = annulusMesh(RING, inner, 0, 8) as Mesh;
+    const same = annulusMesh(RING, inner, 0, 8, RING) as Mesh;
+    expect([...same.positions]).toEqual([...upright.positions]);
   });
 });
