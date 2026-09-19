@@ -574,13 +574,25 @@ actually GPU-bound, which after stage 5 it is not.
    4. The river's shoreline is stepped at the coarse grid's sixty metres,
       which is the heightfield showing through and not a fault.
 
-2. **The architecture pass.** The ancient state's temples are extruded
-   footprints, and Stewart's reference is a reconstruction with fluted
-   columns, an architrave and cornice, a decorated facade, a roofed causeway
-   and a quay. That is parameterised builders in `@seked/geometry` beside
-   `templeMesh` and `enclosureWallMesh`, labelled reconstructions like
-   everything else. It is the bigger job and it is second because the city is
-   the cheaper change and the more visible one.
+2. **The architecture pass**, planned 2026-09-19 as stage 7,
+   `docs/superpowers/plans/2026-09-19-stage-7-the-architecture-pass.md`, with
+   the batter of the temple walls landed ahead of it (f4e46c9).
+
+   The plan opens by refusing half of the reference. Stewart's is a
+   reconstruction with fluted columns, a cornice and a decorated facade, and
+   those are real Egyptian architecture of the wrong dynasty and the wrong
+   site. Giza's Fourth Dynasty temples are the most austere building Egypt
+   ever did: Khafre's valley temple, the one that survives to its roof, is
+   megalithic core blocks in a red granite casing, square monolithic piers
+   with no base and no capital, a flat roof, an alabaster floor, and not one
+   carved surface. Putting a fluted column on it would be a step away from the
+   survey dressed up as a step toward beauty. What the reference is right
+   about is the other half: mass, shadow, a doorway that reads as a way in,
+   and a causeway that arrives somewhere. The tracks are A the doorways,
+   B the casing material per building, C the causeway as a roofed corridor,
+   D the quay, E the plans nobody has read yet (Reisner's *Mycerinus*, the
+   rest of Hoelscher's Blatt XVII), F the court's colonnade round its edge
+   rather than a grid across its middle.
 
 **Where this goes (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
