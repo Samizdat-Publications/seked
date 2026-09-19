@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { insetRing, type Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
 import {
-  annulusMesh, batterInset, colonnadeMesh, PILLAR, planPillars, planPrefix, pointInRing, ROOF_THICKNESS,
-  TEMPLE_BATTER_DEG, TEMPLE_BUILT_HEIGHT_KEY, TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh,
-  WALL_THICKNESS,
+  annulusMesh, batterInset, centredOpening, colonnadeMesh, DOORWAY, edgeFacing, type Opening, PILLAR,
+  planPillars, planPrefix, pointInRing, ROOF_THICKNESS, TEMPLE_BATTER_DEG, TEMPLE_BUILT_HEIGHT_KEY,
+  TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh, walledMesh, WALL_THICKNESS,
 } from './temple';
 
 /** An invented outline, not a measurement: a 60 by 40 m court. */
@@ -329,5 +329,137 @@ describe('annulusMesh with a leaning head', () => {
     const upright = annulusMesh(RING, inner, 0, 8) as Mesh;
     const same = annulusMesh(RING, inner, 0, 8, RING) as Mesh;
     expect([...same.positions]).toEqual([...upright.positions]);
+  });
+});
+
+describe('the way in', () => {
+  const INNER = insetRing(RING, WALL_THICKNESS);
+
+  it('picks the edge whose middle faces the place given', () => {
+    // RING is [0,0] [60,0] [60,40] [0,40]: edge 0 is the south wall, 2 is north.
+    expect(edgeFacing(RING, [30, -100])).toBe(0);
+    expect(edgeFacing(RING, [30, 140])).toBe(2);
+    expect(edgeFacing(RING, [200, 20])).toBe(1);
+  });
+
+  it('centres a doorway on its edge and refuses one that would eat the wall', () => {
+    const wide = centredOpening(RING, 0, 8) as Opening;
+    expect(wide.edge).toBe(0);
+    expect((wide.from + wide.to) / 2).toBeCloseTo(0.5, 9);
+    expect((wide.to - wide.from) * 60).toBeCloseTo(DOORWAY.width, 9);
+    expect(wide.head).toBe(DOORWAY.height);
+    // A five-metre run cannot carry a three-metre door.
+    const short: [number, number][] = [[0, 0], [5, 0], [5, 40], [0, 40]];
+    expect(centredOpening(short, 0, 8)).toBeUndefined();
+  });
+
+  it('keeps the head under the wall it is cut through', () => {
+    const low = centredOpening(RING, 0, 4) as Opening;
+    expect(low.head).toBeCloseTo(3.2, 9);
+    expect(low.head).toBeLessThan(4);
+  });
+
+  it('is the plain wall when nothing is cut', () => {
+    const plain = annulusMesh(RING, INNER, 0, 8) as Mesh;
+    const same = walledMesh(RING, INNER, 0, 8) as Mesh;
+    expect(meshVolume(same)).toBeCloseTo(meshVolume(plain), 6);
+  });
+
+  it('takes exactly the opening out of the wall and no more', () => {
+    const height = 8;
+    const opening = centredOpening(RING, 0, height) as Opening;
+    const plain = annulusMesh(RING, INNER, 0, height) as Mesh;
+    const holed = walledMesh(RING, INNER, 0, height, [opening]) as Mesh;
+    // The hole is the door's width by its head by the wall's thickness. The
+    // wall here is upright, so the sides are parallel and the volume is exact.
+    const cut = DOORWAY.width * opening.head * WALL_THICKNESS;
+    expect(meshVolume(plain) - meshVolume(holed)).toBeCloseTo(cut, 4);
+  });
+
+  it('is still a closed solid with the hole in it', () => {
+    const opening = centredOpening(RING, 0, 8) as Opening;
+    const holed = walledMesh(RING, INNER, 0, 8, [opening]) as Mesh;
+    // A closed surface has every edge used twice, once each way round.
+    const seen = new Map<string, number>();
+    for (let i = 0; i < holed.indices.length; i += 3) {
+      const tri = [holed.indices[i] as number, holed.indices[i + 1] as number, holed.indices[i + 2] as number];
+      for (let k = 0; k < 3; k++) {
+        const a = tri[k] as number;
+        const b = tri[(k + 1) % 3] as number;
+        const key = (u: number, v: number): string => {
+          const p = (n: number): string => [
+            holed.positions[n * 3], holed.positions[n * 3 + 1], holed.positions[n * 3 + 2],
+          ].map((x) => (x as number).toFixed(4)).join(',');
+          return `${p(u)}|${p(v)}`;
+        };
+        seen.set(key(a, b), (seen.get(key(a, b)) ?? 0) + 1);
+      }
+    }
+    let unmatched = 0;
+    for (const [k, count] of seen) {
+      const [u, v] = k.split('|') as [string, string];
+      const back = seen.get(`${v}|${u}`) ?? 0;
+      if (back !== count) unmatched++;
+    }
+    expect(unmatched).toBe(0);
+  });
+
+  it('leans the doorway with the wall it is cut through', () => {
+    const height = 8;
+    const opening = centredOpening(RING, 0, height) as Opening;
+    const lean = batterInset(height);
+    const holed = walledMesh(RING, INNER, 0, height, [opening], insetRing(RING, lean)) as Mesh;
+    // The opening's outer edge at its head sits inside its outer edge at the
+    // footing by the batter's share of the lean.
+    const xsAt = (z: number): number[] => {
+      const out: number[] = [];
+      for (let i = 0; i < holed.positions.length; i += 3) {
+        if (Math.abs((holed.positions[i + 2] as number) - z) < 1e-4) out.push(holed.positions[i + 1] as number);
+      }
+      return out;
+    };
+    const atFoot = Math.min(...xsAt(0));
+    const atHead = Math.min(...xsAt(opening.head));
+    expect(atHead).toBeGreaterThan(atFoot);
+    expect(meshVolume(holed)).toBeGreaterThan(0);
+  });
+});
+
+describe('a temple with a way in', () => {
+  it('opens east, and the opening is a hole through the wall', () => {
+    const env = { ...ENV, [TEMPLE_BUILT_HEIGHT_KEY]: 8 };
+    const built = templeMesh(temple(), env, 'whole') as { walls: Mesh; label: string };
+    // RING is 60 east by 40 north: its east wall is the edge from [60,0] to
+    // [60,40], and a door in it is a gap in the maximum x.
+    const holed = built.walls;
+    const eastAt = (z: number): number[] => {
+      const ys: number[] = [];
+      for (let i = 0; i < holed.positions.length; i += 3) {
+        const x = holed.positions[i] as number;
+        const zz = holed.positions[i + 2] as number;
+        if (Math.abs(x - 60) < 1e-4 && Math.abs(zz - 4.61) < 1e-4) ys.push(holed.positions[i + 1] as number);
+      }
+      return ys.sort((a, b) => a - b);
+    };
+    const jambs = eastAt(4.61);
+    expect(jambs.length).toBeGreaterThan(2);
+    // Two of them are the door's own jambs, three metres apart about the middle.
+    const middle = jambs.filter((y) => y > 10 && y < 30);
+    expect(Math.max(...middle) - Math.min(...middle)).toBeCloseTo(DOORWAY.width, 4);
+    expect(built.label).toContain('doorway');
+    expect(built.label).toContain('east wall');
+  });
+
+  it('gives a ruin no door, because nobody knows where its door was', () => {
+    const ruin = templeMesh(temple(), ENV, 'ruined') as { walls: Mesh; label: string };
+    const plain = annulusMesh(
+      RING,
+      insetRing(RING, WALL_THICKNESS),
+      4.61,
+      4.61 + TEMPLE_RUIN_FRACTION * 6,
+      insetRing(RING, batterInset(TEMPLE_RUIN_FRACTION * 6)),
+    ) as Mesh;
+    expect(meshVolume(ruin.walls)).toBeCloseTo(meshVolume(plain), 4);
+    expect(ruin.label).not.toContain('doorway');
   });
 });

@@ -185,7 +185,16 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
   // built and which leaves the wall thinner at its head than at its footing.
   const lean = batterInset(height);
   const head = insetRing(f.ring, lean);
-  const walls = annulusMesh(f.ring, inner, span.bottom, wallTop, head);
+  // The door is in the east wall. Every temple on this plateau opens east:
+  // a valley temple onto the water it was reached from, a mortuary temple
+  // onto the causeway that climbs to it. That is the plateau's own plan and
+  // not a choice; what is a choice is the size of the opening, which is
+  // `DOORWAY` and is named in the label. A ruin gets none, because how far a
+  // ruined wall stands is already a look choice and where its door was is not
+  // something this builder knows.
+  const [cx, cy] = ringCentroid(f.ring);
+  const door = state === 'whole' ? centredOpening(f.ring, edgeFacing(f.ring, [cx + 1e6, cy]), height) : undefined;
+  const walls = walledMesh(f.ring, inner, span.bottom, wallTop, door ? [door] : [], head);
   if (walls === undefined) return undefined;
 
   const source = state === 'ruined'
@@ -197,7 +206,9 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
     `Reconstruction: ${f.name} ${state}, on the OSM outline, walls to ${source}. Look choices: walls ` +
     `${WALL_THICKNESS} m thick, battered to ${TEMPLE_BATTER_DEG} deg outside and vertical inside` +
     (state === 'whole'
-      ? `, a flat roof slab ${ROOF_THICKNESS} m thick, and a colonnade of ${PILLAR.across} m square pillars ` +
+      ? `, a doorway ${DOORWAY.width} by ${door === undefined ? 0 : Math.round(door.head * 10) / 10} m in the ` +
+        `east wall${door === undefined ? ' (none: the east wall is too short to carry one)' : ''}, a flat roof ` +
+        `slab ${ROOF_THICKNESS} m thick, and a colonnade of ${PILLAR.across} m square pillars ` +
         `at ${PILLAR.pitch} m pitch. Not a reconstruction of this temple: one massing height covers all six, ` +
         'and how any of them was walled, roofed or columned is not in the database.'
       : `, and ${TEMPLE_RUIN_FRACTION} of the height as the ruin. Not a reconstruction of this temple: one ` +
@@ -433,4 +444,230 @@ export function templePlanMesh(f: Footprint, env: Environment, state: 'whole' | 
     (state === 'whole' ? `, and a flat roof slab ${ROOF_THICKNESS} m thick.` : `, and ${TEMPLE_RUIN_FRACTION} of the height as the ruin.`);
 
   return { parts, hall, label };
+}
+
+// --- The way in -------------------------------------------------------------
+//
+// A building with no door is a box. Every temple on the plateau has an axis
+// and a principal doorway, and on this plateau a doorway is a plain
+// rectangular opening: Khafre's valley temple, the one that survives to its
+// roof, has no moulding round either of its two, no lintel carving and no
+// jamb inscription. So what is built here is an opening and nothing else, and
+// its size is the only choice in it.
+
+/**
+ * The opening: how wide a doorway is drawn and how high to its head, metres,
+ * and how much of a wall's run it may take. LOOK CHOICES, all three.
+ *
+ * Three metres by five is a door a barque and the men carrying it go through,
+ * which is what these doors are for. `maxShare` keeps the opening from eating
+ * a short wall: on a wall run of under about seven metres there is no door at
+ * all rather than a gap with nothing either side of it.
+ */
+export const DOORWAY = { width: 3, height: 5, maxShare: 0.45 } as const;
+
+/** Where a doorway goes: which edge of the ring, and how far along it. */
+export interface Opening {
+  /** The edge from ring vertex `edge` to vertex `edge + 1`, modulo the ring. */
+  edge: number;
+  /** The share of the edge the opening starts and ends at, 0 to 1. */
+  from: number;
+  to: number;
+  /** The height of its head above the wall's footing, metres. */
+  head: number;
+}
+
+/**
+ * The edge of a ring whose middle is nearest a given place, which is how a
+ * temple is told which way its door faces: toward the causeway's lower end,
+ * or toward the water where there is no causeway.
+ */
+export function edgeFacing(ring: readonly Xy[], towards: Xy): number {
+  let best = 0;
+  let nearest = Infinity;
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i] as Xy;
+    const b = ring[(i + 1) % ring.length] as Xy;
+    const mx = (a[0] + b[0]) / 2;
+    const my = (a[1] + b[1]) / 2;
+    const d = (mx - towards[0]) ** 2 + (my - towards[1]) ** 2;
+    if (d < nearest) {
+      nearest = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+/**
+ * A doorway centred on an edge, or nothing where the edge is too short to
+ * carry one without becoming a gap between two stubs.
+ */
+export function centredOpening(ring: readonly Xy[], edge: number, height: number): Opening | undefined {
+  const a = ring[edge % ring.length] as Xy;
+  const b = ring[(edge + 1) % ring.length] as Xy;
+  const run = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  if (!(run > 0)) return undefined;
+  const share = DOORWAY.width / run;
+  if (share > DOORWAY.maxShare) return undefined;
+  const head = Math.min(DOORWAY.height, height * 0.8);
+  if (!(head > 0)) return undefined;
+  return { edge: edge % ring.length, from: 0.5 - share / 2, to: 0.5 + share / 2, head };
+}
+
+/**
+ * The wall of `annulusMesh` with rectangular openings cut through it.
+ *
+ * The wall along an edge is a slab and an opening is a rectangular hole in it,
+ * so what is left is a jamb either side, a lintel over, and the two reveals
+ * that look into the opening. Every other edge is built exactly as
+ * `annulusMesh` builds it, and with nothing to cut this returns `annulusMesh`
+ * itself.
+ *
+ * Two things it has to get right, and both were got wrong first.
+ *
+ * The jambs are square to the wall, not square to the ring's parameter. The
+ * inner ring is the outer inset, so its edge is shorter, and taking the same
+ * share along both put the inner end of the opening in a different place from
+ * the outer: the door came out three metres wide outside and two and a half
+ * inside, a splayed embrasure nobody asked for. The inner end of a jamb is
+ * found by projecting the outer one onto the inner edge instead, which is
+ * what `meshVolume` catches: the hole is now exactly its width by its head by
+ * the wall's thickness.
+ *
+ * And the faces either side of the opening are split at the head, so the
+ * lintel's ends meet a wall edge rather than the middle of one. Without it
+ * the surface has a T-junction at each jamb, which is a hairline of daylight
+ * through a solid wall at the wrong angle.
+ *
+ * The head ring is the battered one, so a jamb leans with the wall it is cut
+ * through and the opening is a little narrower at its head than at its foot,
+ * which is what a doorway through a battered wall does.
+ */
+export function walledMesh(
+  outer: readonly Xy[],
+  inner: readonly Xy[],
+  bottom: number,
+  top: number,
+  openings: readonly Opening[] = [],
+  outerTop?: readonly Xy[],
+  innerTop?: readonly Xy[],
+): Mesh | undefined {
+  const n = outer.length;
+  if (n < 3 || inner.length !== n || !(top > bottom)) return undefined;
+  const head = outerTop ?? outer;
+  const lip = innerTop ?? inner;
+  if (head.length !== n || lip.length !== n) return undefined;
+  const cuts = openings.filter((o) => o.to > o.from && o.head > 0 && o.head < top - bottom);
+  if (cuts.length === 0) return annulusMesh(outer, inner, bottom, top, head, lip);
+
+  const verts: number[][] = [];
+  const tris: number[] = [];
+  const put = (p: Xy, z: number): number => {
+    verts.push([p[0], p[1], z]);
+    return verts.length - 1;
+  };
+  const quad = (a: number, b: number, c: number, d: number): void => {
+    tris.push(a, b, c, a, c, d);
+  };
+  const lerp = (a: Xy, b: Xy, t: number): Xy => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  const along = (ring: readonly Xy[], i: number, t: number): Xy => lerp(ring[i] as Xy, ring[(i + 1) % n] as Xy, t);
+
+  /**
+   * The share along the inner edge that stands square to share `t` on the
+   * outer one. The two edges are parallel, the inner being the outer inset,
+   * so the answer is the outer point projected onto the inner edge.
+   */
+  const square = (i: number, t: number): number => {
+    const a = inner[i] as Xy;
+    const b = inner[(i + 1) % n] as Xy;
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len2 = dx * dx + dy * dy;
+    if (!(len2 > 0)) return t;
+    const p = along(outer, i, t);
+    return ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2;
+  };
+
+  /**
+   * A place across the wall's thickness: a share along the outer edge and the
+   * share along the inner one that stands square to it.
+   *
+   * The ring's own corners are the exception and have to be: there the inner
+   * share is 0 or 1 exactly, because the inner ring's corner is where the
+   * next edge starts and a projection would put it somewhere else and tear
+   * the court open along every corner.
+   */
+  const cross = (i: number, t: number): { t: number; u: number } =>
+    ({ t, u: t === 0 || t === 1 ? t : square(i, t) });
+
+  /** The wall's two faces at a place across it, at height `z`. */
+  const face = (i: number, at: { t: number; u: number }, z: number): { out: Xy; in: Xy } => {
+    const share = (z - bottom) / (top - bottom);
+    return {
+      out: lerp(along(outer, i, at.t), along(head, i, at.t), share),
+      in: lerp(along(inner, i, at.u), along(lip, i, at.u), share),
+    };
+  };
+
+  // Every face is split at every opening's head, on every edge and not only
+  // on the edge that is cut. Splitting one edge and not its neighbours leaves
+  // a T-junction at each corner between them, which is twelve unmatched edges
+  // on a four-sided court and a hairline of daylight through a solid wall.
+  const heads = [...new Set(cuts.map((o) => bottom + o.head))]
+    .filter((z) => z > bottom && z < top)
+    .sort((a, b) => a - b);
+
+  for (let i = 0; i < n; i++) {
+    const hole = cuts.find((o) => o.edge === i);
+    const headZ = hole ? bottom + hole.head : bottom;
+    const runs = hole
+      ? [
+          { from: 0, to: hole.from, base: bottom },
+          { from: hole.to, to: 1, base: bottom },
+          { from: hole.from, to: hole.to, base: headZ },
+        ]
+      : [{ from: 0, to: 1, base: bottom }];
+    for (const run of runs) {
+      if (!(run.to > run.from) || !(top > run.base)) continue;
+      const left = cross(i, run.from);
+      const right = cross(i, run.to);
+      const levels = [run.base, ...heads.filter((z) => z > run.base && z < top), top];
+      for (let k = 0; k < levels.length - 1; k++) {
+        const lo = levels[k] as number;
+        const hi = levels[k + 1] as number;
+        const a = face(i, left, lo);
+        const b = face(i, right, lo);
+        const c = face(i, right, hi);
+        const d = face(i, left, hi);
+        quad(put(a.out, lo), put(b.out, lo), put(c.out, hi), put(d.out, hi));  // outward
+        quad(put(b.in, lo), put(a.in, lo), put(d.in, hi), put(c.in, hi));      // into the court
+      }
+      // The head of the wall, up, and its underside: the footing where the run
+      // stands on the ground, the lintel's soffit where it spans the opening.
+      const hiA = face(i, left, top);
+      const hiB = face(i, right, top);
+      quad(put(hiA.out, top), put(hiB.out, top), put(hiB.in, top), put(hiA.in, top));
+      const loA = face(i, left, run.base);
+      const loB = face(i, right, run.base);
+      quad(put(loB.out, run.base), put(loA.out, run.base), put(loA.in, run.base), put(loB.in, run.base));
+    }
+    if (!hole) continue;
+    // The two reveals, footing to head, one facing each way into the opening.
+    // The lintel's own ends abut the jambs and need none.
+    for (const [t, inward] of [[hole.from, true], [hole.to, false]] as const) {
+      const at = cross(i, t);
+      const low = face(i, at, bottom);
+      const high = face(i, at, headZ);
+      const p0 = put(low.out, bottom);
+      const p1 = put(low.in, bottom);
+      const p2 = put(high.in, headZ);
+      const p3 = put(high.out, headZ);
+      if (inward) quad(p0, p1, p2, p3);
+      else quad(p3, p2, p1, p0);
+    }
+  }
+  const positions = new Float32Array(verts.length * 3);
+  verts.forEach((v, k) => positions.set(v, k * 3));
+  return { positions, indices: Uint32Array.from(tris), vertexCount: verts.length, triangleCount: tris.length / 3 };
 }
