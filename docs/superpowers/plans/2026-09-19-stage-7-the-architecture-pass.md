@@ -97,9 +97,9 @@ one principal doorway, and the causeway says which side it is on.
       at every corner), the jambs follow the batter, a ruin has no door, and
       with no openings the wall equals `annulusMesh` vertex for vertex.
 - [x] Commit 10ec9a5, with a still east of Khafre's mortuary temple.
-- [ ] Khafre's valley temple has TWO doorways in its east face and Hoelscher's
-      plate can say where: that is Track E's, not this one's. Still open; the
-      blockers doc records where on the plate the night got to.
+- [x] Khafre's valley temple has TWO doorways in its east face and Hoelscher's
+      plate says where: read 2026-09-19 (e4caf11), 2.416 m and 2.329 m wide,
+      14.11 m north and 14.60 m south of the footprint's centroid, and cut.
 
 ## Track B: the material each building is cased in
 
@@ -151,13 +151,23 @@ The plate reader exists and has been used twice. These are the drawings that
 would turn look choices into records.
 
 - [ ] Reisner, *Mycerinus*: Menkaure's valley and mortuary temples in plan and
-      section. The PDF URL is in `docs/geometry-blockers.md`.
-- [ ] Hoelscher 1912, the rest of Blatt XVII: the twenty-three statue sockets
-      and the east entrances of Khafre's valley temple hall, which stage 3
-      left open.
-- [ ] Every figure through `scripts/plate.py` with its three-term sigma,
-      `method: "scaled from plate"`, never `verified`.
-- [ ] Commit per temple, not per figure.
+      section. Opened, not yet read (26f5c21): the twelve plans are PDF pages
+      394 to 405, Plan I's scale is fitted over all sixteen metre ticks at
+      0.0189647 m per pixel with an rms of 2.3 cm, and its drafting term is
+      0.112 m because this reproduction is 1:224.6 and not the printed 1:100.
+      Its legend is read and is in `data/materials.json`. What is not read is
+      the great court: its west wall is core and casing with a jog in it, so
+      naming "the court's west face" would be a definition of ours, and
+      placing it wants Plan I registered onto a 13-vertex OSM outline.
+- [x] Hoelscher 1912: the two east entrances, read 2026-09-19 (e4caf11).
+- [ ] Hoelscher 1912, the rest of Blatt XVII: the twenty-three statue sockets,
+      which stage 3 left open and which this stage did not reach.
+- [x] Every figure so far through `scripts/plate.py` with its three-term
+      sigma, `method: "scaled from plate"`, never `verified`. The four
+      entrance records carry the pixel term, the drafting tolerance at the
+      scan's own dpi and the shrinkage, and none is verified.
+- [x] Commit per temple: e4caf11 for Khafre's valley temple, 26f5c21 for
+      what Plan I gave without a reading.
 
 ## Track F: the court
 

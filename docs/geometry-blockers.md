@@ -648,7 +648,44 @@ actually GPU-bound, which after stage 5 it is not.
 
    **Open from stage 7, in the order they matter:**
 
-   1. **Track E, the plates nobody has read.** The only track not started.
+   **Track E, later the same day.** The two east entrances of Khafre's valley
+   temple are read and cut (e4caf11), which closes the one item Track A had
+   deferred. The east wall was walked down the plate from corner to corner
+   and there are exactly two gaps in it, each running the whole depth of the
+   wall block out to the front face; each has a surveyed jamb to the north
+   and an inferred one to the south. No jamb was eyeballed: a 90 px column of
+   the scan was profiled for luminance and for redness and a jamb is the row
+   where the drafted line is darkest or the red line reddest. They come out
+   2.416 m and 2.329 m, differing by 0.087 m against a sigma of 0.20, and
+   their centres land 14.11 m north and 14.60 m south of the footprint's own
+   centroid, symmetric to within half a metre, which nothing in the method
+   forced. The three vertices OSM puts near the northern one sit within 0.2 m
+   of its centre, which nothing forced either.
+
+   Building them broke two things that had been quietly wrong.
+   `walledMesh` took the first opening it found on an edge and dropped the
+   rest without a word, so a temple with two doorways in one front came out
+   with one. And no opening fitted anywhere, because OSM traces that straight
+   45.8 m front as eight segments, three under two metres: `mergeCollinear`
+   drops a vertex that stands on the line between its neighbours, which moves
+   no surface and is asserted not to.
+
+   Reisner's Plan I is open but not read (26f5c21). Its scale is fitted over
+   all sixteen whole-metre ticks at 0.0189647 m per pixel, rms 2.3 cm, and
+   its drafting term is 0.112 m because the sheet is printed 1:100 and this
+   reproduction is 1:224.6 at the scan's own 300 dpi. Its legend is read and
+   is in the material table, and it adds a row: the pillars of Menkaure's
+   pyramid temple were to be red granite, which is a different stone from the
+   black granite that was actually set.
+
+   1. **Track E, the rest of it.** The twenty-three statue sockets of Blatt
+      XVII, and Menkaure in plan. The great court of Plan I was tried and set
+      down: its west wall is core and casing with a jog in it, so naming "the
+      court's west face" would be a definition of ours rather than Reisner's,
+      and placing the court at all wants Plan I registered onto a 13-vertex
+      OSM outline the way Blatt XVII was onto a rectangle. The scale and the
+      drafting term are in hand for whoever does it.
+   2. **Track E, as it stood at first light.** The only track not started.
       Reisner's *Mycerinus* is fetched and cited but nothing has been scaled
       off it: Plan I is the pyramid temple in plan and longitudinal section
       and Plans VIII to X the valley temple in plan and four sections (list of
@@ -666,21 +703,29 @@ actually GPU-bound, which after stage 5 it is not.
       `data/measurements/khafre-valley-temple.json`: 0.0193299 m per pixel off
       the metre bar, 0.53 per cent shrinkage against the cubit bar, 0.075 m
       drafting at the scan's own 198 dpi and a plate of 1:151.
-   2. **No frame rate was taken.** `scripts/frames.md` requires a visible
-      window in front with nothing else drawing, and this session drove a
-      hidden browser pane, where `requestAnimationFrame` does not fire and
-      `__seked.frames` never resolves. It was tried and it hung, which is the
-      rule working. So whether `built` and `ancient` still clear their bars
-      after the quay, the colonnade and the material table is not known, and
-      is the first thing to do on a machine with a visible window.
-   3. The court's floor is bare desert with the roofs off, and a paved court
+   3. **No frame rate was taken, and a second measure was tried and not
+      proved.** `scripts/frames.md` requires a visible window in front with
+      nothing else drawing, and this session drove a hidden browser pane,
+      where `requestAnimationFrame` does not fire and `__seked.frames` never
+      resolves. It was tried and it hung, which is the rule working. So
+      whether `built` and `ancient` still clear their bars is not known.
+      `__seked.cost` was written for exactly that gap, stepping the renderer
+      by hand so there is no ceiling and no blank needed (2dd8148), and it is
+      not validated: in a hidden pane it reported about 50 ms a frame while
+      `gl.info.render` claimed one draw call, which is not this plateau, and
+      from a pane that cannot be painted "it is not drawing" and "the GPU is
+      throttled" cannot be told apart. The three checks it needs are over the
+      function and all of them want a visible window.
+      One thing hunted as a bug and found not to be: `__seked.r3f()` comes
+      back null on a freshly loaded page in a hidden window, which reads like
+      the film's "the film has no renderer". Nothing inside a Canvas runs
+      until something forces a paint. Take one screenshot and it is there.
+   4. The court's floor is bare desert with the roofs off, and a paved court
       is what the colonnade is standing on. Hoelscher's legend names the
       paving hatchings on Blatt XVII, so this is a plate read and not an
       invention.
-   4. Khafre's valley temple is the one temple with a plan, so it never gets
-      the east doorway Track A cuts in every other temple wall: its two
-      entrances are Track E's. That is why the close still shows a doorway in
-      the Sphinx Temple and none beside it.
+   5. Khafre's valley temple now has both its entrances, so the item that
+      stood here is done.
 
 **Where this goes (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its
