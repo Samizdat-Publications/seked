@@ -16,7 +16,9 @@
  * them carry no height of any kind, so an extruded OSM would be a few
  * well-mapped districts on an empty plain with every height invented. Open
  * Buildings has 277,266 in the same box, and the 2.5D raster measured a
- * height for nearly all of them.
+ * height for 205,942 of the 231,988 that clear the confidence floor, which is
+ * seven in eight rather than all: what happens to the other eighth is a
+ * stated choice below and not a rounding.
  *
  * The footprint archive is one S2 level-4 cell, 1,315 MB gzipped and
  * 13,308,407 rows, and it is not spatially sorted, so there is nothing to do
