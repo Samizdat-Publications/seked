@@ -622,11 +622,65 @@ actually GPU-bound, which after stage 5 it is not.
    rest of Hoelscher's Blatt XVII), F the court's colonnade round its edge
    rather than a grid across its middle.
 
-   Landed overnight 2026-09-19: A, the east doorway cut through every temple
-   wall with its jambs on the batter (10ec9a5); C's corridor, the walls either
-   side of the causeway under its slab (97a7401, 08b5748). Reisner's
-   *Mycerinus* is now a source, `reisner-1931`, read from Digital Giza's PDF,
-   which carries a text layer and the twelve plans at the end of the volume.
+   **Landed overnight 2026-09-19 (snapshot 0034): A, B, C, D and F.** A, the
+   east doorway cut through every temple wall with its jambs on the batter
+   (10ec9a5). C, the walls either side of the causeway under its slab
+   (97a7401, 08b5748), and its lighting slit built, tested and switched off
+   (d15dd9d), because the causeway of Unas is Fifth Dynasty and Khafre is
+   Fourth. B, `data/materials.json`, a sourced table of what each building is
+   cased in, and red granite that is red (671eff0). F, the colonnade round the
+   court's edge with a temple-roofs layer to see it by (8de6e53). D, a built
+   quay at the harbour front (925fb4d). Reisner's *Mycerinus* is now a source,
+   `reisner-1931`, read from Digital Giza's PDF, which carries a text layer
+   and the twelve plans at the end of the volume.
+
+   Two findings from that night are worth more than the tracks that turned
+   them up. The triplanar's x plane sampled `p.yz`, and the world here is
+   three's, where y is up: that laid every photograph a quarter turn over on
+   every face whose normal is east or west, so the first red granite wall had
+   its courses running from the ground to the roof and read as varnished
+   planking. The normal map had been sampling `p.zy` and getting it right all
+   along. And `waterExtent` puts the harbour basin's west edge on the
+   westernmost of the two valley temples' east faces, which on this plateau
+   runs 1.13 m inside Khafre's valley temple: invisible while that edge was a
+   water plane the temple hid, and a wall through a building the moment it was
+   masonry.
+
+   **Open from stage 7, in the order they matter:**
+
+   1. **Track E, the plates nobody has read.** The only track not started.
+      Reisner's *Mycerinus* is fetched and cited but nothing has been scaled
+      off it: Plan I is the pyramid temple in plan and longitudinal section
+      and Plans VIII to X the valley temple in plan and four sections (list of
+      illustrations, pp. xvii to xx). Hoelscher's Blatt XVII is re-fetched to
+      `build/plates/hoelscher_blatt_XVII.jpg` and the twenty-three statue
+      sockets and the two east entrances are still unread. The night got as
+      far as locating the northern entrance and no further: on the registered
+      plate the east front's inferred face is a red vertical at about x 3968,
+      the surviving hatched wall stops at about y 795, the pink ermittelter
+      Grundriss runs from about y 900, and red horizontals leave the face
+      eastward at about y 750 and y 900. That is where to put the grid, not a
+      reading: which pair of those lines is the doorway's jambs was not
+      settled, and a jamb guessed from how a picture looks is not a
+      measurement. The scale is already established by the stage 3 records in
+      `data/measurements/khafre-valley-temple.json`: 0.0193299 m per pixel off
+      the metre bar, 0.53 per cent shrinkage against the cubit bar, 0.075 m
+      drafting at the scan's own 198 dpi and a plate of 1:151.
+   2. **No frame rate was taken.** `scripts/frames.md` requires a visible
+      window in front with nothing else drawing, and this session drove a
+      hidden browser pane, where `requestAnimationFrame` does not fire and
+      `__seked.frames` never resolves. It was tried and it hung, which is the
+      rule working. So whether `built` and `ancient` still clear their bars
+      after the quay, the colonnade and the material table is not known, and
+      is the first thing to do on a machine with a visible window.
+   3. The court's floor is bare desert with the roofs off, and a paved court
+      is what the colonnade is standing on. Hoelscher's legend names the
+      paving hatchings on Blatt XVII, so this is a plate read and not an
+      invention.
+   4. Khafre's valley temple is the one temple with a plan, so it never gets
+      the east doorway Track A cuts in every other temple wall: its two
+      entrances are Track E's. That is why the close still shows a doorway in
+      the Sphinx Temple and none beside it.
 
 **Where this goes (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its

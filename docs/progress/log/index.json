@@ -468,5 +468,15 @@
     "kept": false,
     "note": "Track D: the built quay along the harbour front, from over the basin looking west. It stands in the water on the easternmost of the two valley temples' east faces, its head two metres above the waterline, with the two granite temples behind it and Khafre's causeway climbing away.",
     "bytes": 2150662
+  },
+  {
+    "file": "2026-09-19T07-39-34Z--stage7-harbour--d15dd9d.png",
+    "taken": "2026-09-19T07:39:34+00:00",
+    "view": "stage7-harbour",
+    "commit": "d15dd9d",
+    "tree": "clean",
+    "kept": false,
+    "note": "Stage 7: the architecture pass at the harbour stand. Red granite on the valley temples from the material table, the built quay along the harbour front, the roofed causeway climbing west.",
+    "bytes": 5831548
   }
 ]

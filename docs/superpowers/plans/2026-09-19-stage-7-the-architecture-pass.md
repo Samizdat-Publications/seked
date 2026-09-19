@@ -69,12 +69,12 @@ New for this stage:
 
 ## The trunk (director, before the tracks branch)
 
-- [ ] `docs/geometry-blockers.md`: fold this plan's list into "Order of work"
-      and mark the batter done.
-- [ ] `data/sources.json`: entries for Hoelscher 1912 (already there, check
-      the plates cited), Reisner's *Mycerinus* and Reisner GN I, with the
-      Heidelberg and MFA URLs already in the blockers doc.
-- [ ] Commit: "Give the architecture pass its sources".
+- [x] `docs/geometry-blockers.md`: folded into "Order of work", the batter
+      marked done, and the night's two findings written up there.
+- [x] `data/sources.json`: Hoelscher 1912 and Reisner GN I were already
+      there; Reisner's *Mycerinus* is now `reisner-1931`, with the MFA URL,
+      the page offset and the list of plans in its note.
+- [x] Commit 5938982.
 
 ---
 
@@ -98,16 +98,22 @@ one principal doorway, and the causeway says which side it is on.
       with no openings the wall equals `annulusMesh` vertex for vertex.
 - [x] Commit 10ec9a5, with a still east of Khafre's mortuary temple.
 - [ ] Khafre's valley temple has TWO doorways in its east face and Hoelscher's
-      plate can say where: that is Track E's, not this one's.
+      plate can say where: that is Track E's, not this one's. Still open; the
+      blockers doc records where on the plate the night got to.
 
 ## Track B: the material each building is cased in
 
-- [ ] Khafre's valley temple is red granite, the mortuary temples limestone
-      with granite at the doorways, the causeway limestone. `Structures/` can
-      already take a material per structure; this is a table and its sources.
-- [ ] Nothing about the casing thickness is invented: it is a material, not a
-      geometry, until a plate gives a thickness.
-- [ ] Commit, then a still.
+- [x] `data/materials.json`, seventeen rows over six buildings, each citing a
+      source that exists and none verified. Khafre's valley temple red granite
+      on Giza limestone with an alabaster floor from Blatt XVII's own
+      Zeichenerklaerung; the mortuary temples limestone with granite at the
+      doorways; the causeway limestone. Menkaure's two are crude brick over
+      limestone, which the plan did not anticipate and Reisner's table of
+      periods (p. 7) requires.
+- [x] Nothing about the casing thickness is invented: the table has no
+      thickness in it and `MaterialSchema` has no field for one.
+- [x] Commit 671eff0, still `0034-viewer-red-granite.png`. It also caught the
+      triplanar laying every east and west face's photograph on its side.
 
 ## Track C: the causeway as a corridor
 
@@ -122,21 +128,22 @@ roof, which is the detail that makes it read.
       the causeway's outline is the import's buffered polyline and a batter on
       it would lean the corridor's walls by a number nobody chose, where the
       temples' batter at least answers a surveyed mastaba.
-- [ ] The roof slit as a look choice, off by default until somebody decides
-      whether a Fourth Dynasty causeway had one: Unas is Fifth Dynasty and
-      Sahure's is the nearest evidence. This is exactly the kind of borrowing
-      the top of this plan warns about, so it is a switch with a sentence and
-      not a default.
+- [x] `CAUSEWAY_ROOF_SLIT.on` is false, with the sentence, and the roof's own
+      label says the slit exists and why it is not drawn. Commit d15dd9d.
 - [x] The ends are left open, found rather than named: the two edges whose
       middles stand farthest apart are the ribbon's end caps.
 - [x] Tests, commit, a still looking up the causeway toward Khafre.
 
 ## Track D: the harbour front
 
-- [ ] A quay along the harbour cut, on the water's own level from
-      `Water.tsx`, with a stated height and batter.
-- [ ] Where the causeway meets it, the two agree in plan.
-- [ ] Tests, commit, a still from the harbour stand.
+- [x] `quayMesh` in `@seked/geometry`, on the level `waterExtent` reads off
+      the temples' footprints, two metres of freeboard, three metres thick,
+      battered 84 degrees on its seaward face and upright behind.
+- [x] They never meet: the causeway ends at the back of the valley temple and
+      the quay stands on its far side. What is asserted is that neither runs
+      through the other, and that the quay clears both temples, which the
+      basin's own west edge did not.
+- [x] Commit 925fb4d, still `0034-viewer-the-architecture-pass.png`.
 
 ## Track E: the plans nobody has read yet
 
@@ -154,21 +161,22 @@ would turn look choices into records.
 
 ## Track F: the court
 
-- [ ] A mortuary temple's open court with its colonnade round the edge rather
-      than a grid of pillars across the whole inside, which is what
-      `colonnadeMesh` does now and what makes the interiors read as a car park
-      when the roof is off.
-- [ ] The pillars stand on the court's own perimeter, inset by one pitch.
-- [ ] Tests, commit, a still with the roof hidden.
+- [x] `courtColonnadeMesh` walks the court's outline and sets a pillar every
+      step along it. The grid stays, and the test asserts the difference
+      against it rather than against a property of one ring.
+- [x] Inset by `PILLAR.pitch` itself, so no second constant was invented.
+- [x] Commit 8de6e53, and a temple-roofs layer to hide them by. Still
+      `0034-viewer-court-and-colonnade.png`.
 
 ---
 
 ## Done when
 
-- [ ] A reader at the harbour stand can see a doorway, a roofed causeway
-      arriving at it, and a quay on the water.
-- [ ] Every new shape is either in `data/` with a plate behind it or named in
-      a label as a choice.
-- [ ] `built` and `ancient` still clear their bars in `scripts/frames.md`'s
-      terms.
-- [ ] A snapshot logged and the site deployed.
+- [x] Snapshot 0034.
+- [x] Every one, through `stoneNote` and `lookWords` for the materials and
+      each builder's own label for the rest.
+- [ ] NOT DONE, and not guessed at. `scripts/frames.md` wants a visible
+      window in front; this session drove a hidden browser pane, where
+      `requestAnimationFrame` does not fire and `__seked.frames` never
+      resolves. It was tried and it hung, which is the rule working.
+- [x] Snapshot 0034 logged, four frames in `docs/progress/log/`, deployed.
