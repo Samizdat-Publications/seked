@@ -22,6 +22,18 @@
         "--strictPort"
       ],
       "port": 5174
+    },
+    {
+      "name": "web-alone",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5186",
+        "--strictPort"
+      ],
+      "port": 5186,
+      "cwd": "apps/web"
     }
   ]
 }
