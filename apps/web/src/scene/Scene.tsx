@@ -116,7 +116,7 @@ export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: S
           <Props env={model.env} />
           <Trench env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
           <Sand terrain={terrain} clippingPlanes={groundPlanes} />
-          <Water env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
+          <Water env={model.env} terrain={terrain} desert={desert} clippingPlanes={groundPlanes} />
           <Vegetation terrain={terrain} clippingPlanes={groundPlanes} />
           <City terrain={terrain} desert={desert} clippingPlanes={planes} />
         </FadeScope>

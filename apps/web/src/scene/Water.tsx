@@ -36,7 +36,7 @@
  */
 import { MeshReflectorMaterial } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { waterExtent, type Environment, type Footprint, type WaterBody } from '@seked/geometry';
+import { riverBody, riverLevel, waterExtent, type Environment, type Footprint, type WaterBody } from '@seked/geometry';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentRef } from 'react';
 import {
   Color,
@@ -57,7 +57,7 @@ import { luminanceOf, skyStand } from './Sky';
 import { meshGeometry } from './geometry';
 import { patchMaterial } from './materials/patch';
 import { groundSampler, StoneSurface } from './Trench';
-import type { TerrainProps } from './Terrain';
+import type { DesertProps, TerrainProps } from './Terrain';
 
 /**
  * LOOK CHOICES, not measurements. Nothing below is a record of anything: it
@@ -421,10 +421,15 @@ function quayMesh(outline: readonly Xy[], floor: number, ground: (x: number, y: 
 export interface WaterProps {
   env: Environment;
   terrain: TerrainProps;
+  /**
+   * The coarse grid, which is the only ground that reaches the river. The
+   * plateau's own stops three kilometres out and the Nile is nine.
+   */
+  desert: Omit<DesertProps, 'clippingPlanes'>;
   clippingPlanes: Plane[];
 }
 
-export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.Element | null {
+export function Water({ env, terrain, desert, clippingPlanes }: WaterProps): React.JSX.Element | null {
   const state = useView((s) => s.state);
   const [footprints, setFootprints] = useState<Footprint[]>([]);
   useEffect(() => {
@@ -437,7 +442,14 @@ export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.E
     };
   }, []);
 
-  const body = useMemo(() => waterExtent(footprints, env, state), [footprints, env, state]);
+  // The modern river's level is read out of the coarse heightfield itself,
+  // so it follows the import and is not typed here. It does not depend on the
+  // stop, so it is found once and kept.
+  const river = useMemo(() => riverLevel(groundSampler({ ...desert, pyramids: [] })), [desert]);
+  const body = useMemo(
+    () => (state === 'stripped' || state === 'today' ? riverBody(river) : waterExtent(footprints, env, state)),
+    [footprints, env, state, river],
+  );
   useEffect(() => {
     publish(body);
     return () => publish(undefined);
@@ -493,13 +505,14 @@ export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.E
     if (reflector) patchMaterial(m, 'reflector', 'v1', (shader) => reflector.call(m, shader));
     applyAtmosphere(m);
     applyDrift(m, drift);
-    // Only the flood plain runs off the end of the terrain. The harbour is a
-    // basin two hundred and fifty metres across with a quay round it, and
-    // dissolving its rim would dissolve the one edge that is meant to be seen.
-    if (body.kind === 'plain') {
+    // The flood plain and the river both run off the end of their own
+    // ground. The harbour is a basin two hundred and fifty metres across with
+    // a quay round it, and dissolving its rim would dissolve the one edge
+    // that is meant to be seen.
+    if (body.kind === 'plain' || body.kind === 'river') {
       // The ground's own box, off the heightfield's header, so the water's
       // dissolve follows the terrain and no extent is typed here.
-      const { x0, y0, spacing, nx, ny } = terrain.header;
+      const { x0, y0, spacing, nx, ny } = body.kind === 'river' ? desert.header : terrain.header;
       const west = x0;
       const east = x0 + (nx - 1) * spacing;
       const south = y0;
@@ -512,16 +525,15 @@ export function Water({ env, terrain, clippingPlanes }: WaterProps): React.JSX.E
     // which `patchMaterial` adopts as the one hook it keeps from outside, and
     // that place is taken here by the reflector. A shadow on a mirror is the
     // smaller loss.
-  }, [body, drift, edge, terrain]);
+  }, [body, drift, edge, terrain, desert]);
 
   if (!body || !surface) return null;
-  const tier = body.kind === 'basin' ? 'reconstruction' : 'claim';
-  const seked = {
-    name: body.kind === 'basin' ? 'The harbour at the valley temples' : 'The flood plain of the First Time',
-    tier,
-    note: body.label,
-    state,
+  const NAMES: Record<typeof body.kind, { name: string; tier: string }> = {
+    basin: { name: 'The harbour at the valley temples', tier: 'reconstruction' },
+    plain: { name: 'The flood plain of the First Time', tier: 'claim' },
+    river: { name: 'The Nile, at its present course', tier: 'context' },
   };
+  const seked = { ...NAMES[body.kind], note: body.label, state };
   const { width, depth } = box(body.outline);
   return (
     <>

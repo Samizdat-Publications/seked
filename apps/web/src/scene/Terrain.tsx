@@ -7,7 +7,7 @@ import { applyAtmosphere } from './Atmosphere';
 import { before, patchMaterial } from './materials/patch';
 import { forgetCascades, receiveCascades } from './materials/shadows';
 import { applyStone, useStone } from './materials/stone';
-import { applyGreen, GREEN, useGreenMask } from './materials/ground';
+import { applyGreen, greenFor, useGreenMask } from './materials/ground';
 import { useView } from '../store';
 import { useSphinxCut } from './Trench';
 import { useWater } from './Water';
@@ -157,23 +157,19 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
     if (!groundMaterial.current) return;
     applyStone(groundMaterial.current, sand, { strength: 0.8, scale: 3, relief: 0.6, mix: gravel, mixMetres: 120 });
   }, [sand, gravel]);
-  // The green of the African Humid Period, laid over the sand by the one mask
+  // The green the stop takes, laid over the sand by the one mask
   // `Vegetation.tsx` stands its grass on, so the tint and the blades cannot
-  // disagree about where the meadow is. Its strength is the stop's own, which
-  // is what makes the First Time green, `built` a dry scrub and the two late
-  // stops bare.
+  // disagree about where the meadow is. `greenFor` chooses: the First Time's
+  // meadow, `built`'s dry scrub, or the cultivated valley of the two modern
+  // stops, which is drawn by its height above the river and so stops where
+  // the desert starts.
   const state = useView((s) => s.state);
   const water = useWater();
   const mask = useGreenMask(header);
   useEffect(() => {
     const material = groundMaterial.current;
     if (!material || !mask) return;
-    applyGreen(material, {
-      mask,
-      level: water?.level,
-      strength: GREEN.strength[state],
-      colour: state === 'built' ? GREEN.dry : GREEN.colour,
-    });
+    applyGreen(material, { mask, level: water?.level, ...greenFor(state) });
   }, [mask, water, state]);
   // The Sphinx's enclosure, where one is standing, and the harbour basin,
   // where the timeline has one, are holes in this grid.
@@ -289,6 +285,18 @@ export function Desert({ header, heights, datum, omitWithin, clippingPlanes }: D
     if (!material.current) return;
     applyStone(material.current, sand, { strength: 0.8, scale: 12, relief: 0.15, mix: gravel, mixMetres: 480 });
   }, [sand, gravel]);
+  // The same green the plateau takes, off a mask baked over this grid's own
+  // square rather than the plateau's. It is what puts the cultivated valley
+  // on the ground between the river and the desert, which is nearly all
+  // outside the fine grid, and it is what keeps the First Time's meadow from
+  // stopping dead at three kilometres.
+  const state = useView((s) => s.state);
+  const water = useWater();
+  const mask = useGreenMask(header);
+  useEffect(() => {
+    if (!material.current || !mask) return;
+    applyGreen(material.current, { mask, level: water?.level, ...greenFor(state) });
+  }, [mask, water, state]);
   useEffect(() => {
     if (material.current) applyAtmosphere(material.current);
   });

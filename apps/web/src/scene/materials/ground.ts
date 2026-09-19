@@ -84,6 +84,32 @@ export const GREEN = {
   keepOffMetres: 15,
   noiseMetres: 260,
   maskPixels: 512,
+  /**
+   * The cultivation of the modern valley, which is a different green from the
+   * First Time's and is drawn by the same terms.
+   *
+   * The savanna is patchy because grassland is patchy; the cultivated valley
+   * is not, so `upland` is zero and the mottle is switched off altogether.
+   * What is left is the one term that says how far above the river a place
+   * is, and that is what draws the valley: the fields run from the water's
+   * edge to the desert, and the desert is simply the ground that is too high
+   * for them. `wetMetres` and `dryMetres` are where that band starts and
+   * ends above the river's own surface, and both are LOOK CHOICES: fourteen
+   * metres holds the floodplain proper at full green and thirty puts the
+   * edge of the green at about the twenty-metre contour, which is roughly
+   * where the desert begins east of Giza.
+   *
+   * `strength` is deliberately under one: modern Egypt's fields are a strong
+   * green but they are seen here through several kilometres of haze and under
+   * a city, and full strength made the valley read as a lawn.
+   */
+  valley: {
+    strength: 0.85,
+    colour: new Vector3(0.24, 0.35, 0.13),
+    upland: 0,
+    wetMetres: 14,
+    dryMetres: 30,
+  },
 } as const;
 
 /** The plateau's extent, which the baked mask covers texel for texel. */
@@ -185,12 +211,16 @@ export function buildGreenMask(features: readonly Footprint[], extent: MaskExten
 }
 
 /**
- * The mask for the plateau's own grid, built once the footprints have loaded
- * and kept for as long as the extent is the same one. Both the ground and the
- * vegetation call it, and both get the same object, because the footprints
- * are fetched once and the bake is memoised on the extent it covers.
+ * The masks, by the extent each covers, built once the footprints have loaded
+ * and kept. Every caller of the same extent gets the same object, because the
+ * footprints are fetched once and the bake is memoised.
+ *
+ * It is a map and not one slot because two grids are masked now: the
+ * plateau's twenty-metre square and the desert's sixty-metre one, which the
+ * valley's cultivation is drawn on. One slot made the two evict each other
+ * and rebake a 512 by 512 mask every render.
  */
-let baked: { key: string; mask: GreenMask } | undefined;
+const baked = new Map<string, GreenMask>();
 
 export function useGreenMask(header: MaskHeader): GreenMask | undefined {
   const extent = useMemo(() => maskExtent(header), [header]);
@@ -204,9 +234,12 @@ export function useGreenMask(header: MaskHeader): GreenMask | undefined {
     let alive = true;
     void loadFootprints().then((features) => {
       const key = extentKey(extent);
-      baked ??= { key, mask: buildGreenMask(features, extent) };
-      if (baked.key !== key) baked = { key, mask: buildGreenMask(features, extent) };
-      if (alive) setMask(baked.mask);
+      let mask = baked.get(key);
+      if (!mask) {
+        mask = buildGreenMask(features, extent);
+        baked.set(key, mask);
+      }
+      if (alive) setMask(mask);
     });
     return () => {
       alive = false;
@@ -237,7 +270,7 @@ function extentKey(extent: MaskExtent): string {
 }
 
 function bakedFor(extent: MaskExtent): GreenMask | undefined {
-  return baked && baked.key === extentKey(extent) ? baked.mask : undefined;
+  return baked.get(extentKey(extent));
 }
 
 /** The baked noise and keep-off at a place on the ground, as the shader reads them. */
@@ -272,26 +305,59 @@ export function greenAt(
   upness: number,
   level: number | undefined,
   strength: number,
+  bands: { upland?: number; wetMetres?: number; dryMetres?: number } = {},
 ): number {
   if (strength <= 0) return 0;
   const { noise, clear } = sampleMask(mask, x, y);
-  const mottle = smoothstep(0.42, 0.72, noise) * GREEN.uplandShare;
+  const mottle = smoothstep(0.42, 0.72, noise) * (bands.upland ?? GREEN.uplandShare);
   const wet = level === undefined
     ? 0
-    : 1 - smoothstep(GREEN.wetMetres, GREEN.dryMetres, z - level);
+    : 1 - smoothstep(bands.wetMetres ?? GREEN.wetMetres, bands.dryMetres ?? GREEN.dryMetres, z - level);
   const above = level === undefined ? 1 : smoothstep(0, GREEN.aboveWaterMetres, z - level);
   const cover = Math.min(1, mottle + wet * (1 - mottle));
   return strength * cover * clear * above * smoothstep(GREEN.slope.from, GREEN.slope.to, upness);
+}
+
+/**
+ * The green one stop of the timeline takes.
+ *
+ * `ancient` gets the meadow of the First Time and `built` its dry scrub, both
+ * patchy over the whole plateau. `stripped` and `today` get the valley's
+ * cultivation instead, which is not patchy and is not on the plateau at all:
+ * its one term is the height above the river, so it draws the fields between
+ * the water and the desert and nothing above them.
+ *
+ * `Vegetation.tsx` is deliberately not routed through here. It scatters on
+ * `GREEN.strength`, which stays zero for the two modern stops, so the
+ * cultivated valley is a tint and not sixty thousand savanna tussocks
+ * standing in somebody's berseem.
+ */
+export function greenFor(state: StateId): Omit<GreenOptions, 'mask' | 'level'> {
+  if (state === 'today' || state === 'stripped') {
+    const { strength, colour, upland, wetMetres, dryMetres } = GREEN.valley;
+    return { strength, colour, upland, wetMetres, dryMetres };
+  }
+  return { strength: GREEN.strength[state], colour: state === 'built' ? GREEN.dry : GREEN.colour };
 }
 
 export interface GreenOptions {
   mask: GreenMask;
   /** The water's surface level in the data frame, or undefined where the stop is dry. */
   level: number | undefined;
-  /** The stop's own weight, from `GREEN.strength`. */
+  /** The stop's own weight, from `GREEN.strength` or from `GREEN.valley`. */
   strength: number;
-  /** What the green is mixed towards: the meadow's colour or the scrub's. */
+  /** What the green is mixed towards: the meadow's colour, the scrub's or the crop's. */
   colour: Vector3;
+  /**
+   * How much green the noise's patches put on ground that is nowhere near the
+   * water. `GREEN.uplandShare` is the savanna's; the cultivated valley passes
+   * zero, which leaves the height above the river as the only term and is
+   * what makes the fields stop where the desert starts.
+   */
+  upland?: number;
+  /** Where the band above the water starts falling away, and where it is gone. */
+  wetMetres?: number;
+  dryMetres?: number;
 }
 
 /**
@@ -306,7 +372,7 @@ export interface GreenOptions {
  */
 export function applyGreen(material: MeshStandardMaterial, options: GreenOptions): void {
   const { mask, level, strength, colour } = options;
-  patchMaterial(material, 'green', 'v1', (shader) => {
+  patchMaterial(material, 'green', 'v2', (shader) => {
     shader.uniforms.greenMask = { value: mask.texture };
     shader.uniforms.greenOrigin = { value: [mask.extent.x0, mask.extent.y0] };
     shader.uniforms.greenSize = { value: mask.extent.size };
@@ -314,6 +380,9 @@ export function applyGreen(material: MeshStandardMaterial, options: GreenOptions
     shader.uniforms.greenHasWater = { value: level === undefined ? 0 : 1 };
     shader.uniforms.greenStrength = { value: strength };
     shader.uniforms.greenColour = { value: colour };
+    shader.uniforms.greenUpland = { value: options.upland ?? GREEN.uplandShare };
+    shader.uniforms.greenWet = { value: options.wetMetres ?? GREEN.wetMetres };
+    shader.uniforms.greenDry = { value: options.dryMetres ?? GREEN.dryMetres };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vGreenWorld;')
       .replace(
@@ -347,6 +416,9 @@ uniform float greenLevel;
 uniform float greenHasWater;
 uniform float greenStrength;
 uniform vec3 greenColour;
+uniform float greenUpland;
+uniform float greenWet;
+uniform float greenDry;
 
 float sekedGreen() {
   if (greenStrength <= 0.0) return 0.0;
@@ -355,8 +427,8 @@ float sekedGreen() {
   vec4 baked = texture2D(greenMask, uv);
   // The upland's term is mottle on both sides of the mask, because patch is
   // a reserved word in GLSL ES.
-  float mottle = smoothstep(0.42, 0.72, baked.r) * ${GREEN.uplandShare.toFixed(3)};
-  float wet = greenHasWater * (1.0 - smoothstep(${GREEN.wetMetres.toFixed(1)}, ${GREEN.dryMetres.toFixed(1)}, vGreenWorld.y - greenLevel));
+  float mottle = smoothstep(0.42, 0.72, baked.r) * greenUpland;
+  float wet = greenHasWater * (1.0 - smoothstep(greenWet, greenDry, vGreenWorld.y - greenLevel));
   float cover = min(1.0, mottle + wet * (1.0 - mottle));
   float above = mix(1.0, smoothstep(0.0, ${GREEN.aboveWaterMetres.toFixed(2)}, vGreenWorld.y - greenLevel), greenHasWater);
   vec3 face = normalize(cross(dFdx(vGreenWorld), dFdy(vGreenWorld)));
