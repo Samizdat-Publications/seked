@@ -115,14 +115,21 @@ one principal doorway, and the causeway says which side it is on.
 roofed corridor with walls, and Unas' is lit by a slit down the middle of the
 roof, which is the detail that makes it read.
 
-- [ ] Walls either side of the causeway's own plan, battered like the
-      temples', to `tier3.causeway.corridor.height`.
+- [x] Walls either side of the causeway's own plan, to
+      `tier3.causeway.corridor.height`. Built on the ribbon's own outline
+      drawn in by `CAUSEWAY_WALL_THICKNESS`, climbing with its per-vertex
+      bases so a wall follows the ridge the causeway follows. Not battered:
+      the causeway's outline is the import's buffered polyline and a batter on
+      it would lean the corridor's walls by a number nobody chose, where the
+      temples' batter at least answers a surveyed mastaba.
 - [ ] The roof slit as a look choice, off by default until somebody decides
       whether a Fourth Dynasty causeway had one: Unas is Fifth Dynasty and
       Sahure's is the nearest evidence. This is exactly the kind of borrowing
       the top of this plan warns about, so it is a switch with a sentence and
       not a default.
-- [ ] Tests, commit, a still looking up the causeway from the valley temple.
+- [x] The ends are left open, found rather than named: the two edges whose
+      middles stand farthest apart are the ribbon's end caps.
+- [x] Tests, commit, a still looking up the causeway toward Khafre.
 
 ## Track D: the harbour front
 

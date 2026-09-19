@@ -23,9 +23,10 @@
  */
 
 import type { Environment } from './environment';
-import { footprintMesh, type Footprint } from './footprints';
+import { footprintMesh, insetRing, type Footprint } from './footprints';
 import type { Mesh } from './mesh';
 import { placeMesh, structurePlacement, type LabelledMesh } from './pyramidion';
+import { mergeMeshes } from './mastaba';
 import { annulusMesh } from './temple';
 
 /**
@@ -123,6 +124,105 @@ export function causewayRoofMesh(env: Environment, features: readonly Footprint[
       `Reconstruction: the roof over ${causeway.name}, carried ${corridor} m over the causeway's own top ` +
       'from tier3.causeway.corridor.height and drawn as a slab of khafre.causeway.thickness, the ' +
       'causeway’s own. Look choices: reusing that thickness for the slab, and a flat roof with no ' +
-      'lighting slits. The walls under it are not built: no record here gives them.',
+      'lighting slits. The walls under it are `causewayWallsMesh`, and are a look choice in the same way: ' +
+      'no record here gives them.',
+  };
+}
+
+/**
+ * How thick the wall either side of a causeway is drawn, metres. A LOOK
+ * CHOICE, and the only number in `causewayWallsMesh` that is one.
+ */
+export const CAUSEWAY_WALL_THICKNESS = 1.5;
+
+/**
+ * The two walls under the causeway's roof.
+ *
+ * The roof has been carried over the causeway since stage 3 with nothing
+ * holding it up, because no record here gives the walls: `khafre.causeway
+ * .thickness` is the ribbon's own and `tier3.causeway.corridor.height` is how
+ * far the roof is carried over it, and neither says anything about what
+ * stands between. So the walls are a look choice, said to be one in the
+ * label, and they are built the only way the import allows: on the causeway's
+ * own outline, drawn in by `CAUSEWAY_WALL_THICKNESS`, climbing with the
+ * ribbon's own per-vertex bases so a wall follows the ridge the causeway
+ * follows.
+ *
+ * The two ends are left open, because a corridor with both ends walled is not
+ * a corridor. They are found rather than named: the ribbon's two end caps are
+ * the pair of edges whose middles stand farthest apart, which on a buffered
+ * polyline is one cap at each end and nothing else.
+ *
+ * Nothing here is entered as a measurement and no claim may cite it.
+ */
+export function causewayWallsMesh(
+  env: Environment,
+  features: readonly Footprint[],
+  id = 'khafre.causeway',
+): LabelledMesh | undefined {
+  const causeway = features.find((f) => f.id === id);
+  const thickness = env['khafre.causeway.thickness'];
+  const corridor = env['tier3.causeway.corridor.height'];
+  if (causeway === undefined || thickness === undefined || corridor === undefined) return undefined;
+  if (!(thickness > 0) || !(corridor > 0)) return undefined;
+  const ring = causeway.ring;
+  const n = ring.length;
+  if (n < 4) return undefined;
+
+  const inner = insetRing(ring, CAUSEWAY_WALL_THICKNESS);
+  /** The top of the causeway itself at vertex `i`, which is what a wall stands on. */
+  const standsAt = (i: number): number => (causeway.bases?.[i] ?? causeway.base) + thickness;
+  const middle = (i: number): [number, number] => {
+    const a = ring[i] as [number, number];
+    const b = ring[(i + 1) % n] as [number, number];
+    return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  };
+
+  // The ribbon's two ends: the pair of edge middles standing farthest apart.
+  let ends: [number, number] = [0, 0];
+  let farthest = -1;
+  for (let i = 0; i < n; i++) {
+    const a = middle(i);
+    for (let j = i + 1; j < n; j++) {
+      const b = middle(j);
+      const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      if (d > farthest) {
+        farthest = d;
+        ends = [i, j];
+      }
+    }
+  }
+
+  const parts: Mesh[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i === ends[0] || i === ends[1]) continue;
+    const j = (i + 1) % n;
+    const a = standsAt(i);
+    const b = standsAt(j);
+    const piece = footprintMesh(
+      {
+        id: `${id}.wall.${i}`,
+        name: `${causeway.name}: its wall`,
+        kind: 'prism',
+        group: causeway.group,
+        base: Math.min(a, b),
+        bases: [a, b, b, a],
+        height: corridor,
+        area: 0,
+        ring: [ring[i] as [number, number], ring[j] as [number, number], inner[j] as [number, number], inner[i] as [number, number]],
+      },
+      env,
+    );
+    if (piece !== undefined) parts.push(piece);
+  }
+  if (parts.length === 0) return undefined;
+  return {
+    ...mergeMeshes(parts),
+    label:
+      `Reconstruction: the walls under the roof of ${causeway.name}, standing on the causeway's own top and ` +
+      `carrying ${corridor} m to the roof from tier3.causeway.corridor.height. LOOK CHOICES: that there were ` +
+      `walls at all in this position, and a thickness of ${CAUSEWAY_WALL_THICKNESS} m. No record here gives ` +
+      'either. The two ends are left open because a corridor is open at its ends; where the doorways in them ' +
+      'stood is not in the database.',
   };
 }

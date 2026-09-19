@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildEnvironment } from './environment';
 import type { Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
-import { causewayRoofMesh, ENCLOSURE_THICKNESS, enclosureWallMesh } from './enclosure';
+import { CAUSEWAY_WALL_THICKNESS, causewayRoofMesh, causewayWallsMesh, ENCLOSURE_THICKNESS, enclosureWallMesh } from './enclosure';
 
 /** Invented numbers, not measurements: the keys the database does not carry, given values. */
 const G1 = { 'g1.base.side.mean': 230, 'g1.height.original': 146 };
@@ -135,5 +135,52 @@ describe('causewayRoofMesh', () => {
     expect(causewayRoofMesh(buildEnvironment(ENV), [])).toBeUndefined();
     expect(causewayRoofMesh(buildEnvironment({ 'khafre.causeway.thickness': 1.5 }), [CAUSEWAY])).toBeUndefined();
     expect(causewayRoofMesh(buildEnvironment({ 'tier3.causeway.corridor.height': 4.5 }), [CAUSEWAY])).toBeUndefined();
+  });
+});
+
+describe('causewayWallsMesh', () => {
+  const ENV = { 'khafre.causeway.thickness': 1.5, 'tier3.causeway.corridor.height': 4.5 };
+
+  it('stands the walls on the causeway’s own top and carries them to the roof', () => {
+    const mesh = causewayWallsMesh(buildEnvironment(ENV), [CAUSEWAY]) as Mesh;
+    expect(wellFormed(mesh)).toBe(true);
+    // The ribbon's top runs from -10 + 1.5 to 0 + 1.5, and the walls stand on
+    // it and rise by the corridor's own height.
+    expect(extent(mesh, 2)).toEqual([-10 + 1.5, 0 + 1.5 + 4.5]);
+  });
+
+  it('leaves both ends of the corridor open', () => {
+    const mesh = causewayWallsMesh(buildEnvironment(ENV), [CAUSEWAY]) as Mesh;
+    // The fixture's ends are the edges [100,-2] to [100,2] and [0,2] to
+    // [0,-2]. With them skipped, nothing of the wall crosses the middle of
+    // either end.
+    let onEnds = 0;
+    for (let i = 0; i < mesh.positions.length; i += 3) {
+      const x = mesh.positions[i] as number;
+      const y = mesh.positions[i + 1] as number;
+      if ((Math.abs(x - 100) < 1e-6 || Math.abs(x) < 1e-6) && Math.abs(y) < 0.5) onEnds++;
+    }
+    expect(onEnds).toBe(0);
+  });
+
+  it('keeps inside the causeway’s own outline', () => {
+    const mesh = causewayWallsMesh(buildEnvironment(ENV), [CAUSEWAY]) as Mesh;
+    expect(extent(mesh, 1)[0]).toBeGreaterThanOrEqual(-2);
+    expect(extent(mesh, 1)[1]).toBeLessThanOrEqual(2);
+    expect(extent(mesh, 0)[0]).toBeGreaterThanOrEqual(0);
+    expect(extent(mesh, 0)[1]).toBeLessThanOrEqual(100);
+  });
+
+  it('says the walls are a choice and nothing in the database gives them', () => {
+    const walls = causewayWallsMesh(buildEnvironment(ENV), [CAUSEWAY]);
+    expect(walls?.label).toContain('LOOK CHOICES');
+    expect(walls?.label).toContain('No record here gives');
+    expect(walls?.label).toContain(String(CAUSEWAY_WALL_THICKNESS));
+  });
+
+  it('builds nothing without the causeway, or without either key', () => {
+    expect(causewayWallsMesh(buildEnvironment(ENV), [])).toBeUndefined();
+    expect(causewayWallsMesh(buildEnvironment({ 'khafre.causeway.thickness': 1.5 }), [CAUSEWAY])).toBeUndefined();
+    expect(causewayWallsMesh(buildEnvironment({ 'tier3.causeway.corridor.height': 4.5 }), [CAUSEWAY])).toBeUndefined();
   });
 });

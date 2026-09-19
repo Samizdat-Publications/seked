@@ -9,6 +9,7 @@ import { resolve, type Database, type Measurement, type Resolved } from '@seked/
 import {
   buildEnvironment,
   causewayRoofMesh,
+  causewayWallsMesh,
   courseHeights,
   enclosureWallMesh,
   footprintMesh,
@@ -236,6 +237,7 @@ export interface Structures {
   walls: StructureMesh[];
   causeway: StructureMesh | undefined;
   causewayRoof: StructureMesh | undefined;
+  causewayWalls: StructureMesh | undefined;
   pits: StructureMesh[];
   /** The slabs over the boat pits, merged; only where a state roofs them. */
   pitCovers: StructureMesh | undefined;
@@ -397,6 +399,7 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
   }
 
   const roof = whole ? causewayRoofMesh(env, features) : undefined;
+  const corridor = whole ? causewayWallsMesh(env, features) : undefined;
   const enclosureWalls: StructureMesh[] = [];
   if (whole) {
     for (const id of ENCLOSED) {
@@ -430,6 +433,16 @@ export function structuresFor(features: readonly Footprint[], env: Environment, 
       roof === undefined
         ? undefined
         : { id: 'khafre.causeway.roof', name: 'Causeway of Khafre, roof', tier: 'reconstruction', note: roof.label, mesh: roof },
+    causewayWalls:
+      corridor === undefined
+        ? undefined
+        : {
+            id: 'khafre.causeway.walls',
+            name: 'Causeway of Khafre, its walls',
+            tier: 'reconstruction',
+            note: corridor.label,
+            mesh: corridor,
+          },
     pits,
     pitCovers:
       covers.length === 0

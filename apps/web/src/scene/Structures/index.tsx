@@ -66,7 +66,13 @@ export function Structures({
       <Mastabas field={structures.mastabas} tombs={structures.tombs} env={env} state={state} whole={whole} clippingPlanes={clippingPlanes} />
       <Temples temples={structures.temples} state={state} whole={whole} clippingPlanes={clippingPlanes} />
       <Walls walls={structures.walls} enclosureWalls={structures.enclosureWalls} state={state} clippingPlanes={clippingPlanes} />
-      <Causeway causeway={structures.causeway} roof={structures.causewayRoof} state={state} clippingPlanes={clippingPlanes} />
+      <Causeway
+        causeway={structures.causeway}
+        roof={structures.causewayRoof}
+        walls={structures.causewayWalls}
+        state={state}
+        clippingPlanes={clippingPlanes}
+      />
       <Pits pits={structures.pits} covers={structures.pitCovers} state={state} clippingPlanes={clippingPlanes} />
       {structures.fallback.map((one) => (
         <Fallback key={one.id} built={one} state={state} clippingPlanes={clippingPlanes} />
