@@ -33,6 +33,7 @@ import {
   LinearFilter,
   RGBAFormat,
   Vector3,
+  type IUniform,
   type MeshStandardMaterial,
 } from 'three';
 import type { Footprint } from '@seked/geometry';
@@ -361,6 +362,59 @@ export interface GreenOptions {
 }
 
 /**
+ * The green's uniforms, one record per material, the same objects for as long
+ * as the material lives.
+ *
+ * Three calls `onBeforeCompile` only when it has to build a program. A patch
+ * that changes nothing the program cache key knows about does not make it
+ * build one: the material is marked for update, three finds the program it
+ * already has, and the uniforms that program was compiled with are the ones it
+ * goes on reading. So a patch that made a fresh `{ value }` on every call
+ * wrote each stop's green into an object nothing would ever read again, and
+ * the ground kept whichever stop it happened to compile under: the plateau
+ * drew `built`'s dry scrub in every state and the desert ring the modern
+ * valley's cultivation in every state, from the first frame to the last.
+ * Found by reading the live uniforms out of the renderer, 2026-09-19.
+ *
+ * `Atmosphere.ts` is written the other way round, and says why, for exactly
+ * this reason. This follows it: the values are written here, outside the
+ * patch, and the patch only hands the shader the objects they live in.
+ */
+interface GreenUniforms {
+  greenMask: IUniform;
+  greenOrigin: IUniform;
+  greenSize: IUniform;
+  greenLevel: IUniform;
+  greenHasWater: IUniform;
+  greenStrength: IUniform;
+  greenColour: IUniform;
+  greenUpland: IUniform;
+  greenWet: IUniform;
+  greenDry: IUniform;
+}
+
+const GREEN_UNIFORMS = new WeakMap<MeshStandardMaterial, GreenUniforms>();
+
+function greenUniforms(material: MeshStandardMaterial): GreenUniforms {
+  const held = GREEN_UNIFORMS.get(material);
+  if (held) return held;
+  const made: GreenUniforms = {
+    greenMask: { value: null },
+    greenOrigin: { value: [0, 0] },
+    greenSize: { value: 1 },
+    greenLevel: { value: 0 },
+    greenHasWater: { value: 0 },
+    greenStrength: { value: 0 },
+    greenColour: { value: GREEN.colour },
+    greenUpland: { value: GREEN.uplandShare },
+    greenWet: { value: GREEN.wetMetres },
+    greenDry: { value: GREEN.dryMetres },
+  };
+  GREEN_UNIFORMS.set(material, made);
+  return made;
+}
+
+/**
  * Lay the green on a ground material.
  *
  * It runs after the stone's own chunk, on `alphamap_fragment`, which is past
@@ -372,17 +426,19 @@ export interface GreenOptions {
  */
 export function applyGreen(material: MeshStandardMaterial, options: GreenOptions): void {
   const { mask, level, strength, colour } = options;
+  const uniforms = greenUniforms(material);
+  uniforms.greenMask.value = mask.texture;
+  uniforms.greenOrigin.value = [mask.extent.x0, mask.extent.y0];
+  uniforms.greenSize.value = mask.extent.size;
+  uniforms.greenLevel.value = level ?? 0;
+  uniforms.greenHasWater.value = level === undefined ? 0 : 1;
+  uniforms.greenStrength.value = strength;
+  uniforms.greenColour.value = colour;
+  uniforms.greenUpland.value = options.upland ?? GREEN.uplandShare;
+  uniforms.greenWet.value = options.wetMetres ?? GREEN.wetMetres;
+  uniforms.greenDry.value = options.dryMetres ?? GREEN.dryMetres;
   patchMaterial(material, 'green', 'v2', (shader) => {
-    shader.uniforms.greenMask = { value: mask.texture };
-    shader.uniforms.greenOrigin = { value: [mask.extent.x0, mask.extent.y0] };
-    shader.uniforms.greenSize = { value: mask.extent.size };
-    shader.uniforms.greenLevel = { value: level ?? 0 };
-    shader.uniforms.greenHasWater = { value: level === undefined ? 0 : 1 };
-    shader.uniforms.greenStrength = { value: strength };
-    shader.uniforms.greenColour = { value: colour };
-    shader.uniforms.greenUpland = { value: options.upland ?? GREEN.uplandShare };
-    shader.uniforms.greenWet = { value: options.wetMetres ?? GREEN.wetMetres };
-    shader.uniforms.greenDry = { value: options.dryMetres ?? GREEN.dryMetres };
+    for (const [name, uniform] of Object.entries(uniforms)) shader.uniforms[name] = uniform;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vGreenWorld;')
       .replace(
