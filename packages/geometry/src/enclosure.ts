@@ -23,7 +23,7 @@
  */
 
 import type { Environment } from './environment';
-import { footprintMesh, insetRing, type Footprint } from './footprints';
+import { footprintMesh, insetRing, ringInradius, type Footprint } from './footprints';
 import type { Mesh } from './mesh';
 import { placeMesh, structurePlacement, type LabelledMesh } from './pyramidion';
 import { mergeMeshes } from './mastaba';
@@ -95,12 +95,50 @@ export function enclosureWallMesh(env: Environment, structure: string): Labelled
 }
 
 /**
+ * The lighting slit down the middle of a causeway's roof: A SWITCH WITH A
+ * SENTENCE, and the sentence is why it is off.
+ *
+ * The causeway of Unas at Saqqara is roofed with a slit down the centre of
+ * the slabs, so that a band of light fell along the reliefs of the corridor
+ * as a walker went up it. It is the detail that makes a covered causeway read
+ * as architecture rather than as a tube, and it is the single most tempting
+ * thing to borrow for this plateau.
+ *
+ * It is not borrowed, because Unas is Fifth Dynasty and Khafre is Fourth.
+ * The nearest thing to evidence for a Fourth Dynasty slit is Sahure's, which
+ * is Fifth Dynasty as well. Putting it on Khafre's causeway would be exactly
+ * the trade the architecture pass opens by refusing: a detail of the right
+ * country and the wrong century, added because it looks good. So it is here,
+ * built and tested, and `on` is false until somebody with a source says
+ * otherwise. Turning it on is one word, and the roof's own label then says
+ * the slit is a borrowing from a later dynasty.
+ *
+ * `widthMetres` is a look choice like everything else here: a slit wide
+ * enough to read at the distance a reader stands and narrow enough to leave
+ * two slabs rather than two ledges.
+ */
+export const CAUSEWAY_ROOF_SLIT = {
+  on: false,
+  widthMetres: 0.6,
+} as const;
+
+/**
  * The roof over Khafre's causeway: the causeway's own ribbon lifted clear of
  * it by `tier3.causeway.corridor.height` and drawn as a slab
  * `khafre.causeway.thickness` deep, so it follows the ridge the causeway
  * follows rather than running level over it.
+ *
+ * With `slit` on it is drawn instead as a band round the outside of that
+ * ribbon, which on a long thin ribbon is two slabs with a gap down the middle
+ * and the two ends closed. See `CAUSEWAY_ROOF_SLIT` for why the default is
+ * off.
  */
-export function causewayRoofMesh(env: Environment, features: readonly Footprint[], id = 'khafre.causeway'): LabelledMesh | undefined {
+export function causewayRoofMesh(
+  env: Environment,
+  features: readonly Footprint[],
+  id = 'khafre.causeway',
+  slit: boolean = CAUSEWAY_ROOF_SLIT.on,
+): LabelledMesh | undefined {
   const causeway = features.find((f) => f.id === id);
   const thickness = env['khafre.causeway.thickness'];
   const corridor = env['tier3.causeway.corridor.height'];
@@ -116,15 +154,33 @@ export function causewayRoofMesh(env: Environment, features: readonly Footprint[
     heightKey: undefined,
     ...(causeway.bases === undefined ? {} : { bases: causeway.bases.map((b) => b + lift) }),
   };
-  const mesh = footprintMesh(roof, env);
-  if (mesh === undefined) return undefined;
+  const whole = footprintMesh(roof, env);
+  if (whole === undefined) return undefined;
+  // A slit is a hole, and the only hole this package makes is an annulus. On
+  // a ribbon that is two slabs with a gap down the middle and the ends
+  // closed, which is what a slit in a corridor's roof is: it does not run off
+  // the end of the building.
+  const half = ringInradius(roof.ring);
+  const inset = half - CAUSEWAY_ROOF_SLIT.widthMetres / 2;
+  const split =
+    slit && inset > 0
+      ? annulusMesh(roof.ring, insetRing(roof.ring, inset), roof.base, roof.base + thickness)
+      : undefined;
+  const mesh = split ?? whole;
   return {
     ...mesh,
     label:
       `Reconstruction: the roof over ${causeway.name}, carried ${corridor} m over the causeway's own top ` +
       'from tier3.causeway.corridor.height and drawn as a slab of khafre.causeway.thickness, the ' +
-      'causeway’s own. Look choices: reusing that thickness for the slab, and a flat roof with no ' +
-      'lighting slits. The walls under it are `causewayWallsMesh`, and are a look choice in the same way: ' +
+      'causeway’s own. Look choices: reusing that thickness for the slab, and ' +
+      (split === undefined
+        ? 'a flat roof with no lighting slit. A slit down the middle, as the causeway of Unas has, is built ' +
+          'and switched off: Unas is Fifth Dynasty and Khafre is Fourth, and the nearest evidence for one, ' +
+          'Sahure’s, is Fifth Dynasty too. See CAUSEWAY_ROOF_SLIT.'
+        : `a lighting slit ${CAUSEWAY_ROOF_SLIT.widthMetres} m wide down the middle. That slit is a BORROWING: ` +
+          'the causeway of Unas has one and Unas is Fifth Dynasty, where Khafre is Fourth, and the nearest ' +
+          'evidence for a Fourth Dynasty slit is Sahure’s, which is Fifth Dynasty as well.') +
+      ' The walls under it are `causewayWallsMesh`, and are a look choice in the same way: ' +
       'no record here gives them.',
   };
 }

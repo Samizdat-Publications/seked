@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { buildEnvironment } from './environment';
 import type { Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
-import { CAUSEWAY_WALL_THICKNESS, causewayRoofMesh, causewayWallsMesh, ENCLOSURE_THICKNESS, enclosureWallMesh } from './enclosure';
+import { CAUSEWAY_ROOF_SLIT, CAUSEWAY_WALL_THICKNESS, causewayRoofMesh, causewayWallsMesh, ENCLOSURE_THICKNESS, enclosureWallMesh } from './enclosure';
+import type { LabelledMesh } from './pyramidion';
 
 /** Invented numbers, not measurements: the keys the database does not carry, given values. */
 const G1 = { 'g1.base.side.mean': 230, 'g1.height.original': 146 };
@@ -182,5 +183,62 @@ describe('causewayWallsMesh', () => {
     expect(causewayWallsMesh(buildEnvironment(ENV), [])).toBeUndefined();
     expect(causewayWallsMesh(buildEnvironment({ 'khafre.causeway.thickness': 1.5 }), [CAUSEWAY])).toBeUndefined();
     expect(causewayWallsMesh(buildEnvironment({ 'tier3.causeway.corridor.height': 4.5 }), [CAUSEWAY])).toBeUndefined();
+  });
+});
+
+/**
+ * Track C's last item. The slit is built, tested and off, and the reason it
+ * is off is a century and not a preference, so the label has to carry that
+ * reason either way round.
+ */
+describe('the lighting slit down the causeway roof', () => {
+  const ENV = buildEnvironment({ 'khafre.causeway.thickness': 1.5, 'tier3.causeway.corridor.height': 4.5 });
+  const FEATURES = [CAUSEWAY];
+
+  it('is off by default, because Unas is of the wrong dynasty', () => {
+    expect(CAUSEWAY_ROOF_SLIT.on).toBe(false);
+    const roof = causewayRoofMesh(ENV, FEATURES) as LabelledMesh;
+    expect(roof.label).toContain('no lighting slit');
+    expect(roof.label).toContain('Fifth Dynasty');
+    expect(roof.label).toContain('CAUSEWAY_ROOF_SLIT');
+  });
+
+  it('cuts the roof in two down its middle when it is switched on', () => {
+    const plain = causewayRoofMesh(ENV, FEATURES, 'khafre.causeway', false) as LabelledMesh;
+    const slit = causewayRoofMesh(ENV, FEATURES, 'khafre.causeway', true) as LabelledMesh;
+    expect(slit).toBeDefined();
+    // A band round a ribbon has twice the walls and less of the solid.
+    expect(meshVolume(slit)).toBeLessThan(meshVolume(plain));
+    expect(meshVolume(slit)).toBeGreaterThan(0);
+    expect(slit.vertexCount).toBeGreaterThan(plain.vertexCount);
+  });
+
+  it('stands on the same ground and reaches no further than the whole slab', () => {
+    const plain = causewayRoofMesh(ENV, FEATURES, 'khafre.causeway', false) as LabelledMesh;
+    const slit = causewayRoofMesh(ENV, FEATURES, 'khafre.causeway', true) as LabelledMesh;
+    const box = (m: LabelledMesh) => {
+      const lo = [Infinity, Infinity, Infinity];
+      const hi = [-Infinity, -Infinity, -Infinity];
+      for (let i = 0; i < m.positions.length; i += 3) {
+        for (let k = 0; k < 3; k++) {
+          lo[k] = Math.min(lo[k] as number, m.positions[i + k] as number);
+          hi[k] = Math.max(hi[k] as number, m.positions[i + k] as number);
+        }
+      }
+      return { lo, hi };
+    };
+    const a = box(plain);
+    const b = box(slit);
+    for (let k = 0; k < 3; k++) {
+      expect(b.lo[k] as number, `low ${k}`).toBeGreaterThanOrEqual((a.lo[k] as number) - 1e-3);
+      expect(b.hi[k] as number, `high ${k}`).toBeLessThanOrEqual((a.hi[k] as number) + 1e-3);
+    }
+  });
+
+  it('says the slit is a borrowing whenever it is drawn', () => {
+    const slit = causewayRoofMesh(ENV, FEATURES, 'khafre.causeway', true) as LabelledMesh;
+    expect(slit.label).toContain('BORROWING');
+    expect(slit.label).toContain(`${CAUSEWAY_ROOF_SLIT.widthMetres} m wide`);
+    expect(slit.label).toContain('Fourth');
   });
 });

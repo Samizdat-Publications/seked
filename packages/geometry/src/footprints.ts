@@ -192,7 +192,15 @@ const MITRE_LIMIT = 4;
  * at `BATTER_LIMIT` of the least distance from the area centroid to an edge,
  * so a small or narrow traced outline is drawn in and never turned inside out.
  */
-export function insetRing(ring: readonly Xy[], inset: number): Xy[] {
+/**
+ * How far the ring's own centroid stands from its nearest edge, metres.
+ *
+ * This is what `insetRing` clamps against, pulled out so a caller can ask it.
+ * For a long thin ribbon, which is what the footprint import makes of a
+ * buffered polyline, it is the ribbon's own half width, which is how the
+ * causeway's roof knows how wide a slit down its middle would be.
+ */
+export function ringInradius(ring: readonly Xy[]): number {
   const n = ring.length;
   const [cx, cy] = ringCentroid(ring);
   let least = Infinity;
@@ -205,6 +213,12 @@ export function insetRing(ring: readonly Xy[], inset: number): Xy[] {
     const t = len2 > 0 ? Math.max(0, Math.min(1, ((cx - x0) * dx + (cy - y0) * dy) / len2)) : 0;
     least = Math.min(least, Math.hypot(cx - (x0 + t * dx), cy - (y0 + t * dy)));
   }
+  return least;
+}
+
+export function insetRing(ring: readonly Xy[], inset: number): Xy[] {
+  const n = ring.length;
+  const least = ringInradius(ring);
   const d = Math.min(inset, BATTER_LIMIT * least);
   return ring.map(([x, y], i) => {
     const [px, py] = ring[(i + n - 1) % n] as Xy;
