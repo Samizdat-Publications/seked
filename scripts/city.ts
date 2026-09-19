@@ -40,12 +40,23 @@
  * year of the imagery, and the count of buildings the raster could not give a
  * height to, are all in the header of the file this writes. Nothing here
  * rounds an unknown height up to something that looks like a city.
+ *
+ * The raster is four GeoTIFFs of 12.5 km square, 3.9 GB between them, and
+ * this reads about an eighth of that: the tiles serve range requests, they
+ * are tiled 512 by 512 inside, and only the blocks a building falls in are
+ * fetched. Reading them needs no library. They are all one profile, classic
+ * little-endian TIFF, deflate, the floating-point predictor, three separate
+ * float32 planes, and the reader below parses that profile and refuses
+ * anything else out loud, which is a smaller thing to own than a general
+ * GeoTIFF reader is to depend on. That the decode is right is not a matter of
+ * opinion: every height that comes out is an exact multiple of the raster's
+ * own half metre, which a mis-shuffled byte plane could not manage.
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { Readable } from 'node:stream';
-import { createGunzip } from 'node:zlib';
+import { createGunzip, inflateSync } from 'node:zlib';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { DATA_DIR, REPO_ROOT, loadDatabase, loadTerrain, resolve } from '@seked/data';
@@ -230,6 +241,8 @@ export interface Projection {
   metresPerDegLat: number;
   metresPerDegLon: number;
   project(lon: number, lat: number): Xy;
+  /** The way back, as a longitude and a latitude. */
+  unproject(x: number, y: number): [number, number];
 }
 
 export function tangentPlane(lat0: number, lon0: number, a: number, b: number): Projection {
@@ -246,6 +259,7 @@ export function tangentPlane(lat0: number, lon0: number, a: number, b: number): 
     metresPerDegLat,
     metresPerDegLon,
     project: (lon, lat) => [(lon - lon0) * metresPerDegLon, (lat - lat0) * metresPerDegLat],
+    unproject: (x, y) => [lon0 + x / metresPerDegLon, lat0 + y / metresPerDegLat],
   };
 }
 
@@ -371,6 +385,616 @@ export async function loadClip(refresh: boolean): Promise<{ rows: CityRow[]; sha
   return { rows, sha256, archiveBytes };
 }
 
+// --- The height raster --------------------------------------------------
+
+/**
+ * Open Buildings 2.5D Temporal: one GeoTIFF per 12.5 km square per year, in
+ * the UTM zone the square falls in, with three bands of which two matter
+ * here. The bucket is public and listable, so the year, the zone's manifests
+ * and the tiles the box needs are all discovered rather than named: a tile
+ * picked by its filename would be a guess that happened to work.
+ */
+const TEMPORAL_BUCKET = 'open-buildings-temporal-data';
+const HEIGHT_BAND = 'building_height';
+const PRESENCE_BAND = 'building_presence';
+
+/** Stated by the dataset, in metres. Not measured here, and not ours to soften. */
+export const HEIGHT_MAE = 1.5;
+/** Stated by the dataset: the raster does not go above this, whatever stands there. */
+export const HEIGHT_CAP = 100;
+/**
+ * The gate the dataset asks for, and a look choice in where it is set. The
+ * presence band is a probability, and the outline this height is being given
+ * to already passed Open Buildings v3's own confidence, so this is a second
+ * opinion from a different year's imagery rather than the only one. Half is
+ * the usual reading of a probability band and is what this uses.
+ */
+export const PRESENCE_GATE = 0.5;
+
+/** One tile of the raster, as its manifest and its own header describe it. */
+export interface RasterTile {
+  url: string;
+  /** Easting and northing of the tile's north-west corner, metres in its UTM zone. */
+  x0: number;
+  y0: number;
+  /** Metres per pixel. */
+  scale: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Easting and northing in a UTM zone, from a latitude and longitude on
+ * WGS84. The transverse Mercator series to the sixth power of the distance
+ * from the central meridian, which is good to a millimetre inside a zone and
+ * is the arithmetic every implementation of UTM uses. The ellipsoid is passed
+ * in so no constant of geodesy is typed here either.
+ */
+export function toUtm(lat: number, lon: number, zone: number, a: number, b: number): Xy {
+  const e2 = 1 - (b / a) ** 2;
+  const ep2 = e2 / (1 - e2);
+  const k0 = 0.9996;
+  const latR = (lat * Math.PI) / 180;
+  const lonR = (lon * Math.PI) / 180;
+  const lon0 = (((zone - 1) * 6 - 180 + 3) * Math.PI) / 180;
+  const n = a / Math.sqrt(1 - e2 * Math.sin(latR) ** 2);
+  const t = Math.tan(latR) ** 2;
+  const c = ep2 * Math.cos(latR) ** 2;
+  const arc = Math.cos(latR) * (lonR - lon0);
+  const m =
+    a *
+    ((1 - e2 / 4 - (3 * e2 ** 2) / 64 - (5 * e2 ** 3) / 256) * latR -
+      ((3 * e2) / 8 + (3 * e2 ** 2) / 32 + (45 * e2 ** 3) / 1024) * Math.sin(2 * latR) +
+      ((15 * e2 ** 2) / 256 + (45 * e2 ** 3) / 1024) * Math.sin(4 * latR) -
+      ((35 * e2 ** 3) / 3072) * Math.sin(6 * latR));
+  const east =
+    k0 * n * (arc + ((1 - t + c) * arc ** 3) / 6 + ((5 - 18 * t + t ** 2 + 72 * c - 58 * ep2) * arc ** 5) / 120) + 500000;
+  const north =
+    k0 *
+    (m +
+      n *
+        Math.tan(latR) *
+        ((arc ** 2) / 2 +
+          ((5 - t + 9 * c + 4 * c ** 2) * arc ** 4) / 24 +
+          ((61 - 58 * t + t ** 2 + 600 * c - 330 * ep2) * arc ** 6) / 720));
+  return [east, north];
+}
+
+/** The zone a longitude falls in, and the EPSG code of that zone north of the equator. */
+export const utmZone = (lon: number): number => Math.floor((lon + 180) / 6) + 1;
+export const utmEpsg = (zone: number): number => 32600 + zone;
+
+/** Every object under a prefix in a public bucket, through the JSON API. */
+async function listBucket(bucket: string, prefix: string): Promise<string[]> {
+  const names: string[] = [];
+  let token: string | undefined;
+  do {
+    const url =
+      `https://storage.googleapis.com/storage/v1/b/${bucket}/o?prefix=${encodeURIComponent(prefix)}&maxResults=1000` +
+      (token ? `&pageToken=${encodeURIComponent(token)}` : '');
+    const response = await fetch(url, { signal: AbortSignal.timeout(180_000) });
+    if (!response.ok) throw new Error(`listing ${bucket}/${prefix}: ${response.status}`);
+    const page = (await response.json()) as { items?: { name: string }[]; nextPageToken?: string };
+    for (const item of page.items ?? []) names.push(item.name);
+    token = page.nextPageToken;
+  } while (token);
+  return names;
+}
+
+/** What the store says about one object: its size and the md5 it holds for it. */
+async function objectMetadata(bucket: string, name: string): Promise<{ size: number; md5: string; generation: string }> {
+  const url = `https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodeURIComponent(name)}`;
+  const response = await fetch(url, { signal: AbortSignal.timeout(180_000) });
+  if (!response.ok) throw new Error(`metadata for ${name}: ${response.status}`);
+  const meta = (await response.json()) as { size: string; md5Hash: string; generation: string };
+  return { size: Number(meta.size), md5: meta.md5Hash, generation: meta.generation };
+}
+
+/** A range of one remote object, with the retry a 1 GB read over a long import needs. */
+async function fetchRange(url: string, start: number, end: number): Promise<Buffer> {
+  let last = '';
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const response = await fetch(url, { headers: { range: `bytes=${start}-${end}` }, signal: AbortSignal.timeout(300_000) });
+      if (response.status === 206 || response.status === 200) return Buffer.from(await response.arrayBuffer());
+      last = `${response.status}`;
+    } catch (error) {
+      last = String(error);
+    }
+    await new Promise((done) => setTimeout(done, 500 * 2 ** attempt));
+  }
+  throw new Error(`${url}: bytes ${start}-${end} would not come: ${last}`);
+}
+
+const TIFF_TYPE_SIZE: Record<number, number> = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 11: 4, 12: 8 };
+
+interface TiffTag {
+  type: number;
+  count: number;
+  /** Either the value itself, for four bytes or fewer, or where in the file it is. */
+  inline: Buffer;
+  offset: number;
+  remote: boolean;
+}
+
+/**
+ * As much of a GeoTIFF reader as this import needs, and it says so when the
+ * file is not the shape it expects.
+ *
+ * The 2.5D tiles are all one profile: classic little-endian TIFF, 512 by 512
+ * tiles, deflate, the floating-point predictor, three separate float32
+ * planes. So rather than take a dependency on a general reader, this parses
+ * the one directory it needs and refuses anything else loudly. Every number
+ * it needs about the ground, the corner, the pixel size and which plane is
+ * which band, comes out of the file, not out of the manifest and not out of
+ * this comment.
+ */
+class RasterReader {
+  private constructor(
+    readonly url: string,
+    readonly width: number,
+    readonly height: number,
+    readonly tileWidth: number,
+    readonly tileHeight: number,
+    readonly x0: number,
+    readonly y0: number,
+    readonly scale: number,
+    readonly bands: string[],
+    private readonly tileOffsets: number[],
+    private readonly tileByteCounts: number[],
+  ) {}
+
+  get tilesAcross(): number {
+    return Math.ceil(this.width / this.tileWidth);
+  }
+
+  get tilesDown(): number {
+    return Math.ceil(this.height / this.tileHeight);
+  }
+
+  /** Where a band's plane starts in the tile tables. */
+  planeOf(band: string): number {
+    const plane = this.bands.indexOf(band);
+    if (plane < 0) throw new Error(`${this.url}: no band called ${band}, only ${this.bands.join(', ')}`);
+    return plane;
+  }
+
+  bytesOf(band: string, block: number): number {
+    return this.tileByteCounts[this.planeOf(band) * this.tilesAcross * this.tilesDown + block] as number;
+  }
+
+  /** One 512 by 512 block of one band, inflated and un-predicted. */
+  async block(band: string, block: number): Promise<Float32Array> {
+    const index = this.planeOf(band) * this.tilesAcross * this.tilesDown + block;
+    const start = this.tileOffsets[index] as number;
+    const bytes = this.tileByteCounts[index] as number;
+    const raw = await fetchRange(this.url, start, start + bytes - 1);
+    return undoFloatPredictor(inflateSync(raw), this.tileWidth, this.tileHeight);
+  }
+
+  static async open(url: string): Promise<RasterReader> {
+    // The directory, its out-of-line values and both tile tables all sit in
+    // the first few hundred kilobytes of these files, so one read has them.
+    const head = await fetchRange(url, 0, 1_048_575);
+    if (head.length < 8 || head.readUInt16LE(0) !== 0x4949 || head.readUInt16LE(2) !== 42) {
+      throw new Error(`${url}: not a little-endian classic TIFF`);
+    }
+    const at = head.readUInt32LE(4);
+    const count = head.readUInt16LE(at);
+    const tags = new Map<number, TiffTag>();
+    for (let i = 0; i < count; i++) {
+      const entry = at + 2 + i * 12;
+      const tag = head.readUInt16LE(entry);
+      const type = head.readUInt16LE(entry + 2);
+      const n = head.readUInt32LE(entry + 4);
+      const size = (TIFF_TYPE_SIZE[type] ?? 1) * n;
+      tags.set(tag, {
+        type,
+        count: n,
+        inline: head.subarray(entry + 8, entry + 12),
+        offset: size > 4 ? head.readUInt32LE(entry + 8) : entry + 8,
+        remote: size > 4,
+      });
+    }
+    const bytesOf = (tag: TiffTag): Buffer => {
+      const size = (TIFF_TYPE_SIZE[tag.type] ?? 1) * tag.count;
+      if (tag.offset + size > head.length) throw new Error(`${url}: tag value at ${tag.offset} is beyond the first megabyte`);
+      return head.subarray(tag.offset, tag.offset + size);
+    };
+    const numbers = (id: number): number[] => {
+      const tag = tags.get(id);
+      if (!tag) throw new Error(`${url}: tag ${id} is missing`);
+      const raw = bytesOf(tag);
+      const out: number[] = [];
+      for (let i = 0; i < tag.count; i++) {
+        if (tag.type === 3) out.push(raw.readUInt16LE(i * 2));
+        else if (tag.type === 4) out.push(raw.readUInt32LE(i * 4));
+        else if (tag.type === 12) out.push(raw.readDoubleLE(i * 8));
+        else throw new Error(`${url}: tag ${id} has type ${tag.type}, which this reader does not read`);
+      }
+      return out;
+    };
+    const one = (id: number): number => numbers(id)[0] as number;
+    const expect = (what: string, got: number | number[], want: number | number[]): void => {
+      if (JSON.stringify(got) !== JSON.stringify(want)) {
+        throw new Error(`${url}: ${what} is ${JSON.stringify(got)}, and this reader only reads ${JSON.stringify(want)}`);
+      }
+    };
+    expect('compression', one(259), 8);
+    expect('the predictor', one(317), 3);
+    expect('the planar configuration', one(284), 2);
+    expect('bits per sample', numbers(258), [32, 32, 32]);
+    expect('the sample format', numbers(339), [3, 3, 3]);
+    const pixelScale = numbers(33550);
+    const tiePoint = numbers(33922);
+    if (pixelScale[0] !== pixelScale[1]) throw new Error(`${url}: pixels are ${pixelScale[0]} by ${pixelScale[1]} m and this reader wants them square`);
+    if (tiePoint[0] !== 0 || tiePoint[1] !== 0) throw new Error(`${url}: the tie point is not the north-west corner`);
+    // Which plane is which band is written in the file's own metadata, so a
+    // dataset that reorders its bands cannot quietly become wrong here.
+    const metadata = bytesOf(tags.get(42112) as TiffTag).toString('utf8');
+    const bands: string[] = [];
+    for (const match of metadata.matchAll(/sample="(\d+)"[^>]*>([^<]+)</g)) {
+      bands[Number(match[1])] = (match[2] as string).trim();
+    }
+    if (bands.length !== 3 || bands.some((b) => !b)) throw new Error(`${url}: the band names are ${JSON.stringify(bands)}`);
+    return new RasterReader(
+      url,
+      one(256),
+      one(257),
+      one(322),
+      one(323),
+      tiePoint[3] as number,
+      tiePoint[4] as number,
+      pixelScale[0] as number,
+      bands,
+      numbers(324),
+      numbers(325),
+    );
+  }
+}
+
+const PLATFORM_IS_LITTLE_ENDIAN = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+
+/**
+ * Undo TIFF predictor 3, which is what makes these tiles compress at all.
+ *
+ * The encoder splits each row of floats into byte planes, most significant
+ * first, and stores the difference between each byte and the one before it,
+ * so a row of similar heights becomes a row of mostly zeroes. Reading it back
+ * is the two steps in the other order: add along the row, then take one byte
+ * from each plane to rebuild each float.
+ */
+export function undoFloatPredictor(bytes: Buffer, width: number, height: number): Float32Array {
+  if (!PLATFORM_IS_LITTLE_ENDIAN) throw new Error('this reader rebuilds float32s in place and wants a little-endian machine');
+  const rowBytes = width * 4;
+  if (bytes.length !== rowBytes * height) throw new Error(`a ${width} by ${height} block of float32 is ${rowBytes * height} bytes, not ${bytes.length}`);
+  const out = new Uint8Array(bytes.length);
+  for (let row = 0; row < height; row++) {
+    const s = row * rowBytes;
+    for (let i = s + 1; i < s + rowBytes; i++) bytes[i] = ((bytes[i] as number) + (bytes[i - 1] as number)) & 0xff;
+    for (let j = 0; j < width; j++) {
+      const b = s + 4 * j;
+      out[b] = bytes[s + 3 * width + j] as number;
+      out[b + 1] = bytes[s + 2 * width + j] as number;
+      out[b + 2] = bytes[s + width + j] as number;
+      out[b + 3] = bytes[s + j] as number;
+    }
+  }
+  return new Float32Array(out.buffer);
+}
+
+/** The tiles of the newest year whose extent meets the box, from the manifests of the box's own zone. */
+async function findRasterTiles(box: { minX: number; maxX: number; minY: number; maxY: number }, epsg: number): Promise<{ tiles: RasterTile[]; year: number; manifests: string[] }> {
+  const all = await listBucket(TEMPORAL_BUCKET, 'v1/manifests/');
+  const mine = all.filter((name) => name.includes(`_EPSG_${epsg}_`));
+  if (mine.length === 0) throw new Error(`no manifest in ${TEMPORAL_BUCKET} covers EPSG ${epsg}`);
+  const yearOf = (name: string): number => Number((/_(\d{4})_\d{2}_\d{2}\.json$/.exec(name) ?? ['', '0'])[1]);
+  const year = Math.max(...mine.map(yearOf));
+  const manifests = mine.filter((name) => yearOf(name) === year).sort();
+  const tiles: RasterTile[] = [];
+  for (const manifest of manifests) {
+    const url = `https://storage.googleapis.com/${TEMPORAL_BUCKET}/${manifest}`;
+    const response = await fetch(url, { signal: AbortSignal.timeout(300_000) });
+    if (!response.ok) throw new Error(`${manifest}: ${response.status}`);
+    const parsed = (await response.json()) as {
+      uriPrefix: string;
+      tilesets: { sources: { uris: string[]; affineTransform: { translateX: number; translateY: number; scaleX: number; scaleY: number }; dimensions: { width: number; height: number } }[] }[];
+    };
+    const prefix = parsed.uriPrefix.replace(/^gs:\/\//, 'https://storage.googleapis.com/');
+    for (const tileset of parsed.tilesets) {
+      for (const source of tileset.sources) {
+        const { translateX, translateY, scaleX, scaleY } = source.affineTransform;
+        const { width, height } = source.dimensions;
+        const xs = [translateX, translateX + scaleX * width];
+        const ys = [translateY, translateY + scaleY * height];
+        const meets =
+          box.maxX >= Math.min(...xs) && box.minX <= Math.max(...xs) && box.maxY >= Math.min(...ys) && box.minY <= Math.max(...ys);
+        if (!meets) continue;
+        tiles.push({ url: `${prefix}${source.uris[0]}`, x0: translateX, y0: translateY, scale: scaleX, width, height });
+      }
+    }
+  }
+  return { tiles, year, manifests };
+}
+
+/** A building's sample points: the centre of its roof and eight more spread over it. */
+export function samplePoints({ x, y, width, depth, yawDeg }: OrientedBox): Xy[] {
+  const c = Math.cos((yawDeg * Math.PI) / 180);
+  const s = Math.sin((yawDeg * Math.PI) / 180);
+  const points: Xy[] = [];
+  for (const u of [-width / 3, 0, width / 3]) {
+    for (const v of [-depth / 3, 0, depth / 3]) points.push([x + u * c - v * s, y + u * s + v * c]);
+  }
+  return points;
+}
+
+/** The median of a handful of numbers, which for an even count is the lower middle. */
+export function median(values: number[]): number {
+  const sorted = [...values].sort((p, q) => p - q);
+  return sorted[(sorted.length - 1) >> 1] as number;
+}
+
+/** What the raster pass found, and everything about it the header has to say. */
+export interface MeasuredHeights {
+  /** One per box, in the same order, NaN where the raster would not give one. */
+  heights: Float32Array;
+  year: number;
+  epsg: number;
+  manifests: string[];
+  tiles: { url: string; bytes: number; md5: string }[];
+  /** Blocks of the raster read, of how many the tiles hold, and what they cost. */
+  blocks: number;
+  blocksInTiles: number;
+  bytesRead: number;
+  /** Buildings whose sample points all fell below the presence gate. */
+  ungated: number;
+  /** The median of the best presence those buildings could show, which says how near the gate they were. */
+  presenceOfUngated: number;
+  /** How many of them the height band had something above zero for anyway. */
+  ungatedWithSomeHeight: number;
+  /** Buildings with at least one sample point outside every tile of the year. */
+  offRaster: number;
+  atCap: number;
+  seconds: number;
+}
+
+const HEIGHTS_CACHE = join(CACHE_DIR, 'heights.f32');
+const HEIGHTS_SIDECAR = join(CACHE_DIR, 'heights.json');
+/** Nine points on each roof: the centre and eight more at a third of the way out. */
+const SAMPLES_PER_BOX = 9;
+
+/**
+ * Give every box the height the raster measured under it.
+ *
+ * Nine points are taken on each roof rather than one, because the product is
+ * distributed at 50 cm but is only good to about 4 m, so a single pixel at a
+ * building's centroid can be a stairwell, a gap between two blocks, or the
+ * centroid of an L-shaped building sitting in its own notch. The median of
+ * the points that pass the presence gate is the height, and a building none
+ * of whose points pass has no height at all rather than a plausible one.
+ *
+ * Only the blocks the buildings actually fall in are read, by range request
+ * into each tile's own tiling. The four tiles are 4.7 GB between them and
+ * this reads a fraction of that; the alternative, downloading them, would be
+ * an hour of somebody's evening for bytes that are mostly empty desert.
+ */
+async function heightsOf(
+  boxes: readonly OrientedBox[],
+  projection: Projection,
+  a: number,
+  b: number,
+  refresh: boolean,
+  clipSha: string,
+): Promise<MeasuredHeights> {
+  const key = { clipSha, boxes: boxes.length, gate: PRESENCE_GATE, samples: SAMPLES_PER_BOX, floor: CONFIDENCE_FLOOR };
+  if (!refresh && existsSync(HEIGHTS_CACHE) && existsSync(HEIGHTS_SIDECAR)) {
+    const cached = JSON.parse(readFileSync(HEIGHTS_SIDECAR, 'utf8')) as MeasuredHeights & { key: typeof key };
+    const bytes = readFileSync(HEIGHTS_CACHE);
+    if (JSON.stringify(cached.key) === JSON.stringify(key) && bytes.byteLength === boxes.length * 4) {
+      const heights = new Float32Array(boxes.length);
+      new Uint8Array(heights.buffer).set(bytes);
+      console.log(`reusing the heights cached at ${HEIGHTS_CACHE}`);
+      return { ...cached, heights };
+    }
+  }
+
+  const started = Date.now();
+  const zone = utmZone((BBOX[1] + BBOX[3]) / 2);
+  const epsg = utmEpsg(zone);
+  const corners = [
+    [BBOX[0], BBOX[1]],
+    [BBOX[0], BBOX[3]],
+    [BBOX[2], BBOX[1]],
+    [BBOX[2], BBOX[3]],
+  ].map(([lat, lon]) => toUtm(lat as number, lon as number, zone, a, b));
+  const extent = {
+    minX: Math.min(...corners.map((c) => c[0])),
+    maxX: Math.max(...corners.map((c) => c[0])),
+    minY: Math.min(...corners.map((c) => c[1])),
+    maxY: Math.max(...corners.map((c) => c[1])),
+  };
+  console.log(`the box is UTM ${zone}N (EPSG ${epsg}) ${extent.minX.toFixed(0)} to ${extent.maxX.toFixed(0)} east, ${extent.minY.toFixed(0)} to ${extent.maxY.toFixed(0)} north`);
+  const { tiles, year, manifests } = await findRasterTiles(extent, epsg);
+  console.log(`${manifests.length} manifests for ${year} name ${tiles.length} tiles that meet it`);
+
+  const readers = await Promise.all(tiles.map((tile) => RasterReader.open(tile.url)));
+  const described: { url: string; bytes: number; md5: string }[] = [];
+  for (let i = 0; i < readers.length; i++) {
+    const reader = readers[i] as RasterReader;
+    const tile = tiles[i] as RasterTile;
+    if (reader.x0 !== tile.x0 || reader.y0 !== tile.y0 || reader.scale !== tile.scale) {
+      throw new Error(`${tile.url}: the manifest puts its corner at ${tile.x0}, ${tile.y0} and the file at ${reader.x0}, ${reader.y0}`);
+    }
+    const name = new URL(reader.url).pathname.split('/').slice(2).join('/');
+    const meta = await objectMetadata(TEMPORAL_BUCKET, name);
+    described.push({ url: reader.url, bytes: meta.size, md5: meta.md5 });
+    console.log(
+      `  ${name}: corner ${reader.x0}, ${reader.y0}, ${reader.width} by ${reader.height} px at ${reader.scale} m, ` +
+        `${(meta.size / 1e6).toFixed(0)} MB, bands ${reader.bands.join(', ')}`,
+    );
+  }
+
+  // Every sample point, sorted into the block of the raster it falls in.
+  const stride = Math.max(...readers.map((r) => r.tilesAcross * r.tilesDown));
+  const groups = new Map<number, number[]>();
+  const samples = new Float32Array(boxes.length * SAMPLES_PER_BOX).fill(Number.NaN);
+  // What the raster said before the gate, kept so the gate can be defended
+  // with numbers rather than with an opinion about probabilities.
+  const ungatedSamples = new Float32Array(boxes.length * SAMPLES_PER_BOX).fill(Number.NaN);
+  const bestPresence = new Float32Array(boxes.length);
+  const offRasterBox = new Uint8Array(boxes.length);
+  for (let i = 0; i < boxes.length; i++) {
+    const points = samplePoints(boxes[i] as OrientedBox);
+    for (let j = 0; j < points.length; j++) {
+      const [x, y] = points[j] as Xy;
+      const [lon, lat] = projection.unproject(x, y);
+      const [east, north] = toUtm(lat, lon, zone, a, b);
+      let placed = false;
+      for (let t = 0; t < readers.length; t++) {
+        const reader = readers[t] as RasterReader;
+        const px = Math.floor((east - reader.x0) / reader.scale);
+        const py = Math.floor((reader.y0 - north) / reader.scale);
+        if (px < 0 || py < 0 || px >= reader.width || py >= reader.height) continue;
+        const block = Math.floor(py / reader.tileHeight) * reader.tilesAcross + Math.floor(px / reader.tileWidth);
+        const inside = (py % reader.tileHeight) * reader.tileWidth + (px % reader.tileWidth);
+        const id = t * stride + block;
+        const pairs = groups.get(id);
+        if (pairs) pairs.push(i * SAMPLES_PER_BOX + j, inside);
+        else groups.set(id, [i * SAMPLES_PER_BOX + j, inside]);
+        placed = true;
+        break;
+      }
+      if (!placed) offRasterBox[i] = 1;
+    }
+  }
+  const blockIds = [...groups.keys()].sort((p, q) => p - q);
+  const blocksInTiles = readers.reduce((sum, r) => sum + r.tilesAcross * r.tilesDown, 0);
+  let bytesRead = 0;
+  for (const id of blockIds) {
+    const reader = readers[Math.floor(id / stride)] as RasterReader;
+    const block = id % stride;
+    bytesRead += reader.bytesOf(HEIGHT_BAND, block) + reader.bytesOf(PRESENCE_BAND, block);
+  }
+  console.log(
+    `${blockIds.length.toLocaleString()} of the tiles' ${blocksInTiles.toLocaleString()} blocks hold a building: ` +
+      `${(bytesRead / 1e6).toFixed(0)} MB of the ${(described.reduce((s, t) => s + t.bytes, 0) / 1e6).toFixed(0)} MB the four tiles weigh`,
+  );
+
+  let finished = 0;
+  let cursor = 0;
+  const worker = async (): Promise<void> => {
+    for (;;) {
+      const at = cursor++;
+      if (at >= blockIds.length) return;
+      const id = blockIds[at] as number;
+      const reader = readers[Math.floor(id / stride)] as RasterReader;
+      const block = id % stride;
+      const [height, presence] = await Promise.all([reader.block(HEIGHT_BAND, block), reader.block(PRESENCE_BAND, block)]);
+      const pairs = groups.get(id) as number[];
+      for (let k = 0; k < pairs.length; k += 2) {
+        const slot = pairs[k] as number;
+        const pixel = pairs[k + 1] as number;
+        const seen = presence[pixel] as number;
+        ungatedSamples[slot] = height[pixel] as number;
+        const box = Math.floor(slot / SAMPLES_PER_BOX);
+        if (seen > (bestPresence[box] as number)) bestPresence[box] = seen;
+        if (seen >= PRESENCE_GATE) samples[slot] = height[pixel] as number;
+      }
+      groups.delete(id);
+      finished += 1;
+      if (finished % 500 === 0) console.log(`  ${finished.toLocaleString()} of ${blockIds.length.toLocaleString()} blocks read`);
+    }
+  };
+  await Promise.all(Array.from({ length: 8 }, worker));
+
+  const heights = new Float32Array(boxes.length);
+  let ungated = 0;
+  let atCap = 0;
+  let offRaster = 0;
+  const missedPresence: number[] = [];
+  let missedWithSomeHeight = 0;
+  const seen: number[] = [];
+  for (let i = 0; i < boxes.length; i++) {
+    seen.length = 0;
+    for (let j = 0; j < SAMPLES_PER_BOX; j++) {
+      const value = samples[i * SAMPLES_PER_BOX + j] as number;
+      if (Number.isFinite(value) && value > 0) seen.push(value);
+    }
+    if (offRasterBox[i] === 1) offRaster += 1;
+    if (seen.length === 0) {
+      heights[i] = Number.NaN;
+      ungated += 1;
+      missedPresence.push(bestPresence[i] as number);
+      for (let j = 0; j < SAMPLES_PER_BOX; j++) {
+        if (((ungatedSamples[i * SAMPLES_PER_BOX + j] as number) || 0) > 0) {
+          missedWithSomeHeight += 1;
+          break;
+        }
+      }
+      continue;
+    }
+    const value = Math.min(median(seen), HEIGHT_CAP);
+    if (value >= HEIGHT_CAP) atCap += 1;
+    heights[i] = value;
+  }
+  const presenceOfMissed = median(missedPresence);
+  console.log(
+    `of the ${ungated.toLocaleString()} the gate turned away, the median best presence was ${presenceOfMissed.toFixed(2)} ` +
+      `against a gate of ${PRESENCE_GATE}, and ${missedWithSomeHeight.toLocaleString()} had a height above zero somewhere under them`,
+  );
+
+  const measured: MeasuredHeights = {
+    heights,
+    year,
+    epsg,
+    manifests,
+    tiles: described,
+    blocks: blockIds.length,
+    blocksInTiles,
+    bytesRead,
+    ungated,
+    presenceOfUngated: Math.round(presenceOfMissed * 100) / 100,
+    ungatedWithSomeHeight: missedWithSomeHeight,
+    offRaster,
+    atCap,
+    seconds: Math.round((Date.now() - started) / 1000),
+  };
+  mkdirSync(CACHE_DIR, { recursive: true });
+  writeFileSync(HEIGHTS_CACHE, Buffer.from(heights.buffer, heights.byteOffset, heights.byteLength));
+  const { heights: _dropped, ...rest } = measured;
+  writeFileSync(HEIGHTS_SIDECAR, `${JSON.stringify({ key, ...rest }, null, 1)}\n`);
+  return measured;
+}
+
+/**
+ * What to draw a building at when the raster would not measure it.
+ *
+ * This is a look choice and not a measurement, so it is one number, said out
+ * loud in the header, and every record that carries it is flagged as carrying
+ * it. The number is taken from the data rather than chosen: the buildings the
+ * raster misses are small, about a third of the footprint of the ones it
+ * catches, and the number is the median height it measured for buildings of
+ * their size. The alternative was to leave them out, and that would thin the
+ * edge of the city exactly where the low sheds and yards are, which is the
+ * part a reader sees from the plateau.
+ */
+export function fillHeight(
+  boxes: readonly OrientedBox[],
+  areas: readonly number[],
+  heights: Float32Array,
+): { height: number; medianMissingArea: number; medianMeasuredArea: number } {
+  const missing: number[] = [];
+  const caught: number[] = [];
+  for (let i = 0; i < boxes.length; i++) (Number.isFinite(heights[i] as number) ? caught : missing).push(areas[i] as number);
+  const medianMissingArea = median(missing);
+  const small: number[] = [];
+  for (let i = 0; i < boxes.length; i++) {
+    const height = heights[i] as number;
+    if (Number.isFinite(height) && (areas[i] as number) <= medianMissingArea) small.push(height);
+  }
+  return { height: median(small), medianMissingArea, medianMeasuredArea: median(caught) };
+}
+
 export async function main(): Promise<void> {
   mkdirSync(OUT_DIR, { recursive: true });
   const refresh = process.argv.includes('--refresh');
@@ -392,6 +1016,7 @@ export async function main(): Promise<void> {
   let unreadable = 0;
   let degenerate = 0;
   const boxes: OrientedBox[] = [];
+  const areas: number[] = [];
   let roof = 0;
   for (const row of rows) {
     if (row.confidence < CONFIDENCE_FLOOR) {
@@ -409,6 +1034,7 @@ export async function main(): Promise<void> {
       continue;
     }
     boxes.push(box);
+    areas.push(row.area);
     roof += row.area;
   }
   console.log(
@@ -419,6 +1045,27 @@ export async function main(): Promise<void> {
   console.log(
     `  mean box ${mean((o) => o.width).toFixed(1)} by ${mean((o) => o.depth).toFixed(1)} m, ` +
       `${(roof / 1e6).toFixed(1)} km2 of roof, mean footprint ${(roof / boxes.length).toFixed(0)} m2`,
+  );
+
+  const measured = await heightsOf(boxes, projection, a, b, refresh, sha256);
+  const withHeight = [...measured.heights].filter((h) => Number.isFinite(h));
+  withHeight.sort((p, q) => p - q);
+  console.log(
+    `${withHeight.length.toLocaleString()} buildings got a height from ${HEIGHT_BAND} ${measured.year}, ` +
+      `${(boxes.length - withHeight.length).toLocaleString()} did not`,
+  );
+  console.log(
+    `  median ${(withHeight[withHeight.length >> 1] as number).toFixed(1)} m, ` +
+      `p90 ${(withHeight[Math.floor(withHeight.length * 0.9)] as number).toFixed(1)} m, ` +
+      `tallest ${(withHeight[withHeight.length - 1] as number).toFixed(1)} m, ` +
+      `${measured.atCap.toLocaleString()} at the ${HEIGHT_CAP} m cap`,
+  );
+
+  const fill = fillHeight(boxes, areas, measured.heights);
+  console.log(
+    `  the ${measured.ungated.toLocaleString()} without one are small: ${fill.medianMissingArea.toFixed(0)} m2 against ` +
+      `${fill.medianMeasuredArea.toFixed(0)} m2, and are drawn at ${fill.height.toFixed(1)} m, ` +
+      'the median height the raster measured for buildings as small as they are',
   );
 }
 
