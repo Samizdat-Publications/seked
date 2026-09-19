@@ -12,7 +12,7 @@
  *
  * Running it twice writes the same bytes twice.
  */
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadClaims } from '@seked/claims';
@@ -24,6 +24,13 @@ export const WEB_PUBLIC = join(REPO_ROOT, 'apps', 'web', 'public');
 
 /** Where the heights land under the site root, and so also inside public/. */
 const TERRAIN_DIR = 'terrain';
+
+/**
+ * Where the city lands. It is context rather than database, and six and a
+ * half megabytes of it, so it is copied beside the terrain and fetched when
+ * the viewer wants it instead of being folded into seked.json.
+ */
+const CITY_DIR = 'city';
 
 /**
  * How faint a star has to be before the viewer stops being given it. The
@@ -57,6 +64,8 @@ export interface WrittenBundle {
   bundle: SekedBundle;
   json: string;
   heights: string;
+  /** The city's header and its boxes, copied as they are. */
+  city: string[];
   bytes: number;
 }
 
@@ -73,7 +82,15 @@ export function writeBundle(outDir = WEB_PUBLIC, dataDir = DATA_DIR): WrittenBun
   const source = readFileSync(from);
   if (!existsSync(heights) || !source.equals(readFileSync(heights))) copyFileSync(from, heights);
 
-  return { bundle, json, heights, bytes: Buffer.byteLength(text) };
+  mkdirSync(join(outDir, CITY_DIR), { recursive: true });
+  const city = ['city.json', 'city.bin'].map((name) => {
+    const into = join(outDir, CITY_DIR, name);
+    const bytes = readFileSync(join(dataDir, 'footprints', name));
+    if (!existsSync(into) || !bytes.equals(readFileSync(into))) writeFileSync(into, bytes);
+    return into;
+  });
+
+  return { bundle, json, heights, city, bytes: Buffer.byteLength(text) };
 }
 
 function main(): void {
@@ -85,6 +102,7 @@ function main(): void {
   );
   console.log(`wrote ${written.json} (${(written.bytes / 1024).toFixed(0)} kB)`);
   console.log(`wrote ${written.heights} (${bundle.terrain.header.nx} x ${bundle.terrain.header.ny} at ${bundle.terrain.header.spacing} m)`);
+  for (const path of written.city) console.log(`wrote ${path} (${(statSync(path).size / 1024).toFixed(0)} kB)`);
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === pathToFileURL(fileURLToPath(import.meta.url)).href) main();

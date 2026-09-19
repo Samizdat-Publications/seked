@@ -67,6 +67,7 @@ const OUT_DIR = join(DATA_DIR, 'footprints');
 const CACHE_DIR = join(REPO_ROOT, 'build', 'city');
 const CLIP = join(CACHE_DIR, 'open-buildings-v3-145-clip.csv');
 const FOOTPRINT_SOURCE = 'open-buildings-v3';
+const HEIGHT_SOURCE = 'open-buildings-25d-temporal';
 const PRESET = 'canonical';
 
 /**
@@ -995,6 +996,87 @@ export function fillHeight(
   return { height: median(small), medianMissingArea, medianMeasuredArea: median(caught) };
 }
 
+// --- The file -----------------------------------------------------------
+
+/** How far the boxes reach one way, without spreading a quarter of a million arguments over the stack. */
+function reach(boxes: readonly OrientedBox[], pick: (box: OrientedBox) => number, keep: (a: number, b: number) => number): number {
+  let best = pick(boxes[0] as OrientedBox);
+  for (const box of boxes) best = keep(best, pick(box));
+  return best;
+}
+
+const OUT_BIN = join(OUT_DIR, 'city.bin');
+const OUT_JSON = join(OUT_DIR, 'city.json');
+
+/**
+ * One record per building, in this order, little-endian float32. Seven
+ * numbers rather than an outline: where the box is, how big it is, which way
+ * it faces, how tall it is, and whether that height was measured or filled.
+ */
+export const CITY_RECORD = ['x', 'y', 'width', 'depth', 'yawDeg', 'height', 'measured'] as const;
+export const CITY_STRIDE = CITY_RECORD.length * 4;
+
+/**
+ * The side of the cell the records are sorted into, metres. A kilometre puts
+ * a few thousand buildings in each, which is a sensible thing to draw or to
+ * cull as one, and leaves about a hundred and fifty cells to list.
+ */
+export const CITY_CELL = 1000;
+
+/** Where one cell's records start and how many there are. */
+export interface CityCell {
+  x: number;
+  y: number;
+  from: number;
+  count: number;
+}
+
+/**
+ * Pack the boxes into the flat records, sorted by cell.
+ *
+ * The order is not an accident and the header says what it is: south to
+ * north by kilometre, west to east within that, and by easting inside a
+ * cell. So a reader that wants the near half of the city, or wants to cull
+ * the far half in one go, can take a run of records rather than sort a
+ * quarter of a million of them itself. Two runs over the same input write
+ * the same bytes, which is what makes the file worth committing.
+ */
+export function cityRecords(
+  boxes: readonly OrientedBox[],
+  heights: Float32Array,
+  fill: number,
+): { data: Float32Array; cells: CityCell[] } {
+  const cellX = (box: OrientedBox): number => Math.floor(box.x / CITY_CELL);
+  const cellY = (box: OrientedBox): number => Math.floor(box.y / CITY_CELL);
+  const order = boxes.map((_, i) => i).sort((p, q) => {
+    const a = boxes[p] as OrientedBox;
+    const b = boxes[q] as OrientedBox;
+    return cellY(a) - cellY(b) || cellX(a) - cellX(b) || a.x - b.x || a.y - b.y || p - q;
+  });
+  const data = new Float32Array(boxes.length * CITY_RECORD.length);
+  const cells: CityCell[] = [];
+  for (let n = 0; n < order.length; n++) {
+    const index = order[n] as number;
+    const box = boxes[index] as OrientedBox;
+    const height = heights[index] as number;
+    const measured = Number.isFinite(height);
+    const at = n * CITY_RECORD.length;
+    data[at] = box.x;
+    data[at + 1] = box.y;
+    data[at + 2] = box.width;
+    data[at + 3] = box.depth;
+    data[at + 4] = box.yawDeg;
+    data[at + 5] = measured ? height : fill;
+    data[at + 6] = measured ? 1 : 0;
+    const x = cellX(box) * CITY_CELL;
+    const y = cellY(box) * CITY_CELL;
+    const last = cells[cells.length - 1];
+    if (last && last.x === x && last.y === y) last.count += 1;
+    else cells.push({ x, y, from: n, count: 1 });
+  }
+  return { data, cells };
+}
+
 export async function main(): Promise<void> {
   mkdirSync(OUT_DIR, { recursive: true });
   const refresh = process.argv.includes('--refresh');
@@ -1067,6 +1149,115 @@ export async function main(): Promise<void> {
       `${fill.medianMeasuredArea.toFixed(0)} m2, and are drawn at ${fill.height.toFixed(1)} m, ` +
       'the median height the raster measured for buildings as small as they are',
   );
+
+  const { data, cells } = cityRecords(boxes, measured.heights, fill.height);
+  const binary = Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+  const round = (value: number, places = 2): number => Math.round(value * 10 ** places) / 10 ** places;
+  const header = {
+    context: true,
+    note:
+      'The modern city behind the plateau, drawn as context and never as evidence: nothing in it carries an ' +
+      'evidence tier and no claim may cite it. What is stored is the best-fit box of each imported outline and ' +
+      'not the outline itself, so a record is where a building is, how big it is, which way it faces and how ' +
+      'tall it is, and nothing about its shape is a measurement of that building.',
+    site: terrain.header.site,
+    script: 'scripts/city.ts',
+    sources: [FOOTPRINT_SOURCE, HEIGHT_SOURCE],
+    attribution:
+      'Outlines: Open Buildings, Google Research (CC BY 4.0 or ODbL). Heights: Open Buildings 2.5D Temporal, ' +
+      'Google Research (CC BY 4.0 or ODbL). Clipped, reduced to boxes and sampled by scripts/city.ts.',
+    preset: PRESET,
+    origin: terrain.header.origin,
+    frame: terrain.header.frame,
+    horizontalDatum: terrain.header.horizontalDatum,
+    projection: terrain.header.projection,
+    registration:
+      "None. The city is projected on the terrain's own tangent plane, from the same origin, so it stands on " +
+      'the ground the scene draws. scripts/footprints.ts fits OSM onto the three surveyed pyramids because ' +
+      'those footprints lie among the monuments; a block of flats four kilometres east neither can nor need be ' +
+      'placed to a metre.',
+    bbox: { south: BBOX[0], west: BBOX[1], north: BBOX[2], east: BBOX[3] },
+    extent: {
+      minX: round(reach(boxes, (box) => box.x, Math.min)),
+      maxX: round(reach(boxes, (box) => box.x, Math.max)),
+      minY: round(reach(boxes, (box) => box.y, Math.min)),
+      maxY: round(reach(boxes, (box) => box.y, Math.max)),
+    },
+    outlines: {
+      source: FOOTPRINT_SOURCE,
+      url: FOOTPRINT_ENDPOINTS[0],
+      sha256,
+      bytes: archiveBytes,
+      rowsInArchive: 13_308_407,
+      inBox: rows.length,
+      confidenceFloor: CONFIDENCE_FLOOR,
+      confidenceNote:
+        'A look choice: below about 0.7 the detections in this box are mostly field walls, canal banks and ' +
+        'shadow. It is the floor Open Buildings itself suggests as a starting point.',
+      belowFloor,
+      unreadable,
+      noRectangle: degenerate,
+      kept: boxes.length,
+      roofAreaM2: Math.round(roof),
+    },
+    heights: {
+      source: HEIGHT_SOURCE,
+      band: HEIGHT_BAND,
+      gateBand: PRESENCE_BAND,
+      gate: PRESENCE_GATE,
+      imageryYear: measured.year,
+      epsg: measured.epsg,
+      manifests: measured.manifests,
+      tiles: measured.tiles,
+      blocksRead: measured.blocks,
+      blocksInTiles: measured.blocksInTiles,
+      bytesRead: measured.bytesRead,
+      meanAbsoluteErrorM: HEIGHT_MAE,
+      errorNote:
+        'Stated by the dataset, not measured here: the 2.5D Temporal height band has a mean absolute error of ' +
+        `${HEIGHT_MAE} m and is capped at ${HEIGHT_CAP} m, and is only meaningful where the presence band agrees.`,
+      capM: HEIGHT_CAP,
+      atCap: measured.atCap,
+      samplesPerBuilding: SAMPLES_PER_BOX,
+      statistic:
+        'The median of the nine points on each roof whose presence band reached the gate. Nine rather than one ' +
+        'because the product is distributed at 0.5 m and is only good to about 4 m.',
+      measured: boxes.length - measured.ungated,
+      unmeasured: measured.ungated,
+      unmeasuredPresence: measured.presenceOfUngated,
+      unmeasuredDrawnAtM: round(fill.height, 1),
+      unmeasuredNote:
+        `A look choice, and the only one in a height here. The ${measured.ungated} buildings the presence band ` +
+        `would not vouch for are small, a median of ${round(fill.medianMissingArea)} m2 against ` +
+        `${round(fill.medianMeasuredArea)} m2 for the rest, and their median best presence was ` +
+        `${measured.presenceOfUngated} against a gate of ${PRESENCE_GATE}. They are drawn rather than dropped, ` +
+        'because leaving them out would thin the edge of the city exactly where the low sheds and yards are, ' +
+        'and they are drawn at the median height the raster measured for buildings as small as they are. Every ' +
+        'record that carries that height has measured = 0, so a reader can draw them differently or not at all.',
+    },
+    binary: {
+      file: 'city.bin',
+      dtype: 'float32',
+      byteOrder: 'little-endian',
+      record: CITY_RECORD,
+      units: 'metres, except yawDeg which is degrees counter-clockwise from east in [0, 180), and measured which is 1 or 0',
+      stride: CITY_STRIDE,
+      count: boxes.length,
+      sha256: createHash('sha256').update(binary).digest('hex'),
+    },
+    cells: {
+      size: CITY_CELL,
+      note:
+        'The records are sorted by cell, south to north, west to east within a row, and by easting inside a ' +
+        'cell, so a reader can take a run of records for a region rather than sorting them itself. Each entry ' +
+        'is the cell corner in metres, the first record in it, and how many.',
+      list: cells.map((cell) => [cell.x, cell.y, cell.from, cell.count]),
+    },
+  };
+  writeFileSync(OUT_BIN, binary);
+  writeFileSync(OUT_JSON, `${JSON.stringify(header, null, 1)}\n`);
+  console.log(`wrote ${OUT_BIN} (${(binary.byteLength / 1e6).toFixed(1)} MB, ${boxes.length.toLocaleString()} records of ${CITY_STRIDE} bytes)`);
+  console.log(`wrote ${OUT_JSON} (${(statSync(OUT_JSON).size / 1024).toFixed(0)} kB, ${cells.length} cells)`);
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === pathToFileURL(fileURLToPath(import.meta.url)).href) {

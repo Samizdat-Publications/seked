@@ -1,6 +1,17 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { DATA_DIR, loadDatabase } from '@seked/data';
 import { describe, expect, it } from 'vitest';
 import {
   BBOX,
+  CITY_RECORD,
+  CITY_STRIDE,
+  CONFIDENCE_FLOOR,
+  HEIGHT_CAP,
+  HEIGHT_MAE,
+  PRESENCE_GATE,
+  cityRecords,
   boxCorners,
   convexHull,
   fillHeight,
@@ -273,5 +284,112 @@ describe('the raster the heights come out of', () => {
     expect(fill.height).toBe(3);
     // The measured ones are 10, 20, 200 and 300 m2, whose middle pair is 20 and 200.
     expect(fill.medianMeasuredArea).toBe(20);
+  });
+});
+
+describe('the file the import writes', () => {
+  it('sorts the records into cells, south to north and west to east', () => {
+    const box = (x: number, y: number): OrientedBox => ({ x, y, width: 4, depth: 3, yawDeg: 0 });
+    const boxes = [box(1500, 1500), box(-10, -10), box(300, 20), box(20, 30)];
+    const heights = new Float32Array([12, Number.NaN, 4, 5]);
+    const { data, cells } = cityRecords(boxes, heights, 8);
+    expect(data).toHaveLength(boxes.length * CITY_RECORD.length);
+    // The cell at -1000, -1000 comes first, then the two in 0, 0 by easting,
+    // then the one a kilometre north-east.
+    expect([...data.filter((_, i) => i % CITY_RECORD.length === 0)]).toEqual([-10, 20, 300, 1500]);
+    expect(cells).toEqual([
+      { x: -1000, y: -1000, from: 0, count: 1 },
+      { x: 0, y: 0, from: 1, count: 2 },
+      { x: 1000, y: 1000, from: 3, count: 1 },
+    ]);
+  });
+
+  it('fills the height of a building the raster missed, and says that it did', () => {
+    const boxes: OrientedBox[] = [{ x: 0, y: 0, width: 4, depth: 3, yawDeg: 45 }];
+    const { data } = cityRecords(boxes, new Float32Array([Number.NaN]), 8);
+    expect([...data]).toEqual([0, 0, 4, 3, 45, 8, 0]);
+    const measured = cityRecords(boxes, new Float32Array([17.5]), 8);
+    expect([...measured.data]).toEqual([0, 0, 4, 3, 45, 17.5, 1]);
+  });
+});
+
+describe('the city as it stands in data/footprints', () => {
+  const dir = join(DATA_DIR, 'footprints');
+  const header = JSON.parse(readFileSync(join(dir, 'city.json'), 'utf8')) as {
+    context: boolean;
+    sources: string[];
+    binary: { count: number; stride: number; record: string[]; sha256: string; byteOrder: string };
+    heights: { measured: number; unmeasured: number; gate: number; meanAbsoluteErrorM: number; capM: number; imageryYear: number; unmeasuredDrawnAtM: number };
+    outlines: { kept: number; confidenceFloor: number };
+    cells: { size: number; list: number[][] };
+  };
+  const bytes = readFileSync(join(dir, 'city.bin'));
+  const records = new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4);
+  const field = (i: number, name: string): number => records[i * header.binary.record.length + header.binary.record.indexOf(name)] as number;
+
+  it('is the binary its own header describes', () => {
+    expect(header.binary.byteOrder).toBe('little-endian');
+    expect(header.binary.stride).toBe(CITY_STRIDE);
+    expect(header.binary.record).toEqual([...CITY_RECORD]);
+    expect(bytes.byteLength).toBe(header.binary.count * CITY_STRIDE);
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe(header.binary.sha256);
+  });
+
+  it('is context, and cites the two datasets it came from', () => {
+    expect(header.context).toBe(true);
+    expect(header.sources).toEqual(['open-buildings-v3', 'open-buildings-25d-temporal']);
+    const known = new Set(loadDatabase().sources.map((source) => source.id));
+    for (const source of header.sources) expect(known.has(source), `${source} is not in sources.json`).toBe(true);
+  });
+
+  it('accounts for every building, measured or filled', () => {
+    expect(header.outlines.kept).toBe(header.binary.count);
+    expect(header.heights.measured + header.heights.unmeasured).toBe(header.binary.count);
+    expect(header.outlines.confidenceFloor).toBe(CONFIDENCE_FLOOR);
+    expect(header.heights.gate).toBe(PRESENCE_GATE);
+    expect(header.heights.meanAbsoluteErrorM).toBe(HEIGHT_MAE);
+    expect(header.heights.capM).toBe(HEIGHT_CAP);
+    let filled = 0;
+    for (let i = 0; i < header.binary.count; i++) {
+      if (field(i, 'measured') === 0) {
+        filled += 1;
+        expect(field(i, 'height')).toBe(header.heights.unmeasuredDrawnAtM);
+      }
+    }
+    expect(filled).toBe(header.heights.unmeasured);
+  });
+
+  it('holds boxes a viewer can draw without checking them', () => {
+    for (let i = 0; i < header.binary.count; i += 97) {
+      expect(field(i, 'width')).toBeGreaterThanOrEqual(field(i, 'depth'));
+      expect(field(i, 'depth')).toBeGreaterThan(0);
+      expect(field(i, 'yawDeg')).toBeGreaterThanOrEqual(0);
+      expect(field(i, 'yawDeg')).toBeLessThan(180);
+      expect(field(i, 'height')).toBeGreaterThan(0);
+      expect(field(i, 'height')).toBeLessThanOrEqual(HEIGHT_CAP);
+    }
+  });
+
+  it('has a cell table that agrees with the order of the records', () => {
+    let counted = 0;
+    for (const [x, y, from, count] of header.cells.list as [number, number, number, number][]) {
+      counted += count;
+      for (const i of [from, from + count - 1]) {
+        expect(field(i, 'x')).toBeGreaterThanOrEqual(x);
+        expect(field(i, 'x')).toBeLessThan(x + header.cells.size);
+        expect(field(i, 'y')).toBeGreaterThanOrEqual(y);
+        expect(field(i, 'y')).toBeLessThan(y + header.cells.size);
+      }
+    }
+    expect(counted).toBe(header.binary.count);
+  });
+
+  it('leaves the three pyramids alone, because the city is not the necropolis', () => {
+    // Nothing Open Buildings detected stands inside the Great Pyramid's base.
+    let inside = 0;
+    for (let i = 0; i < header.binary.count; i++) {
+      if (Math.abs(field(i, 'x')) < 115 && Math.abs(field(i, 'y')) < 115) inside += 1;
+    }
+    expect(inside).toBe(0);
   });
 });
