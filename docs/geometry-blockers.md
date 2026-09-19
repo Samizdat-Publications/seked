@@ -503,20 +503,34 @@ actually GPU-bound, which after stage 5 it is not.
 
    Open from stage 6, in the order they matter:
 
-   1. **The green's per-fragment cost in the modern stops.** `today` runs 97
-      to 192 fps at 1601 by 900 across the five hero looks against a bar of
-      100. The city is nearly free (dawn 189 before it, 192 after) and the
-      river was ruled out by hiding it, which made the night stand faster.
-      What is left is the green: `greenFor` now gives the modern stops a
-      non-zero strength, so a shader that used to return at its first line on
-      every ground fragment runs in full over the plateau's grid and the
-      desert ring both. The leads are that the valley's `upland` is zero, so
-      its mottle is dead arithmetic, and that a fragment more than `dryMetres`
-      above the water is provably zero before the mask is sampled.
-   2. **`built` and `ancient` were not measured after the valley landed**, and
-      the ring takes the green in those stops too. No number could be taken:
-      this environment cannot hold a browser window in the foreground and
-      Chrome throttles an occluded one to about one frame a second.
+   1. **The green's per-fragment cost in the modern stops. Answered
+      2026-09-19: there is no such cost.** Holding the camera still and
+      flipping `greenStrength` to zero in the live uniforms moves nothing at
+      today's harbour (157 to 162 with the green, 149 to 158 without) or at
+      built's (53 to 55 against 52 to 54), and an early return for the modern
+      stops' provably-zero fragments was written, measured three ways and
+      taken out again. The desert ring's whole geometry is worth about four
+      frames a second. The ground shader is not what the modern stops pay for.
+
+      **What the look for it found instead is the green never following the
+      timeline at all**, fixed in b3c519d: `applyGreen` made a fresh uniform
+      object on every call, three only calls `onBeforeCompile` when it has to
+      build a program, so every stop after the first wrote into an object
+      nothing read again. The plateau drew `built`'s dry scrub in every state
+      and the desert ring the modern valley's cultivation in every state, the
+      First Time included, from stage 3 to here. The same shape of fault is
+      latent in `casing.ts` and `stone.ts`.
+   2. **`built` and `ancient` measured, 2026-09-19, and the regression was a
+      unit and not a cost.** The browser can be held in the foreground after
+      all: a fresh Chrome under the Chrome DevTools MCP, its window sized so
+      the drawing buffer is 1601 by 900, counts honestly. At that buffer, over
+      the five hero looks: `today` 158 to 195, `built` 59 to 103, `ancient` 48
+      to 80, against bars of 100 and 45. Stage 5's `built` at 110 to 192 was
+      taken at a 2400 by 1350 buffer, 2.25 times the pixels, and is not the
+      same measurement; `scripts/frames.md` now says to print the buffer with
+      every number, which is what would have caught it. A state change also
+      wants five seconds to settle, not two: two reads `built` at dawn as 13
+      when it is 62.
    3. **The ground east of the plateau reads near black under a low sun**
       (17, 33, 47 at the panorama stand at 16:00; 116, 146, 160 at midsummer
       noon). It predates this stage. It is not a hole and not a shader patch,
