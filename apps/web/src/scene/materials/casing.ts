@@ -73,6 +73,43 @@ const LOOK = {
   blockLength: 1.7,
   blockTone: 0.07,
   fade: [140, 340] as const,
+  /**
+   * Weathering on the finished casing, and the reason it is here.
+   *
+   * Everything else this shader draws is at the scale of a block: a joint two
+   * centimetres wide, a course 0.7 m high, a block 1.7 m long. From the dawn
+   * hero stand the camera is about 760 m from the Great Pyramid, where a
+   * course is a fraction of a pixel; the joints are faded out by then on
+   * purpose, because a line no pixel can hold only shimmers, and the block
+   * tone is a hash evaluated per fragment, so a pixel spanning many blocks
+   * averages it away. The far sample in `stone.ts` is supposed to be what is
+   * left, but `sandy_gravel` was chosen for being fine and even and has
+   * almost no low-frequency content to enlarge. The sum of all that was a
+   * cased pyramid that rendered as two flat tones with a hard edge between
+   * them (found 2026-09-19 from the hero stand).
+   *
+   * What survives distance is variation larger than a pixel, so that is what
+   * this adds. The scale it has to sit in is set by the picture, not by the
+   * stone: at the dawn stand the Great Pyramid's face is about 400 px tall
+   * for 230 m of slope, so a pixel is roughly 0.6 m and a feature has to be
+   * some metres across to read at all. Under about 5 m it mips into an even
+   * tone; over about 20 m it stops reading as surface and becomes a gradient
+   * across the face, which is what a first try at 46 m did: it lit the
+   * pyramid unevenly instead of weathering it. So `metres` is the middle of
+   * that band and the octaves work down from it.
+   *
+   * `streak` stretches the finest octave down the face, which is the way rain
+   * marks a wall. `banding` is the other half, and it is the one that makes a
+   * cased face read as masonry rather than as a painted triangle: the courses
+   * of a pyramid are not uniform, they were laid in batches of similar height
+   * and colour, so a face seen from far off shows broad horizontal bands
+   * where a course group changes. `bandCourses` is how many courses go in a
+   * band. Both are drawn from the course table, so the banding lands on real
+   * course boundaries even though how dark it is, is a choice.
+   *
+   * Every number here is a look choice and none is a measurement.
+   */
+  weather: { metres: 19, amount: 0.15, streak: 4.0, banding: 0.5, bandCourses: 7 },
   built: { roughness: 0.32, clearcoat: 0.18, clearcoatRoughness: 0.14 },
   ancient: { roughness: 0.26, clearcoat: 0.25, clearcoatRoughness: 0.07 },
 } as const;
@@ -172,6 +209,11 @@ export function applyCasing(material: MeshPhysicalMaterial, { courses, pristine 
     shader.uniforms.casingBlockLength = { value: LOOK.blockLength };
     shader.uniforms.casingBlockTone = { value: LOOK.blockTone };
     shader.uniforms.casingFade = { value: [LOOK.fade[0], LOOK.fade[1]] };
+    shader.uniforms.casingWeatherMetres = { value: LOOK.weather.metres };
+    shader.uniforms.casingWeather = { value: LOOK.weather.amount };
+    shader.uniforms.casingStreak = { value: LOOK.weather.streak };
+    shader.uniforms.casingBanding = { value: LOOK.weather.banding };
+    shader.uniforms.casingBandCourses = { value: LOOK.weather.bandCourses };
 
     shader.vertexShader = after(shader.vertexShader, 'common', CASING_VARYINGS);
     shader.vertexShader = after(
@@ -220,6 +262,11 @@ uniform float casingJointDark;
 uniform float casingBlockLength;
 uniform float casingBlockTone;
 uniform vec2 casingFade;
+uniform float casingWeatherMetres;
+uniform float casingWeather;
+uniform float casingStreak;
+uniform float casingBanding;
+uniform float casingBandCourses;
 uniform float casingCorona;
 uniform vec3 casingCoronaColour;
 uniform float casingCoronaReach;
@@ -243,6 +290,53 @@ float sekedCasingHash(vec3 cell) {
   return fract(sin(dot(cell, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
 }
 
+/* Smooth value noise on a lattice, the same shape the stone's patches use. */
+float sekedCasingNoise(vec3 p) {
+  vec3 i = floor(p);
+  vec3 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float n000 = sekedCasingHash(i + vec3(0.0, 0.0, 0.0));
+  float n100 = sekedCasingHash(i + vec3(1.0, 0.0, 0.0));
+  float n010 = sekedCasingHash(i + vec3(0.0, 1.0, 0.0));
+  float n110 = sekedCasingHash(i + vec3(1.0, 1.0, 0.0));
+  float n001 = sekedCasingHash(i + vec3(0.0, 0.0, 1.0));
+  float n101 = sekedCasingHash(i + vec3(1.0, 0.0, 1.0));
+  float n011 = sekedCasingHash(i + vec3(0.0, 1.0, 1.0));
+  float n111 = sekedCasingHash(i + vec3(1.0, 1.0, 1.0));
+  return mix(
+    mix(mix(n000, n100, f.x), mix(n010, n110, f.x), f.y),
+    mix(mix(n001, n101, f.x), mix(n011, n111, f.x), f.y),
+    f.z
+  );
+}
+
+/*
+ * Weathering large enough to survive the distance the hero stands look from.
+ *
+ * Three octaves on the pyramid's own frame, so the pattern belongs to the
+ * building and does not swim when the camera moves. The finest is stretched
+ * down the face by casingStreak, which is what rain running off a dressed
+ * wall leaves. Centred on zero so it darkens and lightens about the stone's
+ * own tone rather than only darkening it.
+ */
+float sekedCasingWeather(float course) {
+  vec3 p = vCasingObject / max(casingWeatherMetres, 1.0);
+  float broad = sekedCasingNoise(p);
+  float mid = sekedCasingNoise(p * 2.7 + 11.7);
+  // The streak is stretched down the face rather than across it, so it runs
+  // the way water runs. Stretching means dividing the vertical, not
+  // multiplying it: a taller cell is a longer streak.
+  vec3 s = vec3(p.xy * 4.3, p.z * 4.3 / max(casingStreak, 1.0)) + 37.2;
+  float fine = sekedCasingNoise(s);
+  // The course group. Hashed on the band index, so every course in a band
+  // shares a tone and the change falls on a course boundary.
+  float band = sekedCasingHash(vec3(floor(course / max(casingBandCourses, 1.0)), 7.0, 3.0)) - 0.5;
+  float noise = (broad * 0.34 + mid * 0.42 + fine * 0.24) - 0.5;
+  // The noise is three averaged lattices, so its spread is well under a half;
+  // the gain puts it back to about the same swing as the banding.
+  return noise * 2.1 + band * casingBanding;
+}
+
 vec3 sekedCasing(vec3 colour) {
   float h = vCasingObject.z;
   float fade = 1.0 - smoothstep(casingFade.x, casingFade.y, length(vCasingWorld - cameraPosition));
@@ -261,7 +355,11 @@ vec3 sekedCasing(vec3 colour) {
   float vertical = 1.0 - smoothstep(0.0, max(half_, fwidth(along)), edge);
   float joint = max(horizontal, vertical) * fade;
   float tone = sekedCasingHash(vec3(floor(t), course, northSouth));
-  return colour * (1.0 - casingBlockTone * tone) * (1.0 - casingJointDark * joint);
+  // The weathering does not take the distance fade: it is the one term here that is
+  // meant to be read from a kilometre, and it is what keeps the face from
+  // going flat once the joints have gone.
+  float weather = 1.0 + casingWeather * sekedCasingWeather(course);
+  return colour * weather * (1.0 - casingBlockTone * tone) * (1.0 - casingJointDark * joint);
 }
 
 // The corona's light on the stone under it. The top course is the last texel
