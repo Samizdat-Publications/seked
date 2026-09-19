@@ -24,6 +24,7 @@ import { Props } from './Props';
 import { Standins } from './Standins';
 import { Sand } from './Sand';
 import { Trench } from './Trench';
+import { City } from './City';
 import { Desert, Plateau, type DesertProps, type TerrainProps } from './Terrain';
 import { Vegetation } from './Vegetation';
 import { Water } from './Water';
@@ -117,6 +118,7 @@ export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: S
           <Sand terrain={terrain} clippingPlanes={groundPlanes} />
           <Water env={model.env} terrain={terrain} clippingPlanes={groundPlanes} />
           <Vegetation terrain={terrain} clippingPlanes={groundPlanes} />
+          <City terrain={terrain} desert={desert} clippingPlanes={planes} />
         </FadeScope>
         {/* Names whatever the pointer rests on; draws nothing itself. */}
         <Hover />
