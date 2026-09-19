@@ -488,5 +488,35 @@
     "kept": false,
     "note": "Track E: the two entrances in the east front of Khafre's valley temple, read off Hoelscher's Blatt XVII and cut into the wall. 2.416 m and 2.329 m wide, 14.11 m north and 14.60 m south of the footprint's centroid, seen from over the harbour at 09:00.",
     "bytes": 3951541
+  },
+  {
+    "file": "2026-09-19T22-36-34Z--dawn--98faa64-dirty.png",
+    "taken": "2026-09-19T22:36:34+00:00",
+    "view": "dawn",
+    "commit": "98faa64",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Baseline for the hero-views turn: the cased Great Pyramid renders as two flat tones with a hard edge, because every surface term the casing has is at the scale of a block and the stand is 760 m out.",
+    "bytes": 3988382
+  },
+  {
+    "file": "2026-09-19T22-36-35Z--dawn--98faa64-dirty.png",
+    "taken": "2026-09-19T22:36:35+00:00",
+    "view": "dawn",
+    "commit": "98faa64",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The same stand after 1561a6a: three octaves of weathering in the pyramid's own frame plus a tone per course group, sized to the 5 to 20 m band that survives this distance.",
+    "bytes": 3993249
+  },
+  {
+    "file": "2026-09-19T22-36-35Z--panorama--98faa64-dirty.png",
+    "taken": "2026-09-19T22:36:35+00:00",
+    "view": "panorama",
+    "commit": "98faa64",
+    "tree": "dirty",
+    "kept": false,
+    "note": "The panorama stand with 1561a6a and 98faa64 in: raking December light, and the false shadow the low sun drew across Khufu's south face is gone.",
+    "bytes": 3879410
   }
 ]
