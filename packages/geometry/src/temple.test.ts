@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { insetRing, type Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
 import {
-  annulusMesh, batterInset, centredOpening, colonnadeMesh, courtColonnadeMesh, DOORWAY, edgeFacing, type Opening, PILLAR,
+  annulusMesh, batterInset, centredOpening, colonnadeMesh, courtColonnadeMesh, DOORWAY, edgeFacing, type Opening, PILLAR, recordedOpenings,
   planPillars, planPrefix, pointInRing, ROOF_THICKNESS, TEMPLE_BATTER_DEG, TEMPLE_BUILT_HEIGHT_KEY,
   TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh, walledMesh, WALL_THICKNESS,
 } from './temple';
@@ -532,5 +532,120 @@ describe('courtColonnadeMesh', () => {
   it('builds nothing where no whole pillar fits, and nothing for a zero-height court', () => {
     expect(courtColonnadeMesh([[0, 0], [1, 0], [1, 1], [0, 1]], 0, 6, {})).toBeUndefined();
     expect(courtColonnadeMesh(inner, 6, 6, {})).toBeUndefined();
+  });
+});
+
+/**
+ * Track E's first reading, and the two things it broke on the way in.
+ *
+ * `walledMesh` took the first opening it found on an edge and dropped the
+ * rest, so a temple with two doorways in one front came out with one. And
+ * `edgeFacing` picked a 1.66 m segment of a 45.8 m front, because OSM traces
+ * a straight wall as eight, so no opening fitted anywhere.
+ */
+describe('two openings in one wall', () => {
+  const inner = insetRing(RING, WALL_THICKNESS);
+  const two: Opening[] = [
+    { edge: 0, from: 0.15, to: 0.25, head: 6 },
+    { edge: 0, from: 0.6, to: 0.72, head: 6 },
+  ];
+  const run = Math.hypot((RING[1] as [number, number])[0] - (RING[0] as [number, number])[0],
+                         (RING[1] as [number, number])[1] - (RING[0] as [number, number])[1]);
+
+  it('cuts both, and the hole is the sum of the two', () => {
+    const solid = annulusMesh(RING, inner, 0, 10) as Mesh;
+    const holed = walledMesh(RING, inner, 0, 10, two) as Mesh;
+    const cut = meshVolume(solid) - meshVolume(holed);
+    const want = two.reduce((s, o) => s + (o.to - o.from) * run * o.head * WALL_THICKNESS, 0);
+    expect(cut).toBeCloseTo(want, 3);
+  });
+
+  it('leaves the solid closed, which is what a jamb between two doors risks', () => {
+    const holed = walledMesh(RING, inner, 0, 10, two) as Mesh;
+    expect(wellFormed(holed)).toBe(true);
+    // The real test: every edge walked twice, once each way, keyed on
+    // position because each quad carries its own vertices.
+    const at = (n: number): string =>
+      [holed.positions[n * 3], holed.positions[n * 3 + 1], holed.positions[n * 3 + 2]]
+        .map((x) => (x as number).toFixed(4)).join(',');
+    const seen = new Map<string, number>();
+    for (let i = 0; i < holed.indices.length; i += 3) {
+      for (let k = 0; k < 3; k++) {
+        const a = holed.indices[i + k] as number;
+        const b = holed.indices[i + ((k + 1) % 3)] as number;
+        seen.set(`${at(a)}|${at(b)}`, (seen.get(`${at(a)}|${at(b)}`) ?? 0) + 1);
+      }
+    }
+    for (const [key, count] of seen) {
+      const [u, v] = key.split('|') as [string, string];
+      expect(seen.get(`${v}|${u}`) ?? 0, key).toBe(count);
+    }
+  });
+
+  it('treats two openings that overlap as one, rather than cutting the jamb away', () => {
+    const overlapping: Opening[] = [
+      { edge: 0, from: 0.2, to: 0.5, head: 6 },
+      { edge: 0, from: 0.4, to: 0.7, head: 6 },
+    ];
+    const solid = annulusMesh(RING, inner, 0, 10) as Mesh;
+    const holed = walledMesh(RING, inner, 0, 10, overlapping) as Mesh;
+    expect(wellFormed(holed)).toBe(true);
+    // Only the first survives: 0.3 of the run, not 0.5 of it.
+    const cut = meshVolume(solid) - meshVolume(holed);
+    expect(cut).toBeCloseTo(0.3 * run * 6 * WALL_THICKNESS, 3);
+  });
+
+  it('still equals annulusMesh with nothing to cut', () => {
+    const plain = walledMesh(RING, inner, 0, 10, []) as Mesh;
+    const annulus = annulusMesh(RING, inner, 0, 10) as Mesh;
+    expect(plain.positions).toEqual(annulus.positions);
+  });
+});
+
+describe('recordedOpenings', () => {
+  /** A front traced as four collinear segments, as OSM traces a real one. */
+  const FRONT: [number, number][] = [
+    [-20, -20], [20, -20], [20, -8], [20, 4], [20, 12], [20, 20], [-20, 20],
+  ];
+  const temple = (): Footprint =>
+    ({ id: 'somebody.valley_temple', name: 'x', kind: 'prism', group: 'temples', base: 0, height: 12, area: 0, ring: FRONT });
+  const ENV_TWO = {
+    'somebody_valley_temple.entrance.north.centre.north': 12,
+    'somebody_valley_temple.entrance.north.width': 3,
+    'somebody_valley_temple.entrance.south.centre.north': -12,
+    'somebody_valley_temple.entrance.south.width': 2.5,
+  };
+
+  it('merges the front first, so an opening is not too wide for its own segment', () => {
+    const { ring, openings } = recordedOpenings(temple(), ENV_TWO, 12);
+    expect(ring).toHaveLength(4);
+    expect(openings).toHaveLength(2);
+    expect(new Set(openings.map((o) => o.edge)).size).toBe(1);
+  });
+
+  it('puts each one where the record says, to the width the record says', () => {
+    const { ring, openings } = recordedOpenings(temple(), ENV_TWO, 12);
+    const e = (openings[0] as Opening).edge;
+    const a = ring[e] as [number, number];
+    const b = ring[(e + 1) % ring.length] as [number, number];
+    const run = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    const northingOf = (o: Opening) => a[1] + (b[1] - a[1]) * ((o.from + o.to) / 2);
+    const widths = openings.map((o) => (o.to - o.from) * run);
+    const norths = openings.map(northingOf);
+    expect(widths.map((w) => Math.round(w * 1000) / 1000).sort()).toEqual([2.5, 3]);
+    expect(norths.map((n) => Math.round(n)).sort((x, y) => x - y)).toEqual([-12, 12]);
+  });
+
+  it('builds nothing for a temple the database records no entrance for', () => {
+    expect(recordedOpenings(temple(), {}, 12).openings).toEqual([]);
+  });
+
+  it('drops a record that would run off the end of its own front', () => {
+    const off = { ...ENV_TWO, 'somebody_valley_temple.entrance.north.centre.north': 19.8 };
+    expect(recordedOpenings(temple(), off, 12).openings).toHaveLength(1);
+  });
+
+  it('gives a wall too low for a head no opening at all', () => {
+    expect(recordedOpenings(temple(), ENV_TWO, 0).openings).toEqual([]);
   });
 });

@@ -18,7 +18,7 @@
  */
 
 import type { Environment } from './environment';
-import { footprintMesh, footprintSpan, insetRing, ringCentroid, type Footprint } from './footprints';
+import { footprintMesh, footprintSpan, insetRing, mergeCollinear, ringCentroid, type Footprint } from './footprints';
 import { mergeMeshes } from './mastaba';
 import type { Mesh } from './mesh';
 
@@ -432,7 +432,17 @@ export function templePlanMesh(f: Footprint, env: Environment, state: 'whole' | 
   };
 
   const parts: TemplePart[] = [];
-  const outer = annulusMesh(f.ring, inner, bottom, top);
+  // The entrances the plate records, where the database has them. A temple
+  // with none keeps a solid outer wall, which is what every plan-driven
+  // temple had before 2026-09-19.
+  // The entrances are cut in the whole states only, for the reason
+  // `templeMesh` gives for its own door: how far a ruined wall stands is
+  // already a look choice, and a lintel drawn over a stub would be a claim
+  // that the lintel survived it. The record says where the doorways are, not
+  // how much of them was left.
+  const { ring: front, openings: doors } =
+    state === 'whole' ? recordedOpenings(f, env, height) : { ring: mergeCollinear(f.ring), openings: [] };
+  const outer = walledMesh(front, insetRing(front, WALL_THICKNESS), bottom, top, doors);
   if (outer === undefined) return undefined;
   parts.push({ name: 'wall.outer', material: 'core', mesh: outer });
 
@@ -492,6 +502,13 @@ export function templePlanMesh(f: Footprint, env: Environment, state: 'whole' | 
     `${plan.prefix}.statue.<n>.east and .north. Walls to ${source}. Look choices: walls ${WALL_THICKNESS} m ` +
     `thick, the hall lined ${HALL_LINING} m in granite, plinths ${PLINTH.width} by ${PLINTH.depth} by ` +
     `${PLINTH.height} m, the mass round the hall squared off to the outline's own bounding box` +
+    (doors.length === 0
+      ? state === 'whole'
+        ? ', and no entrance, the database recording none for this temple'
+        : ', and no entrance drawn, because a ruin is at a look choice of a height and a lintel over a stub would be a claim about the lintel'
+      : `, and ${doors.length} ${doors.length === 1 ? 'entrance' : 'entrances'} in the east front on ` +
+        `${plan.prefix}.entrance.<name>.centre.north and .width, whose heads are the look choice ` +
+        `${DOORWAY.height} m because a plan carries no heights`) +
     (state === 'whole' ? `, and a flat roof slab ${ROOF_THICKNESS} m thick.` : `, and ${TEMPLE_RUIN_FRACTION} of the height as the ruin.`);
 
   return { parts, hall, label };
@@ -565,6 +582,65 @@ export function centredOpening(ring: readonly Xy[], edge: number, height: number
   if (!(head > 0)) return undefined;
   return { edge: edge % ring.length, from: 0.5 - share / 2, to: 0.5 + share / 2, head };
 }
+
+/**
+ * The entrances a plan actually records, as openings on the edge they are in.
+ *
+ * `centredOpening` above puts one door in the middle of a wall because that
+ * is all a massing knows. A temple somebody has read a plate for knows
+ * better, and Khafre's valley temple is the one so far: Hoelscher's Blatt
+ * XVII draws two entrances in its east front, neither of them central, and
+ * both are now in the database as a width and a distance north of the
+ * footprint's own centroid.
+ *
+ * So this is the plan-driven half of Track A. It reads every
+ * `<prefix>.entrance.<name>.centre.north` that has a `.width` beside it and
+ * turns the pair into an opening on the edge whose middle faces east, by
+ * projecting the recorded northing onto that edge. A temple with no such
+ * record gets nothing from here and keeps its one centred door.
+ *
+ * What the plate does not give is the head: Blatt XVII is a plan, and a plan
+ * has no heights in it. So the head is `DOORWAY.height` as everywhere else,
+ * which is a look choice and is named as one in the label. An opening taller
+ * than the wall it is cut through is dropped by `walledMesh`, which is how a
+ * ruin at a quarter of its height ends up with no doorway without anybody
+ * deciding that it should.
+ */
+export function recordedOpenings(f: Footprint, env: Environment, height: number): { ring: Xy[]; openings: Opening[] } {
+  // The front is walked on the merged ring, not the traced one: see
+  // `mergeCollinear`, and the note there about the eight segments OSM lays
+  // down the east front of Khafre's valley temple.
+  const ring = mergeCollinear(f.ring);
+  const prefix = planPrefix(f.id);
+  const [cx, cy] = ringCentroid(ring);
+  const edge = edgeFacing(ring, [cx + 1e6, cy]);
+  const a = ring[edge % ring.length] as Xy;
+  const b = ring[(edge + 1) % ring.length] as Xy;
+  const run = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const head = Math.min(DOORWAY.height, height * 0.8);
+  if (!(run > 0) || !(head > 0)) return { ring, openings: [] };
+
+  const openings: Opening[] = [];
+  for (const name of ENTRANCES) {
+    const north = env[`${prefix}.entrance.${name}.centre.north`];
+    const width = env[`${prefix}.entrance.${name}.width`];
+    if (north === undefined || width === undefined || !(width > 0)) continue;
+    // Where that northing falls along the edge. The edge is near north-south
+    // and may be wound either way, so the recorded point is projected onto it
+    // rather than assumed to run with its parameter.
+    const px = cx;
+    const py = cy + north;
+    const along = (px - a[0]) * (b[0] - a[0]) + (py - a[1]) * (b[1] - a[1]);
+    const centre = along / (run * run);
+    const half = width / 2 / run;
+    if (!(centre - half > 0) || !(centre + half < 1)) continue;
+    openings.push({ edge: edge % ring.length, from: centre - half, to: centre + half, head });
+  }
+  return { ring, openings };
+}
+
+/** The names an entrance record may be filed under, in the order they are cut. */
+export const ENTRANCES = ['north', 'south'] as const;
 
 /**
  * The wall of `annulusMesh` with rectangular openings cut through it.
@@ -670,15 +746,29 @@ export function walledMesh(
     .sort((a, b) => a - b);
 
   for (let i = 0; i < n; i++) {
-    const hole = cuts.find((o) => o.edge === i);
-    const headZ = hole ? bottom + hole.head : bottom;
-    const runs = hole
-      ? [
-          { from: 0, to: hole.from, base: bottom },
-          { from: hole.to, to: 1, base: bottom },
-          { from: hole.from, to: hole.to, base: headZ },
-        ]
-      : [{ from: 0, to: 1, base: bottom }];
+    // Several openings may share an edge, and on this plateau two of them do:
+    // Hoelscher's Blatt XVII draws two entrances in the one east front of
+    // Khafre's valley temple. Until 2026-09-19 this took the first opening it
+    // found on an edge and dropped the rest without a word, so the temple
+    // came out with one doorway and a volume that said so.
+    const holes = cuts
+      .filter((o) => o.edge === i)
+      .sort((a, b) => a.from - b.from)
+      .reduce<Opening[]>((kept, o) => {
+        // Two openings that overlap are one opening, and cutting both would
+        // take away the jamb between them. The later one is dropped.
+        const last = kept[kept.length - 1];
+        if (last === undefined || o.from >= last.to) kept.push(o);
+        return kept;
+      }, []);
+    const runs: { from: number; to: number; base: number }[] = [];
+    let walked = 0;
+    for (const hole of holes) {
+      if (hole.from > walked) runs.push({ from: walked, to: hole.from, base: bottom });
+      runs.push({ from: hole.from, to: hole.to, base: bottom + hole.head });
+      walked = hole.to;
+    }
+    if (walked < 1 || holes.length === 0) runs.push({ from: walked, to: 1, base: bottom });
     for (const run of runs) {
       if (!(run.to > run.from) || !(top > run.base)) continue;
       const left = cross(i, run.from);
@@ -703,19 +793,21 @@ export function walledMesh(
       const loB = face(i, right, run.base);
       quad(put(loB.out, run.base), put(loA.out, run.base), put(loA.in, run.base), put(loB.in, run.base));
     }
-    if (!hole) continue;
-    // The two reveals, footing to head, one facing each way into the opening.
-    // The lintel's own ends abut the jambs and need none.
-    for (const [t, inward] of [[hole.from, true], [hole.to, false]] as const) {
-      const at = cross(i, t);
-      const low = face(i, at, bottom);
-      const high = face(i, at, headZ);
-      const p0 = put(low.out, bottom);
-      const p1 = put(low.in, bottom);
-      const p2 = put(high.in, headZ);
-      const p3 = put(high.out, headZ);
-      if (inward) quad(p0, p1, p2, p3);
-      else quad(p3, p2, p1, p0);
+    // The two reveals of each opening, footing to head, one facing each way
+    // into it. The lintel's own ends abut the jambs and need none.
+    for (const hole of holes) {
+      const headZ = bottom + hole.head;
+      for (const [t, inward] of [[hole.from, true], [hole.to, false]] as const) {
+        const at = cross(i, t);
+        const low = face(i, at, bottom);
+        const high = face(i, at, headZ);
+        const p0 = put(low.out, bottom);
+        const p1 = put(low.in, bottom);
+        const p2 = put(high.in, headZ);
+        const p3 = put(high.out, headZ);
+        if (inward) quad(p0, p1, p2, p3);
+        else quad(p3, p2, p1, p0);
+      }
     }
   }
   const positions = new Float32Array(verts.length * 3);

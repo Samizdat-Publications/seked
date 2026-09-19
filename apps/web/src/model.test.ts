@@ -379,3 +379,87 @@ describe('the quay at the harbour front', () => {
     expect(quay.east - quay.west).toBeLessThan(4);
   });
 });
+
+/** Whether every edge of a surface is walked twice, once each way. Keyed on
+ * positions and not on indices, because `walledMesh` gives each quad its own
+ * vertices and an index would never match across two of them. */
+function unmatchedEdges(mesh: Mesh): number {
+  const at = (n: number): string =>
+    [mesh.positions[n * 3], mesh.positions[n * 3 + 1], mesh.positions[n * 3 + 2]]
+      .map((x) => (x as number).toFixed(4)).join(',');
+  const seen = new Map<string, number>();
+  for (let i = 0; i < mesh.indices.length; i += 3) {
+    for (let k = 0; k < 3; k++) {
+      const a = mesh.indices[i + k] as number;
+      const b = mesh.indices[i + ((k + 1) % 3)] as number;
+      seen.set(`${at(a)}|${at(b)}`, (seen.get(`${at(a)}|${at(b)}`) ?? 0) + 1);
+    }
+  }
+  let unmatched = 0;
+  for (const [key, count] of seen) {
+    const [u, v] = key.split('|') as [string, string];
+    if (count !== (seen.get(`${v}|${u}`) ?? 0)) unmatched++;
+  }
+  return unmatched;
+}
+
+/**
+ * Track E reaching the scene: the two entrances Hoelscher's Blatt XVII draws
+ * in the east front of Khafre's valley temple, read off the plate and cut
+ * into the one temple the database holds a plan for.
+ */
+describe("the two entrances of Khafre's valley temple", () => {
+  const model = buildModel(bundle, 'canonical', null);
+  const valley = (state: 'ancient' | 'built' | 'stripped' | 'today') =>
+    model.plateau.structures(state).temples.find((t) => t.id === 'khafre.valley_temple');
+  const outerOf = (state: 'ancient' | 'built' | 'stripped' | 'today') =>
+    valley(state)?.parts?.find((p) => p.name === 'wall.outer')?.mesh as Mesh;
+
+  it('reads all four records out of the environment', () => {
+    for (const side of ['north', 'south']) {
+      expect(model.env[`khafre_valley_temple.entrance.${side}.width`], side).toBeGreaterThan(2);
+      expect(model.env[`khafre_valley_temple.entrance.${side}.centre.north`], side).toBeDefined();
+    }
+    // They are symmetric about the footprint's own centroid to within half a
+    // metre, which nothing in the reading forced: the centroid is OSM's and
+    // the jambs are Hoelscher's.
+    const n = model.env['khafre_valley_temple.entrance.north.centre.north'] as number;
+    const s = model.env['khafre_valley_temple.entrance.south.centre.north'] as number;
+    expect(Math.abs(n + s)).toBeLessThan(0.5);
+  });
+
+  it('takes both of them out of the wall, not just the first', () => {
+    const width = (side: string) => model.env[`khafre_valley_temple.entrance.${side}.width`] as number;
+    const head = 5;
+    const wall = 4;
+    // The solid the same wall would be with nothing cut: the ruin states,
+    // scaled to the whole states' own height, are that wall.
+    const whole = meshVolume(outerOf('built'));
+    const want = (width('north') + width('south')) * head * wall;
+    expect(whole).toBeGreaterThan(0);
+    // Rebuilt without the records, the wall is heavier by exactly the two holes.
+    const bare = buildModel({ ...bundle, measurements: bundle.measurements.filter((m) => !m.key.includes('.entrance.')) }, 'canonical', null);
+    const solid = meshVolume(
+      bare.plateau.structures('built').temples.find((t) => t.id === 'khafre.valley_temple')?.parts?.find((p) => p.name === 'wall.outer')?.mesh as Mesh,
+    );
+    expect(solid - whole).toBeCloseTo(want, 1);
+  });
+
+  it('leaves the wall a closed solid with two holes in it', () => {
+    expect(unmatchedEdges(outerOf('built'))).toBe(0);
+    expect(unmatchedEdges(outerOf('today'))).toBe(0);
+  });
+
+  it('cuts them in the whole states and leaves a ruin alone', () => {
+    expect(valley('built')?.note).toContain('2 entrances in the east front');
+    expect(valley('ancient')?.note).toContain('2 entrances in the east front');
+    expect(valley('today')?.note).toContain('no entrance drawn');
+    expect(meshVolume(outerOf('built'))).toBeLessThan(meshVolume(outerOf('ancient')) + 1e-6);
+  });
+
+  it('names the records it built them from and the one choice it had to make', () => {
+    const note = valley('built')?.note ?? '';
+    expect(note).toContain('khafre_valley_temple.entrance.<name>.centre.north and .width');
+    expect(note).toContain('a plan carries no heights');
+  });
+});

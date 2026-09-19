@@ -478,5 +478,15 @@
     "kept": false,
     "note": "Stage 7: the architecture pass at the harbour stand. Red granite on the valley temples from the material table, the built quay along the harbour front, the roofed causeway climbing west.",
     "bytes": 5831548
+  },
+  {
+    "file": "2026-09-19T09-14-21Z--khafre-valley-temple-entrances--1bca3a1-dirty.png",
+    "taken": "2026-09-19T09:14:21+00:00",
+    "view": "khafre-valley-temple-entrances",
+    "commit": "1bca3a1",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Track E: the two entrances in the east front of Khafre's valley temple, read off Hoelscher's Blatt XVII and cut into the wall. 2.416 m and 2.329 m wide, 14.11 m north and 14.60 m south of the footprint's centroid, seen from over the harbour at 09:00.",
+    "bytes": 3951541
   }
 ]

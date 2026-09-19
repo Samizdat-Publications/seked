@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { footprintInputs, footprintMesh, footprintSpan, PIT_LIP, ringCentroid, triangulate, type Footprint } from './footprints';
+import { footprintInputs, footprintMesh, footprintSpan, mergeCollinear, PIT_LIP, ringCentroid, triangulate, type Footprint } from './footprints';
 import type { Mesh } from './mesh';
 import { meshVolume } from './mesh';
 
@@ -113,5 +113,48 @@ describe('footprintMesh', () => {
 
   it('builds nothing whose top is not above its bottom', () => {
     expect(footprintMesh(footprint(SQUARE, { height: 5, minHeight: 5 }), {})).toBeUndefined();
+  });
+});
+
+/**
+ * `mergeCollinear` exists because an edge is a unit of work: a doorway is cut
+ * along one, and OpenStreetMap traces a straight wall as several. Its whole
+ * contract is that it changes the ring and not the solid.
+ */
+describe('mergeCollinear', () => {
+  /** A square whose east side is traced as four collinear segments. */
+  const JAGGED: [number, number][] = [
+    [0, 0], [10, 0], [10, 2.5], [10, 5], [10, 7.5], [10, 10], [0, 10],
+  ];
+
+  it('drops a vertex that stands on the line between its neighbours', () => {
+    expect(mergeCollinear(JAGGED)).toEqual([[0, 0], [10, 0], [10, 10], [0, 10]]);
+  });
+
+  it('keeps a corner, however slight, once it is past the tolerance', () => {
+    const bent: [number, number][] = [[0, 0], [10, 0], [10.6, 5], [10, 10], [0, 10]];
+    expect(mergeCollinear(bent)).toHaveLength(5);
+    // The same bend is a straight line to a looser tolerance.
+    // That bend turns by 13.6 degrees, so it takes a tolerance past that.
+    expect(mergeCollinear(bent, 20)).toHaveLength(4);
+  });
+
+  it('moves no surface, which is the whole of why it is allowed', () => {
+    const solid = (ring: readonly [number, number][]) =>
+      meshVolume(footprintMesh({ id: 'x', name: 'x', kind: 'prism', group: 'temples', base: 0, height: 4, area: 0, ring: ring as [number, number][] }, {}) as Mesh);
+    expect(solid(mergeCollinear(JAGGED) as [number, number][])).toBeCloseTo(solid(JAGGED), 6);
+  });
+
+  it('leaves a triangle and a duplicate-free ring alone, and never returns less than a ring', () => {
+    const tri: [number, number][] = [[0, 0], [4, 0], [0, 4]];
+    expect(mergeCollinear(tri)).toEqual(tri);
+    // A ring that is entirely one straight line has no ring in it, so the
+    // traced one comes back rather than two points.
+    const line: [number, number][] = [[0, 0], [1, 0], [2, 0], [3, 0]];
+    expect(mergeCollinear(line)).toEqual(line);
+  });
+
+  it('drops a duplicate vertex, which is a zero-length edge', () => {
+    expect(mergeCollinear([[0, 0], [10, 0], [10, 0], [10, 10], [0, 10]])).toEqual([[0, 0], [10, 0], [10, 10], [0, 10]]);
   });
 });

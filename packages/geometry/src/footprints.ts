@@ -193,6 +193,57 @@ const MITRE_LIMIT = 4;
  * so a small or narrow traced outline is drawn in and never turned inside out.
  */
 /**
+ * How straight a run of edges has to be before it is treated as one, degrees.
+ * A LOOK CHOICE, and a small one: the eight segments OSM traces down the east
+ * front of Khafre's valley temple turn by 0.15 degrees at most.
+ */
+export const COLLINEAR_DEG = 1.5;
+
+/**
+ * A ring with its near-collinear vertices dropped.
+ *
+ * Geometrically this is a no-op: a vertex on the line between its neighbours
+ * adds nothing to the solid, and dropping it moves no surface. What it changes
+ * is the ring's parametrisation, and that matters wherever an edge is a unit
+ * of work. A doorway is cut along one edge, and the east front of Khafre's
+ * valley temple is a straight line that OpenStreetMap's tracer laid down as
+ * eight segments, three of them under two metres: no one of them is long
+ * enough to carry the 2.4 m entrance Hoelscher's plate records, so the
+ * opening was silently dropped. Merged, that front is one edge of 45.8 m and
+ * both entrances fit in it with room either side.
+ *
+ * The first vertex is kept, so a caller that has indexed the ring elsewhere
+ * can still find its way about. Rings of under four vertices come back
+ * untouched, there being nothing to merge that would leave a ring behind.
+ */
+export function mergeCollinear(ring: readonly Xy[], toleranceDeg = COLLINEAR_DEG): Xy[] {
+  const n = ring.length;
+  if (n < 4) return ring.map(([x, y]) => [x, y] as Xy);
+  const limit = Math.cos((toleranceDeg * Math.PI) / 180);
+  const out: Xy[] = [];
+  for (let i = 0; i < n; i++) {
+    const p = ring[(i + n - 1) % n] as Xy;
+    const q = ring[i] as Xy;
+    const r = ring[(i + 1) % n] as Xy;
+    const ax = q[0] - p[0];
+    const ay = q[1] - p[1];
+    const bx = r[0] - q[0];
+    const by = r[1] - q[1];
+    const la = Math.hypot(ax, ay);
+    const lb = Math.hypot(bx, by);
+    // A zero-length edge is a duplicate vertex, which is always droppable.
+    if (la === 0) continue;
+    if (lb === 0) {
+      out.push([q[0], q[1]]);
+      continue;
+    }
+    const straight = (ax * bx + ay * by) / (la * lb);
+    if (straight < limit) out.push([q[0], q[1]]);
+  }
+  return out.length >= 3 ? out : ring.map(([x, y]) => [x, y] as Xy);
+}
+
+/**
  * How far the ring's own centroid stands from its nearest edge, metres.
  *
  * This is what `insetRing` clamps against, pulled out so a caller can ask it.

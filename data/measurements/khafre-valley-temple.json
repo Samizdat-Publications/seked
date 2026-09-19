@@ -128,5 +128,53 @@
     "method": "scaled from plate",
     "note": "The westernmost pillar of the east-west arm whose red outline can be read whole on the scan, its centre at x 2347.5. With khafre_valley_temple.pillar.pitch.east it steps the row out east and west inside the hall, which is why the other pillars are not recorded one by one; the plate's pillars stand on a regular pitch and repeating the same interval as sixteen coordinates would be typing one number many times. The twenty-three statue sockets Hölscher draws in red along the hall's walls, the two east entrances and the north-south arm's own walls are not scaled here for want of time, only the north row's socket centres having been detected, at x 2103, 2238, 2361, 2484, 2609, 2739 and 2868 of the scan. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention.",
     "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.entrance.north.width",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 2.416,
+    "unit": "m",
+    "sigma": 0.2,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The clear width of the northern of the two entrances in the east front of Khafre's valley temple, between its jambs at y 789 and y 914 of the Heidelberg scan of Blatt XVII, 125 px. Both entrances were found the same way and neither was looked for where a book said it would be. The east wall was walked down the plate from the north corner to the south, and it is solid hatched masonry except at two places where a pale gap runs the whole depth of the wall block, from the hall out to the front face at x 3985. There are two such gaps and no others. Each has its northern jamb in surviving masonry, drawn as a drafted line at the foot of the hatching, and its southern jamb in Hoelscher's red ermittelter Grundriss, so one face of each doorway is surveyed and the other is his inference; the record says so rather than averaging the difference away. The jamb pixels are not eyeballed: a column of the scan 90 px wide (x 3870 to 3960), clear of the front face and of the hall, was profiled for luminance and for redness, and the jamb is the row where the drafted line is darkest or the red line reddest. Scaled against the plate's own Massstab, not against the registration. The metre bar's zero tick was found again today at x 697 and its 15 m tick at x 1474.5, within a pixel of the x 698 and x 1474 the stage 3 records establish, and those are kept so the two readings can be compared: 776 px for 15 m, 0.0193299 m per pixel. The registration's own scale is 0.0189118 m per pixel, 2.21 per cent smaller, because that fit splits the difference between the plate's rectangle and the traced outline; a length off this plate goes through the plate's bar and a position in the frame goes through the registration, which is why the two kinds of record here carry different sigmas. Sigma sums the pixel term 0.109 m (4 px at each end of a drafted line, through the bar), the drafting tolerance 0.075 m (half a millimetre on a sheet the scan's 198 dpi makes 1:151) and the shrinkage 0.53 per cent, which is what the cubit bar's 30 aegyptische Ellen give against a royal cubit of 0.5236 m. The check nothing forced: the two openings were read independently and come out 125 px and 120.5 px, which differ by 0.087 m, well inside the sigma; and their centres land 14.11 m north and 14.60 m south of the footprint's own centroid, so they are symmetric about it to within half a metre. The centroid is OSM's, the jambs are Hoelscher's, and nothing in the method ties them together.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.entrance.north.centre.north",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 14.11,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "How far north of the centroid of the temple's OSM footprint the northern entrance's centre line crosses the front face: the midpoint of the jambs at y 789 and y 914, taken on the front face at x 3985 and turned into the frame by the registration. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention: the registration's 1.398 m rms plus the pixel term 0.107 m and the drafting tolerance 0.075 m, and it is the registration and not the plate that limits this. Both entrances were found the same way and neither was looked for where a book said it would be. The east wall was walked down the plate from the north corner to the south, and it is solid hatched masonry except at two places where a pale gap runs the whole depth of the wall block, from the hall out to the front face at x 3985. There are two such gaps and no others. Each has its northern jamb in surviving masonry, drawn as a drafted line at the foot of the hatching, and its southern jamb in Hoelscher's red ermittelter Grundriss, so one face of each doorway is surveyed and the other is his inference; the record says so rather than averaging the difference away. The jamb pixels are not eyeballed: a column of the scan 90 px wide (x 3870 to 3960), clear of the front face and of the hall, was profiled for luminance and for redness, and the jamb is the row where the drafted line is darkest or the red line reddest.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.entrance.south.width",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": 2.329,
+    "unit": "m",
+    "sigma": 0.2,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "The clear width of the southern of the two entrances in the east front of Khafre's valley temple, between its jambs at y 2310 and y 2430.5 of the Heidelberg scan of Blatt XVII, 120.5 px. Everything else as khafre_valley_temple.entrance.north.width, which states the method, the scale and the check.",
+    "verified": false
+  },
+  {
+    "key": "khafre_valley_temple.entrance.south.centre.north",
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "value": -14.6,
+    "unit": "m",
+    "sigma": 1.6,
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "note": "How far north of the centroid of the temple's OSM footprint the southern entrance's centre line crosses the front face, which is negative because it is south of it: the midpoint of the jambs at y 2310 and y 2430.5, taken on the front face at x 3985. Frame, registration and sigma as khafre_valley_temple.entrance.north.centre.north.",
+    "verified": false
   }
 ]
