@@ -30,6 +30,7 @@ pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
 pnpm run footprints # re-import the plateau's lesser monuments from OSM into data/footprints/
+pnpm run city        # re-import the modern city from Open Buildings into data/footprints/city.* (1.3 GB streamed; caches in build/city/)
 pnpm claim -- "<prose>"      # put a claim in somebody's own words to the model; writes build/claims/ only, never data/ (ANTHROPIC_API_KEY in ~/.seked/keys.env)
 pnpm run deploy     # build the viewer, assemble site/, upload to Cloudflare Pages (https://seked.pages.dev); pnpm owns the bare `pnpm deploy`
 pnpm sky-bake       # bake the sun and the star dome into build/ for blender/render.py

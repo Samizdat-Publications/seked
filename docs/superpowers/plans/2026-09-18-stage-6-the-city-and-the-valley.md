@@ -37,10 +37,10 @@ New for this stage:
 
 ## The trunk (director, before the tracks branch)
 
-- [ ] `data/sources.json`: add `open-buildings-v3` and `open-buildings-25d-temporal`, each with its URL, licence (CC BY 4.0 or ODbL), the attribution the licence requires, and a note that the raw archives are cached outside the repo.
-- [ ] `.gitignore`: the footprint archive and the raster tiles under `build/city/`.
-- [ ] `data/structures.json` or its loader: a way to mark a group `context`, carrying no evidence tier, so `City.tsx` and the hover tag can read one flag rather than special-casing a name. Tests that a context group is refused an evidence tier and that no claim may reference one.
-- [ ] Commit: "Give the city somewhere to be context rather than evidence".
+- [x] `data/sources.json`: add `open-buildings-v3` and `open-buildings-25d-temporal`, each with its URL, licence (CC BY 4.0 or ODbL), the attribution the licence requires, and a note that the raw archives are cached outside the repo.
+- [x] `.gitignore`: the footprint archive and the raster tiles under `build/city/`.
+- [x] `data/structures.json` or its loader: a way to mark a group `context`, carrying no evidence tier, so `City.tsx` and the hover tag can read one flag rather than special-casing a name. Tests that a context group is refused an evidence tier and that no claim may reference one.
+- [x] Commit: "Give the city somewhere to be context rather than evidence".
 
 ---
 
