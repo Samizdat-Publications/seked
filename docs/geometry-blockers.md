@@ -416,11 +416,39 @@ could aim it at `data/`.
 
 Open from stage 5, in the order they matter:
 
-1. **Nobody has put a real proposal to the model.** There is no
-   `ANTHROPIC_API_KEY` in the environment or in `~/.seked/keys.env`, so
-   `pnpm claim -- --example 1`, the viewer's own round trip and the prompt's
-   token count are all still to be done. Everything behind the key is covered
-   by tests with a fake client, which is not the same thing.
+1. **A real proposal has now been put to the model, from the CLI.** The key
+   arrived in `~/.seked/keys.env` on 2026-09-19 and `pnpm claim` runs against
+   `claude-opus-5` for real; what that proves and what it does not is written
+   up under "The round trip" below. The viewer's own drawer is the half still
+   open, because it wants the key typed into its form and that is Stewart's
+   to type, not a session's to paste on his behalf.
+
+   **The round trip, 2026-09-19.** Two examples went to `claude-opus-5` for
+   real from the shell and came back graded, neither needing the repair pass.
+   Example 1, the four shafts against four stars at 2450 BCE, came back as P3
+   with four comparisons and four free choices, and three of the four inside
+   tolerance: Alnitak against the King's Chamber south shaft at -12.2', Sirius
+   at +14.9', Kochab at -14.3', and Thuban against the north shaft at +39.5',
+   outside it. That is the right answer and not a flattering one, which is the
+   point of grading a proposal with the same evaluator as a filed claim.
+   Example 3, the 1:43,200 hemisphere, came back as P4, all three comparisons
+   inside tolerance, and it left both sides as formulas rather than doing the
+   multiplication itself, which is what the prompt asks of it. The calls cost
+   182 tokens in, 29,350 written to the cache and 1,249 out for the first, and
+   154 in, 29,350 read from the cache and 787 out for the second. The context
+   the viewer's own bundle builds counts 27,577 tokens, which the skipped test
+   in `apps/web/src/runner.test.ts` prints when a key is in the environment.
+
+   Of the drawer, everything but the key is now confirmed live at
+   `localhost:5186`: the drawer opens on its key gate with the three notes
+   about where a key goes, and a `fetch` from the page to
+   `api.anthropic.com/v1/messages` carrying the SDK's own
+   `anthropic-dangerous-direct-browser-access` header and a deliberately
+   invalid key comes back 401 with `authentication_error` rather than failing
+   as a network error, so the browser is not blocked from the API by CORS and
+   the only untested thing left in that path is whether a real key is real.
+   That step is Stewart's: a session does not type somebody's API key into a
+   form on their behalf, however local the form.
 2. **Done 2026-09-19.** The levels that did nothing do something now, and it
    was not the shells: `khafre-seated` is a photogrammetric scan whose
    triangles barely share vertices, so the edge-collapse simplifier had almost
@@ -593,6 +621,12 @@ actually GPU-bound, which after stage 5 it is not.
    D the quay, E the plans nobody has read yet (Reisner's *Mycerinus*, the
    rest of Hoelscher's Blatt XVII), F the court's colonnade round its edge
    rather than a grid across its middle.
+
+   Landed overnight 2026-09-19: A, the east doorway cut through every temple
+   wall with its jambs on the batter (10ec9a5); C's corridor, the walls either
+   side of the causeway under its slab (97a7401, 08b5748). Reisner's
+   *Mycerinus* is now a source, `reisner-1931`, read from Digital Giza's PDF,
+   which carries a text layer and the twelve plans at the end of the volume.
 
 **Where this goes (Stewart, 2026-09-17).** The end is a fully 3D,
 realtime plateau in the web viewer, as beautiful as it can be made, in its

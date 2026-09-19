@@ -392,6 +392,15 @@
     "note": "Read from the PDF Digital Giza serves without a login, https://d1g9lvwdq3dcse.cloudfront.net/images/MFA-images/Giza/GizaImage/full/library/reisner_gn_books/giza_necropolis_1/giza_necropolis_1.pdf, which has a text layer. Page citations are Reisner's printed pages; the PDF's page index runs 48 ahead of them (index 460 is p. 412). Appendix A describes the core mastabas of the Western Field tomb by tomb. Read on 2026-09-16."
   },
   {
+    "id": "reisner-1931",
+    "kind": "survey",
+    "year": 1931,
+    "citation": "Reisner, G. A. (1931). Mycerinus: The Temples of the Third Pyramid at Giza. Cambridge, MA: Harvard University Press. Plans I to XII at the end of the volume, surveyed and drawn by the Harvard University-Museum of Fine Arts Expedition, 1906 to 1924.",
+    "url": "https://giza.fas.harvard.edu/pubdocs/130/full/",
+    "license": "Free to read from Harvard's Digital Giza",
+    "note": "Reisner's excavation report on Menkaure's pyramid temple, valley temple and queen's temple. Read from the PDF Digital Giza serves without a login, https://d1g9lvwdq3dcse.cloudfront.net/images/MFA-images/Giza/GizaImage/full/library/reisner_gn_books/mycerinus/reisner_mycerinus.pdf, 179 MB, 406 pages, with a text layer. Page citations are Reisner's printed pages; the PDF's page index runs 21 ahead of them (index 28 is p. 7), and the front matter is roman (index 16 is p. xvii). The list of illustrations at pp. xvii to xx names Plan I, the pyramid temple in plan and longitudinal section, and Plans VIII to X, the valley temple in plan and four sections, which are the drawings this project reads for Menkaure. The abbreviations at p. xxi give the materials Reisner writes in: c.b. crude-brick, 1st limestone, alab. alabaster. Fetched 2026-09-19 to build/plates/ (gitignored); nothing of the scan is committed, only figures taken from it."
+  },
+  {
     "id": "arce-sphinx-mapping-oc",
     "kind": "survey",
     "year": 2017,
