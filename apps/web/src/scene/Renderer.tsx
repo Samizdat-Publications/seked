@@ -40,8 +40,28 @@ const LOOK = {
     mapSize: 2048,
     /** Metres of slope-scaled offset. Large enough to kill acne on a face raking the sun. */
     bias: -0.0009,
-    /** Metres the shadow camera is pulled back, so a pyramid casts before it is in frustum. */
-    margin: 400,
+    /**
+     * Metres the shadow camera is pulled back, so a pyramid casts before it is
+     * in frustum.
+     *
+     * Up from 400 on 2026-09-19. At 400 the panorama stand drew a hard-edged
+     * wedge of false shadow across the lower half of the Great Pyramid's south
+     * face: a raycast from a point inside it towards the sun left the scene
+     * without meeting anything, so nothing was casting it. A low sun is what
+     * brings it out. The light travels nearly horizontally then, so the
+     * shadow camera's depth axis is nearly horizontal too, and a pyramid is
+     * 230 m across and 146 m tall along it; past the fitted box the depth
+     * comparison has nothing to read and comes back shadowed, which is why
+     * the edge is straight and why it is the edge of a box rather than the
+     * silhouette of anything. 1600 m clears the Great Pyramid with the sun
+     * down to about six degrees, which is below every stand here.
+     *
+     * It costs nothing measurable: the margin moves the near plane back and
+     * leaves the fitted width, so the texel density is the one the cascades
+     * already had. Over the dawn stand the near ground's spread went 11.45 to
+     * 11.43 and the mastaba field's 19.06 to 19.13, both means unchanged.
+     */
+    margin: 1600,
   },
 } as const;
 
