@@ -4,6 +4,7 @@ import {
   GROUND_FLAT_MARGIN,
   groundHeight,
   terrainGrid,
+  terrainRing,
   type GroundPyramid,
 } from './terrain';
 
@@ -105,5 +106,85 @@ describe('terrainGrid', () => {
   it('winds both triangles of a cell counter-clockwise seen from above', () => {
     const { context } = terrainGrid({ header, heights });
     expect([...context.indices.slice(0, 6)]).toEqual([0, 1, 4, 0, 4, 3]);
+  });
+});
+
+describe('terrainRing', () => {
+  /** A 21 by 21 grid at 100 m, spanning plus or minus 1000 m, every sample at 7 m. */
+  const header = { nx: 21, ny: 21, x0: -1000, y0: -1000, spacing: 100 };
+  const heights = new Float32Array(21 * 21).fill(7);
+
+  it('keeps every sample as a vertex and puts it where the header says', () => {
+    const ring = terrainRing({ header, heights, omitWithin: 500 });
+    expect(ring.vertexCount).toBe(21 * 21);
+    // The first sample is the south-west corner, the last the north-east.
+    expect([ring.positions[0], ring.positions[1], ring.positions[2]]).toEqual([-1000, -1000, 7]);
+    const last = (21 * 21 - 1) * 3;
+    expect([ring.positions[last], ring.positions[last + 1], ring.positions[last + 2]]).toEqual([1000, 1000, 7]);
+  });
+
+  it('takes the datum off every height', () => {
+    const ring = terrainRing({ header, heights, omitWithin: 500, datum: 2 });
+    for (let v = 2; v < ring.positions.length; v += 3) expect(ring.positions[v]).toBe(5);
+  });
+
+  it('leaves out the cells the fine grid covers, and keeps the rest', () => {
+    const whole = terrainRing({ header, heights, omitWithin: 0 });
+    expect(whole.triangleCount).toBe(20 * 20 * 2);
+    // omitWithin 500 less the 120 m overlap drops the cells wholly inside
+    // plus or minus 380, which at 100 m cells is the six by six block from
+    // -300 to 300. Nothing else goes.
+    const ring = terrainRing({ header, heights, omitWithin: 500 });
+    expect(ring.triangleCount).toBe((20 * 20 - 6 * 6) * 2);
+  });
+
+  it('draws the overlap, so the join lies under the finer grid', () => {
+    // Without the overlap the hole would reach 500 m; with it the cells
+    // between 380 and 500 are still drawn.
+    const ring = terrainRing({ header, heights, omitWithin: 500 });
+    const drawn = new Set<number>();
+    for (const i of ring.indices) drawn.add(i);
+    const at = (x: number, y: number): number => ((y - header.y0) / header.spacing) * header.nx + (x - header.x0) / header.spacing;
+    expect(drawn.has(at(400, 0))).toBe(true);
+    expect(drawn.has(at(0, -400))).toBe(true);
+    expect(drawn.has(at(0, 0))).toBe(false);
+  });
+
+  it('hangs a skirt on the boundary and leaves the heights alone', () => {
+    const plain = terrainRing({ header, heights, omitWithin: 500 });
+    const ring = terrainRing({ header, heights, omitWithin: 500, skirtTo: 5000 });
+    // One vertex per boundary sample: 2 * (nx - 1) + 2 * (ny - 1).
+    const edge = 2 * 20 + 2 * 20;
+    expect(ring.vertexCount).toBe(plain.vertexCount + edge);
+    // Two triangles per boundary segment, and the ring is closed.
+    expect(ring.triangleCount).toBe(plain.triangleCount + edge * 2);
+    // Every skirt vertex sits on the skirt's own square at the height of the
+    // sample it hangs from, which in this flat grid is 7 m throughout.
+    for (let v = plain.vertexCount; v < ring.vertexCount; v++) {
+      const x = ring.positions[v * 3] as number;
+      const y = ring.positions[v * 3 + 1] as number;
+      expect(Math.max(Math.abs(x), Math.abs(y))).toBeCloseTo(5000, 6);
+      expect(ring.positions[v * 3 + 2]).toBe(7);
+    }
+  });
+
+  it('carries each edge sample its own height out, not a level of its own', () => {
+    // A grid that falls away to the north-east, so no two boundary samples
+    // share a height and a skirt at one level would be caught.
+    const sloped = new Float32Array(21 * 21);
+    for (let j = 0; j < 21; j++) for (let i = 0; i < 21; i++) sloped[j * 21 + i] = i + 2 * j;
+    const plain = terrainRing({ header, heights: sloped, omitWithin: 500 });
+    const ring = terrainRing({ header, heights: sloped, omitWithin: 500, skirtTo: 5000 });
+    const heightsOut = new Set<number>();
+    for (let v = plain.vertexCount; v < ring.vertexCount; v++) heightsOut.add(ring.positions[v * 3 + 2] as number);
+    expect(heightsOut.size).toBeGreaterThan(1);
+    // The corner sample of the grid is its highest, and the skirt keeps it.
+    expect(Math.max(...heightsOut)).toBe(20 + 2 * 20);
+  });
+
+  it('never indexes past its own vertices', () => {
+    const ring = terrainRing({ header, heights, omitWithin: 500, skirtTo: 5000 });
+    for (const i of ring.indices) expect(i).toBeLessThan(ring.vertexCount);
+    expect(ring.indices.length).toBe(ring.triangleCount * 3);
   });
 });

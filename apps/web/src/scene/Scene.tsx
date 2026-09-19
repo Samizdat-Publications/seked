@@ -24,7 +24,7 @@ import { Props } from './Props';
 import { Standins } from './Standins';
 import { Sand } from './Sand';
 import { Trench } from './Trench';
-import { Plateau, type TerrainProps } from './Terrain';
+import { Desert, Plateau, type DesertProps, type TerrainProps } from './Terrain';
 import { Vegetation } from './Vegetation';
 import { Water } from './Water';
 
@@ -39,6 +39,7 @@ export interface SkyProps {
 export interface SceneProps {
   model: Model;
   terrain: TerrainProps;
+  desert: Omit<DesertProps, 'clippingPlanes'>;
   layers: Record<LayerId, boolean>;
   /** The overlay of the selected claim, where the viewer can draw it. */
   overlay: OverlaySpec | undefined;
@@ -66,7 +67,7 @@ const BACKGROUND = '#05070c';
  * whole group reconciles them, so no geometry is rewritten and a vertex in
  * the browser is the vertex in Blender.
  */
-export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProps): React.JSX.Element {
+export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: SceneProps): React.JSX.Element {
   const start = useRef(useView.getState().camera).current;
   // The observer is the Great Pyramid's own centre, which is where every sky
   // number in this project is reckoned from.
@@ -105,6 +106,7 @@ export function Scene({ model, terrain, layers, overlay, sky, epoch }: SceneProp
         {/* Everything the timeline changes dissolves between stops; the sky
             and the annotations outside the scope do not. */}
         <FadeScope>
+          <Desert {...desert} clippingPlanes={groundPlanes} />
           <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
           {layers.pyramids && <Pyramids pyramids={model.pyramids} observer={observer} clippingPlanes={planes} />}
           {layers.pyramids && <Structures massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}

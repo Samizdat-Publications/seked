@@ -1,5 +1,5 @@
 import type { TerrainHeader } from '@seked/data/browser';
-import { terrainGrid, type GroundPyramid } from '@seked/geometry';
+import { terrainGrid, terrainRing, type GroundPyramid } from '@seked/geometry';
 import { useEffect, useMemo, useRef } from 'react';
 import { Vector2, type MeshStandardMaterial, type Plane } from 'three';
 import { gridGeometry } from './geometry';
@@ -220,5 +220,82 @@ export function Plateau({ header, heights, datum, pyramids, context, ground, cli
         </mesh>
       )}
     </>
+  );
+}
+
+export interface DesertProps {
+  header: TerrainHeader;
+  heights: Float32Array;
+  /** Orthometric elevation of the Great Pyramid's base, which is z = 0 here. */
+  datum: number;
+  /**
+   * Half-extent of the fine grid, metres: the square this ring leaves out,
+   * because `Plateau` draws it. It is the fine header's own, not this one's.
+   */
+  omitWithin: number;
+  /** The section planes, or the keep-everything plane when the cut spares the ground. */
+  clippingPlanes: Plane[];
+}
+
+/**
+ * How far out the far grid's own edge is carried, metres. A LOOK CHOICE.
+ *
+ * The heightfield stops twelve kilometres out, and from a stand eighty metres
+ * up the true horizon is about thirty-two. Without the skirt that difference
+ * showed as a band of sky under the horizon right across the view, which a
+ * reader takes for the edge of the world, and it was three degrees tall
+ * before this ring existed at all. Thirty-five kilometres clears the horizon
+ * from any stand the viewer allows and stays inside the camera's own far
+ * plane. Nothing out there is measured: the skirt holds the last height the
+ * data gives and the air does the rest.
+ */
+export const HORIZON_METRES = 35000;
+
+/**
+ * The desert, the valley floor and the far horizon: the same Copernicus
+ * product over plus or minus twelve kilometres at sixty metres, with the fine
+ * grid's own square left out of it.
+ *
+ * It exists because the plateau's grid stops three kilometres out and the city
+ * behind it runs to ten. Without this the far half of Giza would stand on
+ * nothing and the horizon would be the fine grid's own straight edge four
+ * kilometres away. It is context in the plain sense: the same source, the same
+ * projection, no pyramid flattened into it and nothing cut out of it, drawn
+ * under everything else and hazed into the air like any distance.
+ *
+ * Beyond the data it is carried on as a flat skirt to `HORIZON_METRES`, so
+ * the world does not end in mid-air short of the horizon.
+ *
+ * It is a fixture of every state, so it does not dissolve with the timeline.
+ * Nor does it cast or receive the sun's shadows: it is all beyond the last
+ * cascade, and a cascade that reached it would be too coarse to show anything.
+ */
+export function Desert({ header, heights, datum, omitWithin, clippingPlanes }: DesertProps): React.JSX.Element {
+  const mesh = useMemo(
+    () => terrainRing({ header, heights, datum, omitWithin, skirtTo: HORIZON_METRES }),
+    [header, heights, datum, omitWithin],
+  );
+  const geometry = useMemo(() => gridGeometry(mesh), [mesh]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  // The plateau's own sand, its tile taken four times larger because this grid
+  // is seen from kilometres rather than from hundreds of metres, and its
+  // relief dropped for the same reason: a normal map at that distance is
+  // noise. A look choice, and the same photograph either way.
+  const sand = useStone('sand');
+  const gravel = useStone('gravel');
+  const material = useRef<MeshStandardMaterial>(null);
+  useEffect(() => {
+    if (!material.current) return;
+    applyStone(material.current, sand, { strength: 0.8, scale: 12, relief: 0.15, mix: gravel, mixMetres: 480 });
+  }, [sand, gravel]);
+  useEffect(() => {
+    if (material.current) applyAtmosphere(material.current);
+  });
+
+  return (
+    <mesh geometry={geometry} renderOrder={-2}>
+      <meshStandardMaterial ref={material} color="#a1927a" roughness={1} metalness={0} clippingPlanes={clippingPlanes} />
+    </mesh>
   );
 }

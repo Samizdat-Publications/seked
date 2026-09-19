@@ -32,7 +32,7 @@ import { STATES, sceneEpoch, stateById } from './view';
  * of them stay mounted, so the tour keeps its keys with the stage clear.
  */
 export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
-  const { bundle, heights } = loaded;
+  const { bundle, heights, farHeights } = loaded;
   const preset = useView((s) => s.preset);
   const cubit = useView((s) => s.cubit);
   const epochOverride = useView((s) => s.epoch);
@@ -86,6 +86,17 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
     () => ({ header, heights, datum, pyramids: model.pyramids }),
     [header, heights, datum, model.pyramids],
   );
+  // The desert beyond that grid: no pyramid is flattened into it, so it is
+  // rebuilt only when the bundle itself changes.
+  const desert = useMemo(
+    () => ({
+      header: bundle.farTerrain.header,
+      heights: farHeights,
+      datum,
+      omitWithin: ((header.nx - 1) * header.spacing) / 2,
+    }),
+    [bundle.farTerrain.header, farHeights, datum, header],
+  );
 
   // A proposed claim opens, reads and draws like a filed one, so the open
   // claim is looked for in both lists.
@@ -126,7 +137,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
   return (
     <div className="shell">
       <main className="stage">
-        <Scene model={model} terrain={terrain} layers={layers} overlay={overlay} sky={sky} epoch={epoch} />
+        <Scene model={model} terrain={terrain} desert={desert} layers={layers} overlay={overlay} sky={sky} epoch={epoch} />
       </main>
 
       <Caption epoch={epoch} claimId={selected} />
