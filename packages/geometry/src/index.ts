@@ -15,3 +15,4 @@ export * from './temple';
 export * from './enclosure';
 export * from './trench';
 export * from './water';
+export * from './city';
