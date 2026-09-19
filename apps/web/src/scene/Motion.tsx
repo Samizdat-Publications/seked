@@ -32,7 +32,7 @@ import { useMotion } from '../motion/store';
 import type { StateChange } from '../motion/types';
 import { useView } from '../store';
 import { resetDissolveSeconds, setDissolveSeconds } from './fade';
-import { measureFrames } from './frames';
+import { measureCost, measureFrames, type FrameCost } from './frames';
 
 /** The handle the console gets in development, and nothing in the app reads. */
 export interface SekedHandle {
@@ -43,6 +43,12 @@ export interface SekedHandle {
   r3f: typeof r3f;
   /** The one frame counter, so every rate this project quotes was taken the same way. */
   frames: typeof measureFrames;
+  /**
+   * What a frame costs to draw, in milliseconds. NOT VALIDATED: see the long
+   * note over `measureCost`, and do not quote a number from it until the
+   * three checks there have been run in a visible window.
+   */
+  cost: (frames?: number, runs?: number) => FrameCost;
 }
 
 declare global {
@@ -81,6 +87,15 @@ function meridianLookup(): (starId: string, epoch: number) => number | undefined
 export function Motion(): null {
   // The film draws its own frames and needs R3F's own store to do it, which
   // only something inside the Canvas can hand out (`film/handle.ts`).
+  //
+  // One thing to know before hunting this as a bug, because it was hunted as
+  // one on 2026-09-19: in a browser window nobody is looking at, `r3f()`
+  // comes back null on a freshly loaded page even with the scene apparently
+  // drawing. Nothing inside a Canvas runs until something forces a paint,
+  // and a hidden window is not painted, so this effect has not flushed yet.
+  // Take one screenshot and the handle is there. It is not the film's "no
+  // renderer" and it wants no belt-and-braces write from the frame loop; it
+  // wants a paint.
   const r3f = useStore();
   useEffect(() => {
     setR3F(r3f);
@@ -143,4 +158,39 @@ export function Motion(): null {
 // A handle for the console, in development only: the two stores and the hero
 // stands, so a sequence can be played by hand before the drawers that drive
 // it exist.
-if (import.meta.env.DEV) window.__seked = { motion: useMotion, view: useView, looks: LOOKS, r3f, frames: measureFrames };
+/**
+ * Step the renderer by hand and time it. The root and the sync point are
+ * found here rather than in `frames.ts`, so the measure itself stays a pure
+ * function of something that can be stepped and can be tested without a GPU.
+ */
+function costOfAFrame(frames = 60, runs = 3): FrameCost {
+  const root = r3f();
+  if (!root) throw new Error('cost: the scene is not mounted, so there is nothing to draw.');
+  const state = root.getState();
+  const gl = state.gl.getContext();
+  return measureCost(
+    {
+      // `false` is what makes this a measure of drawing. R3F's second
+      // argument runs the global effects, which here means every `useFrame`
+      // in the scene: the motion player, which writes the view store, which
+      // rebuilds the model. Stepping with them on timed 45 to 90 ms a frame
+      // and was timing a state rebuild, not a draw. With them off, and the
+      // same timestamp every time so nothing in the scene moves, what is
+      // left is the render.
+      advance: (timestamp) => state.advance(timestamp, false),
+      // `finish` blocks until the commands are drawn, which is what makes the
+      // timer measure drawing and not queueing. It returns whether there was
+      // a context to ask.
+      finish: () => {
+        gl.finish();
+        return true;
+      },
+    },
+    frames,
+    runs,
+  );
+}
+
+if (import.meta.env.DEV) {
+  window.__seked = { motion: useMotion, view: useView, looks: LOOKS, r3f, frames: measureFrames, cost: costOfAFrame };
+}

@@ -42,6 +42,26 @@ Every rate quoted in a track Q commit was taken this way and no other way.
    1601 by 900 the stage 6 tables were taken at, size the window to 1067 by 600
    and let the ratio do the rest; a reload resets it, so set it again after one.
 
+   **A hidden window runs nothing inside the Canvas at all**, which is worth
+   knowing before it is hunted as a bug. On 2026-09-19 `__seked.r3f()` came
+   back null on a freshly loaded page with the scene apparently drawing in
+   front of it, which reads exactly like the film's own "the film has no
+   renderer". Nothing inside a Canvas runs until something forces a paint,
+   and an unpainted window is not painted: take one screenshot and the handle
+   is there. The effect is not broken and wants no belt-and-braces write from
+   the frame loop; it wants a paint.
+
+   **There is a second measure now, and it is not validated.**
+   `__seked.cost(frames, runs)` steps the renderer by hand and times it,
+   which has no ceiling and needs no vertical blank, and is meant for the two
+   questions this counter cannot answer: a scene faster than the screen, and
+   a window nobody is looking at. It has tests round it and it has never been
+   shown to time a real frame: in a hidden pane it reported about 50 ms with
+   `gl.info.render` claiming one draw call, which is not this plateau. The
+   three checks it needs, all of which want a visible window, are written
+   over `measureCost` in `apps/web/src/scene/frames.ts`. Until they pass, no
+   number from it goes in a commit message.
+
 3. Put the view where the measure belongs: `__seked.view.getState()` to set
    the state, and a look's own `camera` and `moment` out of `__seked.looks`,
    exactly as the Views drawer sets them (`setMode('orbit')`, `showCamera`,
