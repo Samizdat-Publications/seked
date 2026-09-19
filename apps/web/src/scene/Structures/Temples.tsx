@@ -20,6 +20,12 @@
  * The tints and the photographed sets behind those names are in `cased.ts`,
  * which is where a look choice about a material belongs.
  *
+ * The roofs come off with the `roofs` layer, which is what a reader wants
+ * when the question is how a temple was laid out rather than how it looked
+ * from outside: a Fourth Dynasty mortuary temple's court is open to the sky
+ * with its colonnade round the edge, and with a slab over the whole plan
+ * there is nothing of that to see.
+ *
  * A temple the database holds a plan for arrives with `parts` instead, one
  * mesh per piece with the stone that piece takes, and is drawn from those:
  * the mass in its own stone and the hall's lining, pillars and statue plinths
@@ -43,11 +49,14 @@ export function Temples({
   temples,
   state,
   whole,
+  roofs,
   clippingPlanes,
 }: {
   temples: TempleStructure[];
   state: StateId;
   whole: boolean;
+  /** Whether the roof slabs are drawn. Off lifts them off and leaves the court and its colonnade in the open. */
+  roofs: boolean;
   clippingPlanes: Plane[];
 }): React.JSX.Element {
   return (
@@ -100,7 +109,7 @@ export function Temples({
               mesh={temple.walls}
               part="walls"
             />
-            {temple.roof && (
+            {temple.roof && roofs && (
               <Built
                 built={temple}
                 state={state}

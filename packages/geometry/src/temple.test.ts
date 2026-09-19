@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { insetRing, type Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
 import {
-  annulusMesh, batterInset, centredOpening, colonnadeMesh, DOORWAY, edgeFacing, type Opening, PILLAR,
+  annulusMesh, batterInset, centredOpening, colonnadeMesh, courtColonnadeMesh, DOORWAY, edgeFacing, type Opening, PILLAR,
   planPillars, planPrefix, pointInRing, ROOF_THICKNESS, TEMPLE_BATTER_DEG, TEMPLE_BUILT_HEIGHT_KEY,
   TEMPLE_RUIN_FRACTION, templeMesh, templePlan, templePlanMesh, walledMesh, WALL_THICKNESS,
 } from './temple';
@@ -461,5 +461,76 @@ describe('a temple with a way in', () => {
     ) as Mesh;
     expect(meshVolume(ruin.walls)).toBeCloseTo(meshVolume(plain), 4);
     expect(ruin.label).not.toContain('doorway');
+  });
+});
+
+/**
+ * Track F. The grid above fills the whole inside, which reads as a car park
+ * with the roof off. A court's colonnade stands round its edge and leaves the
+ * middle open, and these say so in a way that could not pass for the grid.
+ */
+describe('courtColonnadeMesh', () => {
+  const inner = insetRing(RING, WALL_THICKNESS);
+  const pillars = courtColonnadeMesh(inner, 0, 6, {}) as Mesh;
+  const centres = (): [number, number][] => {
+    const out: [number, number][] = [];
+    for (let i = 0; i < pillars.positions.length; i += 24) {
+      // Eight vertices a box, in a known order, so the first and the seventh
+      // are opposite corners of its plan.
+      const x = ((pillars.positions[i] as number) + (pillars.positions[i + 18] as number)) / 2;
+      const y = ((pillars.positions[i + 1] as number) + (pillars.positions[i + 19] as number)) / 2;
+      out.push([x, y]);
+    }
+    return out;
+  };
+
+  it('builds, and keeps every pillar wholly inside the court', () => {
+    expect(pillars).toBeDefined();
+    expect(wellFormed(pillars)).toBe(true);
+    for (let i = 0; i < pillars.positions.length; i += 3) {
+      const p: [number, number] = [pillars.positions[i] as number, pillars.positions[i + 1] as number];
+      expect(pointInRing(p, inner), `${p[0]}, ${p[1]}`).toBe(true);
+    }
+  });
+
+  it('leaves the middle of the court open, which the grid does not', () => {
+    const middle = insetRing(inner, PILLAR.pitch * 2.5);
+    const inside = centres().filter((c) => pointInRing(c, middle));
+    expect(inside).toEqual([]);
+
+    // The same court on the grid does put pillars in its middle: this is the
+    // difference the track is about, and not a property of this ring.
+    const grid = colonnadeMesh(inner, 0, 6, {}) as Mesh;
+    let gridInside = 0;
+    for (let i = 0; i < grid.positions.length; i += 24) {
+      const x = ((grid.positions[i] as number) + (grid.positions[i + 18] as number)) / 2;
+      const y = ((grid.positions[i + 1] as number) + (grid.positions[i + 19] as number)) / 2;
+      if (pointInRing([x, y], middle)) gridInside++;
+    }
+    expect(gridInside).toBeGreaterThan(0);
+  });
+
+  it('stands them about a pitch apart along the walk, and nowhere twice', () => {
+    const all = centres();
+    expect(all.length).toBeGreaterThan(7);
+    for (const [i, a] of all.entries()) {
+      for (const b of all.slice(i + 1)) expect(Math.hypot(a[0] - b[0], a[1] - b[1]), `${a} and ${b}`).toBeGreaterThan(PILLAR.across);
+    }
+    // Every pillar has a neighbour within a pitch and a bit, which is what
+    // "round the edge" means: a ring and not a scatter.
+    for (const a of all) {
+      const nearest = Math.min(...all.filter((b) => b !== a).map((b) => Math.hypot(a[0] - b[0], a[1] - b[1])));
+      expect(nearest, `${a}`).toBeLessThan(PILLAR.pitch * 1.6);
+    }
+  });
+
+  it('is cheaper than the grid it replaces, because a ring is not an area', () => {
+    const grid = colonnadeMesh(inner, 0, 6, {}) as Mesh;
+    expect(pillars.vertexCount).toBeLessThan(grid.vertexCount);
+  });
+
+  it('builds nothing where no whole pillar fits, and nothing for a zero-height court', () => {
+    expect(courtColonnadeMesh([[0, 0], [1, 0], [1, 1], [0, 1]], 0, 6, {})).toBeUndefined();
+    expect(courtColonnadeMesh(inner, 6, 6, {})).toBeUndefined();
   });
 });

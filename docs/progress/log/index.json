@@ -438,5 +438,25 @@
     "kept": false,
     "note": "Track B: Khafre's valley temple and the Sphinx Temple in red granite from the material table, seen from the north-east over the harbour, 2450 BCE, 09:00. The courses run the right way for the first time.",
     "bytes": 3982487
+  },
+  {
+    "file": "2026-09-19T07-22-19Z--khafre-mortuary-court-open--671eff0-dirty.png",
+    "taken": "2026-09-19T07:22:19+00:00",
+    "view": "khafre-mortuary-court-open",
+    "commit": "671eff0",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Track F: Khafre's mortuary temple from above with the new temple-roofs layer off. The colonnade stands round the court's edge, its walk set in by one pitch, and the middle of the court is open; before this a grid of pillars filled the whole inside.",
+    "bytes": 6653572
+  },
+  {
+    "file": "2026-09-19T07-22-19Z--khafre-mortuary-court-roofed--671eff0-dirty.png",
+    "taken": "2026-09-19T07:22:19+00:00",
+    "view": "khafre-mortuary-court-roofed",
+    "commit": "671eff0",
+    "tree": "dirty",
+    "kept": false,
+    "note": "Track F, the same stand with the roofs on, which is the pair to the open one.",
+    "bytes": 6586353
   }
 ]

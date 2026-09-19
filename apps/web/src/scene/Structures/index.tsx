@@ -49,6 +49,10 @@ export function Structures({
   clippingPlanes: Plane[];
 }): React.JSX.Element {
   const state = useView((s) => s.state);
+  // The one layer this folder reads for itself. Lifting the temple roofs off
+  // is how a reader sees a court and its colonnade, which is the whole point
+  // of laying the pillars round the edge rather than across the middle.
+  const roofs = useView((s) => s.layers.roofs);
   // Memoised on the model and the state: `plateau.structures` keeps one build
   // per state inside the closure the model made, and a new model makes a new
   // closure. Building a state costs about a tenth of a second, almost all of
@@ -64,7 +68,7 @@ export function Structures({
       ))}
       <Queens queens={structures.queens} env={env} state={state} whole={whole} clippingPlanes={clippingPlanes} />
       <Mastabas field={structures.mastabas} tombs={structures.tombs} env={env} state={state} whole={whole} clippingPlanes={clippingPlanes} />
-      <Temples temples={structures.temples} state={state} whole={whole} clippingPlanes={clippingPlanes} />
+      <Temples temples={structures.temples} state={state} whole={whole} roofs={roofs} clippingPlanes={clippingPlanes} />
       <Walls walls={structures.walls} enclosureWalls={structures.enclosureWalls} state={state} clippingPlanes={clippingPlanes} />
       <Causeway
         causeway={structures.causeway}

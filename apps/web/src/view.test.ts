@@ -133,6 +133,14 @@ describe('encodeView and decodeView', () => {
     expect(decoded.layers.terrain).toBe(true);
   });
 
+  it('round-trips the temple roofs off, which is how a court is looked at', () => {
+    const off = view({ layers: { ...DEFAULT_VIEW.layers, roofs: false } });
+    const decoded = decodeView(encodeView(off), PRESETS);
+    expect(decoded.layers.roofs).toBe(false);
+    expect(encodeView(off)).not.toContain('roofs');
+    expect(DEFAULT_VIEW.layers.roofs).toBe(true);
+  });
+
   it('round-trips a tour step', () => {
     const wanted = view({ tour: 5 });
     expect(decodeView(encodeView(wanted), PRESETS, TOUR_STEPS)).toEqual(wanted);

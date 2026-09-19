@@ -14,6 +14,7 @@ import type { Shot } from './motion/types';
 export const LAYERS = [
   { id: 'pyramids', label: 'Pyramids' },
   { id: 'interior', label: 'Interior' },
+  { id: 'roofs', label: 'Temple roofs' },
   { id: 'ground', label: 'Ground (flattened)' },
   { id: 'terrain', label: 'Terrain (GLO-30 context)' },
   { id: 'city', label: 'Modern city (context)' },
@@ -195,6 +196,7 @@ export const DEFAULT_VIEW: View = {
   layers: {
     pyramids: true,
     interior: true,
+    roofs: true,
     ground: true,
     terrain: false,
     city: true,

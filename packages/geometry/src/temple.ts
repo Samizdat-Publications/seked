@@ -160,6 +160,57 @@ export function colonnadeMesh(inner: readonly Xy[], bottom: number, top: number,
 }
 
 /**
+ * The colonnade of an open court: pillars standing round its edge, not a grid
+ * across its middle.
+ *
+ * `colonnadeMesh` above fills the whole inside on a grid, and with the roof
+ * hidden that reads as a car park rather than as a court. A Fourth Dynasty
+ * mortuary temple's court is open to the sky with a colonnade round its
+ * perimeter, the pillars carrying a roofed walk against the wall and the
+ * middle left empty, which is how the court at Khafre's mortuary temple and
+ * the portico at Menkaure's are laid out.
+ *
+ * So the pillars stand on the court's own outline drawn in by one pitch, and
+ * walk it edge by edge. Each edge is divided into whole steps as near the
+ * pitch as it can manage, which puts a pillar on every corner and none twice,
+ * and a pillar the inner ring cannot take whole is dropped, exactly as the
+ * grid drops one that would grow out of a wall.
+ *
+ * Every number is `PILLAR`, which is a look choice and is named as one in the
+ * temple's label. What the walk is set in by is the pitch itself: a colonnade
+ * stands about a bay off the wall it fronts, and inventing a second number
+ * for it would be a second look choice for nothing.
+ */
+export function courtColonnadeMesh(inner: readonly Xy[], bottom: number, top: number, env: Environment): Mesh | undefined {
+  if (!(top > bottom)) return undefined;
+  const walk = insetRing(inner, PILLAR.pitch);
+  const half = PILLAR.across / 2;
+  const parts: Mesh[] = [];
+  const n = walk.length;
+  let placed = 0;
+  for (let i = 0; i < n; i++) {
+    const [x0, y0] = walk[i] as Xy;
+    const [x1, y1] = walk[(i + 1) % n] as Xy;
+    const run = Math.hypot(x1 - x0, y1 - y0);
+    // One step per edge at least, so a short edge still carries its corner.
+    const steps = Math.max(1, Math.round(run / PILLAR.pitch));
+    for (let s = 0; s < steps; s++) {
+      const u = s / steps;
+      const x = x0 + (x1 - x0) * u;
+      const y = y0 + (y1 - y0) * u;
+      const corners: Xy[] = [[x - half, y - half], [x + half, y - half], [x + half, y + half], [x - half, y + half]];
+      if (!corners.every((c) => pointInRing(c, inner))) continue;
+      const part = box(`pillar.${i}.${s}`, x - half, y - half, x + half, y + half, bottom, top - bottom, env);
+      if (part !== undefined) {
+        parts.push(part);
+        placed++;
+      }
+    }
+  }
+  return placed === 0 ? undefined : mergeMeshes(parts);
+}
+
+/**
  * One temple, whole or ruined.
  *
  * `whole` stands the walls to `tier3.temple.height.built` where the database
@@ -209,7 +260,7 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
       ? `, a doorway ${DOORWAY.width} by ${door === undefined ? 0 : Math.round(door.head * 10) / 10} m in the ` +
         `east wall${door === undefined ? ' (none: the east wall is too short to carry one)' : ''}, a flat roof ` +
         `slab ${ROOF_THICKNESS} m thick, and a colonnade of ${PILLAR.across} m square pillars ` +
-        `at ${PILLAR.pitch} m pitch. Not a reconstruction of this temple: one massing height covers all six, ` +
+        `at ${PILLAR.pitch} m pitch round the court's edge, its walk set in by one pitch. Not a reconstruction of this temple: one massing height covers all six, ` +
         'and how any of them was walled, roofed or columned is not in the database.'
       : `, and ${TEMPLE_RUIN_FRACTION} of the height as the ruin. Not a reconstruction of this temple: one ` +
         'massing height covers all six, and how far any of them stands is not in the database.');
@@ -222,7 +273,7 @@ export function templeMesh(f: Footprint, env: Environment, state: 'whole' | 'rui
     { ...f, ring: head.map(([x, y]) => [x, y] as [number, number]), base: wallTop, height: ROOF_THICKNESS, heightKey: undefined, batterKey: undefined, bases: undefined },
     env,
   );
-  const pillars = colonnadeMesh(inner, span.bottom, wallTop, env);
+  const pillars = courtColonnadeMesh(inner, span.bottom, wallTop, env);
   const temple: Temple = { walls, label };
   if (roof !== undefined) temple.roof = roof;
   if (pillars !== undefined) temple.pillars = pillars;
