@@ -2426,3 +2426,65 @@ button.propose-example:disabled {
 .propose-keep summary:hover {
   color: var(--ink);
 }
+
+/* The invitation: the front door onto the stage.
+
+   It sits where the narration sits, in the same glass, because it is the same
+   kind of thing: words over the plateau rather than a panel beside it. Higher
+   up and wider than the narration band, since it is read once and at rest,
+   and it takes pointer events, which the narration deliberately does not. */
+.invitation {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  width: min(34rem, calc(100vw - 9rem));
+  transform: translate(-50%, -54%);
+  padding: 1.6rem 1.8rem 1.4rem;
+  background: var(--glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
+  border-radius: 1.1rem;
+  box-shadow: var(--lift);
+  text-align: center;
+}
+
+.invitation-body {
+  animation: narration-in 0.7s ease-out both;
+}
+
+.invitation-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.invitation-title {
+  margin: 0 0 0.6rem;
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 1.7rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.invitation-text {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.invitation-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.2rem 0 0;
+}

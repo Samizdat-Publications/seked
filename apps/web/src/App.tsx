@@ -14,6 +14,7 @@ import { Caption } from './ui/Caption';
 import { Drawer } from './ui/Drawer';
 import { Film } from './ui/Film';
 import { HoverTag } from './ui/HoverTag';
+import { Invitation } from './ui/Invitation';
 import { Narration } from './ui/Narration';
 import { Propose } from './ui/Propose';
 import { Rail } from './ui/Rail';
@@ -142,6 +143,7 @@ export function App({ loaded }: { loaded: LoadedBundle }): React.JSX.Element {
 
       <Caption epoch={epoch} claimId={selected} />
       <Narration />
+      <Invitation />
 
       <div className="instruments">
         <Timeline />
