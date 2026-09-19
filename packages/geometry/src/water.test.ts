@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildEnvironment } from './environment';
 import type { Footprint } from './footprints';
-import { LOOK, rectangleContains, valleyTempleFloor, waterExtent, waterLevel } from './water';
+import { LOOK, rectangleContains, riverBody, riverLevel, valleyTempleFloor, waterExtent, waterLevel } from './water';
 
 /**
  * Invented outlines, not measurements: two boxes standing in for the valley
@@ -121,5 +121,66 @@ describe('the dry states', () => {
   it('have no water at all', () => {
     expect(waterExtent(TEMPLES, ENV, 'stripped')).toBeUndefined();
     expect(waterExtent(TEMPLES, ENV, 'today')).toBeUndefined();
+  });
+});
+
+describe('riverLevel', () => {
+  /**
+   * An invented valley, not a measurement of anything: fields at -36 m with a
+   * flat channel five hundred metres wide at -46, which is the shape the real
+   * heightfield has east of Giza and the shape the percentile relies on.
+   */
+  const valley = (x: number): number => (x >= 8000 && x <= 8500 ? -46 : -36);
+  const box = { west: 3000, east: 11000, south: -4500, north: 7000 };
+
+  it('lands on the channel and not on the fields', () => {
+    expect(riverLevel(valley, box)).toBeCloseTo(-46 + LOOK.riverRiseMetres, 6);
+  });
+
+  it('stands the drawn surface clear of the model own water', () => {
+    expect(riverLevel(valley, box) - -46).toBeCloseTo(LOOK.riverRiseMetres, 6);
+  });
+
+  it('does not move while the channel is wider than the percentile', () => {
+    // The channel here is about six per cent of the box, so every percentile
+    // inside it gives the same level.
+    for (const percentile of [1, 3, 5]) {
+      expect(riverLevel(valley, box, 60, percentile), `p${percentile}`).toBeCloseTo(-46 + LOOK.riverRiseMetres, 6);
+    }
+    // Past the channel's own share it climbs onto the fields, which is the
+    // thing the fifth percentile is chosen to be inside.
+    expect(riverLevel(valley, box, 60, 30)).toBeCloseTo(-36 + LOOK.riverRiseMetres, 6);
+  });
+
+  it('reads whatever the ground says, with nothing typed', () => {
+    expect(riverLevel(() => -12, box)).toBeCloseTo(-12 + LOOK.riverRiseMetres, 6);
+  });
+
+  it('refuses a box with no samples in it rather than inventing a level', () => {
+    expect(() => riverLevel(valley, { west: 100, east: 0, south: 0, north: 0 })).toThrow(/no samples/);
+  });
+});
+
+describe('riverBody', () => {
+  it('is a surface with no bed of its own, like the flood plain', () => {
+    const body = riverBody(-45.7);
+    expect(body.kind).toBe('river');
+    expect(body.floor).toBe(body.level);
+    expect(body.level).toBe(-45.7);
+  });
+
+  it('covers the valley it was given', () => {
+    const box = { west: 3000, east: 11000, south: -4500, north: 7000 };
+    const body = riverBody(-45.7, box);
+    expect(rectangleContains(body.outline, 8200, 0)).toBe(true);
+    expect(rectangleContains(body.outline, 0, 0)).toBe(false);
+  });
+
+  it('says it is context, says where its level came from, and names its look choices', () => {
+    const label = riverBody(-45.7).label;
+    expect(label).toMatch(/Context, not evidence/);
+    expect(label).toMatch(/percentile of the valley/);
+    expect(label).toMatch(/Look choices/);
+    expect(label).toMatch(/-45\.70 m/);
   });
 });
