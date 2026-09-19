@@ -230,6 +230,80 @@ const SCATTER_LEVEL = 'scatter';
  */
 const SCATTER_ERRORS = [0.05, 0.2] as const;
 
+/**
+ * The errors a RATIO level may fall back through when the plan's own bound
+ * will not reach its ratio.
+ *
+ * The same fault the budget was invented for, in the place nobody looked for
+ * it next. A ratio and an error bound are two demands and the bound wins, so
+ * on a photogrammetric scan the coarse levels simply do not happen:
+ * `khafre-seated` came out with lod1 and lod2 both at 316,745 triangles
+ * against lod0's 359,327, and `boulder` at 62,272 against 66,122, which is a
+ * distance swap that swaps nothing and a prop that costs its finest level at
+ * every range (logged as a stage 5 leftover, fixed 2026-09-19).
+ *
+ * So a ratio level is now a demand too: `LOD_ERROR` is tried first, because
+ * where it reaches the ratio it is the most faithful, and where it does not
+ * the bound gives way. A statue seen from a hundred metres may lose a
+ * twentieth of its radius; a statue drawn at three hundred thousand triangles
+ * at that distance is drawn at a great many triangles a pixel.
+ */
+const LOD_ERRORS = [LOD_ERROR, 0.01, 0.05, 0.2] as const;
+
+/** How far past its ratio a level may land and still be taken as having reached it. */
+const LOD_TOLERANCE = 1.1;
+
+/**
+ * meshopt's sloppy simplifier, wearing the ordinary one's coat.
+ *
+ * The last resort, and why one is needed. `khafre-seated` is a photogrammetric
+ * scan whose triangles barely share vertices: welded and deduped it still
+ * loses only twelve per cent of its faces at an error bound of 0.2, because
+ * the ordinary simplifier collapses edges and there are hardly any edges to
+ * collapse, only islands. `simplifySloppy` does not collapse edges. It
+ * reclusters the surface in space and is allowed to change the topology, which
+ * is exactly what a scan of a statue seen from fifty metres can afford and a
+ * surveyed pyramid could not.
+ *
+ * It is only ever reached after `LOD_ERRORS` has failed, it is only used for
+ * the coarse levels, and it never touches anything in `data/`: a prop is a
+ * look choice standing where this repo says, and the shape of the scan behind
+ * it is the author's, not a measurement. `gltf-transform` asks its simplifier
+ * for `simplify`, so the swap is a wrapper and nothing else changes.
+ */
+const SLOPPY_SIMPLIFIER = {
+  ...MeshoptSimplifier,
+  /**
+   * The two take their arguments differently and the difference is one
+   * argument in the middle, so it is spelled out rather than forwarded:
+   * `simplify` is (indices, positions, stride, targetCount, error, flags),
+   * which is how `gltf-transform` calls it, and `simplifySloppy` is
+   * (indices, positions, stride, vertexLock, targetCount, error). Checked
+   * against the build rather than against the types, which disagree with it.
+   */
+  simplify(
+    indices: Uint32Array,
+    positions: Float32Array,
+    stride: number,
+    targetCount: number,
+    error: number,
+    _flags?: readonly string[],
+  ): [Uint32Array, number] {
+    const sloppy = MeshoptSimplifier.simplifySloppy as unknown as (
+      indices: Uint32Array,
+      positions: Float32Array,
+      stride: number,
+      vertexLock: Uint8Array | null,
+      targetCount: number,
+      error: number,
+    ) => [Uint32Array, number];
+    return sloppy(indices, positions, stride, null, targetCount, error);
+  },
+} as unknown as typeof MeshoptSimplifier;
+
+/** How far the sloppy pass may move the surface, as a share of the model's radius. A look choice. */
+const SLOPPY_ERROR = 0.05;
+
 /** Where the budgets live, which is the manifest the props are declared in and not the index the fetch writes. */
 const PROPS_MANIFEST = join(REPO_ROOT, 'blender', 'props.json');
 
@@ -460,12 +534,107 @@ async function scatterLevel(
     }
     console.log(`${id}: ${SCATTER_LEVEL} reached only ${reached} triangles at error ${error}, over the budget of ${budget}`);
   }
+  // The same last resort the ratio levels take, and the scatter level is the
+  // one that can most afford it: it is what a plant is drawn as from the far
+  // side of the plateau, where its silhouette is a few pixels across.
+  const clone = cloneDocument(doc);
+  await clone.transform(simplify({ simplifier: SLOPPY_SIMPLIFIER, ratio, error: SLOPPY_ERROR, lockBorder: false }));
+  const sloppy = triangleCount(clone);
+  if (sloppy < (best as { triangles: number }).triangles) {
+    console.log(`${id}: ${SCATTER_LEVEL} is ${sloppy} triangles of ${base} by the sloppy simplifier, budget ${budget}`);
+    return { doc: clone, triangles: sloppy };
+  }
   const reached = (best as { doc: Document; triangles: number }).triangles;
   console.log(
     `${id}: ${SCATTER_LEVEL} is ${reached} triangles of ${base} and misses the budget of ${budget}; `
-      + 'the simplifier will not go further on this topology',
+      + 'neither simplifier will go further on this topology',
   );
   return best as { doc: Document; triangles: number };
+}
+
+/**
+ * One ratio level: the finest level simplified toward `ratio` of its faces,
+ * with the error bound relaxed through `LOD_ERRORS` until the ratio is met
+ * within `LOD_TOLERANCE`. Where the plan's own bound reaches it, which is the
+ * ordinary case, nothing else is tried and the level is exactly what it was
+ * before this existed.
+ */
+async function ratioLevel(
+  doc: Document,
+  base: number,
+  ratio: number,
+  name: string,
+  id: string,
+): Promise<{ doc: Document; triangles: number }> {
+  const target = Math.max(1, Math.ceil(base * ratio));
+  let best: { doc: Document; triangles: number } | undefined;
+  for (const error of LOD_ERRORS) {
+    const clone = cloneDocument(doc);
+    await clone.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error }));
+    const reached = triangleCount(clone);
+    if (!best || reached < best.triangles) best = { doc: clone, triangles: reached };
+    if (reached <= target * LOD_TOLERANCE) {
+      if (error !== LOD_ERROR) {
+        console.log(`${id}: ${name} is ${reached} triangles of ${base}, asked for ${target}, at the relaxed error ${error}`);
+      }
+      return best;
+    }
+    console.log(`${id}: ${name} reached only ${reached} triangles at error ${error}, over the ${target} its ratio asks for`);
+  }
+  // The ordinary simplifier is out of moves. If this is a coarse level, let
+  // the sloppy one reshape the surface rather than ship a level that swaps
+  // nothing; if it is not, keep what the faithful pass reached.
+  if (name !== 'lod0') {
+    const clone = cloneDocument(doc);
+    await clone.transform(
+      simplify({ simplifier: SLOPPY_SIMPLIFIER, ratio, error: SLOPPY_ERROR, lockBorder: false }),
+    );
+    const sloppy = triangleCount(clone);
+    if (sloppy < (best as { triangles: number }).triangles) {
+      console.log(`${id}: ${name} is ${sloppy} triangles of ${base} by the sloppy simplifier, asked for ${target}`);
+      return { doc: clone, triangles: sloppy };
+    }
+  }
+  const reached = (best as { doc: Document; triangles: number }).triangles;
+  console.log(
+    `${id}: ${name} is ${reached} triangles of ${base} and misses the ${target} its ratio asks for; `
+      + 'neither simplifier will go further on this topology',
+  );
+  return best as { doc: Document; triangles: number };
+}
+
+/**
+ * A material that says it is transparent, over a texture with no alpha in it,
+ * is not transparent. It is an opaque material paying a transparent one's
+ * price.
+ *
+ * `island-tree`, the acacia stand-in, is the case this was written for: its
+ * leaves declare `BLEND` and their base colour is a three-channel JPEG, so
+ * every leaf draws fully opaque anyway, and draws in the sorted pass without
+ * writing depth, which is the one way to make a tree cost more than its
+ * triangles. The exporter's metadata simply did not match the textures it
+ * shipped beside it, and the baker believed it.
+ *
+ * So the alpha mode is set from what the texture actually carries. Nothing is
+ * invented: an alpha channel that is not there is not manufactured out of the
+ * colours, and a material whose base colour factor is itself transparent is
+ * left alone.
+ */
+async function tellTheTruthAboutAlpha(doc: Document, id: string): Promise<void> {
+  for (const material of doc.getRoot().listMaterials()) {
+    if (material.getAlphaMode() === 'OPAQUE') continue;
+    if ((material.getBaseColorFactor()[3] ?? 1) < 1) continue;
+    const texture = material.getBaseColorTexture();
+    const image = texture?.getImage();
+    if (!image) continue;
+    const meta = await sharp(Buffer.from(image)).metadata();
+    if (meta.hasAlpha) continue;
+    console.log(
+      `${id}: ${material.getName() || '(unnamed material)'} declared ${material.getAlphaMode()} over a `
+        + `${meta.channels}-channel ${meta.format} with no alpha in it; drawn opaque`,
+    );
+    material.setAlphaMode('OPAQUE');
+  }
 }
 
 /** What a prop's levels came to: the node names in order, the triangles in each, and the card's own triangles. */
@@ -492,11 +661,10 @@ async function lods(doc: Document, finest: number, budget: number | undefined, i
   const triangles: Record<string, number> = { lod0: base };
   const coarser: { name: string; doc: Document }[] = [];
   for (const [i, ratio] of LOD_RATIOS.slice(1).entries()) {
-    const clone = cloneDocument(doc);
-    await clone.transform(simplify({ simplifier: MeshoptSimplifier, ratio, error: LOD_ERROR }));
     const name = `lod${i + 1}`;
-    triangles[name] = triangleCount(clone);
-    coarser.push({ name, doc: clone });
+    const level = await ratioLevel(doc, base, ratio, name, id);
+    triangles[name] = level.triangles;
+    coarser.push({ name, doc: level.doc });
   }
   let card: CardPart[] | undefined;
   if (budget !== undefined) {
@@ -808,6 +976,7 @@ async function props(): Promise<void> {
       dropLoosePrimitives(doc, entry.id);
       if (entry.keep_nodes) keepNodes(doc, entry.keep_nodes, entry.id);
       await doc.transform(dedup(), flatten(), joinMeshes(), prune(), weld());
+      await tellTheTruthAboutAlpha(doc, entry.id);
       const scene = doc.getRoot().getDefaultScene() ?? (doc.getRoot().listScenes()[0] as Scene);
 
       // The measure, then the bake. Both read the same box, so a prop that

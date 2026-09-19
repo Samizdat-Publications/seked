@@ -421,15 +421,28 @@ Open from stage 5, in the order they matter:
    `pnpm claim -- --example 1`, the viewer's own round trip and the prompt's
    token count are all still to be done. Everything behind the key is covered
    by tests with a fake client, which is not the same thing.
-2. Two assets whose levels do nothing, the same fault track Q fixed for the
-   plants: `khafre-seated`'s lod1 and lod2 are both 316,745 triangles against
-   lod0's 359,327, and `boulder`'s are 62,272 against 66,122. That is
-   `Props.tsx`'s cost and it is not yet paid for.
-3. `island-tree`'s leaf material is `BLEND` with a three-channel JPEG, so the
-   leaves carry no alpha at all and draw as solid quads.
-4. The island tree and the date palm miss their triangle budgets (3,341
-   against 3,000; 5,090 against 2,500) because a frond and a leaf card are
-   separate shells and the simplifier will not collapse a shell's border.
+2. **Done 2026-09-19.** The levels that did nothing do something now, and it
+   was not the shells: `khafre-seated` is a photogrammetric scan whose
+   triangles barely share vertices, so the edge-collapse simplifier had almost
+   no edges to collapse and stopped at twelve per cent even with its error
+   bound at 0.2. A ratio level is now a demand like the scatter budget, with
+   the bound relaxed through `LOD_ERRORS` until it is met, and past that
+   `meshopt`'s sloppy simplifier is allowed to reshape a coarse level, which
+   collapses nothing and reclusters instead. `khafre-seated` lod1 316,745 to
+   88,917 and lod2 to 20,863; `island-tree` lod1 169,333 to 58,659 and lod2
+   169,160 to 14,625; `boulder` 62,272 to 16,258 and 3,873; `jackal` lod2 to
+   9,907; `date-palm` lod1 9,531 to 4,010. The statues alone were 7.3M
+   triangles a frame inside a building nobody can see into.
+3. **Done 2026-09-19, and there were three of them.** `island-tree`'s leaves,
+   `rooibos-bush`'s twigs and `shrub_02` all declared `BLEND` or `MASK` over a
+   three-channel JPEG with no alpha in it, so they drew fully opaque anyway
+   and paid the sorted pass and the lost depth write for nothing. The baker
+   now reads the texture rather than believing the exporter's metadata. No
+   alpha is manufactured out of the colours: a plant whose source ships no
+   cutout is drawn as the geometry it actually has.
+4. The island tree's scatter level still misses its budget, by 341 triangles
+   of 3,000, and the date palm's by 1,510 of 2,500, which after the above is
+   not worth another pass.
 
 **Where this goes next (Stewart, 2026-09-18).** Two directions, in this
 order, both settled with him on the day stage 5 landed and both about content
