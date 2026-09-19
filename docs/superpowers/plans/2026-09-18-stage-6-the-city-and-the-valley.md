@@ -50,23 +50,23 @@ Branch `stage6/import`. Owns `scripts/city.ts`, its test, and `data/footprints/c
 
 ### Task V1: the footprints, streamed and clipped
 
-- [ ] `scripts/city.ts` streams tile 145 through `createGunzip`, parses each line by index rather than a CSV library (the first two fields are unquoted numbers, the geometry is quoted and last but one), and keeps rows inside the box. Reuse `footprints.ts`'s endpoint-retry shape and its cache-file convention. A `--refresh` flag re-fetches; without it a cached clip is reused.
-- [ ] Each kept building is reduced to its oriented bounding box: the minimum-area rectangle of its WKT polygon, as centre, width, depth and yaw. Tested against a handful of hand-checked polygons, including one long thin building and one near-square, so a wrong yaw cannot pass.
-- [ ] A confidence floor is a look choice with a sentence: below it a building is not drawn. Start at 0.70, which leaves about 232,000 of the 277,266.
-- [ ] Commit: "Take the city's outlines from Open Buildings, streamed and clipped to the plateau's box".
+- [x] `scripts/city.ts` streams tile 145 through `createGunzip`, parses each line by index rather than a CSV library (the first two fields are unquoted numbers, the geometry is quoted and last but one), and keeps rows inside the box. Reuse `footprints.ts`'s endpoint-retry shape and its cache-file convention. A `--refresh` flag re-fetches; without it a cached clip is reused.
+- [x] Each kept building is reduced to its oriented bounding box: the minimum-area rectangle of its WKT polygon, as centre, width, depth and yaw. Tested against a handful of hand-checked polygons, including one long thin building and one near-square, so a wrong yaw cannot pass.
+- [x] A confidence floor is a look choice with a sentence: below it a building is not drawn. Start at 0.70, which leaves about 232,000 of the 277,266.
+- [x] Commit: "Take the city's outlines from Open Buildings, streamed and clipped to the plateau's box".
 
 ### Task V2: the heights
 
-- [ ] Find every 2.5D tile the box needs from the manifest, by extent, never by guessing a name. Read `building_height` at each building's centre, with `building_presence` as the gate the dataset asks for.
-- [ ] Prefer range requests into the GeoTIFF's own tiling over a 1.2 GB download per tile. If that needs `geotiff`, add it and say so; if a whole-tile download is the honest simpler answer, run it under `python scripts/job.py start` and say that instead.
-- [ ] Record, in the output header: how many buildings got a height, how many did not, what was done with those, the raster's 1.5 m mean absolute error, the imagery year, and the 100 m cap.
-- [ ] Commit: "Give each building the height the 2.5D raster measured, and say what the error is".
+- [x] Find every 2.5D tile the box needs from the manifest, by extent, never by guessing a name. Read `building_height` at each building's centre, with `building_presence` as the gate the dataset asks for.
+- [x] Prefer range requests into the GeoTIFF's own tiling over a 1.2 GB download per tile. If that needs `geotiff`, add it and say so; if a whole-tile download is the honest simpler answer, run it under `python scripts/job.py start` and say that instead.
+- [x] Record, in the output header: how many buildings got a height, how many did not, what was done with those, the raster's 1.5 m mean absolute error, the imagery year, and the 100 m cap.
+- [x] Commit: "Give each building the height the 2.5D raster measured, and say what the error is".
 
 ### Task V3: the file
 
-- [ ] Write `data/footprints/city.bin` (oriented boxes, little-endian float32, a fixed record) plus `data/footprints/city.json` carrying only the header: the sources, the box, the counts, the confidence floor, the error bars, the checksums of both archives. Both committed; neither hand-edited. Target well under 10 MB.
-- [ ] `scripts/bundle.ts` copies it the way the terrain is copied, and `@seked/data` loads it.
-- [ ] Commit: "Write the city as boxes and a header, and nothing a person would edit".
+- [x] Write `data/footprints/city.bin` (oriented boxes, little-endian float32, a fixed record) plus `data/footprints/city.json` carrying only the header: the sources, the box, the counts, the confidence floor, the error bars, the checksums of both archives. Both committed; neither hand-edited. Target well under 10 MB.
+- [x] `scripts/bundle.ts` copies it the way the terrain is copied. `@seked/data` was deliberately left alone: the city is context rather than database, the two files are copied whole into `apps/web/public/city/` and fetched there, and a loader in `packages/data` would have been track V editing a file tracks W and X also want. `city.json` describes its own binary, including the record names, the stride and the sha256, so a reader needs nothing from `@seked/data` to read it.
+- [x] Commit: "Write the city as boxes and a header, and nothing a person would edit".
 
 ---
 
