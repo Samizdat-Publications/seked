@@ -6,6 +6,36 @@ those stands see. He is deciding whether the project continues on what comes
 out of them, so this file is the record of what they are, what was found in
 them, and what is known about making them beautiful.
 
+Later the same day he set the shape of it, after his Antikythera exhibit
+(`samizdat-publications.github.io/antikythera/`): **an exhibit, not a
+sandbox.** A guided walk on rails through a canned set of scenes that a
+beginner can click through for the highlights, with the claims layered onto
+it, as a demonstration piece. Flying around in realtime is explicitly not the
+point, and trading it away for a better picture is welcome.
+
+That walk already existed. Stage 4 built the tour as eleven shots with
+narration on the stage (`tour.ts`, `sequences.ts`, `ui/Tour.tsx`,
+`ui/Narration.tsx`); it was behind a button inside a drawer, so what a reader
+met on opening was an empty plateau and thirty controls. `ui/Invitation.tsx`
+puts it on the stage as the front door (c0f6354). The five stands below are
+what the shots are framed from, so the two are the same work seen from
+different ends.
+
+**What being on rails is worth, and what it is not.** It is worth saying
+plainly, because the obvious answer is wrong. It does not buy a rendering
+trick. The viewer is not GPU-bound (110 to 192 fps in `built` at stage 5's
+measurement), so not drawing what is off screen frees a budget nothing is
+waiting to spend, and two things that sound like the payoff were measured and
+are not: shadow maps at 4096 against 2048 moved the mastaba field's edge
+energy by a tenth of a per cent, and the air is carrying eight luma over six
+hundred metres.
+
+What it buys is a **content** strategy. On rails, a stop's frame holds perhaps
+ten structures instead of six hundred, so the modelled form that the temples
+and mastabas want stops being an unbounded problem and becomes a countable
+one. That is the whole of the difference between "photoreal Giza everywhere",
+which is studio work, and "eleven framed scenes done properly", which is not.
+
 The stands themselves are already written down, in `apps/web/src/looks.ts`,
 and they are the same five `blender/render.py`'s `VIEWS` carries: **dawn**,
 **panorama**, **harbour**, **akhet**, **night**. Nothing here invents a sixth.
@@ -120,11 +150,16 @@ screenshot forces that paint; `advance` does the rest. The frame-rate work in
 2. **Building-scale form.** The temples and the mastabas are footprints pushed
    up: sharp arrises, no batter on most, no cornice, no recessed doorway, one
    tiled surface. This is the same fault as the casing's, one level up, and it
-   is the largest content item left.
-3. **Per-structure variation in the mastaba field.** 577 tombs share one tone,
+   is the largest content item left. On rails it is also a finite one: take
+   the eleven shots, list what is actually in each frame, and model that list.
+   Nothing outside it has to be good.
+3. **A shot list.** The thing to write before any more modelling: for each of
+   the eleven shots, what is in frame, at what distance, and therefore what
+   band of detail it needs. That is what turns the rule above into work.
+4. **Per-structure variation in the mastaba field.** 577 tombs share one tone,
    so the field reads as a pale carpet. The casing's band hash is the pattern
    to copy; the field is one merged mesh, so it wants a per-tomb attribute at
    merge time rather than a world-space cell, which would cut tombs in half.
-4. **A frame rate.** None has been taken since stage 6, and `built` and
+5. **A frame rate.** None has been taken since stage 6, and `built` and
    `ancient` have had the material table, the quay and the colonnade added
    since. `advance` above should unblock it.
