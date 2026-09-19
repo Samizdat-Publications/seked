@@ -17,6 +17,7 @@ import { Sky, useSun } from './Sky';
 import { FlyCamera } from './FlyCamera';
 import { Interiors } from './Interior';
 import { Motion } from './Motion';
+import { SurveyGrid } from './SurveyGrid';
 import { NorthArrow } from './NorthArrow';
 import { Structures } from './Structures';
 import { Pyramids } from './Pyramids';
@@ -100,7 +101,7 @@ export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: S
       {/* Plays whatever sequence is loaded by writing the view store; draws nothing. */}
       <Motion />
 
-      {layers.grid && <gridHelper args={[6000, 60, '#38475a', '#1d2630']} />}
+      {layers.grid && <SurveyGrid />}
 
       <group rotation={[-Math.PI / 2, 0, 0]}>
         <Sky sun={sun} observer={observer} stars={sky} furniture={layers.sky} />

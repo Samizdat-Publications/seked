@@ -544,12 +544,20 @@ actually GPU-bound, which after stage 5 it is not.
       as a rate, which is what every `today` stand now is. A state change also
       wants five seconds to settle, not two: two reads `built` at dawn as 13
       when it is 122.
-   3. **The ground east of the plateau reads near black under a low sun**
-      (17, 33, 47 at the panorama stand at 16:00; 116, 146, 160 at midsummer
-      noon). It predates this stage. It is not a hole and not a shader patch,
-      both ruled out by substituting plain materials and by removing each
-      patch in turn, so it is ground in shade lit by too little else and it
-      wants a look at the ambient term.
+   3. **The ground east of the plateau reading near black under a low sun is
+      answered, 2026-09-19: it was never ground.** It is the survey grid.
+      `gridHelper` drew six kilometres of opaque dark lines on the datum, and
+      from a stand a few tens of metres up they fall edge-on into one row of
+      pixels and pile into a solid band along the horizon, with the city
+      drawn over it. Raycasting through the dark pixel hit a `GridHelper` at
+      2,501 m, and the same pixel reads 204, 178, 155 with the grid switched
+      off against 17, 33, 47 with it on: exactly the figure logged. It was
+      hunted twice as a hole in the terrain and as a fault in a shader patch,
+      which is why it survived two passes. `scene/SurveyGrid.tsx` now fades
+      the grid out between 700 m and 2,200 m and stops it writing depth, so it
+      is a reading aid where a reader measures something and nothing at the
+      horizon. The Giza skyline the band had been hiding is visible behind
+      the pyramids for the first time.
    4. The river's shoreline is stepped at the coarse grid's sixty metres,
       which is the heightfield showing through and not a fault.
 
