@@ -98,9 +98,26 @@ retexturing pass, and it is on screen less than the boat pits.
    rock-cut trench read as a dark hole; they take `bedrock` now, the same
    quarried face the Sphinx enclosure uses. The cased queens had joints but no
    block tone, so a dressed face read as a scored sheet.
-3. **Khafre's causeway at close range.** Ten shots, down to 102 m. The next
-   one, and the last of the near band.
+3. **Khafre's causeway wants nothing from the material table.** Checked
+   2026-09-20 and listed here so it is not done twice: the ramp, its walls and
+   its roof all already carry a block tone and course joints, read off
+   `data/materials.json` through `cased.ts`, as the valley temple does. The
+   near band's material work is finished.
 4. **Nothing for the Sphinx.** It is finished for what it is asked to do.
+
+## What is actually left, and it is not materials
+
+Every surface in the near band now has a photograph, a relief, a tone per
+block and a joint at each course. What none of them has is **form**. The
+causeway is a ribbon with flat walls and a flat lid; the mastabas are
+footprints pushed up with one notch for a chapel; a queen's pyramid is a
+cone of steps. At 84 to 150 m those read as clean boxes wearing good stone,
+which is a different fault from the one this file started with and a dearer
+one to fix: chamfered arrises, a cornice, a torus moulding, a doorway with a
+depth to it, a broken course at a corner. That is modelling rather than
+shading, it is the item `hero-views.md` already calls the largest content
+gap, and the shot list is what makes it affordable, because it names the ten
+or so buildings that have to have it rather than the six hundred that do not.
 
 ## One fault this measuring exposed
 
