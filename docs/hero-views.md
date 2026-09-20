@@ -124,6 +124,27 @@ nothing change. Both were reverted. The lesson is the cheap one: the scene can
 be asked what it contains, and asking took one call where guessing took
 several.
 
+## Measuring a still, and two traps that cost a session
+
+Both of these produced hours of contradictory numbers on 2026-09-19 and both
+are cheap to avoid.
+
+**Wait for `loading` to empty, not for a number of seconds.** The view store
+keeps a map of what is still loading and `useView.getState().loading` is empty
+when the scene is whole. A capture taken before that has an untextured ground
+and a washed sky, and it looks enough like a real frame to be measured by
+mistake. Several comparisons here were a loaded frame against an unloaded one
+and said nothing about the change being tested.
+
+**Measure the thing, not the frame.** A crop box over the mastaba field is
+mostly desert, so the field's own spread is swamped and a real change moves
+the number by a tenth. Filtering to bright pixels is worse than useless where
+the change makes things darker: it removes exactly the pixels that moved. When
+a shader term is suspect, read it off the GPU instead. `gl.getUniform` on the
+program from `renderer.properties.get(material).currentProgram` says what the
+value actually is, and dumping `geometry.attributes` says what the vertices
+actually carry. Both are one call and neither can be argued with.
+
 ## Taking a still
 
 `?still=1` turns on `preserveDrawingBuffer`, `python scripts/still.py` listens
