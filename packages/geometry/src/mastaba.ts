@@ -44,8 +44,24 @@ export const CHAPEL_SIZE = { along: 3, into: 2, up: 2.5 };
 /** The least and the most of its height a ruined mastaba is left standing at. */
 export const RUIN_RANGE = { low: 0.3, high: 0.7 };
 
-/** Every mesh in one, the later ones' indices moved along. */
-export function mergeMeshes(meshes: readonly Mesh[]): Mesh {
+/**
+ * Every mesh in one, the later ones' indices moved along.
+ *
+ * `tones`, where it is given, is one number per mesh, and it comes back as
+ * one number per vertex: whatever the caller passed for a mesh, written to
+ * every vertex that mesh contributed. That is the only way a shader can tell
+ * one of the merged bodies from another once they are a single buffer, and
+ * the reason the mastaba field wants it is in docs/shot-list.md: the field is
+ * in all eleven shots of the walkthrough and it is 577 tombs sharing one
+ * tone, so it reads as a pale carpet rather than a cemetery.
+ *
+ * A cell of world space would be the cheap way to vary them and it is the
+ * wrong one: a tomb is about the size of such a cell, so the boundary would
+ * fall across tombs and cut them in half. The number has to belong to the
+ * body, which means it has to be written here, where the bodies are still
+ * separate.
+ */
+export function mergeMeshes(meshes: readonly Mesh[], tones?: readonly number[]): Mesh {
   let vertexCount = 0;
   let triangleCount = 0;
   for (const m of meshes) {
@@ -54,21 +70,39 @@ export function mergeMeshes(meshes: readonly Mesh[]): Mesh {
   }
   const positions = new Float32Array(vertexCount * 3);
   const indices = new Uint32Array(triangleCount * 3);
+  const perVertex = tones ? new Float32Array(vertexCount) : undefined;
   let vertex = 0;
   let index = 0;
-  for (const m of meshes) {
-    positions.set(m.positions, vertex * 3);
-    for (let i = 0; i < m.indices.length; i++) indices[index + i] = (m.indices[i] as number) + vertex;
-    vertex += m.vertexCount;
-    index += m.indices.length;
+  for (let m = 0; m < meshes.length; m++) {
+    const mesh = meshes[m] as Mesh;
+    positions.set(mesh.positions, vertex * 3);
+    for (let i = 0; i < mesh.indices.length; i++) indices[index + i] = (mesh.indices[i] as number) + vertex;
+    if (perVertex) perVertex.fill(tones?.[m] ?? 0, vertex, vertex + mesh.vertexCount);
+    vertex += mesh.vertexCount;
+    index += mesh.indices.length;
   }
-  return { positions, indices, vertexCount, triangleCount };
+  return { positions, indices, vertexCount, triangleCount, ...(perVertex ? { tones: perVertex } : {}) };
 }
 
 /**
- * A number in [0, 1) from a string, by FNV-1a. The point is only that it is
- * the same number everywhere the same id is read, so a ruin does not move
- * between one render and the next; nothing is claimed about the number.
+ * A number in [0, 1) from a string, by FNV-1a with a final avalanche. The
+ * point is only that it is the same number everywhere the same id is read, so
+ * a ruin does not move between one render and the next; nothing is claimed
+ * about the number.
+ *
+ * The avalanche is not decoration, and it was added on 2026-09-19 after the
+ * mastaba field would not vary. FNV-1a ends on a multiply, so two ids that
+ * differ only in their last character come out differing by one multiple of
+ * the prime: 16777619 over 2^32, which is 0.0039. Every id here is an OSM way
+ * id and OSM issues them in sequence, so neighbouring tombs were getting
+ * fractions four thousandths apart. A field of 577 of them spanned a few per
+ * cent of the range instead of all of it, which is why they all stood at the
+ * same ruined height and, once a tone per tomb was fed from the same hash,
+ * why they were all the same colour.
+ *
+ * The finaliser is the xor-shift-multiply of MurmurHash3, which is the
+ * standard fix: it spreads a one-bit change across the whole word, so
+ * consecutive ids give unrelated fractions.
  */
 export function hashFraction(id: string): number {
   let h = 0x811c9dc5;
@@ -76,6 +110,12 @@ export function hashFraction(id: string): number {
     h ^= id.charCodeAt(i);
     h = Math.imul(h, 0x01000193);
   }
+  // MurmurHash3's fmix32.
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
   return (h >>> 0) / 2 ** 32;
 }
 

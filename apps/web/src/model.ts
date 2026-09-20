@@ -14,6 +14,7 @@ import {
   enclosureWallMesh,
   footprintMesh,
   interiorSolids,
+  hashFraction,
   mastabaMesh,
   pyramidionMesh,
   quayMesh,
@@ -166,20 +167,34 @@ export interface PlateauMass {
   count: number;
 }
 
-/** Several meshes as one, indices offset so each still points at its own vertices. */
-export function mergeMeshes(meshes: readonly Mesh[]): Mesh {
+/**
+ * Several meshes as one, indices offset so each still points at its own
+ * vertices.
+ *
+ * `tones`, where it is given, is one number per mesh and comes back as one
+ * per vertex, so a shader can tell the merged bodies apart. The mastaba field
+ * is why: it is one buffer of 577 tombs and it is in all eleven shots of the
+ * walkthrough (docs/shot-list.md), so a tone per tomb is the difference
+ * between a cemetery and a pale carpet. A cell of world space would be the
+ * cheap way and the wrong one, because a cell is about the size of a tomb and
+ * its boundary would cut tombs in half.
+ */
+export function mergeMeshes(meshes: readonly Mesh[], tones?: readonly number[]): Mesh {
   const vertexCount = meshes.reduce((a, m) => a + m.vertexCount, 0);
   const positions = new Float32Array(vertexCount * 3);
   const indices = new Uint32Array(meshes.reduce((a, m) => a + m.indices.length, 0));
+  const perVertex = tones ? new Float32Array(vertexCount) : undefined;
   let v = 0;
   let i = 0;
-  for (const m of meshes) {
-    positions.set(m.positions, v * 3);
-    for (let k = 0; k < m.indices.length; k++) indices[i + k] = (m.indices[k] as number) + v;
-    v += m.vertexCount;
-    i += m.indices.length;
+  for (let m = 0; m < meshes.length; m++) {
+    const mesh = meshes[m] as Mesh;
+    positions.set(mesh.positions, v * 3);
+    for (let k = 0; k < mesh.indices.length; k++) indices[i + k] = (mesh.indices[k] as number) + v;
+    if (perVertex) perVertex.fill(tones?.[m] ?? 0, v, v + mesh.vertexCount);
+    v += mesh.vertexCount;
+    i += mesh.indices.length;
   }
-  return { positions, indices, vertexCount, triangleCount: indices.length / 3 };
+  return { positions, indices, vertexCount, triangleCount: indices.length / 3, ...(perVertex ? { tones: perVertex } : {}) };
 }
 
 // --- The lesser monuments, per state ---------------------------------------
@@ -395,6 +410,12 @@ export function structuresFor(
   const covers: Mesh[] = [];
   const fallback: StructureMesh[] = [];
   const field: Mesh[] = [];
+  // A number per tomb, from its own id, written into the merged buffer so the
+  // stone shader can vary one tomb against the next. `hashFraction` is the
+  // same stable hash the ruin heights already use, so a tomb keeps its tone
+  // from one load to the next. It is a look choice and says nothing about the
+  // tomb.
+  const fieldTones: number[] = [];
   let firstTomb: string | undefined;
   let causeway: StructureMesh | undefined;
 
@@ -403,6 +424,7 @@ export function structuresFor(
       const tomb = mastabaMesh(f, env, whole ? 'cased' : 'ruined');
       if (tomb === undefined) continue;
       field.push(tomb);
+      fieldTones.push(hashFraction(f.id));
       firstTomb ??= tomb.label;
       continue;
     }
@@ -489,7 +511,7 @@ export function structuresFor(
             note:
               `${field.length} tombs, each built alike and merged into one geometry. One of them, as a ` +
               `sample of all of them. ${firstTomb ?? ''}`,
-            mesh: mergeMeshes(field),
+            mesh: mergeMeshes(field, fieldTones),
           },
     tombs,
     temples,

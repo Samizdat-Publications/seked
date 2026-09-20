@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { footprintMesh, type Footprint } from './footprints';
 import { meshVolume, type Mesh } from './mesh';
-import { CHAPEL_SIZE, mastabaChapelMesh, mastabaMesh, mergeMeshes, RUIN_RANGE, ruinFraction } from './mastaba';
+import { CHAPEL_SIZE, hashFraction, mastabaChapelMesh, mastabaMesh, mergeMeshes, RUIN_RANGE, ruinFraction } from './mastaba';
 
 /** Invented outlines, not measurements: a 20 by 44 m tomb, its long axis north. */
 const RING: [number, number][] = [[324.71, -55.61], [324.94, -11.77], [303.76, -11.65], [303.53, -55.51]];
@@ -65,6 +65,20 @@ describe('mastabaMesh', () => {
       expect(f).toBeLessThan(RUIN_RANGE.high);
     }
     expect(new Set(fractions).size).toBe(ids.length);
+  });
+
+  it('spreads consecutive ids across the range, not into a huddle', () => {
+    // The fault this guards: FNV-1a ends on a multiply, so before the
+    // avalanche was added two ids differing in their last character came out
+    // 0.0039 apart. OSM issues way ids in sequence, so a whole cemetery
+    // landed on one ruin height and, later, one colour. Distinctness alone
+    // passed that happily, which is why it is not the thing asserted here.
+    const run = Array.from({ length: 24 }, (_, i) => hashFraction(`mastaba.osm_${296626500 + i}`));
+    const gaps = run.slice(1).map((v, i) => Math.abs(v - (run[i] as number)));
+    const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+    // Unrelated draws from [0, 1) average a third apart; a huddle averages
+    // near zero. A quarter is clear of both the fault and of chance.
+    expect(mean).toBeGreaterThan(0.25);
   });
 
   it('leaves a ruined tomb below the cased one, and the cased one at the full height', () => {

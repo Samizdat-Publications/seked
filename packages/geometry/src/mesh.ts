@@ -19,6 +19,14 @@ export interface Mesh {
   indices: Uint32Array;
   vertexCount: number;
   triangleCount: number;
+  /**
+   * One number per vertex, for a mesh that is several bodies merged into one
+   * buffer and wants them told apart in a shader. `mergeMeshes` writes it
+   * from a number per body; nothing else sets it and nothing reads it as a
+   * measurement. It is absent on a mesh that is one body, which is most of
+   * them.
+   */
+  tones?: Float32Array;
 }
 
 type V3 = [number, number, number];

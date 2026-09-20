@@ -151,6 +151,20 @@ export interface StoneOptions {
   mix?: Stone | undefined;
   /** Metres of that noise's patches. A look choice. */
   mixMetres?: number;
+  /**
+   * How far the bodies of a merged field are allowed to differ in tone, as a
+   * share either side of their shared colour. Zero, the default, leaves them
+   * identical, which is what every single-body mesh wants.
+   *
+   * This reads the `sekedTone` attribute `mergeMeshes` writes, one number per
+   * body, so it does nothing on a mesh that has none. The mastaba field is
+   * what it exists for: 577 tombs in one buffer, in all eleven shots of the
+   * walkthrough, sharing a single tone and reading as a pale carpet rather
+   * than a cemetery (docs/shot-list.md). Limestone quarried at different
+   * times and weathered for four thousand years does not come out one colour;
+   * how far apart is a look choice and this number measures nothing.
+   */
+  bodyTone?: number;
 }
 
 /**
@@ -163,13 +177,14 @@ export interface StoneOptions {
  */
 export function applyStone(material: MeshStandardMaterial, stone: Stone | undefined, options: StoneOptions): void {
   if (!stone) return;
-  const { strength, scale = 1, relief = 1, block, course = 0, mix, mixMetres = 90 } = options;
+  const { strength, scale = 1, relief = 1, block, course = 0, mix, mixMetres = 90, bodyTone = 0 } = options;
   const tile = stone.tileMetres * scale;
   const hasNormal = Boolean(stone.normal) && relief > 0;
   const hasRough = Boolean(stone.roughness);
   const hasMix = Boolean(mix);
   const hasBlock = Boolean(block);
   const hasCourse = course > 0;
+  const hasBodyTone = bodyTone > 0;
   // What the program is compiled from, as against what a uniform can change.
   const key = [
     tile,
@@ -178,6 +193,7 @@ export function applyStone(material: MeshStandardMaterial, stone: Stone | undefi
     hasMix ? 'm' : '',
     hasBlock ? 'b' : '',
     hasCourse ? 'c' : '',
+    hasBodyTone ? 't' : '',
   ].join(':');
 
   patchMaterial(material, 'stone', key, (shader) => {
@@ -198,10 +214,7 @@ export function applyStone(material: MeshStandardMaterial, stone: Stone | undefi
     }
     if (hasBlock && block) shader.uniforms.stoneBlock = { value: [block.length, block.height] };
     if (hasCourse) shader.uniforms.stoneCourse = { value: course };
-
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vStoneWorld;')
-      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvStoneWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    if (hasBodyTone) shader.uniforms.stoneBodyTone = { value: bodyTone };
 
     const defines = [
       hasNormal ? '#define SEKED_STONE_NORMAL' : '',
@@ -209,7 +222,21 @@ export function applyStone(material: MeshStandardMaterial, stone: Stone | undefi
       hasMix ? '#define SEKED_STONE_MIX' : '',
       hasBlock ? '#define SEKED_STONE_BLOCK' : '',
       hasCourse ? '#define SEKED_STONE_COURSE' : '',
+      hasBodyTone ? '#define SEKED_STONE_BODY_TONE' : '',
     ].filter(Boolean).join('\n');
+
+    // The defines go into the vertex shader too, because the body tone's
+    // attribute and varying are declared there and a material without one
+    // must not ask for `sekedTone` that no geometry supplies.
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>\n${defines}\nvarying vec3 vStoneWorld;\n#ifdef SEKED_STONE_BODY_TONE\nattribute float sekedTone;\nvarying float vStoneBody;\n#endif`,
+      )
+      .replace(
+        '#include <worldpos_vertex>',
+        '#include <worldpos_vertex>\nvStoneWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;\n#ifdef SEKED_STONE_BODY_TONE\nvStoneBody = sekedTone;\n#endif',
+      );
 
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>\n${defines}\n${STONE_CHUNK}`)
@@ -249,6 +276,10 @@ export function applyStone(material: MeshStandardMaterial, stone: Stone | undefi
  */
 const STONE_CHUNK = `
 varying vec3 vStoneWorld;
+#ifdef SEKED_STONE_BODY_TONE
+uniform float stoneBodyTone;
+varying float vStoneBody;
+#endif
 uniform sampler2D stoneMap;
 uniform float stoneTile;
 uniform float stoneStrength;
@@ -383,6 +414,11 @@ const COLOUR_FRAGMENT = `
 #ifdef SEKED_STONE_COURSE
   float fromTop = abs(fract(vStoneWorld.z / stoneCourse + 0.5) - 0.5) * stoneCourse;
   photo *= mix(0.82, 1.0, smoothstep(0.0, 0.06, fromTop));
+#endif
+#ifdef SEKED_STONE_BODY_TONE
+  // One tone for the whole body, from the attribute the merge wrote, so a
+  // tomb differs from its neighbour and never from itself.
+  photo *= 1.0 + stoneBodyTone * (vStoneBody - 0.5) * 2.0;
 #endif
   diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * photo, stoneStrength);
 }

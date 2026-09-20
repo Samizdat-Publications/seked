@@ -11,6 +11,10 @@ import { BufferAttribute, BufferGeometry } from 'three';
 export function meshGeometry(mesh: Mesh): BufferGeometry {
   const indexed = new BufferGeometry();
   indexed.setAttribute('position', new BufferAttribute(mesh.positions, 3));
+  // A merged field's per-body tone rides along as an attribute, set before
+  // the un-indexing so three carries it through with the positions. Where the
+  // mesh is one body there is none and the shader falls back to a constant.
+  if (mesh.tones) indexed.setAttribute('sekedTone', new BufferAttribute(mesh.tones, 1));
   indexed.setIndex(new BufferAttribute(mesh.indices, 1));
   const geometry = indexed.toNonIndexed();
   indexed.dispose();
