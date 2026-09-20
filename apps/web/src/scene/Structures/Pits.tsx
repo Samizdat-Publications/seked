@@ -5,6 +5,16 @@
  * blocks, so a covered pit is the documented condition of one of them; that
  * every pit is covered, and by one slab, is a look choice and the model says
  * so in the label.
+ *
+ * The cut takes the bedrock set rather than a flat colour, changed
+ * 2026-09-20. It had `strength: 0`, which is the flat tint and no photograph
+ * at all, and docs/shot-list.md is why that matters: the covering slabs stand
+ * 116 m from the camera in the shot inside the Great Pyramid, third nearest
+ * of anything in the walkthrough, and a rock-cut trench at that range reads
+ * as a dark hole rather than as rock. `bedrock` is the quarried face the
+ * Sphinx enclosure already uses, which is the same thing these are: stone the
+ * quarrymen cut back. The tint stays what it was, so the pit is no lighter
+ * than before, it simply has a surface now.
  */
 import type { Plane } from 'three';
 import type { StructureMesh } from '../../model';
@@ -30,9 +40,9 @@ export function Pits({
           built={pit}
           state={state}
           clippingPlanes={clippingPlanes}
-          role={undefined}
+          role="bedrock"
           colour={COLOURS.pit}
-          stone={{ strength: 0 }}
+          stone={{ strength: 0.7, relief: 0.9 }}
         />
       ))}
       {covers && (
