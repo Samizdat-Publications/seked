@@ -78,14 +78,42 @@ retexturing pass, and it is on screen less than the boat pits.
 
 ## The order to work in
 
-1. **Per-tomb variation in the mastaba field.** Eleven shots out of eleven.
-   The field is one merged mesh, so it wants a per-tomb attribute written at
-   merge time and hashed in the shader, the way the casing's course bands are.
-   A world-space cell would cut tombs in half and must not be used.
-2. **The queens' pyramids and the near furniture** (boat pit slabs, basalt
-   pavement). Nearest things in the exhibit, currently the plainest.
-3. **Khafre's causeway at close range.** Ten shots, down to 102 m.
+1. **Per-tomb variation in the mastaba field. Done 2026-09-20** (31d1060).
+   A number per tomb is written at merge time and read in the shader, because
+   a world-space cell is about the size of a tomb and would have cut tombs in
+   half. It only reads at close range: driving the uniform from 0 to 0.45 on
+   one frame of the Western Field at about 100 m moves the field's spread from
+   29.45 to 30.70 and is plain to the eye, while the same change at the dawn
+   stand, 1,300 m off, does nothing a measurement can find. That is the rule
+   of this file working in the other direction, and it is why the first day of
+   trying to tune this from the dawn stand found nothing.
+
+   It also turned up the reason the field would not vary at all:
+   `hashFraction` was FNV-1a with no avalanche, so ids differing in their last
+   character came out 0.0039 apart, and every id here is a sequential OSM way
+   id. `ruinFraction` reads the same hash, so the ruined mastabas had been
+   standing at one height throughout.
+2. **The queens' pyramids and the near furniture. Done 2026-09-20** (b468ee4).
+   The boat pits had `strength: 0`, a flat tint with no photograph, so a
+   rock-cut trench read as a dark hole; they take `bedrock` now, the same
+   quarried face the Sphinx enclosure uses. The cased queens had joints but no
+   block tone, so a dressed face read as a scored sheet.
+3. **Khafre's causeway at close range.** Ten shots, down to 102 m. The next
+   one, and the last of the near band.
 4. **Nothing for the Sphinx.** It is finished for what it is asked to do.
+
+## One fault this measuring exposed
+
+Not a distance question, but it was found while chasing one and it touches
+everything drawn from our own geometry. `useStoneMaterial`'s effect depended
+on the stone, the role and the options, none of which is the material, while
+the components key their material on the timeline's state. Moving the timeline
+therefore mounted a new material that never got `applyStone` at all, and it
+kept its flat colour until something unrelated forced the effect. Going
+`built` to `ancient` and back left the mastaba field's program cache key at
+`air:v3`, with no stone in it. `built` to `stripped` never showed it, because
+that transition also flips the role from casing to core and the role *was* a
+dependency, which is most of why it survived this long. Fixed in b755833.
 
 ## A note on the shot mix
 
