@@ -518,5 +518,15 @@
     "kept": false,
     "note": "The panorama stand with 1561a6a and 98faa64 in: raking December light, and the false shadow the low sun drew across Khufu's south face is gone.",
     "bytes": 3879410
+  },
+  {
+    "file": "2026-09-20T05-26-33Z--panorama--b468ee4.png",
+    "taken": "2026-09-20T05:26:33+00:00",
+    "view": "panorama",
+    "commit": "b468ee4",
+    "tree": "clean",
+    "kept": false,
+    "note": "The Western Field at about 100 m, the band docs/shot-list.md says matters. Per-tomb tone visible: some tombs pale cream, others grey.",
+    "bytes": 4708117
   }
 ]
