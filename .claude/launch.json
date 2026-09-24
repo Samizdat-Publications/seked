@@ -46,6 +46,18 @@
       ],
       "port": 5187,
       "cwd": "apps/web"
+    },
+    {
+      "name": "walk",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5190",
+        "--directory",
+        "apps/walk"
+      ],
+      "port": 5190
     }
   ]
 }

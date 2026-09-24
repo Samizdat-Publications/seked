@@ -1,0 +1,646 @@
+<title>Giza at Block Scale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&display=swap">
+<style>
+  :root {
+    --ground: #f2efe9;
+    --raised: #e8e3da;
+    --ink: #1c1a17;
+    --muted: #675f55;
+    --line: rgba(28, 26, 23, 0.14);
+    --accent: #2c4a8c;
+    --granite: #974634;
+    --stage: #0f0e0c;
+    --stage-ink: #efe8dc;
+    --stage-muted: #b3a896;
+    --display: "Marcellus", "Trajan Pro", "Palatino Linotype", Georgia, serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #14120f;
+      --raised: #1d1a16;
+      --ink: #ece5d9;
+      --muted: #a89d8d;
+      --line: rgba(236, 229, 217, 0.14);
+      --accent: #8ea8e6;
+      --granite: #d28b73;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #14120f;
+    --raised: #1d1a16;
+    --ink: #ece5d9;
+    --muted: #a89d8d;
+    --line: rgba(236, 229, 217, 0.14);
+    --accent: #8ea8e6;
+    --granite: #d28b73;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 17px/1.62 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- the station ---------- */
+  .stage {
+    position: relative;
+    height: clamp(430px, 70vh, 780px);
+    background: var(--stage);
+    color: var(--stage-ink);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+  .stage canvas:active { cursor: grabbing; }
+  .stage canvas:focus-visible { outline: 2px solid var(--stage-ink); outline-offset: -4px; }
+  .stage .fallback { position: absolute; inset: 0; overflow-x: auto; }
+  .stage .fallback img { height: 100%; max-width: none; }
+  .veil {
+    position: absolute; left: 0; right: 0; pointer-events: none;
+  }
+  .veil.top { top: 0; height: 130px; background: linear-gradient(rgba(10, 9, 8, 0.62), rgba(10, 9, 8, 0)); }
+  .veil.bottom { bottom: 0; height: 170px; background: linear-gradient(rgba(10, 9, 8, 0), rgba(10, 9, 8, 0.72)); }
+  .station-head {
+    position: absolute; top: 16px; left: 16px; right: 16px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    pointer-events: none;
+  }
+  .station-head .name { font: 400 clamp(20px, 2.6vw, 28px)/1.15 var(--display); letter-spacing: 0.02em; margin: 0; }
+  .station-head .where { font: 400 12px/1.4 var(--mono); color: var(--stage-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
+  .compass { font: 500 12px/1 var(--mono); letter-spacing: 0.08em; color: var(--stage-muted); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .compass b { display: block; font-weight: 500; font-size: 20px; color: var(--stage-ink); margin-bottom: 6px; }
+
+  .labels { position: absolute; inset: 0; pointer-events: none; }
+  .tag {
+    position: absolute; left: 0; top: 0;
+    transform: translate(-50%, calc(-100% - 14px));
+    text-align: center; white-space: nowrap;
+    font: 500 12px/1.25 var(--body); letter-spacing: 0.03em;
+    color: var(--stage-ink);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    transition: opacity 0.2s;
+  }
+  .tag::after {
+    content: ""; position: absolute; left: 50%; top: calc(100% + 3px);
+    width: 1px; height: 9px; background: rgba(239, 232, 220, 0.75);
+  }
+  .tag small { display: block; font: 400 11px/1.3 var(--mono); color: var(--stage-muted); font-variant-numeric: tabular-nums; }
+
+  .era {
+    position: absolute; left: 16px; right: 16px; bottom: 16px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px;
+  }
+  .era button {
+    font: 500 13px/1 var(--body); letter-spacing: 0.02em;
+    color: var(--stage-ink); background: rgba(20, 18, 15, 0.55);
+    border: 1px solid rgba(239, 232, 220, 0.28); border-radius: 999px;
+    padding: 9px 14px; cursor: pointer; white-space: nowrap;
+  }
+  .era button[aria-pressed="true"] { background: var(--stage-ink); color: var(--stage); border-color: var(--stage-ink); }
+  .era button:focus-visible, .era input:focus-visible { outline: 2px solid var(--stage-ink); outline-offset: 2px; }
+  .era input[type="range"] { width: 100%; accent-color: #e9dcc4; }
+  .era .readout {
+    grid-column: 1 / -1; text-align: center; font: 400 12px/1.3 var(--mono);
+    color: var(--stage-muted); letter-spacing: 0.05em; font-variant-numeric: tabular-nums;
+  }
+  .hint {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font: 500 13px/1 var(--body); letter-spacing: 0.04em; color: var(--stage-ink);
+    background: rgba(15, 14, 12, 0.55); border-radius: 999px; padding: 10px 16px;
+    pointer-events: none; transition: opacity 0.6s;
+  }
+  .loading { position: absolute; right: 16px; bottom: 96px; font: 400 12px/1 var(--mono); color: var(--stage-muted); }
+
+  /* ---------- the reading column ---------- */
+  main { padding-inline: 16px; padding-block: 28px 64px; }
+  .col { max-width: 66ch; margin-inline: auto; }
+  .wide { max-width: 1120px; margin-inline: auto; }
+  .credits {
+    max-width: 1120px; margin: 0 auto 44px; font: 400 12.5px/1.55 var(--mono); color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 18px;
+  }
+  h1, h2 { font-family: var(--display); font-weight: 400; text-wrap: balance; letter-spacing: 0.01em; }
+  h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.06; margin: 0 0 18px; }
+  h2 { font-size: clamp(25px, 3vw, 32px); line-height: 1.15; margin: 64px 0 14px; }
+  h3 { font: 600 17px/1.35 var(--body); margin: 26px 0 6px; }
+  p { margin: 0 0 16px; }
+  .lede { font-size: 20px; line-height: 1.55; color: var(--ink); }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--granite); margin: 0 0 14px; }
+  .muted { color: var(--muted); }
+  code, .num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+
+  figure { margin: 28px 0 8px; }
+  figure img { display: block; width: 100%; height: auto; border-radius: 3px; }
+  figcaption { font: 400 13px/1.5 var(--body); color: var(--muted); margin-top: 10px; max-width: 72ch; }
+
+  .compare { position: relative; overflow: hidden; border-radius: 3px; background: var(--raised); aspect-ratio: 16 / 9; max-width: 100%; }
+  .compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .compare .top { clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0); }
+  .compare .divider {
+    position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; margin-left: -1px;
+    background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); pointer-events: none;
+  }
+  .compare .side {
+    position: absolute; top: 12px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+    color: #fff; background: rgba(15, 14, 12, 0.55); padding: 6px 8px; border-radius: 2px; pointer-events: none;
+  }
+  .compare .side.l { left: 12px; }
+  .compare .side.r { right: 12px; }
+  .compare input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+  .compare input:focus-visible + .divider { outline: 3px solid var(--accent); }
+
+  .reasons { display: grid; gap: 22px; margin-top: 18px; }
+  .reason { display: grid; grid-template-columns: 5.2ch 1fr; gap: 16px; align-items: baseline; }
+  .reason .k { font: 500 13px/1.4 var(--mono); color: var(--granite); }
+  .reason h3 { margin-top: 0; }
+  .reason p { margin: 0; }
+
+  .changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 20px; }
+  .changes div { background: var(--ground); padding: 18px 18px 16px; }
+  .changes h3 { margin: 0 0 6px; }
+  .changes p { margin: 0; font-size: 15.5px; line-height: 1.55; }
+
+  ol.plan { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: stage; }
+  ol.plan li { counter-increment: stage; display: grid; grid-template-columns: 3.2ch 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+  ol.plan li:last-child { border-bottom: 1px solid var(--line); }
+  ol.plan li::before { content: counter(stage); font: 400 22px/1.2 var(--display); color: var(--granite); }
+  ol.plan h3 { margin: 0 0 4px; }
+  ol.plan p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
+
+  table.costs { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+  table.costs th, table.costs td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.costs th { font: 500 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  table.costs td.num { white-space: nowrap; }
+  .tablewrap { overflow-x: auto; }
+
+  .asks { border: 1px solid var(--line); background: var(--raised); padding: 18px 20px; margin-top: 18px; border-radius: 3px; }
+  .asks p:last-child { margin-bottom: 0; }
+
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .lede { font-size: 18px; }
+    .era { grid-template-columns: 1fr 1fr; }
+    .era input[type="range"] { grid-column: 1 / -1; order: -1; }
+    .reason { grid-template-columns: 1fr; gap: 4px; }
+    .station-head .compass { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tag, .hint { transition: none; }
+  }
+</style>
+
+<section class="stage" id="stage" aria-label="Panorama of the Giza plateau from south of the Great Pyramid">
+  <canvas id="view" tabindex="0" aria-label="Drag, or use the arrow keys, to look around. Plus and minus zoom."></canvas>
+  <div class="veil top"></div>
+  <div class="veil bottom"></div>
+  <div class="labels" id="labels" aria-hidden="true"></div>
+  <div class="station-head">
+    <div>
+      <p class="name">Station 1 &middot; South of Khufu</p>
+      <p class="where">Between the Great Pyramid and Khafre &middot; late afternoon</p>
+    </div>
+    <div class="compass" aria-live="off"><b id="bearing">000&deg;</b>facing <span id="facing">north</span></div>
+  </div>
+  <div class="hint" id="hint">Drag to look around</div>
+  <div class="loading" id="loading">loading the panorama&hellip;</div>
+  <div class="era">
+    <button type="button" id="b-today" aria-pressed="true">Today</button>
+    <input type="range" id="era" min="0" max="1000" step="1" value="0" aria-label="Slide from today back to the plateau as built">
+    <button type="button" id="b-built" aria-pressed="false">c. 2560 BCE</button>
+    <div class="readout" id="readout">Today, 2026 CE</div>
+  </div>
+</section>
+
+<main>
+  <p class="credits">Path traced in Blender Cycles from the project's own data: Petrie's and Cole's base dimensions, Goyon's 201 measured course heights for Khufu, the Copernicus GLO-30 terrain, OpenStreetMap footprints, Google Open Buildings for the modern city. The individual blocks, the erosion and the rubble are a reconstruction at block scale. Temples, causeways and the Sphinx are not built yet.</p>
+
+  <div class="col">
+    <p class="eyebrow">Seked &middot; 24 September 2026</p>
+    <h1>Keep going. The fidelity is there.</h1>
+    <p class="lede">You asked whether this could ever look the way you want. It can. What held it back was not effort and not the data. It was where the detail lived and what was drawing it. The station above was built in an afternoon from numbers the project already had, laid block by block, and lit by a path tracer instead of a game renderer.</p>
+  </div>
+
+  <div class="wide">
+    <figure>
+      <img src="img/before-after.jpg" width="1280" height="2176" alt="Three frames of the Giza plateau: the old web viewer with flat boxes, the old Blender render with smooth pyramids, and the new render with pyramids laid from weathered blocks.">
+      <figcaption>Top: the live web viewer on 20 September. Middle: the best Blender render, 16 September. Bottom: the proof, from the stand south-west of Menkaure where the classic three-in-a-row photograph is taken.</figcaption>
+    </figure>
+  </div>
+
+  <div class="col">
+    <h2>Then and now, from the same spot</h2>
+    <p>Drag across each frame. The present day is laid from blocks: Khufu's 201 courses, Khafre's surviving cap with its ragged lower edge, Menkaure's band of red granite casing. The as-built plateau is dressed casing, satin rather than mirror, sharp at every arris. Both come from the same model, switched at render time.</p>
+  </div>
+  <div class="wide">
+    <figure>
+      <div class="compare" style="--split: 50%">
+        <img src="img/panorama-built.jpg" alt="The three pyramids as built, cased in white limestone, at golden hour.">
+        <img class="top" src="img/panorama-today.jpg" alt="The three pyramids today, stepped and weathered, at golden hour.">
+        <span class="side l">Today</span><span class="side r">c. 2560 BCE</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Move the divide between today and the plateau as built">
+        <div class="divider"></div>
+      </div>
+      <figcaption>The panorama stand, 120&nbsp;mm lens, sun at 9&deg; in the west-south-west.</figcaption>
+    </figure>
+    <figure>
+      <div class="compare" style="--split: 50%">
+        <img src="img/south-built.jpg" alt="The Great Pyramid as built, from the south, in raking light.">
+        <img class="top" src="img/south-today.jpg" alt="The Great Pyramid today, from the south, in raking light across its courses.">
+        <span class="side l">Today</span><span class="side r">c. 2560 BCE</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Move the divide between today and the Great Pyramid as built">
+        <div class="divider"></div>
+      </div>
+      <figcaption>Khufu from 360&nbsp;m south, 28&nbsp;mm. The faint vertical crease down the middle of the face is Petrie's measured hollowing of the core, <span class="num">0.94&nbsp;m</span>, showing up on its own.</figcaption>
+    </figure>
+  </div>
+
+  <div class="col">
+    <h2>What was holding it back</h2>
+    <div class="reasons">
+      <div class="reason">
+        <span class="k">scale</span>
+        <div>
+          <h3>Detail at the survey's scale, none at the eye's</h3>
+          <p>The old scene modelled a pyramid as five faces and a temple as its footprint pushed up into a box. The eye reads Giza at the scale of blocks: 201 courses on Khufu, a ragged skyline where the corners were robbed, rubble at every foot, sand in every step. None of that existed, so no amount of lighting could make it look real.</p>
+        </div>
+      </div>
+      <div class="reason">
+        <span class="k">light</span>
+        <div>
+          <h3>A game renderer</h3>
+          <p>The web viewer drew everything in real time, which means no true bounce light. At Giza the bright sand lights the pyramids from below, and without it every face reads flat. Much of the last week went into frame rates rather than into the stone.</p>
+        </div>
+      </div>
+      <div class="reason">
+        <span class="k">weight</span>
+        <div>
+          <h3>Proof paperwork on every stone</h3>
+          <p>Every visual element had to be a sourced record, a TypeScript builder, a Python mirror and a test that the two agree. That is right for a claim and far too heavy for a pebble.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>What changes</h2>
+  </div>
+  <div class="wide">
+    <div class="changes">
+      <div>
+        <h3>Blender's path tracer draws it</h3>
+        <p>Light is computed, not approximated: bounce light off the sand, the soft shadow of the whole sky, the sun reddened by the air it crosses.</p>
+      </div>
+      <div>
+        <h3>Everything at the scale you see it</h3>
+        <p>Pyramids course by course from measured course heights where they exist. Blocks sized, weathered and missing by rule, and labelled as reconstruction.</p>
+      </div>
+      <div>
+        <h3>A walkthrough of stations</h3>
+        <p>Each station is a 360&deg; path-traced panorama like the one at the top, in each era, with the slider between them. Flights between stations are pre-rendered film.</p>
+      </div>
+      <div>
+        <h3>The claims draw on top</h3>
+        <p>Every station's camera is known exactly, so the claims engine and the star calculations can draw their lines and stars over the panorama live, registered to the pixel.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p style="margin-top: 22px;">What stays: the measurement database and its sources, the sky engine with its precession and star catalogue, the claims engine and the Claude claims runner, the rule that a reconstruction is always labelled, and the current web viewer, kept as the survey tool rather than the showcase.</p>
+
+    <h2>The plan</h2>
+    <ol class="plan">
+      <li><div><h3>The generator</h3><p>Today's spike becomes the project's pipeline: terrain, pyramids, mastabas, rubble, city, sky, and stations described as data. The render queue runs as detached jobs so no session is woken by a finished frame.</p></div></li>
+      <li><div><h3>The rest of the plateau</h3><p>Khafre's valley and mortuary temples in red granite, the causeways, the Sphinx in its enclosure, the boat pits and enclosure walls. Today's roads and the Mena House; the green valley and the harbour for the as-built plateau.</p></div></li>
+      <li><div><h3>Twelve to twenty stations</h3><p>Each rendered today, as built, and as the First Time for the lost-civilisation claim, starting at golden hour.</p></div></li>
+      <li><div><h3>Inside Khufu</h3><p>The descending passage, the Grand Gallery, the King's and Queen's Chambers, the relieving chambers and the subterranean chamber, path traced in granite and limestone from the interior survey already in the database.</p></div></li>
+      <li><div><h3>Night stations</h3><p>The shafts and their stars, Orion over the three, with the live star overlay for 2500 BCE and 10,500 BCE drawn on the night panorama.</p></div></li>
+      <li><div><h3>Films</h3><p>Flights between stations, and the rollback from today to the First Time.</p></div></li>
+    </ol>
+
+    <h2>Costs and limits</h2>
+    <div class="tablewrap">
+      <table class="costs">
+        <thead><tr><th>Render, on your RTX 5070 Ti laptop</th><th>Time</th></tr></thead>
+        <tbody id="costrows">
+          <tr><td>Full-HD hero frame, 128 samples</td><td class="num">about 1 min</td></tr>
+          <tr><td>4K station panorama, 48 samples</td><td class="num">about 1&frac12; min</td></tr>
+          <tr><td>8K station panorama, 64 samples (estimate)</td><td class="num">about 5 min</td></tr>
+          <tr><td>Twenty stations in three eras at 8K</td><td class="num">one night</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 16px;">Rendering is not the constraint I feared. A whole walkthrough renders overnight on your laptop, as detached jobs that wake no session when they finish. The two 4K panoramas at the top are just over a megabyte each, so hosting is no concern either. The trade, plainly: this is not free roaming in real time. You said locked scenes were fine, and locked scenes are exactly what buys this look.</p>
+
+    <h2>From you</h2>
+    <div class="asks">
+      <p><strong>Nothing is blocking.</strong> I am carrying on with the generator. If you want any of this held back or pointed elsewhere, say so and I will change course.</p>
+      <p class="muted">Housekeeping: the project now lives in <code>C:\Users\stewa\ClaudeProjects\seked</code>, off OneDrive, and every commit is pushed to GitHub, including twelve from last week that were only on your disk. The old OneDrive copy is marked stale and can be deleted when you like.</p>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ------------------------------------------------------------------ station
+  // Frame: metres, +x east, +y north, +z up, origin at the Great Pyramid's base centre.
+  var CAMERA = [-30.0, -360.0, -1.6];
+  var LANDMARKS = [
+    { name: "Khufu", x: 0.0, y: 0.0, today: 138.7, built: 146.6, fmt: "m" },
+    { name: "Khafre", x: -334.41, y: -353.86, base: 10.0, today: 136.4, built: 143.5, fmt: "m" },
+    { name: "Menkaure", x: -574.45, y: -739.19, base: 11.9, today: 61.9, built: 65.0, fmt: "m" },
+    { name: "Queens' pyramids", x: 193.0, y: -92.5, base: -1.7, today: 18.0, built: 30.0, fmt: "" },
+    { name: "Giza and Cairo", x: 3800.0, y: 900.0, base: 10.0, today: 30.0, built: 30.0, fmt: "", only: "today" },
+    { name: "The Nile valley", x: 3800.0, y: 900.0, base: -30.0, today: 10.0, built: 10.0, fmt: "", only: "built" }
+  ];
+  var BUILT_YEAR = "c. 2560 BCE";
+
+  var canvas = document.getElementById("view");
+  var stage = document.getElementById("stage");
+  var labelsEl = document.getElementById("labels");
+  var hint = document.getElementById("hint");
+  var loading = document.getElementById("loading");
+  var slider = document.getElementById("era");
+  var readout = document.getElementById("readout");
+  var bToday = document.getElementById("b-today");
+  var bBuilt = document.getElementById("b-built");
+  var bearingEl = document.getElementById("bearing");
+  var facingEl = document.getElementById("facing");
+
+  var view = { yaw: 0.0, pitch: 0.07, fov: 1.0, vy: 0, vp: 0 };
+  var era = 0.0;
+  var gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+
+  function fallback() {
+    canvas.hidden = true;
+    var d = document.createElement("div");
+    d.className = "fallback";
+    d.innerHTML = '<img src="pano/south-today.jpg" alt="The panorama, flat">';
+    stage.insertBefore(d, canvas);
+    loading.hidden = true;
+    hint.hidden = true;
+  }
+  if (!gl) { fallback(); return; }
+
+  var VS = "#version 300 es\nin vec2 p; out vec2 v; void main(){ v = p; gl_Position = vec4(p, 0.0, 1.0); }";
+  var FS = [
+    "#version 300 es",
+    "precision highp float;",
+    "uniform sampler2D ta, tb; uniform float mixv, yaw, pitch, tanh, aspect, lod, haveb;",
+    "in vec2 v; out vec4 o;",
+    "const float PI = 3.141592653589793;",
+    "void main(){",
+    "  vec3 r = normalize(vec3(v.x * tanh * aspect, v.y * tanh, 1.0));",
+    "  float cp = cos(pitch), sp = sin(pitch);",
+    "  r = vec3(r.x, r.y * cp + r.z * sp, -r.y * sp + r.z * cp);",
+    "  float cy = cos(yaw), sy = sin(yaw);",
+    "  vec3 w = vec3(r.x * cy + r.z * sy, -r.x * sy + r.z * cy, r.y);",
+    "  float az = atan(w.x, w.y);",
+    "  float el = asin(clamp(w.z, -1.0, 1.0));",
+    "  vec2 uv = vec2(0.5 + az / (2.0 * PI), 0.5 - el / PI);",
+    "  vec3 a = textureLod(ta, uv, lod).rgb;",
+    "  vec3 b = haveb > 0.5 ? textureLod(tb, uv, lod).rgb : a;",
+    "  o = vec4(mix(a, b, mixv), 1.0);",
+    "}"
+  ].join("\n");
+
+  function shader(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  var prog;
+  try {
+    prog = gl.createProgram();
+    gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  } catch (e) { fallback(); return; }
+  gl.useProgram(prog);
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, "p");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  var U = {};
+  ["ta", "tb", "mixv", "yaw", "pitch", "tanh", "aspect", "lod", "haveb"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+  gl.uniform1i(U.ta, 0);
+  gl.uniform1i(U.tb, 1);
+
+  var aniso = gl.getExtension("EXT_texture_filter_anisotropic");
+  var texW = 4096, haveA = false, haveB = false;
+  function upload(unit, img) {
+    var t = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+    texW = img.naturalWidth || texW;
+  }
+  function load(src, unit, done) {
+    var img = new Image();
+    img.decoding = "async";
+    img.onload = function () { upload(unit, img); done(); request(); };
+    img.onerror = function () { loading.textContent = "The panorama did not load."; };
+    img.src = src;
+  }
+  load("pano/south-today.jpg", 0, function () {
+    haveA = true;
+    loading.textContent = "loading the as-built panorama\u2026";
+    load("pano/south-built.jpg", 1, function () { haveB = true; loading.hidden = true; });
+  });
+
+  // ------------------------------------------------------------------ labels
+  var tags = LANDMARKS.map(function (L) {
+    var el = document.createElement("div");
+    el.className = "tag";
+    el.innerHTML = L.name + (L.fmt ? "<small></small>" : "");
+    labelsEl.appendChild(el);
+    return el;
+  });
+
+  function project(x, y, z, W, H) {
+    var dx = x - CAMERA[0], dy = y - CAMERA[1], dz = z - CAMERA[2];
+    var n = Math.hypot(dx, dy, dz);
+    dx /= n; dy /= n; dz /= n;
+    var cy = Math.cos(view.yaw), sy = Math.sin(view.yaw);
+    var rx = dx * cy - dy * sy;          // camera right
+    var rz0 = dx * sy + dy * cy;         // forward before pitch
+    var ry0 = dz;
+    var cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
+    var ry = ry0 * cp - rz0 * sp;
+    var rz = ry0 * sp + rz0 * cp;
+    if (rz <= 0.05) return null;
+    var t = Math.tan(view.fov / 2), aspect = W / H;
+    var sx = rx / (rz * t * aspect), syy = ry / (rz * t);
+    return [(sx * 0.5 + 0.5) * W, (0.5 - syy * 0.5) * H];
+  }
+
+  function placeLabels(W, H) {
+    for (var i = 0; i < LANDMARKS.length; i++) {
+      var L = LANDMARKS[i], el = tags[i];
+      var h = L.today + (L.built - L.today) * era;
+      var z = (L.base || 0) + h;
+      var vis = L.only === "today" ? 1 - era : L.only === "built" ? era : 1;
+      var p = project(L.x, L.y, z, W, H);
+      if (!p || vis < 0.02 || p[0] < -80 || p[0] > W + 80) { el.style.opacity = "0"; continue; }
+      el.style.opacity = String(Math.min(1, vis));
+      el.style.transform = "translate(" + p[0].toFixed(1) + "px," + p[1].toFixed(1) + "px) translate(-50%, calc(-100% - 14px))";
+      if (L.fmt) el.lastChild.textContent = h.toFixed(1) + " m high";
+    }
+  }
+
+  // ------------------------------------------------------------------ drawing
+  var W = 0, H = 0, dpr = 1, pending = false;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = stage.clientWidth; H = stage.clientHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    request();
+  }
+  var COMPASS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
+  function draw() {
+    pending = false;
+    if (Math.abs(view.vy) > 1e-5 || Math.abs(view.vp) > 1e-5) {
+      view.yaw += view.vy; view.pitch += view.vp;
+      view.vy *= 0.9; view.vp *= 0.9;
+      pending = true;
+    }
+    view.pitch = Math.max(-1.2, Math.min(1.2, view.pitch));
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    var tanh = Math.tan(view.fov / 2);
+    var texelsPerPixel = (texW / (2 * Math.PI)) / (canvas.height / view.fov);
+    gl.uniform1f(U.yaw, view.yaw);
+    gl.uniform1f(U.pitch, view.pitch);
+    gl.uniform1f(U.tanh, tanh);
+    gl.uniform1f(U.aspect, canvas.width / canvas.height);
+    gl.uniform1f(U.mixv, haveB ? era : 0.0);
+    gl.uniform1f(U.haveb, haveB ? 1 : 0);
+    gl.uniform1f(U.lod, Math.max(0, Math.log2(Math.max(texelsPerPixel, 1e-3))));
+    if (haveA) gl.drawArrays(gl.TRIANGLES, 0, 3);
+    placeLabels(W, H);
+    var deg = ((view.yaw * 180 / Math.PI) % 360 + 360) % 360;
+    bearingEl.textContent = String(Math.round(deg)).padStart(3, "0") + "\u00b0";
+    facingEl.textContent = COMPASS[Math.round(deg / 45) % 8];
+    if (pending) requestAnimationFrame(draw);
+  }
+  function request() { if (!pending) { pending = true; requestAnimationFrame(draw); } }
+
+  // ------------------------------------------------------------------ input
+  var drag = null, pinch = null, pointers = new Map();
+  function hideHint() { hint.style.opacity = "0"; }
+  canvas.addEventListener("pointerdown", function (e) {
+    canvas.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pointers.size === 2) {
+      var pts = Array.from(pointers.values());
+      pinch = { d: Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]), fov: view.fov };
+      drag = null;
+    } else {
+      drag = { x: e.clientX, y: e.clientY, t: performance.now() };
+    }
+    view.vy = view.vp = 0;
+    hideHint();
+  });
+  canvas.addEventListener("pointermove", function (e) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pinch && pointers.size === 2) {
+      var pts = Array.from(pointers.values());
+      var d = Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]);
+      view.fov = Math.max(0.45, Math.min(1.75, pinch.fov * pinch.d / d));
+      request();
+      return;
+    }
+    if (!drag) return;
+    var k = (view.fov / H);
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    view.yaw -= dx * k;
+    view.pitch += dy * k;
+    view.vy = -dx * k * 0.5; view.vp = dy * k * 0.5;
+    drag.x = e.clientX; drag.y = e.clientY;
+    request();
+  });
+  function end(e) {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (pointers.size === 0) { drag = null; request(); }
+  }
+  canvas.addEventListener("pointerup", end);
+  canvas.addEventListener("pointercancel", end);
+  canvas.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    view.fov = Math.max(0.45, Math.min(1.75, view.fov * Math.exp(e.deltaY * 0.0012)));
+    hideHint();
+    request();
+  }, { passive: false });
+  canvas.addEventListener("keydown", function (e) {
+    var step = 0.06;
+    if (e.key === "ArrowLeft") view.yaw -= step;
+    else if (e.key === "ArrowRight") view.yaw += step;
+    else if (e.key === "ArrowUp") view.pitch += step;
+    else if (e.key === "ArrowDown") view.pitch -= step;
+    else if (e.key === "+" || e.key === "=") view.fov = Math.max(0.45, view.fov * 0.9);
+    else if (e.key === "-") view.fov = Math.min(1.75, view.fov / 0.9);
+    else return;
+    e.preventDefault();
+    hideHint();
+    request();
+  });
+
+  // ------------------------------------------------------------------ the era
+  function setEra(v, fromSlider) {
+    era = Math.max(0, Math.min(1, v));
+    if (!fromSlider) slider.value = String(Math.round(era * 1000));
+    bToday.setAttribute("aria-pressed", era < 0.5 ? "true" : "false");
+    bBuilt.setAttribute("aria-pressed", era >= 0.5 ? "true" : "false");
+    readout.textContent = era < 0.02 ? "Today, 2026 CE" : era > 0.98 ? "As built, " + BUILT_YEAR : "Crossing 4,500 years";
+    request();
+  }
+  slider.addEventListener("input", function () { setEra(slider.value / 1000, true); });
+  var anim = null;
+  function glide(to) {
+    if (anim) cancelAnimationFrame(anim);
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { setEra(to); return; }
+    var from = era, t0 = performance.now(), dur = 1400;
+    (function step(now) {
+      var t = Math.min(1, (now - t0) / dur);
+      var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      setEra(from + (to - from) * e);
+      if (t < 1) anim = requestAnimationFrame(step);
+    })(t0);
+  }
+  bToday.addEventListener("click", function () { glide(0); });
+  bBuilt.addEventListener("click", function () { glide(1); });
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  // ------------------------------------------------------------------ compare frames
+  document.querySelectorAll(".compare").forEach(function (box) {
+    var input = box.querySelector("input");
+    input.addEventListener("input", function () { box.style.setProperty("--split", input.value + "%"); });
+  });
+})();
+</script>
