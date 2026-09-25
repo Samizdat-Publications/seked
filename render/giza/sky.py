@@ -226,14 +226,16 @@ class Sky:
         return colour, energy
 
     def _slab(self, coll, z0, z1, density, colour):
+        # A cylinder 30 km in radius, not a box: a box's corners show from the air as a straight seam
+        # where the haze along one side runs longer than along the other.
         bm = bmesh.new()
-        bmesh.ops.create_cube(bm, size=1.0)
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=128, radius1=0.5, radius2=0.5, depth=1.0)
         me = bpy.data.meshes.new("air")
         bm.to_mesh(me)
         bm.free()
         ob = bpy.data.objects.new("air", me)
         coll.objects.link(ob)
-        ob.scale = (60000, 60000, z1 - z0)         # 30 km out every way, as far as the horizon plain
+        ob.scale = (60000, 60000, z1 - z0)
         ob.location = (0, 0, (z0 + z1) / 2)
         mat = bpy.data.materials.new("air")
         t = Tree(mat)

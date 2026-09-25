@@ -1,0 +1,70 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "town",
+   "size": "4096x2048",
+   "samples": 48
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48
+  }
+ ]
+}

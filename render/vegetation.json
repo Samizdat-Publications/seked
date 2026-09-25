@@ -3,7 +3,7 @@
   "library": {
     "file": "build/vegetation/plants.blend",
     "made_by": "render/giza/vegetation.py prepare()",
-    "prepared_in_s": 21
+    "prepared_in_s": 73
   },
   "assets": [
     {
@@ -166,6 +166,183 @@
         {"height_m": 0.99, "triangles": 647},
         {"height_m": 1.05, "triangles": 647}
       ]
+    },
+    {
+      "id": "fig",
+      "name": "Spreading fig standing in for a sycamore fig (Ficus sycomorus) or a forest fig",
+      "made": "generated: vegetation.broadleaf() with FOREST_TREES['fig']",
+      "source": "Generated here: leaf clusters spread through the shell of a wide dome, the branching grown back from them to a short, thick, fluted trunk by the pipe model (a branch's section the sum of its children's). Every leaf is a hexagon cut from Poly Haven's island_tree_01 leaf atlas (_leaf_templates), so it needs no alpha; the atlas's olive is turned to a deep, glossy green (veg fig leaf). Three variants, one low, wide and leaning.",
+      "author": "geometry: this project; leaf photographs: Poly Haven",
+      "url": "https://polyhaven.com/a/island_tree_01",
+      "license": "the project's own (geometry); CC0 1.0 (the leaf atlas)",
+      "height_range_m": [12, 24],
+      "note": "The First Time's canopy tree and the lion's lone giants. Not any one species: its form is a look choice, and its leaves are drawn larger than a fig's (0.4 m) so a crown reads as dense from across the plateau.",
+      "variants": [
+        {"height_m": 17.65, "triangles": 184880},
+        {"height_m": 15.73, "triangles": 142600},
+        {"height_m": 14.55, "triangles": 157896}
+      ]
+    },
+    {
+      "id": "emergent",
+      "name": "Emergent rainforest tree after the kapok (Ceiba pentandra)",
+      "made": "generated: vegetation.broadleaf() with FOREST_TREES['emergent']",
+      "source": "Generated here as the fig is: a tall bole wandering in one or two long bends, plank buttresses at its foot (_buttresses), and a wide, flat, layered crown on five or six near-level limbs; the atlas leaves in a fresher green (veg kapok leaf). Two variants.",
+      "author": "geometry: this project; leaf photographs: Poly Haven",
+      "url": "https://polyhaven.com/a/island_tree_01",
+      "license": "the project's own (geometry); CC0 1.0 (the leaf atlas)",
+      "height_range_m": [22, 34],
+      "note": "Stands out of the First Time's canopy. A look choice after the kapok's silhouette, not a model of it.",
+      "variants": [
+        {"height_m": 28.66, "triangles": 140708},
+        {"height_m": 25.73, "triangles": 114008}
+      ]
+    },
+    {
+      "id": "broadleaf",
+      "name": "Rounder broadleaf tree of the forest's middle layer",
+      "made": "generated: vegetation.broadleaf() with FOREST_TREES['broadleaf']; downloaded and reduced: vegetation._island_tree_2()",
+      "source": "Two generated round-crowned trees, and Poly Haven's island_tree_02 reduced as island_tree_01 is (trunk at half its triangles, branches at 18 %, each of its 29,781 leaves a hexagon), its leaves turned to the forest's green (veg broadleaf leaf). island_tree_02 shares its leaf and branch atlases with island_tree_01; its own bark is kept.",
+      "author": "Poly Haven (island_tree_02, the leaf atlas); this project (the generated trees)",
+      "url": "https://polyhaven.com/a/island_tree_02",
+      "license": "CC0 1.0 (Poly Haven); the project's own (generated)",
+      "height_range_m": [6, 14],
+      "note": "Fetched into build/props/island-tree-2/ by vegetation._fetch_polyhaven() when it is not there (the 2k glTF, md5-checked against the Poly Haven API).",
+      "variants": [
+        {"height_m": 11.31, "triangles": 63856},
+        {"height_m": 12.27, "triangles": 65180},
+        {"height_m": 3.41, "triangles": 192202}
+      ]
+    },
+    {
+      "id": "oil-palm",
+      "name": "African oil palm (Elaeis guineensis)",
+      "made": "generated: vegetation.oil_palm()",
+      "source": "Generated here: a stout trunk shingled with old frond bases, 42 to 52 fronds of 5 to 7 m arching from upright to hanging, their leaflets thrown up and down out of one plane (_frond's jitter), a few dead fronds hanging. The trunk carries the Sketchfab date palm's bark photograph, greyed (veg oil palm bark).",
+      "author": "geometry: this project; bark texture: evolveduk",
+      "url": "https://sketchfab.com/3d-models/date-palm-11acf710e6c149daa8d6fb8cdc5d087f",
+      "license": "the project's own (geometry); CC BY 4.0 (the bark texture)",
+      "height_range_m": [8, 18],
+      "note": "Three variants (about 9.7, 13.5 and 16.7 m). Palm groves of it (PALMS) are what make the First Time's forest read as tropical from afar. Every leaflet is geometry; no alpha.",
+      "variants": [
+        {"height_m": 9.34, "triangles": 28148},
+        {"height_m": 13.45, "triangles": 26868},
+        {"height_m": 16.72, "triangles": 23882}
+      ]
+    },
+    {
+      "id": "banana",
+      "name": "Banana clump (Musa, with the Ethiopian Ensete)",
+      "made": "generated: vegetation.banana()",
+      "source": "Generated here: a mother pseudostem and two to four suckers, each with a spiral of great paddle leaves (_paddle) with a paler midrib, torn into strips here and there, and one to three dead leaves hanging brown against the stem.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [2.4, 5.8],
+      "note": "Along the forest's edges and in its gaps. A look choice, not a species.",
+      "variants": [
+        {"height_m": 4.62, "triangles": 3832},
+        {"height_m": 5.13, "triangles": 4370},
+        {"height_m": 3.69, "triangles": 3022}
+      ]
+    },
+    {
+      "id": "elephant-grass",
+      "name": "Elephant grass (Pennisetum purpureum)",
+      "made": "generated: vegetation.reed() with the elephant grass's keywords",
+      "source": "Generated here: a wide clump of 34 to 90 canes 2.5 to 3.5 m tall with long, broad arching leaves and green plumes (the reed generator's own form, larger).",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [1.8, 3.5],
+      "note": "Thick along the forest's edges and in patches in the glades; the lion has it in the hollows and round its woods.",
+      "variants": [
+        {"height_m": 3.33, "triangles": 10235},
+        {"height_m": 3.62, "triangles": 12806},
+        {"height_m": 3.99, "triangles": 15230},
+        {"height_m": 2.96, "triangles": 8507}
+      ]
+    },
+    {
+      "id": "fern",
+      "name": "Ground fern",
+      "made": "generated: vegetation.fern()",
+      "source": "Generated here: ten to sixteen arching fronds, each a rachis with two ranks of pinnae as leaf quads.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.6, 1.6],
+      "note": "The First Time's forest floor, within GRASS_REACH of Khufu.",
+      "variants": [
+        {"height_m": 0.59, "triangles": 908},
+        {"height_m": 0.73, "triangles": 1228},
+        {"height_m": 0.87, "triangles": 1480}
+      ]
+    },
+    {
+      "id": "aroid",
+      "name": "Big-leaved aroid (an elephant's ear, after Colocasia and Alocasia)",
+      "made": "generated: vegetation.aroid()",
+      "source": "Generated here: five to nine stout petioles from one foot, each carrying an arrow-shaped leaf with backward lobes, hung tip-down and outward.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.8, 2.0],
+      "note": "On the forest floor and at the water's edge. A look choice, not a species.",
+      "variants": [
+        {"height_m": 0.91, "triangles": 420},
+        {"height_m": 1.32, "triangles": 588},
+        {"height_m": 1.51, "triangles": 756}
+      ]
+    },
+    {
+      "id": "lily",
+      "name": "Water lilies (Nymphaea lotus and N. caerulea, the white and the blue lotus)",
+      "made": "generated: vegetation.lily()",
+      "source": "Generated here: 10 to 18 round notched pads within a metre, and one to three open flowers or buds a hand over the water, white or blue with a yellow heart.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.1, 0.14],
+      "note": "Afloat on the era's water where it is 0.3 to 2.5 m deep (the `pond` zone, POND), at the water's level.",
+      "variants": [
+        {"height_m": 0.12, "triangles": 192},
+        {"height_m": 0.12, "triangles": 300},
+        {"height_m": 0.12, "triangles": 356}
+      ]
+    },
+    {
+      "id": "lush-grass",
+      "name": "Lush grass tuft",
+      "made": "generated: vegetation.grass_tuft()",
+      "source": "Generated here: 50 to 70 wider blade strips, few dead; four short, four medium and two tall with seed stalks, as the grass tuft's set is, in a saturated green varied blade by blade (veg lush grass).",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.25, 1.3],
+      "note": "The tufts near_camera lays round a camera in the First Time (its recipe's near `kind`).",
+      "variants": [
+        {"height_m": 0.29, "triangles": 450},
+        {"height_m": 0.31, "triangles": 450},
+        {"height_m": 0.34, "triangles": 450},
+        {"height_m": 0.33, "triangles": 450},
+        {"height_m": 0.53, "triangles": 630},
+        {"height_m": 0.57, "triangles": 630},
+        {"height_m": 0.64, "triangles": 630},
+        {"height_m": 0.65, "triangles": 630},
+        {"height_m": 1.18, "triangles": 786},
+        {"height_m": 1.26, "triangles": 786}
+      ]
+    },
+    {
+      "id": "lush-tussock",
+      "name": "Lush grass tussock",
+      "made": "generated: vegetation.grass_tuft()",
+      "source": "Generated here: 220 to 280 blade strips in a wide clump, few dead, a seed stalk on every other variant only (a row of stalks read as a picket fence against Khufu's base).",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.5, 1.3],
+      "note": "The First Time's grass over the near grid, within GRASS_REACH of Khufu.",
+      "variants": [
+        {"height_m": 0.64, "triangles": 1980},
+        {"height_m": 1.13, "triangles": 2201},
+        {"height_m": 0.83, "triangles": 2340},
+        {"height_m": 1.36, "triangles": 2561}
+      ]
     }
   ],
   "not_used": [
@@ -176,6 +353,14 @@
     {
       "id": "date-palm fronds",
       "why": "alpha-tested cards; the generated fronds are geometry, so they need no transparent bounces"
+    },
+    {
+      "id": "jacaranda_tree (Poly Haven)",
+      "why": "tried as the biggest fig: its feathery leaves are alpha cards (116,084 of them) this pipeline cannot draw, so they were replaced with atlas leaves at the cards' places; the result read as a dark, sparse bush and cost 460,000 triangles, so it was dropped and its download deleted"
+    },
+    {
+      "id": "tree_small_02 (Poly Haven)",
+      "why": "its leaves are cut along their outlines (no alpha needed) but lie sideways in the atlas and come in sprigs of up to 170 triangles, which the hexagon reduction cannot take; at 1.9 million leaf triangles it was left out and its download deleted"
     }
   ]
 }

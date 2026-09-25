@@ -1,0 +1,109 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "orion",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/orion-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  }
+ ]
+}

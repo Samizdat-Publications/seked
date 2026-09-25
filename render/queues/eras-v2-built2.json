@@ -1,0 +1,39 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-built.png"
+  },
+  {
+   "state": "built",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/harbour-built.png"
+  },
+  {
+   "state": "built",
+   "station": "town",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/town-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-built.png"
+  }
+ ]
+}

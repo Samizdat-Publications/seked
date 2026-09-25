@@ -18,7 +18,7 @@ from .nodes import Tree, hexlin
 
 # The plateau's ground by era: (sand, gravel, chips) colours, and how much gravel shows.
 GROUND = {
-    "desert": ("e3c596", "c4a883", "e6dccb", (0.52, 0.64)),
+    "desert": ("e3c596", "c4a883", "e6dccb", (0.5, 0.68)),
     "sand": ("e8c99a", "d2b58c", "eadfcc", (0.62, 0.72)),
     "savanna": ("9d9a52", "7f8a44", "b3a868", (0.40, 0.62)),
     "dry-savanna": ("bba56a", "9a9150", "cdb98a", (0.45, 0.62)),
@@ -492,15 +492,15 @@ def water(name="water"):
     out = t.node("ShaderNodeOutputMaterial")
     bsdf = t.node("ShaderNodeBsdfPrincipled")
     t.link(bsdf.outputs[0], out.inputs["Surface"])
-    bsdf.inputs["Base Color"].default_value = hexlin("5e4e33")
-    bsdf.inputs["Roughness"].default_value = 0.07
+    bsdf.inputs["Base Color"].default_value = hexlin("5a5236")
+    bsdf.inputs["Roughness"].default_value = 0.03
     bsdf.inputs["IOR"].default_value = 1.33
     geo = t.node("ShaderNodeNewGeometry")
     ripple_space = t.node("ShaderNodeMapping")
     ripple_space.inputs["Scale"].default_value = (1.0, 2.2, 1.0)
     t.link(geo.outputs["Position"], ripple_space.inputs["Vector"])
     bmp = t.node("ShaderNodeBump")
-    bmp.inputs["Strength"].default_value = 0.12
+    bmp.inputs["Strength"].default_value = 0.06
     bmp.inputs["Distance"].default_value = 0.05
     t.link(t.noise(ripple_space.outputs[0], 0.35, 5.0, 0.6), bmp.inputs["Height"])
     t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])

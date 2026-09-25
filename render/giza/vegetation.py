@@ -2,8 +2,13 @@
 Vegetation by era, every plant of it instanced.
 
 The First Time (c. 10,500 BCE) and the lion (c. 7000 BCE) are the claim's green eras:
-the African Humid Period, which is real climate science, drawn as a savanna over the
-plateau and a lush valley below it, the lion's drier than the First Time's. As built
+the African Humid Period, which is real climate science. The First Time is drawn as a
+humid tropical forest (Stewart asked for "full blown tropical lush"): a closed canopy of
+spreading figs and rounder broadleaf trees under emergents, oil palms through it and in
+groves of their own, bananas and elephant grass along its edges, ferns and aroids on its
+floor, glades of tall grass, papyrus and lilies at the water; the pyramids stand in it,
+the forest to their pavement, every station in a clearing that opens towards them
+(VIEWS_OPEN, `frame`). The lion is a green wooded savanna, thinner and drier. As built
 (c. 2560 BCE) the plateau is desert and the valley east of the temples carries palm
 groves, rows of palms on the field edges and a few palms by the harbour; by 1800 CE and
 today only a few palms stand in the valley and the village. What grows where, how
@@ -17,9 +22,12 @@ coll, camera_xy, log)` adds dense small tufts within NEAR_RADIUS of a camera, pe
 so the state-wide grass can stay sparse.
 
 The plants come from a library prepared once into build/vegetation/plants.blend by
-`prepare()` (`blender -b --factory-startup -P render/giza/vegetation.py -- prepare`);
-render/vegetation.json names each asset's source, author, licence, height and
-triangles. `build()` prepares the library in a child Blender when it is missing.
+`prepare()` (`blender -b --factory-startup -P render/giza/vegetation.py -- prepare`,
+about a minute; it fetches the Poly Haven models it lacks, POLYHAVEN); render/vegetation.json
+names each asset's source, author, licence, height and triangles. `build()` prepares
+the library in a child Blender when it is missing. The forest's trees are generated
+(broadleaf()) with leaves cut from Poly Haven's island-tree leaf atlas, so no leaf needs
+alpha: the renderer's four transparent bounces run out in a crown of alpha cards.
 
 Grass on the ground: `ground_tint(state)` is the colour the grass gives the ground from
 a distance and how strongly it covers it; `tint_ground(material, state)` mixes that
@@ -27,7 +35,8 @@ colour into a ground material through the same cover map the grass is scattered 
 a bare patch in the grass is bare in the ground as well.
 
     blender -b --factory-startup -P render/giza/vegetation.py -- prepare
-    blender -b --factory-startup -P render/giza/vegetation.py -- sheet
+    blender -b --factory-startup -P render/giza/vegetation.py -- sheet --group forest
+    blender -b --factory-startup -P render/giza/vegetation.py -- sheet --kinds oil-palm,banana
     blender -b --factory-startup -P render/giza/vegetation.py -- test --view savanna
     blender -b --factory-startup -P render/giza/vegetation.py -- count --state first-time
 """
@@ -73,18 +82,31 @@ GRASS_REACH = (1000.0, 1800.0)
 
 # LOOK CHOICES, every one. `sink`: how far the base goes into the ground, metres; `tilt`: the
 # sigma of the lean, radians; `xy`: the range of the sideways stretch against the height;
-# `margin`: metres kept clear of the era's monuments (beyond their aprons, APRON).
+# `margin`: metres kept clear of the era's monuments (beyond their aprons, APRON); `crown`:
+# the crown's radius against the height, which is what keeps a view open (VIEWS_OPEN).
 KINDS = {
-    "date-palm": dict(sink=0.3, tilt=0.05, xy=(0.95, 1.05), margin=10.0),
-    "doum-palm": dict(sink=0.25, tilt=0.04, xy=(0.9, 1.1), margin=10.0),
-    "acacia": dict(sink=0.2, tilt=0.03, xy=(0.9, 1.2), margin=10.0),
-    "tree": dict(sink=0.2, tilt=0.03, xy=(0.9, 1.15), margin=10.0),
-    "shrub": dict(sink=0.06, tilt=0.1, xy=(0.8, 1.25), margin=3.0),
-    "bush": dict(sink=0.08, tilt=0.06, xy=(0.8, 1.3), margin=3.0),
-    "tussock": dict(sink=0.05, tilt=0.12, xy=(0.8, 1.25), margin=1.0),
-    "grass": dict(sink=0.02, tilt=0.14, xy=(0.8, 1.3), margin=0.0),
-    "papyrus": dict(sink=0.12, tilt=0.07, xy=(0.8, 1.2), margin=2.0),
-    "reed": dict(sink=0.12, tilt=0.07, xy=(0.8, 1.2), margin=2.0),
+    "date-palm": dict(sink=0.3, tilt=0.05, xy=(0.95, 1.05), margin=10.0, crown=0.3),
+    "doum-palm": dict(sink=0.25, tilt=0.04, xy=(0.9, 1.1), margin=10.0, crown=0.3),
+    "acacia": dict(sink=0.2, tilt=0.03, xy=(0.9, 1.2), margin=10.0, crown=0.6),
+    "tree": dict(sink=0.2, tilt=0.03, xy=(0.9, 1.15), margin=10.0, crown=0.45),
+    "shrub": dict(sink=0.06, tilt=0.1, xy=(0.8, 1.25), margin=3.0, crown=0.5),
+    "bush": dict(sink=0.08, tilt=0.06, xy=(0.8, 1.3), margin=3.0, crown=0.5),
+    "tussock": dict(sink=0.05, tilt=0.12, xy=(0.8, 1.25), margin=1.0, crown=0.5),
+    "grass": dict(sink=0.02, tilt=0.14, xy=(0.8, 1.3), margin=0.0, crown=0.5),
+    "papyrus": dict(sink=0.12, tilt=0.07, xy=(0.8, 1.2), margin=2.0, crown=0.3),
+    "reed": dict(sink=0.12, tilt=0.07, xy=(0.8, 1.2), margin=2.0, crown=0.2),
+    # The First Time's forest and its understorey (the tropical kinds, added 2026-09-25).
+    "fig": dict(sink=0.35, tilt=0.02, xy=(0.9, 1.2), margin=3.0, crown=0.65),
+    "emergent": dict(sink=0.45, tilt=0.012, xy=(0.9, 1.15), margin=3.0, crown=0.45),
+    "broadleaf": dict(sink=0.2, tilt=0.03, xy=(0.85, 1.2), margin=2.0, crown=0.45),
+    "oil-palm": dict(sink=0.3, tilt=0.05, xy=(0.95, 1.05), margin=2.0, crown=0.45),
+    "banana": dict(sink=0.1, tilt=0.05, xy=(0.8, 1.2), margin=1.0, crown=0.45),
+    "elephant-grass": dict(sink=0.05, tilt=0.08, xy=(0.8, 1.3), margin=1.0, crown=0.3),
+    "fern": dict(sink=0.05, tilt=0.08, xy=(0.8, 1.25), margin=1.5, crown=0.8),
+    "aroid": dict(sink=0.04, tilt=0.06, xy=(0.8, 1.25), margin=1.5, crown=0.6),
+    "lily": dict(sink=0.0, tilt=0.0, xy=(0.8, 1.3), margin=0.0, crown=1.0),
+    "lush-grass": dict(sink=0.02, tilt=0.14, xy=(0.8, 1.3), margin=0.0, crown=0.5),
+    "lush-tussock": dict(sink=0.05, tilt=0.1, xy=(0.8, 1.25), margin=1.0, crown=0.5),
 }
 
 # Bare ground kept round each kind of monument before any plant's own margin: a pavement's
@@ -92,56 +114,144 @@ KINDS = {
 APRON = {"pyramid": 8.0, "precinct": 2.0, "queen": 3.0, "temple": 3.0, "sphinx": 1.0, "cut": 1.0, "mastaba": 1.5,
          "causeway": 2.0, "road": 2.0}
 
+# LOOK CHOICES: the First Time's forest (clump wavelength, share of the ground): the plateau's groves,
+# the low ground's, and the palm groves (a noise of their own wavelength, so they are not the forest's).
+FOREST = (240.0, 0.72)
+LOW_FOREST = (300.0, 0.82)
+PALMS = (130.0, 0.16)
+FRAME = (16.0, 160.0)      # the ring of forest round each eye on the ground, metres from it (`frame`)
+WOODS = (240.0, 0.25)      # the lion's open woods
+
 # LOOK CHOICES: each era's planting. `cover` is the grass cover by zone (0..1) with the share
-# of it left bare in patches of about `wavelength` metres; `tint` the two colours the grass
+# of it left bare in patches of about `wavelength` metres, and, where `shade` (wavelength, share,
+# how much) names the groves a clump makes, thinner under their canopy; `tint` the two colours the grass
 # gives the ground from afar, how strongly, and the soil's hue where the grass is thin (see
-# tint_ground); `near` the tufts round a camera (per square
-# metre at the camera, falling off over `falloff` metres) and their dryness. Each plant entry:
-# `zone` (plateau, lowland, valley, shore, village or box), `per_ha` plants a hectare where the
-# zone is full, or `count` plants in all, or `rows` along field edges; `clump` (wavelength,
-# share of the ground) gathers them into groves; `hollows` keeps them to the plateau's low
-# ground; `grass` follows the grass cover; `within` (full, none) thins them with distance from
-# Khufu; `far` carries them out to REACH; `avoid` keeps them off the buildings of the village
-# or the city.
+# tint_ground), with `mottle` (noise scale, depth) darkening it in clumps a few metres across
+# and `far` (colour, from, to) turning it to a forest canopy's colour between two distances from
+# Khufu, where the planting thins away; `near` the tufts round a camera (per square
+# metre at the camera, falling off over `falloff` metres), their dryness and which kind of tuft
+# (`kind`, "grass" when not named); `wear` the dryness of every plant whose entry names none.
+# Each plant entry: `zone` (plateau, lowland, valley, shore, pond, village or box; `pond` is
+# open water from 0.3 to 2.5 m deep, where a plant floats at the water's level), `per_ha`
+# plants a hectare where the zone is full, or `count` plants in all, or `rows` along field
+# edges; `clump` (wavelength, share of the ground) gathers them into groves; `edge`
+# (wavelength, share, width) puts them in a band `width` of the ground wide round the groves
+# that a clump of the same wavelength and share makes, the groves' margins; `patch` (wavelength,
+# share) gathers them again within that, on a noise of its own, into masses with gaps between;
+# `rise` (wavelength, amount) swells and sinks their heights across the ground; `hollows` keeps
+# them to the plateau's low ground; `grass` follows the grass cover; `within` (full, none)
+# thins them with distance from Khufu; `far` carries them out to REACH (and, where the era says
+# `fade`, thins them raggedly to nothing before its edge); `avoid` keeps them off the buildings of
+# the village or the city; `frame` (from, to) puts them in a ring round every eye on the ground
+# (VIEWS_OPEN's stations and shots), so a station stands in a clearing, not in open country.
 STATES = {
+    # The First Time: a humid tropical forest (Stewart, 2026-09-25: "full blown tropical lush"). A
+    # closed canopy over most of the ground (FOREST), clustered into masses and gaps (`patch`) and
+    # swelling and sinking (`rise`): spreading figs 12 to 24 m over a middle layer of rounder
+    # broadleaf trees, emergents to 34 m standing out of it, oil palms through it and in palm groves
+    # of their own (PALMS); bananas and elephant grass thick along the forest's edges; ferns and
+    # big-leaved aroids on its floor; glades of tall grass with lone trees and palms between. The
+    # forest stands to the pyramids' pavement (the kinds' small margins); every view of the
+    # pyramids from a station or shot is kept open through it (VIEWS_OPEN).
     "first-time": dict(
-        cover=dict(plateau=0.85, lowland=1.0, bare=0.15, wavelength=70.0),
-        tint=dict(grass=("707c3c", "8b8d4e"), strength=0.8, soil=("8e7654", "a08966")),
-        near=dict(per_m2=18.0, falloff=32.0, dry=(0.0, 0.3)),
+        cover=dict(plateau=1.0, lowland=1.0, bare=0.04, wavelength=60.0),
+        tint=dict(grass=("4b6327", "637733"), strength=0.9, soil=("4a3a27", "5d4a32"), mottle=(0.06, 0.5),
+                  far=("2c4220", 3200.0, 5200.0)),
+        near=dict(kind="lush-grass", per_m2=24.0, falloff=36.0, dry=(0.0, 0.1)),
+        wear=(0.0, 0.12),
+        fade=True,
         plants=[
-            dict(kind="acacia", zone="plateau", per_ha=1.3, height=(4.5, 9.5), clump=(220.0, 0.45), far=True),
-            dict(kind="doum-palm", zone="plateau", per_ha=0.12, height=(8.0, 12.0), hollows=True, far=True),
-            dict(kind="date-palm", zone="plateau", per_ha=0.05, height=(10.0, 15.0), hollows=True, far=True),
-            dict(kind="bush", zone="plateau", per_ha=9.0, height=(0.7, 1.9), clump=(110.0, 0.5)),
-            dict(kind="shrub", zone="plateau", per_ha=2.0, height=(0.9, 1.7)),
-            dict(kind="tussock", zone="plateau", per_ha=250.0, height=(0.45, 0.95), grass=True, dry=(0.15, 0.55), within=GRASS_REACH),
-            dict(kind="date-palm", zone="lowland", per_ha=8.0, height=(11.0, 19.0), clump=(300.0, 0.55), far=True),
-            dict(kind="doum-palm", zone="lowland", per_ha=4.0, height=(8.0, 14.0), clump=(260.0, 0.4), far=True),
-            dict(kind="tree", zone="lowland", per_ha=2.5, height=(6.0, 11.0), far=True),
-            dict(kind="acacia", zone="lowland", per_ha=0.8, height=(5.0, 9.5), far=True),
-            dict(kind="bush", zone="lowland", per_ha=18.0, height=(0.8, 2.0)),
-            dict(kind="tussock", zone="lowland", per_ha=420.0, height=(0.5, 1.0), grass=True, dry=(0.0, 0.3), within=GRASS_REACH),
-            dict(kind="papyrus", zone="shore", per_ha=1400.0, height=(2.2, 3.8)),
-            dict(kind="reed", zone="shore", per_ha=1100.0, height=(1.8, 2.9)),
+            # the forest's canopy
+            dict(kind="fig", zone="plateau", per_ha=15.0, height=(12.0, 24.0), clump=FOREST, patch=(80.0, 0.8), rise=(300.0, 0.25), far=True),
+            dict(kind="emergent", zone="plateau", per_ha=1.8, height=(24.0, 34.0), clump=(240.0, 0.6), patch=(80.0, 0.55), far=True),
+            dict(kind="broadleaf", zone="plateau", per_ha=14.0, height=(6.0, 14.0), clump=FOREST, rise=(300.0, 0.2), far=True),
+            dict(kind="oil-palm", zone="plateau", per_ha=4.0, height=(8.0, 16.0), clump=FOREST, far=True),
+            # palm groves
+            dict(kind="oil-palm", zone="plateau", per_ha=38.0, height=(8.0, 17.0), clump=PALMS, far=True),
+            dict(kind="date-palm", zone="plateau", per_ha=6.0, height=(10.0, 18.0), clump=PALMS, far=True),
+            # the glades: lone trees and palms in tall grass
+            dict(kind="fig", zone="plateau", per_ha=0.35, height=(13.0, 22.0), far=True),
+            dict(kind="broadleaf", zone="plateau", per_ha=1.2, height=(6.0, 12.0), far=True),
+            dict(kind="oil-palm", zone="plateau", per_ha=1.0, height=(8.0, 15.0), far=True),
+            dict(kind="tree", zone="plateau", per_ha=0.4, height=(7.0, 12.0), far=True),
+            dict(kind="date-palm", zone="plateau", per_ha=0.4, height=(10.0, 16.0), hollows=True, far=True),
+            # every station stands in a clearing: forest in a ring round it, opened towards the pyramids by VIEWS_OPEN
+            dict(kind="fig", zone="plateau", per_ha=12.0, height=(13.0, 22.0), frame=FRAME, patch=(80.0, 0.8)),
+            dict(kind="broadleaf", zone="plateau", per_ha=18.0, height=(6.0, 13.0), frame=FRAME),
+            dict(kind="oil-palm", zone="plateau", per_ha=8.0, height=(8.0, 15.0), frame=FRAME),
+            dict(kind="emergent", zone="plateau", per_ha=1.0, height=(24.0, 32.0), frame=FRAME),
+            dict(kind="banana", zone="plateau", per_ha=36.0, height=(2.6, 5.4), frame=FRAME),
+            dict(kind="elephant-grass", zone="plateau", per_ha=50.0, height=(2.0, 3.2), frame=FRAME),
+            dict(kind="fig", zone="lowland", per_ha=12.0, height=(13.0, 22.0), frame=FRAME, patch=(80.0, 0.8)),
+            dict(kind="oil-palm", zone="lowland", per_ha=10.0, height=(8.0, 15.0), frame=FRAME),
+            dict(kind="banana", zone="lowland", per_ha=36.0, height=(2.6, 5.4), frame=FRAME),
+            # the forest's edges and floor
+            dict(kind="banana", zone="plateau", per_ha=40.0, height=(2.6, 5.6), edge=(240.0, 0.72, 0.08), far=True),
+            dict(kind="banana", zone="plateau", per_ha=8.0, height=(2.4, 5.0), clump=FOREST, within=GRASS_REACH),
+            dict(kind="elephant-grass", zone="plateau", per_ha=90.0, height=(2.0, 3.5), edge=(240.0, 0.72, 0.14), far=True),
+            dict(kind="elephant-grass", zone="plateau", per_ha=70.0, height=(1.8, 3.2), clump=(90.0, 0.35), within=GRASS_REACH),
+            dict(kind="bush", zone="plateau", per_ha=14.0, height=(0.8, 2.2), clump=(110.0, 0.5)),
+            dict(kind="fern", zone="plateau", per_ha=220.0, height=(0.6, 1.5), clump=FOREST, within=GRASS_REACH),
+            dict(kind="aroid", zone="plateau", per_ha=60.0, height=(0.8, 1.8), clump=FOREST, within=GRASS_REACH),
+            dict(kind="lush-tussock", zone="plateau", per_ha=650.0, height=(0.5, 1.2), grass=True, within=GRASS_REACH),
+            dict(kind="tussock", zone="plateau", per_ha=25.0, height=(0.3, 0.6), grass=True, dry=(0.0, 0.2), within=GRASS_REACH),
+            # the low ground: forest nearly throughout, palm groves, the same edges and floor
+            dict(kind="fig", zone="lowland", per_ha=16.0, height=(14.0, 24.0), clump=LOW_FOREST, patch=(80.0, 0.8), rise=(300.0, 0.25), far=True),
+            dict(kind="emergent", zone="lowland", per_ha=2.2, height=(24.0, 34.0), clump=(300.0, 0.7), patch=(80.0, 0.55), far=True),
+            dict(kind="broadleaf", zone="lowland", per_ha=16.0, height=(6.0, 14.0), clump=LOW_FOREST, far=True),
+            dict(kind="oil-palm", zone="lowland", per_ha=40.0, height=(8.0, 18.0), clump=PALMS, far=True),
+            dict(kind="oil-palm", zone="lowland", per_ha=6.0, height=(8.0, 17.0), clump=LOW_FOREST, far=True),
+            dict(kind="date-palm", zone="lowland", per_ha=8.0, height=(11.0, 19.0), clump=PALMS, far=True),
+            dict(kind="doum-palm", zone="lowland", per_ha=1.5, height=(8.0, 14.0), clump=(260.0, 0.35), far=True),
+            dict(kind="banana", zone="lowland", per_ha=45.0, height=(2.8, 5.8), edge=(300.0, 0.82, 0.08), far=True),
+            dict(kind="banana", zone="lowland", per_ha=12.0, height=(2.6, 5.5), clump=(90.0, 0.25), far=True),
+            dict(kind="elephant-grass", zone="lowland", per_ha=100.0, height=(2.2, 3.5), edge=(300.0, 0.82, 0.12), far=True),
+            dict(kind="bush", zone="lowland", per_ha=18.0, height=(0.9, 2.2)),
+            dict(kind="fern", zone="lowland", per_ha=240.0, height=(0.7, 1.6), clump=LOW_FOREST, within=GRASS_REACH),
+            dict(kind="aroid", zone="lowland", per_ha=70.0, height=(0.9, 2.0), clump=LOW_FOREST, within=GRASS_REACH),
+            dict(kind="lush-tussock", zone="lowland", per_ha=650.0, height=(0.6, 1.3), grass=True, within=GRASS_REACH),
+            # the water's edge
+            dict(kind="papyrus", zone="shore", per_ha=1600.0, height=(2.4, 4.2)),
+            dict(kind="reed", zone="shore", per_ha=1000.0, height=(1.9, 3.0)),
+            dict(kind="aroid", zone="shore", per_ha=120.0, height=(0.9, 1.9)),
+            dict(kind="lily", zone="pond", per_ha=260.0, height=(0.1, 0.14), clump=(60.0, 0.45)),
         ]),
+    # The lion, c. 7000 BCE, the long rains: a green wooded savanna, between the First Time's forest
+    # and the desert of the builders' day. Grass most of the way over the plateau, open woods of
+    # broadleaf trees and figs (WOODS) with elephant grass round them, flat-topped acacias in loose
+    # stands, lone giant figs; palms, figs and broadleaf trees thicker in the low ground, papyrus on
+    # the shore and a few lilies in the shallows. Thinner and drier than the First Time throughout.
     "lion": dict(
-        cover=dict(plateau=0.6, lowland=0.9, bare=0.45, wavelength=45.0),
-        tint=dict(grass=("8a8752", "a39b67"), strength=0.7, soil=("a38c64", "b39c74")),
-        near=dict(per_m2=9.0, falloff=28.0, dry=(0.4, 0.95)),
+        cover=dict(plateau=0.72, lowland=0.95, bare=0.3, wavelength=55.0),
+        tint=dict(grass=("62783a", "7a8a47"), strength=0.82, soil=("9a8460", "ac9670"), mottle=(0.06, 0.35)),
+        near=dict(per_m2=14.0, falloff=30.0, dry=(0.05, 0.4)),
         plants=[
-            dict(kind="acacia", zone="plateau", per_ha=0.45, height=(4.0, 8.5), clump=(260.0, 0.35), far=True),
-            dict(kind="doum-palm", zone="plateau", per_ha=0.02, height=(8.0, 11.0), hollows=True),
-            dict(kind="bush", zone="plateau", per_ha=4.0, height=(0.6, 1.6), clump=(110.0, 0.4)),
-            dict(kind="shrub", zone="plateau", per_ha=5.0, height=(0.7, 1.6)),
-            dict(kind="tussock", zone="plateau", per_ha=150.0, height=(0.4, 0.85), grass=True, dry=(0.45, 0.95), within=GRASS_REACH),
-            dict(kind="date-palm", zone="lowland", per_ha=6.0, height=(11.0, 19.0), clump=(300.0, 0.5), far=True),
-            dict(kind="doum-palm", zone="lowland", per_ha=3.0, height=(8.0, 14.0), clump=(260.0, 0.4), far=True),
-            dict(kind="tree", zone="lowland", per_ha=1.8, height=(6.0, 10.0), far=True),
-            dict(kind="acacia", zone="lowland", per_ha=0.7, height=(5.0, 9.0), far=True),
-            dict(kind="bush", zone="lowland", per_ha=14.0, height=(0.8, 2.0)),
-            dict(kind="tussock", zone="lowland", per_ha=330.0, height=(0.5, 1.0), grass=True, dry=(0.2, 0.6), within=GRASS_REACH),
-            dict(kind="papyrus", zone="shore", per_ha=1200.0, height=(2.2, 3.6)),
+            dict(kind="fig", zone="plateau", per_ha=3.0, height=(12.0, 20.0), clump=WOODS, patch=(80.0, 0.6), far=True),
+            dict(kind="broadleaf", zone="plateau", per_ha=6.0, height=(6.0, 12.0), clump=WOODS, far=True),
+            dict(kind="acacia", zone="plateau", per_ha=1.6, height=(4.5, 9.0), clump=(240.0, 0.45), far=True),
+            dict(kind="broadleaf", zone="plateau", per_ha=0.5, height=(6.0, 11.0), far=True),
+            dict(kind="fig", zone="plateau", per_ha=0.08, height=(12.0, 18.0), far=True),
+            dict(kind="tree", zone="plateau", per_ha=0.3, height=(6.0, 10.0), far=True),
+            dict(kind="doum-palm", zone="plateau", per_ha=0.1, height=(8.0, 12.0), hollows=True, far=True),
+            dict(kind="date-palm", zone="plateau", per_ha=0.06, height=(10.0, 15.0), hollows=True, far=True),
+            dict(kind="elephant-grass", zone="plateau", per_ha=12.0, height=(1.8, 2.8), hollows=True),
+            dict(kind="elephant-grass", zone="plateau", per_ha=25.0, height=(1.8, 3.0), edge=(WOODS[0], WOODS[1], 0.1)),
+            dict(kind="bush", zone="plateau", per_ha=9.0, height=(0.7, 1.9), clump=(110.0, 0.45)),
+            dict(kind="shrub", zone="plateau", per_ha=3.0, height=(0.8, 1.7)),
+            dict(kind="tussock", zone="plateau", per_ha=240.0, height=(0.45, 0.95), grass=True, dry=(0.1, 0.45), within=GRASS_REACH),
+            dict(kind="date-palm", zone="lowland", per_ha=7.0, height=(11.0, 19.0), clump=(300.0, 0.55), far=True),
+            dict(kind="doum-palm", zone="lowland", per_ha=3.5, height=(8.0, 14.0), clump=(260.0, 0.45), far=True),
+            dict(kind="fig", zone="lowland", per_ha=2.5, height=(14.0, 20.0), clump=(300.0, 0.5), far=True),
+            dict(kind="broadleaf", zone="lowland", per_ha=4.0, height=(7.0, 13.0), clump=(300.0, 0.5), far=True),
+            dict(kind="tree", zone="lowland", per_ha=1.5, height=(6.0, 11.0), far=True),
+            dict(kind="acacia", zone="lowland", per_ha=0.6, height=(5.0, 9.0), far=True),
+            dict(kind="elephant-grass", zone="lowland", per_ha=40.0, height=(2.0, 3.2), edge=(300.0, 0.5, 0.14)),
+            dict(kind="banana", zone="lowland", per_ha=5.0, height=(2.4, 4.8), clump=(300.0, 0.5)),
+            dict(kind="bush", zone="lowland", per_ha=16.0, height=(0.8, 2.0)),
+            dict(kind="tussock", zone="lowland", per_ha=380.0, height=(0.5, 1.0), grass=True, dry=(0.05, 0.4), within=GRASS_REACH),
+            dict(kind="papyrus", zone="shore", per_ha=1300.0, height=(2.2, 3.8)),
             dict(kind="reed", zone="shore", per_ha=1000.0, height=(1.8, 2.8)),
+            dict(kind="lily", zone="pond", per_ha=90.0, height=(0.1, 0.13), clump=(60.0, 0.35)),
         ]),
     "built": dict(
         cover=dict(valley=0.9, bare=0.2, wavelength=50.0),
@@ -323,16 +433,25 @@ def keepout(state, terrain, X, Y, dmax=40.0):
     return D
 
 
+POND = (0.3, 2.5)                  # the depths of open water where lilies float, metres (a look choice)
+
+
 def _wet(X, Y, Z, water):
-    """Dry land (1) and the shore band from 0.45 m under each water plane to 0.8 m above it."""
+    """
+    Dry land (1), the shore band from 0.45 m under each water plane to 0.8 m above it, and the
+    shallows (POND deep) where a plant can float.
+    """
     dry = np.ones(Z.shape, np.float32)
     shore = np.zeros(Z.shape, np.float32)
+    pond = np.zeros(Z.shape, np.float32)
     for level, (x0, x1, y0, y1) in water:
         inside = (X > x0) & (X < x1) & (Y > y0) & (Y < y1)
         dry = np.where(inside, np.minimum(dry, smoothstep(level + 0.1, level + 0.6, Z)), dry)
         band = smoothstep(level - 0.45, level - 0.1, Z) * smoothstep(level + 0.8, level + 0.35, Z)
         shore = np.where(inside, np.maximum(shore, band), shore)
-    return dry.astype(np.float32), shore.astype(np.float32)
+        shallow = smoothstep(level - POND[1], level - POND[1] + 0.3, Z) * smoothstep(level - POND[0], level - POND[0] - 0.2, Z)
+        pond = np.where(inside, np.maximum(pond, shallow), pond)
+    return dry.astype(np.float32), shore.astype(np.float32), pond.astype(np.float32)
 
 
 def _box_blur(Z, r):
@@ -360,7 +479,7 @@ class Grid:
         Z = self.Z
         self.lowland = smoothstep(-26.0, -32.0, Z).astype(np.float32)
         self.valley = (smoothstep(-26.0, -31.0, Z) * smoothstep(430.0, 520.0, self.X)).astype(np.float32)
-        self.dry, self.shore = _wet(self.X, self.Y, Z, self.water)
+        self.dry, self.shore, self.pond = _wet(self.X, self.Y, Z, self.water)
         if near:
             self.distance = keepout(state, terrain, self.X, self.Y)
         else:
@@ -376,6 +495,10 @@ class Grid:
         if not C:
             return np.zeros(self.Z.shape, np.float32)
         base = C.get("plateau", 0.0) * (1.0 - self.lowland) + C.get("lowland", 0.0) * self.lowland + C.get("valley", 0.0) * self.valley
+        if C.get("shade"):
+            # under the groves' canopy the grass gives way to the forest floor
+            w, share, k = C["shade"]
+            base = base * (1.0 - k * self.clump(w, share))
         keep = 1.0
         if C.get("bare", 0.0) > 0:
             n = _noise(31, 2400.0).fbm(self.X, self.Y, C["wavelength"], 3, key=1)
@@ -399,6 +522,8 @@ class Grid:
             box = box or _village_box()
         elif name == "shore":
             m = self.shore.copy()
+        elif name == "pond":
+            m = self.pond.copy()
         elif name == "box":
             m = self.dry.copy()
         else:
@@ -407,11 +532,25 @@ class Grid:
             m = m * ((self.X > box[0]) & (self.X < box[1]) & (self.Y > box[2]) & (self.Y < box[3]))
         return m
 
+    def _grove_noise(self, wavelength, seed):
+        """The groves' noise at this grid's nodes, computed once per wavelength (every clump of it shares one field)."""
+        cache = self.__dict__.setdefault("_groves", {})
+        if (wavelength, seed) not in cache:
+            cache[(wavelength, seed)] = _noise(41 + seed, 6000.0).fbm(self.X, self.Y, wavelength, 3, key=int(wavelength))
+        return cache[(wavelength, seed)]
+
     def clump(self, wavelength, share, seed=0):
         """1 in groves covering about `share` of the ground, 0 between them."""
-        n = _noise(41 + seed, 6000.0).fbm(self.X, self.Y, wavelength, 3, key=int(wavelength))
+        n = self._grove_noise(wavelength, seed)
         q = _clump_threshold(wavelength, share, seed)
         return smoothstep(q - 0.08, q + 0.08, n)
+
+    def edge(self, wavelength, share, width, seed=0):
+        """1 in a band about `width` of the ground wide just outside the groves clump() makes of `share`."""
+        n = self._grove_noise(wavelength, seed)
+        q_in = _clump_threshold(wavelength, share, seed)
+        q_out = _clump_threshold(wavelength, min(share + width, 0.99), seed)
+        return smoothstep(q_out - 0.04, q_out + 0.04, n) * smoothstep(q_in + 0.02, q_in - 0.06, n)
 
     def _bilinear(self, F, i, j, u, v):
         return (F[j, i] * (1 - u) * (1 - v) + F[j, i + 1] * u * (1 - v) + F[j + 1, i] * (1 - u) * v + F[j + 1, i + 1] * u * v)
@@ -638,7 +777,25 @@ def _rows(grid, far, entry, kind, rng):
     return x[keep], y[keep], z[keep]
 
 
-def _entry_points(grid, far, entry, rng, box=None):
+PATCH_SEED = 3        # the patches' noise, apart from the groves'
+
+
+def _eye_distance(grid, sights):
+    """Metres from each node of the grid to the nearest eye standing on the ground (within 5 m of it), cached."""
+    key = tuple((round(e[0], 1), round(e[1], 1)) for e in sights)
+    got = grid.__dict__.get("_eye_distance")
+    if got is not None and got[0] == key:
+        return got[1]
+    D = np.full(grid.X.shape, 1e6, np.float32)
+    for ex, ey, ez, _ in sights:
+        if ez - grid.at(grid.Z, np.array([ex]), np.array([ey]))[0] > 5.0 or not grid.inside(ex, ey):
+            continue
+        D = np.minimum(D, np.hypot(grid.X - ex, grid.Y - ey).astype(np.float32))
+    grid._eye_distance = (key, D)
+    return D
+
+
+def _entry_points(grid, far, entry, rng, box=None, fade=False, sights=()):
     """Where one planting entry puts its plants: x, y and the ground's height under each."""
     kind = entry["kind"]
     if "rows" in entry:
@@ -647,6 +804,14 @@ def _entry_points(grid, far, entry, rng, box=None):
         m = grid.zone(entry["zone"], entry.get("box")) * grid.clear(KINDS[kind]["margin"])
         if entry.get("clump"):
             m = m * grid.clump(*entry["clump"])
+        if entry.get("frame"):
+            r0, r1 = entry["frame"]
+            d = _eye_distance(grid, sights)
+            m = m * smoothstep(r0 - 10.0, r0 + 10.0, d) * smoothstep(r1 + 25.0, r1 - 25.0, d)
+        if entry.get("patch"):
+            m = m * grid.clump(*entry["patch"], seed=PATCH_SEED)
+        if entry.get("edge"):
+            m = m * grid.edge(*entry["edge"])
         if entry.get("hollows"):
             m = m * grid.hollows
         if entry.get("grass"):
@@ -661,10 +826,19 @@ def _entry_points(grid, far, entry, rng, box=None):
             mf = far.zone(entry["zone"], entry.get("box"))
             if entry.get("clump"):
                 mf = mf * far.clump(*entry["clump"])
+            if entry.get("patch"):
+                mf = mf * far.clump(*entry["patch"], seed=PATCH_SEED)
+            if entry.get("edge"):
+                mf = mf * far.edge(*entry["edge"])
             if entry.get("hollows"):
                 mf = mf * far.hollows
             r = np.hypot(far.X, far.Y)
             mf = mf * np.minimum(1.0, (FAR_FALLOFF / np.maximum(r, 1.0)) ** 1.2) * ~grid.inside(far.X, far.Y)
+            if fade:
+                # thinning to nothing over the last kilometre or so before REACH's edge, raggedly, so the
+                # planting has no ruler-straight end
+                inset = np.minimum(np.minimum(far.X - REACH[0], REACH[1] - far.X), np.minimum(far.Y - REACH[2], REACH[3] - far.Y))
+                mf = mf * smoothstep(0.0, 1300.0, inset + 700.0 * _noise(61, 12000.0).fbm(far.X, far.Y, 900.0, 3, key=7))
             fx, fy, _ = far.scatter(mf * (entry["per_ha"] / 1e4), rng)
             fx, fy = fx[~grid.inside(fx, fy)], fy[~grid.inside(fx, fy)]
             x, y = np.concatenate([x, fx]), np.concatenate([y, fy])
@@ -675,6 +849,15 @@ def _entry_points(grid, far, entry, rng, box=None):
         for level, (x0, x1, y0, y1) in grid.water:
             ok |= (x > x0) & (x < x1) & (y > y0) & (y < y1) & (z > level - 0.45) & (z < level + 0.8)
         x, y, z = x[ok], y[ok], z[ok]
+    if entry["zone"] == "pond" and len(x):
+        # afloat: held to the shallows by the ground's own height, then stood on the water's surface
+        ok = np.zeros(len(x), bool)
+        top = np.zeros(len(x))
+        for level, (x0, x1, y0, y1) in grid.water:
+            here = (x > x0) & (x < x1) & (y > y0) & (y < y1) & (z < level - POND[0] + 0.1) & (z > level - POND[1] - 0.1)
+            ok |= here
+            top = np.where(here, level + 0.01, top)
+        x, y, z = x[ok], y[ok], top[ok]
     if entry.get("avoid") and len(x):
         ok = _outside_buildings(x, y, entry["avoid"])
         x, y, z = x[ok], y[ok], z[ok]
@@ -684,16 +867,19 @@ def _entry_points(grid, far, entry, rng, box=None):
     return x, y, z
 
 
-def instances(kind, x, y, z, height, heights, rng, dry=(0.0, 0.3)):
+def instances(kind, x, y, z, height, heights, rng, dry=(0.0, 0.3), rise=None):
     """
     Point attributes for plants of one kind: which variant (the palm built nearest the height
     wanted, or any), the scale that gives the height wanted, a lean, a turn, `tone` (colour
-    variety) and `wear` (dryness, 0 green to 1 straw).
+    variety) and `wear` (dryness, 0 green to 1 straw). `rise` (wavelength, amount) swells and
+    sinks the heights across the ground, so a canopy has crests and hollows, not one level.
     """
     K = KINDS[kind]
     n = len(x)
     H = np.asarray(heights, np.float64)
     h = rng.uniform(height[0], height[1], n)
+    if rise and n:
+        h = h * np.clip(1.0 + rise[1] * 2.0 * _noise(67, 12000.0).fbm(x, y, rise[0], 2, key=8), 1.0 - rise[1], 1.0 + rise[1])
     if kind in ("date-palm", "doum-palm") and len(H) > 1:
         order = np.argsort(np.abs(H[None, :] - h[:, None]), axis=1)
         var = np.where(rng.random(n) < 0.65, order[:, 0], order[:, 1])
@@ -709,25 +895,203 @@ def instances(kind, x, y, z, height, heights, rng, dry=(0.0, 0.3)):
     return pos, rot, scl, var.astype(np.int32), rng.random(n), wear
 
 
+# LOOK CHOICES: the views kept open through the trees, in the eras whose forest could close them
+# (`eras`). Every station and shot outside (render/stations.json, render/shots.json), every film
+# of the era (render/films.json) sampled every `film_step` metres along its path, and EYES, looks
+# at the three pyramids (at the faces turned to it, from `keep` of each pyramid's height up, and
+# at the apex), at its own target, and within `sphinx_within` metres at the Sphinx (SPHINX). A plant
+# taller than `tall` whose crown (KINDS `crown`, plus `pad`) would stand in one of those sightlines
+# is cut down to `below` metres under it or, when that would take off more than `shrink` of its
+# height, not planted. Round each eye nothing reaching within `below` of the eye's height stands
+# closer than `clear` metres plus `per_m` metres a metre of its height. So a station stands in a
+# glade that opens towards the pyramids, which is what a view kept open through a forest is.
+VIEWS_OPEN = dict(eras=("first-time", "lion"), keep=0.35, pad=0.6, below=0.4, clear=5.0, per_m=0.7, shrink=0.25,
+                  tall=1.2, sphinx_within=800.0, film_step=60.0)
+EYES = [dict(id="overview", x=1400.0, y=-1600.0, above=350.0, target=(-150.0, -250.0, 20.0))]
+# The Sphinx's head, chest, paws, back and both flanks low and high (after data/footprints/giza.json's
+# sphinx.head, .paws and .body: bases -38.6 to -39.7 m, 20, 4 and 11 m high, x 288 to 363, y -442.6 to
+# -423.5), kept in view from any eye within `sphinx_within`.
+SPHINX = ((337.6, -433.0, -21.0), (346.0, -433.0, -30.0), (355.0, -433.0, -36.5), (300.0, -433.0, -29.0)) + tuple(
+    (x, y, z) for x in (296.0, 316.0, 336.0) for y in (-441.5, -424.5) for z in (-35.0, -30.0))
+
+
+def _ground_at(terrain, water, x, y):
+    z = float(np.asarray(terrain.surface(np.float32([x]), np.float32([y])), np.float64).ravel()[0])
+    for level, (x0, x1, y0, y1) in water:
+        if x0 < x < x1 and y0 < y < y1:
+            z = max(z, level)
+    return z
+
+
+def _towards_sun(moment, state, x, y, z, reach=300.0):
+    """A point `reach` metres from (x, y, z) towards the sun of a moment (stations.json's), or None for a night."""
+    if not isinstance(moment, dict) or "date" not in moment:
+        return None
+    from . import sun
+    alt, az, _ = sun.parse_moment(moment, states.spec(state)["year"])
+    if alt <= 0:
+        return None
+    a, b = math.radians(alt), math.radians(az)
+    return (x + reach * math.sin(b) * math.cos(a), y + reach * math.cos(b) * math.cos(a), z + reach * math.sin(a))
+
+
+def eyes(state, terrain, water=()):
+    """
+    Every eye whose view the planting keeps open, as [(x, y, z, [its own targets])]: a station's
+    or a shot's own targets are what it aims at and the sun of its moment, so that no tree
+    stands between the camera and the sun and puts it in a shadow the moment was chosen to avoid.
+    """
+    stations, shots = data.views()
+    moments = stations.get("moments", {})
+    out = []
+    for v in stations["stations"] + shots["shots"]:
+        v = dict(v, **v.get("by_state", {}).get(state, {}))
+        if v.get("inside") or v.get("hall"):
+            continue
+        z = v["z"] if "z" in v else _ground_at(terrain, water, v["x"], v["y"]) + v.get("eye", 1.7)
+        own = [tuple(v["target"])] if "target" in v else []
+        m = v.get("moment")
+        lit = _towards_sun(moments.get(m) if isinstance(m, str) else m, state, float(v["x"]), float(v["y"]), float(z))
+        out.append((float(v["x"]), float(v["y"]), float(z), own + ([lit] if lit else [])))
+    try:
+        films = data.load_json(data.RENDER, "films.json")["films"]
+    except (OSError, KeyError, ValueError):
+        films = []
+    for f in films:
+        if f.get("state") != state or f.get("inside"):
+            continue
+        if "at" in f:
+            x, y = f["at"]
+            out.append((float(x), float(y), _ground_at(terrain, water, x, y) + f.get("eye", 1.7), []))
+            continue
+        path, look = np.asarray(f["path"], np.float64), np.asarray(f["look"], np.float64)
+        for k in range(len(path) - 1):
+            n = max(1, int(np.hypot(*(path[k + 1, :2] - path[k, :2])) / VIEWS_OPEN["film_step"]))
+            for i in range(n + (k == len(path) - 2)):
+                u = i / n
+                p = path[k] * (1 - u) + path[k + 1] * u
+                q = look[min(k, len(look) - 1)] * (1 - u) + look[min(k + 1, len(look) - 1)] * u
+                out.append((float(p[0]), float(p[1]), float(p[2]), [tuple(q)]))
+    for e in EYES:
+        out.append((e["x"], e["y"], _ground_at(terrain, water, e["x"], e["y"]) + e["above"], [tuple(e["target"])]))
+    return out
+
+
+def _sight_targets(ex, ey, ez, extra):
+    """The points a view from (ex, ey, ez) keeps: the pyramids' faces turned to it and their apexes, the Sphinx near it."""
+    keep = VIEWS_OPEN["keep"]
+    pts = list(extra)
+    for P in data.PYRAMIDS.values():
+        cx, cy, h, H, z0 = P["cx"], P["cy"], P["half"], P["H"], P["base"]
+        pts.append((cx, cy, z0 + H))
+        for nx, ny in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if (ex - cx) * nx + (ey - cy) * ny + (h / H) * (ez - z0) <= h:
+                continue            # the face is turned away from the eye
+            for f in (keep, keep + 0.2, keep + 0.45):
+                r = h * (1 - f)
+                for s in (-0.75, 0.0, 0.75):
+                    pts.append((cx + nx * r - ny * s * r, cy + ny * r + nx * s * r, z0 + f * H))
+    if np.hypot(ex - SPHINX[0][0], ey - SPHINX[0][1]) < VIEWS_OPEN["sphinx_within"]:
+        pts.extend(SPHINX)
+    pts = np.asarray(pts, np.float64)
+    # a point another pyramid stands in front of needs no way kept open to it
+    t = np.linspace(0.02, 0.98, 32)[None, :]
+    X = ex + (pts[:, 0:1] - ex) * t
+    Y = ey + (pts[:, 1:2] - ey) * t
+    Z = ez + (pts[:, 2:3] - ez) * t
+    hidden = np.zeros(len(pts), bool)
+    for P in data.PYRAMIDS.values():
+        cx, cy, h, H, z0 = P["cx"], P["cy"], P["half"], P["H"], P["base"]
+        reach = np.maximum(np.abs(X - cx), np.abs(Y - cy))
+        own = (np.abs(pts[:, 0] - cx) <= h + 0.5) & (np.abs(pts[:, 1] - cy) <= h + 0.5)
+        hidden |= ~own & ((reach < h) & (Z < z0 + H * (1.0 - reach / h))).any(axis=1)
+    return pts[~hidden]
+
+
+def keep_open(kind, pos, scl, height, sights, tall=None, drop=True):
+    """
+    Which plants of one kind may stand, and their scales, cut down where a crown would stand in
+    a view VIEWS_OPEN keeps: returns (keep mask, new scl). `height` is each plant's height in metres.
+    `tall` overrides VIEWS_OPEN's; with `drop` False nothing is left out, only cut down.
+    """
+    V, K = VIEWS_OPEN, KINDS[kind]
+    n = len(pos)
+    keep = np.ones(n, bool)
+    if not sights or not n:
+        return keep, scl
+    idx = np.nonzero(height > (V["tall"] if tall is None else tall))[0]
+    if not len(idx):
+        return keep, scl
+    px, py = pos[idx, 0], pos[idx, 1]
+    pz = pos[idx, 2] + K["sink"]
+    hh = height[idx]
+    rc = K.get("crown", 0.4) * hh * (scl[idx, 0] / np.maximum(scl[idx, 2], 1e-6)) + V["pad"]
+    allow = hh.copy()
+    dropped = np.zeros(len(idx), bool)
+    for ex, ey, ez, extra in sights:
+        dx, dy = px - ex, py - ey
+        d = np.hypot(dx, dy)
+        if drop:
+            drop_here = (d < V["clear"] + V["per_m"] * hh) & (pz + hh > ez - V["below"])
+        else:
+            drop_here = np.zeros(len(idx), bool)
+        dropped |= drop_here
+        T = _sight_targets(ex, ey, ez, extra)
+        vx, vy = T[:, 0] - ex, T[:, 1] - ey
+        # only plants whose crowns, seen from the eye, overlap the bearing of some target can stand in its way
+        ths = np.sort(np.arctan2(vy, vx))
+        thp = np.arctan2(dy, dx)
+        k = np.searchsorted(ths, thp)
+        wrap = lambda a: np.abs((a + np.pi) % (2 * np.pi) - np.pi)
+        gap = np.minimum(wrap(thp - ths[k % len(ths)]), wrap(thp - ths[(k - 1) % len(ths)]))
+        near = np.nonzero((d < np.hypot(vx, vy).max()) & (gap < np.arcsin(np.minimum(rc / np.maximum(d, 1e-3), 1.0)) + 0.02))[0]
+        if not len(near):
+            continue
+        L2 = np.maximum(vx * vx + vy * vy, 1e-6)
+        for j0 in range(0, len(near), 20000):
+            sel = near[j0:j0 + 20000]
+            t = (dx[sel, None] * vx[None, :] + dy[sel, None] * vy[None, :]) / L2[None, :]
+            off = np.abs(dx[sel, None] * vy[None, :] - dy[sel, None] * vx[None, :]) / np.sqrt(L2)[None, :]
+            room = ez + t * (T[None, :, 2] - ez) - V["below"] - pz[sel, None]
+            # in the sightline, reaching up into it, and the line above the plant's foot (else the ground hides it anyway)
+            hit = (t > 0.0) & (t < 1.0) & (off < rc[sel, None]) & (room < hh[sel, None]) & (room > -V["below"])
+            room = np.where(hit, room, np.inf).min(axis=1)
+            allow[sel] = np.minimum(allow[sel], room)
+    ok = ~dropped & (allow >= (1.0 - V["shrink"]) * hh) if drop else np.ones(len(idx), bool)
+    keep[idx] = ok
+    f = np.clip(allow / hh, 0.0 if drop else 0.2, 1.0)
+    scl = scl.copy()
+    scl[idx] *= f[:, None]
+    return keep, scl
+
+
 def plan(state, terrain, lib_heights, grid=None, far=None, box=None, seed=0):
     """
     The whole era's planting as {kind: (pos, rot, scl, var, tone, wear)}, with no Blender:
-    `lib_heights` is {kind: [native height of each variant]}.
+    `lib_heights` is {kind: [native height of each variant]}. In the eras VIEWS_OPEN names, a
+    plant that would close a kept view is cut down or left out (keep_open).
     """
     R = recipe(state)
     grid = grid or near_grid(state, terrain, box)
     if far is None and any(e.get("far") for e in R["plants"]):
         far = far_grid(state, terrain, water=grid.water)
     rng = np.random.default_rng(1009 + seed + sum(map(ord, state)))
+    sights = eyes(state, terrain, grid.water) if state in VIEWS_OPEN["eras"] else []
     out = {}
     for e in R["plants"]:
         kind = e["kind"]
         if kind not in lib_heights:
             continue
-        x, y, z = _entry_points(grid, far, e, rng, box)
+        x, y, z = _entry_points(grid, far, e, rng, box, fade=R.get("fade", False), sights=sights)
         if not len(x):
             continue
-        attrs = instances(kind, x, y, z, e["height"], lib_heights[kind], rng, e.get("dry", _dry(kind)))
+        attrs = instances(kind, x, y, z, e["height"], lib_heights[kind], rng, e.get("dry", R.get("wear") or _dry(kind)), e.get("rise"))
+        if sights:
+            pos, rot, scl, var = attrs[:4]
+            ok, scl = keep_open(kind, pos, scl, scl[:, 2] * np.asarray(lib_heights[kind], np.float64)[var], sights)
+            if not ok.any():
+                continue
+            attrs = tuple(a[ok] for a in (pos, rot, scl, var) + tuple(attrs[4:]))
         if kind in out:
             out[kind] = tuple(np.concatenate([a, b]) for a, b in zip(out[kind], attrs))
         else:
@@ -854,7 +1218,7 @@ def build(state, terrain, coll, rng=None, log=print, camera_xy=None, box=None):
     _fill_cover_image(state, grid)
     obs = []
     if R["plants"]:
-        lib = library(coll, log, kinds={e["kind"] for e in R["plants"]} | ({"grass"} if R["near"] else set()))
+        lib = library(coll, log, kinds={e["kind"] for e in R["plants"]} | ({R["near"].get("kind", "grass")} if R["near"] else set()))
         heights = {k: h for k, (c, h) in lib.items()}
         planned = plan(state, terrain, heights, grid=grid, box=box)
         for kind, (pos, rot, scl, var, tone, wear) in planned.items():
@@ -879,9 +1243,10 @@ def near_camera(state, terrain, coll, camera_xy, log=print):
     if not recipe(state).get("near"):
         return None
     t0 = time.time()
-    lib = library(None, log, kinds={"grass"})
+    tuft = recipe(state)["near"].get("kind", "grass")
+    lib = library(None, log, kinds={tuft})
     grid = _grid_for(state, terrain, None, log, around=camera_xy)
-    coll_grass, heights = lib["grass"]
+    coll_grass, heights = lib[tuft]
     got = near_plan(state, grid, camera_xy, heights)
     if got is None or not len(got[0]):
         return None
@@ -897,7 +1262,7 @@ def near_camera(state, terrain, coll, camera_xy, log=print):
             z[on] = terrain.z(x[on].astype(np.float32), y[on].astype(np.float32)) + _patch_lift() + 0.01
     n = len(x)
     g = np.random.default_rng(n)
-    K = KINDS["grass"]
+    K = KINDS[tuft]
     xy = g.uniform(K["xy"][0], K["xy"][1], n)
     pos = np.stack([x, y, z - K["sink"]], 1)
     rot = np.stack([g.normal(0.0, K["tilt"], n), g.normal(0.0, K["tilt"], n), g.uniform(0.0, 2 * math.pi, n)], 1)
@@ -1003,7 +1368,22 @@ def cover_group(state):
     t.link(broken, out.inputs["Cover"])
     T = recipe(state).get("tint") or dict(grass=("808080", "808080"), soil=("808080", "808080"))
     drift = t.noise(pos, 0.012, 3.0)
-    t.link(t.ramp(drift, [(0.38, hexlin(T["grass"][0])), (0.62, hexlin(T["grass"][1]))]), out.inputs["Color"])
+    col = t.ramp(drift, [(0.38, hexlin(T["grass"][0])), (0.62, hexlin(T["grass"][1]))])
+    if T.get("mottle"):
+        # tall grass from afar is not a lawn: clumps and hollows a few metres across, darker and lighter
+        k, depth = T["mottle"]
+        col = t.mix(1.0, col, t.ramp(t.noise(pos, k, 4.0, 0.65), [(0.3, (1 - depth,) * 3 + (1.0,)), (0.7, (1.0, 1.0, 1.0, 1.0))]), "MULTIPLY")
+    if T.get("far"):
+        # out where the planting thins away (REACH, `fade`), the ground takes the forest canopy's colour
+        hexc, r0, r1 = T["far"]
+        dist = t.node("ShaderNodeVectorMath", operation="LENGTH")
+        flat = t.node("ShaderNodeCombineXYZ")
+        t.link(sep.outputs["X"], flat.inputs[0])
+        t.link(sep.outputs["Y"], flat.inputs[1])
+        t.link(flat.outputs[0], dist.inputs[0])
+        wob = t.math("MULTIPLY", t.math("SUBTRACT", t.noise(pos, 0.0006, 3.0), 0.5), 900.0)
+        col = t.mix(t.band(t.math("ADD", dist.outputs["Value"], wob), r0, r1), col, hexlin(hexc))
+    t.link(col, out.inputs["Color"])
     t.link(t.ramp(t.noise(pos, 0.03, 3.0), [(0.35, hexlin(T["soil"][0])), (0.65, hexlin(T["soil"][1]))]), out.inputs["Soil"])
     nb, step = _near_box()
     xs = np.arange(nb[0], nb[1] + 0.1, step)
@@ -1177,34 +1557,41 @@ def _tube(b, pts, radii, sides, mat=0, v_scale=1.0, **attrs):
             b.face((r0[k], r0[k1], r1[k1], r1[k]), [(u0, s0), (u1, s0), (u1, s1), (u0, s1)], mat)
 
 
-def grass_tuft(seed, blades, height, spread, lean, curl, stalks=0, dead=0.0):
-    """A tuft or a tussock of blades, a share of them dead, with `stalks` seed heads over it."""
+def grass_tuft(seed, blades, height, spread, lean, curl, stalks=0, dead=0.0, width=None, plume=1.0):
+    """
+    A tuft or a tussock of blades, a share of them dead, with `stalks` seed heads over it.
+    `width` (least, most) is the blades' width in metres, by default a little wider as the tuft
+    is taller; `plume` scales the seed heads' spikelets.
+    """
     rnd = random.Random(seed)
     b = _Builder(("blade", "dead", "stalk"))
+    w0, w1 = width or (0.005 * (height / 0.5) ** 0.3, 0.011 * (height / 0.5) ** 0.3)
     for _ in range(blades):
         r = spread * math.sqrt(rnd.random())
         a = rnd.uniform(0.0, 2.0 * math.pi)
         out = r / spread if spread else 0.0
         _blade(b, (r * math.cos(a), r * math.sin(a), 0.0), a + rnd.gauss(0.0, 0.5), height * rnd.uniform(0.45, 1.0),
-               rnd.uniform(0.005, 0.011) * (height / 0.5) ** 0.3, lean * (0.2 + 0.8 * out) + abs(rnd.gauss(0.0, 0.1)),
+               rnd.uniform(w0, w1), lean * (0.2 + 0.8 * out) + abs(rnd.gauss(0.0, 0.1)),
                curl * rnd.uniform(0.3, 1.2) * (0.4 + out), rnd.gauss(0.0, 0.6), 5,
                blade=rnd.random(), dead=1.0 if rnd.random() < dead else 0.0)
     for _ in range(stalks):
         r = spread * 0.6 * math.sqrt(rnd.random())
         a = rnd.uniform(0.0, 2.0 * math.pi)
-        line = _blade(b, (r * math.cos(a), r * math.sin(a), 0.0), a, height * rnd.uniform(1.1, 1.45), 0.0028,
+        line = _blade(b, (r * math.cos(a), r * math.sin(a), 0.0), a, height * rnd.uniform(1.1, 1.45), 0.0028 * plume ** 0.5,
                       rnd.uniform(0.03, 0.2), rnd.uniform(0.05, 0.3), 0.0, 6, taper=0.97, stalk=1.0, blade=rnd.random())
         for k in range(10):
-            _blade(b, _along(line, 0.72 + 0.26 * k / 9), rnd.uniform(0.0, 2 * math.pi), rnd.uniform(0.03, 0.06), 0.0035,
-                   rnd.uniform(0.4, 0.9), 0.3, 0.0, 2, taper=0.5, stalk=1.0, blade=rnd.random())
+            _blade(b, _along(line, 0.72 + 0.26 * k / 9), rnd.uniform(0.0, 2 * math.pi), rnd.uniform(0.03, 0.06) * plume,
+                   0.0035 * plume ** 0.5, rnd.uniform(0.4, 0.9), 0.3, 0.0, 2, taper=0.5, stalk=1.0, blade=rnd.random())
     return b
 
 
-def _frond(b, rnd, base, az, el, length, droop, v_angle, leaf, dead, pinnae=55, pin_len=0.46, mat=1):
+def _frond(b, rnd, base, az, el, length, droop, v_angle, leaf, dead, pinnae=55, pin_len=0.46, mat=1, pin_w=0.034, jitter=0.0):
     """
     A date palm's frond: a rachis arching under its own weight, two ranks of leaflets held
     in a V along it, longest in the middle. Real leaflets, so no alpha and no transparent
     bounces: the Sketchfab palm's alpha-card fronds were left behind for that reason.
+    `pin_w` is a leaflet's width; `jitter` throws the leaflets up and down out of the V by
+    turns (radians), as an oil palm's are.
     """
     from mathutils import Vector
     segs = 12
@@ -1239,9 +1626,11 @@ def _frond(b, rnd, base, az, el, length, droop, v_angle, leaf, dead, pinnae=55, 
         L = pin_len * (math.sin(math.pi * min(t * 1.08, 1.0)) ** 0.6) * rnd.uniform(0.85, 1.1)
         for sg in (-1.0, 1.0):
             beta = v_angle + rnd.gauss(0.0, 0.08)
+            if jitter:
+                beta += jitter * (1.0 if k % 2 else -0.6) + rnd.gauss(0.0, 0.3 * jitter)
             dp = (s * (sg * math.cos(beta)) + n * math.sin(beta) + d * 0.55).normalized()
             wv = d - dp * d.dot(dp)
-            wv = wv.normalized() * 0.034
+            wv = wv.normalized() * pin_w
             p1 = q + dp * (0.45 * L) - up * (0.02 * L)
             p2 = q + dp * L - up * (0.08 * L)
             v0 = b.vert(q - wv * 0.3, leaf=leaf, dead=dead)
@@ -1407,27 +1796,33 @@ def papyrus(seed, stems=22, height=3.0):
     return b
 
 
-def reed(seed, culms=36, height=2.5):
-    """A clump of reeds (Phragmites): culms with arching leaves and a plume leaning with the wind. Slots: 0 culms, 1 leaves."""
+def reed(seed, culms=36, height=2.5, spread=0.35, leaves=(6, 9), leaf_len=(0.3, 0.45), leaf_w=0.018, culm_r=0.007,
+         plume=(0.12, 0.22), plume_dead=0.7):
+    """
+    A clump of reeds (Phragmites): culms with arching leaves and a plume leaning with the wind.
+    Slots: 0 culms, 1 leaves. The keywords make it the elephant grass (Pennisetum purpureum) too:
+    a wider clump of taller canes with longer, broader leaves and green plumes.
+    """
     from mathutils import Vector
     rnd = random.Random(seed)
     b = _Builder()
     wind = rnd.uniform(0.0, 2 * math.pi)
     for _ in range(culms):
-        r, a = 0.35 * math.sqrt(rnd.random()), rnd.uniform(0.0, 2 * math.pi)
+        r, a = spread * math.sqrt(rnd.random()), rnd.uniform(0.0, 2 * math.pi)
         base = Vector((r * math.cos(a), r * math.sin(a), 0.0))
         h = height * rnd.uniform(0.65, 1.0)
         lean = Vector((math.cos(a), math.sin(a), 0.0)) * rnd.uniform(0.02, 0.12)
         pts = [base + Vector((0.0, 0.0, h * t)) + lean * (h * t * t) for t in (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)]
-        _tube(b, pts, [0.007, 0.0065, 0.006, 0.0055, 0.005, 0.004], 4, mat=0, leaf=rnd.random())
+        k0 = culm_r / 0.007
+        _tube(b, pts, [0.007 * k0, 0.0065 * k0, 0.006 * k0, 0.0055 * k0, 0.005 * k0, 0.004 * k0], 4, mat=0, leaf=rnd.random())
         yaw = rnd.uniform(0.0, 2 * math.pi)
-        for k in range(rnd.randint(6, 9)):
+        for k in range(rnd.randint(*leaves)):
             t = 0.12 + 0.7 * k / 8
-            _blade(b, _along(pts, t), yaw + k * math.pi + rnd.gauss(0.0, 0.3), rnd.uniform(0.3, 0.45), 0.018,
+            _blade(b, _along(pts, t), yaw + k * math.pi + rnd.gauss(0.0, 0.3), rnd.uniform(*leaf_len), leaf_w,
                    rnd.uniform(0.6, 1.0), rnd.uniform(0.8, 1.3), 0.0, 4, taper=0.5, mat=1, leaf=rnd.random())
         for k in range(12):
-            _blade(b, _along(pts, 0.9 + 0.1 * k / 11), wind + rnd.gauss(0.0, 0.5), rnd.uniform(0.12, 0.22), 0.006,
-                   rnd.uniform(0.3, 0.8), 0.8, 0.0, 3, taper=0.5, mat=1, leaf=rnd.random(), dead=0.7)
+            _blade(b, _along(pts, 0.9 + 0.1 * k / 11), wind + rnd.gauss(0.0, 0.5), rnd.uniform(*plume), 0.006,
+                   rnd.uniform(0.3, 0.8), 0.8, 0.0, 3, taper=0.5, mat=1, leaf=rnd.random(), dead=plume_dead)
     return b
 
 
@@ -1478,6 +1873,468 @@ def bush(seed, height, width, twigs=40, leaves=60):
     return b
 
 
+# --- The First Time's forest: trees grown on the atlas leaves, palms, bananas, understorey ----
+
+def _hex_leaf(b, p, n, a, length, tpl, fold=0.12, curl=0.1, mat=1, **attrs):
+    """
+    A leaf as the hexagon of one leaf of the Poly Haven leaf atlas (`tpl`, its six UVs from foot
+    round to tip and back, _leaf_templates), laid from p along a with its face to n, `length`
+    long, its proportions the atlas leaf's own. `fold` lifts its sides along n and `curl` bends
+    its tip back, both against its length. No alpha: the hexagon lies inside the leaf's outline.
+    """
+    f, t = tpl[0], tpl[3]
+    ex, ey = t[0] - f[0], t[1] - f[1]
+    L = math.hypot(ex, ey) or 1e-6
+    ex, ey = ex / L, ey / L
+    side = n.cross(a)
+    side = side.normalized() if side.length > 1e-6 else a.orthogonal().normalized()
+    idx = []
+    for u, v in tpl:
+        s = ((u - f[0]) * ex + (v - f[1]) * ey) / L
+        c = ((u - f[0]) * -ey + (v - f[1]) * ex) / L
+        idx.append(b.vert(p + a * (s * length) + side * (c * length) + n * (length * (fold * abs(c) - curl * s * s)), **attrs))
+    b.face(idx, [(float(u), float(v)) for u, v in tpl], mat)
+
+
+def _leaf_cluster(b, rnd, c, out, radius, flat, count, length, templates, droop=0.35, mat=1):
+    """`count` atlas leaves round c in a spray `radius` across (squashed by `flat` in height), faced out along `out` and up."""
+    from mathutils import Vector
+    up = Vector((0.0, 0.0, 1.0))
+    for _ in range(count):
+        d = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1)))
+        if d.length < 1e-6:
+            continue
+        d.normalize()
+        p = c + Vector((d.x, d.y, d.z * flat)) * (radius * (0.25 + 0.75 * rnd.random() ** 0.5))
+        n = (out * 0.9 + d * 0.8 + up * 1.0 + Vector((rnd.gauss(0, 0.45), rnd.gauss(0, 0.45), rnd.gauss(0, 0.45)))).normalized()
+        a = d - up * droop + Vector((rnd.gauss(0, 0.6), rnd.gauss(0, 0.6), rnd.gauss(0, 0.3)))
+        a = a - n * a.dot(n)
+        if a.length < 1e-6:
+            continue
+        a.normalize()
+        L = length * rnd.uniform(0.75, 1.25)
+        _hex_leaf(b, p - a * (0.4 * L), n, a, L, templates[rnd.randrange(len(templates))], leaf=rnd.random(), dead=0.0)
+
+
+def _crown_points(rnd, count, R, z0, z1, dome, shell, spacing, under=0.45, lobes=0.35):
+    """
+    Cluster centres through the outer shell of a crown: widest at `dome` of the way up, radius R
+    there, its outline pushed out and in by `lobes` (a few broad bulges in random directions, so
+    no two crowns are one round ball).
+    """
+    from mathutils import Vector
+    g = np.random.default_rng(rnd.randrange(1 << 30))
+    zc = z0 + dome * (z1 - z0)
+    P = np.stack([g.uniform(-R, R, count * 300), g.uniform(-R, R, count * 300), g.uniform(z0, z1, count * 300)], 1)
+    rz = np.where(P[:, 2] >= zc, z1 - zc, max(zc - z0, 1e-3))
+    Q = np.stack([P[:, 0] / R, P[:, 1] / R, (P[:, 2] - zc) / rz], 1)
+    rho = np.linalg.norm(Q, axis=1)
+    U = g.normal(size=(5, 3))
+    U /= np.linalg.norm(U, axis=1)[:, None]
+    w = g.uniform(0.5, 1.0, 5)
+    dirs = Q / np.maximum(rho, 1e-6)[:, None]
+    bulge = 1.0 - 0.45 * lobes + lobes * (np.maximum(dirs @ U.T, 0.0) ** 2 * w).sum(1)
+    # the crown's underside carries fewer leaves than its top and sides
+    P = P[(rho >= shell * bulge) & (rho <= bulge) & ((P[:, 2] >= zc) | (g.random(len(P)) < under))]
+    got = np.zeros((0, 3))
+    for p in P:
+        if len(got) and (np.sum((got - p) ** 2, axis=1) < spacing * spacing).any():
+            continue
+        got = np.vstack([got, p])
+        if len(got) >= count:
+            break
+    return [Vector(tuple(p)) for p in got]
+
+
+def _split(rnd, p, pts, k):
+    """The points in `k` groups by their bearing round the way from p to their middle, each group a contiguous sector."""
+    from mathutils import Vector
+    m = sum((q - p for q in pts), Vector((0.0, 0.0, 0.0)))
+    m = m.normalized() if m.length > 1e-6 else Vector((0.0, 0.0, 1.0))
+    u1 = m.orthogonal().normalized()
+    u2 = m.cross(u1)
+    ang = sorted((math.atan2((q - p).dot(u2), (q - p).dot(u1)), i) for i, q in enumerate(pts))
+    gaps = [(ang[(j + 1) % len(ang)][0] - ang[j][0]) % (2 * math.pi) for j in range(len(ang))]
+    start = (max(range(len(gaps)), key=gaps.__getitem__) + 1) % len(ang)
+    order = [ang[(start + j) % len(ang)][1] for j in range(len(ang))]
+    cuts = [round(len(order) * g / k) for g in range(k + 1)]
+    return [[pts[i] for i in order[cuts[g]:cuts[g + 1]]] for g in range(k) if cuts[g + 1] > cuts[g]]
+
+
+def _bark_tube(b, p, q, r0, r1, rnd, bend, sides=None, **attrs):
+    """A branch from p to q, bowed a little upward and aside, `r0` thick at its foot and `r1` at its end."""
+    from mathutils import Vector
+    d = q - p
+    L = d.length
+    if L < 1e-4:
+        return
+    side = d.orthogonal().normalized()
+    mid = p.lerp(q, 0.5) + Vector((0.0, 0.0, bend * L)) + side * rnd.gauss(0.0, 0.5 * bend * L)
+    n = sides or (12 if r0 > 0.35 else 8 if r0 > 0.12 else 6 if r0 > 0.04 else 4 if r0 > 0.015 else 3)
+    _tube(b, [p, mid, q], [r0, 0.5 * (r0 + r1), r1], n, mat=0, v_scale=1.0 / max(2 * math.pi * r0, 0.05), **attrs)
+
+
+def broadleaf(seed, templates, height, width, crown_base, trunk_r, clusters, per_cluster, cluster_r, leaf_len,
+              fork=None, dome=0.4, shell=0.5, limbs=5, flat=0.7, lean=0.03, buttress=0, bend=0.06, under=0.45, droop=0.35, lobes=0.35):
+    """
+    A broadleaf tree `height` metres tall, its crown `width` across from `crown_base` up. Leaf
+    clusters are spread through the outer shell of the crown (widest `dome` of the way up), then
+    the branching is grown back from them to the trunk: at the fork into `limbs` limbs, after that
+    in twos and threes by bearing, each branch as thick as the leaves it carries need (the pipe
+    model: a branch's section is the sum of its children's). `buttress` fins flare the trunk's foot.
+    Each cluster is `per_cluster` atlas leaves `leaf_len` long. Slots: 0 bark, 1 leaves. The whole
+    form is a look choice; the leaves are Poly Haven's photographed atlas (see _leaf_templates).
+    """
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    b = _Builder()
+    fork = fork if fork is not None else 0.85 * crown_base
+    top = height - cluster_r * flat * 0.5
+    R = 0.5 * width - 0.6 * cluster_r
+    centres = _crown_points(rnd, clusters, R, crown_base + cluster_r * flat * 0.5, top, dome, shell, 0.8 * cluster_r, under, lobes)
+    tilt = Vector((rnd.gauss(0.0, lean), rnd.gauss(0.0, lean), 0.0))
+    centres = [c + tilt * c.z for c in centres]
+    F = Vector((0.0, 0.0, fork)) + tilt * fork
+    n = max(6, int(fork / 0.8))
+    # a bole that wanders in one or two long bends, not segment by segment
+    bends = [Vector((rnd.gauss(0, 0.012 * fork), rnd.gauss(0, 0.012 * fork), 0.0)) for _ in range(2)]
+    pts = [Vector((0.0, 0.0, fork * i / n)) + tilt * (fork * i / n)
+           + bends[0] * math.sin(math.pi * i / n) + bends[1] * math.sin(2 * math.pi * i / n) for i in range(n + 1)]
+    radii = [trunk_r * (1.0 + 0.3 * math.exp(-fork * i / n / 1.4)) * (1.0 - 0.1 * i / n) for i in range(n + 1)]
+    _tube(b, pts, radii, 14 if trunk_r > 0.4 else 10, mat=0, v_scale=1.0 / (2 * math.pi * trunk_r), leaf=rnd.random())
+    if buttress:
+        _buttresses(b, rnd, buttress, trunk_r, min(0.18 * height, 5.5), min(0.12 * height, 3.2))
+    axis_xy = Vector((F.x, F.y, 0.0))
+
+    def grow(p, r, group, depth):
+        if len(group) == 1 or depth > 14:
+            for c in group:
+                _bark_tube(b, p, c, r, max(0.25 * r, 0.006), rnd, bend, leaf=rnd.random())
+                out = Vector((c.x - axis_xy.x, c.y - axis_xy.y, 0.0))
+                out = out.normalized() if out.length > 1e-3 else Vector((0.0, 0.0, 0.0))
+                k = rnd.uniform(0.7, 1.25)
+                _leaf_cluster(b, rnd, c, out, cluster_r * k, flat, int(per_cluster * k * k), leaf_len, templates, droop=droop)
+            return
+        k = limbs if depth == 0 else (3 if len(group) > 9 and rnd.random() < 0.35 else 2)
+        for g in _split(rnd, p, group, min(k, len(group))):
+            cg = sum(g, Vector((0.0, 0.0, 0.0))) / len(g)
+            f = rnd.uniform(0.38, 0.58) if depth else rnd.uniform(0.3, 0.45)
+            if len(g) == 1:
+                f = 1.0
+            q = p + (cg - p) * f
+            rg = max(r * math.sqrt(len(g) / len(group)), 0.008)
+            if len(g) > 1:
+                # the limbs leave the trunk from inside its top, so the fork is a swelling and not a seam
+                start = p - Vector((0.0, 0.0, 0.5 * radii[-1] + 0.3)) if depth == 0 else p
+                _bark_tube(b, start, q, rg * 1.04, rg * 0.94, rnd, bend, leaf=rnd.random())
+                grow(q, rg * 0.94, g, depth + 1)
+            else:
+                grow(p, rg, g, depth + 1)
+
+    grow(F, radii[-1], centres, 0)
+    return b
+
+
+def _buttresses(b, rnd, count, r, height, reach):
+    """Plank buttresses round a trunk's foot: `count` thin fins `reach` out at the ground, meeting the trunk `height` up."""
+    from mathutils import Vector
+    a0 = rnd.uniform(0.0, 2 * math.pi)
+    for k in range(count):
+        a = a0 + 2 * math.pi * k / count + rnd.gauss(0.0, 0.25)
+        out = Vector((math.cos(a), math.sin(a), 0.0))
+        side = Vector((-math.sin(a), math.cos(a), 0.0))
+        D, Hh = reach * rnd.uniform(0.7, 1.2), height * rnd.uniform(0.75, 1.15)
+        rows = []
+        for i in range(7):
+            t = i / 6
+            z = Hh * t
+            ro = r * 0.9 + D * (1.0 - t) ** 1.8
+            w = 0.09 * (1.0 - 0.6 * t) + 0.03
+            inner, outer = out * (r * 0.6) + Vector((0.0, 0.0, z)), out * ro + Vector((0.0, 0.0, z - 0.06 * D * (1 - t)))
+            rows.append([b.vert(inner - side * w), b.vert(outer - side * w), b.vert(outer + side * w), b.vert(inner + side * w)])
+        for i in range(6):
+            p0, p1 = rows[i], rows[i + 1]
+            v0, v1 = i / 6 * Hh, (i + 1) / 6 * Hh
+            for j in range(3):
+                b.face((p0[j], p0[j + 1], p1[j + 1], p1[j]), [(j / 3, v0), ((j + 1) / 3, v0), ((j + 1) / 3, v1), (j / 3, v1)], 0)
+
+
+def oil_palm(seed, height, dead=5):
+    """
+    An African oil palm (Elaeis guineensis) `height` metres to its crown's top: a stout trunk
+    shingled with the bases of old fronds, forty-odd long fronds arching from upright to hanging,
+    their leaflets thrown up and down out of one plane (which is what makes its crown bristle), a
+    few dead fronds hanging under them. Slots: 0 bark, 1 fronds. Proportions are a look choice.
+    """
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    b = _Builder()
+    crown = max(height - 3.8, 3.0)
+    lean = Vector((rnd.gauss(0.0, 0.04), rnd.gauss(0.0, 0.04), 0.0))
+    n = max(8, int(crown / 0.45))
+    pts, radii = [], []
+    for i in range(n + 1):
+        t = i / n
+        pts.append(Vector((0.0, 0.0, crown * t)) + lean * (crown * t * t))
+        radii.append(0.36 + 0.16 * (1 - t) ** 5 + 0.12 * smoothstep(0.85, 1.0, t))
+    _tube(b, pts, radii, 12, mat=0, v_scale=1.0 / (2 * math.pi * 0.36))
+    for k in range(int(crown * 9)):
+        t = rnd.uniform(0.3, 0.97)
+        az = k * 2.39996
+        c = _along(pts, t)
+        out = Vector((math.cos(az), math.sin(az), 0.0))
+        r = 0.38 + 0.12 * smoothstep(0.85, 1.0, t)
+        base = c + out * (r * 0.85)
+        tip = base + out * rnd.uniform(0.18, 0.34) + Vector((0.0, 0.0, rnd.uniform(0.15, 0.32)))
+        side = Vector((-math.sin(az), math.cos(az), 0.0)) * rnd.uniform(0.06, 0.1)
+        v = [b.vert(base - side), b.vert(base + side), b.vert(tip + side * 0.5), b.vert(tip - side * 0.5)]
+        b.face(v, [(0, 0), (1, 0), (1, 1), (0, 1)], 0)
+    top = pts[-1]
+    live = rnd.randint(42, 52)
+    for i in range(live):
+        age = i / (live - 1)
+        az = i * 2.39996 + rnd.gauss(0.0, 0.1)
+        el = math.radians(76 - 112 * age ** 0.85) + rnd.gauss(0.0, 0.06)
+        base = top + Vector((math.cos(az), math.sin(az), 0.0)) * (0.2 + 0.25 * age) - Vector((0.0, 0.0, 1.3 * age))
+        length = rnd.uniform(5.2, 7.0) * (0.55 + 0.45 * min(1.0, (i + 1) / 6)) * (height / 13.0) ** 0.35
+        droop = (0.35 + 0.9 * math.cos(el)) * rnd.uniform(0.7, 1.1)
+        _frond(b, rnd, base, az, el, length, droop, math.radians(30 - 12 * age), leaf=rnd.random(), dead=0.0,
+               pinnae=80, pin_len=0.9, pin_w=0.055, jitter=0.5)
+    for i in range(dead):
+        az = rnd.uniform(0.0, 2 * math.pi)
+        base = top + Vector((math.cos(az), math.sin(az), 0.0)) * 0.3 - Vector((0.0, 0.0, 1.3 + 0.5 * rnd.random()))
+        _frond(b, rnd, base, az, math.radians(rnd.uniform(-85, -60)), rnd.uniform(3.4, 4.6), 0.05, math.radians(-30),
+               leaf=rnd.random(), dead=1.0, pinnae=40, pin_len=0.5, pin_w=0.03, jitter=0.3)
+    return b
+
+
+def _paddle(b, rnd, base, az, el, length, width, droop, mat=1, tears=0.25, stalk=0.15, **attrs):
+    """
+    A banana leaf: a midrib from `base` rising at `el` and bending down by `droop` towards the
+    tip, the blade's halves hanging off it, torn into strips here and there (`tears`), the first
+    `stalk` of its length a bare petiole. u runs across the blade, v along it.
+    """
+    from mathutils import Vector
+    segs = 12
+    ca, sa = math.cos(az), math.sin(az)
+    side = Vector((-sa, ca, 0.0))
+    up = Vector((0.0, 0.0, 1.0))
+    p = Vector(base)
+    rows = []
+    cols = (-1.0, -0.5, 0.0, 0.5, 1.0)
+    for i in range(segs + 1):
+        t = i / segs
+        e = el - droop * t ** 1.5
+        d = Vector((math.cos(e) * ca, math.cos(e) * sa, math.sin(e)))
+        n = side.cross(d).normalized()
+        if n.dot(up) < 0:
+            n = -n
+        s = (t - stalk) / (1.0 - stalk)
+        hw = 0.012 if s <= 0 else 0.5 * width * (math.sin(math.pi * min(1.0, 0.1 + 0.9 * s) ** 0.85) ** 0.45) * (1.0 - 0.15 * s)
+        if i == segs:
+            hw = 0.02
+        row = []
+        for c in cols:
+            q = p + side * (c * hw) - n * (0.18 * hw * c * c) + n * (0.04 * hw * abs(c))
+            row.append(b.vert(q, **attrs))
+        rows.append(row)
+        p = p + d * (length / segs)
+    stalk_rows = int(math.ceil(stalk * segs))
+    for i in range(segs):
+        torn = [i > stalk_rows and i < segs - 2 and rnd.random() < tears for _ in range(2)]
+        for j in range(4):
+            if (j == 0 and torn[0]) or (j == 3 and torn[1]):
+                continue            # a tear: the outer strip of this row is gone, and the blade hangs in strips
+            b.face((rows[i][j], rows[i][j + 1], rows[i + 1][j + 1], rows[i + 1][j]),
+                   [(j / 4, i / segs), ((j + 1) / 4, i / segs), ((j + 1) / 4, (i + 1) / segs), (j / 4, (i + 1) / segs)], mat)
+
+
+def banana(seed, height, stems=4):
+    """
+    A clump of bananas (Musa, with Ethiopia's Ensete the tropical Africa of a humid Sahara would
+    know): a mother stem `height` tall to its top leaf and smaller suckers, each a green pseudostem
+    with a spiral of great paddle leaves and a few dead ones hanging brown against it. Slots:
+    0 stems, 1 leaves. A look choice, not a species.
+    """
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    b = _Builder()
+    for s in range(stems):
+        f = 1.0 if s == 0 else rnd.uniform(0.35, 0.8)
+        r, a = (0.0, 0.0) if s == 0 else (rnd.uniform(0.35, 0.8), rnd.uniform(0.0, 2 * math.pi))
+        foot = Vector((r * math.cos(a), r * math.sin(a), 0.0))
+        hs = height * f * 0.5
+        lean = Vector((math.cos(a), math.sin(a), 0.0)) * (0.05 + 0.1 * (s > 0))
+        pts = [foot + Vector((0.0, 0.0, hs * t)) + lean * (hs * t * t) for t in (0.0, 0.25, 0.5, 0.75, 1.0)]
+        rad = 0.15 * f ** 0.7
+        _tube(b, pts, [rad * 1.25, rad, rad * 0.92, rad * 0.8, rad * 0.65], 8, mat=0, v_scale=0.5, leaf=rnd.random())
+        top = pts[-1]
+        leaves = rnd.randint(6, 9)
+        for i in range(leaves):
+            age = i / max(leaves - 1, 1)
+            az = i * 2.39996 + rnd.uniform(-0.2, 0.2)
+            el = math.radians(68 - 72 * age ** 0.9) + rnd.gauss(0.0, 0.07)
+            L = height * f * rnd.uniform(0.62, 0.8) * (0.7 if i == 0 else 1.0)
+            _paddle(b, rnd, top - Vector((0.0, 0.0, 0.25 * age * hs * 0.3)), az, el, L, L * rnd.uniform(0.3, 0.38),
+                    rnd.uniform(0.8, 1.4) * (0.5 + age), tears=0.12 + 0.3 * age, leaf=rnd.random(), dead=0.0)
+        for i in range(rnd.randint(1, 3)):
+            az = rnd.uniform(0.0, 2 * math.pi)
+            _paddle(b, rnd, top - Vector((0.0, 0.0, 0.15 * hs)), az, math.radians(rnd.uniform(-80, -60)),
+                    height * f * rnd.uniform(0.35, 0.5), 0.14 * height * f, 0.1, tears=0.5, leaf=rnd.random(), dead=1.0)
+    return b
+
+
+def fern(seed, fronds, length):
+    """A ground fern: `fronds` arching fronds up to `length` long, each a rachis with two ranks of pinnae. Slots: 0 rachis, 1 pinnae."""
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    b = _Builder()
+    up = Vector((0.0, 0.0, 1.0))
+    for i in range(fronds):
+        az = i * 2.39996 + rnd.gauss(0.0, 0.2)
+        el = math.radians(rnd.uniform(48, 80))
+        L = length * rnd.uniform(0.65, 1.0)
+        droop = rnd.uniform(0.9, 1.6)
+        ca, sa = math.cos(az), math.sin(az)
+        p = Vector((0.05 * ca, 0.05 * sa, 0.0))
+        pts, tans = [], []
+        for k in range(9):
+            t = k / 8
+            e = el - droop * t ** 1.4
+            d = Vector((math.cos(e) * ca, math.cos(e) * sa, math.sin(e)))
+            pts.append(p.copy())
+            tans.append(d)
+            p = p + d * (L / 8)
+        leaf = rnd.random()
+        _blade_between(b, pts[0], pts[4], 0.012, mat=0, leaf=leaf, dead=0.0)
+        _blade_between(b, pts[4], pts[8], 0.007, mat=0, leaf=leaf, dead=0.0)
+        pinnae = rnd.randint(18, 24)
+        for k in range(pinnae):
+            t = 0.12 + 0.86 * k / pinnae
+            f = t * 8
+            j = min(int(f), 7)
+            q = pts[j].lerp(pts[j + 1], f - j)
+            d = tans[j].lerp(tans[j + 1], f - j).normalized()
+            s = d.cross(up)
+            s = s.normalized() if s.length > 1e-4 else Vector((-sa, ca, 0.0))
+            n = s.cross(d)
+            if n.dot(up) < 0:
+                n = -n
+            pl = 0.24 * L * math.sin(math.pi * min(1.0, 0.1 + t)) ** 0.7 * (1.0 - 0.45 * t) * rnd.uniform(0.9, 1.1)
+            for sg in (-1.0, 1.0):
+                u = (s * sg + d * 0.45 - n * 0.15).normalized()
+                _leaf_quad(b, q, n, u, pl, pl * 0.3, leaf=leaf, dead=0.0)
+    return b
+
+
+def aroid(seed, leaves, height):
+    """
+    A big-leaved aroid of the wet forest floor and the shore (an elephant's ear, after Colocasia
+    and Alocasia): stout petioles from one foot, each carrying a great arrow-shaped leaf hung
+    tip-down and outward. Slots: 0 petioles, 1 leaves. A look choice, not a species.
+    """
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    b = _Builder()
+    up = Vector((0.0, 0.0, 1.0))
+    for i in range(leaves):
+        az = i * 2.39996 + rnd.gauss(0.0, 0.25)
+        out = Vector((math.cos(az), math.sin(az), 0.0))
+        side = Vector((-math.sin(az), math.cos(az), 0.0))
+        hp = height * rnd.uniform(0.55, 0.85)
+        lean = rnd.uniform(0.15, 0.55)
+        foot = out * 0.04
+        tip = foot + out * (hp * math.sin(lean)) + up * (hp * math.cos(lean))
+        mid = foot.lerp(tip, 0.5) - out * 0.05 * hp
+        _tube(b, [foot, mid, tip], [0.028 * height, 0.022 * height, 0.016 * height], 5, mat=0, leaf=rnd.random(), dead=0.0)
+        Lb = height * rnd.uniform(0.42, 0.55)
+        W = Lb * rnd.uniform(0.62, 0.78)
+        e = math.radians(rnd.uniform(-60, -25))
+        d = (out * math.cos(e) + up * math.sin(e)).normalized()
+        n = side.cross(d).normalized()
+        if n.dot(up) < 0:
+            n = -n
+        leaf = rnd.random()
+        ts = (-0.28, -0.14, 0.0, 0.15, 0.32, 0.5, 0.68, 0.84, 1.0)
+        cols = (-1.0, -0.5, 0.0, 0.5, 1.0)
+        rows = []
+        for t in ts:
+            if t < 0:
+                hw = 0.5 * W * (0.95 - 0.9 * (-t / 0.28) ** 1.5)
+                back = 0.18 * Lb * (-t / 0.28)
+            else:
+                hw = 0.5 * W * max(1.0 - t ** 1.7, 0.0) ** 0.75
+                back = 0.0
+            row = []
+            for c in cols:
+                off = t * Lb if t >= 0 else -0.06 * Lb * (-t / 0.28)
+                q = tip + d * off + side * (c * hw) - d * (back * abs(c)) + n * (0.12 * hw * abs(c)) - n * (0.06 * Lb * max(t, 0.0) ** 2)
+                row.append(b.vert(q, leaf=leaf, dead=0.0))
+            rows.append(row)
+        for r in range(len(ts) - 1):
+            for j in range(4):
+                b.face((rows[r][j], rows[r][j + 1], rows[r + 1][j + 1], rows[r + 1][j]),
+                       [(j / 4, (ts[r] + 0.28) / 1.28), ((j + 1) / 4, (ts[r] + 0.28) / 1.28),
+                        ((j + 1) / 4, (ts[r + 1] + 0.28) / 1.28), (j / 4, (ts[r + 1] + 0.28) / 1.28)], 1)
+    return b
+
+
+def lily(seed, pads, spread, flowers, blue):
+    """
+    Water lilies (Nymphaea lotus, white, and N. caerulea, the blue lotus of Egypt): `pads` round
+    notched pads afloat within `spread` metres, and `flowers` open flowers or buds standing a hand
+    over the water, blue when `blue`. Slots: 0 pads, 1 petals, 2 stamens. Floats at z = 0.
+    """
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    b = _Builder()
+    placed = []
+    for _ in range(pads):
+        for _ in range(30):
+            r, a = spread * math.sqrt(rnd.random()), rnd.uniform(0.0, 2 * math.pi)
+            c = Vector((r * math.cos(a), r * math.sin(a), 0.0))
+            R = rnd.uniform(0.1, 0.26)
+            if all((c - q).length > 0.8 * (R + s) for q, s in placed):
+                break
+        placed.append((c, R))
+        notch = rnd.uniform(0.0, 2 * math.pi)
+        leaf = rnd.random()
+        centre = b.vert(c + Vector((0.0, 0.0, 0.004)), leaf=leaf, dead=0.0)
+        ring = []
+        for k in range(15):
+            th = notch + 0.18 + (2 * math.pi - 0.36) * k / 14
+            lift = 0.012 * R / 0.2 * rnd.uniform(0.3, 1.0)
+            ring.append(b.vert(c + Vector((R * math.cos(th), R * math.sin(th), 0.002 + lift)), leaf=leaf, dead=0.0))
+        for k in range(14):
+            th0, th1 = notch + 0.18 + (2 * math.pi - 0.36) * k / 14, notch + 0.18 + (2 * math.pi - 0.36) * (k + 1) / 14
+            b.face((centre, ring[k], ring[k + 1]), [(0.5, 0.5), (0.5 + 0.5 * math.cos(th0), 0.5 + 0.5 * math.sin(th0)),
+                                                    (0.5 + 0.5 * math.cos(th1), 0.5 + 0.5 * math.sin(th1))], 0)
+    up = Vector((0.0, 0.0, 1.0))
+    for fl in range(flowers):
+        c, R = placed[rnd.randrange(len(placed))]
+        c = c + Vector((rnd.gauss(0, 0.05), rnd.gauss(0, 0.05), 0.0))
+        h = 0.09 if fl == 0 else rnd.uniform(0.05, 0.09)
+        open_ = fl == 0 or rnd.random() < 0.6
+        foot = c + Vector((0.0, 0.0, h - 0.035))
+        _tube(b, [c, c + Vector((0.0, 0.0, h * 0.5)), foot], [0.006, 0.006, 0.008], 3, mat=0, leaf=0.5, dead=0.0)
+        hue = 0.9 if blue else 0.1
+        petals = 16 if open_ else 7
+        for k in range(petals):
+            a = k * 2 * math.pi / petals + (0.2 if k % 2 else 0.0)
+            ring_in = k % 2
+            el = math.radians((62 if ring_in else 38) if open_ else 80)
+            d = Vector((math.cos(a) * math.cos(el), math.sin(a) * math.cos(el), math.sin(el)))
+            n = (up - d * d.dot(up)).normalized() * -1.0 if abs(d.dot(up)) < 0.999 else Vector((1.0, 0.0, 0.0))
+            _leaf_quad(b, foot, n, d, 0.07 if open_ else 0.06, 0.028 if open_ else 0.02, mat=1, leaf=hue, dead=0.0)
+        if open_:
+            centre = b.vert(foot + Vector((0.0, 0.0, 0.012)), leaf=0.5, dead=0.0)
+            ring = [b.vert(foot + Vector((0.018 * math.cos(k * math.pi / 4), 0.018 * math.sin(k * math.pi / 4), 0.02)),
+                           leaf=0.5, dead=0.0) for k in range(8)]
+            for k in range(8):
+                b.face((centre, ring[k], ring[(k + 1) % 8]), [(0.5, 0.5), (0.0, 1.0), (1.0, 1.0)], 2)
+    return b
+
+
 # --- Materials -------------------------------------------------------------------------
 
 def _gattr(t, name):
@@ -1525,16 +2382,20 @@ def _leaf_shader(t, col, rough=0.5, spec=0.3, translucent=0.3, normal=None):
     t.link(mix.outputs[0], out.inputs["Surface"])
 
 
-def _grass_material():
-    """Blades green to straw: `wear` (per tuft) and each blade's own draw decide how dry; roots dark, tips pale."""
+def _grass_material(name="veg grass", greens=("4c6829", "627b33", "78893d"), straws=("a08d5c", "bba877", "8c7a50"), per_blade=False):
+    """
+    Blades green to straw: `wear` (per tuft) and each blade's own draw decide how dry; roots dark,
+    tips pale. `per_blade` also varies the green blade by blade, not only tuft by tuft.
+    """
     from .nodes import Tree, hexlin
-    mat = bpy.data.materials.new("veg grass")
+    mat = bpy.data.materials.new(name)
     t = Tree(mat)
     tone, wear = t.attr("tone"), t.attr("wear")
     blade, dead, stalk = _gattr(t, "blade"), _gattr(t, "dead"), _gattr(t, "stalk")
     _, v = _uv(t)
-    green = t.ramp(tone, [(0.0, hexlin("4c6829")), (0.5, hexlin("627b33")), (1.0, hexlin("78893d"))])
-    straw = t.ramp(blade, [(0.0, hexlin("a08d5c")), (0.5, hexlin("bba877")), (1.0, hexlin("8c7a50"))])
+    which = t.math("FRACT", t.math("ADD", tone, t.math("MULTIPLY", blade, 0.4))) if per_blade else tone
+    green = t.ramp(which, [(0.0, hexlin(greens[0])), (0.5, hexlin(greens[1])), (1.0, hexlin(greens[2]))])
+    straw = t.ramp(blade, [(0.0, hexlin(straws[0])), (0.5, hexlin(straws[1])), (1.0, hexlin(straws[2]))])
     dry = t.math("ADD", t.math("ADD", wear, t.math("MULTIPLY", t.math("SUBTRACT", blade, 0.5), 0.5)),
                  t.math("ADD", dead, t.math("MULTIPLY", stalk, 0.6)), clamp=True)
     col = t.mix(dry, green, straw)
@@ -1595,6 +2456,85 @@ def _doum_bark():
     return mat
 
 
+def _smooth_bark(name, colours, streaks=0.35, bump=0.3):
+    """Smooth-barked trunks (a fig's, a kapok's): a mottled grey by position, faint vertical streaks along the UV's v; procedural."""
+    from .nodes import Tree, hexlin
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    geo = t.node("ShaderNodeNewGeometry")
+    u, v = _uv(t)
+    stretch = t.node("ShaderNodeCombineXYZ")
+    t.link(t.math("MULTIPLY", u, 9.0), stretch.inputs[0])
+    t.link(t.math("MULTIPLY", v, 0.6), stretch.inputs[1])
+    streak = t.noise(stretch.outputs[0], 3.0, 3.0)
+    mottle = t.noise(geo.outputs["Position"], 1.4, 4.0)
+    col = t.ramp(mottle, [(0.3, hexlin(colours[0])), (0.55, hexlin(colours[1])), (0.75, hexlin(colours[2]))])
+    col = t.mix(t.math("MULTIPLY", t.band(streak, 0.45, 0.75), streaks), col, hexlin("3a3630"), "MULTIPLY")
+    col = _vary(t, col, t.attr("tone"), hue=0.01, sat=0.1, val=0.12)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.82
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = bump
+    bmp.inputs["Distance"].default_value = 0.02
+    t.link(t.math("ADD", streak, t.math("MULTIPLY", mottle, 0.5)), bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    return mat
+
+
+def _atlas_leaf_material(name, diffuse, normal=None, hue=0.5, sat=1.0, val=1.0, rough=0.5, spec=0.35, translucent=0.3,
+                         dry="a39c5c", per_leaf=(0.03, 0.14, 0.28)):
+    """
+    The Poly Haven leaf atlas on the generated trees' leaf hexagons: the photograph's hue, saturation
+    and value turned by (`hue`, `sat`, `val`), varied leaf by leaf (the `leaf` draw, `per_leaf`) and
+    tree by tree (`tone`), yellowed by `wear`. Every number here is a look choice.
+    """
+    from .nodes import Tree, hexlin
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    uv = t.node("ShaderNodeUVMap")
+    uv.uv_map = "UVMap"
+    im = t.node("ShaderNodeTexImage", image=diffuse)
+    t.link(uv.outputs["UV"], im.inputs["Vector"])
+    hsv = t.node("ShaderNodeHueSaturation")
+    hsv.inputs["Hue"].default_value, hsv.inputs["Saturation"].default_value, hsv.inputs["Value"].default_value = hue, sat, val
+    t.link(im.outputs["Color"], hsv.inputs["Color"])
+    col = _vary(t, hsv.outputs["Color"], _gattr(t, "leaf"), *per_leaf)
+    col = t.mix(t.math("MULTIPLY", t.attr("wear"), 0.5), col, hexlin(dry), "MULTIPLY")
+    col = _vary(t, col, t.attr("tone"), hue=0.02, sat=0.1, val=0.14)
+    nrm = None
+    if normal is not None:
+        ni = t.node("ShaderNodeTexImage", image=normal)
+        t.link(uv.outputs["UV"], ni.inputs["Vector"])
+        nm = t.node("ShaderNodeNormalMap")
+        nm.inputs["Strength"].default_value = 0.6
+        t.link(ni.outputs["Color"], nm.inputs["Color"])
+        nrm = nm.outputs["Normal"]
+    _leaf_shader(t, col, rough=rough, spec=spec, translucent=translucent, normal=nrm)
+    return mat
+
+
+def _paddle_material(name, live, dead, rib="c3cc7e", rough=0.4, spec=0.45, translucent=0.4):
+    """A banana's or an aroid's leaf: the per-leaf green, a paler midrib down the middle of u, dead leaves brown."""
+    from .nodes import Tree, hexlin
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    tone, wear = t.attr("tone"), t.attr("wear")
+    leaf, isdead = _gattr(t, "leaf"), _gattr(t, "dead")
+    u, v = _uv(t)
+    col = t.ramp(leaf, [(k / max(len(live) - 1, 1), hexlin(c)) for k, c in enumerate(live)])
+    mid = t.math("SUBTRACT", 1.0, t.band(t.math("ABSOLUTE", t.math("SUBTRACT", u, 0.5)), 0.015, 0.06))
+    col = t.mix(t.math("MULTIPLY", mid, 0.7), col, hexlin(rib))
+    edge = t.band(t.math("ABSOLUTE", t.math("SUBTRACT", u, 0.5)), 0.38, 0.5)
+    col = t.mix(t.math("MULTIPLY", edge, 0.25), col, hexlin("a6a24e"))
+    dcol = t.ramp(leaf, [(k / max(len(dead) - 1, 1), hexlin(c)) for k, c in enumerate(dead)])
+    col = t.mix(t.math("ADD", isdead, t.math("MULTIPLY", wear, 0.4), clamp=True), col, dcol)
+    _leaf_shader(t, _vary(t, col, tone, hue=0.02, sat=0.1, val=0.15), rough=rough, spec=spec, translucent=translucent)
+    return mat
+
+
 def _textured_material(name, diffuse, normal=None, rough=0.8, translucent=0.0, mapping=None, dry="a39c5c", normal_strength=1.0, tint=None):
     """A photographed texture by UV, varied by `tone` and yellowed by `wear`."""
     from .nodes import Tree, hexlin
@@ -1651,6 +2591,27 @@ def _materials():
         "bush leaf": _foliage_material("veg bush leaf", ("42532a", "566832", "6a7a3a"), ("8a8450", "9c9058"), rough=0.5, translucent=0.25),
         "twig": _plain_material("veg twig", ("4f4236", "625244", "574a3e")),
         "doum bark": _doum_bark(),
+        # the First Time's forest
+        "lush grass": _grass_material("veg lush grass", ("3d6b20", "4f7f28", "679334"), ("93864f", "aa9b62", "857548"), per_blade=True),
+        "cane": _foliage_material("veg cane", ("5c7d30", "6b8a38"), ("8a7c52", "a0906a"), rough=0.45, translucent=0.1),
+        "lush grass leaf": _foliage_material("veg lush grass leaf", ("3f6f22", "4f8029", "639236"), ("a0905e", "b7a574"),
+                                             rough=0.5, translucent=0.32, tips="8fa54a"),
+        "oil palm frond": _foliage_material("veg oil palm frond", ("2e5a1c", "3a6822", "4a792b"), ("8a7045", "a0885a"),
+                                            rough=0.36, translucent=0.22, spec=0.45),
+        "banana leaf": _paddle_material("veg banana leaf", ("4c8226", "5f9530", "72a33a"), ("7d6440", "947a50", "6d5a3c"),
+                                        rib="c9d488", translucent=0.42),
+        "banana stem": _plain_material("veg banana stem", ("6f8a3c", "7f9446", "66723a")),
+        "fern": _foliage_material("veg fern", ("3e6f25", "4e822d", "619437"), ("8a6a40", "a08058"), rough=0.5, translucent=0.35),
+        "aroid leaf": _paddle_material("veg aroid leaf", ("2f5c1d", "3a6b23", "477a2b"), ("6f5c3a", "85704a"), rib="7fa352",
+                                       rough=0.3, spec=0.5, translucent=0.28),
+        "aroid stem": _plain_material("veg aroid stem", ("587a36", "6a8a40", "4f6a30")),
+        "lily pad": _foliage_material("veg lily pad", ("2c5220", "3a6327", "466d2c"), ("6e5a36", "806a44"), rough=0.22, translucent=0.08, spec=0.5),
+        "lily petal": _foliage_material("veg lily petal", ("f2efe2", "ece9dc", "b2c0ea", "8ea3e2"), ("c8b890", "c8b890"),
+                                        rough=0.45, translucent=0.45, spec=0.3),
+        "lily stamen": _plain_material("veg lily stamen", ("e6b82c", "f0c83a")),
+        "fig bark": _smooth_bark("veg fig bark", ("5c5a50", "6f6b5f", "827d6d")),
+        "kapok bark": _smooth_bark("veg kapok bark", ("4b5042", "5a5e4e", "6a6c5a"), streaks=0.3),
+        "broadleaf bark": _smooth_bark("veg broadleaf bark", ("4f463a", "625646", "746753"), streaks=0.5, bump=0.45),
     }
 
 
@@ -1842,14 +2803,110 @@ def _island_trees(log=print):
     t = time.time()
     parts = [_decimate(_submesh(me, 0), ISLAND_KEEP[0]), _leaf_hexagons(me, 1, "island tree leaves"),
              _decimate(_submesh(me, 2), ISLAND_KEEP[2])]
+    templates = _leaf_templates(parts[1])
     tree = _grounded(_join(parts, "island tree", mats))
     tree.shade_smooth()
-    log(f"island tree reduced in {time.time() - t:.0f}s")
+    log(f"island tree reduced in {time.time() - t:.0f}s; {len(templates)} leaves of its atlas taken as templates")
     acacia = _flatten(tree, "acacia", **ACACIA_CROWN)
     acacia2 = _flatten(tree, "acacia wide", ACACIA_CROWN["crown_from"] - 0.3, ACACIA_CROWN["squash"] * 0.85, ACACIA_CROWN["widen"] * 1.4)
     for o in obs:
         bpy.data.objects.remove(o)
-    return tree, [acacia, acacia2]
+    return tree, [acacia, acacia2], templates
+
+
+def _leaf_templates(hexes, least=0.02):
+    """
+    The atlas's leaves as templates for generated leaves: the six UVs of each distinct hexagon
+    _leaf_hexagons cut (foot, the widest points on the right, tip, the widest on the left), the
+    ones at least `least` of the tree's leaves use. The island trees share one atlas of 8 leaves.
+    """
+    uv = np.empty(len(hexes.loops) * 2, np.float32)
+    hexes.uv_layers[0].data.foreach_get("uv", uv)
+    rings = uv.reshape(-1, 6, 2)
+    keys, count = {}, {}
+    for r in rings:
+        k = tuple(np.round(r[[0, 3]].ravel(), 2))
+        keys.setdefault(k, r)
+        count[k] = count.get(k, 0) + 1
+    return [tuple((float(u), float(v)) for u, v in keys[k]) for k in sorted(keys) if count[k] >= least * len(rings)]
+
+
+def _leaf_draw(me, seed, per=6):
+    """A `leaf` draw (0..1) shared by the `per` vertices of each leaf of a mesh of separate leaves, for the leaf's own colour."""
+    n = len(me.vertices) // per
+    g = np.random.default_rng(seed)
+    a = me.attributes.get("leaf") or me.attributes.new("leaf", "FLOAT", "POINT")
+    a.data.foreach_set("value", np.repeat(g.random(n), per).astype(np.float32)[:len(me.vertices)])
+    return me
+
+
+# The Poly Haven models the First Time's forest adds, each into build/props/<id>/ as scripts/props.py
+# lays a Poly Haven prop (the 2k glTF with its .bin and textures, every file md5-checked).
+POLYHAVEN = {"island-tree-2": "island_tree_02"}
+
+
+def _fetch_polyhaven(pid, log=print):
+    """build/props/<pid>/model.gltf, fetched from Poly Haven (POLYHAVEN) when it is not there yet."""
+    import hashlib
+    import urllib.request
+    folder = os.path.join(PROPS, pid)
+    root = os.path.join(folder, "model.gltf")
+    if os.path.exists(root):
+        return root
+    get = lambda url: urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "seked-vegetation"}), timeout=600).read()
+    spec = json.loads(get(f"https://api.polyhaven.com/files/{POLYHAVEN[pid]}"))["gltf"]["2k"]["gltf"]
+    for name, part in [("model.gltf", spec)] + sorted(spec.get("include", {}).items()):
+        blob = get(part["url"])
+        if hashlib.md5(blob).hexdigest() != part["md5"]:
+            raise SystemExit(f"{pid}: {name} does not match the md5 Poly Haven publishes")
+        path = os.path.join(folder, *name.split("/"))
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as f:
+            f.write(blob)
+        log(f"{pid}: {name} {len(blob) / 1e6:.1f} MB from Poly Haven")
+    return root
+
+
+def _load_tree(pid, log=print):
+    """A Poly Haven tree's one mesh in the project's frame, its slots by kind ('trunk', 'leaves', 'branches'), their mappings."""
+    from mathutils import Matrix
+    obs = _import(_fetch_polyhaven(pid, log))
+    ob = next(o for o in obs if o.type == "MESH")
+    me = ob.data
+    me.transform(ob.matrix_world)
+    ob.matrix_world = Matrix.Identity(4)
+    slots, mapping = {}, {}
+    for i, m in enumerate(me.materials):
+        name = m.name if m else ""
+        kind = "leaves" if "leaves" in name else "branches" if "branch" in name else "trunk"
+        slots[kind] = i
+        for nd in (m.node_tree.nodes if m and m.node_tree else ()):
+            if nd.type == "MAPPING":
+                mapping[kind] = tuple(tuple(nd.inputs[k].default_value) for k in ("Location", "Rotation", "Scale"))
+    return obs, me, slots, mapping
+
+
+def _island_tree_2(M, log=print):
+    """
+    Poly Haven's island_tree_02 (a leaning, spreading tree), reduced as island_tree_01 is, as one
+    of the broadleaf kind's trees. It shares its leaf and branch atlases with island_tree_01; its
+    leaves take the forest's greens (M "broadleaf leaf").
+    """
+    tex = os.path.join(PROPS, "island-tree-2", "textures")
+    t = time.time()
+    obs, me, S, mapping = _load_tree("island-tree-2", log)
+    bark = _textured_material("veg island tree 2 bark", _image(os.path.join(tex, "island_tree_02_diff_2k.jpg"), 1024),
+                              _image(os.path.join(tex, "island_tree_02_nor_gl_2k.jpg"), 1024, True), rough=0.85)
+    twig = _textured_material("veg island tree 2 twig", _image(os.path.join(tex, "island_tree_02_branches_diff_2k.jpg"), 1024),
+                              rough=0.85, mapping=mapping.get("branches"))
+    leaves = _leaf_draw(_leaf_hexagons(me, S["leaves"], "island tree 2 leaves"), 21)
+    parts = [_decimate(_submesh(me, S["trunk"]), ISLAND_KEEP[0]), leaves, _decimate(_submesh(me, S["branches"]), ISLAND_KEEP[2])]
+    tree = _grounded(_join(parts, "island tree 2", [bark, M["broadleaf leaf"], twig]))
+    tree.shade_smooth()
+    for o in obs:
+        bpy.data.objects.remove(o)
+    log(f"island tree 2 reduced in {time.time() - t:.0f}s")
+    return tree
 
 
 def _shrubs():
@@ -1897,6 +2954,75 @@ def _tris(me):
     return int(sum(len(p.vertices) - 2 for p in me.polygons))
 
 
+# LOOK CHOICES: the generated forest trees, as broadleaf()'s arguments (after its seed and the leaf
+# templates). Figs: short thick trunks forking low into a wide dome; emergents: a tall buttressed
+# bole under a flat, layered crown (after the kapok, Ceiba pentandra); the rounder broadleaf trees.
+FOREST_TREES = {
+    "fig": [
+        dict(height=18.0, width=24.0, crown_base=4.5, fork=3.0, trunk_r=0.75, clusters=190, per_cluster=240, cluster_r=1.9,
+             leaf_len=0.4, dome=0.3, shell=0.45, limbs=6, flat=0.7, under=0.5, buttress=4),
+        dict(height=16.0, width=19.0, crown_base=3.6, fork=2.5, trunk_r=0.62, clusters=165, per_cluster=220, cluster_r=1.7,
+             leaf_len=0.38, dome=0.35, shell=0.45, limbs=5, flat=0.72, under=0.5),
+        dict(height=14.0, width=23.0, crown_base=3.2, fork=2.2, trunk_r=0.7, clusters=175, per_cluster=220, cluster_r=1.8,
+             leaf_len=0.38, dome=0.22, shell=0.45, limbs=7, flat=0.65, under=0.55, lean=0.07, buttress=3),
+    ],
+    "emergent": [
+        dict(height=28.0, width=26.0, crown_base=18.5, fork=16.5, trunk_r=0.85, clusters=170, per_cluster=200, cluster_r=2.2,
+             leaf_len=0.36, dome=0.3, shell=0.5, limbs=6, flat=0.45, under=0.3, buttress=5, bend=0.12),
+        dict(height=25.0, width=22.0, crown_base=16.0, fork=14.5, trunk_r=0.75, clusters=150, per_cluster=190, cluster_r=2.0,
+             leaf_len=0.34, dome=0.3, shell=0.5, limbs=5, flat=0.5, under=0.3, buttress=4, bend=0.12),
+    ],
+    "broadleaf": [
+        dict(height=11.0, width=9.0, crown_base=3.0, fork=2.3, trunk_r=0.28, clusters=90, per_cluster=180, cluster_r=1.2,
+             leaf_len=0.3, dome=0.45, shell=0.4, limbs=4, flat=0.8),
+        dict(height=12.5, width=8.0, crown_base=4.0, fork=3.1, trunk_r=0.3, clusters=95, per_cluster=180, cluster_r=1.15,
+             leaf_len=0.3, dome=0.5, shell=0.4, limbs=3, flat=0.8),
+    ],
+}
+
+
+def _forest(sets, M, templates, log=print):
+    """The First Time's kinds into `sets`: the forest trees, oil palms, bananas, elephant grass, ferns, aroids, lilies, lush grass."""
+    t = time.time()
+    tex = os.path.join(PROPS, "island-tree", "textures")
+    atlas = _image(os.path.join(tex, "island_tree_01_leaves_diff_2k.jpg"), 1024)
+    atlas_n = _image(os.path.join(tex, "island_tree_01_leaves_nor_gl_2k.jpg"), 1024, True)
+    # the atlas's olive leaves turned to the forest's greens: deep and glossy on the figs, fresher on the emergents
+    M["fig leaf"] = _atlas_leaf_material("veg fig leaf", atlas, atlas_n, hue=0.56, sat=1.45, val=0.6, rough=0.38, spec=0.45, translucent=0.25)
+    M["kapok leaf"] = _atlas_leaf_material("veg kapok leaf", atlas, atlas_n, hue=0.555, sat=1.3, val=0.8, rough=0.5, translucent=0.32)
+    M["broadleaf leaf"] = _atlas_leaf_material("veg broadleaf leaf", atlas, atlas_n, hue=0.55, sat=1.4, val=0.7, rough=0.45, translucent=0.3)
+    leaf = {"fig": M["fig leaf"], "emergent": M["kapok leaf"], "broadleaf": M["broadleaf leaf"]}
+    bark = {"fig": M["fig bark"], "emergent": M["kapok bark"], "broadleaf": M["broadleaf bark"]}
+    for kind, specs in FOREST_TREES.items():
+        sets[kind] = [broadleaf(200 + 10 * i + len(kind), templates, **spec).mesh(f"{kind} {i}", [bark[kind], leaf[kind]])
+                      for i, spec in enumerate(specs)]
+    log(f"forest trees grown in {time.time() - t:.0f}s")
+    sets["broadleaf"].append(_island_tree_2(M, log))
+    imgs = [nd.image for nd in M["palm bark"].node_tree.nodes if nd.type == "TEX_IMAGE"]
+    colour = next((i for i in imgs if i.colorspace_settings.name != "Non-Color"), None)
+    normal = next((i for i in imgs if i.colorspace_settings.name == "Non-Color"), None)
+    M["oil palm bark"] = (_textured_material("veg oil palm bark", colour, normal, rough=0.92, normal_strength=1.0, tint="857e70")
+                          if colour is not None else _plain_material("veg oil palm bark", ("5a5246", "6a6052", "4e473d")))
+    sets["oil-palm"] = [oil_palm(300 + i, h, d).mesh(f"oil palm {h:.0f} m", [M["oil palm bark"], M["oil palm frond"]])
+                        for i, (h, d) in enumerate(((9.0, 6), (12.5, 4), (16.0, 7)))]
+    sets["banana"] = [banana(310 + i, h, s).mesh(f"banana {i}", [M["banana stem"], M["banana leaf"]])
+                      for i, (h, s) in enumerate(((4.5, 4), (5.2, 5), (3.6, 3)))]
+    sets["elephant-grass"] = [reed(320 + i, n, h, spread=sp, leaves=(8, 12), leaf_len=(0.7, 1.1), leaf_w=0.032, culm_r=0.011,
+                                   plume=(0.1, 0.18), plume_dead=0.35).mesh(f"elephant grass {i}", [M["cane"], M["lush grass leaf"]])
+                              for i, (n, h, sp) in enumerate(((60, 2.8, 0.7), (75, 3.2, 0.85), (90, 3.5, 1.0), (50, 2.5, 0.6)))]
+    sets["fern"] = [fern(330 + i, n, L).mesh(f"fern {i}", [M["fern"], M["fern"]]) for i, (n, L) in enumerate(((10, 0.9), (13, 1.1), (16, 1.3)))]
+    sets["aroid"] = [aroid(340 + i, n, h).mesh(f"aroid {i}", [M["aroid stem"], M["aroid leaf"]]) for i, (n, h) in enumerate(((5, 1.2), (7, 1.5), (9, 1.8)))]
+    sets["lily"] = [lily(350 + i, n, s, f, blue).mesh(f"lily {i}", [M["lily pad"], M["lily petal"], M["lily stamen"]])
+                    for i, (n, s, f, blue) in enumerate(((10, 0.6, 1, False), (14, 0.8, 2, True), (18, 1.0, 3, False)))]
+    g = [grass_tuft(360 + i, 50, 0.32 + 0.02 * i, 0.07, 0.3, 0.5, dead=0.03, width=(0.006, 0.012)) for i in range(4)]
+    g += [grass_tuft(370 + i, 70, 0.58 + 0.04 * i, 0.09, 0.28, 0.7, dead=0.04, width=(0.007, 0.014)) for i in range(4)]
+    g += [grass_tuft(380 + i, 60, 0.85 + 0.1 * i, 0.1, 0.28, 0.85, stalks=6, dead=0.05, width=(0.008, 0.015)) for i in range(2)]
+    sets["lush-grass"] = [x.mesh(f"lush grass {i}", [M["lush grass"]]) for i, x in enumerate(g)]
+    sets["lush-tussock"] = [grass_tuft(390 + i, 220 + 20 * i, 0.72 + 0.08 * i, 0.3 + 0.04 * i, 0.4, 1.0, stalks=i % 2, dead=0.05,
+                                       width=(0.007, 0.015)).mesh(f"lush tussock {i}", [M["lush grass"]]) for i in range(4)]
+    log(f"the First Time's forest prepared in {time.time() - t:.0f}s")
+
+
 def prepare(log=print):
     """
     Build the plant library into build/vegetation/plants.blend: the generated grasses, palms,
@@ -1926,10 +3052,11 @@ def prepare(log=print):
     sets["bush"] = [bush(90 + i, h, w).mesh(f"bush {i}", [M["twig"], M["bush leaf"]])
                     for i, (h, w) in enumerate(((1.3, 1.6), (1.0, 2.2), (1.9, 1.5)))]
     log(f"generated plants in {time.time() - t0:.0f}s")
-    tree, acacias = _island_trees(log)
+    tree, acacias, templates = _island_trees(log)
     sets["tree"] = [tree]
     sets["acacia"] = acacias
     sets["shrub"] = _shrubs()
+    _forest(sets, M, templates, log)
     colls, info = set(), {}
     for kind, meshes in sets.items():
         c = bpy.data.collections.new(f"veg {kind}")
@@ -1942,7 +3069,17 @@ def prepare(log=print):
             c.objects.link(ob)
             info[kind].append({"height_m": h, "triangles": _tris(me)})
         colls.add(c)
-    bpy.data.libraries.write(LIBRARY, colls, fake_user=True, compress=True)
+    # written beside it and moved into place, so a scene appending from it meanwhile never reads half a file
+    part = LIBRARY[:-len(".blend")] + ".part.blend"
+    bpy.data.libraries.write(part, colls, fake_user=True, compress=True)
+    for attempt in range(20):
+        try:
+            os.replace(part, LIBRARY)
+            break
+        except PermissionError:
+            time.sleep(3.0)
+    else:
+        raise SystemExit(f"could not move {part} over {LIBRARY}: it stayed open elsewhere")
     _write_manifest(info, time.time() - t0)
     log(f"wrote {LIBRARY} ({os.path.getsize(LIBRARY) / 1e6:.1f} MB) in {time.time() - t0:.0f}s")
     return info
@@ -2018,6 +3155,10 @@ def _reset():
 
 
 SHEETS = {
+    "forest": ["fig", "emergent", "broadleaf"],
+    "tropics": ["oil-palm", "banana", "elephant-grass"],
+    "understorey": ["fern", "aroid", "lush-tussock"],
+    "lilies": ["lily"],
     "palms": ["date-palm", "doum-palm"],
     "trees": ["tree", "acacia"],
     "shrubs": ["shrub", "bush"],
@@ -2036,12 +3177,21 @@ def _sheet(opts):
     _reset()
     scene = bpy.context.scene
     lib = library(None)
+    # each variant at the height the eras plant it at (the middle of the first planting of its kind), not its native size
+    planted = {}
+    for S in STATES.values():
+        for e in S["plants"]:
+            planted.setdefault(e["kind"], 0.5 * (e["height"][0] + e["height"][1]))
     x, top = 0.0, 0.0
-    for kind in SHEETS[group]:
+    kinds = opts["kinds"].split(",") if "kinds" in opts else SHEETS[group]
+    for kind in kinds:
         c, hs = lib[kind]
         for i, (o, h) in enumerate(zip(sorted(c.objects, key=lambda o: o.name), hs)):
             inst = bpy.data.objects.new(f"show {o.name}", o.data)
             scene.collection.objects.link(inst)
+            f = planted.get(kind, h) / h if opts.get("planted", "1") == "1" else 1.0
+            inst.scale = (f, f, f)
+            h *= f
             w = max(h * 0.42, 0.35)
             inst.location = (x + w, 0.0, 0.0)
             inst.rotation_euler = (0.0, 0.0, 0.7 * i)
@@ -2060,8 +3210,12 @@ def _sheet(opts):
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     me.materials.append(mat)
     scene.collection.objects.link(bpy.data.objects.new("floor", me))
-    sky = Sky(scene, haze=0.0)
-    sky.set_sun(float(opts.get("sun", 30.0)), 235.0)
+    try:
+        sky = Sky(scene, haze=0.0)
+        sky.set_sun(float(opts.get("sun", 30.0)), 235.0)
+    except (KeyError, AttributeError, TypeError) as err:      # sky.py mid-edit elsewhere: a plain sky and sun will do for a sheet
+        print(f"sheet: the scene's sky failed ({err}); a plain sky instead")
+        _plain_sky(scene, float(opts.get("sun", 30.0)), 235.0)
     cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam"))
     scene.collection.objects.link(cam)
     scene.camera = cam
@@ -2073,9 +3227,31 @@ def _sheet(opts):
     cam.rotation_euler = (aim - cam.location).to_track_quat("-Z", "Y").to_euler()
     renderer.gpu(scene)
     renderer.configure(scene)
-    out = os.path.abspath(opts.get("out", os.path.join(data.REPO, "build", "vegetation", f"sheet-{group}.png")))
+    name = opts["kinds"].replace(",", "-") if "kinds" in opts else group
+    out = os.path.abspath(opts.get("out", os.path.join(data.REPO, "build", "vegetation", f"sheet-{name}.png")))
     renderer.render(scene, out, int(opts.get("w", 1600)), int(opts.get("h", 700)), int(opts.get("samples", 32)))
     print("sheet", out)
+
+
+def _plain_sky(scene, alt, az):
+    """A flat pale-blue sky and a sun lamp at (alt, az) degrees, for the sheet when the scene's own sky cannot be built."""
+    from .nodes import Tree, hexlin
+    world = bpy.data.worlds.new("plain sky")
+    scene.world = world
+    t = Tree(world)
+    bg = t.node("ShaderNodeBackground")
+    bg.inputs["Color"].default_value = hexlin("9fb8d8")
+    bg.inputs["Strength"].default_value = 14.0         # against the renderer's exposure of -3.8
+    t.link(bg.outputs[0], t.node("ShaderNodeOutputWorld").inputs["Surface"])
+    lamp = bpy.data.lights.new("sun", "SUN")
+    lamp.energy = 60.0
+    lamp.angle = math.radians(0.53)
+    sun = bpy.data.objects.new("sun", lamp)
+    scene.collection.objects.link(sun)
+    a, z = math.radians(alt), math.radians(az)
+    d = (math.sin(z) * math.cos(a), math.cos(z) * math.cos(a), math.sin(a))
+    from mathutils import Vector
+    sun.rotation_euler = Vector(d).to_track_quat("Z", "Y").to_euler()
 
 
 def _ground_mesh(terrain, box, step, coll, material, hole=None):
