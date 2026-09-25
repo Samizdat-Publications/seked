@@ -12,8 +12,8 @@ import time
 import bpy
 from mathutils import Vector
 
-from . import (causeway, cameras, city, data, instancing, mastabas, materials, pyramids, renderer, scatter, sphinx,
-               states, sun, temples, variants, water)
+from . import (causeway, cameras, city, data, instancing, mastabas, materials, precincts, pyramids, renderer, scatter,
+               sphinx, states, sun, temples, variants, water)
 from .sky import Sky
 from .terrain import Terrain
 
@@ -52,8 +52,11 @@ class Plateau:
             "city": materials.flat("city", "city", 0.85),
             "people": materials.flat("people", "people", 0.7),
             "dressed": materials.dressed("dressed casing"),
+            "coursed casing": materials.coursed_casing("coursed casing"),
+            "limestone flat": materials.dressed("limestone flat", colours=("e3dccd", "ebe5d8"), rough=0.55),
+            "pavement": materials.pavement(),
             # The claim's casing, polished further than any reconstruction would draw it.
-            "pristine casing": materials.dressed("pristine casing", colours=("f3efe7", "faf8f3"), rough=0.16),
+            "pristine casing": materials.coursed_casing("pristine casing", colours=("f4f0e8", "fbf9f4"), rough=0.14, tone=0.025, line=0.04),
             "weathered casing": materials.weathered_casing(),
             "gold": materials.metal("gold", "f2c35a", 0.2),
             "electrum": materials.metal("electrum", "efe0a8", 0.14),
@@ -73,6 +76,7 @@ class Plateau:
         }
         self.lib = variants.library(self.library, self.mats, state, rng)
         footprints = pyramids.build(state, rng, self.world, self.mats, self.lib, self.log)
+        footprints = footprints + precincts.footprints(state)
         self.terrain = Terrain(state, footprints, flats=temples.flats(state), cuts=[sphinx.enclosure(state)],
                                calm=causeway.centreline() if S["causeway"] else None,
                                sand=states.SPHINX_SAND if S["sphinx"] == "buried" else None)
@@ -81,6 +85,7 @@ class Plateau:
         sphinx.statue(state, self.world, self.log)
         if S["sphinx"] != "buried":
             sphinx.walls(self.terrain, self.world, self.mats["bedrock"], state)
+        precincts.build(state, rng, self.world, self.mats, self.lib, self.log)
         temples.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         causeway.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         mastabas.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
@@ -136,6 +141,18 @@ class Plateau:
         alt, az, dec = sun.parse_moment(m, self.spec["year"])
         colour, energy = self.sky.set_sun(alt, az)
         self.log(f"sun at {alt:.1f} deg altitude, {az:.1f} deg azimuth (declination {dec:.1f}), beam {energy:.0f}")
+        self._shadow_check(alt, az)
+
+    def _shadow_check(self, alt, az):
+        """Say so when the camera stands in a shadow: a station lit by the sky alone reads as a mistake."""
+        import math
+        bpy.context.view_layer.update()
+        e, a = math.radians(alt), math.radians(az)
+        to_sun = Vector((math.cos(e) * math.sin(a), math.cos(e) * math.cos(a), math.sin(e)))
+        origin = self.camera.location + Vector((0.0, 0.0, 0.3))
+        hit, loc, _, _, ob, _ = self.scene.ray_cast(bpy.context.evaluated_depsgraph_get(), origin, to_sun, distance=20000.0)
+        if hit and ob is not None and "air" not in ob.name:
+            self.log(f"WARNING: the camera stands in the shadow of {ob.name!r}, {(loc - origin).length:.0f} m towards the sun")
 
     def render(self, out, width, height, samples):
         t = time.time()

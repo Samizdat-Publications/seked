@@ -149,6 +149,93 @@ def dressed(name, colours=("e9e2d4", "f3eee5"), rough=0.38, grain_scale=0.05):
     return mat
 
 
+def _face_bricks(t, geo, course, width, mortar):
+    """
+    A brick pattern laid on a surface in world metres: rows follow the height, and the
+    run follows whichever horizontal axis the face lies along. Returns (mortar, tone).
+    """
+    sep = t.node("ShaderNodeSeparateXYZ")
+    t.link(geo.outputs["Position"], sep.inputs[0])
+    nsep = t.node("ShaderNodeSeparateXYZ")
+    t.link(geo.outputs["Normal"], nsep.inputs[0])
+    east_west = t.math("GREATER_THAN", t.math("ABSOLUTE", nsep.outputs["X"]), t.math("ABSOLUTE", nsep.outputs["Y"]))
+    run = t.math("ADD", t.math("MULTIPLY", east_west, sep.outputs["Y"]), t.math("MULTIPLY", t.math("SUBTRACT", 1.0, east_west), sep.outputs["X"]))
+    uv = t.node("ShaderNodeCombineXYZ")
+    t.link(run, uv.inputs[0])
+    t.link(sep.outputs["Z"], uv.inputs[1])
+    br = t.node("ShaderNodeTexBrick")
+    br.offset = 0.5
+    br.offset_frequency = 2
+    br.inputs["Scale"].default_value = 1.0
+    br.inputs["Mortar Size"].default_value = mortar
+    br.inputs["Mortar Smooth"].default_value = 0.3
+    br.inputs["Bias"].default_value = 0.0
+    br.inputs["Brick Width"].default_value = width
+    br.inputs["Row Height"].default_value = course
+    br.inputs["Color1"].default_value = (0.0, 0.0, 0.0, 1.0)
+    br.inputs["Color2"].default_value = (1.0, 1.0, 1.0, 1.0)
+    t.link(uv.outputs[0], br.inputs["Vector"])
+    bw = t.node("ShaderNodeRGBToBW")
+    t.link(br.outputs["Color"], bw.inputs[0])
+    return br.outputs["Fac"], bw.outputs[0]
+
+
+def coursed_casing(name, colours=("ece5d8", "f3eee5"), rough=0.55, course=0.85, width=1.5, mortar=0.008, tone=0.07, line=0.12):
+    """
+    Dressed casing laid in courses: each stone a shade off its neighbours, the joints a
+    hairline. From the stations a course is three or four pixels high, so the face reads
+    as masonry rather than a colour, and still as the satin white the reference shows.
+    """
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    drift = t.noise(geo.outputs["Position"], 0.05, 3.0)
+    col = t.ramp(drift, [(0.35, hexlin(colours[0])), (0.65, hexlin(colours[1]))])
+    joint, stone_tone = _face_bricks(t, geo, course, width, mortar)
+    shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone_tone, 0.5), tone * 2.0), 1.0)
+    col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
+    col = t.mix(t.math("MULTIPLY", joint, line), col, hexlin("8a8272"))
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = rough
+    bsdf.inputs["Specular IOR Level"].default_value = 0.5
+    return mat
+
+
+def pavement(name="pavement"):
+    """A court paved in white limestone slabs."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    sep = t.node("ShaderNodeSeparateXYZ")
+    t.link(geo.outputs["Position"], sep.inputs[0])
+    uv = t.node("ShaderNodeCombineXYZ")
+    t.link(sep.outputs["X"], uv.inputs[0])
+    t.link(sep.outputs["Y"], uv.inputs[1])
+    br = t.node("ShaderNodeTexBrick")
+    br.offset = 0.5
+    br.inputs["Scale"].default_value = 1.0
+    br.inputs["Mortar Size"].default_value = 0.01
+    br.inputs["Brick Width"].default_value = 1.6
+    br.inputs["Row Height"].default_value = 1.1
+    br.inputs["Color1"].default_value = (0.0, 0.0, 0.0, 1.0)
+    br.inputs["Color2"].default_value = (1.0, 1.0, 1.0, 1.0)
+    t.link(uv.outputs[0], br.inputs["Vector"])
+    bw = t.node("ShaderNodeRGBToBW")
+    t.link(br.outputs["Color"], bw.inputs[0])
+    base = t.ramp(t.noise(geo.outputs["Position"], 0.08, 3.0), [(0.3, hexlin("e2d9c6")), (0.7, hexlin("ece5d6"))])
+    col = t.mix(1.0, base, t.grey(t.math("ADD", t.math("MULTIPLY", bw.outputs[0], 0.12), 0.94)), "MULTIPLY")
+    col = t.mix(t.math("MULTIPLY", br.outputs["Fac"], 0.35), col, hexlin("9c907a"))
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.6
+    return mat
+
+
 def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
     """Dressed stone on instanced blocks: each block its own tone off the palette, a fine speckle for granite."""
     mat = bpy.data.materials.new(name)

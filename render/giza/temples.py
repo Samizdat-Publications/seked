@@ -154,7 +154,7 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                                 variants=N_DRESSED, openings=doors, joint=0.025, erosion_jitter=False)
                 lean = HEIGHT_BUILT / math.tan(math.radians(82.0))
                 _slab(inset_ring(ring, 1.6 + lean + 0.2), base - 0.3, base + HEIGHT_BUILT - 0.05, coll, t["id"] + " core", mats["core behind"])
-                _slab(inset_ring(ring, lean + 0.05), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.35, coll, t["id"] + " roof", mats["dressed"])
+                _slab(inset_ring(ring, lean + 0.05), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.35, coll, t["id"] + " roof", mats["pavement"])
                 log(f"{t['id']}: {laid} dressed {casing} blocks to {HEIGHT_BUILT:.0f} m")
         _mouths(doors, base, coll, mats["dark"])
     core_blocks.emit("temple blocks", lib["core"], coll, log)

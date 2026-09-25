@@ -14,10 +14,13 @@ from mathutils import Vector, noise
 
 from . import data, states
 from .instancing import Field
-from .variants import N_CORE
+from .variants import N_CORE, N_DRESSED
+from .walls import lay_ring
 
 BATTER = 1.0 / math.tan(math.radians(74.8))
 COURSE = 0.5          # look choice: the laid courses of the ruins
+DRESSED_COURSE = {r["key"]: r["value"] for r in data.records("tier3.json")}["tier3.mastaba.course.height"]   # Reisner: 0.35 m
+NICHE = (1.2, 2.6, 1.4)   # look choice: the offering niche in the east face, width, height, depth
 RUIN = (0.4, 1.0)     # look choice: what share of its height a mastaba keeps today
 
 
@@ -27,6 +30,8 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
         return
     bm = bmesh.new()
     blocks = Field()
+    dressed_blocks = Field()
+    niches = []
     today = mode in ("ruin", "buried")
     ruin = (0.25, 0.7) if mode == "buried" else RUIN
     sunk = 1.4 if mode == "buried" else 0.6
@@ -61,8 +66,15 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                         blocks.add((m["cx"] + uc * cs - vv * sn, m["cy"] + uc * sn + vv * cs, base_z + zb + hh / 2 + sunk),
                                    (rng.gauss(0, 0.01), rng.gauss(0, 0.01), ang + rng.gauss(0, 0.02)),
                                    (bl - 0.04, dd, hh), rng.randrange(N_CORE), rng.random(), rng.random())
-        # The core (today, inside the laid shell and a little lower) or the dressed form.
-        inset = 0.55 if today else 0.0
+        else:
+            # As built: the casing laid in Reisner's courses, and an offering niche near the south end of the east face.
+            ring = [(m["cx"] + x * ca - y * sa, m["cy"] + x * sa + y * ca)
+                    for x, y in ((-L_ / 2, -W_ / 2), (L_ / 2, -W_ / 2), (L_ / 2, W_ / 2), (-L_ / 2, W_ / 2))]
+            lay_ring(ring, base_z + sunk - 0.05, H_, rng, dressed_blocks, course=DRESSED_COURSE, length=1.1, depth=0.7,
+                     batter_deg=74.84, miss=0.0, variants=N_DRESSED, joint=0.015, erosion_jitter=False)
+            niches.append((m, ca, sa, L_, W_, base_z + sunk))
+        # The core (today, inside the laid shell and a little lower) or the fill behind the dressed courses.
+        inset = 0.55 if today else 0.6
         seg_l, seg_w, seg_h = max(2, int(L_ / 1.6)), max(2, int(W_ / 1.6)), max(2, int(H_ / 0.7))
         seed = rng.random() * 100
         grid = []
@@ -91,9 +103,40 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
     me = bpy.data.meshes.new("mastabas")
     bm.to_mesh(me)
     bm.free()
-    me.materials.append(mats["mastaba core"] if today else mats["dressed"])
+    me.materials.append(mats["mastaba core"] if today else mats["limestone flat"])
     ob = bpy.data.objects.new("mastabas", me)
     coll.objects.link(ob)
     log(f"mastabas: {len(data.mastabas())} forms, {len(me.polygons):,} faces")
     if today:
         blocks.emit("mastaba blocks", lib["core"], coll, log)
+    else:
+        dressed_blocks.emit("mastaba casing", lib["dressed limestone"], coll, log)
+        _niches(niches, coll, mats["dark"])
+
+
+def _niches(niches, coll, material):
+    """A dark recess in the east face of each mastaba, a fifth of the way from its south end."""
+    w, h, dpt = NICHE
+    verts, faces = [], []
+    for m, ca, sa, L_, W_, z0 in niches:
+        # The face whose outward normal points most nearly east.
+        faces_out = [((L_ / 2, 0.0), (ca, sa)), ((-L_ / 2, 0.0), (-ca, -sa)), ((0.0, W_ / 2), (-sa, ca)), ((0.0, -W_ / 2), (sa, -ca))]
+        (fx, fy), (nx, ny) = max(faces_out, key=lambda f: f[1][0])
+        along = (-ny, nx) if abs(fx) > 0 else (ca, sa)
+        run = W_ if abs(fx) > 0 else L_
+        # Towards the south end of that face.
+        sgn = -1.0 if along[1] > 0 else 1.0
+        off = sgn * run * 0.3
+        px = m["cx"] + fx * ca - fy * sa + along[0] * off - nx * (dpt / 2 - 0.2)
+        py = m["cy"] + fx * sa + fy * ca + along[1] * off - ny * (dpt / 2 - 0.2)
+        i = len(verts)
+        for dz in (0.0, h):
+            for a, b in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+                verts.append((px + along[0] * a * w / 2 + nx * b * dpt / 2, py + along[1] * a * w / 2 + ny * b * dpt / 2, z0 + dz))
+        faces += [(i, i + 1, i + 2, i + 3), (i + 4, i + 7, i + 6, i + 5), (i, i + 4, i + 5, i + 1), (i + 1, i + 5, i + 6, i + 2),
+                  (i + 2, i + 6, i + 7, i + 3), (i + 3, i + 7, i + 4, i)]
+    me = bpy.data.meshes.new("mastaba niches")
+    me.from_pydata(verts, [], faces)
+    me.materials.append(material)
+    ob = bpy.data.objects.new("mastaba niches", me)
+    coll.objects.link(ob)

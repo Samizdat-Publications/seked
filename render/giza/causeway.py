@@ -16,7 +16,7 @@ import numpy as np
 
 from . import data, states
 from .instancing import Field
-from .variants import N_CORE
+from .variants import N_CORE, N_DRESSED
 
 WIDTH = {r["key"]: r["value"] for r in data.records("giza-temples.json")}["khafre.causeway.width"]
 CORRIDOR = 4.5
@@ -104,26 +104,40 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
         blocks.emit("causeway blocks", lib["core"], coll, log)
         log(f"causeway: {s_total:.0f} m of ramp")
     else:
-        # The corridor: two walls and a roof, dressed, following the ground.
-        bm = bmesh.new()
-        for side in (-1, 1):
-            inner, outer = side * half, side * (half + WALL)
-            prof_w = [(inner, 0.3), (inner, CORRIDOR), (outer, CORRIDOR + 0.9), (outer, -0.4)]
-            rows = [[bm.verts.new((line[i, 0] + n[i, 0] * o, line[i, 1] + n[i, 1] * o, z[i] + h)) for o, h in prof_w]
-                    for i in range(len(line))]
-            for i in range(len(line) - 1):
-                for j in range(len(prof_w) - 1):
-                    bm.faces.new((rows[i][j], rows[i][j + 1], rows[i + 1][j + 1], rows[i + 1][j]))
-        roof = [(-half - WALL, CORRIDOR + 0.9), (half + WALL, CORRIDOR + 0.9)]
-        rows = [[bm.verts.new((line[i, 0] + n[i, 0] * o, line[i, 1] + n[i, 1] * o, z[i] + h)) for o, h in roof]
-                for i in range(len(line))]
+        # The corridor: dressed limestone walls laid in courses that step up the slope, roofed with
+        # slabs laid across it, as the covered causeways of the Old Kingdom were.
+        blocks, slabs = Field(), Field()
+        course = 0.9
+        n_courses = int(round((CORRIDOR + 0.3) / course))
         for i in range(len(line) - 1):
-            bm.faces.new((rows[i][0], rows[i][1], rows[i + 1][1], rows[i + 1][0]))
-        me = bpy.data.meshes.new("khafre causeway corridor")
-        bm.to_mesh(me)
-        bm.free()
-        me.materials.append(mats["dressed"])
-        ob2 = bpy.data.objects.new("khafre causeway corridor", me)
-        coll.objects.link(ob2)
-        log(f"causeway: corridor {CORRIDOR} m high on {len(line)} stations")
+            p0, p1 = line[i], line[i + 1]
+            seg = float(np.linalg.norm(p1 - p0))
+            yaw = math.atan2(p1[1] - p0[1], p1[0] - p0[0])
+            s = 0.0
+            while s < seg - 0.1:
+                bl = min(rng.uniform(1.0, 1.8), seg - s)
+                t = (s + bl / 2) / seg
+                p = p0 + (p1 - p0) * t
+                zz = z[i] + (z[i + 1] - z[i]) * t
+                for side in (-1, 1):
+                    off = side * (half + WALL / 2)
+                    for k in range(n_courses):
+                        hh = course - 0.02
+                        blocks.add((p[0] + n[i, 0] * off, p[1] + n[i, 1] * off, zz + 0.3 + k * course + hh / 2),
+                                   (0.0, 0.0, yaw + (0.0 if side > 0 else math.pi)), (bl - 0.02, WALL, hh),
+                                   rng.randrange(N_DRESSED), rng.random(), rng.random() * 0.1)
+                s += bl
+            # Roof slabs across the corridor, one every metre or so.
+            s = 0.0
+            while s < seg - 0.1:
+                w = min(rng.uniform(0.9, 1.3), seg - s)
+                t = (s + w / 2) / seg
+                p = p0 + (p1 - p0) * t
+                zz = z[i] + (z[i + 1] - z[i]) * t
+                slabs.add((p[0], p[1], zz + 0.3 + n_courses * course + 0.4), (0.0, 0.0, yaw),
+                          (w - 0.02, WIDTH + 2 * WALL + 0.3, 0.8), rng.randrange(N_DRESSED), rng.random(), rng.random() * 0.1)
+                s += w
+        blocks.emit("causeway corridor walls", lib["dressed limestone"], coll, log)
+        slabs.emit("causeway corridor roof", lib["dressed limestone"], coll, log)
+        log(f"causeway: corridor {CORRIDOR} m high, laid in blocks, on {len(line)} stations")
     return line

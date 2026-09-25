@@ -265,7 +265,7 @@ def khufu_north_face(coll, mats, mast=True):
     ob.location = (0, 0, top + (g1["H"] - top) / 2)
 
 
-CASING_FOR = {"dressed": "dressed", "pristine": "pristine casing", "weathered": "weathered casing"}
+CASING_FOR = {"dressed": "coursed casing", "pristine": "pristine casing", "weathered": "weathered casing"}
 CAP_FOR = {"gold": "gold", "electrum": "electrum"}
 
 
@@ -307,7 +307,7 @@ def build(state, rng, coll, mats, lib, log=print):
             laid(P)
     elif queens_mode == "dressed":
         for P in queens:
-            dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["dressed"], mats["dressed granite"])
+            dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["coursed casing"], mats["dressed granite"])
     core.emit("core blocks", lib["core"], coll, log)
     casing.emit("casing blocks", lib["casing"], coll, log)
     gran.emit("granite blocks", lib["granite"], coll, log)
