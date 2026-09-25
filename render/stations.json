@@ -25,6 +25,11 @@
       "date": "11-15",
       "solar": 8.0,
       "label": "early morning, November, low light across the Sphinx's face"
+    },
+    "june-dawn": {
+      "date": "06-21",
+      "solar": 6.4,
+      "label": "just after sunrise, midsummer, the only season the sun reaches the north face"
     }
   },
   "stations": [
@@ -45,6 +50,33 @@
       "y": -445.0,
       "eye": 16.0,
       "moment": "sphinx-morning"
+    },
+    {
+      "id": "east",
+      "name": "East of Khufu",
+      "where": "On the Great Pyramid's axis, beyond its mortuary temple and the queens",
+      "x": 205.0,
+      "y": 8.0,
+      "eye": 1.7,
+      "moment": "sphinx-morning"
+    },
+    {
+      "id": "north",
+      "name": "The north face",
+      "where": "Below the entrance and al-Ma'mun's tunnel",
+      "x": 20.0,
+      "y": 205.0,
+      "eye": 1.7,
+      "moment": "june-dawn"
+    },
+    {
+      "id": "panorama",
+      "name": "The panorama stand",
+      "where": "The rise south-west of Menkaure where the three stand in a row",
+      "x": -980.0,
+      "y": -1830.0,
+      "eye": 1.7,
+      "moment": "golden-west"
     }
   ]
 }

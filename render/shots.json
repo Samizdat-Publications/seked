@@ -56,6 +56,20 @@
       ],
       "lens": 35,
       "moment": "sphinx-morning"
+    },
+    {
+      "id": "east",
+      "name": "Khufu from the east, over his mortuary temple",
+      "x": 250.0,
+      "y": 30.0,
+      "eye": 12.0,
+      "target": [
+        60.0,
+        0.0,
+        40.0
+      ],
+      "lens": 30,
+      "moment": "sphinx-morning"
     }
   ]
 }

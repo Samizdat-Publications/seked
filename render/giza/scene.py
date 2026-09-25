@@ -12,8 +12,8 @@ import time
 import bpy
 from mathutils import Vector
 
-from . import (causeway, cameras, city, data, instancing, mastabas, materials, precincts, pyramids, renderer, scatter,
-               sphinx, states, sun, temples, variants, water)
+from . import (causeway, cameras, city, data, harbour, instancing, khufu_temple, mastabas, materials, precincts, pyramids,
+               renderer, scatter, sphinx, states, sun, temples, variants, water)
 from .sky import Sky
 from .terrain import Terrain
 
@@ -90,6 +90,8 @@ class Plateau:
         causeway.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         mastabas.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         water.build(state, self.world, self.mats, self.log)
+        harbour.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
+        khufu_temple.build(state, rng, self.world, self.mats, self.lib, self.log)
         if S["rubble"]:
             scatter.rubble(rng, self.terrain, self.world, self.lib, self.log)
         if S["city"] == "city":

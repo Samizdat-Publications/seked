@@ -1,0 +1,5 @@
+{"renders": [
+  {"state": "built", "shot": "east", "size": "960x540", "samples": 20, "out": "build/render/check/built-east.png"},
+  {"state": "built", "station": "sphinx", "size": "1536x768", "samples": 16, "out": "build/render/check/built-sphinx-station.png"},
+  {"state": "today", "shot": "east", "size": "960x540", "samples": 20, "out": "build/render/check/today-east.png"}
+]}

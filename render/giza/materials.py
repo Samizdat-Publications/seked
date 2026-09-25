@@ -289,14 +289,14 @@ def metal(name, rgb_hex, rough):
 
 
 def water(name="water"):
-    """Open water: dark, glossy, rippled by a slow wind."""
+    """Open water: the inundation carried silt, so dark olive-brown, glossy, rippled by a slow wind."""
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
     bsdf = t.node("ShaderNodeBsdfPrincipled")
     t.link(bsdf.outputs[0], out.inputs["Surface"])
-    bsdf.inputs["Base Color"].default_value = hexlin("1d3a3a")
-    bsdf.inputs["Roughness"].default_value = 0.05
+    bsdf.inputs["Base Color"].default_value = hexlin("3b3a26")
+    bsdf.inputs["Roughness"].default_value = 0.07
     bsdf.inputs["IOR"].default_value = 1.33
     geo = t.node("ShaderNodeNewGeometry")
     ripple_space = t.node("ShaderNodeMapping")
