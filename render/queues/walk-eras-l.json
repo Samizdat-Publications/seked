@@ -57,6 +57,20 @@
    "out": "build/render/pano/orion-first-time.png"
   },
   {
+   "state": "first-time",
+   "shot": "cap",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/cap-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-first-time.png"
+  },
+  {
    "state": "lion",
    "station": "south",
    "size": "4096x2048",
@@ -104,6 +118,20 @@
    "size": "4096x2048",
    "samples": 48,
    "out": "build/render/pano/menkaure-lion.png"
+  },
+  {
+   "state": "lion",
+   "shot": "cap",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/cap-lion.png"
+  },
+  {
+   "state": "lion",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-lion.png"
   },
   {
    "state": "built",
@@ -197,6 +225,20 @@
    "out": "build/render/pano/subterranean-built.png"
   },
   {
+   "state": "built",
+   "shot": "cap",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/cap-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-built.png"
+  },
+  {
    "state": "stripped",
    "station": "south",
    "size": "4096x2048",
@@ -267,6 +309,13 @@
    "out": "build/render/pano/subterranean-stripped.png"
   },
   {
+   "state": "stripped",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-stripped.png"
+  },
+  {
    "state": "today",
    "station": "south",
    "size": "4096x2048",
@@ -335,6 +384,13 @@
    "size": "4096x2048",
    "samples": 128,
    "out": "build/render/pano/subterranean-today.png"
+  },
+  {
+   "state": "today",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-today.png"
   }
  ]
 }

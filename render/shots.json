@@ -84,6 +84,20 @@
       ],
       "lens": 24,
       "moment": "june-dawn"
+    },
+    {
+      "id": "cap",
+      "name": "Khufu's capstone in the morning sun, 600 mm from the east",
+      "x": 205.0,
+      "y": 8.0,
+      "eye": 1.7,
+      "target": [
+        0.0,
+        0.0,
+        141.0
+      ],
+      "lens": 600,
+      "moment": "sphinx-morning"
     }
   ]
 }
