@@ -6,6 +6,7 @@ to 60 seconds (the Sphinx stand-in is most of it); a view only rebuilds what
 depends on the camera (the displaced patch of ground, the stones and the people
 round it) and moves the sun.
 """
+import os
 import random
 import time
 
@@ -23,6 +24,12 @@ VEGETATION = True
 vegetation = None
 if VEGETATION:
     from . import vegetation
+# The herds of each era (render/giza/fauna.py), wired in 2026-09-25. SEKED_FAUNA=0 leaves them out, for a
+# film begun before they were wired, so they do not appear partway through it.
+FAUNA = os.environ.get("SEKED_FAUNA", "1") != "0"
+fauna = None
+if FAUNA:
+    from . import fauna
 
 
 class Plateau:
@@ -111,6 +118,10 @@ class Plateau:
             # The grass's colour from afar, through the same cover map the tufts are scattered by.
             for key in ("ground", "ground displaced"):
                 vegetation.tint_ground(self.mats[key], state)
+        if fauna is not None:
+            herd_lib = fauna.library(self.library, state, self.log)
+            if herd_lib is not None:
+                fauna.place(state, self.terrain, self.world, herd_lib, log=self.log)
         self.sky = Sky(self.scene, aerosol=aerosol, haze=haze, coll=self.world)
         self.camera = cameras.make(self.scene)
         renderer.gpu(self.scene, self.log)
