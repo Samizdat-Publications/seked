@@ -116,13 +116,14 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
     half_bottom = THICKNESS / 2 - FACING
     half_top = half_bottom - (top - base) * inset
     _core(line, base, top - 0.05, half_bottom, half_top, total / 2, GATE_WIDTH / 2, coll, mats["core behind"])
-    # Three lintels roof the gateway through the wall's thickness.
-    lintels = Field()
-    yaw = math.atan2(dy, dx)
-    for k in (-1, 0, 1):
-        cx, cy = gx + nx * k * THICKNESS / 3, gy + ny * k * THICKNESS / 3
-        lintels.add((cx, cy, base + GATE_HEIGHT + 0.55), (0.0, 0.0, yaw), (GATE_WIDTH + 1.6, THICKNESS / 3 - 0.06, 1.1),
-                    rng.randrange(4), rng.random(), rng.random() * 0.2)
-    lintels.emit("Wall of the Crow lintels", lib["core fresh" if whole else "core"], coll, log)
+    # Three lintels roof the gateway through the wall's thickness; once the top is broken they are down.
+    if whole:
+        lintels = Field()
+        yaw = math.atan2(dy, dx)
+        for k in (-1, 0, 1):
+            cx, cy = gx + nx * k * THICKNESS / 3, gy + ny * k * THICKNESS / 3
+            lintels.add((cx, cy, base + GATE_HEIGHT + 0.55), (0.0, 0.0, yaw), (GATE_WIDTH + 1.6, THICKNESS / 3 - 0.06, 1.1),
+                        rng.randrange(4), rng.random(), rng.random() * 0.2)
+        lintels.emit("Wall of the Crow lintels", lib["core fresh"], coll, log)
     log(f"Wall of the Crow: {total:.0f} m long, {H} m high, {laid} facing blocks, the gate {GATE_WIDTH} x {GATE_HEIGHT} m"
         f"{'' if whole else ', broken along its top'}")

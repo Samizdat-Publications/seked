@@ -58,6 +58,41 @@ def landmarks():
     return out
 
 
+STAR_LABELS = ("Alnitak", "Alnilam", "Mintaka", "Sirius")
+
+
+def star_marks(s, moments, cameras):
+    """
+    Labels on the claims' stars for a night station: each star's baked altitude and
+    azimuth for that era's night, set 20 km out from the camera so the viewer's labels,
+    which are points in the frame, land on the star. One entry per era, since the sky of
+    10,450 BCE is not the sky of 2450 BCE.
+    """
+    import math
+    path = os.path.join(data.REPO, "build", "sky-bake.json")
+    if not os.path.exists(path):
+        return []
+    with io.open(path, encoding="utf-8") as f:
+        bake = json.load(f)
+    catalogue = data.load_json(data.DATA, "stars", "hyg-bright.json")
+    name_col = catalogue["columns"].index("name")
+    index = {row[name_col]: i for i, row in enumerate(catalogue["stars"]) if row[name_col] in STAR_LABELS}
+    out = []
+    for st, cam in cameras.items():
+        m = moments.get(s.get("by_state", {}).get(st, {}).get("moment", s.get("moment")), {})
+        night = bake.get("nights", {}).get(m.get("night"))
+        if night is None:
+            continue
+        for name in STAR_LABELS:
+            az, alt = (math.radians(v) for v in night["stars"][index[name]][:2])
+            if alt <= 0.0:
+                continue
+            d = 20000.0
+            out.append({"name": name, "x": round(cam[0] + d * math.cos(alt) * math.sin(az), 1),
+                        "y": round(cam[1] + d * math.cos(alt) * math.cos(az), 1), "z": {st: round(cam[2] + d * math.sin(alt), 1)}})
+    return out
+
+
 def in_shadow(png):
     """
     How dark the ground under the camera is against the sunlit ground near the horizon.
@@ -98,14 +133,17 @@ def main():
                     cameras[st] = json.load(f)["camera"]
                 if camera is None or st == "today":
                     camera = cameras[st]
-            if not s.get("inside"):
+            over = s.get("by_state", {}).get(st, {})
+            by_night = "night" in moments.get(over.get("moment", s.get("moment")), {})
+            if not s.get("inside") and not by_night:
                 dark = in_shadow(png)
                 if dark < 0.38:
                     print(f"  WARNING: {s['id']}-{st}: the ground under the camera is {dark:.2f} of the lit ground; "
                           "in shadow or over dark water?")
-            over = s.get("by_state", {}).get(st, {})
-            if "name" in over or "where" in over:
+            if "name" in over or "where" in over or "moment" in over:
                 titles[st] = {"name": over.get("name", s["name"]), "where": over.get("where", s.get("where", ""))}
+                if "moment" in over:
+                    titles[st]["moment"] = moments.get(over["moment"], {}).get("label", "")
         if not panos:
             print(f"{s['id']}: nothing rendered yet; left out")
             continue
@@ -117,7 +155,7 @@ def main():
             "panoramas": panos,
             "neighbours": [n for n in s.get("neighbours", [])],
             # An inside station names what is round it; the plateau's landmarks are behind the walls.
-            "landmarks": s["landmarks"] if s.get("inside") else marks,
+            "landmarks": s["landmarks"] if s.get("inside") else marks + star_marks(s, moments, cameras),
         }
         if len({tuple(c) for c in cameras.values()}) > 1:
             entry["cameras"] = cameras

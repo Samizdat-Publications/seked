@@ -18,8 +18,8 @@
     {
       "id": "south",
       "name": "Khufu from the south, in raking light",
-      "x": -30.0,
-      "y": -360.0,
+      "x": 20.0,
+      "y": -330.0,
       "eye": 1.7,
       "target": [
         0.0,
@@ -70,6 +70,20 @@
       ],
       "lens": 30,
       "moment": "sphinx-morning"
+    },
+    {
+      "id": "crow",
+      "name": "The Wall of the Crow and its gate, from the north-east",
+      "x": 600.0,
+      "y": -740.0,
+      "eye": 2.0,
+      "target": [
+        556.0,
+        -786.0,
+        -37.0
+      ],
+      "lens": 24,
+      "moment": "june-dawn"
     }
   ]
 }

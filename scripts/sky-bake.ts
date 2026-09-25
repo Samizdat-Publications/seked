@@ -41,7 +41,9 @@ import {
   solarDeclinationAndRa,
   starById,
   transitLst,
+  SEASON_EVENTS,
   SUN_STANDARD_ALTITUDE_DEG,
+  type SeasonEvent,
 } from '@seked/sky';
 
 /**
@@ -58,6 +60,18 @@ const NIGHT_EPOCH = -2449;
 
 /** The star put on the meridian for the night view, by `data/stars/named.json`'s id. */
 const MERIDIAN_STAR = 'alnitak';
+
+/**
+ * The nights the walkthrough renders (render/giza/night.py): an epoch, the star put
+ * on the meridian, and what the night is for. `c2-2450` is the night `stars` has
+ * always carried; `first-time` is Bauval and Hancock's 10,450 BCE, when Orion's belt
+ * crossed the meridian at the lowest point of its precessional swing. Each is baked
+ * the same way as `stars`, so a render of one is as honest as a render of the other.
+ */
+export const NIGHTS: Record<string, { epoch: number; meridian: string; label: string }> = {
+  'c2-2450': { epoch: NIGHT_EPOCH, meridian: MERIDIAN_STAR, label: 'Bauval and Gilbert\'s 2450 BCE, Alnitak on the meridian' },
+  'first-time': { epoch: -10449, meridian: 'alnitak', label: 'The First Time, 10,450 BCE, Alnitak on the meridian at the lowest of the belt\'s precessional swing' },
+};
 
 /** Named in the error when the sky package stops providing a key this script reads. */
 const SKY = 'the @seked/sky environment';
@@ -115,6 +129,20 @@ export interface BakedStars {
   icrsToEnu: number[][];
 }
 
+/**
+ * A night of `NIGHTS`: its stars, and the sun that keeps it dark. The meridian
+ * star transits at one sidereal time, and which season of the epoch's year puts
+ * the sun lowest at that sidereal time is a matter of precession: at 2450 BCE
+ * Alnitak crosses the meridian at midnight near the December solstice, at
+ * 10,450 BCE near the June one. The sun is taken at whichever of the year's four
+ * season instants is lowest, from the same functions as `alnitak-transit`.
+ */
+export interface BakedNight extends BakedStars {
+  label: string;
+  season: SeasonEvent;
+  sun: BakedSun;
+}
+
 export interface SkyBake {
   generated: string;
   preset: string;
@@ -126,6 +154,7 @@ export interface SkyBake {
   };
   moments: Record<string, BakedMoment>;
   stars: BakedStars;
+  nights: Record<string, BakedNight>;
 }
 
 /**
@@ -224,7 +253,7 @@ export function buildSkyBake(presetId = 'canonical'): SkyBake {
     },
   };
 
-  const stars = bakeStars(latitudeDeg);
+  const stars = bakeStars(latitudeDeg, NIGHT_EPOCH, MERIDIAN_STAR);
   // The night moment's sun. Alnitak's transit is a night sight in the season
   // the December solstice falls in, so the sun of that solstice at that
   // sidereal time is the sun this view is under: Meeus's place for the
@@ -257,6 +286,25 @@ export function buildSkyBake(presetId = 'canonical'): SkyBake {
     },
     moments,
     stars,
+    nights: Object.fromEntries(Object.entries(NIGHTS).map(([id, night]) => [id, bakeNight(latitudeDeg, night)])),
+  };
+}
+
+/** A night of `NIGHTS`: `bakeStars` for its epoch and meridian star, under the lowest of the year's season suns. */
+function bakeNight(latitudeDeg: number, night: { epoch: number; meridian: string; label: string }): BakedNight {
+  const stars = bakeStars(latitudeDeg, night.epoch, night.meridian);
+  const year = calendarYearOfEpoch(night.epoch);
+  let lowest: { season: SeasonEvent; altDeg: number; azDeg: number } | null = null;
+  for (const season of SEASON_EVENTS) {
+    const sun = solarDeclinationAndRa(seasonInstant(year, season));
+    const { altDeg, azDeg } = altAz({ ...sun, latDeg: latitudeDeg, lstDeg: stars.lstDeg });
+    if (lowest === null || altDeg < lowest.altDeg) lowest = { season, altDeg, azDeg };
+  }
+  return {
+    ...stars,
+    label: night.label,
+    season: lowest!.season,
+    sun: { azimuthDeg: round(lowest!.azDeg), ...altitudes(lowest!.altDeg) },
   };
 }
 
@@ -268,31 +316,31 @@ export function buildSkyBake(presetId = 'canonical'): SkyBake {
  * draws is the render's business, and a reader checking the meridian star
  * should be able to find every one of its neighbours here.
  */
-function bakeStars(latitudeDeg: number): BakedStars {
-  const meridianStar = starById(loadNamedStars(), MERIDIAN_STAR);
-  const meridianAt = positionAtEpoch(meridianStar, NIGHT_EPOCH);
+function bakeStars(latitudeDeg: number, epoch: number, meridian: string): BakedStars {
+  const meridianStar = starById(loadNamedStars(), meridian);
+  const meridianAt = positionAtEpoch(meridianStar, epoch);
   const lstDeg = transitLst(meridianAt.raDeg);
 
   const catalogue = loadBrightStars();
   const bright = expandBrightStars(catalogue);
-  const positions = positionsAtEpoch(bright, NIGHT_EPOCH);
+  const positions = positionsAtEpoch(bright, epoch);
   const stars = positions.map((at, i) => {
     const { altDeg, azDeg } = altAz({ raDeg: at.raDeg, decDeg: at.decDeg, latDeg: latitudeDeg, lstDeg });
     const star = bright[i]!;
     return [round(azDeg), round(altDeg), round(star.mag, 3), round(star.ci ?? 0, 3)];
   });
 
-  const precession = ltpb(NIGHT_EPOCH);
+  const precession = ltpb(epoch);
   const horizon = equatorialToHorizon(latitudeDeg, lstDeg);
   const columns = ([[1, 0, 0], [0, 1, 0], [0, 0, 1]] as const).map((e) => apply(horizon, apply(precession, [e[0], e[1], e[2]])));
   const icrsToEnu = [0, 1, 2].map((row) => columns.map((column) => Number(column[row]!.toFixed(12))));
 
   return {
-    epoch: NIGHT_EPOCH,
+    epoch,
     lstDeg: round(lstDeg),
     icrsToEnu,
     meridian: {
-      star: MERIDIAN_STAR,
+      star: meridian,
       name: meridianStar.name,
       raDeg: round(meridianAt.raDeg),
       decDeg: round(meridianAt.decDeg),
@@ -322,8 +370,14 @@ const STAR_ROW = '@star-row';
  * is indented, and the rows go back in as they were written.
  */
 export function serializeSkyBake(bake: SkyBake): string {
-  const rows = bake.stars.stars.map((row) => `[${row.join(', ')}]`);
-  const marked = { ...bake, stars: { ...bake.stars, stars: rows.map(() => STAR_ROW) } };
+  // Rows are collected in the order the JSON will print them: `stars`, then each night.
+  const rows: string[] = [];
+  const mark = <T extends BakedStars>(s: T): T => ({ ...s, stars: s.stars.map((row) => (rows.push(`[${row.join(', ')}]`), STAR_ROW)) }) as T;
+  const marked = {
+    ...bake,
+    stars: mark(bake.stars),
+    nights: Object.fromEntries(Object.entries(bake.nights).map(([id, night]) => [id, mark(night)])),
+  };
   let i = 0;
   return `${JSON.stringify(marked, null, 2).replaceAll(`"${STAR_ROW}"`, () => rows[i++]!)}\n`;
 }
@@ -346,6 +400,10 @@ function main(): void {
   const up = stars.stars.filter((row) => row[1]! > 0).length;
   console.log(`${stars.catalogue.count} stars to magnitude ${stars.catalogue.magnitudeLimit} at epoch ${stars.epoch}, ${up} above the horizon`);
   console.log(`${stars.meridian.name} on the meridian at sidereal time ${stars.lstDeg.toFixed(3)} deg`);
+  for (const [id, night] of Object.entries(bake.nights)) {
+    console.log(`night ${id.padEnd(12)} epoch ${String(night.epoch).padStart(6)}  ${night.meridian.name} on the meridian at ${night.lstDeg.toFixed(3)} deg, `
+      + `the ${night.season} sun at ${night.sun.altitudeDeg.toFixed(1)} deg`);
+  }
   console.log(`wrote ${SKY_BAKE_PATH}`);
 }
 

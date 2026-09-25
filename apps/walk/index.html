@@ -1235,16 +1235,17 @@
   // A station's name and place, which an era may change (the harbour where the ground is flooded).
   function titleFor(st, id) {
     var t = id && st.titles[id];
-    return { name: String((t && t.name) || st.name), where: String((t && t.where) || st.where) };
+    return { name: String((t && t.name) || st.name), where: String((t && t.where) || st.where), moment: String((t && t.moment) || st.moment) };
   }
   function showTitle(st, id) {
     if (!st) return;
     var t = titleFor(st, id);
-    if (nameEl.textContent === t.name && whereEl.getAttribute("data-where") === t.where) return;
+    var key = t.where + "|" + t.moment;
+    if (nameEl.textContent === t.name && whereEl.getAttribute("data-where") === key) return;
     nameEl.textContent = t.name;
     whereEl.textContent = "";
-    whereEl.setAttribute("data-where", t.where);
-    var bits = [t.where, st.moment].filter(Boolean);
+    whereEl.setAttribute("data-where", key);
+    var bits = [t.where, t.moment].filter(Boolean);
     bits.forEach(function (text, i) {
       var span = document.createElement("span");
       span.textContent = text;

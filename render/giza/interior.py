@@ -54,7 +54,7 @@ def floor_z(r, y):
     return z_foot + (y_foot - y) * math.tan(angle)
 
 
-def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, joint=0.35, speckle=None):
+def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, joint=0.35, speckle=None, mortar=0.004):
     """
     Fine stone laid in courses, the joints drawn as hairlines. `frame(t, geo)` returns the
     (along, up, height-above-floor) sockets the courses are laid in, so the same material
@@ -74,7 +74,7 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
     br.offset = 0.5
     br.offset_frequency = 2
     br.inputs["Scale"].default_value = 1.0
-    br.inputs["Mortar Size"].default_value = 0.004
+    br.inputs["Mortar Size"].default_value = mortar
     br.inputs["Mortar Smooth"].default_value = 0.4
     br.inputs["Brick Width"].default_value = width
     br.inputs["Row Height"].default_value = course
@@ -351,9 +351,11 @@ def lights(state, coll, r, room, log=print):
                 lamps.append(_area("gallery strip", coll, at, (0.08, 2.0), (side * 0.12, 0.0, 1.0), slope, 40.0, warm))
             y -= 2.4
         for yy, sign in ((y1 - 0.12, 1.0), (y0 + 0.12, -1.0)):     # each washes the wall behind it
-            for fx in (0.2, 0.5, 0.8):
+            for fx in (0.4, 0.63, 0.86):                           # kept clear of the coffer, which they would burn out
                 at = (x0 + (x1 - x0) * fx, yy, z0 + 0.06)
                 lamps.append(_area("chamber strip", coll, at, (2.4, 0.08), (0.0, sign * 0.2, 1.0), (1.0, 0.0, 0.0), 160.0, warm))
+        # A softer wash up the west wall, so the coffer stands dark against lit granite.
+        lamps.append(_area("chamber strip", coll, (x0 + 0.12, (y0 + y1) / 2, z0 + 0.06), (0.08, 4.4), (-0.2, 0.0, 1.0), (0.0, 1.0, 0.0), 70.0, warm))
         log(f"interior light: {len(lamps)} electric strips")
     else:
         flame = (1.0, 0.52, 0.2)
@@ -361,8 +363,9 @@ def lights(state, coll, r, room, log=print):
             yy = y_foot - 2.0 - k * (y_foot - step_y - 4.0) / 7
             side = -1 if k % 2 else 1
             lamps.append(_point("oil lamp", coll, (x + side * (half - 0.26), yy, floor_z(r, yy) + RAMP_HEIGHT + 0.12), 16.0, flame, 0.03))
-        for fx, fy in ((0.12, 0.25), (0.35, 0.8), (0.55, 0.2), (0.72, 0.75), (0.9, 0.3)):
-            lamps.append(_point("oil lamp", coll, (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, z0 + 0.12), 40.0, flame, 0.03))
+        for fx, fy, watts in ((0.34, 0.15, 40.0), (0.46, 0.85, 40.0), (0.6, 0.2, 40.0), (0.75, 0.8, 40.0), (0.9, 0.3, 40.0),
+                              (0.04, 0.9, 14.0)):          # none within 1.5 m of the coffer; a small one behind it
+            lamps.append(_point("oil lamp", coll, (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, z0 + 0.12), watts, flame, 0.03))
         log(f"interior light: {len(lamps)} oil lamps")
     return lamps
 
@@ -389,7 +392,7 @@ def build(state, coll, mats, log=print):
                                     soot=soot, height=r["gg.height"])
     course = (r["kc.ceiling.up"] - r["kc.floor.elevation"]) / KC_COURSES
     mats["chamber granite"] = masonry("chamber granite", granite, rough * 0.8, course, 2.1, room_frame(r["kc.floor.elevation"]),
-                                      soot=soot * 0.8, height=course * KC_COURSES, joint=0.8, speckle="1c1715")
+                                      soot=soot * 0.8, height=course * KC_COURSES, joint=0.8, speckle="1c1715", mortar=0.01)
     mats["coffer granite"] = masonry("coffer granite", granite, rough, 10.0, 10.0, room_frame(r["kc.floor.elevation"]),
                                      joint=0.0, speckle="1c1715")
     mats.setdefault("timber", _flat("timber", (0.24, 0.15, 0.08), 0.7))

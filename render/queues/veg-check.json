@@ -1,0 +1,53 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "south",
+   "size": "1536x768",
+   "samples": 32,
+   "out": "build/render/check/south-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "1536x768",
+   "samples": 32,
+   "out": "build/render/check/sphinx-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "orion",
+   "size": "2048x1024",
+   "samples": 64,
+   "out": "build/render/check/orion-first-time.png"
+  },
+  {
+   "state": "built",
+   "shot": "crow",
+   "size": "1280x720",
+   "samples": 64,
+   "out": "build/render/check/crow-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "1536x768",
+   "samples": 32,
+   "out": "build/render/check/harbour-built-veg.png"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "size": "2048x1024",
+   "samples": 64,
+   "out": "build/render/check/orion-built.png"
+  },
+  {
+   "state": "today",
+   "shot": "crow",
+   "size": "1280x720",
+   "samples": 64,
+   "out": "build/render/check/crow-today.png"
+  }
+ ]
+}

@@ -120,3 +120,33 @@ describe('the sky bake', () => {
     }
   });
 });
+
+describe('the nights', () => {
+  it('bakes C2\'s night exactly as `stars`', () => {
+    const night = bake.nights['c2-2450']!;
+    expect(night.epoch).toBe(bake.stars.epoch);
+    expect(night.lstDeg).toBe(bake.stars.lstDeg);
+    expect(night.stars).toEqual(bake.stars.stars);
+  });
+
+  it('puts every night\'s meridian star on the meridian under a sun past astronomical twilight', () => {
+    const bright = expandBrightStars(loadBrightStars());
+    for (const [id, night] of Object.entries(bake.nights)) {
+      const index = bright.findIndex((s) => s.name === night.meridian.name);
+      const [azDeg, altDeg] = night.stars[index]!;
+      expect(azDeg, id).toBeCloseTo(180, 2);
+      expect(altDeg, id).toBeCloseTo(transitAltitude(night.meridian.decDeg, latitudeDeg), 2);
+      expect(night.sun.altitudeDeg, id).toBeLessThan(-18);
+    }
+  });
+
+  it('finds the First Time\'s belt low, and its dark season moved by precession', () => {
+    const night = bake.nights['first-time']!;
+    expect(night.epoch).toBe(-10449);
+    // Alnitak crosses near its precessional low: roughly 50 degrees south, so about ten degrees up at Giza.
+    expect(night.meridian.decDeg).toBeLessThan(-45);
+    expect(transitAltitude(night.meridian.decDeg, latitudeDeg)).toBeLessThan(15);
+    // Half a precessional cycle from 2450 BCE, the midnight transit falls near the other solstice.
+    expect(night.season).not.toBe(bake.nights['c2-2450']!.season);
+  });
+});

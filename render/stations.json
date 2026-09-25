@@ -30,6 +30,14 @@
       "date": "06-21",
       "solar": 6.4,
       "label": "just after sunrise, midsummer, the only season the sun reaches the north face"
+    },
+    "night-first-time": {
+      "night": "first-time",
+      "label": "night, 10,450 BCE: Alnitak on the meridian at the low point of the belt's precessional swing"
+    },
+    "night-2450": {
+      "night": "c2-2450",
+      "label": "night, 2450 BCE: Alnitak on the meridian"
     }
   },
   "stations": [
@@ -108,7 +116,8 @@
       },
       "neighbours": [
         "east",
-        "gallery"
+        "gallery",
+        "orion"
       ]
     },
     {
@@ -148,6 +157,29 @@
         "south"
       ],
       "note": "Only where an era has open water here: the harbour basin as built (render/giza/harbour.py BASIN) and the flood of the claim eras. The raft sets the eye 1.7 m above the water."
+    },
+    {
+      "id": "orion",
+      "name": "Orion over Giza",
+      "where": "A kilometre north of the Great Pyramid, looking south along the meridian",
+      "x": -100.0,
+      "y": 1000.0,
+      "eye": 1.7,
+      "moment": "night-first-time",
+      "view": {
+        "yaw": 182,
+        "pitch": 8,
+        "fov": 60
+      },
+      "neighbours": [
+        "north"
+      ],
+      "by_state": {
+        "built": {
+          "moment": "night-2450"
+        }
+      },
+      "note": "The stars are the sky bake's (pnpm run sky-bake): the bright catalogue precessed with Vondrak 2011 to the night's epoch and turned to the sidereal time Alnitak transits. The First Time is the claim's night; as built it is C2's 2450 BCE."
     },
     {
       "id": "gallery",

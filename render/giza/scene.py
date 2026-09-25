@@ -12,14 +12,13 @@ import time
 import bpy
 from mathutils import Vector
 
-from . import (causeway, cameras, city, data, harbour, instancing, interior, khufu_temple, mastabas, materials, precincts,
-               pyramids, renderer, roads, scatter, sphinx, states, sun, temples, variants, wall_of_the_crow, water)
+from . import (causeway, cameras, city, data, harbour, instancing, interior, khufu_temple, mastabas, materials, night,
+               precincts, pyramids, renderer, roads, scatter, sphinx, states, sun, temples, variants, wall_of_the_crow, water)
 from .sky import Sky
 from .terrain import Terrain
 
-# The vegetation layer is wired in only once it has been reviewed; until then a
-# half-written module must not be able to break a build.
-VEGETATION = False
+# The vegetation layer (render/giza/vegetation.py), reviewed and switched on 2026-09-24.
+VEGETATION = True
 vegetation = None
 if VEGETATION:
     from . import vegetation
@@ -104,12 +103,16 @@ class Plateau:
             city.village(self.terrain, self.world, self.lib, self.log)
         if vegetation is not None:
             vegetation.build(state, self.terrain, self.world, rng, self.log)
+            # The grass's colour from afar, through the same cover map the tufts are scattered by.
+            for key in ("ground", "ground displaced"):
+                vegetation.tint_ground(self.mats[key], state)
         self.sky = Sky(self.scene, aerosol=aerosol, haze=haze, coll=self.world)
         self.camera = cameras.make(self.scene)
         renderer.gpu(self.scene, self.log)
         renderer.configure(self.scene)
         self.exposure = self.scene.view_settings.exposure
         self.inside_lamps = None       # the interior is built the first time a view goes inside
+        self.night = None              # and the star dome the first time a moment is a night
         self.log(f"built {state} ({S['label']}, {S['honesty']})")
 
     def _coll(self, name):
@@ -164,6 +167,19 @@ class Plateau:
         self.log(f"{kind} {v['id']} at ({x:.0f}, {y:.0f}, {z:.1f})")
 
     def moment(self, m):
+        if isinstance(m, dict) and "night" in m:
+            # Stars from the sky bake round the eye, the sun where the bake puts it, its lamp off.
+            if self.night is None:
+                self.night = night.Night(self.scene, self.scene.world.node_tree, self.log)
+            n = self.night.show(m["night"], tuple(self.camera.location))
+            alt, az = (n["sun"]["altitudeDeg"], n["sun"]["azimuthDeg"]) if n else (-30.0, 0.0)
+            self.sky.set_sun(alt, az)
+            self.sky.sun.data.energy = 0.0
+            self.sun_now = (alt, az)
+            self.scene.view_settings.exposure = m.get("exposure", night.EXPOSURE)
+            return
+        if self.night is not None:
+            self.night.hide()
         alt, az, dec = sun.parse_moment(m, self.spec["year"])
         self.sun_now = (alt, az)
         colour, energy = self.sky.set_sun(alt, az)
