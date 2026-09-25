@@ -23,7 +23,7 @@ def fbm3(p, octaves=4):
     return total / norm
 
 
-def block(seed, rounding, erosion, chips=2, cuts=10, shear=0.0, front_bias=1.0, base_zero=False, batter=0.0):
+def block(seed, rounding, erosion, chips=2, cuts=10, shear=0.0, front_bias=1.0, base_zero=False, batter=0.0, smooth=True):
     """
     A unit block (-0.5..0.5; front +Y, up +Z), rounded and eroded, most on the front
     and top where the weather reaches. `shear` slopes the front back at the top, for a
@@ -63,7 +63,10 @@ def block(seed, rounding, erosion, chips=2, cuts=10, shear=0.0, front_bias=1.0, 
     me = bpy.data.meshes.new(f"block {seed}")
     bm.to_mesh(me)
     bm.free()
-    me.shade_smooth()
+    if smooth:
+        me.shade_smooth()
+    else:
+        me.shade_flat()
     return me
 
 
@@ -129,6 +132,7 @@ def collection(parent, name, meshes, material):
 
 SHEARS = [0.2, 0.26, 0.32, 0.38, 0.44, 0.5, 0.58, 0.66, 0.75]
 N_CORE = 16
+N_DRESSED = 4
 
 
 def library(parent, mats, state, rng):
@@ -145,6 +149,10 @@ def library(parent, mats, state, rng):
     lib["granite"] = collection(parent, "v granite", [block(400 + i, rounding=0.12, erosion=0.07, chips=1, cuts=8, shear=s, front_bias=2.5)
                                                       for i, s in enumerate(SHEARS)], mats["granite"])
     lib["rock"] = collection(parent, "v rock", [rock(500 + i) for i in range(12)], mats["rock"])
-    lib["box"] = collection(parent, "v box", [block(700, rounding=0.0, erosion=0.0, chips=0, cuts=1, base_zero=True)], mats["city"])
+    lib["dressed granite"] = collection(parent, "v dressed granite", [block(600 + i, rounding=0.012, erosion=0.002, chips=0, cuts=2, smooth=False)
+                                                                      for i in range(N_DRESSED)], mats["granite blocks"])
+    lib["dressed limestone"] = collection(parent, "v dressed limestone", [block(620 + i, rounding=0.012, erosion=0.002, chips=0, cuts=2, smooth=False)
+                                                                          for i in range(N_DRESSED)], mats["limestone blocks"])
+    lib["box"] = collection(parent, "v box", [block(700, rounding=0.0, erosion=0.0, chips=0, cuts=1, base_zero=True, smooth=False)], mats["city"])
     lib["people"] = collection(parent, "v people", [person(800 + i) for i in range(4)], mats["people"])
     return lib

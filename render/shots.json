@@ -28,6 +28,34 @@
       ],
       "lens": 28,
       "moment": "golden-south"
+    },
+    {
+      "id": "sphinx",
+      "name": "The Sphinx with Khafre behind, from above the temples",
+      "x": 439.0,
+      "y": -445.0,
+      "eye": 20.0,
+      "target": [
+        337.0,
+        -433.0,
+        -16.0
+      ],
+      "lens": 55,
+      "moment": "sphinx-morning"
+    },
+    {
+      "id": "debug-vt",
+      "name": "debug: the valley temple's east front",
+      "x": 470.0,
+      "y": -470.0,
+      "eye": 3.0,
+      "target": [
+        410.0,
+        -490.0,
+        -38.0
+      ],
+      "lens": 35,
+      "moment": "sphinx-morning"
     }
   ]
 }

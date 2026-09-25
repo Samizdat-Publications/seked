@@ -62,15 +62,21 @@ def stones(centre, terrain, coll, lib, log=print, count=60000, radius=350.0):
 
 # Where visitors stand: (x, y, half-width, half-depth, how many).
 CROWDS = [(0, 128, 70, 40, 60), (120, 30, 20, 60, 60), (60, -125, 60, 30, 60), (-125, -40, 20, 50, 60),
-          (215, -60, 15, 80, 60), (150, -250, 60, 40, 60), (-8, -318, 10, 8, 9), (-70, -300, 14, 10, 9)]
+          (215, -60, 15, 80, 60), (150, -250, 60, 40, 60), (-8, -318, 10, 8, 9), (-70, -300, 14, 10, 9),
+          (392, -484, 14, 6, 30), (300, -458, 22, 3, 18)]
+NEAR_CAMERA = 35.0   # no figure closer than this: at a few metres the stand-in people read as toys
 
 
-def people(rng, terrain, coll, lib, log=print):
+def people(camera_xy, terrain, coll, lib, log=print):
+    import random
+    rng = random.Random(21)
     pos, rot, scl, var, tone = [], [], [], [], []
     for sx, sy, rx, ry, n in CROWDS:
         for _ in range(n):
             x, y = sx + rng.uniform(-rx, rx), sy + rng.uniform(-ry, ry)
             if abs(x) < 118 and abs(y) < 118:
+                continue
+            if math.hypot(x - camera_xy[0], y - camera_xy[1]) < NEAR_CAMERA:
                 continue
             pos.append([x, y, 0.0])
             rot.append((0, 0, rng.uniform(0, 6.3)))

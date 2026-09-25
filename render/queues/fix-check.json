@@ -1,0 +1,5 @@
+{"renders": [
+  {"state": "today", "shot": "sphinx", "size": "960x540", "samples": 24, "out": "build/render/check/fix-sphinx-today.png"},
+  {"state": "built", "shot": "debug-vt", "size": "960x540", "samples": 16, "out": "build/render/check/fix-vt-built.png"},
+  {"state": "built", "shot": "sphinx", "size": "960x540", "samples": 24, "out": "build/render/check/fix-sphinx-built.png"}
+]}

@@ -11,7 +11,7 @@ import time
 import bpy
 from mathutils import Vector
 
-from . import cameras, city, data, instancing, mastabas, materials, pyramids, renderer, scatter, sun, variants
+from . import causeway, cameras, city, data, instancing, mastabas, materials, pyramids, renderer, scatter, sphinx, sun, temples, variants
 from .sky import Sky
 from .terrain import Terrain
 
@@ -48,16 +48,28 @@ class Plateau:
             "dark": materials.dark(),
             "ground": materials.ground(state),
             "ground displaced": materials.ground(state, displace=True),
+            "mudbrick": materials.dressed("mudbrick", colours=("6c533f", "7d6149"), rough=0.95, grain_scale=0.3),
+            # Aswan granite: red-brown to grey, a tone per block.
+            "granite blocks": materials.dressed_blocks("granite blocks", [(0.0, "5e3a31"), (0.3, "74463a"), (0.55, "6a4a42"),
+                                                                          (0.8, "7e5244"), (1.0, "5a403b")], rough=0.42),
+            # Tura and Mokattam limestone, dressed: white with a faint drift from block to block.
+            "limestone blocks": materials.dressed_blocks("limestone blocks", [(0.0, "e6dfd1"), (0.5, "efe9dd"), (1.0, "ddd4c3")],
+                                                         rough=0.45, speckle=False),
+            "bedrock": sphinx.bedrock_material(),
         }
         self.lib = variants.library(self.library, self.mats, state, rng)
         footprints = pyramids.build(state, rng, self.world, self.mats, self.lib, self.log)
-        self.terrain = Terrain(state, footprints)
+        self.terrain = Terrain(state, footprints, flats=temples.flats(), cuts=[sphinx.enclosure()],
+                               calm=causeway.centreline())
         self.terrain.build(self.world, self.mats["ground"])
         self.log("terrain")
+        sphinx.statue(state, self.world, self.log)
+        sphinx.walls(self.terrain, self.world, self.mats["bedrock"])
+        temples.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
+        causeway.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         mastabas.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         if today:
             scatter.rubble(rng, self.terrain, self.world, self.lib, self.log)
-            scatter.people(rng, self.terrain, self.world, self.lib, self.log)
             city.build(self.terrain, self.world, self.lib, self.log)
         self.sky = Sky(self.scene, aerosol=aerosol, haze=haze, coll=self.world)
         self.camera = cameras.make(self.scene)
@@ -92,6 +104,8 @@ class Plateau:
         self.terrain.patch(centre, self.per_view, self.mats["ground displaced"])
         if self.want_stones:
             scatter.stones((x, y), self.terrain, self.per_view, self.lib, self.log)
+        if self.state == "today":
+            scatter.people((x, y), self.terrain, self.per_view, self.lib, self.log)
         self.log(f"{kind} {v['id']} at ({x:.0f}, {y:.0f}, {z:.1f})")
 
     def moment(self, m):

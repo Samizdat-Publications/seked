@@ -20,6 +20,11 @@
       "date": "11-01",
       "solar": 16.7,
       "label": "late afternoon, November, the sun just clear of Khafre"
+    },
+    "sphinx-morning": {
+      "date": "11-15",
+      "solar": 8.0,
+      "label": "early morning, November, low light across the Sphinx's face"
     }
   },
   "stations": [
@@ -31,6 +36,15 @@
       "y": -360.0,
       "eye": 1.7,
       "moment": "golden-south"
+    },
+    {
+      "id": "sphinx",
+      "name": "Above the Sphinx Temple",
+      "where": "On the line from Khafre's apex through the Sphinx's head",
+      "x": 439.0,
+      "y": -445.0,
+      "eye": 16.0,
+      "moment": "sphinx-morning"
     }
   ]
 }

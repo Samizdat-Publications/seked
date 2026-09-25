@@ -135,6 +135,26 @@ def dressed(name, colours=("e9e2d4", "f3eee5"), rough=0.38, grain_scale=0.05):
     return mat
 
 
+def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
+    """Dressed stone on instanced blocks: each block its own tone off the palette, a fine speckle for granite."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    col = t.ramp(t.attr("tone"), [(p, hexlin(c)) for p, c in stops_hex])
+    if speckle:
+        geo = t.node("ShaderNodeNewGeometry")
+        v = t.node("ShaderNodeTexVoronoi")
+        v.inputs["Scale"].default_value = 45.0
+        t.link(geo.outputs["Position"], v.inputs["Vector"])
+        grain = t.math("ADD", t.math("MULTIPLY", v.outputs["Distance"], 0.9), 0.6)
+        col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = rough
+    return mat
+
+
 def dressed_granite(name="dressed granite"):
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
@@ -216,7 +236,8 @@ def ground(state, displace=False):
     col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
     sep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, sep.inputs[0])
-    valley = t.band(t.math("MULTIPLY", sep.outputs["Z"], -1.0), 26.0, 31.0)
+    # The valley floor: low ground east of the valley temples (x > 430 m), not the Sphinx's ditch.
+    valley = t.math("MULTIPLY", t.band(t.math("MULTIPLY", sep.outputs["Z"], -1.0), 26.0, 31.0), t.band(sep.outputs["X"], 430.0, 520.0))
     fields = t.noise(pos, 0.006, 3.0)
     if state == "today":
         vcol = t.ramp(fields, [(0.35, hexlin("8a7a64")), (0.55, hexlin("6f6a52")), (0.7, hexlin("98876c"))])

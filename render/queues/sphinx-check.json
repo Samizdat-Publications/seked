@@ -1,0 +1,6 @@
+{"renders": [
+  {"state": "today", "shot": "sphinx", "size": "960x540", "samples": 24, "out": "build/render/check/sphinx-shot-today.png"},
+  {"state": "today", "station": "sphinx", "size": "1024x512", "samples": 16, "out": "build/render/check/sphinx-station-today.png"},
+  {"state": "built", "shot": "sphinx", "size": "960x540", "samples": 24, "out": "build/render/check/sphinx-shot-built.png"},
+  {"state": "built", "station": "sphinx", "size": "1024x512", "samples": 16, "out": "build/render/check/sphinx-station-built.png"}
+]}

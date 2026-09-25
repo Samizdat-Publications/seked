@@ -24,10 +24,32 @@ PATCH_LIFT = 0.05
 
 
 class Terrain:
-    def __init__(self, state, footprints):
+    """
+    `footprints` are the pyramids' squares (cx, cy, half, base); `flats` the temples'
+    platforms (cx, cy, half-x, half-y, z); `cuts` rectangles dug to a floor, like the
+    Sphinx's ditch (x0, x1, y0, y1, floor); `calm` a polyline (the causeway) near
+    which the invented relief is held down so nothing pokes through a road.
+    """
+
+    def __init__(self, state, footprints, flats=(), cuts=(), calm=None):
         self.state = state
         self.footprints = footprints
+        self.flats = list(flats)
+        self.cuts = list(cuts)
+        self.calm = None if calm is None else np.asarray(calm, np.float64)
         self.noise = ValueNoise(11, 2400.0)
+
+    def _calm_distance(self, X, Y):
+        d = np.full(np.shape(X), 1e9, dtype=np.float64)
+        pts = self.calm
+        for i in range(len(pts) - 1):
+            ax, ay = pts[i]
+            bx, by = pts[i + 1]
+            ex, ey = bx - ax, by - ay
+            L2 = ex * ex + ey * ey
+            t = np.clip(((X - ax) * ex + (Y - ay) * ey) / L2, 0.0, 1.0)
+            d = np.minimum(d, np.hypot(X - (ax + t * ex), Y - (ay + t * ey)))
+        return d
 
     def z(self, X, Y, far=False):
         grid = data.FAR if far else data.NEAR
@@ -41,10 +63,20 @@ class Terrain:
             keep = np.minimum(keep, smoothstep(0.0, 30.0, d) * 0.8 + 0.2)
             if self.state == "today" and half > 40:
                 drift += 0.8 * np.exp(-np.maximum(d, 0.0) / 6.0) * (d > -1.0)
+        for cx, cy, hx, hy, bz in self.flats:
+            d = np.maximum(np.abs(X - cx) - hx, np.abs(Y - cy) - hy)
+            t = smoothstep(3.0, 25.0, d)
+            Z = bz * (1 - t) + Z * t
+            keep = np.minimum(keep, smoothstep(0.0, 20.0, d) * 0.85 + 0.15)
+        if self.calm is not None and not far:
+            keep = np.minimum(keep, smoothstep(6.0, 25.0, self._calm_distance(X, Y)) * 0.9 + 0.1)
         if not far:
             n = self.noise
             Z = Z + keep * (1.1 * n.fbm(X, Y, 90.0, 5, 0.5, key=1) + 0.35 * n.fbm(X, Y, 16.0, 2, 0.5, key=3)) \
                 + drift * (0.6 + 0.4 * n.fbm(X, Y, 20.0, 2, key=2))
+        for x0, x1, y0, y1, floor in self.cuts:
+            inside = np.minimum(np.minimum(X - x0, x1 - X), np.minimum(Y - y0, y1 - Y))
+            Z = np.where(inside > 0.0, np.minimum(Z, floor + 0.02 * self.noise.fbm(X, Y, 8.0, 2, key=4)), Z)
         return Z
 
     def surface(self, x, y):
