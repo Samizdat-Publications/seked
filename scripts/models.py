@@ -63,9 +63,9 @@ def main():
     index = {"models": {}}
     auth = None
     # A whole-plateau reconstruction downloads like any Sketchfab stand-in; a figure is found like any generated one;
-    # an animal is either.
+    # an animal or a prop is either.
     for model in (manifest["models"] + manifest.get("reconstructions", []) + manifest.get("figures", [])
-                  + manifest.get("animals", [])):
+                  + manifest.get("animals", []) + manifest.get("props", [])):
         if model.get("retired"):
             continue
         folder = os.path.join(OUT, model["id"])

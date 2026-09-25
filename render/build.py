@@ -11,6 +11,7 @@ each state is built once and every view in it rendered from the same scene.
 Outputs default to build/render/<view>-<state>.png.
 """
 import json
+import math
 import os
 import sys
 
@@ -43,6 +44,18 @@ def renders_from(opts):
     return [r]
 
 
+def _lens(lens, t):
+    """A flight's focal length at t: one number, or one per control point, eased between them in log space."""
+    if not isinstance(lens, list):
+        return lens
+    n = len(lens) - 1
+    s = min(max(t, 0.0), 1.0) * n
+    i = min(int(s), n - 1)
+    f = s - i
+    f = f * f * (3 - 2 * f)
+    return math.exp(math.log(lens[i]) * (1 - f) + math.log(lens[i + 1]) * f)
+
+
 def _catmull(points, t):
     """A point on the uniform Catmull-Rom curve through `points` at t in [0, 1], ends clamped."""
     n = len(points) - 1
@@ -63,7 +76,7 @@ def film(film_id, opts):
     stations, _ = data.views()
     plateau = Plateau(spec["state"], aerosol=float(opts.get("aerosol", 1.1)), haze=float(opts.get("haze", 1.0)))
     cx, cy = spec["centre"]
-    where = {"id": film_id, "x": cx, "y": cy, "eye": 1.7, "target": list(spec["look"][-1]), "lens": spec["lens"]}
+    where = {"id": film_id, "x": cx, "y": cy, "eye": 1.7, "target": list(spec["look"][-1]), "lens": _lens(spec["lens"], 0.0)}
     if spec.get("inside"):
         # Inside the pyramid: the era's lamps and the inside exposure, no sun to set.
         where.update(inside=True, z=spec["path"][0][2])
@@ -85,7 +98,7 @@ def film(film_id, opts):
             continue
         t = k / (n - 1)
         t = t * t * (3 - 2 * t)                    # ease in and out
-        cameras.frame(plateau.camera, _catmull(spec["path"], t), _catmull(spec["look"], t), spec["lens"])
+        cameras.frame(plateau.camera, _catmull(spec["path"], t), _catmull(spec["look"], t), _lens(spec["lens"], t))
         plateau.render(out, w, h, samples, view_id=f"{film_id} {k}", kind="film", moment=spec.get("moment"))
     print(f"film {film_id}: {n} frames in {frames}")
 

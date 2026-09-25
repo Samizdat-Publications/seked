@@ -104,10 +104,11 @@ def sha256_of(path):
 
 
 def entry(model_id):
-    """The manifest entry `model_id` names: a stand-in under `models`, a figure under `figures` or an animal under `animals`."""
+    """The manifest entry `model_id` names: a stand-in under `models`, a figure under `figures`, an animal under
+    `animals` or a prop (a boat, say) under `props`."""
     manifest = json.load(open(MANIFEST, encoding="utf-8"))
     return next((m for m in manifest["models"] + manifest.get("figures", []) + manifest.get("animals", [])
-                 if m["id"] == model_id), None)
+                 + manifest.get("props", []) if m["id"] == model_id), None)
 
 
 def generate(args):
