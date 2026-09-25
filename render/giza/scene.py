@@ -162,7 +162,10 @@ class Plateau:
         else:
             cameras.station(self.camera, (x, y, z))
             centre = (x, y)
-        self.terrain.patch(centre, self.per_view, self.mats["ground displaced"])
+        # A long lens dices the displaced patch to every pixel's millimetre and runs the GPU out of
+        # memory; at that reach the ground is far off anyway, so a telephoto shot goes without it.
+        if not (kind == "shot" and v.get("lens", 35) > 150):
+            self.terrain.patch(centre, self.per_view, self.mats["ground displaced"])
         if self.want_stones:
             scatter.stones((x, y), self.terrain, self.per_view, self.lib, self.log)
         if self.spec["people"]:
