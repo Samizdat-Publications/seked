@@ -33,6 +33,18 @@ MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx
 TINTED = {"sphinx-meshy", "sphinx-lion"}      # generated textures with a pink cast
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
+# GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
+# where the photographs show the plateau standing well over the statue's rump. The rock round the
+# ditch is given the height the DEM has 35 m out, beyond the averaging, carried in to the cut's edge
+# (a look choice: the reach, and the fade at the paws, where Amenhotep II's temple stands low).
+RIM_REACH = 35.0
+RIM_FADE = (340.0, 357.0)
+
+
+def rim(state="today"):
+    """The rock round the ditch for the terrain: (x0, x1, y0, y1, reach, fade from x, fade to x)."""
+    x0, x1, y0, y1, _ = enclosure(state)
+    return (x0, x1, y0, y1, RIM_REACH) + RIM_FADE
 
 
 def _records(name):

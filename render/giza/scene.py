@@ -61,8 +61,8 @@ class Plateau:
             "pristine casing": materials.coursed_casing("pristine casing", colours=("e8e3d7", "f0ece3"), rough=0.2, tone=0.08, line=0.12,
                                                         mortar=0.01, mottle=0.04),
             "weathered casing": materials.weathered_casing(),
-            "gold": materials.metal("gold", "f2c35a", 0.2),
-            "electrum": materials.metal("electrum", "efe0a8", 0.14),
+            "gold": materials.metal("gold", "f2c35a", 0.3),
+            "electrum": materials.metal("electrum", "efe0a8", 0.26),
             "dressed granite": materials.dressed_granite(),
             "dark": materials.dark(),
             "water": materials.water(),
@@ -83,7 +83,7 @@ class Plateau:
         self.terrain = Terrain(state, footprints, flats=temples.flats(state) + khufu_temple.flats(state), cuts=[sphinx.enclosure(state)],
                                calm=causeway.centreline() if S["causeway"] else None,
                                sand=states.SPHINX_SAND if S["sphinx"] == "buried" else None,
-                               basins=harbour.basins(state))
+                               basins=harbour.basins(state), rims=[sphinx.rim(state)])
         self.terrain.build(self.world, self.mats["ground"])
         self.log("terrain")
         sphinx.statue(state, self.world, self.log)

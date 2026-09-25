@@ -37,17 +37,19 @@ class Terrain:
     """
     `footprints` are the pyramids' squares (cx, cy, half, base); `flats` the temples'
     platforms (cx, cy, half-x, half-y, z); `cuts` rectangles dug to a floor, like the
-    Sphinx's ditch (x0, x1, y0, y1, floor); `basins` water basins dug with sloping banks
-    (x0, x1, y0, y1, floor, bank width); `calm` a polyline (the causeway) near which the
-    invented relief is held down so nothing pokes through a road.
+    Sphinx's ditch (x0, x1, y0, y1, floor); `rims` the rock the DEM has smoothed away round
+    such a ditch (x0, x1, y0, y1, reach, fade from x, fade to x); `basins` water basins dug
+    with sloping banks (x0, x1, y0, y1, floor, bank width); `calm` a polyline (the causeway)
+    near which the invented relief is held down so nothing pokes through a road.
     """
 
-    def __init__(self, state, footprints, flats=(), cuts=(), calm=None, sand=None, basins=()):
+    def __init__(self, state, footprints, flats=(), cuts=(), calm=None, sand=None, basins=(), rims=()):
         self.state = state
         self.footprints = footprints
         self.flats = list(flats)
         self.cuts = list(cuts)
         self.basins = list(basins)
+        self.rims = list(rims)
         self.calm = None if calm is None else np.asarray(calm, np.float64)
         self.noise = ValueNoise(11, 2400.0)
         self.drift = DRIFT.get(state, 0.0)
@@ -93,6 +95,17 @@ class Terrain:
             n = self.noise
             Z = Z + keep * (1.1 * n.fbm(X, Y, 90.0, 5, 0.5, key=1) + 0.35 * n.fbm(X, Y, 16.0, 2, 0.5, key=3)) \
                 + drift * (0.6 + 0.4 * n.fbm(X, Y, 20.0, 2, key=2))
+        for x0, x1, y0, y1, reach, fade0, fade1 in self.rims:
+            # The rock round a ditch the DEM has averaged away: the ground is lifted by what the DEM
+            # rises between here and `reach` out from the cut's edge, fully near the edge and not at
+            # all from `reach` on, faded out eastward from fade0 to fade1. The ditch is cut below.
+            qx, qy = np.clip(X, x0, x1), np.clip(Y, y0, y1)
+            vx, vy = X - qx, Y - qy
+            d = np.hypot(vx, vy)
+            s = reach / np.maximum(d, 1e-6)
+            lift = grid.sample(qx + vx * s, qy + vy * s) - grid.sample(X, Y)
+            w = (d > 0) * (1.0 - smoothstep(reach * 0.5, reach, d)) * (1.0 - smoothstep(fade0, fade1, X))
+            Z = Z + w * np.maximum(lift, 0.0)
         for x0, x1, y0, y1, floor, bank in self.basins:
             # Dug below the ground, the quay its west side, sloping banks on the other three.
             inside = np.minimum(np.minimum(x1 - X, Y - y0), y1 - Y)

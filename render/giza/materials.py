@@ -283,7 +283,11 @@ def weathered_casing(name="weathered casing"):
 
 
 def metal(name, rgb_hex, rough):
-    """Gold or electrum for the pyramidions."""
+    """
+    Gold or electrum for the pyramidions. Sheet beaten over stone is never a mirror: a flat,
+    polished face shows only the deep sky above it, so the sheet is hammered (look choice),
+    dents a hand's breadth across that throw the sun back from most directions.
+    """
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
@@ -292,6 +296,15 @@ def metal(name, rgb_hex, rough):
     bsdf.inputs["Base Color"].default_value = hexlin(rgb_hex)
     bsdf.inputs["Metallic"].default_value = 1.0
     bsdf.inputs["Roughness"].default_value = rough
+    geo = t.node("ShaderNodeNewGeometry")
+    dents = t.node("ShaderNodeTexVoronoi")
+    dents.inputs["Scale"].default_value = 9.0
+    t.link(geo.outputs["Position"], dents.inputs["Vector"])
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 0.35
+    bmp.inputs["Distance"].default_value = 0.03
+    t.link(dents.outputs["Distance"], bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
