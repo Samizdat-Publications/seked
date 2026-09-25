@@ -126,19 +126,19 @@
     },
     {
       "id": "valley-hall",
-      "name": "Khafre's granite hall, down the long hall's middle aisle, 20 mm",
-      "x": 397.0,
+      "name": "Khafre's granite hall from the west end of the long hall, looking east to the light, 24 mm",
+      "x": 380.2,
       "y": -493.654,
-      "z": -40.5,
+      "z": -40.4,
       "target": [
-        380.0,
+        400.0,
         -493.654,
-        -39.9
+        -40.2
       ],
-      "lens": 20,
+      "lens": 24,
       "hall": "valley-temple",
       "moment": "temple-morning",
-      "exposure": 2.8
+      "exposure": 2.4
     }
   ]
 }
