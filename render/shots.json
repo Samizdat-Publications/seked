@@ -123,6 +123,22 @@
           "note": "the drift of c. 1800 stands at -29 m here, so the camera rises 12 m over it"
         }
       }
+    },
+    {
+      "id": "valley-hall",
+      "name": "Khafre's granite hall, down the long hall's middle aisle, 20 mm",
+      "x": 397.0,
+      "y": -493.654,
+      "z": -40.5,
+      "target": [
+        380.0,
+        -493.654,
+        -39.9
+      ],
+      "lens": 20,
+      "hall": "valley-temple",
+      "moment": "temple-morning",
+      "exposure": 2.8
     }
   ]
 }
