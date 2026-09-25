@@ -246,9 +246,29 @@
       },
       "neighbours": [
         "sphinx",
-        "south"
+        "south",
+        "town"
       ],
       "note": "Only where an era has open water here: the harbour basin as built (render/giza/harbour.py BASIN) and the flood of the claim eras. The raft sets the eye 1.7 m above the water."
+    },
+    {
+      "id": "town",
+      "name": "The builders' town",
+      "where": "Where its main street crosses the lane between the gallery blocks, south of the Wall of the Crow",
+      "x": 516.0,
+      "y": -841.5,
+      "eye": 1.7,
+      "moment": "sphinx-noon",
+      "view": {
+        "yaw": 330,
+        "pitch": 6,
+        "fov": 66
+      },
+      "neighbours": [
+        "harbour",
+        "menkaure"
+      ],
+      "note": "As built only. The town is an impression after AERA's published layout (render/giza/town.py), not a survey."
     },
     {
       "id": "orion",

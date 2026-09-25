@@ -63,8 +63,13 @@ def film(film_id, opts):
     stations, _ = data.views()
     plateau = Plateau(spec["state"], aerosol=float(opts.get("aerosol", 1.1)), haze=float(opts.get("haze", 1.0)))
     cx, cy = spec["centre"]
-    plateau.view({"id": film_id, "x": cx, "y": cy, "eye": 1.7, "target": list(spec["look"][-1]), "lens": spec["lens"]}, "shot")
-    plateau.moment(stations["moments"][spec["moment"]])
+    where = {"id": film_id, "x": cx, "y": cy, "eye": 1.7, "target": list(spec["look"][-1]), "lens": spec["lens"]}
+    if spec.get("inside"):
+        # Inside the pyramid: the era's lamps and the inside exposure, no sun to set.
+        where.update(inside=True, z=spec["path"][0][2])
+    plateau.view(where, "shot")
+    if not spec.get("inside"):
+        plateau.moment(stations["moments"][spec["moment"]])
     # The camera alone moves, so Cycles keeps the scene between frames instead of rebuilding it for each.
     plateau.scene.render.use_persistent_data = True
     w, h = (int(n) for n in spec["size"].split("x"))

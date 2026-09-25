@@ -275,6 +275,9 @@ def shapes(state, terrain=None):
         out.append(("square", (sq[0], sq[1], sq[2]), APRON[key]))
     for c in getattr(terrain, "cuts", None) or ():
         out.append(("rect", tuple(c[:4]), APRON["cut"]))
+    from . import town            # the builders' town, as built: nothing grows through its houses
+    for box in town.extents(state):
+        out.append(("rect", box, APRON["temple"]))
     for f in data.FOOTPRINTS:
         g = f.get("group")
         if g == "temples" and f["id"] in S["temples"]:

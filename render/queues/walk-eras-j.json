@@ -1,0 +1,46 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "town",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/town-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/harbour-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-built.png"
+  },
+  {
+   "state": "built",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "crow",
+   "size": "1920x1080",
+   "samples": 96,
+   "out": "build/render/shots/crow-built.png"
+  }
+ ]
+}

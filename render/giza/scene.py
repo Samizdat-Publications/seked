@@ -13,7 +13,8 @@ import bpy
 from mathutils import Vector
 
 from . import (causeway, cameras, city, data, harbour, instancing, interior, khufu_temple, mastabas, materials, night,
-               precincts, pyramids, renderer, roads, scatter, sphinx, states, sun, temples, variants, wall_of_the_crow, water)
+               precincts, pyramids, renderer, roads, scatter, sphinx, states, sun, temples, town, variants, wall_of_the_crow,
+               water)
 from .sky import Sky
 from .terrain import Terrain
 
@@ -97,6 +98,7 @@ class Plateau:
         khufu_temple.build(state, rng, self.world, self.mats, self.lib, self.log)
         # Its own generator, so adding it leaves every other structure's blocks where they were.
         wall_of_the_crow.build(state, random.Random(31), self.terrain, self.world, self.mats, self.lib, self.log)
+        town.build(state, self.terrain, self.world, self.mats, self.log)
         if S["rubble"]:
             scatter.rubble(rng, self.terrain, self.world, self.lib, self.log)
         if S["city"] == "city":
