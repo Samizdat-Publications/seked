@@ -177,6 +177,28 @@
           49.171
         ]
       ]
+    },
+    {
+      "id": "sky-rollback",
+      "name": "The sky rolls back",
+      "kind": "night",
+      "state": "first-time",
+      "moment": "night-first-time",
+      "at": [
+        -100.0,
+        1000.0
+      ],
+      "eye": 1.7,
+      "fps": 24,
+      "size": "1280x720",
+      "samples": 48,
+      "lens": 20,
+      "below": 10.0,
+      "min_pitch": 8.0,
+      "shaft": {
+        "key": "kc.shaft.south.angle",
+        "label": "C2: the King's Chamber south shaft"
+      }
     }
   ]
 }

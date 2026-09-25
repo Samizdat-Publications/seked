@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giza at Block Scale &middot; Films</title>
+<meta name="description" content="Path-traced films of the Giza plateau in its eras.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&display=swap">
+<style>
+  :root {
+    --ground: #f2efe9;
+    --raised: #e8e3da;
+    --ink: #1c1a17;
+    --muted: #675f55;
+    --line: rgba(28, 26, 23, 0.14);
+    --accent: #2c4a8c;
+    --granite: #974634;
+    --display: "Marcellus", "Trajan Pro", "Palatino Linotype", Georgia, serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #14120f; --raised: #1d1a16; --ink: #ece5d9; --muted: #a89d8d;
+      --line: rgba(236, 229, 217, 0.14); --accent: #8ea8e6; --granite: #d28b73;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #14120f; --raised: #1d1a16; --ink: #ece5d9; --muted: #a89d8d;
+    --line: rgba(236, 229, 217, 0.14); --accent: #8ea8e6; --granite: #d28b73;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font: 400 17px/1.62 var(--body); -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  .topbar {
+    max-width: 1120px; margin: 0 auto; padding: 18px 16px 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    font: 500 13px/1.3 var(--mono); letter-spacing: 0.05em;
+  }
+  .topbar a { text-decoration: none; }
+  .topbar a:hover { text-decoration: underline; }
+  .topbar span { color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; }
+  main { padding-inline: 16px; padding-block: 28px 64px; }
+  .col { max-width: 66ch; margin-inline: auto; }
+  .wide { max-width: 1120px; margin-inline: auto; }
+  h1, h2 { font-family: var(--display); font-weight: 400; text-wrap: balance; letter-spacing: 0.01em; }
+  h1 { font-size: clamp(34px, 5vw, 50px); line-height: 1.06; margin: 0 0 16px; }
+  h2 { font-size: clamp(23px, 2.6vw, 29px); line-height: 1.15; margin: 0 0 6px; }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--granite); margin: 0 0 14px; }
+  .lede { font-size: 19px; line-height: 1.55; }
+  .films { display: grid; gap: 56px; margin-top: 40px; }
+  .film video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #0e0d0b; border-radius: 4px; }
+  .film .meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-top: 14px; }
+  .film .pill { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 7px; border-radius: 2px; border: 1px solid var(--line); color: var(--muted); }
+  .film .pill.claim { color: #b07a12; border-color: rgba(176, 122, 18, 0.5); }
+  .film p { margin: 6px 0 0; max-width: 72ch; color: var(--muted); font-size: 15.5px; line-height: 1.55; }
+  .back { margin-top: 48px; font: 500 14px/1.4 var(--mono); letter-spacing: 0.04em; }
+  @media (max-width: 560px) { body { font-size: 16px; } .lede { font-size: 17px; } }
+</style>
+</head>
+<body>
+<nav class="topbar" aria-label="Walkthrough">
+  <a href="index.html">&larr; Back to the walkthrough</a>
+  <span>Seked &middot; Films</span>
+</nav>
+<main>
+  <div class="col">
+    <p class="eyebrow">Path traced in Blender Cycles</p>
+    <h1>Films</h1>
+    <p class="lede">Moving pictures from the same scenes as the walkthrough. Every frame is rendered from the project's data, and the eras keep their labels: survey, reconstruction or claim.</p>
+  </div>
+  <div class="wide films">
+    <section class="film" aria-labelledby="f-rollback">
+      <video src="films/rollback.mp4" controls muted playsinline preload="metadata"></video>
+      <div class="meta"><h2 id="f-rollback">The rollback</h2><span class="pill">24 s</span><span class="pill claim">ends in a claim</span></div>
+      <p>The panorama stand south-west of Menkaure at golden hour, 120&nbsp;mm: today, the plateau of c.&nbsp;1800, the plateau as built in c.&nbsp;2560&nbsp;BCE, then the two claim eras, the lion and the First Time. Each era is one still, dissolving into the next.</p>
+    </section>
+    <section class="film" aria-labelledby="f-approach">
+      <video src="films/approach-built.mp4" controls muted playsinline preload="metadata"></video>
+      <div class="meta"><h2 id="f-approach">Approach, as built</h2><span class="pill">14 s</span><span class="pill">reconstruction</span></div>
+      <p>A flight in over the desert from the south-west to Menkaure's pyramid, its lower courses in red granite, with his three queens before it and Khafre and Khufu behind, c.&nbsp;2560&nbsp;BCE.</p>
+    </section>
+    <section class="film" aria-labelledby="f-first">
+      <video src="films/first-time-flight.mp4" controls muted playsinline preload="metadata"></video>
+      <div class="meta"><h2 id="f-first">Over the First Time</h2><span class="pill">16 s</span><span class="pill claim">a claim</span></div>
+      <p>The lost-civilisation claim's c.&nbsp;10,500&nbsp;BCE, drawn so it can be tested: low over the flood and the palms of the valley to the megalithic temple and the Anubis Sphinx, the pristine pyramids behind, in the morning sun.</p>
+    </section>
+    <section class="film" aria-labelledby="f-gallery">
+      <video src="films/gallery-climb.mp4" controls muted playsinline preload="metadata"></video>
+      <div class="meta"><h2 id="f-gallery">Up the Grand Gallery</h2><span class="pill">14 s</span><span class="pill">reconstruction</span></div>
+      <p>Inside the Great Pyramid as built, by the light of oil lamps, up the 47.8&nbsp;m slope of the gallery toward the great step. The seven corbels, the ramps and the great step are Petrie's measurements; the fresh stone and the lamps are the reconstruction.</p>
+    </section>
+    <section class="film" aria-labelledby="f-sky">
+      <video src="films/sky-rollback.mp4" controls muted playsinline preload="metadata"></video>
+      <div class="meta"><h2 id="f-sky">The sky rolls back</h2><span class="pill">20 s</span><span class="pill claim">tests two claims</span></div>
+      <p>A kilometre north of Khufu, looking south along the meridian, while the sky engine precesses every bright star from 2000&nbsp;CE back to 10,500&nbsp;BCE with Alnitak held on the meridian. At 2450&nbsp;BCE Alnitak crosses the line the King's Chamber's south shaft points along (claim C2); by the First Time the belt has sunk to nine degrees, just over the pyramids (the Orion correlation). The ground is the First Time's; nothing in the sky is drawn by hand.</p>
+    </section>
+  </div>
+  <div class="col"><p class="back"><a href="index.html">&larr; Back to the walkthrough</a></p></div>
+</main>
+</body>
+</html>

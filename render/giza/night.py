@@ -119,6 +119,39 @@ class Night:
                  f"{n['lstDeg']:.2f} deg, {up} stars up, the {n['season']} sun at {n['sun']['altitudeDeg']:.1f} deg")
         return n
 
+    def show_frame(self, rollback, f, centre):
+        """
+        One frame of the sky-rollback bake (build/sky-rollback.json, `pnpm run sky-rollback`): the
+        same star cloud, every star moved to that frame's baked place, and the Milky Way turned by
+        that frame's own rotation. Returns the frame's header row (epoch, meridian altitude).
+        """
+        from mathutils import Matrix
+        rs = _render_sky()
+        header, values = rollback
+        cat = header["catalogue"]
+        count = cat["count"]
+        if self.air is None:
+            self._world_terms()
+        if self.night_id != "rollback":
+            if self.dome is not None:
+                bpy.data.objects.remove(self.dome, do_unlink=True)
+            self.dome, self.radii = rs.make_star_cloud("Sky (bright stars)", cat["mag"], cat["ci"], rs.DOME_RADIUS_M,
+                                                       {"seked_sources": cat["source"], "seked_attribution": cat["attribution"]})
+            self.scene.collection.objects.link(self.dome)
+            self.night_id = "rollback"
+        base = f * count * 2
+        az = values[base:base + 2 * count:2]
+        alt = values[base + 1:base + 2 * count:2]
+        self.dome.location = centre
+        rs.place_stars(self.dome, self.radii, az, alt, rs.DOME_RADIUS_M)
+        self.dome.hide_render = False
+        self.air.inputs["Strength"].default_value = AIRGLOW_STRENGTH
+        row = header["frames"][f]
+        if self.glow is not None:
+            self.turn.inputs["Rotation"].default_value = Matrix(row["icrsToEnu"]).transposed().to_euler("XYZ")
+            self.glow.inputs["Strength"].default_value = MILKY_WAY_STRENGTH
+        return row
+
     def hide(self):
         if self.dome is not None:
             self.dome.hide_render = True

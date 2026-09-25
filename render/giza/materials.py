@@ -400,11 +400,31 @@ def ground(state, displace=False):
     col = t.mix(t.math("MULTIPLY", m_chip, 0.55), col, hexlin(chip_hex))
     col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.0025, 3.0), [(0.3, hexlin("dcc39f")), (0.5, hexlin("ffffff")), (0.72, hexlin("f1e4cc"))]), "MULTIPLY")
     col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.09, 4.0), [(0.35, hexlin("d8ccba")), (0.65, hexlin("ffffff"))]), "MULTIPLY")
+    # From the air the desert is streaked along the wind, which comes from the north-north-west, and
+    # patched with darker gravel sheets; both are look choices, made so a flight over it is not a blur.
+    wind = t.node("ShaderNodeMapping")
+    wind.inputs["Rotation"].default_value = (0.0, 0.0, 0.35)          # about 20 degrees west of north
+    wind.inputs["Scale"].default_value = (0.016, 0.0016, 1.0)         # 60 m across a streak, 600 m along it
+    t.link(pos, wind.inputs["Vector"])
+    streak = t.node("ShaderNodeTexNoise")
+    streak.inputs["Scale"].default_value = 1.0
+    streak.inputs["Detail"].default_value = 3.0
+    streak.inputs["Roughness"].default_value = 0.55
+    t.link(wind.outputs[0], streak.inputs["Vector"])
+    col = t.mix(1.0, col, t.ramp(streak.outputs["Fac"], [(0.3, hexlin("e2d3bc")), (0.55, hexlin("ffffff")), (0.75, hexlin("fff8ea"))]), "MULTIPLY")
+    sheet = t.band(t.noise(pos, 0.0012, 4.0, 0.6), 0.56, 0.66)
+    col = t.mix(t.math("MULTIPLY", sheet, 0.45), col, hexlin(grav_hex))
     col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
     sep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, sep.inputs[0])
     # The valley floor: low ground east of the valley temples (x > 430 m), not the Sphinx's ditch.
     valley = t.math("MULTIPLY", t.band(t.math("MULTIPLY", sep.outputs["Z"], -1.0), 26.0, 31.0), t.band(sep.outputs["X"], 430.0, 520.0))
+    # Where the builders' town stands (as built), its streets are packed earth, not the valley's fields.
+    from . import town
+    for x0, x1, y0, y1 in town.extents(state):
+        inside = t.math("MULTIPLY", t.math("MULTIPLY", t.band(sep.outputs["X"], x0 - 12.0, x0), t.math("SUBTRACT", 1.0, t.band(sep.outputs["X"], x1, x1 + 12.0))),
+                        t.math("MULTIPLY", t.band(sep.outputs["Y"], y0 - 12.0, y0), t.math("SUBTRACT", 1.0, t.band(sep.outputs["Y"], y1, y1 + 12.0))))
+        valley = t.math("MULTIPLY", valley, t.math("SUBTRACT", 1.0, inside))
     fields = t.noise(pos, 0.006, 3.0)
     vcol = t.ramp(fields, [(p, hexlin(c)) for p, c in VALLEY[S["valley"]]])
     col = t.mix(valley, col, vcol)

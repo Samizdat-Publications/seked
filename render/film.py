@@ -106,6 +106,60 @@ def encode(frames_dir, mp4, fps, width, height, quality="HIGH"):
     print(f"encoded {len(names)} frames at {fps} fps into {mp4}")
 
 
+def _year(epoch):
+    """Astronomical year numbering to the calendar's: year 0 is 1 BCE, -2449 is 2450 BCE."""
+    y = int(round(epoch))
+    return f"{y} CE" if y > 0 else f"{1 - y:,} BCE"
+
+
+def night_overlay(film_id, fps=24):
+    """
+    Letter the sky-rollback frames: the date the sky has rolled back to, the meridian star's
+    altitude, and the line claim C2 draws, the King's Chamber's south shaft at its angle from the
+    database, set at its true elevation in each frame from the camera's pitch and lens.
+    """
+    import math
+    import numpy as np
+    from PIL import Image, ImageDraw, ImageFont
+    sys.path.insert(0, HERE)
+    from giza import data
+    spec = next(x for x in json.load(open(os.path.join(HERE, "films.json"), encoding="utf-8"))["films"] if x["id"] == film_id)
+    base = os.path.join(REPO, "build", "films", film_id)
+    epochs = json.load(open(os.path.join(base, "epochs.json"), encoding="utf-8"))
+    header = json.load(open(os.path.join(REPO, "build", "sky-rollback.json"), encoding="utf-8"))
+    shaft = header["shaft"]["angleDeg"]
+    star = header["meridian"]["name"]
+    out_dir = os.path.join(base, "lettered")
+    os.makedirs(out_dir, exist_ok=True)
+    big = ImageFont.truetype(FONT, 46)
+    small = ImageFont.truetype(FONT_SMALL, 20)
+    for e in epochs:
+        src = os.path.join(base, "frames", f"frame_{e['frame']:04d}.png")
+        if not os.path.exists(src):
+            continue
+        img = Image.open(src).convert("RGB")
+        W, H = img.size
+        d = ImageDraw.Draw(img, "RGBA")
+        pitch = max(spec.get("min_pitch", 12.0), e["meridianAltDeg"] - spec.get("below", 12.0))
+        half_v = math.atan((36.0 * H / W) / 2 / spec["lens"])
+        yline = H / 2 - math.tan(math.radians(shaft - pitch)) / math.tan(half_v) * H / 2
+        if 0 < yline < H:
+            for x in range(0, W, 14):
+                d.line([(x, yline), (x + 7, yline)], fill=(232, 196, 120, 170), width=2)
+            d.text((W - 16, yline - 26), f"{spec['shaft']['label']}, {shaft:.0f} deg", font=small, fill=(232, 196, 120, 220), anchor="ra")
+        x0, y0 = 36, H - 118
+        d.text((x0 + 2, y0 + 2), _year(e["epoch"]), font=big, fill=(0, 0, 0, 140))
+        d.text((x0, y0), _year(e["epoch"]), font=big, fill=(248, 242, 230, 255))
+        d.text((x0, y0 + 60), f"{star} on the meridian, {e['meridianAltDeg']:.1f} deg up; every star precessed by the sky engine",
+               font=small, fill=(232, 206, 150, 235))
+        img.save(os.path.join(out_dir, f"frame_{e['frame']:04d}.png"), compress_level=1)
+    mp4 = os.path.abspath(os.path.join(base, f"{film_id}.mp4"))
+    w, h = (int(v) for v in spec["size"].split("x"))
+    subprocess.run([BLENDER, "-b", "--factory-startup", "-P", os.path.abspath(__file__), "--", "encode",
+                    "--frames", os.path.abspath(out_dir), "--fps", str(fps), "--out", mp4, "--size", f"{w}x{h}"], check=True)
+    return mp4
+
+
 def rollback():
     """Today back to the First Time, from the panorama stand, 120 mm, at golden hour."""
     sys.path.insert(0, HERE)
@@ -141,6 +195,8 @@ if __name__ == "__main__":
     if cmd == "encode":
         w, h = (int(v) for v in o.get("size", "1920x1080").split("x"))
         encode(o["frames"], o["out"], int(o.get("fps", 24)), w, h, o.get("quality", "HIGH"))
+    elif cmd == "night":
+        print(night_overlay(o.get("id", "sky-rollback")))
     elif cmd == "crossfade":
         stills = o["stills"] if isinstance(o["stills"], list) else [o["stills"]]
         labels = o.get("labels", [os.path.basename(p) for p in stills])

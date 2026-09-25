@@ -87,10 +87,55 @@ def film(film_id, opts):
     print(f"film {film_id}: {n} frames in {frames}")
 
 
+def night_film(film_id, opts):
+    """
+    A night film from the sky-rollback bake: the camera stands at `at`, looking south, and tilts
+    to follow the meridian star as the epochs roll back, so the ground comes into view as its
+    transit sinks; every star of every frame is where the bake puts it.
+    """
+    import io
+    import math
+    from giza import cameras, night
+    with io.open(os.path.join(HERE, "films.json"), encoding="utf-8") as f:
+        spec = next(x for x in json.load(f)["films"] if x["id"] == film_id)
+    render_sky = night._render_sky()
+    rollback = render_sky.load_rollback(os.path.join(data.REPO, "build", "sky-rollback.json"))
+    stations, _ = data.views()
+    plateau = Plateau(spec["state"], aerosol=float(opts.get("aerosol", 1.1)), haze=float(opts.get("haze", 1.0)))
+    x, y = spec["at"]
+    plateau.view({"id": film_id, "x": x, "y": y, "eye": spec.get("eye", 1.7), "target": [x, y - 100.0, 40.0],
+                  "lens": spec["lens"]}, "shot")
+    plateau.moment(stations["moments"][spec["moment"]])      # a night: the sun where that night's bake puts it
+    plateau.scene.render.use_persistent_data = True
+    eye = tuple(plateau.camera.location)
+    w, h = (int(n) for n in spec["size"].split("x"))
+    frames = os.path.join(data.REPO, "build", "films", film_id, "frames")
+    os.makedirs(frames, exist_ok=True)
+    n = len(rollback[0]["frames"])
+    step = int(spec.get("every", 1))
+    log = []
+    for k in range(0, n, step):
+        out = os.path.join(frames, f"frame_{k // step:04d}.png")
+        row = plateau.night.show_frame(rollback, k, eye)
+        log.append({"frame": k // step, "epoch": row["epoch"], "meridianAltDeg": row["meridianAltDeg"]})
+        if os.path.exists(out):
+            continue
+        pitch = math.radians(max(spec.get("min_pitch", 12.0), row["meridianAltDeg"] - spec.get("below", 12.0)))
+        target = (eye[0], eye[1] - 100.0 * math.cos(pitch), eye[2] + 100.0 * math.sin(pitch))
+        cameras.frame(plateau.camera, eye, target, spec["lens"])
+        plateau.render(out, w, h, int(spec["samples"]), view_id=f"{film_id} {k}", kind="film", moment=spec["moment"])
+    with io.open(os.path.join(data.REPO, "build", "films", film_id, "epochs.json"), "w", encoding="utf-8") as f:
+        json.dump(log, f)
+    print(f"night film {film_id}: {len(log)} frames in {frames}")
+
+
 def main():
     opts = parse(sys.argv)
     if "film" in opts:
         film(opts["film"], opts)
+        return
+    if "night-film" in opts:
+        night_film(opts["night-film"], opts)
         return
     stations, shots = data.views()
     moments = stations["moments"]
