@@ -1,0 +1,102 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-built.png"
+  },
+  {
+   "state": "built",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-built.png"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/harbour-built.png"
+  },
+  {
+   "state": "built",
+   "station": "gallery",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/gallery-built.png"
+  },
+  {
+   "state": "built",
+   "station": "kings-chamber",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/kings-chamber-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "gallery",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/gallery-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "kings-chamber",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/kings-chamber-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-today.png"
+  },
+  {
+   "state": "today",
+   "station": "gallery",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/gallery-today.png"
+  },
+  {
+   "state": "today",
+   "station": "kings-chamber",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/kings-chamber-today.png"
+  }
+ ]
+}

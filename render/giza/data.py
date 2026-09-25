@@ -112,7 +112,7 @@ def mastabas():
     """Each mastaba as an oriented rectangle: centre, yaw, length, width, height, base."""
     out = []
     for f in FOOTPRINTS:
-        if f.get("group") != "mastabas":
+        if f.get("group") not in ("mastabas", "tombs"):       # "tombs" is Hemiunu's G 4000, the largest
             continue
         pts = np.array(f["ring"], dtype=np.float64)
         c = pts.mean(0)

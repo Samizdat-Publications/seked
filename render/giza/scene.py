@@ -12,8 +12,8 @@ import time
 import bpy
 from mathutils import Vector
 
-from . import (causeway, cameras, city, data, harbour, instancing, khufu_temple, mastabas, materials, precincts, pyramids,
-               renderer, scatter, sphinx, states, sun, temples, variants, water)
+from . import (causeway, cameras, city, data, harbour, instancing, interior, khufu_temple, mastabas, materials, precincts,
+               pyramids, renderer, roads, scatter, sphinx, states, sun, temples, variants, wall_of_the_crow, water)
 from .sky import Sky
 from .terrain import Terrain
 
@@ -79,7 +79,8 @@ class Plateau:
         footprints = footprints + precincts.footprints(state)
         self.terrain = Terrain(state, footprints, flats=temples.flats(state), cuts=[sphinx.enclosure(state)],
                                calm=causeway.centreline() if S["causeway"] else None,
-                               sand=states.SPHINX_SAND if S["sphinx"] == "buried" else None)
+                               sand=states.SPHINX_SAND if S["sphinx"] == "buried" else None,
+                               basins=harbour.basins(state))
         self.terrain.build(self.world, self.mats["ground"])
         self.log("terrain")
         sphinx.statue(state, self.world, self.log)
@@ -92,10 +93,13 @@ class Plateau:
         water.build(state, self.world, self.mats, self.log)
         harbour.build(state, rng, self.terrain, self.world, self.mats, self.lib, self.log)
         khufu_temple.build(state, rng, self.world, self.mats, self.lib, self.log)
+        # Its own generator, so adding it leaves every other structure's blocks where they were.
+        wall_of_the_crow.build(state, random.Random(31), self.terrain, self.world, self.mats, self.lib, self.log)
         if S["rubble"]:
             scatter.rubble(rng, self.terrain, self.world, self.lib, self.log)
         if S["city"] == "city":
             city.build(self.terrain, self.world, self.lib, self.log)
+            roads.build(state, self.terrain, self.world, self.log)
         elif S["city"] == "village":
             city.village(self.terrain, self.world, self.lib, self.log)
         if vegetation is not None:
@@ -104,6 +108,8 @@ class Plateau:
         self.camera = cameras.make(self.scene)
         renderer.gpu(self.scene, self.log)
         renderer.configure(self.scene)
+        self.exposure = self.scene.view_settings.exposure
+        self.inside_lamps = None       # the interior is built the first time a view goes inside
         self.log(f"built {state} ({S['label']}, {S['honesty']})")
 
     def _coll(self, name):
@@ -122,7 +128,25 @@ class Plateau:
         """Point the camera at a shot or stand it at a station; rebuild the ground at its feet."""
         self._clear_view()
         x, y = v["x"], v["y"]
-        z = float(self.terrain.surface([x], [y])[0]) + v.get("eye", 1.7)
+        z = v["z"] if "z" in v else float(self.terrain.surface([x], [y])[0]) + v.get("eye", 1.7)
+        self.inside = bool(v.get("inside"))
+        if self.inside and self.inside_lamps is None:
+            self.inside_lamps = interior.build(self.state, self._coll("inside"), self.mats, self.log)
+        for lamp in self.inside_lamps or ():
+            lamp.hide_render = not self.inside
+        self.scene.view_settings.exposure = v.get("exposure", interior.exposure(self.state) if self.inside else self.exposure)
+        if v.get("raft"):
+            deck = harbour.float_raft(self.state, (x, y), v["raft"], self.per_view, self.log)
+            if deck is not None:
+                z = deck
+        if self.inside:
+            if kind == "station":
+                cameras.station(self.camera, (x, y, z))
+            else:
+                cameras.frame(self.camera, (x, y, z), v["target"], v["lens"])
+            self.sun_now = None
+            self.log(f"{kind} {v['id']} inside at ({x:.1f}, {y:.1f}, {z:.2f})")
+            return
         if kind == "shot":
             cameras.frame(self.camera, (x, y, z), v["target"], v["lens"])
             d = Vector((v["target"][0] - x, v["target"][1] - y, 0.0)).normalized()
@@ -141,9 +165,11 @@ class Plateau:
 
     def moment(self, m):
         alt, az, dec = sun.parse_moment(m, self.spec["year"])
+        self.sun_now = (alt, az)
         colour, energy = self.sky.set_sun(alt, az)
         self.log(f"sun at {alt:.1f} deg altitude, {az:.1f} deg azimuth (declination {dec:.1f}), beam {energy:.0f}")
-        self._shadow_check(alt, az)
+        if not getattr(self, "inside", False):
+            self._shadow_check(alt, az)
 
     def _shadow_check(self, alt, az):
         """Say so when the camera stands in a shadow: a station lit by the sky alone reads as a mistake."""
@@ -156,7 +182,15 @@ class Plateau:
         if hit and ob is not None and "air" not in ob.name:
             self.log(f"WARNING: the camera stands in the shadow of {ob.name!r}, {(loc - origin).length:.0f} m towards the sun")
 
-    def render(self, out, width, height, samples):
+    def render(self, out, width, height, samples, view_id=None, kind=None, moment=None):
         t = time.time()
         renderer.render(self.scene, out, width, height, samples)
         self.log(f"rendered {out} in {time.time() - t:.0f}s")
+        # A sidecar with what the viewer needs to register overlays on the picture.
+        import json
+        import os
+        side = {"state": self.state, "view": view_id, "kind": kind, "camera": [round(c, 3) for c in self.camera.location],
+                "sun": {"altitude": round(self.sun_now[0], 2), "azimuth": round(self.sun_now[1], 2)} if getattr(self, "sun_now", None) else None,
+                "moment": moment, "size": [width, height], "samples": samples, "seconds": round(time.time() - t, 1)}
+        with open(os.path.splitext(out)[0] + ".json", "w", encoding="utf-8") as f:
+            json.dump(side, f, indent=1)

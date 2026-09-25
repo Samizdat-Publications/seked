@@ -59,13 +59,16 @@ def main():
         for r in (r for r in renders if r["state"] == state):
             kind = "station" if "station" in r else "shot"
             v = by_id[(kind, r[kind])]
+            # A view may stand somewhere else in one era (on a boat where the ground is under water).
+            v = dict(v, **v.get("by_state", {}).get(state, {}))
             plateau.view(v, kind)
             m = r.get("moment", v.get("moment"))
-            plateau.moment(moments[m] if isinstance(m, str) else m)
+            if m is not None:
+                plateau.moment(moments[m] if isinstance(m, str) else m)
             w, h = (int(n) for n in str(r.get("size", DEFAULTS[kind]["size"])).split("x"))
             samples = int(r.get("samples", DEFAULTS[kind]["samples"]))
             out = r.get("out") or os.path.join(data.REPO, "build", "render", f"{r[kind]}-{state}.png")
-            plateau.render(os.path.abspath(out), w, h, samples)
+            plateau.render(os.path.abspath(out), w, h, samples, view_id=r[kind], kind=kind, moment=m)
 
 
 main()

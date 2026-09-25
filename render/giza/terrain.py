@@ -30,15 +30,17 @@ class Terrain:
     """
     `footprints` are the pyramids' squares (cx, cy, half, base); `flats` the temples'
     platforms (cx, cy, half-x, half-y, z); `cuts` rectangles dug to a floor, like the
-    Sphinx's ditch (x0, x1, y0, y1, floor); `calm` a polyline (the causeway) near
-    which the invented relief is held down so nothing pokes through a road.
+    Sphinx's ditch (x0, x1, y0, y1, floor); `basins` water basins dug with sloping banks
+    (x0, x1, y0, y1, floor, bank width); `calm` a polyline (the causeway) near which the
+    invented relief is held down so nothing pokes through a road.
     """
 
-    def __init__(self, state, footprints, flats=(), cuts=(), calm=None, sand=None):
+    def __init__(self, state, footprints, flats=(), cuts=(), calm=None, sand=None, basins=()):
         self.state = state
         self.footprints = footprints
         self.flats = list(flats)
         self.cuts = list(cuts)
+        self.basins = list(basins)
         self.calm = None if calm is None else np.asarray(calm, np.float64)
         self.noise = ValueNoise(11, 2400.0)
         self.drift = DRIFT.get(state, 0.0)
@@ -79,6 +81,11 @@ class Terrain:
             n = self.noise
             Z = Z + keep * (1.1 * n.fbm(X, Y, 90.0, 5, 0.5, key=1) + 0.35 * n.fbm(X, Y, 16.0, 2, 0.5, key=3)) \
                 + drift * (0.6 + 0.4 * n.fbm(X, Y, 20.0, 2, key=2))
+        for x0, x1, y0, y1, floor, bank in self.basins:
+            # Dug below the ground, the quay its west side, sloping banks on the other three.
+            inside = np.minimum(np.minimum(x1 - X, Y - y0), y1 - Y)
+            cap = floor + np.maximum(0.0, bank - inside) * (4.0 / bank)
+            Z = np.where((X >= x0 - 2.0) & (inside > 0.0), np.minimum(Z, cap), Z)
         for x0, x1, y0, y1, floor in self.cuts:
             inside = np.minimum(np.minimum(X - x0, x1 - X), np.minimum(Y - y0, y1 - Y))
             Z = np.where(inside > 0.0, np.minimum(Z, floor + 0.02 * self.noise.fbm(X, Y, 8.0, 2, key=4)), Z)

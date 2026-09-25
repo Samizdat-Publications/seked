@@ -1,0 +1,7 @@
+{"renders": [
+  {"state": "built", "station": "gallery", "size": "1024x512", "samples": 32, "out": "build/render/check/gallery-built.png"},
+  {"state": "built", "station": "kings-chamber", "size": "1024x512", "samples": 32, "out": "build/render/check/kings-chamber-built.png"},
+  {"state": "built", "station": "harbour", "size": "2048x1024", "samples": 32, "out": "build/render/check/harbour-built.png"},
+  {"state": "today", "station": "gallery", "size": "1024x512", "samples": 32, "out": "build/render/check/gallery-today.png"},
+  {"state": "today", "station": "kings-chamber", "size": "1024x512", "samples": 32, "out": "build/render/check/kings-chamber-today.png"}
+]}

@@ -1,0 +1,79 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "south",
+   "out": "build/render/pano/south-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "east",
+   "out": "build/render/pano/east-built.png"
+  },
+  {
+   "state": "built",
+   "station": "north",
+   "out": "build/render/pano/north-built.png"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "out": "build/render/pano/panorama-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "south",
+   "out": "build/render/pano/south-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx",
+   "out": "build/render/pano/sphinx-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "east",
+   "out": "build/render/pano/east-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "north",
+   "out": "build/render/pano/north-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "panorama",
+   "out": "build/render/pano/panorama-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "out": "build/render/pano/south-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "station": "east",
+   "out": "build/render/pano/east-today.png"
+  },
+  {
+   "state": "today",
+   "station": "north",
+   "out": "build/render/pano/north-today.png"
+  },
+  {
+   "state": "today",
+   "station": "panorama",
+   "out": "build/render/pano/panorama-today.png"
+  }
+ ]
+}

@@ -464,6 +464,8 @@
         id: String(s.id), index: i,
         name: String(s.name || s.id), where: String(s.where || ""), moment: String(s.moment || ""),
         camera: [num(cam[0], 0), num(cam[1], 0), num(cam[2], 0)],
+        cameras: cameraTable(s.cameras),
+        titles: s.titles && typeof s.titles === "object" ? s.titles : {},
         view: { yaw: num(v.yaw, 0) * DEG, pitch: num(v.pitch, 0) * DEG, fov: num(v.fov, 58) * DEG },
         panoramas: pan,
         // the states this station has, oldest first, in the manifest's order
@@ -478,6 +480,20 @@
       st.neighbours = st.neighbours.filter(function (id, k, all) { return byId[id] && id !== st.id && all.indexOf(id) === k; });
     });
     return { states: states, order: order, stateById: stateById, stations: stations, byId: byId };
+  }
+
+  // Where the camera stood in each era, when that differs (on a boat where the ground is flooded).
+  function cameraTable(t) {
+    if (!t || typeof t !== "object") return null;
+    var out = {}, any = false;
+    Object.keys(t).forEach(function (k) {
+      var c = t[k];
+      if (Array.isArray(c) && c.length === 3 && c.every(function (x) { return isFinite(Number(x)); })) {
+        out[k] = c.map(Number);
+        any = true;
+      }
+    });
+    return any ? out : null;
   }
 
   // A per-state value: an object keyed by state id, or one number for every state.
@@ -948,8 +964,16 @@
   }
 
   // ------------------------------------------------------------------ labels and hotspots
+  // The camera between the two eras on screen, so labels hold still through a crossfade.
+  function cameraNow() {
+    var s = segment(), t = station.cameras;
+    if (!s || !t) return station.camera;
+    var a = t[station.stops[s.a]] || station.camera, b = t[station.stops[s.b]] || station.camera;
+    return [a[0] + (b[0] - a[0]) * s.w, a[1] + (b[1] - a[1]) * s.w, a[2] + (b[2] - a[2]) * s.w];
+  }
+
   function project(x, y, z, f) {
-    var c = station.camera;
+    var c = cameraNow();
     var dx = x - c[0], dy = y - c[1], dz = z - c[2];
     var n = Math.hypot(dx, dy, dz) || 1;
     dx /= n; dy /= n; dz /= n;
@@ -1205,6 +1229,34 @@
     var id = currentStateId();
     if (!quiet && id && id !== settledState) say(describeState(id));
     settledState = id;
+    showTitle(station, id);
+  }
+
+  // A station's name and place, which an era may change (the harbour where the ground is flooded).
+  function titleFor(st, id) {
+    var t = id && st.titles[id];
+    return { name: String((t && t.name) || st.name), where: String((t && t.where) || st.where) };
+  }
+  function showTitle(st, id) {
+    if (!st) return;
+    var t = titleFor(st, id);
+    if (nameEl.textContent === t.name && whereEl.getAttribute("data-where") === t.where) return;
+    nameEl.textContent = t.name;
+    whereEl.textContent = "";
+    whereEl.setAttribute("data-where", t.where);
+    var bits = [t.where, st.moment].filter(Boolean);
+    bits.forEach(function (text, i) {
+      var span = document.createElement("span");
+      span.textContent = text;
+      if (i < bits.length - 1) {
+        var sep = document.createElement("span");
+        sep.className = "sep";
+        sep.textContent = " · ";
+        span.appendChild(sep);
+      }
+      whereEl.appendChild(span);
+      if (i < bits.length - 1) whereEl.appendChild(document.createTextNode(" "));
+    });
   }
 
   slider.addEventListener("input", function () {
@@ -1322,21 +1374,10 @@
   function enter(st, stateId) {
     station = st;
     kickerEl.textContent = "Station " + (st.index + 1) + " of " + M.stations.length;
-    nameEl.textContent = st.name;
-    whereEl.textContent = "";
-    var bits = [st.where, st.moment].filter(Boolean);
-    bits.forEach(function (text, i) {
-      var span = document.createElement("span");
-      span.textContent = text;
-      if (i < bits.length - 1) {
-        var sep = document.createElement("span");
-        sep.className = "sep";
-        sep.textContent = " · ";
-        span.appendChild(sep);
-      }
-      whereEl.appendChild(span);
-      if (i < bits.length - 1) whereEl.appendChild(document.createTextNode(" "));
-    });
+    nameEl.textContent = "";
+    whereEl.removeAttribute("data-where");
+    var first = pickStop(st, stateId);
+    showTitle(st, first != null ? st.stops[first] : null);
     document.title = st.name + " · Giza at Block Scale";
     canvas.setAttribute("aria-label", "Panorama from " + st.name + ". Drag, or use the arrow keys, to look around. Plus and minus zoom.");
     eraTween = null;

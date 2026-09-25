@@ -1,5 +1,5 @@
 {
-  "about": "The walkthrough's stations: where a 360-degree panorama is taken, in the project frame (metres, +x east, +y north, from Khufu's base centre), and the moment it is lit at. A moment is a date in the present calendar and a local solar time (render/giza/sun.py); an ancient state keeps the season and takes its own epoch's obliquity.",
+  "about": "The walkthrough's stations: where a 360-degree panorama is taken, in the project frame (metres, +x east, +y north, from Khufu's base centre), and the moment it is lit at. A moment is a date in the present calendar and a local solar time (render/giza/sun.py); an ancient state keeps the season and takes its own epoch's obliquity. by_state overrides a station's fields in one era, such as the eye standing on the Grand Gallery's walkway today; a raft floats a station on an era's open water. An inside station is lit by the era's lamps, not the sun, and names its own landmarks.",
   "moments": {
     "golden-west": {
       "date": "10-20",
@@ -36,11 +36,22 @@
     {
       "id": "south",
       "name": "South of Khufu",
-      "where": "Between the Great Pyramid and Khafre",
-      "x": -30.0,
-      "y": -360.0,
+      "where": "Between the Great Pyramid and Khafre's causeway",
+      "x": 20.0,
+      "y": -330.0,
       "eye": 1.7,
-      "moment": "golden-south"
+      "moment": "golden-south",
+      "view": {
+        "yaw": 0,
+        "pitch": 4,
+        "fov": 58
+      },
+      "neighbours": [
+        "sphinx",
+        "east",
+        "panorama"
+      ],
+      "note": "moved from (-30, -360) on 2026-09-24: there the built causeway's shadow reached the camera, and further north Khafre's does"
     },
     {
       "id": "sphinx",
@@ -49,7 +60,19 @@
       "x": 439.0,
       "y": -445.0,
       "eye": 16.0,
-      "moment": "sphinx-morning"
+      "moment": "sphinx-morning",
+      "view": {
+        "yaw": 277,
+        "pitch": 2,
+        "fov": 58
+      },
+      "neighbours": [
+        "south",
+        "east",
+        "harbour"
+      ],
+      "z": -29.5,
+      "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it."
     },
     {
       "id": "east",
@@ -58,7 +81,17 @@
       "x": 205.0,
       "y": 8.0,
       "eye": 1.7,
-      "moment": "sphinx-morning"
+      "moment": "sphinx-morning",
+      "view": {
+        "yaw": 270,
+        "pitch": 8,
+        "fov": 62
+      },
+      "neighbours": [
+        "south",
+        "north",
+        "sphinx"
+      ]
     },
     {
       "id": "north",
@@ -67,7 +100,16 @@
       "x": 20.0,
       "y": 205.0,
       "eye": 1.7,
-      "moment": "june-dawn"
+      "moment": "june-dawn",
+      "view": {
+        "yaw": 180,
+        "pitch": 12,
+        "fov": 66
+      },
+      "neighbours": [
+        "east",
+        "gallery"
+      ]
     },
     {
       "id": "panorama",
@@ -76,7 +118,125 @@
       "x": -980.0,
       "y": -1830.0,
       "eye": 1.7,
-      "moment": "golden-west"
+      "moment": "golden-west",
+      "view": {
+        "yaw": 24,
+        "pitch": 1,
+        "fov": 40
+      },
+      "neighbours": [
+        "south"
+      ]
+    },
+    {
+      "id": "harbour",
+      "name": "On the harbour",
+      "where": "On a papyrus raft in the basin before the valley temples",
+      "x": 500.0,
+      "y": -468.0,
+      "raft": {
+        "heading": 180
+      },
+      "moment": "sphinx-morning",
+      "view": {
+        "yaw": 280,
+        "pitch": 5,
+        "fov": 58
+      },
+      "neighbours": [
+        "sphinx",
+        "south"
+      ],
+      "note": "Only where an era has open water here: the harbour basin as built (render/giza/harbour.py BASIN) and the flood of the claim eras. The raft sets the eye 1.7 m above the water."
+    },
+    {
+      "id": "gallery",
+      "name": "The Grand Gallery",
+      "where": "At its foot, looking up the 47.8 m slope to the great step",
+      "inside": true,
+      "x": 7.224,
+      "y": 38.0,
+      "z": 24.96,
+      "light": "by the era's lamps",
+      "view": {
+        "yaw": 180,
+        "pitch": 22,
+        "fov": 70
+      },
+      "neighbours": [
+        "kings-chamber",
+        "north"
+      ],
+      "landmarks": [
+        {
+          "name": "The great step",
+          "x": 7.224,
+          "y": -0.8,
+          "z": 43.2
+        },
+        {
+          "name": "To the King's Chamber",
+          "x": 7.224,
+          "y": -1.567,
+          "z": 43.7
+        },
+        {
+          "name": "Down the ascending passage",
+          "x": 7.224,
+          "y": 41.33,
+          "z": 22.3
+        }
+      ],
+      "note": "z is the channel floor under the eye (Petrie's slope, 23.36 m) plus 1.6 m; today the eye stands on the walkway",
+      "by_state": {
+        "today": {
+          "z": 25.04
+        }
+      }
+    },
+    {
+      "id": "kings-chamber",
+      "name": "The King's Chamber",
+      "where": "Inside the doorway, the coffer at the west end",
+      "inside": true,
+      "x": 5.6,
+      "y": -9.4,
+      "z": 44.59,
+      "light": "by the era's lamps",
+      "view": {
+        "yaw": 257,
+        "pitch": -8,
+        "fov": 70
+      },
+      "neighbours": [
+        "gallery"
+      ],
+      "landmarks": [
+        {
+          "name": "The coffer",
+          "x": -0.85,
+          "y": -10.81,
+          "z": 43.6
+        },
+        {
+          "name": "North shaft",
+          "x": 1.9,
+          "y": -8.4,
+          "z": 44.0
+        },
+        {
+          "name": "South shaft",
+          "x": 1.3,
+          "y": -13.64,
+          "z": 44.0
+        },
+        {
+          "name": "From the antechamber",
+          "x": 7.224,
+          "y": -8.4,
+          "z": 43.6
+        }
+      ]
     }
   ]
 }
