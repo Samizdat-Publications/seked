@@ -1,0 +1,18 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "shot": "valley-hall",
+   "size": "1920x1080",
+   "samples": 256,
+   "out": "build/render/shots/valley-hall-built.png"
+  },
+  {
+   "state": "today",
+   "station": "valley-temple",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/pano/valley-temple-today.png"
+  }
+ ]
+}

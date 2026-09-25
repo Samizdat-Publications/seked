@@ -42,6 +42,9 @@ SLIT_WATTS = 220.0        # look choice: the glow a shaft reflects down its slit
 PASSAGE_WATTS = 500.0     # look choice: the daylight in the vestibule, falling on its east wall
 VESTIBULE = 4.45          # look choice after Petrie's plan: the vestibule's depth east of the passage
 DAYLIGHT = (1.0, 0.93, 0.82)
+ERAS = ("built", "today")
+# Petrie, §96: "Six of these beams, or a third of the whole, are now missing". Which six is a look choice.
+MISSING = (1, 4, 8, 11, 15, 19)
 
 
 def _r():
@@ -114,8 +117,8 @@ def plan():
                 passage_w=r["khafre.valley.hall.transverse.passage.width"], side=side, big=big)
 
 
-def alabaster_material(name="alabaster floor"):
-    """Egyptian alabaster (calcite) paving, polished: honey-white, banded, in large slabs (look choice)."""
+def alabaster_material(name="alabaster floor", worn=False):
+    """Egyptian alabaster (calcite) paving: honey-white, banded, in large slabs (look choice); polished as built, dulled and dusty today."""
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
@@ -146,9 +149,33 @@ def alabaster_material(name="alabaster floor"):
     t.link(uv.outputs[0], slabs.inputs["Vector"])
     col = t.mix(1.0, col, slabs.outputs["Color"], "MULTIPLY")
     col = t.mix(t.math("MULTIPLY", slabs.outputs["Fac"], 0.6), col, hexlin("8a7a62"))
+    if worn:
+        dust = t.band(t.noise(geo.outputs["Position"], 0.5, 4.0), 0.35, 0.75)
+        col = t.mix(t.math("MULTIPLY", dust, 0.55), col, hexlin("b9a07c"))
     t.link(col, bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = 0.18
+    bsdf.inputs["Roughness"].default_value = 0.55 if worn else 0.18
     return mat
+
+
+def beams(p):
+    """
+    The hall's beams one by one, each as (from, to, the axis it runs along, the line it lies on, depth):
+    the single colonnade's seven spans from wall to wall, the double's five a row from the west wall to
+    the large pillar, and the three across the long hall's mouth.
+    """
+    side, big = p["side"], p["big"]
+    out = []
+    ys = [p["y_s"]] + sorted(y for x, y, s in p["pillars"] if abs(x - p["x_row"]) < 0.01) + [p["y_n"]]
+    for a, b in zip(ys[:-1], ys[1:]):
+        out.append((a if a == p["y_s"] else a - side / 2, b if b == p["y_n"] else b + side / 2, "y", p["x_row"], p["single"]))
+    for y in p["row_y"]:
+        xs = [p["x_lw"]] + sorted(x for x, yy, s in p["pillars"] if abs(yy - y) < 0.01 and x < p["x_w"])
+        for a, b in zip(xs[:-1], xs[1:]):
+            out.append((a if a == p["x_lw"] else a - side / 2, b + (big if b == p["x_big"] else side) / 2, "x", y, p["double"]))
+    mouth = [p["y_ls"]] + sorted(p["row_y"]) + [p["y_ln"]]
+    for a, b in zip(mouth[:-1], mouth[1:]):
+        out.append((a if a == p["y_ls"] else a - big / 2, b if b == p["y_ln"] else b + big / 2, "y", p["x_big"], p["single"]))
+    return out
 
 
 def _wall_run(bm, x0, x1, y0, y1, z0, z1, gaps=()):
@@ -177,9 +204,13 @@ def _lamp(coll, name, loc, rot, size, size_y, watts):
 
 
 def build(state, coll, mats, log=print):
-    """The hall, its colonnades, slits and lamps; returns the objects made."""
-    if state != "built":
+    """
+    The hall, its colonnades and slits: as built roofed, shut in its shell and lit by its lamps; today
+    open to the sky and lit by the sun, a third of its beams gone. Returns the objects made.
+    """
+    if state not in ERAS:
         return []
+    built = state == "built"
     p = plan()
     fz, t_ceil, l_ceil = p["floor"], p["floor"] + p["ceiling_t"], p["floor"] + p["ceiling_l"]
     granite = masonry("hall granite", ("6b4c44", "82605a"), 0.3, 1.18, 2.6, room_frame(fz), joint=0.7,
@@ -192,7 +223,7 @@ def build(state, coll, mats, log=print):
     # The floor under the whole T and the passage.
     bm = bmesh.new()
     _box(bm, x_lw - WALL, x_end + VESTIBULE + WALL, y_s - WALL, y_n + WALL, fz - 0.4, fz)
-    made.append(_emit("valley temple floor", bm, alabaster_material(), coll))
+    made.append(_emit("valley temple floor", bm, alabaster_material(worn=not built), coll))
     # Walls. The long hall's north and south walls stop short of the ceiling where a slit opens.
     bm = bmesh.new()
     south_gaps = [(a, b, l_ceil - SLIT_HIGH) for a, b, y, s in p["slits"] if s < 0]
@@ -212,24 +243,32 @@ def build(state, coll, mats, log=print):
     _box(bm, x_end, x_end + VESTIBULE, ym - half_pass - 2.0, ym - half_pass, fz, t_ceil)
     _box(bm, x_end, x_end + VESTIBULE, ym + half_pass, ym + half_pass + 2.0, fz, t_ceil)
     _box(bm, x_end + VESTIBULE, x_end + VESTIBULE + WALL, ym - half_pass - 2.0, ym + half_pass + 2.0, fz, t_ceil)
-    _box(bm, x_end, x_end + VESTIBULE, ym - half_pass - 2.0, ym + half_pass + 2.0, t_ceil, t_ceil + ROOF)
-    # The ceilings: slabs over the transverse hall at the single colonnade's height, over the long hall at the double's.
-    _box(bm, x_w, x_end, y_s, y_n, t_ceil, t_ceil + ROOF)
-    _box(bm, x_lw, x_w, y_ls, y_ln, l_ceil, t_ceil + ROOF)
+    if built:
+        _box(bm, x_end, x_end + VESTIBULE, ym - half_pass - 2.0, ym + half_pass + 2.0, t_ceil, t_ceil + ROOF)
+        # The ceilings: slabs over the transverse hall at the single colonnade's height, over the long hall at the double's.
+        _box(bm, x_w, x_end, y_s, y_n, t_ceil, t_ceil + ROOF)
+        _box(bm, x_lw, x_w, y_ls, y_ln, l_ceil, t_ceil + ROOF)
     made.append(_emit("valley temple walls", bm, granite, coll))
     # Pillars and beams, monoliths of the same granite.
     bm = bmesh.new()
     ph = fz + p["pillar_h"]
     for x, y, s in p["pillars"]:
         _box(bm, x - s / 2, x + s / 2, y - s / 2, y + s / 2, fz, ph)
-    side = p["side"]
-    _box(bm, p["x_row"] - side / 2, p["x_row"] + side / 2, y_s, y_n, ph, ph + p["single"])        # the single colonnade's beam
-    for y in p["row_y"]:
-        _box(bm, x_lw, p["x_big"], y - side / 2, y + side / 2, ph, ph + p["double"])              # the double's beams
-    # Across the long hall's mouth, on the two large pillars: its three beams as one line.
-    xb = p["x_big"]
-    _box(bm, xb - side / 2, xb + side / 2, y_ls, y_ln, ph, ph + p["single"])
+    for k, (a, b, axis, fixed, depth) in enumerate(beams(p)):
+        if not built and k in MISSING:
+            continue
+        half = p["side"] / 2
+        if axis == "y":
+            _box(bm, fixed - half, fixed + half, a, b, ph, ph + depth)
+        else:
+            _box(bm, a, b, fixed - half, fixed + half, ph, ph + depth)
     made.append(_emit("valley temple colonnades", bm, granite, coll))
+    if not built:
+        for ob in made:
+            ob["seked"] = ("the granite hall of Khafre's valley temple as it is, after Petrie's plan and text and Hölscher's placing; "
+                           "which six beams are missing is a look choice")
+        log(f"valley temple: the T-shaped hall open to the sky, {len(p['pillars'])} pillars, {len(beams(p)) - len(MISSING)} beams")
+        return made
     # A shell round everything, so that no sun or sky reaches the hall but by the lamps below.
     dark = mats.get("dark") or granite
     bm = bmesh.new()

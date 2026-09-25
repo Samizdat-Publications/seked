@@ -490,7 +490,7 @@
         "harbour",
         "sphinx"
       ],
-      "note": "Built era only. The hall stands where Hölscher's plate puts it in the footprint, with Petrie's dimensions; the light, the floor and the statues are look choices.",
+      "note": "Built and today. The hall stands where Hölscher's plate puts it in the footprint, with Petrie's dimensions; the light as built, the floor and the statues are look choices.",
       "landmarks": [
         {
           "name": "The long hall, to its west wall",
@@ -522,7 +522,14 @@
           "y": -493.654,
           "z": -39.68
         }
-      ]
+      ],
+      "by_state": {
+        "today": {
+          "exposure": -3.4,
+          "name": "In Khafre's granite hall, open to the sky",
+          "where": "The valley temple's T-shaped hall as it stands, its roof gone and a third of its beams with it"
+        }
+      }
     }
   ]
 }
