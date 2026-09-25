@@ -115,7 +115,10 @@ STATION_CLEAR = 12.0               # metres kept clear round every station (a lo
 # "axis" with the axis its head points along ("axis-x"): the plan's principal axis is turned
 # onto Y, head forward. `faces`: triangles kept. `drop`: fragments of material or object names
 # whose faces are removed. `cut`: a plinth, as a share of the model's height from its lowest
-# point, cut away with the loose pieces left standing on it.
+# point, cut away with the loose pieces left standing on it. `kneel`, `graze` and `bend` are the
+# model's parts for the poses a variant asks for with "@kneel", "@graze" or "@bend" (see _kneel,
+# _graze and _bend): its rig's bones, or for a model with no rig the neck's place as shares of
+# its size.
 MODELS = {
     # The savanna of the claim eras.
     "animal-giraffe": dict(height=4.7, ref=("loopIdle01", 0.5), turn=180.0),            # withers ~2.9 m
@@ -123,10 +126,11 @@ MODELS = {
     "animal-elephant-cow": dict(height=2.7, turn=180.0, faces=14000),                   # shoulder ~2.5 m
     "animal-elephant-bull": dict(height=3.4, turn=180.0, faces=14000),                  # shoulder ~3.2 m
     "animal-elephant-calf": dict(height=1.35, turn=180.0),                              # shoulder ~1.2 m
-    "animal-gazelle": dict(height=1.2, turn=180.0),                                     # shoulder ~0.7 m
-    "animal-oryx": dict(height=2.0, turn="axis-x"),                                      # shoulder ~1.15 m
-    "animal-addax": dict(height=1.75, turn=-90.0, cut=0.075),                           # shoulder ~1.05 m
-    "animal-hartebeest": dict(height=1.65, turn=180.0),                                 # shoulder ~1.2 m
+    "animal-gazelle": dict(height=1.2, turn=180.0,                                      # shoulder ~0.7 m
+                           bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),
+    "animal-oryx": dict(height=2.0, turn="axis-x", bend=dict(at=0.68, z=0.46, reach=0.16, floor=0.38)),   # shoulder ~1.15 m
+    "animal-addax": dict(height=1.75, turn=-90.0, cut=0.075, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # shoulder ~1.05 m
+    "animal-hartebeest": dict(height=1.65, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # shoulder ~1.2 m
     "animal-ostrich": dict(height=2.3, turn=180.0),                                     # head up, back ~1.3 m
     "animal-buffalo": dict(height=1.65, ref=("Animation", 0.0), turn=180.0, faces=14000,   # shoulder ~1.5 m
                            graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
@@ -140,8 +144,8 @@ MODELS = {
     "animal-donkey-pack": dict(height=1.4, turn="axis-x"),                              # withers ~1.05 m
     "animal-donkey-pack-2": dict(height=1.45, turn=90.0),                               # withers ~1.05 m
     "animal-donkey": dict(height=1.45, turn="axis+x"),                                  # withers ~1.05 m
-    "animal-goat-white": dict(height=1.2, turn=180.0),                                  # withers ~0.7 m
-    "animal-goat-brown": dict(height=1.05, turn=180.0),                                 # withers ~0.65 m
+    "animal-goat-white": dict(height=1.2, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # withers ~0.7 m
+    "animal-goat-brown": dict(height=1.05, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # withers ~0.65 m
     # Today (and 1800).
     "animal-camel-saddled": dict(height=2.35, turn=90.0),                               # shoulder ~1.9 m
     "animal-camel-blanket": dict(height=2.35, ref=("Armature|Idle_02", 0.5), turn=0.0, drop=("CamelHair",),
@@ -161,8 +165,10 @@ MODELS = {
     "animal-horse-cart": dict(height=2.2, turn=90.0, drop=("Floor", "Stone")),          # the horse's withers ~1.5 m
 }
 
-# The variants the libraries are built from: a model in a pose (an action and the fraction of
-# its frame range, or None for the pose it imports in), and the kind it belongs to.
+# The variants the libraries are built from: a model in a pose, which is an action and the
+# fraction of its frame range, None for the pose it imports in, or one of the made poses: a
+# camel couched ("@kneel", how far the body drops in the model's units), a head bent down to the
+# grass ("@graze" through the rig's neck, "@bend" through the mesh, degrees).
 VARIANTS = {
     "giraffe-stand": dict(model="animal-giraffe", pose=("loopIdle01", 0.5)),
     "giraffe-browse": dict(model="animal-giraffe", pose=("loopEating", 0.5)),
@@ -172,9 +178,14 @@ VARIANTS = {
     "elephant-bull": dict(model="animal-elephant-bull"),
     "elephant-calf": dict(model="animal-elephant-calf"),
     "gazelle": dict(model="animal-gazelle"),
+    # Head down to the grass, for the models with no rig: the mesh bent at the neck by _bend.
+    "gazelle-graze": dict(model="animal-gazelle", pose=("@bend", 70.0)),
     "oryx": dict(model="animal-oryx"),
+    "oryx-graze": dict(model="animal-oryx", pose=("@bend", 70.0)),
     "addax": dict(model="animal-addax"),
+    "addax-graze": dict(model="animal-addax", pose=("@bend", 70.0)),
     "hartebeest": dict(model="animal-hartebeest"),
+    "hartebeest-graze": dict(model="animal-hartebeest", pose=("@bend", 70.0)),
     "ostrich": dict(model="animal-ostrich"),
     "buffalo": dict(model="animal-buffalo", pose=("Animation", 0.0)),
     # Head down to the grass: the neck bent by _graze.
@@ -187,7 +198,9 @@ VARIANTS = {
     "donkey-pack-2": dict(model="animal-donkey-pack-2"),
     "donkey": dict(model="animal-donkey"),
     "goat-white": dict(model="animal-goat-white"),
+    "goat-white-graze": dict(model="animal-goat-white", pose=("@bend", 70.0)),
     "goat-brown": dict(model="animal-goat-brown"),
+    "goat-brown-graze": dict(model="animal-goat-brown", pose=("@bend", 70.0)),
     "camel-saddled": dict(model="animal-camel-saddled"),
     "camel-blanket": dict(model="animal-camel-blanket", pose=("Armature|Idle_02", 0.5)),
     "camel-blanket-graze": dict(model="animal-camel-blanket", pose=("Armature|Idle_01", 0.5)),
@@ -212,17 +225,19 @@ KINDS = {
                     spacing=6.0, slope=16.0, young=(0.15, (0.55, 0.7))),
     "elephant": dict(variants=("elephant-cow", "elephant-bull", "elephant-calf"), weights=(6, 1, 3), spacing=5.0,
                      slope=14.0, young=None),
-    "gazelle": dict(variants=("gazelle",), spacing=1.8, slope=24.0, young=(0.15, (0.65, 0.8))),
-    "oryx": dict(variants=("oryx",), spacing=2.6, slope=20.0, young=(0.12, (0.6, 0.75))),
-    "addax": dict(variants=("addax",), spacing=2.4, slope=20.0, young=(0.12, (0.6, 0.75))),
-    "hartebeest": dict(variants=("hartebeest",), spacing=2.6, slope=20.0, young=(0.12, (0.6, 0.75))),
+    "gazelle": dict(variants=("gazelle", "gazelle-graze"), weights=(1, 2), spacing=1.8, slope=24.0, young=(0.15, (0.65, 0.8))),
+    "oryx": dict(variants=("oryx", "oryx-graze"), spacing=2.6, slope=20.0, young=(0.12, (0.6, 0.75))),
+    "addax": dict(variants=("addax", "addax-graze"), spacing=2.4, slope=20.0, young=(0.12, (0.6, 0.75))),
+    "hartebeest": dict(variants=("hartebeest", "hartebeest-graze"), weights=(1, 2), spacing=2.6, slope=20.0,
+                       young=(0.12, (0.6, 0.75))),
     "ostrich": dict(variants=("ostrich",), spacing=2.4, slope=20.0, young=(0.1, (0.6, 0.75))),
     "buffalo": dict(variants=("buffalo", "buffalo-graze"), weights=(1, 2), spacing=3.2, slope=14.0, young=(0.12, (0.6, 0.75))),
     "hippo": dict(variants=("hippo",), spacing=4.0, slope=10.0, young=(0.2, (0.5, 0.7)), water=(0.75, 1.25)),
     "cattle": dict(variants=("cattle-ankole", "cattle-ankole-graze", "cattle-piebald"), weights=(2, 3, 2), spacing=3.0, slope=14.0,
                    young=(0.15, (0.55, 0.7))),
     "donkey": dict(variants=("donkey-pack", "donkey-pack-2", "donkey"), weights=(2, 2, 1), spacing=2.2, slope=18.0, young=None),
-    "goat": dict(variants=("goat-white", "goat-brown"), spacing=1.3, slope=32.0, young=(0.2, (0.55, 0.7))),
+    "goat": dict(variants=("goat-white", "goat-white-graze", "goat-brown", "goat-brown-graze"), weights=(1, 2, 1, 2), spacing=1.3,
+                 slope=32.0, young=(0.2, (0.55, 0.7))),
     "camel": dict(variants=("camel-saddled", "camel-blanket", "camel-blanket-graze", "camel-blanket-walk",
                             "camel-blanket-kneeling", "camel", "camel-kneeling"), weights=(4, 3, 2, 1, 4, 1, 2), spacing=3.4, slope=12.0, young=None),
     "camel-plain": dict(variants=("camel", "camel-kneeling"), weights=(2, 1), spacing=3.4, slope=12.0, young=(0.12, (0.6, 0.75))),
@@ -232,13 +247,15 @@ KINDS = {
 
 # Which variants each era's library holds, in Collection Info's order.
 SAVANNA = ("giraffe-stand", "giraffe-browse", "giraffe-walk", "giraffe-look", "elephant-cow", "elephant-bull",
-           "elephant-calf", "gazelle", "oryx", "addax", "hartebeest", "ostrich", "buffalo", "buffalo-graze", "hippo")
+           "elephant-calf", "gazelle", "gazelle-graze", "oryx", "oryx-graze", "addax", "addax-graze", "hartebeest",
+           "hartebeest-graze", "ostrich", "buffalo", "buffalo-graze", "hippo")
 ERAS = {
     "first-time": SAVANNA,
     "lion": SAVANNA,
     "built": ("cattle-ankole", "cattle-ankole-graze", "cattle-piebald", "donkey-pack", "donkey-pack-2", "donkey", "goat-white",
-              "goat-brown"),
-    "stripped": ("camel", "camel-kneeling", "donkey-pack", "donkey", "goat-white", "goat-brown"),
+              "goat-white-graze", "goat-brown", "goat-brown-graze"),
+    "stripped": ("camel", "camel-kneeling", "donkey-pack", "donkey", "goat-white", "goat-white-graze", "goat-brown",
+                 "goat-brown-graze"),
     "today": ("camel-saddled", "camel-blanket", "camel-blanket-graze", "camel-blanket-walk", "camel-blanket-kneeling", "camel",
               "camel-kneeling", "horse-arabian", "horse-bay", "horse-cart"),
 }
@@ -480,6 +497,30 @@ def _graze(arm, rig, degrees):
         turn = M4.Translation(head) @ M4.Rotation(math.radians(degrees * share), 4, axis) @ M4.Translation(-head)
         pb.matrix = turn @ pb.matrix
         bpy.context.view_layer.update()
+
+
+def _bend(me, spec, degrees):
+    """
+    Head down to the grass for a model with no rig: the mesh, standing and facing +Y, bent down
+    about a left-right axis through a pivot at the base of the neck, `at` of the way from its tail
+    to its nose and `z` of its height up. The bend grows from nothing at the pivot to `degrees` a
+    `reach` of the length ahead of it, and leaves alone everything below `floor` of the height,
+    so the forelegs stand where they stood. Every figure is a share of the model's own size.
+    """
+    co = _coords(me)
+    H = float(co[:, 2].max())
+    y0, y1 = float(co[:, 1].min()), float(co[:, 1].max())
+    L = y1 - y0
+    py, pz = y0 + spec["at"] * L, spec["z"] * H
+    t = np.clip((co[:, 1] - py) / (spec["reach"] * L), 0.0, 1.0)
+    u = np.clip((co[:, 2] - spec["floor"] * H) / (0.1 * H), 0.0, 1.0)
+    w = (t * t * (3 - 2 * t)) * (u * u * (3 - 2 * u))
+    a = -np.radians(degrees) * w
+    dy, dz = co[:, 1] - py, co[:, 2] - pz
+    co[:, 1] = py + dy * np.cos(a) - dz * np.sin(a)
+    co[:, 2] = pz + dy * np.sin(a) + dz * np.cos(a)
+    me.vertices.foreach_set("co", co.ravel())
+    me.update()
 
 
 def _alpha_material(mat):
@@ -726,8 +767,10 @@ def model_variants(model_id, path, variants, model, look, faces=None, texture_px
         scale = look["height"] / float(co[:, 2].max() - co[:, 2].min())
         bpy.data.objects.remove(probe, do_unlink=True)
         for vname, vspec in variants:
-            if not _pose(new, animated, slots, vspec.get("pose"), look):
-                log(f"animals: {vname}: {model_id} has no action {vspec['pose'][0]!r}; skipped")
+            pose = vspec.get("pose")
+            bend = pose[1] if pose is not None and pose[0] == "@bend" else None
+            if not _pose(new, animated, slots, None if bend is not None else pose, look):
+                log(f"animals: {vname}: {model_id} has no action {pose[0]!r}; skipped")
                 continue
             obj = _bake(meshes, vname, look.get("drop", ()))
             if obj is None:
@@ -738,6 +781,12 @@ def model_variants(model_id, path, variants, model, look, faces=None, texture_px
                 _cut(me, look["cut"])
             _decimate(obj, faces or look.get("faces", FACES))
             _stand(me, turn, scale)
+            if bend is not None:
+                if "bend" not in look:
+                    log(f"animals: {vname}: {model_id} has no `bend` to graze with; skipped")
+                    bpy.data.objects.remove(obj, do_unlink=True)
+                    continue
+                _bend(me, look["bend"], bend)
             _normals(me)
             for mat in me.materials:
                 _coat(mat, texture_px)
@@ -791,8 +840,8 @@ def _cache_key(era, wanted, index, manifest, faces, texture_px):
 def _code_digest():
     """The functions that shape a variant, so a change to how a model is read makes a new cache."""
     import inspect
-    parts = [inspect.getsource(f) for f in (_import, _pose, _aim, _kneel, _graze, _alpha_material, _bake, _turn_angle, _cut,
-                                            _decimate, _stand, _normals, _unlit_to_lit, _coat, model_variants)]
+    parts = [inspect.getsource(f) for f in (_import, _pose, _aim, _kneel, _graze, _bend, _alpha_material, _bake, _turn_angle,
+                                            _cut, _decimate, _stand, _normals, _unlit_to_lit, _coat, model_variants)]
     return hashlib.sha256("".join(parts).encode("utf-8")).hexdigest()
 
 
