@@ -1,405 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0f0e0c">
 <title>Giza at Block Scale</title>
+<meta name="description" content="A path-traced walkthrough of the Giza plateau: stand at a station, look around, and slide through its eras.">
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Marcellus&display=swap">
 <style>
   :root {
-    --ground: #f2efe9;
-    --raised: #e8e3da;
-    --ink: #1c1a17;
-    --muted: #675f55;
-    --line: rgba(28, 26, 23, 0.14);
-    --accent: #2c4a8c;
-    --granite: #974634;
+    color-scheme: dark;
     --stage: #0f0e0c;
-    --stage-ink: #efe8dc;
-    --stage-muted: #b3a896;
+    --ink: #efe8dc;
+    --muted: #b3a896;
+    --rule: rgba(239, 232, 220, 0.28);
+    --rule-hi: rgba(239, 232, 220, 0.62);
+    --glass: rgba(17, 15, 12, 0.58);
+    --glass-hi: rgba(17, 15, 12, 0.9);
+    --claim: #f2b544;
+    --claim-soft: rgba(242, 181, 68, 0.78);
+    --claim-ink: #1f1604;
+    --recon: #a9bdf0;
+    --thumb: 18px;
+    --g: 16px;
+    --top: max(var(--g), env(safe-area-inset-top));
+    --right: max(var(--g), env(safe-area-inset-right));
+    --bottom: max(var(--g), env(safe-area-inset-bottom));
+    --left: max(var(--g), env(safe-area-inset-left));
     --display: "Marcellus", "Trajan Pro", "Palatino Linotype", Georgia, serif;
     --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --ground: #14120f;
-      --raised: #1d1a16;
-      --ink: #ece5d9;
-      --muted: #a89d8d;
-      --line: rgba(236, 229, 217, 0.14);
-      --accent: #8ea8e6;
-      --granite: #d28b73;
-    }
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --ground: #14120f;
-    --raised: #1d1a16;
-    --ink: #ece5d9;
-    --muted: #a89d8d;
-    --line: rgba(236, 229, 217, 0.14);
-    --accent: #8ea8e6;
-    --granite: #d28b73;
-  }
-
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
   body {
-    background: var(--ground);
-    color: var(--ink);
-    font: 400 17px/1.62 var(--body);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* ---------- the station ---------- */
-  .stage {
-    position: relative;
-    height: clamp(430px, 70vh, 780px);
     background: var(--stage);
-    color: var(--stage-ink);
+    color: var(--ink);
+    font: 400 15px/1.5 var(--body);
+    -webkit-font-smoothing: antialiased;
     overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
+    overscroll-behavior: none;
   }
-  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
-  .stage canvas:active { cursor: grabbing; }
-  .stage canvas:focus-visible { outline: 2px solid var(--stage-ink); outline-offset: -4px; }
-  .stage .fallback { position: absolute; inset: 0; overflow-x: auto; }
-  .stage .fallback img { height: 100%; max-width: none; }
-  .veil {
-    position: absolute; left: 0; right: 0; pointer-events: none;
+  p, h1, h2 { margin: 0; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
-  .veil.top { top: 0; height: 130px; background: linear-gradient(rgba(10, 9, 8, 0.62), rgba(10, 9, 8, 0)); }
-  .veil.bottom { bottom: 0; height: 170px; background: linear-gradient(rgba(10, 9, 8, 0), rgba(10, 9, 8, 0.72)); }
-  .station-head {
-    position: absolute; top: 16px; left: 16px; right: 16px;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    pointer-events: none;
-  }
-  .station-head .name { font: 400 clamp(20px, 2.6vw, 28px)/1.15 var(--display); letter-spacing: 0.02em; margin: 0; }
-  .station-head .where { font: 400 12px/1.4 var(--mono); color: var(--stage-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
-  .compass { font: 500 12px/1 var(--mono); letter-spacing: 0.08em; color: var(--stage-muted); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .compass b { display: block; font-weight: 500; font-size: 20px; color: var(--stage-ink); margin-bottom: 6px; }
 
-  .labels { position: absolute; inset: 0; pointer-events: none; }
+  /* ---------- the stage ---------- */
+  .stage {
+    position: relative; height: 100%; overflow: hidden;
+    user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .stage canvas {
+    position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: block;
+    cursor: grab; touch-action: none;
+  }
+  .stage canvas.grabbing { cursor: grabbing; }
+  .stage canvas:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }
+  .flat { position: absolute; inset: 0; z-index: 0; overflow-x: auto; overflow-y: hidden; }
+  .flat img { display: block; height: 100%; width: auto; max-width: none; }
+  .veil { position: absolute; left: 0; right: 0; z-index: 1; pointer-events: none; }
+  .veil.top { top: 0; height: 160px; background: linear-gradient(rgba(10, 9, 8, 0.66), rgba(10, 9, 8, 0)); }
+  .veil.bottom { bottom: 0; height: 230px; background: linear-gradient(rgba(10, 9, 8, 0), rgba(10, 9, 8, 0.78)); }
+
+  .claim-frame {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+    border: 3px solid var(--claim);
+    box-shadow: inset 0 0 90px rgba(242, 181, 68, 0.2);
+  }
+  .claim-frame span {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    background: var(--claim); color: var(--claim-ink);
+    font: 600 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 5px 11px 6px; border-radius: 0 0 5px 5px; white-space: nowrap;
+  }
+
+  /* landmark labels, as in the first station */
+  .labels, .spots { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
   .tag {
-    position: absolute; left: 0; top: 0;
+    position: absolute; left: 0; top: 0; opacity: 0;
     transform: translate(-50%, calc(-100% - 14px));
     text-align: center; white-space: nowrap;
     font: 500 12px/1.25 var(--body); letter-spacing: 0.03em;
-    color: var(--stage-ink);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
-    transition: opacity 0.2s;
+    color: var(--ink);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+    transition: opacity 0.18s;
+    will-change: transform, opacity;
   }
   .tag::after {
-    content: ""; position: absolute; left: 50%; top: calc(100% + 3px);
+    content: ""; position: absolute; left: calc(50% + var(--tick, 0px)); top: calc(100% + 3px);
     width: 1px; height: 9px; background: rgba(239, 232, 220, 0.75);
   }
-  .tag small { display: block; font: 400 11px/1.3 var(--mono); color: var(--stage-muted); font-variant-numeric: tabular-nums; }
+  .tag small { display: block; font: 400 11px/1.3 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 
-  .era {
-    position: absolute; left: 16px; right: 16px; bottom: 16px;
-    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px;
+  /* hotspots: the neighbouring stations */
+  .spot {
+    position: absolute; left: 0; top: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0; background: none; border: 0; border-radius: 999px;
+    color: var(--ink); cursor: pointer; pointer-events: auto;
+    transition: opacity 0.2s;
+    will-change: transform;
   }
-  .era button {
-    font: 500 13px/1 var(--body); letter-spacing: 0.02em;
-    color: var(--stage-ink); background: rgba(20, 18, 15, 0.55);
-    border: 1px solid rgba(239, 232, 220, 0.28); border-radius: 999px;
-    padding: 9px 14px; cursor: pointer; white-space: nowrap;
+  .spot.off { opacity: 0; pointer-events: none; }
+  .spot.below { flex-direction: column-reverse; }
+  .spot-card {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px 7px 10px; border-radius: 999px;
+    background: var(--glass); border: 1px solid var(--rule-hi);
+    font: 500 13px/1 var(--body); letter-spacing: 0.02em; white-space: nowrap;
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    transform: translateX(var(--shift, 0px));
+    transition: background-color 0.15s, color 0.15s;
   }
-  .era button[aria-pressed="true"] { background: var(--stage-ink); color: var(--stage); border-color: var(--stage-ink); }
-  .era button:focus-visible, .era input:focus-visible { outline: 2px solid var(--stage-ink); outline-offset: 2px; }
-  .era input[type="range"] { width: 100%; accent-color: #e9dcc4; }
-  .era .readout {
-    grid-column: 1 / -1; text-align: center; font: 400 12px/1.3 var(--mono);
-    color: var(--stage-muted); letter-spacing: 0.05em; font-variant-numeric: tabular-nums;
+  .spot-card::before {
+    content: ""; width: 9px; height: 9px; border-radius: 50%;
+    border: 1.5px solid currentColor; box-sizing: border-box;
   }
+  .spot-dist { font: 400 11px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .spot-stem { width: 1px; height: 20px; background: rgba(239, 232, 220, 0.75); }
+  .spot-pin {
+    width: 11px; height: 11px; border-radius: 50%;
+    border: 2px solid var(--ink); background: rgba(15, 14, 12, 0.45);
+    box-shadow: 0 0 0 3px rgba(15, 14, 12, 0.3);
+  }
+  .spot:hover .spot-card { background: var(--ink); color: var(--stage); }
+  .spot:hover .spot-dist { color: #5d554a; }
+  .spot:focus-visible { outline: none; }
+  .spot:focus-visible .spot-card { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .curtain {
+    position: absolute; inset: 0; z-index: 4; background: var(--stage);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .curtain.on { opacity: 1; }
+
   .hint {
-    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-    font: 500 13px/1 var(--body); letter-spacing: 0.04em; color: var(--stage-ink);
-    background: rgba(15, 14, 12, 0.55); border-radius: 999px; padding: 10px 16px;
-    pointer-events: none; transition: opacity 0.6s;
+    position: absolute; left: 50%; bottom: calc(var(--era-h, 150px) + 18px); z-index: 5; transform: translateX(-50%);
+    font: 500 13px/1 var(--body); letter-spacing: 0.04em; color: var(--ink); white-space: nowrap;
+    background: rgba(15, 14, 12, 0.58); border-radius: 999px; padding: 10px 16px;
+    pointer-events: none; opacity: 0; transition: opacity 0.6s;
   }
-  .loading { position: absolute; right: 16px; bottom: 96px; font: 400 12px/1 var(--mono); color: var(--stage-muted); }
+  .hint.on { opacity: 1; }
 
-  /* ---------- the reading column ---------- */
-  main { padding-inline: 16px; padding-block: 28px 64px; }
-  .col { max-width: 66ch; margin-inline: auto; }
-  .wide { max-width: 1120px; margin-inline: auto; }
-  .credits {
-    max-width: 1120px; margin: 0 auto 44px; font: 400 12.5px/1.55 var(--mono); color: var(--muted);
-    border-bottom: 1px solid var(--line); padding-bottom: 18px;
+  /* sits on the era panel, so the view above stays free for the labels it points to */
+  .notice {
+    width: min(430px, 100%); margin: 0 auto 14px;
+    padding: 14px 18px; text-align: center;
+    background: var(--glass-hi); border: 1px solid var(--rule); border-radius: 8px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+    user-select: text; -webkit-user-select: text;
   }
-  h1, h2 { font-family: var(--display); font-weight: 400; text-wrap: balance; letter-spacing: 0.01em; }
-  h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.06; margin: 0 0 18px; }
-  h2 { font-size: clamp(25px, 3vw, 32px); line-height: 1.15; margin: 64px 0 14px; }
-  h3 { font: 600 17px/1.35 var(--body); margin: 26px 0 6px; }
-  p { margin: 0 0 16px; }
-  .lede { font-size: 20px; line-height: 1.55; color: var(--ink); }
-  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--granite); margin: 0 0 14px; }
-  .muted { color: var(--muted); }
-  code, .num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
-  a { color: var(--accent); text-underline-offset: 3px; }
+  .notice .kind { font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .notice h2 { font: 400 21px/1.2 var(--display); letter-spacing: 0.01em; margin-bottom: 6px; }
+  .notice p { font-size: 13.5px; line-height: 1.5; color: var(--muted); text-wrap: balance; }
+  .notice .btn { margin-top: 12px; min-height: 32px; }
 
-  figure { margin: 28px 0 8px; }
-  figure img { display: block; width: 100%; height: auto; border-radius: 3px; }
-  figcaption { font: 400 13px/1.5 var(--body); color: var(--muted); margin-top: 10px; max-width: 72ch; }
-
-  .compare { position: relative; overflow: hidden; border-radius: 3px; background: var(--raised); aspect-ratio: 16 / 9; max-width: 100%; }
-  .compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .compare .top { clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0); }
-  .compare .divider {
-    position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; margin-left: -1px;
-    background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); pointer-events: none;
+  /* ---------- the station head ---------- */
+  .head {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 6;
+    padding: var(--top) var(--right) 0 var(--left);
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
+    pointer-events: none;
   }
-  .compare .side {
-    position: absolute; top: 12px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
-    color: #fff; background: rgba(15, 14, 12, 0.55); padding: 6px 8px; border-radius: 2px; pointer-events: none;
+  .head .title { min-width: 0; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); }
+  .kicker { font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .name { font: 400 clamp(21px, 2.6vw, 30px)/1.12 var(--display); letter-spacing: 0.02em; text-wrap: balance; }
+  .where { font: 400 11.5px/1.45 var(--mono); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 6px; max-width: 72ch; }
+  .where span { display: inline-block; }
+  .tools { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+  .buttons { display: flex; gap: 8px; pointer-events: auto; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 36px; padding: 0 14px;
+    font: 500 13px/1 var(--body); letter-spacing: 0.02em;
+    color: var(--ink); text-decoration: none; white-space: nowrap;
+    background: var(--glass); border: 1px solid var(--rule); border-radius: 999px;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   }
-  .compare .side.l { left: 12px; }
-  .compare .side.r { right: 12px; }
-  .compare input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
-  .compare input:focus-visible + .divider { outline: 3px solid var(--accent); }
+  .btn:hover { border-color: var(--rule-hi); }
+  .btn[aria-expanded="true"] { background: var(--ink); color: var(--stage); border-color: var(--ink); }
+  .btn svg { flex: none; }
+  .compass { font: 500 12px/1 var(--mono); letter-spacing: 0.08em; color: var(--muted); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
+  .compass b { display: block; font-weight: 500; font-size: 20px; color: var(--ink); margin-bottom: 6px; }
 
-  .reasons { display: grid; gap: 22px; margin-top: 18px; }
-  .reason { display: grid; grid-template-columns: 5.2ch 1fr; gap: 16px; align-items: baseline; }
-  .reason .k { font: 500 13px/1.4 var(--mono); color: var(--granite); }
-  .reason h3 { margin-top: 0; }
-  .reason p { margin: 0; }
+  /* ---------- the station list ---------- */
+  .panel {
+    position: absolute; z-index: 8;
+    top: calc(var(--top) + 46px); right: var(--right);
+    width: min(390px, calc(100% - 2 * var(--g)));
+    max-height: calc(100% - var(--top) - 64px); overflow: auto; overscroll-behavior: contain;
+    padding: 8px;
+    background: var(--glass-hi); border: 1px solid var(--rule); border-radius: 10px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    user-select: text; -webkit-user-select: text;
+    animation: rise 0.18s ease-out;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .panel h2 { font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 10px 10px 8px; }
+  .panel ol { list-style: none; margin: 0; padding: 0; }
+  .st {
+    display: grid; grid-template-columns: 2.6ch 1fr auto; gap: 12px; align-items: start;
+    width: 100%; padding: 11px 10px; text-align: left;
+    background: none; border: 0; border-radius: 7px; cursor: pointer;
+  }
+  .st:hover { background: rgba(239, 232, 220, 0.07); }
+  .st[aria-current] { background: rgba(239, 232, 220, 0.12); }
+  .st-n { font: 500 12px/1.7 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .st-name { display: block; font: 400 18px/1.25 var(--display); letter-spacing: 0.01em; }
+  .st-where { display: block; font-size: 13px; line-height: 1.45; color: var(--muted); margin-top: 3px; }
+  .st-eras { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 7px; font: 400 11px/1.3 var(--mono); color: var(--muted); letter-spacing: 0.03em; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+  .chip.reconstruction::before { background: var(--recon); }
+  .chip.claim::before { background: var(--claim); }
+  .st-here { font: 500 10.5px/1.9 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); visibility: hidden; }
+  .st[aria-current] .st-here { visibility: visible; }
+  .panel-foot { font-size: 12.5px; line-height: 1.5; color: var(--muted); margin: 8px 10px 6px; padding-top: 10px; border-top: 1px solid var(--rule); }
 
-  .changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 20px; }
-  .changes div { background: var(--ground); padding: 18px 18px 16px; }
-  .changes h3 { margin: 0 0 6px; }
-  .changes p { margin: 0; font-size: 15.5px; line-height: 1.55; }
+  /* ---------- the era timeline ---------- */
+  .era {
+    position: absolute; left: 50%; bottom: 0; z-index: 6; transform: translateX(-50%);
+    width: min(780px, 100%);
+    padding: 0 var(--right) var(--bottom) var(--left);
+    text-align: center;
+    pointer-events: none;
+  }
+  .loading {
+    display: inline-block; margin-bottom: 10px;
+    font: 400 12px/1 var(--mono); letter-spacing: 0.05em; color: var(--muted); font-variant-numeric: tabular-nums;
+    background: var(--glass); border-radius: 999px; padding: 8px 13px;
+  }
+  .now { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: 6px 12px; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55); }
+  .pill {
+    align-self: center;
+    font: 600 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 5px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; text-shadow: none;
+  }
+  .pill.survey, .pill.other { color: var(--ink); border-color: var(--rule-hi); background: rgba(239, 232, 220, 0.1); }
+  .pill.reconstruction { color: var(--recon); border-color: rgba(169, 189, 240, 0.62); background: rgba(169, 189, 240, 0.12); }
+  .pill.claim { color: var(--claim-ink); background: var(--claim); border-color: var(--claim); }
+  .era-title { font: 400 23px/1.15 var(--display); letter-spacing: 0.02em; }
+  .era-label { font: 500 13px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .note { font-size: 12.5px; line-height: 1.45; color: var(--muted); margin: 6px auto 0; max-width: 64ch; text-wrap: balance; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
+  .note.claim { color: var(--claim); font-weight: 500; }
 
-  ol.plan { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: stage; }
-  ol.plan li { counter-increment: stage; display: grid; grid-template-columns: 3.2ch 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
-  ol.plan li:last-child { border-bottom: 1px solid var(--line); }
-  ol.plan li::before { content: counter(stage); font: 400 22px/1.2 var(--display); color: var(--granite); }
-  ol.plan h3 { margin: 0 0 4px; }
-  ol.plan p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
+  .track { margin-top: 8px; padding: 0 40px; pointer-events: auto; }
+  .rail { position: relative; height: 28px; }
+  .rail::before {
+    content: ""; position: absolute; top: 50%; height: 2px; margin-top: -1px;
+    left: calc(var(--thumb) / 2); right: calc(var(--thumb) / 2);
+    background: rgba(239, 232, 220, 0.34); border-radius: 1px;
+  }
+  .ticks { position: absolute; left: 0; right: 0; top: 50%; height: 0; }
+  .ticks i {
+    position: absolute; top: 0; left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+    width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%;
+    background: var(--ink); box-shadow: 0 0 0 3px rgba(15, 14, 12, 0.45);
+  }
+  .ticks i.reconstruction { background: var(--recon); }
+  .ticks i.claim { background: var(--claim); }
+  .ticks i.missing { background: var(--stage); box-shadow: inset 0 0 0 1.5px var(--muted), 0 0 0 3px rgba(15, 14, 12, 0.45); }
+  .rail input {
+    position: relative; z-index: 1; display: block; width: 100%; height: 28px; margin: 0;
+    background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer;
+    touch-action: pan-y;
+  }
+  .rail input:focus-visible { outline: none; }
+  .rail input::-webkit-slider-runnable-track { height: 28px; background: transparent; border: 0; }
+  .rail input::-moz-range-track { height: 28px; background: transparent; border: 0; }
+  .rail input::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: var(--thumb); height: var(--thumb); margin-top: 5px; border: 0; border-radius: 50%;
+    background: var(--ink); box-shadow: 0 0 0 4px rgba(15, 14, 12, 0.4), 0 1px 6px rgba(0, 0, 0, 0.6);
+  }
+  .rail input::-moz-range-thumb {
+    width: var(--thumb); height: var(--thumb); border: 0; border-radius: 50%;
+    background: var(--ink); box-shadow: 0 0 0 4px rgba(15, 14, 12, 0.4), 0 1px 6px rgba(0, 0, 0, 0.6);
+  }
+  .rail input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--stage), 0 0 0 5px var(--ink); }
+  .rail input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--stage), 0 0 0 5px var(--ink); }
+  .era.is-claim .rail input::-webkit-slider-thumb { background: var(--claim); }
+  .era.is-claim .rail input::-moz-range-thumb { background: var(--claim); }
 
-  table.costs { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
-  table.costs th, table.costs td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-  table.costs th { font: 500 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  table.costs td.num { white-space: nowrap; }
-  .tablewrap { overflow-x: auto; }
+  .stops { position: relative; height: 38px; }
+  .stop {
+    position: absolute; top: 0; left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+    transform: translateX(-50%);
+    padding: 5px 7px 6px; background: none; border: 0; border-radius: 5px;
+    font: 500 11.5px/1.25 var(--mono); letter-spacing: 0.03em; color: var(--muted);
+    white-space: nowrap; cursor: pointer; font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
+  }
+  .stop:hover, .stop[aria-pressed="true"] { color: var(--ink); }
+  .stop[aria-pressed="true"] .lab { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .stop.claim { color: var(--claim-soft); }
+  .stop.claim:hover, .stop.claim[aria-pressed="true"] { color: var(--claim); }
+  .stop .sub { display: none; margin-top: 5px; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+  .stop.missing .sub { display: block; }
 
-  .asks { border: 1px solid var(--line); background: var(--raised); padding: 18px 20px; margin-top: 18px; border-radius: 3px; }
-  .asks p:last-child { margin-bottom: 0; }
-
+  @media (max-width: 700px) {
+    .claim-frame span { display: none; }
+  }
   @media (max-width: 560px) {
-    body { font-size: 16px; }
-    .lede { font-size: 18px; }
-    .era { grid-template-columns: 1fr 1fr; }
-    .era input[type="range"] { grid-column: 1 / -1; order: -1; }
-    .reason { grid-template-columns: 1fr; gap: 4px; }
-    .station-head .compass { display: none; }
+    .name { font-size: 21px; }
+    .where { font-size: 10.5px; letter-spacing: 0.05em; }
+    .where > span { display: block; }
+    .where .sep { display: none; }
+    .compass { font-size: 10.5px; }
+    .compass b { font-size: 15px; margin-bottom: 4px; }
+    .btn { min-height: 34px; padding: 0 12px; }
+    .era-title { font-size: 20px; }
+    .note { font-size: 12px; }
+    .track { padding: 0 34px; }
+    .stops.dense .stop:not([aria-pressed="true"]) .lab,
+    .stops.dense .stop:not([aria-pressed="true"]) .sub { visibility: hidden; }
+    .panel { top: calc(var(--top) + 44px); }
+  }
+  @media (max-height: 480px) {
+    /* a phone on its side: the pill still names the honesty, and a claim keeps its note */
+    .note:not(.claim) { display: none; }
+    .veil.bottom { height: 160px; }
+    .kicker { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .tag, .hint { transition: none; }
+    .curtain, .hint, .spot, .spot-card, .tag { transition: none; }
+    .panel { animation: none; }
   }
 </style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <header class="head">
+    <div class="title">
+      <p class="kicker" id="kicker">Giza at block scale</p>
+      <h1 class="name" id="name">The walkthrough</h1>
+      <p class="where" id="where">Loading the stations</p>
+    </div>
+    <div class="tools">
+      <div class="buttons">
+        <button type="button" class="btn" id="stations-btn" aria-expanded="false" aria-controls="stations">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="3" cy="11" r="1.9" fill="currentColor"/><circle cx="11" cy="3" r="1.9" fill="currentColor"/><path d="M3.6 9.4C4.6 5.6 9.4 8.4 10.4 4.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="1.6 2"/></svg>
+          Stations
+        </button>
+        <a class="btn" href="rethink.html">About</a>
+      </div>
+      <p class="compass" aria-hidden="true"><b id="bearing">000&deg;</b><span id="facing">facing north</span></p>
+    </div>
+  </header>
 
-<section class="stage" id="stage" aria-label="Panorama of the Giza plateau from south of the Great Pyramid">
-  <canvas id="view" tabindex="0" aria-label="Drag, or use the arrow keys, to look around. Plus and minus zoom."></canvas>
-  <div class="veil top"></div>
-  <div class="veil bottom"></div>
+  <nav class="panel" id="stations" aria-label="Stations" hidden>
+    <h2>Stations</h2>
+    <ol id="station-list"></ol>
+    <p class="panel-foot">Each station is a 360&deg; panorama path traced in Blender Cycles from the project's own data, one for every era rendered so far. Blocks, weathering and rubble are a reconstruction at block scale.</p>
+  </nav>
+
+  <canvas id="view" tabindex="0" role="application" aria-roledescription="panorama" aria-label="Panorama. Drag, or use the arrow keys, to look around. Plus and minus zoom."></canvas>
+  <div class="flat" id="flat" tabindex="0" aria-label="The panorama, laid out flat. Scroll sideways to look around." hidden></div>
+  <div class="veil top" aria-hidden="true"></div>
+  <div class="veil bottom" aria-hidden="true"></div>
+  <div class="claim-frame" id="claim-frame" aria-hidden="true"><span>A claim, not the record</span></div>
   <div class="labels" id="labels" aria-hidden="true"></div>
-  <div class="station-head">
-    <div>
-      <p class="name">Station 1 &middot; South of Khufu</p>
-      <p class="where">Between the Great Pyramid and Khafre &middot; late afternoon</p>
+  <div class="spots" id="spots"></div>
+  <div class="curtain on" id="curtain" aria-hidden="true"></div>
+  <p class="hint" id="hint" aria-hidden="true">Drag to look around</p>
+
+  <section class="era" id="era" aria-label="Era">
+    <div class="notice" id="notice" hidden>
+      <p class="kind" id="notice-kind">Still to come</p>
+      <h2 id="notice-title">Not rendered yet</h2>
+      <p id="notice-text"></p>
+      <button type="button" class="btn" id="retry">Check again</button>
     </div>
-    <div class="compass" aria-live="off"><b id="bearing">000&deg;</b>facing <span id="facing">north</span></div>
-  </div>
-  <div class="hint" id="hint">Drag to look around</div>
-  <div class="loading" id="loading">loading the panorama&hellip;</div>
-  <div class="era">
-    <button type="button" id="b-today" aria-pressed="true">Today</button>
-    <input type="range" id="era" min="0" max="1000" step="1" value="0" aria-label="Slide from today back to the plateau as built">
-    <button type="button" id="b-built" aria-pressed="false">c. 2560 BCE</button>
-    <div class="readout" id="readout">Today, 2026 CE</div>
-  </div>
-</section>
-
-<main>
-  <p class="credits">Path traced in Blender Cycles from the project's own data: Petrie's and Cole's base dimensions, Goyon's 201 measured course heights for Khufu, the Copernicus GLO-30 terrain, OpenStreetMap footprints, Google Open Buildings for the modern city. The individual blocks, the erosion and the rubble are a reconstruction at block scale. Temples, causeways and the Sphinx are not built yet.</p>
-
-  <div class="col">
-    <p class="eyebrow">Seked &middot; 24 September 2026</p>
-    <h1>Keep going. The fidelity is there.</h1>
-    <p class="lede">You asked whether this could ever look the way you want. It can. What held it back was not effort and not the data. It was where the detail lived and what was drawing it. The station above was built in an afternoon from numbers the project already had, laid block by block, and lit by a path tracer instead of a game renderer.</p>
-  </div>
-
-  <div class="wide">
-    <figure>
-      <img src="img/before-after.jpg" width="1280" height="2176" alt="Three frames of the Giza plateau: the old web viewer with flat boxes, the old Blender render with smooth pyramids, and the new render with pyramids laid from weathered blocks.">
-      <figcaption>Top: the live web viewer on 20 September. Middle: the best Blender render, 16 September. Bottom: the proof, from the stand south-west of Menkaure where the classic three-in-a-row photograph is taken.</figcaption>
-    </figure>
-  </div>
-
-  <div class="col">
-    <h2>Then and now, from the same spot</h2>
-    <p>Drag across each frame. The present day is laid from blocks: Khufu's 201 courses, Khafre's surviving cap with its ragged lower edge, Menkaure's band of red granite casing. The as-built plateau is dressed casing, satin rather than mirror, sharp at every arris. Both come from the same model, switched at render time.</p>
-  </div>
-  <div class="wide">
-    <figure>
-      <div class="compare" style="--split: 50%">
-        <img src="img/panorama-built.jpg" alt="The three pyramids as built, cased in white limestone, at golden hour.">
-        <img class="top" src="img/panorama-today.jpg" alt="The three pyramids today, stepped and weathered, at golden hour.">
-        <span class="side l">Today</span><span class="side r">c. 2560 BCE</span>
-        <input type="range" min="0" max="100" value="50" aria-label="Move the divide between today and the plateau as built">
-        <div class="divider"></div>
-      </div>
-      <figcaption>The panorama stand, 120&nbsp;mm lens, sun at 9&deg; in the west-south-west.</figcaption>
-    </figure>
-    <figure>
-      <div class="compare" style="--split: 50%">
-        <img src="img/south-built.jpg" alt="The Great Pyramid as built, from the south, in raking light.">
-        <img class="top" src="img/south-today.jpg" alt="The Great Pyramid today, from the south, in raking light across its courses.">
-        <span class="side l">Today</span><span class="side r">c. 2560 BCE</span>
-        <input type="range" min="0" max="100" value="50" aria-label="Move the divide between today and the Great Pyramid as built">
-        <div class="divider"></div>
-      </div>
-      <figcaption>Khufu from 360&nbsp;m south, 28&nbsp;mm. The faint vertical crease down the middle of the face is Petrie's measured hollowing of the core, <span class="num">0.94&nbsp;m</span>, showing up on its own.</figcaption>
-    </figure>
-  </div>
-
-  <div class="col">
-    <h2>What was holding it back</h2>
-    <div class="reasons">
-      <div class="reason">
-        <span class="k">scale</span>
-        <div>
-          <h3>Detail at the survey's scale, none at the eye's</h3>
-          <p>The old scene modelled a pyramid as five faces and a temple as its footprint pushed up into a box. The eye reads Giza at the scale of blocks: 201 courses on Khufu, a ragged skyline where the corners were robbed, rubble at every foot, sand in every step. None of that existed, so no amount of lighting could make it look real.</p>
-        </div>
-      </div>
-      <div class="reason">
-        <span class="k">light</span>
-        <div>
-          <h3>A game renderer</h3>
-          <p>The web viewer drew everything in real time, which means no true bounce light. At Giza the bright sand lights the pyramids from below, and without it every face reads flat. Much of the last week went into frame rates rather than into the stone.</p>
-        </div>
-      </div>
-      <div class="reason">
-        <span class="k">weight</span>
-        <div>
-          <h3>Proof paperwork on every stone</h3>
-          <p>Every visual element had to be a sourced record, a TypeScript builder, a Python mirror and a test that the two agree. That is right for a claim and far too heavy for a pebble.</p>
-        </div>
-      </div>
+    <p class="loading" id="loading" aria-hidden="true" hidden></p>
+    <div class="now">
+      <span class="pill" id="pill" hidden></span>
+      <span class="era-title" id="era-title"></span>
+      <span class="era-label" id="era-label"></span>
     </div>
-
-    <h2>What changes</h2>
-  </div>
-  <div class="wide">
-    <div class="changes">
-      <div>
-        <h3>Blender's path tracer draws it</h3>
-        <p>Light is computed, not approximated: bounce light off the sand, the soft shadow of the whole sky, the sun reddened by the air it crosses.</p>
+    <p class="note" id="note"></p>
+    <div class="track" id="track" hidden>
+      <div class="rail">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <input type="range" id="slider" min="0" max="1000" step="1" value="0" aria-label="Era">
       </div>
-      <div>
-        <h3>Everything at the scale you see it</h3>
-        <p>Pyramids course by course from measured course heights where they exist. Blocks sized, weathered and missing by rule, and labelled as reconstruction.</p>
-      </div>
-      <div>
-        <h3>A walkthrough of stations</h3>
-        <p>Each station is a 360&deg; path-traced panorama like the one at the top, in each era, with the slider between them. Flights between stations are pre-rendered film.</p>
-      </div>
-      <div>
-        <h3>The claims draw on top</h3>
-        <p>Every station's camera is known exactly, so the claims engine and the star calculations can draw their lines and stars over the panorama live, registered to the pixel.</p>
-      </div>
+      <div class="stops" id="stops"></div>
     </div>
-  </div>
+  </section>
 
-  <div class="col">
-    <p style="margin-top: 22px;">What stays: the measurement database and its sources, the sky engine with its precession and star catalogue, the claims engine and the Claude claims runner, the rule that a reconstruction is always labelled, and the current web viewer, kept as the survey tool rather than the showcase.</p>
-
-    <h2>The plan</h2>
-    <ol class="plan">
-      <li><div><h3>The generator</h3><p>Today's spike becomes the project's pipeline: terrain, pyramids, mastabas, rubble, city, sky, and stations described as data. The render queue runs as detached jobs so no session is woken by a finished frame.</p></div></li>
-      <li><div><h3>The rest of the plateau</h3><p>Khafre's valley and mortuary temples in red granite, the causeways, the Sphinx in its enclosure, the boat pits and enclosure walls. Today's roads and the Mena House; the green valley and the harbour for the as-built plateau.</p></div></li>
-      <li><div><h3>Twelve to twenty stations</h3><p>Each rendered today, as built, and as the First Time for the lost-civilisation claim, starting at golden hour.</p></div></li>
-      <li><div><h3>Inside Khufu</h3><p>The descending passage, the Grand Gallery, the King's and Queen's Chambers, the relieving chambers and the subterranean chamber, path traced in granite and limestone from the interior survey already in the database.</p></div></li>
-      <li><div><h3>Night stations</h3><p>The shafts and their stars, Orion over the three, with the live star overlay for 2500 BCE and 10,500 BCE drawn on the night panorama.</p></div></li>
-      <li><div><h3>Films</h3><p>Flights between stations, and the rollback from today to the First Time.</p></div></li>
-    </ol>
-
-    <h2>Costs and limits</h2>
-    <div class="tablewrap">
-      <table class="costs">
-        <thead><tr><th>Render, on your RTX 5070 Ti laptop</th><th>Time</th></tr></thead>
-        <tbody id="costrows">
-          <tr><td>Full-HD hero frame, 128 samples</td><td class="num">about 1 min</td></tr>
-          <tr><td>4K station panorama, 48 samples</td><td class="num">about 1&frac12; min</td></tr>
-          <tr><td>8K station panorama, 64 samples (estimate)</td><td class="num">about 5 min</td></tr>
-          <tr><td>Twenty stations in three eras at 8K</td><td class="num">one night</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="margin-top: 16px;">Rendering is not the constraint I feared. A whole walkthrough renders overnight on your laptop, as detached jobs that wake no session when they finish. The two 4K panoramas at the top are just over a megabyte each, so hosting is no concern either. The trade, plainly: this is not free roaming in real time. You said locked scenes were fine, and locked scenes are exactly what buys this look.</p>
-
-    <h2>From you</h2>
-    <div class="asks">
-      <p><strong>Nothing is blocking.</strong> I am carrying on with the generator. If you want any of this held back or pointed elsewhere, say so and I will change course.</p>
-      <p class="muted">Housekeeping: the project now lives in <code>C:\Users\stewa\ClaudeProjects\seked</code>, off OneDrive, and every commit is pushed to GitHub, including twelve from last week that were only on your disk. The old OneDrive copy is marked stale and can be deleted when you like.</p>
-    </div>
-  </div>
-</main>
+  <p class="sr-only" id="live" aria-live="polite"></p>
+</div>
 
 <script>
 (function () {
   "use strict";
 
-  // ------------------------------------------------------------------ station
   // Frame: metres, +x east, +y north, +z up, origin at the Great Pyramid's base centre.
-  var CAMERA = [-30.0, -360.0, -1.6];
-  var LANDMARKS = [
-    { name: "Khufu", x: 0.0, y: 0.0, today: 138.7, built: 146.6, fmt: "m" },
-    { name: "Khafre", x: -334.41, y: -353.86, base: 10.0, today: 136.4, built: 143.5, fmt: "m" },
-    { name: "Menkaure", x: -574.45, y: -739.19, base: 11.9, today: 61.9, built: 65.0, fmt: "m" },
-    { name: "Queens' pyramids", x: 193.0, y: -92.5, base: -1.7, today: 18.0, built: 30.0, fmt: "" },
-    { name: "Giza and Cairo", x: 3800.0, y: 900.0, base: 10.0, today: 30.0, built: 30.0, fmt: "", only: "today" },
-    { name: "The Nile valley", x: 3800.0, y: 900.0, base: -30.0, today: 10.0, built: 10.0, fmt: "", only: "built" }
-  ];
-  var BUILT_YEAR = "c. 2560 BCE";
+  // Panoramas: equirectangular, image centre on true north, azimuth increasing to the right,
+  // so u = 0.5 + az / 2pi and v = 0.5 - el / pi.
+  var DEG = Math.PI / 180;
+  var MIN_FOV = 20 * DEG, MAX_FOV = 100 * DEG, MIN_HFOV = 55 * DEG, PITCH_MAX = 80 * DEG;
+  var MAX_TEXTURES = 4;   // 4096 x 2048 with mipmaps is about 45 MB of GPU memory each
+  var MAX_BLOBS = 12;     // compressed files kept for a quick return, about 1.3 MB each
+  var FADE_MS = 320;
+  var HONESTY = {
+    survey: "Measured. The blocks, the weathering and the rubble are a reconstruction at block scale.",
+    reconstruction: "Rebuilt from the evidence. What is filled in is said to be filled in.",
+    claim: "Somebody's claim, drawn so it can be tested. Not the record."
+  };
+  var COMPASS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
+  var ARROWS = { ArrowLeft: 1, ArrowRight: 1, ArrowUp: 1, ArrowDown: 1 };
 
-  var canvas = document.getElementById("view");
-  var stage = document.getElementById("stage");
-  var labelsEl = document.getElementById("labels");
-  var hint = document.getElementById("hint");
-  var loading = document.getElementById("loading");
-  var slider = document.getElementById("era");
-  var readout = document.getElementById("readout");
-  var bToday = document.getElementById("b-today");
-  var bBuilt = document.getElementById("b-built");
-  var bearingEl = document.getElementById("bearing");
-  var facingEl = document.getElementById("facing");
+  var motionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  function still() { return !!(motionQuery && motionQuery.matches); }
+  var coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 
-  var view = { yaw: 0.0, pitch: 0.07, fov: 1.0, vy: 0, vp: 0 };
-  var era = 0.0;
-  var gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+  function $(id) { return document.getElementById(id); }
+  var stage = $("stage"), canvas = $("view"), flat = $("flat");
+  var labelsEl = $("labels"), spotsEl = $("spots"), curtain = $("curtain"), hintEl = $("hint");
+  var claimFrame = $("claim-frame"), live = $("live");
+  var kickerEl = $("kicker"), nameEl = $("name"), whereEl = $("where");
+  var bearingEl = $("bearing"), facingEl = $("facing");
+  var stationsBtn = $("stations-btn"), panel = $("stations"), listEl = $("station-list");
+  var eraEl = $("era"), loadingEl = $("loading"), pillEl = $("pill"), eraTitleEl = $("era-title");
+  var eraLabelEl = $("era-label"), noteEl = $("note");
+  var trackEl = $("track"), slider = $("slider"), ticksEl = $("ticks"), stopsEl = $("stops");
+  var noticeEl = $("notice"), noticeKind = $("notice-kind"), noticeTitle = $("notice-title");
+  var noticeText = $("notice-text"), retryBtn = $("retry");
 
-  function fallback() {
-    canvas.hidden = true;
-    var d = document.createElement("div");
-    d.className = "fallback";
-    d.innerHTML = '<img src="pano/south-today.jpg" alt="The panorama, flat">';
-    stage.insertBefore(d, canvas);
-    loading.hidden = true;
-    hint.hidden = true;
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function num(v, d) { v = Number(v); return isFinite(v) ? v : d; }
+  function smooth(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+  function wrapAngle(a) { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; }
+  function hclass(h) { return HONESTY[h] ? h : "other"; }
+
+  // ------------------------------------------------------------------ the manifest
+  var M = null;
+
+  function normalise(m) {
+    var states = (Array.isArray(m.states) ? m.states : []).filter(function (s) { return s && s.id; }).map(function (s) {
+      return { id: String(s.id), label: String(s.label || s.id), title: String(s.title || s.id), honesty: String(s.honesty || ""), note: s.note ? String(s.note) : "" };
+    });
+    var order = {}, stateById = {};
+    states.forEach(function (s, i) { order[s.id] = i; stateById[s.id] = s; });
+    var byId = {};
+    var stations = (Array.isArray(m.stations) ? m.stations : []).filter(function (s) { return s && s.id; }).map(function (s, i) {
+      var pan = s.panoramas && typeof s.panoramas === "object" ? s.panoramas : {};
+      var cam = Array.isArray(s.camera) ? s.camera : [];
+      var v = s.view || {};
+      var st = {
+        id: String(s.id), index: i,
+        name: String(s.name || s.id), where: String(s.where || ""), moment: String(s.moment || ""),
+        camera: [num(cam[0], 0), num(cam[1], 0), num(cam[2], 0)],
+        view: { yaw: num(v.yaw, 0) * DEG, pitch: num(v.pitch, 0) * DEG, fov: num(v.fov, 58) * DEG },
+        panoramas: pan,
+        // the states this station has, oldest first, in the manifest's order
+        stops: states.filter(function (x) { return typeof pan[x.id] === "string" && pan[x.id]; }).map(function (x) { return x.id; }),
+        neighbours: Array.isArray(s.neighbours) ? s.neighbours.map(String) : [],
+        landmarks: (Array.isArray(s.landmarks) ? s.landmarks : []).filter(function (L) { return L && L.name; })
+      };
+      byId[st.id] = st;
+      return st;
+    });
+    stations.forEach(function (st) {
+      st.neighbours = st.neighbours.filter(function (id, k, all) { return byId[id] && id !== st.id && all.indexOf(id) === k; });
+    });
+    return { states: states, order: order, stateById: stateById, stations: stations, byId: byId };
   }
-  if (!gl) { fallback(); return; }
 
-  var VS = "#version 300 es\nin vec2 p; out vec2 v; void main(){ v = p; gl_Position = vec4(p, 0.0, 1.0); }";
+  // A per-state value: an object keyed by state id, or one number for every state.
+  function perState(v, id) {
+    if (v == null || id == null) return null;
+    if (typeof v === "number") return isFinite(v) ? v : null;
+    if (typeof v === "object" && typeof v[id] === "number" && isFinite(v[id])) return v[id];
+    return null;
+  }
+
+  function isClaim(id) { var s = M.stateById[id]; return !!s && s.honesty === "claim"; }
+
+  function defaultStop(st) {
+    var i = st.stops.indexOf("today");
+    return i >= 0 ? i : Math.max(0, st.stops.length - 1);
+  }
+  // The era to open a station in: the one asked for if it has it, else the nearest it has,
+  // the newer of two equally near.
+  function pickStop(st, stateId) {
+    if (!st.stops.length) return 0;
+    if (!stateId || M.order[stateId] == null) return defaultStop(st);
+    var i = st.stops.indexOf(stateId);
+    if (i >= 0) return i;
+    var g = M.order[stateId], best = 0, bestD = Infinity;
+    for (var j = 0; j < st.stops.length; j++) {
+      var d = Math.abs(M.order[st.stops[j]] - g);
+      if (d <= bestD) { bestD = d; best = j; }
+    }
+    return best;
+  }
+
+  // ------------------------------------------------------------------ what is shown
+  var station = null;
+  var pos = 0;                 // the timeline, in stop units: 0 is the station's oldest era
+  var view = { yaw: 0, pitch: 0, zoom: 1, vy: 0, vp: 0 };
+  var fitted = 58 * DEG;       // the station's field of view, fitted to this screen
+  var W = 1, H = 1;
+  var eraTween = null, turnTween = null, keys = new Set();
+  var tags = [], spots = [];
+  var mode = "gl";
+  var revealAt = 0, switching = false, hintDone = false, settledState = null;
+
+  function stopCount() { return station ? station.stops.length : 0; }
+  function currentStateId() { var n = stopCount(); return n ? station.stops[clamp(Math.round(pos), 0, n - 1)] : null; }
+  function urlAt(i) { return station.panoramas[station.stops[i]]; }
+  function segment() {
+    var n = stopCount();
+    if (!n) return null;
+    if (n === 1) return { a: 0, b: 0, w: 0 };
+    var i = clamp(Math.floor(pos), 0, n - 2);
+    return { a: i, b: i + 1, w: clamp(pos - i, 0, 1) };
+  }
+  function coreUrls() {
+    var s = segment();
+    if (!s) return [];
+    return s.a === s.b ? [urlAt(s.a)] : [urlAt(s.a), urlAt(s.b)];
+  }
+  // The two eras being crossed plus one either side, so the slider rarely waits.
+  function wantedUrls() {
+    var s = segment(), out = [];
+    if (!s) return out;
+    for (var i = Math.max(0, s.a - 1); i <= Math.min(stopCount() - 1, s.b + 1); i++) out.push(urlAt(i));
+    return out;
+  }
+  function wanted(url) { return !!station && wantedUrls().indexOf(url) >= 0; }
+
+  function fitFov(vfov) {
+    var need = 2 * Math.atan(Math.tan(MIN_HFOV / 2) / (W / Math.max(H, 1)));
+    return clamp(Math.max(vfov, need), MIN_FOV, MAX_FOV);
+  }
+  function fov() { return clamp(fitted * view.zoom, MIN_FOV, MAX_FOV); }
+  function setFov(f) { view.zoom = clamp(f, MIN_FOV, MAX_FOV) / fitted; }
+
+  // ------------------------------------------------------------------ WebGL
+  var gl = null, prog = null, vao = null, U = {}, dummy = null, maxTex = 4096, aniso = null, lost = false;
+
+  var VS = "#version 300 es\nin vec2 p; out vec2 v; void main() { v = p; gl_Position = vec4(p, 0.0, 1.0); }";
   var FS = [
     "#version 300 es",
     "precision highp float;",
-    "uniform sampler2D ta, tb; uniform float mixv, yaw, pitch, tanh, aspect, lod, haveb;",
+    "uniform sampler2D ta, tb;",
+    "uniform vec3 wts;",        // weights of panorama a, panorama b and the blank
+    "uniform vec2 lods;",
+    "uniform float yaw, pitch, tanh, aspect;",
     "in vec2 v; out vec4 o;",
     "const float PI = 3.141592653589793;",
-    "void main(){",
+    // an unrendered era: a dark sky, a dark ground and a faint horizon
+    "vec3 blank(float el) {",
+    "  vec3 sky = mix(vec3(0.085, 0.09, 0.105), vec3(0.035, 0.04, 0.055), clamp(el * 1.6, 0.0, 1.0));",
+    "  vec3 ground = mix(vec3(0.095, 0.083, 0.068), vec3(0.05, 0.045, 0.04), clamp(-el * 1.6, 0.0, 1.0));",
+    "  return (el >= 0.0 ? sky : ground) + vec3(0.075, 0.066, 0.052) * exp(-abs(el) * 90.0);",
+    "}",
+    "void main() {",
     "  vec3 r = normalize(vec3(v.x * tanh * aspect, v.y * tanh, 1.0));",
     "  float cp = cos(pitch), sp = sin(pitch);",
     "  r = vec3(r.x, r.y * cp + r.z * sp, -r.y * sp + r.z * cp);",
@@ -408,45 +579,166 @@
     "  float az = atan(w.x, w.y);",
     "  float el = asin(clamp(w.z, -1.0, 1.0));",
     "  vec2 uv = vec2(0.5 + az / (2.0 * PI), 0.5 - el / PI);",
-    "  vec3 a = textureLod(ta, uv, lod).rgb;",
-    "  vec3 b = haveb > 0.5 ? textureLod(tb, uv, lod).rgb : a;",
-    "  o = vec4(mix(a, b, mixv), 1.0);",
+    "  vec3 c = vec3(0.0);",
+    "  if (wts.x > 0.0) c += wts.x * textureLod(ta, uv, lods.x).rgb;",
+    "  if (wts.y > 0.0) c += wts.y * textureLod(tb, uv, lods.y).rgb;",
+    "  if (wts.z > 0.0) c += wts.z * blank(el);",
+    "  o = vec4(c, 1.0);",
     "}"
   ].join("\n");
 
-  function shader(type, src) {
+  function compile(type, src) {
     var s = gl.createShader(type);
     gl.shaderSource(s, src);
     gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) || "the shader did not compile");
     return s;
   }
-  var prog;
-  try {
-    prog = gl.createProgram();
-    gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS));
-    gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
-  } catch (e) { fallback(); return; }
-  gl.useProgram(prog);
-  var buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  var loc = gl.getAttribLocation(prog, "p");
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  var U = {};
-  ["ta", "tb", "mixv", "yaw", "pitch", "tanh", "aspect", "lod", "haveb"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
-  gl.uniform1i(U.ta, 0);
-  gl.uniform1i(U.tb, 1);
 
-  var aniso = gl.getExtension("EXT_texture_filter_anisotropic");
-  var texW = 4096, haveA = false, haveB = false;
-  function upload(unit, img) {
+  function initGL() {
+    if (!gl) {
+      try { gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false, stencil: false }); } catch (e) { gl = null; }
+    }
+    if (!gl) return false;
+    try {
+      prog = gl.createProgram();
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog) || "the program did not link");
+    } catch (e) {
+      if (!gl.isContextLost()) console.warn("The panorama shader failed, so the flat image is shown instead.", e);
+      return false;
+    }
+    gl.useProgram(prog);
+    vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(prog, "p");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    ["ta", "tb", "wts", "lods", "yaw", "pitch", "tanh", "aspect"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+    gl.uniform1i(U.ta, 0);
+    gl.uniform1i(U.tb, 1);
+    // a 1 x 1 texture for a unit with no panorama, so the samplers are always complete
+    dummy = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, dummy);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([15, 14, 12, 255]));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    aniso = gl.getExtension("EXT_texture_filter_anisotropic");
+    maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096;
+    return true;
+  }
+
+  canvas.addEventListener("webglcontextlost", function (e) {
+    e.preventDefault();
+    lost = true;
+    cache.forEach(function (x) { x.tex = null; x.busy = false; if (x.status === "ready" || x.status === "decoding") x.status = x.blob ? "fetched" : "idle"; });
+  });
+  canvas.addEventListener("webglcontextrestored", function () {
+    lost = false;
+    if (initGL()) { refresh(); request(); }
+  });
+
+  // ------------------------------------------------------------------ panoramas
+  // One entry per file. status: idle, fetching, fetched (the file is here, not on the GPU),
+  // decoding, ready (on the GPU), missing (the server has no such file) or error.
+  var cache = new Map(), clock = 0, prefetching = false;
+
+  function entry(url) {
+    var e = cache.get(url);
+    if (!e) {
+      e = { url: url, status: "idle", tex: null, blob: null, fetching: null, busy: false, progress: 0, used: 0, width: 4096, readyAt: 0, error: "" };
+      cache.set(url, e);
+    }
+    return e;
+  }
+  function failed(e) { return !!e && (e.status === "missing" || e.status === "error"); }
+  function settledEntry(e) { return !!e && (!!e.tex || failed(e)); }
+
+  function getBlob(e) {
+    if (e.blob) return Promise.resolve(e.blob);
+    if (failed(e)) return Promise.resolve(null);
+    if (e.fetching) return e.fetching;
+    e.status = "fetching";
+    e.progress = 0;
+    e.fetching = fetch(e.url).then(function (r) {
+      var type = r.headers.get("Content-Type") || "";
+      // A host that answers every unknown path with its index page also means "no such file".
+      if (r.status === 404 || r.status === 410 || (r.ok && /text\/html/i.test(type))) { e.status = "missing"; return null; }
+      if (!r.ok) throw new Error("the server answered " + r.status);
+      var total = Number(r.headers.get("Content-Length")) || 0;
+      if (!total || !r.body || !r.body.getReader) return r.blob();
+      var reader = r.body.getReader(), parts = [], got = 0;
+      function pump() {
+        return reader.read().then(function (res) {
+          if (res.done) return new Blob(parts, { type: type || "image/jpeg" });
+          parts.push(res.value);
+          got += res.value.byteLength;
+          e.progress = Math.min(1, got / total);
+          request();
+          return pump();
+        });
+      }
+      return pump();
+    }).then(function (blob) {
+      e.fetching = null;
+      if (blob) { e.blob = blob; e.progress = 1; if (!e.tex) e.status = "fetched"; trimBlobs(); }
+      statusChanged();
+      return blob;
+    }, function (err) {
+      e.fetching = null;
+      e.status = "error";
+      e.error = err && err.message ? err.message : String(err);
+      statusChanged();
+      return null;
+    }).then(function (blob) {
+      if (failed(e)) e.failedAt = performance.now();
+      return blob;
+    });
+    return e.fetching;
+  }
+  // Panoramas are rendered while the walkthrough is open, so a file that was missing
+  // a while ago is asked for again when its station is entered.
+  function forgetStaleMisses(st) {
+    var now = performance.now();
+    st.stops.forEach(function (id) {
+      var e = cache.get(st.panoramas[id]);
+      if (e && e.status === "missing" && now - (e.failedAt || 0) > 20000) { e.status = "idle"; e.error = ""; }
+    });
+  }
+
+  function closeImg(img) { if (img && typeof img.close === "function") img.close(); }
+  // Shrink to the GPU's limit if it is smaller than the panorama.
+  function fitToGpu(img) {
+    var w = img.width, h = img.height;
+    if (w <= maxTex && h <= maxTex) return img;
+    var s = maxTex / Math.max(w, h), c = document.createElement("canvas");
+    c.width = Math.floor(w * s);
+    c.height = Math.floor(h * s);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    closeImg(img);
+    return c;
+  }
+  function decode(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob).then(fitToGpu);
+    return new Promise(function (resolve, reject) {
+      var u = URL.createObjectURL(blob), img = new Image();
+      img.onload = function () { URL.revokeObjectURL(u); resolve(fitToGpu(img)); };
+      img.onerror = function () { URL.revokeObjectURL(u); reject(new Error("the image did not decode")); };
+      img.src = u;
+    });
+  }
+
+  function upload(e, img) {
+    if (!gl || lost) { closeImg(img); return; }
     var t = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -454,193 +746,1004 @@
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
-    texW = img.naturalWidth || texW;
-  }
-  function load(src, unit, done) {
-    var img = new Image();
-    img.decoding = "async";
-    img.onload = function () { upload(unit, img); done(); request(); };
-    img.onerror = function () { loading.textContent = "The panorama did not load."; };
-    img.src = src;
-  }
-  load("pano/south-today.jpg", 0, function () {
-    haveA = true;
-    loading.textContent = "loading the as-built panorama\u2026";
-    load("pano/south-built.jpg", 1, function () { haveB = true; loading.hidden = true; });
-  });
-
-  // ------------------------------------------------------------------ labels
-  var tags = LANDMARKS.map(function (L) {
-    var el = document.createElement("div");
-    el.className = "tag";
-    el.innerHTML = L.name + (L.fmt ? "<small></small>" : "");
-    labelsEl.appendChild(el);
-    return el;
-  });
-
-  function project(x, y, z, W, H) {
-    var dx = x - CAMERA[0], dy = y - CAMERA[1], dz = z - CAMERA[2];
-    var n = Math.hypot(dx, dy, dz);
-    dx /= n; dy /= n; dz /= n;
-    var cy = Math.cos(view.yaw), sy = Math.sin(view.yaw);
-    var rx = dx * cy - dy * sy;          // camera right
-    var rz0 = dx * sy + dy * cy;         // forward before pitch
-    var ry0 = dz;
-    var cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
-    var ry = ry0 * cp - rz0 * sp;
-    var rz = ry0 * sp + rz0 * cp;
-    if (rz <= 0.05) return null;
-    var t = Math.tan(view.fov / 2), aspect = W / H;
-    var sx = rx / (rz * t * aspect), syy = ry / (rz * t);
-    return [(sx * 0.5 + 0.5) * W, (0.5 - syy * 0.5) * H];
+    e.tex = t;
+    e.width = img.width || 4096;
+    e.status = "ready";
+    e.readyAt = performance.now();
+    closeImg(img);
+    evict();
   }
 
-  function placeLabels(W, H) {
-    for (var i = 0; i < LANDMARKS.length; i++) {
-      var L = LANDMARKS[i], el = tags[i];
-      var h = L.today + (L.built - L.today) * era;
-      var z = (L.base || 0) + h;
-      var vis = L.only === "today" ? 1 - era : L.only === "built" ? era : 1;
-      var p = project(L.x, L.y, z, W, H);
-      if (!p || vis < 0.02 || p[0] < -80 || p[0] > W + 80) { el.style.opacity = "0"; continue; }
-      el.style.opacity = String(Math.min(1, vis));
-      el.style.transform = "translate(" + p[0].toFixed(1) + "px," + p[1].toFixed(1) + "px) translate(-50%, calc(-100% - 14px))";
-      if (L.fmt) el.lastChild.textContent = h.toFixed(1) + " m high";
+  // Keep at most MAX_TEXTURES on the GPU, never the two being crossed.
+  function evict() {
+    var ready = [];
+    cache.forEach(function (e) { if (e.tex) ready.push(e); });
+    var extra = ready.length - MAX_TEXTURES;
+    if (extra <= 0) return;
+    var pinned = coreUrls();
+    ready.sort(function (a, b) { return a.used - b.used; });
+    for (var i = 0; i < ready.length && extra > 0; i++) {
+      var e = ready[i];
+      if (pinned.indexOf(e.url) >= 0) continue;
+      gl.deleteTexture(e.tex);
+      e.tex = null;
+      e.status = e.blob ? "fetched" : "idle";
+      extra--;
+    }
+  }
+  function trimBlobs() {
+    var have = [];
+    cache.forEach(function (e) { if (e.blob) have.push(e); });
+    if (have.length <= MAX_BLOBS) return;
+    have.sort(function (a, b) { return a.used - b.used; });
+    for (var i = 0; i < have.length - MAX_BLOBS; i++) {
+      have[i].blob = null;
+      if (!have[i].tex && have[i].status === "fetched") have[i].status = "idle";
     }
   }
 
-  // ------------------------------------------------------------------ drawing
-  var W = 0, H = 0, dpr = 1, pending = false;
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = stage.clientWidth; H = stage.clientHeight;
-    canvas.width = Math.round(W * dpr);
-    canvas.height = Math.round(H * dpr);
+  // Put a panorama on the GPU, fetching it first if need be.
+  function need(url) {
+    var e = entry(url);
+    e.used = ++clock;
+    if (e.tex || e.busy || failed(e) || mode !== "gl") return e;
+    e.busy = true;
+    getBlob(e).then(function (blob) {
+      if (!blob || lost || !wanted(url)) return null;
+      e.status = "decoding";
+      return decode(blob).then(function (img) {
+        if (lost || !wanted(url)) { closeImg(img); if (!e.tex) e.status = e.blob ? "fetched" : "idle"; return; }
+        upload(e, img);
+      });
+    }).catch(function (err) {
+      e.status = "error";
+      e.error = err && err.message ? err.message : String(err);
+    }).then(function () {
+      e.busy = false;
+      statusChanged();
+      refresh();
+    });
+    return e;
+  }
+
+  function refresh() {
+    if (!station) return;
+    if (mode === "flat") { refreshFlat(); return; }
+    var core = coreUrls();
+    core.forEach(need);
+    if (!core.every(function (u) { return settledEntry(cache.get(u)); })) return;
+    var more = wantedUrls();
+    more.forEach(need);
+    if (more.every(function (u) { return settledEntry(cache.get(u)); })) prefetch();
+  }
+
+  // With the view settled, fetch (but do not decode) this station's other eras and the
+  // neighbours in the era they would open in, one file at a time.
+  function prefetch() {
+    if (prefetching || !station) return;
+    var c = navigator.connection;
+    if (c && c.saveData) return;
+    var keep = currentStateId(), queue = [];
+    station.stops.forEach(function (id) { queue.push(station.panoramas[id]); });
+    station.neighbours.forEach(function (nid) {
+      var s = M.byId[nid];
+      if (s.stops.length) queue.push(s.panoramas[s.stops[pickStop(s, keep)]]);
+    });
+    var next = null;
+    for (var i = 0; i < queue.length && !next; i++) {
+      var e = cache.get(queue[i]);
+      if (!e || (!e.blob && !e.tex && !e.fetching && !failed(e))) next = queue[i];
+    }
+    if (!next) return;
+    prefetching = true;
+    var go = function () {
+      getBlob(entry(next)).then(function () { prefetching = false; prefetch(); });
+    };
+    if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 200);
+  }
+
+  function statusChanged() {
+    syncStops();
     request();
   }
-  var COMPASS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
-  function draw() {
-    pending = false;
-    if (Math.abs(view.vy) > 1e-5 || Math.abs(view.vp) > 1e-5) {
-      view.yaw += view.vy; view.pitch += view.vp;
-      view.vy *= 0.9; view.vp *= 0.9;
-      pending = true;
+
+  // ------------------------------------------------------------------ the flat fallback
+  var flatUrl = null;
+  function refreshFlat() {
+    var id = currentStateId();
+    if (!id) { clearFlat(); flat.removeAttribute("data-url"); return; }
+    var url = station.panoramas[id];
+    if (flat.getAttribute("data-url") === url) return;
+    flat.setAttribute("data-url", url);
+    var st = station, e = entry(url);
+    e.used = ++clock;
+    getBlob(e).then(function (blob) {
+      if (flat.getAttribute("data-url") !== url) return;
+      clearFlat();
+      if (!blob) { request(); return; }
+      var img = new Image();
+      img.alt = "The panorama from " + st.name + ", " + M.stateById[id].title + ", laid out flat";
+      img.onload = function () {
+        var u = 0.5 + wrapAngle(st.view.yaw) / (2 * Math.PI);
+        flat.scrollLeft = u * img.clientWidth - flat.clientWidth / 2;
+        request();
+      };
+      flatUrl = URL.createObjectURL(blob);
+      img.src = flatUrl;
+      flat.appendChild(img);
+    });
+  }
+  function clearFlat() {
+    if (flatUrl) { URL.revokeObjectURL(flatUrl); flatUrl = null; }
+    flat.textContent = "";
+  }
+  // The compass follows the middle of the flat image as it scrolls.
+  flat.addEventListener("scroll", function () {
+    var img = flat.querySelector("img");
+    if (!img || !img.clientWidth) return;
+    view.yaw = wrapAngle(((flat.scrollLeft + flat.clientWidth / 2) / img.clientWidth - 0.5) * 2 * Math.PI);
+    request();
+  }, { passive: true });
+
+  // ------------------------------------------------------------------ the mix
+  function presence(e, now) {
+    if (!e || !e.tex) return 0;
+    if (still()) return 1;
+    return clamp((now - e.readyAt) / FADE_MS, 0, 1);
+  }
+
+  // How much of each panorama, and of the blank, to show. An era whose file is missing
+  // hands its share to the blank; one still loading, or fading in, hands it to the other
+  // era if that one is up, and to the blank otherwise.
+  function mixState(now) {
+    var out = { wts: [0, 0, 1], ea: null, eb: null, missing: 0, claim: 0, fading: false, dom: null, domId: currentStateId() };
+    var s = segment();
+    if (!s) { out.missing = 1; return out; }
+    out.dom = cache.get(station.panoramas[out.domId]) || null;
+    var idA = station.stops[s.a], idB = station.stops[s.b], single = s.a === s.b;
+    if (mode !== "gl") {
+      out.missing = failed(out.dom) ? 1 : 0;
+      out.claim = isClaim(out.domId) ? 1 : 0;
+      return out;
     }
-    view.pitch = Math.max(-1.2, Math.min(1.2, view.pitch));
+    var ea = cache.get(station.panoramas[idA]) || null;
+    var eb = single ? null : cache.get(station.panoramas[idB]) || null;
+    var sA = single ? 1 : 1 - s.w, sB = single ? 0 : s.w;
+    var pA = presence(ea, now), pB = presence(eb, now);
+    var wA = sA * pA, wB = sB * pB, wP = 0, uA = sA - wA, uB = sB - wB;
+    if (failed(ea)) { wP += uA; out.missing += sA; uA = 0; }
+    if (failed(eb)) { wP += uB; out.missing += sB; uB = 0; }
+    wA += uB * pA; wP += uB * (1 - pA);
+    wB += uA * pB; wP += uA * (1 - pB);
+    out.wts = [wA, wB, wP];
+    out.ea = ea;
+    out.eb = eb;
+    out.fading = (pA > 0 && pA < 1) || (pB > 0 && pB < 1);
+    out.claim = (isClaim(idA) ? sA : 0) + (!single && isClaim(idB) ? sB : 0);
+    return out;
+  }
+
+  function lodFor(e, f) {
+    var w = e && e.width ? e.width : 4096;
+    var texelsPerPixel = (w / (2 * Math.PI)) / (canvas.height / f);
+    return Math.max(0, Math.log2(Math.max(texelsPerPixel, 1e-3)));
+  }
+
+  function render(mx) {
+    var f = fov();
     gl.viewport(0, 0, canvas.width, canvas.height);
-    var tanh = Math.tan(view.fov / 2);
-    var texelsPerPixel = (texW / (2 * Math.PI)) / (canvas.height / view.fov);
+    gl.useProgram(prog);
+    gl.bindVertexArray(vao);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, mx.ea && mx.ea.tex ? mx.ea.tex : dummy);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, mx.eb && mx.eb.tex ? mx.eb.tex : dummy);
+    gl.uniform3f(U.wts, mx.wts[0], mx.wts[1], mx.wts[2]);
+    gl.uniform2f(U.lods, lodFor(mx.ea, f), lodFor(mx.eb, f));
     gl.uniform1f(U.yaw, view.yaw);
     gl.uniform1f(U.pitch, view.pitch);
-    gl.uniform1f(U.tanh, tanh);
+    gl.uniform1f(U.tanh, Math.tan(f / 2));
     gl.uniform1f(U.aspect, canvas.width / canvas.height);
-    gl.uniform1f(U.mixv, haveB ? era : 0.0);
-    gl.uniform1f(U.haveb, haveB ? 1 : 0);
-    gl.uniform1f(U.lod, Math.max(0, Math.log2(Math.max(texelsPerPixel, 1e-3))));
-    if (haveA) gl.drawArrays(gl.TRIANGLES, 0, 3);
-    placeLabels(W, H);
-    var deg = ((view.yaw * 180 / Math.PI) % 360 + 360) % 360;
-    bearingEl.textContent = String(Math.round(deg)).padStart(3, "0") + "\u00b0";
-    facingEl.textContent = COMPASS[Math.round(deg / 45) % 8];
-    if (pending) requestAnimationFrame(draw);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
-  function request() { if (!pending) { pending = true; requestAnimationFrame(draw); } }
+
+  // ------------------------------------------------------------------ labels and hotspots
+  function project(x, y, z, f) {
+    var c = station.camera;
+    var dx = x - c[0], dy = y - c[1], dz = z - c[2];
+    var n = Math.hypot(dx, dy, dz) || 1;
+    dx /= n; dy /= n; dz /= n;
+    var cy = Math.cos(view.yaw), sy = Math.sin(view.yaw);
+    var rx = dx * cy - dy * sy;          // to the right
+    var fz = dx * sy + dy * cy;          // ahead, before pitch
+    var cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
+    var ry = dz * cp - fz * sp;          // up
+    var rz = dz * sp + fz * cp;          // ahead
+    if (rz <= 0.02) return null;
+    var t = Math.tan(f / 2);
+    return [(rx / (rz * t * (W / H)) * 0.5 + 0.5) * W, (0.5 - ry / (rz * t) * 0.5) * H];
+  }
+
+  function buildTags() {
+    labelsEl.textContent = "";
+    tags = station.landmarks.map(function (L) {
+      var el = document.createElement("div");
+      el.className = "tag";
+      el.textContent = L.name;
+      var small = null;
+      if (L.height != null) { small = document.createElement("small"); el.appendChild(small); }
+      labelsEl.appendChild(el);
+      return { L: L, el: el, small: small, shown: false };
+    });
+  }
+
+  function lerpState(v, A, B, w) {
+    var a = perState(v, A), b = perState(v, B);
+    if (a != null && b != null) return a + (b - a) * w;
+    return a != null ? a : b;
+  }
+
+  var tagBoxes = [];
+  function placeTags(f) {
+    var s = segment();
+    var A = s ? station.stops[s.a] : null, B = s ? station.stops[s.b] : null, w = s ? s.w : 0;
+    tagBoxes = [];
+    for (var i = 0; i < tags.length; i++) {
+      var t = tags[i], L = t.L;
+      var za = perState(L.z, A), zb = perState(L.z, B);
+      var vis = A === B ? (za != null ? 1 : 0) : (za != null ? 1 - w : 0) + (zb != null ? w : 0);
+      var z = lerpState(L.z, A, B, w);
+      var p = z == null || vis < 0.02 ? null : project(num(L.x, 0), num(L.y, 0), z, f);
+      // fade a label out as the thing it names leaves the screen
+      var o = p ? vis * smooth(-10, 40, p[0]) * smooth(-10, 40, W - p[0]) : 0;
+      if (!p || o < 0.02 || p[1] < -80 || p[1] > H + 80) {
+        if (t.shown) { t.el.style.opacity = "0"; t.shown = false; }
+        continue;
+      }
+      if (t.small) {
+        var h = lerpState(L.height, A, B, w);
+        var txt = h == null ? "" : h.toFixed(1) + " m high";
+        if (t.small.textContent !== txt) t.small.textContent = txt;
+      }
+      if (!t.w) { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; }
+      // keep the words on screen; the tick still points at the thing itself
+      var half = t.w / 2, cx = W > t.w + 16 ? clamp(p[0], half + 8, W - half - 8) : p[0];
+      if (overChrome(cx - half, p[1] - 14 - t.h, cx + half, p[1] - 14)) o = 0;
+      if (o > 0.25) tagBoxes.push([cx - half, p[1] - 14 - t.h, cx + half, p[1]]);
+      t.shown = true;
+      t.el.style.opacity = o.toFixed(3);
+      t.el.style.setProperty("--tick", (p[0] - cx).toFixed(1) + "px");
+      t.el.style.transform = "translate(" + cx.toFixed(1) + "px," + p[1].toFixed(1) + "px) translate(-50%, calc(-100% - 14px))";
+    }
+  }
+
+  function fmtDist(m) { return m >= 1000 ? (m / 1000).toFixed(1) + " km" : Math.round(m / 10) * 10 + " m"; }
+  function bearingWord(dx, dy) {
+    var deg = ((Math.atan2(dx, dy) / DEG) % 360 + 360) % 360;
+    return COMPASS[Math.round(deg / 45) % 8];
+  }
+
+  function buildSpots() {
+    spotsEl.textContent = "";
+    spots = station.neighbours.map(function (id) {
+      var n = M.byId[id];
+      var dx = n.camera[0] - station.camera[0], dy = n.camera[1] - station.camera[1];
+      var dist = Math.hypot(dx, dy);
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "spot off";
+      b.innerHTML = '<span class="spot-card"><span class="spot-name"></span><span class="spot-dist"></span></span><span class="spot-stem"></span><span class="spot-pin"></span>';
+      b.querySelector(".spot-name").textContent = n.name;
+      b.querySelector(".spot-dist").textContent = fmtDist(dist);
+      b.setAttribute("aria-label", "Go to " + n.name + ", " + fmtDist(dist).replace(" m", " metres").replace(" km", " kilometres") + " to the " + bearingWord(dx, dy));
+      b.addEventListener("click", function () { goStation(id, "spot"); });
+      // A keyboard user tabbing to a station out of view is turned to face it.
+      b.addEventListener("focus", function () { if (b.classList.contains("off")) turnTo(n); });
+      spotsEl.appendChild(b);
+      return { n: n, el: b, card: b.querySelector(".spot-card"), off: true, below: false, w: 0, h: 0 };
+    });
+  }
+
+  // The station head, its buttons and the era panel: labels and hotspots give way to them.
+  var chrome = [];
+  function measureChrome() {
+    chrome = [];
+    var s = stage.getBoundingClientRect();
+    [document.querySelector(".head .title"), document.querySelector(".tools"), eraEl].forEach(function (el) {
+      if (!el || el.hidden) return;
+      var r = el.getBoundingClientRect();
+      if (r.width && r.height) chrome.push([r.left - s.left - 6, r.top - s.top - 6, r.right - s.left + 6, r.bottom - s.top + 6]);
+    });
+    stage.style.setProperty("--era-h", Math.round(eraEl.offsetHeight) + "px");
+  }
+  function overlaps(boxes, x0, y0, x1, y1) {
+    for (var k = 0; k < boxes.length; k++) {
+      var a = boxes[k];
+      if (x0 < a[2] && x1 > a[0] && y0 < a[3] && y1 > a[1]) return true;
+    }
+    return false;
+  }
+  function overChrome(x0, y0, x1, y1) { return overlaps(chrome, x0, y0, x1, y1); }
+
+  function placeSpots(f) {
+    for (var i = 0; i < spots.length; i++) {
+      var s = spots[i], c = s.n.camera;
+      var p = project(c[0], c[1], c[2], f);
+      var off = !p || p[0] < 24 || p[0] > W - 24 || p[1] < 70 || p[1] > H - 30;
+      var half = 0, cx = 0, below = s.below;
+      if (!off) {
+        if (!s.w) { s.w = s.card.offsetWidth; s.h = s.el.offsetHeight; }
+        half = s.w / 2;
+        cx = W > s.w + 16 ? clamp(p[0], half + 8, W - half - 8) : p[0];
+        // The card floats above its pin, or hangs below it when above would cover a label.
+        var x0 = cx - half, x1 = cx + half, up0 = p[1] - s.h, dn1 = p[1] - 6 + s.h;
+        var upChrome = overChrome(x0, up0, x1, p[1]), dnChrome = overChrome(x0, p[1] - 6, x1, dn1);
+        var upTags = overlaps(tagBoxes, x0, up0, x1, p[1]), dnTags = overlaps(tagBoxes, x0, p[1] - 6, x1, dn1);
+        if (!upChrome && !upTags) below = false;
+        else if (!dnChrome && !dnTags) below = true;
+        else if (!upChrome) below = false;
+        else if (!dnChrome) below = true;
+        else off = true;
+      }
+      if (off !== s.off) { s.off = off; s.el.classList.toggle("off", off); }
+      if (off) continue;
+      if (below !== s.below) { s.below = below; s.el.classList.toggle("below", below); }
+      s.el.style.setProperty("--shift", (cx - p[0]).toFixed(1) + "px");
+      s.el.style.transform = "translate(" + p[0].toFixed(1) + "px," + p[1].toFixed(1) + "px) translate(-50%, " + (below ? "-6px" : "-100%") + ")";
+    }
+  }
+
+  function turnTo(n) {
+    var c = station.camera;
+    var dx = n.camera[0] - c[0], dy = n.camera[1] - c[1], dz = n.camera[2] - c[2];
+    var yaw = Math.atan2(dx, dy);
+    var pitch = clamp(Math.atan2(dz, Math.hypot(dx, dy)) + 4 * DEG, -PITCH_MAX, PITCH_MAX);
+    view.vy = view.vp = 0;
+    if (still()) { view.yaw = wrapAngle(yaw); view.pitch = pitch; request(); return; }
+    var d = wrapAngle(yaw - view.yaw);
+    turnTween = { y0: view.yaw, dy: d, p0: view.pitch, dp: pitch - view.pitch, t0: performance.now(), dur: 450 + 350 * Math.abs(d) / Math.PI };
+    request();
+  }
+
+  // ------------------------------------------------------------------ the timeline
+  function stopLabel(id, miss) {
+    var s = M.stateById[id];
+    return s.label + ", " + s.title + ", " + (s.honesty || "unlabelled") + (miss ? ", not rendered yet" : "");
+  }
+
+  function buildTimeline() {
+    var n = stopCount();
+    stopsEl.textContent = "";
+    ticksEl.textContent = "";
+    trackEl.hidden = n < 2;
+    stopsEl.classList.toggle("dense", n > 3);
+    slider.max = String(Math.max(1, n - 1) * 1000);
+    station.stops.forEach(function (id, i) {
+      var s = M.stateById[id], at = n > 1 ? i / (n - 1) : 0.5;
+      var tick = document.createElement("i");
+      tick.className = hclass(s.honesty);
+      tick.style.setProperty("--at", String(at));
+      ticksEl.appendChild(tick);
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "stop " + hclass(s.honesty);
+      b.style.setProperty("--at", String(at));
+      b.innerHTML = '<span class="lab"></span><span class="sub">not rendered</span>';
+      b.querySelector(".lab").textContent = s.label;
+      b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", function () { glideTo(i); });
+      stopsEl.appendChild(b);
+    });
+    syncStops();
+  }
+
+  function syncStops() {
+    if (!station) return;
+    for (var i = 0; i < station.stops.length; i++) {
+      var id = station.stops[i], miss = failed(cache.get(station.panoramas[id]));
+      var b = stopsEl.children[i], t = ticksEl.children[i];
+      if (b) { b.classList.toggle("missing", miss); b.setAttribute("aria-label", stopLabel(id, miss)); }
+      if (t) t.classList.toggle("missing", miss);
+    }
+    shownIdx = -1;
+    updateReadout();
+  }
+
+  var shownIdx = -1;
+  function updateReadout() {
+    if (!station) return;
+    var n = stopCount();
+    if (!n) {
+      pillEl.hidden = true;
+      eraTitleEl.textContent = "Nothing rendered here yet";
+      eraLabelEl.textContent = "";
+      noteEl.textContent = "";
+      eraEl.classList.remove("is-claim");
+      return;
+    }
+    var i = clamp(Math.round(pos), 0, n - 1);
+    if (i === shownIdx) return;
+    shownIdx = i;
+    var id = station.stops[i], s = M.stateById[id], h = hclass(s.honesty);
+    pillEl.hidden = false;
+    pillEl.className = "pill " + h;
+    pillEl.textContent = s.honesty || "unlabelled";
+    eraTitleEl.textContent = s.title;
+    eraLabelEl.textContent = s.label;
+    noteEl.textContent = s.note || HONESTY[s.honesty] || "";
+    noteEl.className = "note " + h;
+    eraEl.classList.toggle("is-claim", s.honesty === "claim");
+    for (var j = 0; j < stopsEl.children.length; j++) {
+      stopsEl.children[j].setAttribute("aria-pressed", j === i ? "true" : "false");
+    }
+    slider.setAttribute("aria-valuetext", stopLabel(id, failed(cache.get(station.panoramas[id]))));
+    measureChrome();
+  }
+
+  function setPos(p, fromSlider) {
+    pos = clamp(p, 0, Math.max(0, stopCount() - 1));
+    if (!fromSlider) slider.value = String(Math.round(pos * 1000));
+    refresh();
+    updateReadout();
+    request();
+  }
+
+  function glideTo(i) {
+    var n = stopCount();
+    if (!n) return;
+    i = clamp(i, 0, n - 1);
+    eraTween = null;
+    var dist = Math.abs(i - pos);
+    if (still() || dist < 1e-3) { setPos(i); settle(); return; }
+    eraTween = { from: pos, to: i, t0: performance.now(), dur: Math.min(2200, 1100 + 450 * (dist - 1)) };
+    request();
+  }
+
+  // The timeline has come to rest: remember it in the address and say what is shown.
+  function settle(quiet) {
+    writeHash();
+    var id = currentStateId();
+    if (!quiet && id && id !== settledState) say(describeState(id));
+    settledState = id;
+  }
+
+  slider.addEventListener("input", function () {
+    eraTween = null;
+    setPos(Number(slider.value) / 1000, true);
+  });
+  slider.addEventListener("change", function () {
+    var r = Math.round(pos);
+    if (Math.abs(pos - r) < 0.08) glideTo(r); else settle();
+  });
+  slider.addEventListener("keydown", function (e) {
+    var n = stopCount(), to = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "PageUp") to = Math.floor(pos + 1e-6) + 1;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "PageDown") to = Math.ceil(pos - 1e-6) - 1;
+    else if (e.key === "Home") to = 0;
+    else if (e.key === "End") to = n - 1;
+    else return;
+    e.preventDefault();
+    glideTo(clamp(to, 0, n - 1));
+  });
+
+  // ------------------------------------------------------------------ stations
+  function buildList() {
+    listEl.textContent = "";
+    M.stations.forEach(function (s, i) {
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "st";
+      b.setAttribute("data-id", s.id);
+      var n = document.createElement("span");
+      n.className = "st-n";
+      n.textContent = String(i + 1).padStart(2, "0");
+      var body = document.createElement("span");
+      var nm = document.createElement("span");
+      nm.className = "st-name";
+      nm.textContent = s.name;
+      var wh = document.createElement("span");
+      wh.className = "st-where";
+      wh.textContent = [s.where, s.moment].filter(Boolean).join(" · ");
+      var eras = document.createElement("span");
+      eras.className = "st-eras";
+      if (!s.stops.length) eras.textContent = "Nothing rendered yet";
+      s.stops.forEach(function (id) {
+        var st = M.stateById[id], chip = document.createElement("span");
+        chip.className = "chip " + hclass(st.honesty);
+        chip.textContent = st.label;
+        eras.appendChild(chip);
+      });
+      body.appendChild(nm);
+      body.appendChild(wh);
+      body.appendChild(eras);
+      var here = document.createElement("span");
+      here.className = "st-here";
+      here.textContent = "Here";
+      b.appendChild(n);
+      b.appendChild(body);
+      b.appendChild(here);
+      b.addEventListener("click", function () { goStation(s.id, "list"); });
+      li.appendChild(b);
+      listEl.appendChild(li);
+    });
+  }
+  function markList() {
+    var bs = listEl.querySelectorAll(".st");
+    for (var i = 0; i < bs.length; i++) {
+      if (bs[i].getAttribute("data-id") === station.id) bs[i].setAttribute("aria-current", "location");
+      else bs[i].removeAttribute("aria-current");
+    }
+  }
+
+  function openPanel() {
+    panel.hidden = false;
+    stationsBtn.setAttribute("aria-expanded", "true");
+    var cur = panel.querySelector(".st[aria-current]") || panel.querySelector(".st");
+    if (cur) cur.focus();
+    document.addEventListener("pointerdown", outsidePanel, true);
+  }
+  function closePanel(returnFocus) {
+    if (panel.hidden) return;
+    panel.hidden = true;
+    stationsBtn.setAttribute("aria-expanded", "false");
+    document.removeEventListener("pointerdown", outsidePanel, true);
+    if (returnFocus) stationsBtn.focus();
+  }
+  function outsidePanel(e) {
+    if (!panel.contains(e.target) && !stationsBtn.contains(e.target)) closePanel(false);
+  }
+  stationsBtn.addEventListener("click", function () { if (panel.hidden) openPanel(); else closePanel(true); });
+  panel.addEventListener("focusout", function (e) {
+    var to = e.relatedTarget;
+    if (to && !panel.contains(to) && to !== stationsBtn) closePanel(false);
+  });
+
+  function goStation(id, how, stateId) {
+    var st = M.byId[id];
+    if (!st || switching) return;
+    if (st === station) {
+      closePanel(how === "list");
+      if (stateId && st.stops.indexOf(stateId) >= 0) glideTo(st.stops.indexOf(stateId));
+      return;
+    }
+    var keep = stateId || currentStateId();
+    closePanel(how === "list");
+    switching = true;
+    curtain.classList.add("on");
+    var swap = function () {
+      enter(st, keep);
+      switching = false;
+      if (how === "spot") canvas.focus({ preventScroll: true });
+    };
+    if (still()) swap(); else setTimeout(swap, 300);
+  }
+
+  function enter(st, stateId) {
+    station = st;
+    kickerEl.textContent = "Station " + (st.index + 1) + " of " + M.stations.length;
+    nameEl.textContent = st.name;
+    whereEl.textContent = "";
+    var bits = [st.where, st.moment].filter(Boolean);
+    bits.forEach(function (text, i) {
+      var span = document.createElement("span");
+      span.textContent = text;
+      if (i < bits.length - 1) {
+        var sep = document.createElement("span");
+        sep.className = "sep";
+        sep.textContent = " · ";
+        span.appendChild(sep);
+      }
+      whereEl.appendChild(span);
+      if (i < bits.length - 1) whereEl.appendChild(document.createTextNode(" "));
+    });
+    document.title = st.name + " · Giza at Block Scale";
+    canvas.setAttribute("aria-label", "Panorama from " + st.name + ". Drag, or use the arrow keys, to look around. Plus and minus zoom.");
+    eraTween = null;
+    turnTween = null;
+    view.yaw = st.view.yaw;
+    view.pitch = clamp(st.view.pitch, -PITCH_MAX, PITCH_MAX);
+    view.zoom = 1;
+    view.vy = view.vp = 0;
+    fitted = fitFov(st.view.fov);
+    forgetStaleMisses(st);
+    buildTimeline();
+    buildTags();
+    buildSpots();
+    markList();
+    if (mode === "flat") flat.removeAttribute("data-url");
+    shownIdx = -1;
+    setPos(pickStop(st, stateId));
+    measureChrome();
+    settle(true);
+    settledState = currentStateId();
+    say(st.name + ". " + [st.where, st.moment].filter(Boolean).join(", ") + ". " + describeState(settledState) + landmarkSentence());
+    revealAt = performance.now() + 1400;
+    setTimeout(request, 1450);
+    request();
+  }
+
+  // ------------------------------------------------------------------ what a screen reader hears
+  // Messages that arrive together are read together rather than one replacing the other.
+  var sayTimer = 0, sayQueue = [];
+  function say(text) {
+    if (!text) return;
+    if (!sayQueue.length) live.textContent = "";
+    sayQueue.push(text);
+    clearTimeout(sayTimer);
+    sayTimer = setTimeout(function () {
+      live.textContent = sayQueue.join(" ");
+      sayQueue = [];
+    }, 250);
+  }
+  function describeState(id) {
+    if (!id) return "Nothing has been rendered here yet.";
+    var s = M.stateById[id];
+    return s.title + ", " + s.label + ". " + (s.honesty === "claim" ? "This is a claim, not the record." : s.honesty ? "A " + s.honesty + "." : "");
+  }
+  function landmarkSentence() {
+    var id = currentStateId(), parts = [];
+    station.landmarks.forEach(function (L) {
+      if (perState(L.z, id) == null) return;
+      var h = perState(L.height, id);
+      parts.push(L.name + (h != null ? ", " + h.toFixed(1) + " metres high" : ""));
+    });
+    return parts.length ? " In view from here: " + parts.join("; ") + "." : "";
+  }
+
+  // ------------------------------------------------------------------ the address
+  function parseHash() {
+    var h = (location.hash || "").replace(/^#/, "");
+    if (!h) return null;
+    var parts = h.split("/").map(function (x) { try { return decodeURIComponent(x); } catch (e) { return x; } });
+    return { station: parts[0], state: parts[1] || null };
+  }
+  function writeHash() {
+    if (!station) return;
+    var id = currentStateId();
+    var h = "#" + encodeURIComponent(station.id) + (id ? "/" + encodeURIComponent(id) : "");
+    if (location.hash !== h) { try { history.replaceState(null, "", h); } catch (e) { /* a sandboxed frame */ } }
+  }
+  window.addEventListener("hashchange", function () {
+    var want = parseHash();
+    if (want && M && M.byId[want.station]) goStation(want.station, "hash", want.state);
+  });
+
+  // ------------------------------------------------------------------ the frame loop
+  var raf = 0, last = 0, noticeOn = false, noticeKey = "", curtainOpen = false;
+
+  function request() { if (!raf) raf = requestAnimationFrame(frame); }
+
+  function step(now, dt) {
+    var busy = false;
+    if (keys.size) {
+      var sp = fov() * 0.9 * dt;
+      if (keys.has("ArrowLeft")) view.yaw -= sp;
+      if (keys.has("ArrowRight")) view.yaw += sp;
+      if (keys.has("ArrowUp")) view.pitch += sp;
+      if (keys.has("ArrowDown")) view.pitch -= sp;
+      busy = true;
+    }
+    if (!drag && (Math.abs(view.vy) > 0.002 || Math.abs(view.vp) > 0.002)) {
+      view.yaw += view.vy * dt;
+      view.pitch += view.vp * dt;
+      var k = Math.exp(-dt * 4.5);
+      view.vy *= k;
+      view.vp *= k;
+      busy = true;
+    } else if (!drag) {
+      view.vy = view.vp = 0;
+    }
+    if (turnTween) {
+      var tt = clamp((now - turnTween.t0) / turnTween.dur, 0, 1), et = ease(tt);
+      view.yaw = turnTween.y0 + turnTween.dy * et;
+      view.pitch = turnTween.p0 + turnTween.dp * et;
+      if (tt >= 1) turnTween = null; else busy = true;
+    }
+    if (eraTween) {
+      var te = clamp((now - eraTween.t0) / eraTween.dur, 0, 1);
+      setPos(eraTween.from + (eraTween.to - eraTween.from) * ease(te));
+      if (te >= 1) { eraTween = null; settle(); } else busy = true;
+    }
+    view.yaw = wrapAngle(view.yaw);
+    view.pitch = clamp(view.pitch, -PITCH_MAX, PITCH_MAX);
+    return busy;
+  }
+
+  function frame(now) {
+    raf = 0;
+    var dt = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
+    last = now;
+    if (!station) return;
+    var busy = step(now, dt);
+    var mx = mixState(now);
+    var f = fov();
+    if (mode === "gl" && gl && !lost) {
+      render(mx);
+      placeTags(f);
+      placeSpots(f);
+    }
+    compass();
+    claimFrame.style.opacity = mx.claim.toFixed(3);
+    showNotice(mx);
+    showLoading(mx);
+    reveal(mx, now);
+    if (busy || mx.fading) request(); else last = 0;
+  }
+
+  var lastBearing = -1;
+  function compass() {
+    var deg = ((view.yaw / DEG) % 360 + 360) % 360, r = Math.round(deg) % 360;
+    if (r === lastBearing) return;
+    lastBearing = r;
+    bearingEl.textContent = String(r).padStart(3, "0") + "°";
+    facingEl.textContent = "facing " + COMPASS[Math.round(deg / 45) % 8];
+  }
+
+  // The "not rendered yet" card follows the share of the view that has no panorama.
+  function showNotice(mx) {
+    var o = stopCount() ? smooth(0.35, 0.65, mx.missing) : 1;
+    if (o < 0.02) {
+      if (!noticeEl.hidden) { noticeEl.hidden = true; measureChrome(); syncHint(); }
+    } else {
+      if (noticeEl.hidden) { noticeEl.hidden = false; measureChrome(); syncHint(); }
+      noticeEl.style.opacity = o.toFixed(3);
+    }
+    var on = o > 0.5;
+    var id = mx.domId, e = mx.dom;
+    var key = id ? id + ":" + (e ? e.status : "") : "none";
+    if (key !== noticeKey) {
+      noticeKey = key;
+      if (!id) {
+        noticeKind.textContent = "Still to come";
+        noticeTitle.textContent = "Not rendered yet";
+        noticeText.textContent = "No era of " + station.name + " has been rendered yet.";
+        retryBtn.hidden = true;
+      } else {
+        var s = M.stateById[id];
+        retryBtn.hidden = false;
+        retryBtn.textContent = "Check again";
+        if (e && e.status === "error") {
+          noticeKind.textContent = "Something went wrong";
+          noticeTitle.textContent = "This panorama did not load";
+          noticeText.textContent = "The " + s.title + " panorama, " + s.label + ", could not be loaded: " + (e.error || "no reason given") + ".";
+        } else {
+          noticeKind.textContent = "Still to come";
+          noticeTitle.textContent = "Not rendered yet";
+          noticeText.textContent = "The " + s.title + " panorama from here, " + s.label + ", has not been rendered yet. The labels still show where things stand.";
+        }
+      }
+    }
+    if (on !== noticeOn) {
+      noticeOn = on;
+      if (on) say(noticeTitle.textContent + ". " + noticeText.textContent);
+    }
+  }
+
+  function showLoading(mx) {
+    var e = mx.dom, text = "";
+    if (e && !failed(e)) {
+      var up = mode === "gl" ? !!e.tex : !!e.blob && !!flat.querySelector("img");
+      if (!up) {
+        var s = M.stateById[mx.domId];
+        text = e.blob ? "Preparing " + s.title + "…" : "Loading " + s.title + ", " + Math.round(e.progress * 100) + "%";
+      }
+    }
+    if (text) {
+      if (loadingEl.textContent !== text) loadingEl.textContent = text;
+      if (loadingEl.hidden) { loadingEl.hidden = false; measureChrome(); }
+    } else if (!loadingEl.hidden) {
+      loadingEl.hidden = true;
+      measureChrome();
+    }
+  }
+
+  // Lift the curtain once the era on show is up (or known to be missing), or after a wait.
+  function reveal(mx, now) {
+    if (!revealAt || switching) return;
+    var e = mx.dom;
+    var ready = !mx.domId || failed(e) || (e && (mode === "gl" ? !!e.tex : !!e.blob));
+    if (!ready && now < revealAt) return;
+    revealAt = 0;
+    curtain.classList.remove("on");
+    if (!curtainOpen) {
+      curtainOpen = true;
+      if (!hintDone) { hintShown = true; syncHint(); setTimeout(hideHint, 9000); }
+    }
+  }
+
+  // The first-visit hint, kept out of the way while the "not rendered yet" card is up.
+  var hintShown = false;
+  function syncHint() { hintEl.classList.toggle("on", hintShown && !hintDone && noticeEl.hidden); }
+  function hideHint() {
+    if (hintDone) return;
+    hintDone = true;
+    syncHint();
+  }
+
+  retryBtn.addEventListener("click", function () {
+    if (!M) { location.reload(); return; }
+    var id = currentStateId();
+    if (!id) return;
+    var e = cache.get(station.panoramas[id]);
+    if (e && failed(e)) { e.status = "idle"; e.error = ""; }
+    retryBtn.textContent = "Checking…";
+    if (mode === "flat") flat.removeAttribute("data-url");
+    noticeKey = "";
+    refresh();
+    syncStops();
+    request();
+  });
 
   // ------------------------------------------------------------------ input
-  var drag = null, pinch = null, pointers = new Map();
-  function hideHint() { hint.style.opacity = "0"; }
+  var pointers = new Map(), drag = null, pinch = null;
+  function spread() {
+    var a = [];
+    pointers.forEach(function (p) { a.push(p); });
+    return Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y);
+  }
   canvas.addEventListener("pointerdown", function (e) {
-    canvas.setPointerCapture(e.pointerId);
-    pointers.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pointers.size === 2) {
-      var pts = Array.from(pointers.values());
-      pinch = { d: Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]), fov: view.fov };
-      drag = null;
-    } else {
-      drag = { x: e.clientX, y: e.clientY, t: performance.now() };
-    }
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* not a live pointer */ }
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 2) { drag = null; pinch = { d: spread(), fov: fov() }; }
+    else if (pointers.size === 1) drag = { x: e.clientX, y: e.clientY, t: e.timeStamp };
     view.vy = view.vp = 0;
+    turnTween = null;
+    canvas.classList.add("grabbing");
     hideHint();
+    request();
   });
   canvas.addEventListener("pointermove", function (e) {
-    if (!pointers.has(e.pointerId)) return;
-    pointers.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pinch && pointers.size === 2) {
-      var pts = Array.from(pointers.values());
-      var d = Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]);
-      view.fov = Math.max(0.45, Math.min(1.75, pinch.fov * pinch.d / d));
-      request();
+    var p = pointers.get(e.pointerId);
+    if (!p) return;
+    p.x = e.clientX;
+    p.y = e.clientY;
+    if (pinch) {
+      if (pointers.size >= 2) { setFov(pinch.fov * pinch.d / Math.max(spread(), 1)); request(); }
       return;
     }
     if (!drag) return;
-    var k = (view.fov / H);
+    var k = 2 * Math.tan(fov() / 2) / H;   // radians per pixel at the centre: the scene stays under the finger
     var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    view.yaw -= dx * k;
-    view.pitch += dy * k;
-    view.vy = -dx * k * 0.5; view.vp = dy * k * 0.5;
-    drag.x = e.clientX; drag.y = e.clientY;
+    var dt = Math.max(8, e.timeStamp - drag.t) / 1000;
+    view.yaw = wrapAngle(view.yaw - dx * k);
+    view.pitch = clamp(view.pitch + dy * k, -PITCH_MAX, PITCH_MAX);
+    view.vy = 0.6 * (-dx * k / dt) + 0.4 * view.vy;
+    view.vp = 0.6 * (dy * k / dt) + 0.4 * view.vp;
+    drag.x = e.clientX;
+    drag.y = e.clientY;
+    drag.t = e.timeStamp;
     request();
   });
-  function end(e) {
+  function release(e) {
+    if (!pointers.has(e.pointerId)) return;
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = null;
-    if (pointers.size === 0) { drag = null; request(); }
+    if (pointers.size === 1) {
+      var rest = pointers.values().next().value;
+      drag = { x: rest.x, y: rest.y, t: e.timeStamp };
+      view.vy = view.vp = 0;
+    } else if (pointers.size === 0) {
+      if (!drag || e.timeStamp - drag.t > 90 || still()) view.vy = view.vp = 0;
+      view.vy = clamp(view.vy, -5, 5);
+      view.vp = clamp(view.vp, -5, 5);
+      drag = null;
+      canvas.classList.remove("grabbing");
+    }
+    request();
   }
-  canvas.addEventListener("pointerup", end);
-  canvas.addEventListener("pointercancel", end);
+  canvas.addEventListener("pointerup", release);
+  canvas.addEventListener("pointercancel", release);
+  canvas.addEventListener("lostpointercapture", release);
   canvas.addEventListener("wheel", function (e) {
     e.preventDefault();
-    view.fov = Math.max(0.45, Math.min(1.75, view.fov * Math.exp(e.deltaY * 0.0012)));
+    var d = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H : 1);
+    setFov(fov() * Math.exp(d * 0.0012));
     hideHint();
     request();
   }, { passive: false });
-  canvas.addEventListener("keydown", function (e) {
-    var step = 0.06;
-    if (e.key === "ArrowLeft") view.yaw -= step;
-    else if (e.key === "ArrowRight") view.yaw += step;
-    else if (e.key === "ArrowUp") view.pitch += step;
-    else if (e.key === "ArrowDown") view.pitch -= step;
-    else if (e.key === "+" || e.key === "=") view.fov = Math.max(0.45, view.fov * 0.9);
-    else if (e.key === "-") view.fov = Math.min(1.75, view.fov / 0.9);
-    else return;
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !panel.hidden) { e.preventDefault(); closePanel(true); return; }
+    if (e.altKey || e.ctrlKey || e.metaKey || !station || mode !== "gl") return;
+    var t = e.target;
+    if (!(t === canvas || t === document.body || t === document.documentElement)) return;
+    if (ARROWS[e.key]) {
+      keys.add(e.key);
+      turnTween = null;
+      view.vy = view.vp = 0;
+    } else if (e.key === "+" || e.key === "=") {
+      setFov(fov() * 0.88);
+    } else if (e.key === "-" || e.key === "_") {
+      setFov(fov() / 0.88);
+    } else {
+      return;
+    }
     e.preventDefault();
     hideHint();
     request();
   });
+  document.addEventListener("keyup", function (e) { if (keys.delete(e.key)) request(); });
+  window.addEventListener("blur", function () { keys.clear(); });
 
-  // ------------------------------------------------------------------ the era
-  function setEra(v, fromSlider) {
-    era = Math.max(0, Math.min(1, v));
-    if (!fromSlider) slider.value = String(Math.round(era * 1000));
-    bToday.setAttribute("aria-pressed", era < 0.5 ? "true" : "false");
-    bBuilt.setAttribute("aria-pressed", era >= 0.5 ? "true" : "false");
-    readout.textContent = era < 0.02 ? "Today, 2026 CE" : era > 0.98 ? "As built, " + BUILT_YEAR : "Crossing 4,500 years";
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(1, stage.clientWidth);
+    H = Math.max(1, stage.clientHeight);
+    if (mode === "gl") {
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+    }
+    if (station) {
+      fitted = fitFov(station.view.fov);
+      view.zoom = clamp(view.zoom, MIN_FOV / fitted, MAX_FOV / fitted);
+    }
+    measureChrome();
     request();
   }
-  slider.addEventListener("input", function () { setEra(slider.value / 1000, true); });
-  var anim = null;
-  function glide(to) {
-    if (anim) cancelAnimationFrame(anim);
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) { setEra(to); return; }
-    var from = era, t0 = performance.now(), dur = 1400;
-    (function step(now) {
-      var t = Math.min(1, (now - t0) / dur);
-      var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      setEra(from + (to - from) * e);
-      if (t < 1) anim = requestAnimationFrame(step);
-    })(t0);
+
+  // ------------------------------------------------------------------ start
+  function fatal(msg) {
+    curtain.classList.remove("on");
+    stationsBtn.hidden = true;
+    eraEl.querySelector(".now").hidden = true;
+    noteEl.hidden = true;
+    trackEl.hidden = true;
+    kickerEl.textContent = "Giza at block scale";
+    nameEl.textContent = "The walkthrough";
+    whereEl.textContent = "";
+    noticeKind.textContent = "Something went wrong";
+    noticeTitle.textContent = "The walkthrough did not load";
+    noticeText.textContent = msg;
+    retryBtn.hidden = false;
+    retryBtn.textContent = "Try again";
+    noticeEl.style.opacity = "1";
+    noticeEl.hidden = false;
+    say(msg);
   }
-  bToday.addEventListener("click", function () { glide(0); });
-  bBuilt.addEventListener("click", function () { glide(1); });
 
-  window.addEventListener("resize", resize);
-  resize();
+  function boot() {
+    if (!initGL()) mode = "flat";
+    if (mode === "flat") {
+      canvas.hidden = true;
+      flat.hidden = false;
+      labelsEl.hidden = true;
+      spotsEl.hidden = true;
+      hintEl.textContent = "Scroll sideways to look around";
+    } else {
+      hintEl.textContent = coarse ? "Drag to look around, pinch to zoom" : "Drag to look around";
+    }
+    buildList();
+    resize();
+    window.addEventListener("resize", resize);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        tags.forEach(function (t) { t.w = 0; });
+        spots.forEach(function (s) { s.w = 0; });
+        measureChrome();
+        request();
+      });
+    }
+    var want = parseHash();
+    var st = want && M.byId[want.station] ? M.byId[want.station] : M.stations[0];
+    enter(st, want && M.byId[want.station] ? want.state : null);
+  }
 
-  // ------------------------------------------------------------------ compare frames
-  document.querySelectorAll(".compare").forEach(function (box) {
-    var input = box.querySelector("input");
-    input.addEventListener("input", function () { box.style.setProperty("--split", input.value + "%"); });
-  });
+  fetch("stations.json", { cache: "no-cache" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("the server answered " + r.status);
+      return r.json();
+    })
+    .then(function (json) {
+      var m = normalise(json);
+      if (!m.stations.length) throw new Error("it lists no stations");
+      return m;
+    })
+    .then(function (m) { M = m; boot(); }, function (err) {
+      fatal("The list of stations, stations.json, could not be read: " + (err && err.message ? err.message : String(err)) + ".");
+    });
 })();
 </script>
+</body>
+</html>

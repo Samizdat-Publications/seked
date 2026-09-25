@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giza at Block Scale &middot; About</title>
+<meta name="description" content="Why the Giza walkthrough is path traced, what changed, the plan and the costs.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Marcellus&display=swap">
+<style>
+  :root {
+    --ground: #f2efe9;
+    --raised: #e8e3da;
+    --ink: #1c1a17;
+    --muted: #675f55;
+    --line: rgba(28, 26, 23, 0.14);
+    --accent: #2c4a8c;
+    --granite: #974634;
+    --display: "Marcellus", "Trajan Pro", "Palatino Linotype", Georgia, serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #14120f;
+      --raised: #1d1a16;
+      --ink: #ece5d9;
+      --muted: #a89d8d;
+      --line: rgba(236, 229, 217, 0.14);
+      --accent: #8ea8e6;
+      --granite: #d28b73;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #14120f;
+    --raised: #1d1a16;
+    --ink: #ece5d9;
+    --muted: #a89d8d;
+    --line: rgba(236, 229, 217, 0.14);
+    --accent: #8ea8e6;
+    --granite: #d28b73;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 17px/1.62 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  .topbar {
+    max-width: 1120px; margin: 0 auto; padding: 18px 16px 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    font: 500 13px/1.3 var(--mono); letter-spacing: 0.05em;
+  }
+  .topbar a { text-decoration: none; }
+  .topbar a:hover { text-decoration: underline; }
+  .topbar span { color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; }
+
+  /* ---------- the reading column ---------- */
+  main { padding-inline: 16px; padding-block: 28px 64px; }
+  .col { max-width: 66ch; margin-inline: auto; }
+  .wide { max-width: 1120px; margin-inline: auto; }
+  .credits {
+    max-width: 1120px; margin: 0 auto 44px; font: 400 12.5px/1.55 var(--mono); color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 18px;
+  }
+  h1, h2 { font-family: var(--display); font-weight: 400; text-wrap: balance; letter-spacing: 0.01em; }
+  h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.06; margin: 0 0 18px; }
+  h2 { font-size: clamp(25px, 3vw, 32px); line-height: 1.15; margin: 64px 0 14px; }
+  h3 { font: 600 17px/1.35 var(--body); margin: 26px 0 6px; }
+  p { margin: 0 0 16px; }
+  .lede { font-size: 20px; line-height: 1.55; color: var(--ink); }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--granite); margin: 0 0 14px; }
+  .muted { color: var(--muted); }
+  code, .num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+
+  figure { margin: 28px 0 8px; }
+  figure img { display: block; width: 100%; height: auto; border-radius: 3px; }
+  figcaption { font: 400 13px/1.5 var(--body); color: var(--muted); margin-top: 10px; max-width: 72ch; }
+
+  .compare { position: relative; overflow: hidden; border-radius: 3px; background: var(--raised); aspect-ratio: 16 / 9; max-width: 100%; }
+  .compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .compare .top { clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0); }
+  .compare .divider {
+    position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; margin-left: -1px;
+    background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); pointer-events: none;
+  }
+  .compare .side {
+    position: absolute; top: 12px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+    color: #fff; background: rgba(15, 14, 12, 0.55); padding: 6px 8px; border-radius: 2px; pointer-events: none;
+  }
+  .compare .side.l { left: 12px; }
+  .compare .side.r { right: 12px; }
+  .compare input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+  .compare input:focus-visible + .divider { outline: 3px solid var(--accent); }
+
+  .reasons { display: grid; gap: 22px; margin-top: 18px; }
+  .reason { display: grid; grid-template-columns: 5.2ch 1fr; gap: 16px; align-items: baseline; }
+  .reason .k { font: 500 13px/1.4 var(--mono); color: var(--granite); }
+  .reason h3 { margin-top: 0; }
+  .reason p { margin: 0; }
+
+  .changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 20px; }
+  .changes div { background: var(--ground); padding: 18px 18px 16px; }
+  .changes h3 { margin: 0 0 6px; }
+  .changes p { margin: 0; font-size: 15.5px; line-height: 1.55; }
+
+  ol.plan { list-style: none; padding: 0; margin: 18px 0 0; counter-reset: stage; }
+  ol.plan li { counter-increment: stage; display: grid; grid-template-columns: 3.2ch 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+  ol.plan li:last-child { border-bottom: 1px solid var(--line); }
+  ol.plan li::before { content: counter(stage); font: 400 22px/1.2 var(--display); color: var(--granite); }
+  ol.plan h3 { margin: 0 0 4px; }
+  ol.plan p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
+
+  table.costs { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+  table.costs th, table.costs td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.costs th { font: 500 12px/1.3 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  table.costs td.num { white-space: nowrap; }
+  .tablewrap { overflow-x: auto; }
+
+  .asks { border: 1px solid var(--line); background: var(--raised); padding: 18px 20px; margin-top: 18px; border-radius: 3px; }
+  .asks p:last-child { margin-bottom: 0; }
+
+  .back { margin-top: 48px; font: 500 14px/1.4 var(--mono); letter-spacing: 0.04em; }
+
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .lede { font-size: 18px; }
+    .reason { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<nav class="topbar" aria-label="Walkthrough">
+  <a href="index.html">&larr; Back to the walkthrough</a>
+  <span>Seked</span>
+</nav>
+
+<main>
+  <p class="credits">Path traced in Blender Cycles from the project's own data: Petrie's and Cole's base dimensions, Goyon's 201 measured course heights for Khufu, the Copernicus GLO-30 terrain, OpenStreetMap footprints, Google Open Buildings for the modern city. The individual blocks, the erosion and the rubble are a reconstruction at block scale. Temples, causeways and the Sphinx are not built yet.</p>
+
+  <div class="col">
+    <p class="eyebrow">Seked &middot; 24 September 2026</p>
+    <h1>Keep going. The fidelity is there.</h1>
+    <p class="lede">You asked whether this could ever look the way you want. It can. What held it back was not effort and not the data. It was where the detail lived and what was drawing it. The first station of the <a href="index.html">walkthrough</a> was built in an afternoon from numbers the project already had, laid block by block, and lit by a path tracer instead of a game renderer.</p>
+  </div>
+
+  <div class="wide">
+    <figure>
+      <img src="img/before-after.jpg" width="1280" height="2176" alt="Three frames of the Giza plateau: the old web viewer with flat boxes, the old Blender render with smooth pyramids, and the new render with pyramids laid from weathered blocks.">
+      <figcaption>Top: the live web viewer on 20 September. Middle: the best Blender render, 16 September. Bottom: the proof, from the stand south-west of Menkaure where the classic three-in-a-row photograph is taken.</figcaption>
+    </figure>
+  </div>
+
+  <div class="col">
+    <h2>Then and now, from the same spot</h2>
+    <p>Drag across each frame. The present day is laid from blocks: Khufu's 201 courses, Khafre's surviving cap with its ragged lower edge, Menkaure's band of red granite casing. The as-built plateau is dressed casing, satin rather than mirror, sharp at every arris. Both come from the same model, switched at render time.</p>
+  </div>
+  <div class="wide">
+    <figure>
+      <div class="compare" style="--split: 50%">
+        <img src="img/panorama-built.jpg" alt="The three pyramids as built, cased in white limestone, at golden hour.">
+        <img class="top" src="img/panorama-today.jpg" alt="The three pyramids today, stepped and weathered, at golden hour.">
+        <span class="side l">Today</span><span class="side r">c. 2560 BCE</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Move the divide between today and the plateau as built">
+        <div class="divider"></div>
+      </div>
+      <figcaption>The panorama stand, 120&nbsp;mm lens, sun at 9&deg; in the west-south-west.</figcaption>
+    </figure>
+    <figure>
+      <div class="compare" style="--split: 50%">
+        <img src="img/south-built.jpg" alt="The Great Pyramid as built, from the south, in raking light.">
+        <img class="top" src="img/south-today.jpg" alt="The Great Pyramid today, from the south, in raking light across its courses.">
+        <span class="side l">Today</span><span class="side r">c. 2560 BCE</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Move the divide between today and the Great Pyramid as built">
+        <div class="divider"></div>
+      </div>
+      <figcaption>Khufu from 360&nbsp;m south, 28&nbsp;mm. The faint vertical crease down the middle of the face is Petrie's measured hollowing of the core, <span class="num">0.94&nbsp;m</span>, showing up on its own.</figcaption>
+    </figure>
+  </div>
+
+  <div class="col">
+    <h2>What was holding it back</h2>
+    <div class="reasons">
+      <div class="reason">
+        <span class="k">scale</span>
+        <div>
+          <h3>Detail at the survey's scale, none at the eye's</h3>
+          <p>The old scene modelled a pyramid as five faces and a temple as its footprint pushed up into a box. The eye reads Giza at the scale of blocks: 201 courses on Khufu, a ragged skyline where the corners were robbed, rubble at every foot, sand in every step. None of that existed, so no amount of lighting could make it look real.</p>
+        </div>
+      </div>
+      <div class="reason">
+        <span class="k">light</span>
+        <div>
+          <h3>A game renderer</h3>
+          <p>The web viewer drew everything in real time, which means no true bounce light. At Giza the bright sand lights the pyramids from below, and without it every face reads flat. Much of the last week went into frame rates rather than into the stone.</p>
+        </div>
+      </div>
+      <div class="reason">
+        <span class="k">weight</span>
+        <div>
+          <h3>Proof paperwork on every stone</h3>
+          <p>Every visual element had to be a sourced record, a TypeScript builder, a Python mirror and a test that the two agree. That is right for a claim and far too heavy for a pebble.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>What changes</h2>
+  </div>
+  <div class="wide">
+    <div class="changes">
+      <div>
+        <h3>Blender's path tracer draws it</h3>
+        <p>Light is computed, not approximated: bounce light off the sand, the soft shadow of the whole sky, the sun reddened by the air it crosses.</p>
+      </div>
+      <div>
+        <h3>Everything at the scale you see it</h3>
+        <p>Pyramids course by course from measured course heights where they exist. Blocks sized, weathered and missing by rule, and labelled as reconstruction.</p>
+      </div>
+      <div>
+        <h3>A walkthrough of stations</h3>
+        <p>Each station is a 360&deg; path-traced panorama like the ones in the walkthrough, in each era, with the slider between them. Flights between stations are pre-rendered film.</p>
+      </div>
+      <div>
+        <h3>The claims draw on top</h3>
+        <p>Every station's camera is known exactly, so the claims engine and the star calculations can draw their lines and stars over the panorama live, registered to the pixel.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <p style="margin-top: 22px;">What stays: the measurement database and its sources, the sky engine with its precession and star catalogue, the claims engine and the Claude claims runner, the rule that a reconstruction is always labelled, and the current web viewer, kept as the survey tool rather than the showcase.</p>
+
+    <h2>The plan</h2>
+    <ol class="plan">
+      <li><div><h3>The generator</h3><p>Today's spike becomes the project's pipeline: terrain, pyramids, mastabas, rubble, city, sky, and stations described as data. The render queue runs as detached jobs so no session is woken by a finished frame.</p></div></li>
+      <li><div><h3>The rest of the plateau</h3><p>Khafre's valley and mortuary temples in red granite, the causeways, the Sphinx in its enclosure, the boat pits and enclosure walls. Today's roads and the Mena House; the green valley and the harbour for the as-built plateau.</p></div></li>
+      <li><div><h3>Twelve to twenty stations</h3><p>Each rendered today, as built, and as the First Time for the lost-civilisation claim, starting at golden hour.</p></div></li>
+      <li><div><h3>Inside Khufu</h3><p>The descending passage, the Grand Gallery, the King's and Queen's Chambers, the relieving chambers and the subterranean chamber, path traced in granite and limestone from the interior survey already in the database.</p></div></li>
+      <li><div><h3>Night stations</h3><p>The shafts and their stars, Orion over the three, with the live star overlay for 2500 BCE and 10,500 BCE drawn on the night panorama.</p></div></li>
+      <li><div><h3>Films</h3><p>Flights between stations, and the rollback from today to the First Time.</p></div></li>
+    </ol>
+
+    <h2>Costs and limits</h2>
+    <div class="tablewrap">
+      <table class="costs">
+        <thead><tr><th>Render, on your RTX 5070 Ti laptop</th><th>Time</th></tr></thead>
+        <tbody>
+          <tr><td>Full-HD hero frame, 128 samples</td><td class="num">about 1 min</td></tr>
+          <tr><td>4K station panorama, 48 samples</td><td class="num">about 1&frac12; min</td></tr>
+          <tr><td>8K station panorama, 64 samples (estimate)</td><td class="num">about 5 min</td></tr>
+          <tr><td>Twenty stations in three eras at 8K</td><td class="num">one night</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 16px;">Rendering is not the constraint I feared. A whole walkthrough renders overnight on your laptop, as detached jobs that wake no session when they finish. The two 4K panoramas in the walkthrough are just over a megabyte each, so hosting is no concern either. The trade, plainly: this is not free roaming in real time. You said locked scenes were fine, and locked scenes are exactly what buys this look.</p>
+
+    <h2>From you</h2>
+    <div class="asks">
+      <p><strong>Nothing is blocking.</strong> I am carrying on with the generator. If you want any of this held back or pointed elsewhere, say so and I will change course.</p>
+      <p class="muted">Housekeeping: the project now lives in <code>C:\Users\stewa\ClaudeProjects\seked</code>, off OneDrive, and every commit is pushed to GitHub, including twelve from last week that were only on your disk. The old OneDrive copy is marked stale and can be deleted when you like.</p>
+    </div>
+
+    <p class="back"><a href="index.html">&larr; Back to the walkthrough</a></p>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  document.querySelectorAll(".compare").forEach(function (box) {
+    var input = box.querySelector("input");
+    input.addEventListener("input", function () { box.style.setProperty("--split", input.value + "%"); });
+  });
+})();
+</script>
+</body>
+</html>
