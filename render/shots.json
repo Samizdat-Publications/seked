@@ -111,7 +111,18 @@
         -22.75
       ],
       "lens": 28,
-      "moment": "sphinx-morning"
+      "moment": "sphinx-morning",
+      "by_state": {
+        "stripped": {
+          "z": -16.0,
+          "target": [
+            332.0,
+            -438.0,
+            -16.0
+          ],
+          "note": "the drift of c. 1800 stands at -29 m here, so the camera rises 12 m over it"
+        }
+      }
     }
   ]
 }

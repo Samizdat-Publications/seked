@@ -1,0 +1,25 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/harbour-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "stripped",
+   "shot": "sphinx-sequence",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/sphinx-sequence-stripped.png"
+  }
+ ]
+}
