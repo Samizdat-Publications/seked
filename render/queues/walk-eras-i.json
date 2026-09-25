@@ -1,0 +1,39 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-today.png"
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+  "about": "Flights: a camera moved along control points (x, y, z absolute, the project frame) while it looks along a second set, both eased through Catmull-Rom curves, in one era under one moment. `centre` is where the view's near detail (the displaced ground, stones, people) is built. Frames go to build/films/<id>/frames and are encoded by render/film.py.",
+  "films": [
+    {
+      "id": "approach-built",
+      "name": "Approach, as built",
+      "state": "built",
+      "moment": "golden-west",
+      "fps": 24,
+      "seconds": 14,
+      "size": "1280x720",
+      "samples": 24,
+      "lens": 32,
+      "centre": [
+        -760.0,
+        -990.0
+      ],
+      "path": [
+        [
+          -1650.0,
+          -2050.0,
+          110.0
+        ],
+        [
+          -1300.0,
+          -1600.0,
+          90.0
+        ],
+        [
+          -1000.0,
+          -1250.0,
+          75.0
+        ],
+        [
+          -820.0,
+          -1050.0,
+          66.0
+        ]
+      ],
+      "look": [
+        [
+          -360.0,
+          -420.0,
+          70.0
+        ],
+        [
+          -380.0,
+          -450.0,
+          64.0
+        ],
+        [
+          -410.0,
+          -500.0,
+          60.0
+        ],
+        [
+          -440.0,
+          -560.0,
+          56.0
+        ]
+      ]
+    }
+  ]
+}

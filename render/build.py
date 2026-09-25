@@ -4,6 +4,7 @@ Build the plateau in Blender and render views of it.
     blender -b --factory-startup -P render/build.py -- --state today --station south
     blender -b --factory-startup -P render/build.py -- --state built --shot panorama --size 1920x1080 --samples 128
     blender -b --factory-startup -P render/build.py -- --queue render/queues/spike.json
+    blender -b --factory-startup -P render/build.py -- --film approach-built      # render/films.json
 
 A queue is {"renders": [{"state", "station" | "shot", "moment"?, "size"?, "samples"?, "out"?}, ...]};
 each state is built once and every view in it rendered from the same scene.
@@ -42,8 +43,50 @@ def renders_from(opts):
     return [r]
 
 
+def _catmull(points, t):
+    """A point on the uniform Catmull-Rom curve through `points` at t in [0, 1], ends clamped."""
+    n = len(points) - 1
+    s = min(max(t, 0.0), 1.0) * n
+    i = min(int(s), n - 1)
+    u = s - i
+    p = [points[max(0, min(n, i + k))] for k in (-1, 0, 1, 2)]
+    return tuple(0.5 * (2 * p[1][d] + (-p[0][d] + p[2][d]) * u + (2 * p[0][d] - 5 * p[1][d] + 4 * p[2][d] - p[3][d]) * u * u
+                        + (-p[0][d] + 3 * p[1][d] - 3 * p[2][d] + p[3][d]) * u ** 3) for d in range(3))
+
+
+def film(film_id, opts):
+    """Render a flight's frames from one built era (render/films.json); skips frames already on disk."""
+    import io
+    from giza import cameras
+    with io.open(os.path.join(HERE, "films.json"), encoding="utf-8") as f:
+        spec = next(x for x in json.load(f)["films"] if x["id"] == film_id)
+    stations, _ = data.views()
+    plateau = Plateau(spec["state"], aerosol=float(opts.get("aerosol", 1.1)), haze=float(opts.get("haze", 1.0)))
+    cx, cy = spec["centre"]
+    plateau.view({"id": film_id, "x": cx, "y": cy, "eye": 1.7, "target": list(spec["look"][-1]), "lens": spec["lens"]}, "shot")
+    plateau.moment(stations["moments"][spec["moment"]])
+    # The camera alone moves, so Cycles keeps the scene between frames instead of rebuilding it for each.
+    plateau.scene.render.use_persistent_data = True
+    w, h = (int(n) for n in spec["size"].split("x"))
+    n = int(spec["fps"] * spec["seconds"])
+    frames = os.path.join(data.REPO, "build", "films", film_id, "frames")
+    os.makedirs(frames, exist_ok=True)
+    for k in range(n):
+        out = os.path.join(frames, f"frame_{k:04d}.png")
+        if os.path.exists(out):
+            continue
+        t = k / (n - 1)
+        t = t * t * (3 - 2 * t)                    # ease in and out
+        cameras.frame(plateau.camera, _catmull(spec["path"], t), _catmull(spec["look"], t), spec["lens"])
+        plateau.render(out, w, h, int(spec["samples"]), view_id=f"{film_id} {k}", kind="film", moment=spec["moment"])
+    print(f"film {film_id}: {n} frames in {frames}")
+
+
 def main():
     opts = parse(sys.argv)
+    if "film" in opts:
+        film(opts["film"], opts)
+        return
     stations, shots = data.views()
     moments = stations["moments"]
     by_id = {("station", s["id"]): s for s in stations["stations"]}

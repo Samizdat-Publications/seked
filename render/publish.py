@@ -128,7 +128,7 @@ def main():
             jpg_name = f"{s['id']}-{st}.jpg"
             jpg = os.path.join(PANO_OUT, jpg_name)
             if not os.path.exists(jpg) or os.path.getmtime(jpg) < os.path.getmtime(png):
-                Image.open(png).convert("RGB").save(jpg, quality=86, optimize=True, progressive=True)
+                Image.open(png).convert("RGB").save(jpg, quality=82, optimize=True, progressive=True)   # 82 keeps a whole walkthrough under the 64 MB a page may carry
                 print(f"  {jpg_name}: {os.path.getsize(jpg) / 1e6:.2f} MB")
             panos[st] = f"pano/{jpg_name}"
             if os.path.exists(side):

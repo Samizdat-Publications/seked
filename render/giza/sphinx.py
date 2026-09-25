@@ -73,6 +73,14 @@ def statue(state, coll, log=print):
     mesh = rs.import_model(path, model["name"], keep_materials=True)
     obj = rs.cut_and_reduce(mesh, model.get("cut_z"), model.get("faces", 300000), model.get("largest_part_only", False))
     done = rs.fit(obj, model, data.FOOTPRINTS)
+    # The statue is cut from the bedrock it stands on: set its lowest point on the ditch's floor, where
+    # the fit leaves the paws hanging a few tenths of a metre over it (the floor sits under the lowest footprint base).
+    bpy.context.view_layer.update()
+    lowest = min((obj.matrix_world @ v.co).z for v in obj.data.vertices)
+    floor = enclosure(state)[4] + 0.02
+    if lowest > floor:
+        obj.location.z -= lowest - floor
+        log(f"sphinx: set down {lowest - floor:.2f} m onto the ditch's floor")
     if surface.get("gilded"):
         for mat in obj.data.materials:
             if mat is not None:

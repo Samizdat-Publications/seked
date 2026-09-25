@@ -192,7 +192,8 @@
    "neighbours": [
     "south",
     "east",
-    "harbour"
+    "harbour",
+    "sphinx-face"
    ],
    "landmarks": [
     {
@@ -624,7 +625,8 @@
     "today": "pano/panorama-today.jpg"
    },
    "neighbours": [
-    "south"
+    "south",
+    "menkaure"
    ],
    "landmarks": [
     {
@@ -891,6 +893,301 @@
     "temple",
     "east",
     "sphinx"
+   ],
+   "landmarks": [
+    {
+     "name": "Khufu",
+     "x": 0.0,
+     "y": 0.0,
+     "z": {
+      "first-time": 146.59,
+      "lion": 146.59,
+      "built": 146.59,
+      "stripped": 138.75,
+      "today": 138.75
+     },
+     "height": {
+      "first-time": 146.6,
+      "lion": 146.6,
+      "built": 146.6,
+      "stripped": 138.7,
+      "today": 138.7
+     }
+    },
+    {
+     "name": "Khafre",
+     "x": -334.41,
+     "y": -353.86,
+     "z": {
+      "first-time": 153.5,
+      "lion": 153.5,
+      "built": 153.5,
+      "stripped": 146.4,
+      "today": 146.4
+     },
+     "height": {
+      "first-time": 143.5,
+      "lion": 143.5,
+      "built": 143.5,
+      "stripped": 136.4,
+      "today": 136.4
+     }
+    },
+    {
+     "name": "Menkaure",
+     "x": -574.45,
+     "y": -739.19,
+     "z": {
+      "first-time": 76.89,
+      "lion": 76.89,
+      "built": 76.89,
+      "stripped": 73.76,
+      "today": 73.76
+     },
+     "height": {
+      "first-time": 65.0,
+      "lion": 65.0,
+      "built": 65.0,
+      "stripped": 61.9,
+      "today": 61.9
+     }
+    },
+    {
+     "name": "The Sphinx",
+     "x": 337.0,
+     "y": -433.0,
+     "z": {
+      "first-time": -2.95,
+      "lion": -8.55,
+      "built": -13.35,
+      "stripped": -14.35,
+      "today": -14.35
+     }
+    },
+    {
+     "name": "Queens' pyramids",
+     "x": 193.0,
+     "y": -92.5,
+     "z": {
+      "built": 28.3,
+      "stripped": 16.3,
+      "today": 16.3
+     }
+    },
+    {
+     "name": "The Nile valley",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "first-time": -30.0,
+      "lion": -30.0,
+      "built": -30.0
+     }
+    },
+    {
+     "name": "The village",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "stripped": 10.0
+     }
+    },
+    {
+     "name": "Giza and Cairo",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "today": 10.0
+     }
+    }
+   ]
+  },
+  {
+   "id": "sphinx-face",
+   "name": "Before the Sphinx",
+   "where": "On the floor of the ditch at the tips of the paws, looking up at the face",
+   "moment": "midday, November, the sun over the south wall of the ditch",
+   "camera": [
+    365.5,
+    -433.0,
+    -40.406
+   ],
+   "view": {
+    "yaw": 272,
+    "pitch": 30,
+    "fov": 70
+   },
+   "panoramas": {
+    "first-time": "pano/sphinx-face-first-time.jpg",
+    "lion": "pano/sphinx-face-lion.jpg",
+    "built": "pano/sphinx-face-built.jpg",
+    "stripped": "pano/sphinx-face-stripped.jpg",
+    "today": "pano/sphinx-face-today.jpg"
+   },
+   "neighbours": [
+    "sphinx",
+    "harbour"
+   ],
+   "landmarks": [
+    {
+     "name": "Khufu",
+     "x": 0.0,
+     "y": 0.0,
+     "z": {
+      "first-time": 146.59,
+      "lion": 146.59,
+      "built": 146.59,
+      "stripped": 138.75,
+      "today": 138.75
+     },
+     "height": {
+      "first-time": 146.6,
+      "lion": 146.6,
+      "built": 146.6,
+      "stripped": 138.7,
+      "today": 138.7
+     }
+    },
+    {
+     "name": "Khafre",
+     "x": -334.41,
+     "y": -353.86,
+     "z": {
+      "first-time": 153.5,
+      "lion": 153.5,
+      "built": 153.5,
+      "stripped": 146.4,
+      "today": 146.4
+     },
+     "height": {
+      "first-time": 143.5,
+      "lion": 143.5,
+      "built": 143.5,
+      "stripped": 136.4,
+      "today": 136.4
+     }
+    },
+    {
+     "name": "Menkaure",
+     "x": -574.45,
+     "y": -739.19,
+     "z": {
+      "first-time": 76.89,
+      "lion": 76.89,
+      "built": 76.89,
+      "stripped": 73.76,
+      "today": 73.76
+     },
+     "height": {
+      "first-time": 65.0,
+      "lion": 65.0,
+      "built": 65.0,
+      "stripped": 61.9,
+      "today": 61.9
+     }
+    },
+    {
+     "name": "The Sphinx",
+     "x": 337.0,
+     "y": -433.0,
+     "z": {
+      "first-time": -2.95,
+      "lion": -8.55,
+      "built": -13.35,
+      "stripped": -14.35,
+      "today": -14.35
+     }
+    },
+    {
+     "name": "Queens' pyramids",
+     "x": 193.0,
+     "y": -92.5,
+     "z": {
+      "built": 28.3,
+      "stripped": 16.3,
+      "today": 16.3
+     }
+    },
+    {
+     "name": "The Nile valley",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "first-time": -30.0,
+      "lion": -30.0,
+      "built": -30.0
+     }
+    },
+    {
+     "name": "The village",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "stripped": 10.0
+     }
+    },
+    {
+     "name": "Giza and Cairo",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "today": 10.0
+     }
+    }
+   ],
+   "cameras": {
+    "first-time": [
+     365.5,
+     -433.0,
+     -40.406
+    ],
+    "lion": [
+     365.5,
+     -433.0,
+     -40.406
+    ],
+    "built": [
+     365.5,
+     -433.0,
+     -40.406
+    ],
+    "stripped": [
+     365.5,
+     -433.0,
+     -27.471
+    ],
+    "today": [
+     365.5,
+     -433.0,
+     -40.406
+    ]
+   }
+  },
+  {
+   "id": "menkaure",
+   "name": "Menkaure",
+   "where": "South-east of his mortuary temple, his three queens to the left",
+   "moment": "mid-morning, November, the sun high enough to clear the walls' shadows",
+   "camera": [
+    -400.0,
+    -800.0,
+    3.568
+   ],
+   "view": {
+    "yaw": 282,
+    "pitch": 8,
+    "fov": 62
+   },
+   "panoramas": {
+    "first-time": "pano/menkaure-first-time.jpg",
+    "lion": "pano/menkaure-lion.jpg",
+    "built": "pano/menkaure-built.jpg",
+    "stripped": "pano/menkaure-stripped.jpg",
+    "today": "pano/menkaure-today.jpg"
+   },
+   "neighbours": [
+    "south",
+    "panorama"
    ],
    "landmarks": [
     {

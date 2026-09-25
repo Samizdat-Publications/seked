@@ -43,6 +43,11 @@
       "date": "11-15",
       "solar": 10.0,
       "label": "mid-morning, November, the sun high enough to clear the walls' shadows"
+    },
+    "sphinx-noon": {
+      "date": "11-15",
+      "solar": 12.0,
+      "label": "midday, November, the sun over the south wall of the ditch"
     }
   },
   "stations": [
@@ -82,7 +87,8 @@
       "neighbours": [
         "south",
         "east",
-        "harbour"
+        "harbour",
+        "sphinx-face"
       ],
       "z": -29.5,
       "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it."
@@ -141,7 +147,8 @@
         "fov": 40
       },
       "neighbours": [
-        "south"
+        "south",
+        "menkaure"
       ]
     },
     {
@@ -183,6 +190,44 @@
         "sphinx"
       ],
       "note": "Chosen from the mastaba and queens' footprints: 9 m from the nearest mastaba, twelve within 50 m, and Khufu's apex 6 degrees above the nearest queen."
+    },
+    {
+      "id": "sphinx-face",
+      "name": "Before the Sphinx",
+      "where": "On the floor of the ditch at the tips of the paws, looking up at the face",
+      "x": 365.5,
+      "y": -433.0,
+      "eye": 1.7,
+      "moment": "sphinx-noon",
+      "view": {
+        "yaw": 272,
+        "pitch": 30,
+        "fov": 70
+      },
+      "neighbours": [
+        "sphinx",
+        "harbour"
+      ],
+      "note": "Eye 1.7 m over whatever floor the era has: the ditch where it is open, the drift of c. 1800 CE where it is not."
+    },
+    {
+      "id": "menkaure",
+      "name": "Menkaure",
+      "where": "South-east of his mortuary temple, his three queens to the left",
+      "x": -400.0,
+      "y": -800.0,
+      "eye": 1.7,
+      "moment": "temple-morning",
+      "view": {
+        "yaw": 282,
+        "pitch": 8,
+        "fov": 62
+      },
+      "neighbours": [
+        "south",
+        "panorama"
+      ],
+      "note": "Outside the mortuary temple's footprint, so its walls stand between the camera and the pyramid as built."
     },
     {
       "id": "harbour",

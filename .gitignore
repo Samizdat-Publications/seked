@@ -56,3 +56,4 @@ build/city/
 # The walkthrough's rendered panoramas and frames are build outputs
 apps/walk/pano/
 apps/walk/img/
+apps/walk/films/

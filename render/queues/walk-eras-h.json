@@ -1,0 +1,109 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-lion.png"
+  },
+  {
+   "state": "lion",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-lion.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-built.png"
+  },
+  {
+   "state": "built",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/menkaure-today.png"
+  },
+  {
+   "state": "today",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 128,
+   "out": "build/render/shots/panorama-today.png"
+  }
+ ]
+}
