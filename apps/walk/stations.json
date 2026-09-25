@@ -492,7 +492,8 @@
    "neighbours": [
     "east",
     "gallery",
-    "orion"
+    "orion",
+    "subterranean"
    ],
    "landmarks": [
     {
@@ -1317,7 +1318,138 @@
    },
    "neighbours": [
     "sphinx",
-    "south"
+    "south",
+    "town"
+   ],
+   "landmarks": [
+    {
+     "name": "Khufu",
+     "x": 0.0,
+     "y": 0.0,
+     "z": {
+      "first-time": 146.59,
+      "lion": 146.59,
+      "built": 146.59,
+      "stripped": 138.75,
+      "today": 138.75
+     },
+     "height": {
+      "first-time": 146.6,
+      "lion": 146.6,
+      "built": 146.6,
+      "stripped": 138.7,
+      "today": 138.7
+     }
+    },
+    {
+     "name": "Khafre",
+     "x": -334.41,
+     "y": -353.86,
+     "z": {
+      "first-time": 153.5,
+      "lion": 153.5,
+      "built": 153.5,
+      "stripped": 146.4,
+      "today": 146.4
+     },
+     "height": {
+      "first-time": 143.5,
+      "lion": 143.5,
+      "built": 143.5,
+      "stripped": 136.4,
+      "today": 136.4
+     }
+    },
+    {
+     "name": "Menkaure",
+     "x": -574.45,
+     "y": -739.19,
+     "z": {
+      "first-time": 76.89,
+      "lion": 76.89,
+      "built": 76.89,
+      "stripped": 73.76,
+      "today": 73.76
+     },
+     "height": {
+      "first-time": 65.0,
+      "lion": 65.0,
+      "built": 65.0,
+      "stripped": 61.9,
+      "today": 61.9
+     }
+    },
+    {
+     "name": "The Sphinx",
+     "x": 337.0,
+     "y": -433.0,
+     "z": {
+      "first-time": -2.95,
+      "lion": -8.55,
+      "built": -13.35,
+      "stripped": -14.35,
+      "today": -14.35
+     }
+    },
+    {
+     "name": "Queens' pyramids",
+     "x": 193.0,
+     "y": -92.5,
+     "z": {
+      "built": 28.3,
+      "stripped": 16.3,
+      "today": 16.3
+     }
+    },
+    {
+     "name": "The Nile valley",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "first-time": -30.0,
+      "lion": -30.0,
+      "built": -30.0
+     }
+    },
+    {
+     "name": "The village",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "stripped": 10.0
+     }
+    },
+    {
+     "name": "Giza and Cairo",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "today": 10.0
+     }
+    }
+   ]
+  },
+  {
+   "id": "town",
+   "name": "The builders' town",
+   "where": "Where its main street crosses the lane between the gallery blocks, south of the Wall of the Crow",
+   "moment": "midday, November, the sun over the south wall of the ditch",
+   "camera": [
+    516.0,
+    -841.5,
+    -38.152
+   ],
+   "view": {
+    "yaw": 330,
+    "pitch": 6,
+    "fov": 66
+   },
+   "panoramas": {
+    "built": "pano/town-built.jpg"
+   },
+   "neighbours": [
+    "harbour",
+    "menkaure"
    ],
    "landmarks": [
     {
@@ -1782,6 +1914,52 @@
      "x": 4.95,
      "y": -2.64,
      "z": 22.8
+    }
+   ],
+   "inside": true
+  },
+  {
+   "id": "subterranean",
+   "name": "The subterranean chamber",
+   "where": "Cut in the bedrock thirty metres under the pyramid, and never finished",
+   "moment": "by the era's lamps",
+   "camera": [
+    5.2,
+    -3.0,
+    -28.78
+   ],
+   "view": {
+    "yaw": 262,
+    "pitch": -4,
+    "fov": 72
+   },
+   "panoramas": {
+    "built": "pano/subterranean-built.jpg",
+    "stripped": "pano/subterranean-stripped.jpg",
+    "today": "pano/subterranean-today.jpg"
+   },
+   "neighbours": [
+    "north",
+    "gallery"
+   ],
+   "landmarks": [
+    {
+     "name": "The pit",
+     "x": 2.26,
+     "y": -5.96,
+     "z": -31.6
+    },
+    {
+     "name": "From the descending passage",
+     "x": 7.27,
+     "y": -1.02,
+     "z": -29.4
+    },
+    {
+     "name": "The dead-end drift",
+     "x": 7.24,
+     "y": -9.3,
+     "z": -30.5
     }
    ],
    "inside": true

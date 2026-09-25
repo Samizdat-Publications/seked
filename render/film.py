@@ -2,6 +2,7 @@
 Films from rendered stills.
 
     python render/film.py rollback                      # the panorama shot, today back to the First Time
+    python render/film.py sphinx                        # the Sphinx's sequence, Anubis to today
     python render/film.py crossfade --stills a.png b.png ... --labels "A" "B" ... --out build/films/NAME
 
 `crossfade` holds each still, dissolves into the next and pushes in slowly across the whole
@@ -176,6 +177,23 @@ def rollback():
     return crossfade(stills, labels, notes, os.path.join(REPO, "build", "films", "rollback"))
 
 
+def sphinx():
+    """The Sphinx's sequence forward in time, from above its temple with Khafre's pyramid behind."""
+    order = ["first-time", "lion", "built", "stripped", "today"]
+    stills = [os.path.join(REPO, "build", "render", "shots", f"sphinx-sequence-{st}.png") for st in order]
+    missing = [p for p in stills if not os.path.exists(p)]
+    if missing:
+        raise SystemExit(f"not rendered yet: {missing}")
+    labels = ["The Anubis Sphinx, c. 10,500 BCE", "The lion, c. 7000 BCE", "Khafre's Sphinx, c. 2560 BCE",
+              "Buried to the chest, c. 1800 CE", "Excavated, 2026"]
+    notes = ["a claim: a jackal first, the older statue the recut Sphinx is said to hide",
+             "a claim: the weathered lion before the king's head was cut from its own",
+             "a reconstruction: the king's head, the ditch swept, his temple before it",
+             "a reconstruction: the sand in the ditch as the first surveyors found it",
+             "the present Sphinx, from the survey; the statue is a labelled stand-in"]
+    return crossfade(stills, labels, notes, os.path.join(REPO, "build", "films", "sphinx-sequence"), zoom=1.08)
+
+
 def _opts(argv):
     """--key value [value ...] pairs; a key with one value maps to it, with several to the list."""
     out, key = {}, None
@@ -197,6 +215,8 @@ if __name__ == "__main__":
         encode(o["frames"], o["out"], int(o.get("fps", 24)), w, h, o.get("quality", "HIGH"))
     elif cmd == "night":
         print(night_overlay(o.get("id", "sky-rollback")))
+    elif cmd == "sphinx":
+        print(sphinx())
     elif cmd == "crossfade":
         stills = o["stills"] if isinstance(o["stills"], list) else [o["stills"]]
         labels = o.get("labels", [os.path.basename(p) for p in stills])

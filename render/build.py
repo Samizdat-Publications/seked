@@ -72,18 +72,21 @@ def film(film_id, opts):
         plateau.moment(stations["moments"][spec["moment"]])
     # The camera alone moves, so Cycles keeps the scene between frames instead of rebuilding it for each.
     plateau.scene.render.use_persistent_data = True
-    w, h = (int(n) for n in spec["size"].split("x"))
+    w, h = (int(n) for n in opts.get("size", spec["size"]).split("x"))
+    samples = int(opts.get("samples", spec["samples"]))
     n = int(spec["fps"] * spec["seconds"])
-    frames = os.path.join(data.REPO, "build", "films", film_id, "frames")
+    # --preview 0,96,200 renders just those frames into build/films/<id>/preview, to try a path cheaply.
+    preview = [int(k) for k in opts["preview"].split(",")] if opts.get("preview") else None
+    frames = os.path.join(data.REPO, "build", "films", film_id, "preview" if preview else "frames")
     os.makedirs(frames, exist_ok=True)
-    for k in range(n):
+    for k in (preview if preview else range(n)):
         out = os.path.join(frames, f"frame_{k:04d}.png")
-        if os.path.exists(out):
+        if os.path.exists(out) and not preview:
             continue
         t = k / (n - 1)
         t = t * t * (3 - 2 * t)                    # ease in and out
         cameras.frame(plateau.camera, _catmull(spec["path"], t), _catmull(spec["look"], t), spec["lens"])
-        plateau.render(out, w, h, int(spec["samples"]), view_id=f"{film_id} {k}", kind="film", moment=spec.get("moment"))
+        plateau.render(out, w, h, samples, view_id=f"{film_id} {k}", kind="film", moment=spec.get("moment"))
     print(f"film {film_id}: {n} frames in {frames}")
 
 

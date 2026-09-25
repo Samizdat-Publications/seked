@@ -98,6 +98,20 @@
       ],
       "lens": 500,
       "moment": "sphinx-morning"
+    },
+    {
+      "id": "sphinx-sequence",
+      "name": "The Sphinx before Khafre's pyramid, from above its temple, 40 mm",
+      "x": 439.0,
+      "y": -445.0,
+      "z": -29.5,
+      "target": [
+        337.5,
+        -441.6,
+        -25.9
+      ],
+      "lens": 40,
+      "moment": "sphinx-morning"
     }
   ]
 }
