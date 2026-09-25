@@ -1,5 +1,5 @@
 {
-  "about": "Third-party models used as visual stand-ins for structures that are not pyramids. None is a measurement: each is placed on the OSM footprint of what it stands for (centroid, principal axis and length along it), and nothing about its form is entered in data/. `python scripts/models.py` downloads them into build/models/ (gitignored) through the Sketchfab API with the token in SKETCHFAB_TOKEN or ~/.seked/keys.env; `blender/render_standins.py` fits them at render time and labels every one a stand-in. Under `figures` are people for the walkthrough's crowds, generated with Meshy text to 3D (`python scripts/meshy.py generate <id>`) and instanced by render/giza/figures.py. A figure is not a stand-in: it is fitted to no footprint and stands for no one, the prompt is the whole of what the model was told, and its form, its clothing and the height it is drawn at are look choices, never measurements.",
+  "about": "Third-party models used as visual stand-ins for structures that are not pyramids. None is a measurement: each is placed on the OSM footprint of what it stands for (centroid, principal axis and length along it), and nothing about its form is entered in data/. `python scripts/models.py` downloads them into build/models/ (gitignored) through the Sketchfab API with the token in SKETCHFAB_TOKEN or ~/.seked/keys.env; `blender/render_standins.py` fits them at render time and labels every one a stand-in. Under `figures` are people for the walkthrough's crowds, generated with Meshy text to 3D (`python scripts/meshy.py generate <id>`) and instanced by render/giza/figures.py. A figure is not a stand-in: it is fitted to no footprint and stands for no one, the prompt is the whole of what the model was told, and its form, its clothing and the height it is drawn at are look choices, never measurements. Under `animals` are the walkthrough's herds (render/giza/fauna.py instances them): third-party models from Sketchfab and, where nothing free served, a Meshy generation; like a figure, an animal is fitted to no footprint and stands for no one, its pose and the size it is drawn at are look choices, and nothing of its form is a measurement.",
   "models": [
     {
       "id": "sphinx-watt",
@@ -706,6 +706,294 @@
         "preview_task": "01a0d6ad-e9c3-705b-94b6-e72dc25e8ac6",
         "sha256": "9b445c7957885605307224d2101190cc3810c2e410fbf5450988fcf5a4372a4c"
       }
+    }
+  ],
+  "animals": [
+    {
+      "id": "animal-giraffe",
+      "sketchfab": "20a57636ec0c44c996e7f36313792cea",
+      "name": "Giraffe, rigged (animal)",
+      "author": "Kapi777",
+      "url": "https://sketchfab.com/3d-models/giraffemotions-20a57636ec0c44c996e7f36313792cea",
+      "license": "CC BY-NC 4.0",
+      "attribution": "\"Giraffe+motions\" by Kapi777 (https://sketchfab.com/Kapi777), CC BY-NC 4.0: a rigged giraffe with nineteen animations, posed from three of them, decimated and refitted.",
+      "why": "The claim eras' giraffes. render/giza/fauna.py takes three poses from its animations (standing, browsing with the neck raised, walking), so one model gives a herd more than one outline."
+    },
+    {
+      "id": "animal-giraffe-reticulated",
+      "sketchfab": "7c91bd719e594fcc930f3646db843265",
+      "name": "Giraffe, head turned (animal)",
+      "author": "SDPM Esare (sdpm)",
+      "url": "https://sketchfab.com/3d-models/giraffe-7c91bd719e594fcc930f3646db843265",
+      "license": "CC BY 4.0",
+      "attribution": "\"Giraffe\" by SDPM Esare (sdpm) (https://sketchfab.com/sdpm), CC BY 4.0: a giraffe standing with its head turned aside, decimated and refitted.",
+      "why": "A second giraffe for the claim eras' herds, with a darker coat and another outline."
+    },
+    {
+      "id": "animal-elephant-cow",
+      "sketchfab": "fe5fcad06cad4cf79aca431b937510a2",
+      "name": "African savanna elephant, cow (animal)",
+      "author": "jimmyho905",
+      "url": "https://sketchfab.com/3d-models/female-african-elephant-planet-zoo-fe5fcad06cad4cf79aca431b937510a2",
+      "license": "CC BY 4.0",
+      "attribution": "\"Female African Elephant Planet Zoo\" by jimmyho905 (https://sketchfab.com/jimmyho905), CC BY 4.0: an elephant cow its uploader describes as a model from the game Planet Zoo, recorded as posted; decimated and refitted.",
+      "why": "The claim eras' elephants: elephants, giraffes, antelopes and ostriches are the animals of the Saharan rock art of the African Humid Period. Its uploader says it comes from Planet Zoo (Frontier Developments); the licence recorded is the one it is posted under."
+    },
+    {
+      "id": "animal-elephant-bull",
+      "sketchfab": "56bd35c75a5d463889ef2e49b714337d",
+      "name": "African savanna elephant, bull (animal)",
+      "author": "jimmyho905",
+      "url": "https://sketchfab.com/3d-models/african-elephant-planet-zoo-56bd35c75a5d463889ef2e49b714337d",
+      "license": "CC BY 4.0",
+      "attribution": "\"African Elephant Planet Zoo\" by jimmyho905 (https://sketchfab.com/jimmyho905), CC BY 4.0: an elephant bull its uploader describes as a model from the game Planet Zoo, recorded as posted; decimated and refitted.",
+      "why": "A bull for the elephant herds; the same provenance as animal-elephant-cow."
+    },
+    {
+      "id": "animal-elephant-calf",
+      "sketchfab": "1d155e129d1346c39dacda270bbb9250",
+      "name": "African savanna elephant, calf (animal)",
+      "author": "jimmyho905",
+      "url": "https://sketchfab.com/3d-models/baby-african-elephant-planet-zoo-1d155e129d1346c39dacda270bbb9250",
+      "license": "CC BY 4.0",
+      "attribution": "\"Baby African Elephant Planet Zoo\" by jimmyho905 (https://sketchfab.com/jimmyho905), CC BY 4.0: an elephant calf its uploader describes as a model from the game Planet Zoo, recorded as posted; decimated and refitted.",
+      "why": "A calf for the elephant herds; the same provenance as animal-elephant-cow."
+    },
+    {
+      "id": "animal-gazelle",
+      "sketchfab": "4afbf4bd95764e32b8a29168cb2549da",
+      "name": "Gazelle (animal)",
+      "author": "hendrikReyneke",
+      "url": "https://sketchfab.com/3d-models/gazelle-4afbf4bd95764e32b8a29168cb2549da",
+      "license": "CC BY 4.0",
+      "attribution": "\"Gazelle\" by hendrikReyneke (https://sketchfab.com/hendrikReyneke), CC BY 4.0: a gazelle standing, refitted.",
+      "why": "A plains gazelle standing in for the dorcas and dama gazelles of North Africa in the claim eras' herds."
+    },
+    {
+      "id": "animal-oryx",
+      "sketchfab": "a7b3f9ddbf234374b79a1e40e3a05b59",
+      "name": "Oryx (animal)",
+      "author": "Khan Farhan (Farhan001)",
+      "url": "https://sketchfab.com/3d-models/arabian-oryx-a7b3f9ddbf234374b79a1e40e3a05b59",
+      "license": "CC BY 4.0",
+      "attribution": "\"Arabian oryx\" by Khan Farhan (Farhan001) (https://sketchfab.com/Farhan001), CC BY 4.0: generated by its author with Meshy's AI toolkit, decimated and refitted.",
+      "why": "An oryx standing in for the scimitar-horned oryx of the Sahara, whose horns curve further back than this one's."
+    },
+    {
+      "id": "animal-addax",
+      "sketchfab": "9aaa96bf6e984d8fbf865625a60a411f",
+      "name": "Addax (animal)",
+      "author": "Kent MORI @rojohaku (Memento)",
+      "url": "https://sketchfab.com/3d-models/addax-taxidermy-nsmt-m32067-9aaa96bf6e984d8fbf865625a60a411f",
+      "license": "CC BY-NC 4.0",
+      "attribution": "\"Addax_Taxidermy ( NSMT-M32067 )\" by Kent MORI @rojohaku (Memento) (https://sketchfab.com/Memento), CC BY-NC 4.0: a photogrammetric scan of the mounted addax NSMT-M32067 in the National Museum of Nature and Science, Tokyo, scanned and prepared by Kent Mori (Rojohaku); its plinth cut away and refitted.",
+      "why": "The addax is an antelope of the Sahara itself, and a scan of a mounted specimen carries a real animal's coat and proportions."
+    },
+    {
+      "id": "animal-hartebeest",
+      "sketchfab": "f7a99d6b1b3f41c8a7016c7e00ed7039",
+      "name": "Hartebeest (animal)",
+      "author": "iRahulRajput (rt699448)",
+      "url": "https://sketchfab.com/3d-models/elk-antelope-f7a99d6b1b3f41c8a7016c7e00ed7039",
+      "license": "CC BY 4.0",
+      "attribution": "\"Elk Antelope\" by iRahulRajput (rt699448) (https://sketchfab.com/rt699448), CC BY 4.0: an antelope its author describes as a hartebeest; decimated and refitted.",
+      "why": "The bubal hartebeest lived in North Africa into the twentieth century; this East African hartebeest stands in for it in the claim eras."
+    },
+    {
+      "id": "animal-ostrich",
+      "sketchfab": "7c1ba7c48a9c485b848ae4d48487a423",
+      "name": "Ostrich (animal)",
+      "author": "Stephengury",
+      "url": "https://sketchfab.com/3d-models/ostrichstruthio-camelus-7c1ba7c48a9c485b848ae4d48487a423",
+      "license": "CC BY 4.0",
+      "attribution": "\"Ostrich (Struthio camelus)\" by Stephengury (https://sketchfab.com/Stephengury), CC BY 4.0: a standing ostrich, decimated and refitted.",
+      "why": "The claim eras' ostriches, which also stand in the Saharan rock art."
+    },
+    {
+      "id": "animal-cattle-ankole",
+      "sketchfab": "3cefbcf3e4cc4e77b9dd354d3ba7e915",
+      "name": "Long-horned cattle, Ankole (animal)",
+      "author": "kenchoo",
+      "url": "https://sketchfab.com/3d-models/ankole-cattle-3cefbcf3e4cc4e77b9dd354d3ba7e915",
+      "license": "CC BY-NC-ND 4.0",
+      "attribution": "\"Ankole Cattle\" by kenchoo (https://sketchfab.com/kenchoo), CC BY-NC-ND 4.0: an Ankole bull, decimated and refitted for rendering; the NoDerivs term is recorded.",
+      "why": "The long-horned cattle of the Old Kingdom's tomb scenes carry lyre-shaped horns like the Ankole's; the as-built era's herds in the valley fields and near the Wall of the Crow, where the builders' town ate cattle brought in from the estates."
+    },
+    {
+      "id": "animal-cattle-piebald",
+      "sketchfab": "de1a51df880b4fc3b1b46d36a64628f6",
+      "name": "Long-horned cattle, piebald (animal)",
+      "author": "Brian Trepanier (CMBC)",
+      "url": "https://sketchfab.com/3d-models/ankole-watusi-cow-de1a51df880b4fc3b1b46d36a64628f6",
+      "license": "CC BY 4.0",
+      "attribution": "\"Ankole-Watusi cow\" by Brian Trepanier (CMBC) (https://sketchfab.com/CMBC), CC BY 4.0: an Ankole-Watusi cow, decimated and refitted.",
+      "why": "A dark piebald long-horned cow, as the black-and-white cattle of the Old Kingdom's tomb scenes, for variety in the as-built herds."
+    },
+    {
+      "id": "animal-donkey-pack",
+      "sketchfab": "77bcefe8d32b40cba8e706f43e3e0996",
+      "name": "Donkey with a load (animal)",
+      "author": "amoreno",
+      "url": "https://sketchfab.com/3d-models/donkey-13-77bcefe8d32b40cba8e706f43e3e0996",
+      "license": "CC BY 4.0",
+      "attribution": "\"DONKEY 13\" by amoreno (https://sketchfab.com/amoreno), CC BY 4.0: an AI-generated donkey carrying a load of sacks, decimated and refitted.",
+      "why": "The donkey was the Old Kingdom's pack animal; as built, loaded donkeys go between the harbour, the gate in the Wall of the Crow and the plateau."
+    },
+    {
+      "id": "animal-donkey-pack-2",
+      "sketchfab": "e5070bc9358a46cda0fb03fc9d14c385",
+      "name": "Donkey with packs (animal)",
+      "author": "amoreno",
+      "url": "https://sketchfab.com/3d-models/donkey-12-e5070bc9358a46cda0fb03fc9d14c385",
+      "license": "CC BY 4.0",
+      "attribution": "\"DONKEY 12\" by amoreno (https://sketchfab.com/amoreno), CC BY 4.0: an AI-generated donkey carrying packs, decimated and refitted.",
+      "why": "A second loaded donkey, with another load and outline."
+    },
+    {
+      "id": "animal-donkey",
+      "sketchfab": "258569ef657b48e597ca0a167642b512",
+      "name": "Donkey (animal)",
+      "author": "iRahulRajput (rt699448)",
+      "url": "https://sketchfab.com/3d-models/donkey-in-profile-258569ef657b48e597ca0a167642b512",
+      "license": "CC BY 4.0",
+      "attribution": "\"Donkey in Profile\" by iRahulRajput (rt699448) (https://sketchfab.com/rt699448), CC BY 4.0: an AI-generated donkey standing unloaded, decimated and refitted.",
+      "why": "An unloaded donkey for the as-built era and 1800."
+    },
+    {
+      "id": "animal-goat-white",
+      "sketchfab": "15692d6248564a19bf2514ce2344ce70",
+      "name": "Goat, white (animal)",
+      "author": "Tolibjon (tolibjon)",
+      "url": "https://sketchfab.com/3d-models/goat-15692d6248564a19bf2514ce2344ce70",
+      "license": "CC BY 4.0",
+      "attribution": "\"Goat\" by Tolibjon (tolibjon) (https://sketchfab.com/tolibjon), CC BY 4.0: a white goat standing, decimated and refitted.",
+      "why": "Goats for the as-built valley and the village of 1800."
+    },
+    {
+      "id": "animal-goat-brown",
+      "sketchfab": "2624ac2ce2364930ba2d5f70eb7aa1ea",
+      "name": "Goat, brown (animal)",
+      "author": "hendrikReyneke",
+      "url": "https://sketchfab.com/3d-models/goat-2624ac2ce2364930ba2d5f70eb7aa1ea",
+      "license": "CC BY 4.0",
+      "attribution": "\"Goat\" by hendrikReyneke (https://sketchfab.com/hendrikReyneke), CC BY 4.0: a brown goat standing, refitted.",
+      "why": "A second goat, brown, so a flock is not all white."
+    },
+    {
+      "id": "animal-camel-saddled",
+      "sketchfab": "44ef2ea4b50a49e395e5e3ebbdc99f98",
+      "name": "Dromedary, saddled (animal)",
+      "author": "omarme37",
+      "url": "https://sketchfab.com/3d-models/camel-44ef2ea4b50a49e395e5e3ebbdc99f98",
+      "license": "CC BY 4.0",
+      "attribution": "\"camel\" by omarme37 (https://sketchfab.com/omarme37), CC BY 4.0: a dromedary under a carpet saddle cloth with tassels and a lead rope, refitted.",
+      "why": "Today's tourist camels at the panorama stand and along the plateau's roads."
+    },
+    {
+      "id": "animal-camel-blanket",
+      "sketchfab": "99af7daa5baf450ea7b809937937e6d5",
+      "name": "Dromedary in a striped coat (animal)",
+      "author": "eb78 (E.A.Cornell)",
+      "url": "https://sketchfab.com/3d-models/camel-99af7daa5baf450ea7b809937937e6d5",
+      "license": "CC BY 4.0",
+      "attribution": "\"Camel\" by eb78 (E.A.Cornell) (https://sketchfab.com/E.A.Cornell), CC BY 4.0: a rigged dromedary in a striped coat with three animations, posed from them; its alpha-card hair dropped, decimated and refitted.",
+      "why": "Tourist camels in coloured blankets, as at Giza today; the poses give one standing, one grazing and one walking."
+    },
+    {
+      "id": "animal-camel",
+      "sketchfab": "05a0854fb54d4e34a100016545cc69e5",
+      "name": "Dromedary (animal)",
+      "author": "kenchoo",
+      "url": "https://sketchfab.com/3d-models/camel-download-the-original-glb-05a0854fb54d4e34a100016545cc69e5",
+      "license": "CC BY 4.0",
+      "attribution": "\"Camel (Download the original glb)\" by kenchoo (https://sketchfab.com/kenchoo), CC BY 4.0: a rebuild of \"Camel\" by yankobe (CC BY 4.0), posed from its animation, decimated and refitted.",
+      "why": "An unsaddled dromedary, for the village of 1800 and the camels resting between rides today."
+    },
+    {
+      "id": "animal-horse-arabian",
+      "sketchfab": "9b58091498374f2191b37ec78abe6aaf",
+      "name": "Horse, grey Arabian (animal)",
+      "author": "ben.townsend",
+      "url": "https://sketchfab.com/3d-models/horse-9b58091498374f2191b37ec78abe6aaf",
+      "license": "CC BY-NC-SA 4.0",
+      "attribution": "\"Horse\" by ben.townsend (https://sketchfab.com/ben.townsend), CC BY-NC-SA 4.0: an Arabian horse trotting, captured with Scaniverse; decimated and refitted.",
+      "why": "Today's horses at Giza, many of them grey Arabians."
+    },
+    {
+      "id": "animal-horse-bay",
+      "sketchfab": "9b77bb7542354b10bb7b4c6a25866724",
+      "name": "Horse, bay (animal)",
+      "author": "pgonarg",
+      "url": "https://sketchfab.com/3d-models/horse-free-download-9b77bb7542354b10bb7b4c6a25866724",
+      "license": "CC BY 4.0",
+      "attribution": "\"Horse free download\" by pgonarg (https://sketchfab.com/pgonarg), CC BY 4.0: a bay horse standing; its author notes that its texture is projected from a photograph (Scott Smudsky, Britannica) he does not own. Decimated and refitted.",
+      "why": "A standing horse for today's stands; the texture's provenance is recorded as its author gives it."
+    },
+    {
+      "id": "animal-horse-cart",
+      "sketchfab": "1c130992d2d64b4ba127ba1df6735229",
+      "name": "Horse and cart (animal)",
+      "author": "Depro777 (depro777ru)",
+      "url": "https://sketchfab.com/3d-models/cart-and-horse-1c130992d2d64b4ba127ba1df6735229",
+      "license": "CC BY 4.0",
+      "attribution": "\"Cart and horse\" by Depro777 (depro777ru) (https://sketchfab.com/depro777ru), CC BY 4.0: a horse between the shafts of a cart loaded with sacks and a barrel; its floor tile dropped, refitted.",
+      "why": "Horses with carts on today's plateau roads."
+    },
+    {
+      "id": "animal-hippo",
+      "sketchfab": "0977b07597ea46f4a2f6a7cfacac523a",
+      "name": "Hippopotamus (animal)",
+      "author": "Stephengury",
+      "url": "https://sketchfab.com/3d-models/hippopotamus-amphibius-0977b07597ea46f4a2f6a7cfacac523a",
+      "license": "CC BY 4.0",
+      "attribution": "\"Hippopotamus amphibius\" by Stephengury (https://sketchfab.com/Stephengury), CC BY 4.0: a hippopotamus walking, decimated and refitted.",
+      "why": "The claim eras' flood carries hippopotamuses, as the lakes of the green Sahara did and the rock art shows; they stand in the shallows with the water to their backs."
+    },
+    {
+      "id": "animal-buffalo",
+      "sketchfab": "10430df80e6446f2a77cb0ba93ed5cd1",
+      "name": "African buffalo (animal)",
+      "author": "kenchoo",
+      "url": "https://sketchfab.com/3d-models/african-buffalo-10430df80e6446f2a77cb0ba93ed5cd1",
+      "license": "CC BY 4.0",
+      "attribution": "\"African Buffalo\" by kenchoo (https://sketchfab.com/kenchoo), CC BY 4.0, a rebuild of \"African Buffalo\" by Stephengury (CC BY 4.0): posed from its animation, decimated and refitted.",
+      "why": "A Cape buffalo standing in for the great buffalo of the Saharan rock art (the 'Bubalus' of its earliest period), grazing the claim eras' valley edge."
+    },
+    {
+      "id": "animal-camel-meshy",
+      "name": "Dromedary, saddled, half sitting (animal)",
+      "author": "generated with Meshy from a text prompt",
+      "url": "https://www.meshy.ai/",
+      "license": "generated (Meshy paid plan: the output belongs to the account holder)",
+      "attribution": "Generated by Meshy (text to 3D, meshy-7.1) from the prompt in this entry; a look choice, and nothing of its form is a measurement.",
+      "why": "Asked for a kneeling tourist camel, as the camels at Giza wait between rides. It came back with a red halter and lead, a striped blanket and a wooden riding saddle, standing on its forelegs with its hind legs folded under it, half way to sitting, which reads at a distance as a camel standing wrong. The prompt is kept as it was sent, because it is the whole of what the model was told.",
+      "meshy": {
+        "endpoint": "text-to-3d",
+        "prompt": "Photorealistic 3D model of an adult dromedary camel kneeling on the ground, resting with all four legs folded underneath its body and its belly on the sand, the neck raised in a gentle S-curve and the head up, looking straight ahead. A working tourist camel at the pyramids of Giza: a traditional Egyptian riding saddle with a low wooden frame and upright wooden pommels front and back, padded with a folded red, orange and indigo woven wool blanket with a fringe of short tassels, and a red and black woven halter with a lead rope. Natural short sandy tan coat. Realistic camel proportions, lifelike, like a 3D scan. Not stylised, not a cartoon, not a toy. No base, no pedestal, no ground plane.",
+        "options": {
+          "ai_model": "meshy-7.1",
+          "model_type": "standard",
+          "topology": "triangle",
+          "should_remesh": true,
+          "target_polycount": 30000,
+          "target_formats": [
+            "glb"
+          ]
+        },
+        "refine": {
+          "enable_pbr": true,
+          "texture_resolution": "2k",
+          "remove_lighting": true,
+          "texture_prompt": "Realistic short sandy tan camel hair with natural variation, darker on the hump and neck, grey calloused knees; red, orange and indigo striped woven wool blanket; worn brown wood and leather saddle; red and black woven halter. Photographic, even, no painted-on shadows or highlights.",
+          "target_formats": [
+            "glb"
+          ]
+        },
+        "task": "01a0d74a-b63e-760a-a972-bc4ef1f0e59e",
+        "preview_task": "01a0d749-6a49-7076-ae10-fe86883da671",
+        "sha256": "d27c75fdc9c366265a5ded798884c86594af5e5a7550eb39042f1423cd39ecac"
+      },
+      "retired": "2026-09-25: not used; the pose is neither standing nor kneeling. Kept pinned so the generation can be found again."
     }
   ]
 }

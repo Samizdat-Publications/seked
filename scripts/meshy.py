@@ -8,7 +8,8 @@ A stand-in in blender/models.json may carry a `meshy` block instead of a
 `sketchfab` id: the endpoint (`image-to-3d` or `multi-image-to-3d`), the
 photographs by Wikimedia Commons file name, and the options sent with them.
 So may a figure, one of the people under the manifest's `figures` that
-render/giza/figures.py instances; an ID names either.
+render/giza/figures.py instances, or an animal under `animals` that
+render/giza/fauna.py instances; an ID names any of them.
 For a form nothing photographs, because it no longer exists, the endpoint is
 `text-to-3d`: a `prompt` builds the mesh (Meshy's preview) and `refine`
 options texture it, and the prompt is the whole of what the model was told.
@@ -103,9 +104,10 @@ def sha256_of(path):
 
 
 def entry(model_id):
-    """The manifest entry `model_id` names: a stand-in under `models` or a figure under `figures`."""
+    """The manifest entry `model_id` names: a stand-in under `models`, a figure under `figures` or an animal under `animals`."""
     manifest = json.load(open(MANIFEST, encoding="utf-8"))
-    return next((m for m in manifest["models"] + manifest.get("figures", []) if m["id"] == model_id), None)
+    return next((m for m in manifest["models"] + manifest.get("figures", []) + manifest.get("animals", [])
+                 if m["id"] == model_id), None)
 
 
 def generate(args):
