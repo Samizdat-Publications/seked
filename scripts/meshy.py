@@ -7,6 +7,8 @@ Generate a stand-in model with Meshy from freely licensed photographs.
 A stand-in in blender/models.json may carry a `meshy` block instead of a
 `sketchfab` id: the endpoint (`image-to-3d` or `multi-image-to-3d`), the
 photographs by Wikimedia Commons file name, and the options sent with them.
+So may a figure, one of the people under the manifest's `figures` that
+render/giza/figures.py instances; an ID names either.
 For a form nothing photographs, because it no longer exists, the endpoint is
 `text-to-3d`: a `prompt` builds the mesh (Meshy's preview) and `refine`
 options texture it, and the prompt is the whole of what the model was told.
@@ -100,8 +102,14 @@ def sha256_of(path):
     return h.hexdigest()
 
 
+def entry(model_id):
+    """The manifest entry `model_id` names: a stand-in under `models` or a figure under `figures`."""
+    manifest = json.load(open(MANIFEST, encoding="utf-8"))
+    return next((m for m in manifest["models"] + manifest.get("figures", []) if m["id"] == model_id), None)
+
+
 def generate(args):
-    model = next((m for m in json.load(open(MANIFEST, encoding="utf-8"))["models"] if m["id"] == args.id), None)
+    model = entry(args.id)
     if not model or "meshy" not in model:
         sys.exit(f"{args.id}: no model with a meshy block in {MANIFEST}")
     spec = model["meshy"]
@@ -231,7 +239,7 @@ def retexture(args):
     its own generation task where Meshy accepts that, and as the GLB itself where not.
     The result lands in build/models/<ID>-<TAG>/ like any generation, and is kept.
     """
-    model = next((m for m in json.load(open(MANIFEST, encoding="utf-8"))["models"] if m["id"] == args.id), None)
+    model = entry(args.id)
     if not model or "retexture" not in model.get("meshy", {}):
         sys.exit(f"{args.id}: no meshy.retexture block in {MANIFEST}")
     spec = dict(model["meshy"]["retexture"])
