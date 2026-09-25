@@ -53,16 +53,79 @@ def plaster_material(name="mud plaster", colours=("9c8566", "ad9573")):
     return mat
 
 
+def mudbrick_material(name="town mudbrick", colours=("8a7458", "a08a6a")):
+    """
+    Mud plaster over mudbrick (look choices throughout): the plaster mottled and streaked, darker
+    where the street's dirt splashes its foot, and fallen away in patches, most near the ground,
+    to show the courses of bricks behind. `rise`, each vertex's height over the ground its wall
+    stands on, is written by _Boxes.
+    """
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    P = geo.outputs["Position"]
+    rise = t.node("ShaderNodeAttribute", attribute_type="GEOMETRY", attribute_name="rise").outputs["Fac"]
+    plaster = t.ramp(t.noise(P, 0.35, 5.0), [(0.3, hexlin(colours[0])), (0.7, hexlin(colours[1]))])
+    # Faint vertical streaks washed down from the parapets.
+    tall = t.node("ShaderNodeMapping")
+    tall.inputs["Scale"].default_value = (3.0, 3.0, 0.25)
+    t.link(P, tall.inputs["Vector"])
+    plaster = t.mix(t.math("MULTIPLY", t.band(t.noise(tall.outputs[0], 1.0, 3.0), 0.5, 0.75), 0.18), plaster, hexlin("6a5741"))
+    # Bricks where the plaster has fallen: courses laid along whichever of x or y the wall runs.
+    sep = t.node("ShaderNodeSeparateXYZ")
+    t.link(geo.outputs["Normal"], sep.inputs[0])
+    pos = t.node("ShaderNodeSeparateXYZ")
+    t.link(P, pos.inputs[0])
+    along_y = t.math("GREATER_THAN", t.math("ABSOLUTE", sep.outputs[0]), t.math("ABSOLUTE", sep.outputs[1]))
+    u = t.math("ADD", t.math("MULTIPLY", pos.outputs[0], t.math("SUBTRACT", 1.0, along_y)), t.math("MULTIPLY", pos.outputs[1], along_y))
+    uv = t.node("ShaderNodeCombineXYZ")
+    t.link(u, uv.inputs[0])
+    t.link(pos.outputs[2], uv.inputs[1])
+    brick = t.node("ShaderNodeTexBrick")
+    brick.offset = 0.5
+    brick.inputs["Scale"].default_value = 1.0
+    brick.inputs["Brick Width"].default_value = 0.34
+    brick.inputs["Row Height"].default_value = 0.105
+    brick.inputs["Mortar Size"].default_value = 0.012
+    brick.inputs["Color1"].default_value = hexlin("6b5640")
+    brick.inputs["Color2"].default_value = hexlin("7c6549")
+    brick.inputs["Mortar"].default_value = hexlin("988770")
+    t.link(uv.outputs[0], brick.inputs["Vector"])
+    low = t.math("SUBTRACT", 1.0, t.band(rise, 0.2, 1.6))
+    flake = t.band(t.math("ADD", t.noise(P, 0.9, 6.0), t.math("MULTIPLY", low, 0.16)), 0.64, 0.67)
+    col = t.mix(flake, plaster, brick.outputs["Color"])
+    # The foot of the wall, darkened by the street.
+    foot = t.math("SUBTRACT", 1.0, t.band(rise, 0.05, 0.5))
+    col = t.mix(t.math("MULTIPLY", foot, 0.55), col, hexlin("54432f"))
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.96
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 0.5
+    bmp.inputs["Distance"].default_value = 0.02
+    height = t.math("ADD", t.math("MULTIPLY", t.noise(P, 4.0, 4.0), 0.6),
+                    t.math("MULTIPLY", t.math("MULTIPLY", brick.outputs["Fac"], flake), -1.0))
+    t.link(height, bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
 class _Boxes:
-    """Axis-aligned boxes, each with its own base, gathered into one mesh."""
+    """Axis-aligned boxes, each with its own base, gathered into one mesh with each vertex's rise over its ground."""
 
     def __init__(self):
         self.bm = bmesh.new()
+        self.rise = self.bm.verts.layers.float.new("rise")
         self.n = 0
 
-    def add(self, x0, x1, y0, y1, z0, z1):
+    def add(self, x0, x1, y0, y1, z0, z1, ground=None):
+        g = z0 if ground is None else ground
         v = [self.bm.verts.new(p) for p in ((x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
                                              (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1))]
+        for vert in v:
+            vert[self.rise] = vert.co.z - g
         for f in ((0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)):
             self.bm.faces.new([v[i] for i in f])
         self.n += 1
@@ -89,7 +152,7 @@ def _room(walls, roofs, x0, x1, y0, y1, z, height, wall, rng, door_side="s", roo
                 mid = (x0 + x1) / 2
                 walls.add(x0, mid - door / 2, yy, yy + wall, z, zt)
                 walls.add(mid + door / 2, x1, yy, yy + wall, z, zt)
-                walls.add(mid - door / 2, mid + door / 2, yy, yy + wall, z + 2.0, zt)
+                walls.add(mid - door / 2, mid + door / 2, yy, yy + wall, z + 2.0, zt, ground=z)
             else:
                 walls.add(x0, x1, yy, yy + wall, z, zt)
         else:
@@ -150,8 +213,7 @@ def build(state, terrain, coll, mats, log=print, rng=None):
                     houses += 1
                 x += w + (gap if rng.random() < 0.3 else 0.3)
             y -= depth + gap
-    mud = mats.get("mudbrick")
-    walls.emit("builders' town walls", mud, coll)
+    walls.emit("builders' town walls", mudbrick_material(), coll)
     roofs.emit("builders' town roofs", plaster_material(), coll)
     # Granaries: squat cylinders with domed tops.
     bm = bmesh.new()

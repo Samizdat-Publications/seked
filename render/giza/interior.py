@@ -57,11 +57,14 @@ def floor_z(r, y):
     return z_foot + (y_foot - y) * math.tan(angle)
 
 
-def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, joint=0.35, speckle=None, mortar=0.004):
+def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, joint=0.35, speckle=None, mortar=0.004,
+            quartz="7f7a75"):
     """
     Fine stone laid in courses, the joints drawn as hairlines. `frame(t, geo)` returns the
     (along, up, height-above-floor) sockets the courses are laid in, so the same material
     serves the sloping gallery and the level chamber. Soot darkens it towards the roof.
+    With `speckle` (the mica's colour) it is granite, its crystals feldspar in the two
+    `colours`, `quartz` and mica.
     """
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
@@ -88,11 +91,15 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
     t.link(br.outputs["Color"], tone.inputs[0])
     col = t.ramp(t.noise(geo.outputs["Position"], 1.8, 5.0), [(0.3, hexlin(colours[0])), (0.7, hexlin(colours[1]))])
     col = t.mix(1.0, col, t.grey(t.math("ADD", t.math("MULTIPLY", tone.outputs[0], 0.14), 0.93)), "MULTIPLY")
-    if speckle:        # granite: a coarse crystal speckle
+    if speckle:        # granite: a mosaic of crystals a centimetre or two across, feldspar, quartz and mica
         vor = t.node("ShaderNodeTexVoronoi")
-        vor.inputs["Scale"].default_value = 70.0
+        vor.inputs["Scale"].default_value = 55.0
         t.link(geo.outputs["Position"], vor.inputs["Vector"])
-        col = t.mix(t.math("MULTIPLY", t.band(vor.outputs["Distance"], 0.25, 0.0), 0.8), col, hexlin(speckle))
+        cell = t.node("ShaderNodeSeparateColor")
+        t.link(vor.outputs["Color"], cell.inputs[0])
+        crystal = t.ramp(cell.outputs[0], [(0.0, hexlin(colours[1])), (0.45, hexlin(colours[0])), (0.62, hexlin(quartz)),
+                                           (0.84, hexlin(speckle))], interp="CONSTANT")
+        col = t.mix(0.7, col, crystal)
     if soot:
         grime = t.math("MULTIPLY", t.band(up, 0.0, height), soot)
         grime = t.math("MULTIPLY", grime, t.band(t.noise(geo.outputs["Position"], 0.7, 3.0), 0.25, 0.75))
@@ -580,19 +587,23 @@ def _flat(name, rgb, rough):
 def build(state, coll, mats, log=print):
     """Build the gallery and the chamber into `coll`; returns the era's lamps, for the scene to switch."""
     r = _r()
+    # Aswan's red granite: pink feldspar, grey quartz and black mica, muted enough that lamplight
+    # does not turn it to orange plaster; the coffer's stone is darker, as it is.
     if state in MODERN:
-        lime, granite, soot, rough = ("b2a38c", "c4b59d"), ("4b332c", "5e4036"), 0.75, 0.5
+        lime, granite, soot, rough, quartz = ("b2a38c", "c4b59d"), ("4b3530", "644740"), 0.75, 0.5, "6e6964"
     elif state == "stripped":
-        lime, granite, soot, rough = ("a89985", "baab95"), ("45302a", "573b33"), 0.9, 0.55
+        lime, granite, soot, rough, quartz = ("a89985", "baab95"), ("45322d", "5a413a"), 0.9, 0.55, "66615c"
     else:
-        lime, granite, soot, rough = ("e7e0d0", "f1ebdf"), ("6a4337", "7e5041"), 0.0, 0.28
+        lime, granite, soot, rough, quartz = ("e7e0d0", "f1ebdf"), ("6b4c44", "82605a"), 0.0, 0.34, "8e8984"
+    coffer = tuple("%02x%02x%02x" % tuple(int(int(c[i:i + 2], 16) * 0.72) for i in (0, 2, 4)) for c in granite)
     mats["gallery stone"] = masonry("gallery stone", lime, rough, r["gg.corbel.height"], 1.9, gallery_frame(r),
                                     soot=soot, height=r["gg.height"])
     course = (r["kc.ceiling.up"] - r["kc.floor.elevation"]) / KC_COURSES
     mats["chamber granite"] = masonry("chamber granite", granite, rough * 0.8, course, 2.1, room_frame(r["kc.floor.elevation"]),
-                                      soot=soot * 0.8, height=course * KC_COURSES, joint=0.8, speckle="1c1715", mortar=0.01)
-    mats["coffer granite"] = masonry("coffer granite", granite, rough, 10.0, 10.0, room_frame(r["kc.floor.elevation"]),
-                                     joint=0.0, speckle="1c1715")
+                                      soot=soot * 0.8, height=course * KC_COURSES, joint=0.8, speckle="1c1715", mortar=0.01,
+                                      quartz=quartz)
+    mats["coffer granite"] = masonry("coffer granite", coffer, rough, 10.0, 10.0, room_frame(r["kc.floor.elevation"]),
+                                     joint=0.0, speckle="161210", quartz=quartz)
     mats["qc limestone"] = masonry("qc limestone", lime, rough, 0.8, 1.7, room_frame(r["qc.corner.ne.up"]),
                                    soot=soot * 0.6, height=r["qc.gable.height"])
     mats["bedrock rough"] = rough_rock("bedrock rough", ("8f7f68", "a8977d") if state in MODERN or state == "stripped" else ("b7a88f", "cbbca2"),
