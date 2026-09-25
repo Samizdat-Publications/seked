@@ -34,7 +34,7 @@ half_w east-west and half_d north-south, how many animals, and the kinds they ar
 scatters the herds onto the terrain as one point cloud of instances of `lib` (library's
 collection) through instancing.field, linked into `coll`, and returns it (None when there is
 nothing to place). It keeps animals out of the era's water (all but the hippopotamuses, which
-stand in its shallows) and off its monuments, clear of
+stand in its shallows), off its monuments and out of its houses, clear of
 every station in render/stations.json by STATION_CLEAR metres and of any (x, y, radius) in
 `avoid`, pitches each to the slope under it, loosely aligns a herd, turns animals on today's
 roads to face along them, mirrors half of them and makes a few of each herd young (smaller).
@@ -943,6 +943,45 @@ def _monuments(era):
     return boxes
 
 
+def _buildings(era, near, reach=120.0):
+    """
+    The era's houses as (x, y, half-width, half-depth, yaw) arrays, as city.py draws them (today's
+    city, or the thinned village of 1800), kept to those within `reach` of any point in `near`.
+    """
+    kind = states.spec(era)["city"]
+    if not kind:
+        return None
+    x, y, w, d, yaw, _ = data.city_boxes().T
+    if kind == "village":
+        try:
+            from .city import VILLAGE_BOX
+        except ImportError:
+            VILLAGE_BOX = (420.0, 1600.0, -1600.0, 900.0)
+        x0, x1, y0, y1 = VILLAGE_BOX
+        keep = (x > x0) & (x < x1) & (y > y0) & (y < y1) & ((np.arange(len(x)) % 4) == 0)
+        w, d = np.clip(w, 3, 14), np.clip(d, 3, 14)
+    else:
+        keep = np.ones(len(x), bool)
+        for P in (data.PYRAMIDS[k] for k in ("g1", "g2", "g3")):
+            keep &= np.hypot(x - P["cx"], y - P["cy"]) > P["half"] * 3.2
+        w, d = np.maximum(w, 2), np.maximum(d, 2)
+    close = np.zeros(len(x), bool)
+    for px, py in near:
+        close |= np.hypot(x - px, y - py) < reach
+    keep &= close
+    return x[keep], y[keep], w[keep] / 2, d[keep] / 2, np.radians(yaw[keep])
+
+
+def _in_building(x, y, houses, pad=1.5):
+    if houses is None or len(houses[0]) == 0:
+        return False
+    hx, hy, hw, hd, yaw = houses
+    c, s = np.cos(-yaw), np.sin(-yaw)
+    lx = (x - hx) * c - (y - hy) * s
+    ly = (x - hx) * s + (y - hy) * c
+    return bool(np.any((np.abs(lx) < hw + pad) & (np.abs(ly) < hd + pad)))
+
+
 _ROADS = None
 
 
@@ -988,6 +1027,7 @@ def plan(era, lib_variants, terrain=None, surface=None, avoid=(), seed=0):
     boxes = _monuments(era)
     clear = [(x, y, STATION_CLEAR) for x, y in _stations()] + [tuple(a) for a in avoid]
     mastabas = data.mastabas() if states.spec(era)["mastabas"] else []
+    houses = _buildings(era, [(h.x, h.y) for h in herds(era)])
     pos, rot, scl, var, tone, which = [], [], [], [], [], []
     for hi, h in enumerate(herds(era)):
         kinds = [k for k in h.kinds if any(v in index for v in KINDS[k]["variants"])]
@@ -1011,6 +1051,8 @@ def plan(era, lib_variants, terrain=None, surface=None, avoid=(), seed=0):
             if any(b[0] < x < b[1] and b[2] < y < b[3] for b in boxes):
                 continue
             if mastabas and _inside_mastaba(x, y, mastabas):
+                continue
+            if _in_building(x, y, houses):
                 continue
             names = [v for v in spec["variants"] if v in index]
             weights = np.array([spec.get("weights", [1] * len(spec["variants"]))[spec["variants"].index(v)] for v in names], float)

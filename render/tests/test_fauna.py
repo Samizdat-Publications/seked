@@ -118,6 +118,13 @@ class FaunaTests(unittest.TestCase):
             for sx, sy in stations:
                 self.assertTrue(np.all(np.hypot(pos[:, 0] - sx, pos[:, 1] - sy) >= F.STATION_CLEAR), (era, sx, sy))
 
+    def test_no_animal_stands_in_a_house(self):
+        for era in ("stripped", "today"):
+            names = list(F.ERAS[era])
+            pos, *_ = F.plan(era, names, surface=ground(era))
+            houses = F._buildings(era, [(h.x, h.y) for h in F.herds(era)])
+            self.assertFalse(any(F._in_building(x, y, houses, pad=0.0) for x, y, _ in pos), era)
+
     def test_the_plan_is_repeatable(self):
         a = F.plan("today", list(F.ERAS["today"]), surface=ground("today"))
         b = F.plan("today", list(F.ERAS["today"]), surface=ground("today"))
