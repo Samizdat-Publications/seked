@@ -29,6 +29,7 @@ NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
 FAR_HALF = 11500.0
 FAR_STEP = 60.0
+HORIZON = 150000.0         # how far the plain beyond the far grid runs (look choice)
 PATCH_HALF = 150.0
 PATCH_LIFT = 0.05
 
@@ -140,6 +141,19 @@ class Terrain:
         far = grid_object("ground far", f, f, lambda X, Y: self.z(X, Y, far=True) - 0.8, coll,
                           hole=(NEAR_BOX[0] + 60, NEAR_BOX[1] - 60, NEAR_BOX[2] + 60, NEAR_BOX[3] - 60))
         far.data.materials.append(material)
+        # Beyond the far grid, a plain out to HORIZON at the grid's median edge height, tucked two metres
+        # under its rim: without it an aerial view sees the sky's lower half as a band under the horizon.
+        edge = np.concatenate([self.z(f, np.full_like(f, s * FAR_HALF), far=True) for s in (-1, 1)] +
+                              [self.z(np.full_like(f, s * FAR_HALF), f, far=True) for s in (-1, 1)])
+        zr = float(np.median(edge)) - 2.8
+        a, b = FAR_HALF - 300.0, HORIZON
+        verts = [(-a, -a, zr), (a, -a, zr), (a, a, zr), (-a, a, zr), (-b, -b, zr), (b, -b, zr), (b, b, zr), (-b, b, zr)]
+        faces = [(e, e + 4, (e + 1) % 4 + 4, (e + 1) % 4) for e in range(4)]
+        me = bpy.data.meshes.new("ground horizon")
+        me.from_pydata(verts, [], faces)
+        me.materials.append(material)
+        ring = bpy.data.objects.new("ground horizon", me)
+        coll.objects.link(ring)
         return near, far
 
     def patch(self, centre, coll, material):

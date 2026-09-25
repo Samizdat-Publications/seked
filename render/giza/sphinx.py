@@ -28,9 +28,10 @@ if BLENDER_DIR not in sys.path:
     sys.path.insert(0, BLENDER_DIR)
 
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
-MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion", None), "carved": ("sphinx-carved", None),
+MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion", None),
+             "lion-fresh": ("sphinx-lion-fresh", None), "carved": ("sphinx-carved", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
-TINTED = {"sphinx-meshy", "sphinx-lion"}      # generated textures with a pink cast
+TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high

@@ -206,14 +206,18 @@ def dressed_mesh(P, top, granite_to, coll, m_case, m_gran):
     ob = mesh_object(P["name"] + " dressed", verts, faces, coll, (m_case, m_gran))
     for poly, mi in zip(ob.data.polygons, mats):
         poly.material_index = mi
+    # Height above the base, for the materials' grime and sand on the lowest courses; linear in z, so a
+    # vertex attribute interpolates it exactly across the big faces.
+    hb = ob.data.attributes.new("hb", "FLOAT", "POINT")
+    hb.data.foreach_set("value", [v[2] - base for v in verts])
     bev = ob.modifiers.new("arris", "BEVEL")
     bev.width = 0.05
     bev.segments = 2
     return ob
 
 
-def pyramidion(P, coll, mat):
-    ph = PYRAMIDION_HEIGHT
+def pyramidion(P, coll, mat, ph=PYRAMIDION_HEIGHT):
+    """The metal apex: the pyramidion, or with a larger `ph` the pyramidion and the sheathed courses under it."""
     bm = bmesh.new()
     bmesh.ops.create_cone(bm, cap_ends=True, segments=4, radius1=ph * P["half"] / P["H"] * math.sqrt(2), radius2=0.0, depth=ph)
     bmesh.ops.rotate(bm, verts=bm.verts, cent=(0, 0, 0), matrix=Matrix.Rotation(math.radians(45), 3, "Z"))
@@ -265,7 +269,7 @@ def khufu_north_face(coll, mats, mast=True):
     ob.location = (0, 0, top + (g1["H"] - top) / 2)
 
 
-CASING_FOR = {"dressed": "coursed casing", "pristine": "pristine casing", "weathered": "weathered casing"}
+CASING_FOR = {"dressed": "restored casing", "pristine": "pristine casing", "weathered": "weathered casing"}
 CAP_FOR = {"gold": "gold", "electrum": "electrum"}
 
 
@@ -299,15 +303,19 @@ def build(state, rng, coll, mats, lib, log=print):
         khufu_north_face(coll, mats, mast=(mode == "today"))
     else:
         face = mats[CASING_FOR[mode]]
+        # The metal apex: the era's `gild`, scaled to each pyramid's height from Khufu's (a look choice
+        # made so the gold reads from the stations, where a 1.4 m pyramidion is a few dark pixels).
+        g1_H = data.PYRAMIDS["g1"]["H"]
         for P in main:
-            dressed_mesh(P, P["H"] - PYRAMIDION_HEIGHT, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"])
-            pyramidion(P, coll, mats[CAP_FOR[S["caps"]]] if S["caps"] else face)
+            ph = max(PYRAMIDION_HEIGHT, S.get("gild", PYRAMIDION_HEIGHT) * P["H"] / g1_H) if S["caps"] else PYRAMIDION_HEIGHT
+            dressed_mesh(P, P["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"])
+            pyramidion(P, coll, mats[CAP_FOR[S["caps"]]] if S["caps"] else face, ph)
     if queens_mode == "ruin":
         for P in queens:
             laid(P)
     elif queens_mode == "dressed":
         for P in queens:
-            dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["coursed casing"], mats["dressed granite"])
+            dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["restored casing"], mats["dressed granite"])
     core.emit("core blocks", lib["core"], coll, log)
     casing.emit("casing blocks", lib["casing"], coll, log)
     gran.emit("granite blocks", lib["granite"], coll, log)

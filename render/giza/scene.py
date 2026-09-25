@@ -65,11 +65,12 @@ class Plateau:
             "limestone flat": materials.dressed("limestone flat", colours=("e3dccd", "ebe5d8"), rough=0.55),
             "pavement": materials.pavement(),
             # The claim's casing, polished further than any reconstruction would draw it.
-            "pristine casing": materials.coursed_casing("pristine casing", colours=("e8e3d7", "f0ece3"), rough=0.2, tone=0.08, line=0.12,
-                                                        mortar=0.01, mottle=0.04),
+            "pristine casing": materials.polished_casing("pristine casing"),
+            # As built: the inherited casing, restored, showing its age (Stewart's reading, 2026-09-25).
+            "restored casing": materials.restored_casing("restored casing"),
             "weathered casing": materials.weathered_casing(),
-            "gold": materials.metal("gold", "f2c35a", 0.38),
-            "electrum": materials.metal("electrum", "efe0a8", 0.34),
+            "gold": materials.metal("gold", "eeb94c", 0.3, metallic=0.78),
+            "electrum": materials.metal("electrum", "f1e3ae", 0.3, metallic=0.7),
             "dressed granite": materials.dressed_granite(),
             "dark": materials.dark(),
             "water": materials.water(),
@@ -122,7 +123,10 @@ class Plateau:
             herd_lib = fauna.library(self.library, state, self.log)
             if herd_lib is not None:
                 fauna.place(state, self.terrain, self.world, herd_lib, log=self.log)
-        self.sky = Sky(self.scene, aerosol=aerosol, haze=haze, coll=self.world)
+        air = S.get("air", (1.0, 1.0))
+        self.sky = Sky(self.scene, aerosol=aerosol * air[0], haze=haze * air[1], coll=self.world)
+        if S.get("clouds"):
+            self.sky.clouds(S["clouds"], self.log)
         self.camera = cameras.make(self.scene)
         renderer.gpu(self.scene, self.log)
         renderer.configure(self.scene)

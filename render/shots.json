@@ -139,6 +139,16 @@
       "hall": "valley-temple",
       "moment": "temple-morning",
       "exposure": 2.4
+    },
+    {
+      "id": "overview",
+      "name": "The plateau from the air over the valley, south-east, the Sphinx in front of the three",
+      "x": 1400.0,
+      "y": -1600.0,
+      "z": 330.0,
+      "target": [-150.0, -250.0, 20.0],
+      "lens": 35,
+      "moment": "golden-south"
     }
   ]
 }

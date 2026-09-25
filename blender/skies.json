@@ -1,0 +1,13 @@
+{
+  "about": "Photographed skies (Poly Haven pure-sky HDRIs, CC0) that the humid eras show behind the plateau and in reflections, in place of Blender's clear physical sky, which still lights the scene. Fetched by python scripts/skies.py into build/skies/. Which sky an era uses and at what sun is render/giza/sky.py's CLOUDS: a look choice, and never evidence of any past weather.",
+  "resolution": "4k",
+  "format": "hdr",
+  "skies": [
+    {"id": "kloofendal_48d_partly_cloudy_puresky", "why": "Fair-weather cumulus under a high sun: the First Time's day sky."},
+    {"id": "sunflowers_puresky", "why": "Cumulus rows under a high sun, a second day sky."},
+    {"id": "kloppenheim_06_puresky", "why": "Cumulus lit gold by a low sun: the First Time's mornings and evenings."},
+    {"id": "citrus_orchard_puresky", "why": "A broken cumulus field at a low sun."},
+    {"id": "farm_field_puresky", "why": "Heavy, dark-bellied cumulus: the long rains under a high sun."},
+    {"id": "drackenstein_quarry_puresky", "why": "A layered, stormy low-sun sky: the long rains at dawn and dusk."}
+  ]
+}
