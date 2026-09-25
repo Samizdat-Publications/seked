@@ -1,0 +1,36 @@
+{
+  "about": "The walkthrough's stations: where a 360-degree panorama is taken, in the project frame (metres, +x east, +y north, from Khufu's base centre), and the moment it is lit at. A moment is a date in the present calendar and a local solar time (render/giza/sun.py); an ancient state keeps the season and takes its own epoch's obliquity.",
+  "moments": {
+    "golden-west": {
+      "date": "10-20",
+      "solar": 16.86,
+      "label": "late afternoon, October"
+    },
+    "morning-east": {
+      "date": "04-20",
+      "solar": 7.4,
+      "label": "early morning, April"
+    },
+    "high-noon": {
+      "date": "06-21",
+      "solar": 12.4,
+      "label": "midday, June"
+    },
+    "golden-south": {
+      "date": "11-01",
+      "solar": 16.7,
+      "label": "late afternoon, November, the sun just clear of Khafre"
+    }
+  },
+  "stations": [
+    {
+      "id": "south",
+      "name": "South of Khufu",
+      "where": "Between the Great Pyramid and Khafre",
+      "x": -30.0,
+      "y": -360.0,
+      "eye": 1.7,
+      "moment": "golden-south"
+    }
+  ]
+}

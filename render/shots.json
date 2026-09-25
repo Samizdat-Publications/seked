@@ -1,0 +1,33 @@
+{
+  "about": "Framed hero shots: camera position (x, y in the project frame, eye height above the ground), target and lens in millimetres on a 36 mm sensor.",
+  "shots": [
+    {
+      "id": "panorama",
+      "name": "The three from the panorama stand",
+      "x": -980.0,
+      "y": -1830.0,
+      "eye": 1.7,
+      "target": [
+        -314.0,
+        -375.0,
+        56.0
+      ],
+      "lens": 120,
+      "moment": "golden-west"
+    },
+    {
+      "id": "south",
+      "name": "Khufu from the south, in raking light",
+      "x": -30.0,
+      "y": -360.0,
+      "eye": 1.7,
+      "target": [
+        0.0,
+        0.0,
+        50.0
+      ],
+      "lens": 28,
+      "moment": "golden-south"
+    }
+  ]
+}

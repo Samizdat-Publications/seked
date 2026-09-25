@@ -1,0 +1,8 @@
+{"renders": [
+  {"state": "today", "station": "south", "out": "apps/walk/pano/south-today.png"},
+  {"state": "today", "shot": "panorama", "out": "build/render/panorama-today.png"},
+  {"state": "today", "shot": "south", "out": "build/render/south-today.png"},
+  {"state": "built", "station": "south", "out": "apps/walk/pano/south-built.png"},
+  {"state": "built", "shot": "panorama", "out": "build/render/panorama-built.png"},
+  {"state": "built", "shot": "south", "out": "build/render/south-built.png"}
+]}

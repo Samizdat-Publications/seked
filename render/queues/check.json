@@ -1,0 +1,5 @@
+{"renders": [
+  {"state": "today", "shot": "panorama", "size": "640x360", "samples": 16, "out": "build/render/check/panorama-today.png"},
+  {"state": "today", "station": "south", "size": "1024x512", "samples": 12, "out": "build/render/check/south-today.png"},
+  {"state": "built", "shot": "panorama", "size": "640x360", "samples": 16, "out": "build/render/check/panorama-built.png"}
+]}

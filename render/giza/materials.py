@@ -1,0 +1,241 @@
+"""
+The materials. Every colour here is a look choice, not a measurement, and the palettes
+are named so they can be tuned in one place.
+
+Stone on instanced blocks reads three instance attributes written by the layers:
+`tone` (0..1, picks the block's colour off its palette), `wear` (0..1, darkens) and
+`scl` (the block's size in metres, so the photograph keeps its real scale on a block
+of any shape).
+"""
+import os
+
+import bpy
+
+from .data import REPO, load_json
+from .nodes import Tree, hexlin
+
+TEXTURES = os.path.join(REPO, "build", "textures")
+TEX = load_json(TEXTURES, "index.json")["sets"]
+_IMAGES = {}
+
+
+def image(role, kind, noncolor=False):
+    key = (role, kind)
+    if key not in _IMAGES:
+        img = bpy.data.images.load(os.path.join(TEXTURES, TEX[role]["files"][kind]), check_existing=True)
+        if noncolor:
+            img.colorspace_settings.name = "Non-Color"
+        _IMAGES[key] = img
+    return _IMAGES[key]
+
+
+PALETTES = {
+    # The nummulitic limestone of the core as it stands: honey, buff, grey-tan, brown.
+    "core": [(0.00, "a9885f"), (0.18, "c3a57c"), (0.36, "9c8a78"), (0.52, "b89366"), (0.68, "cdb893"),
+             (0.84, "8f7152"), (1.00, "b7996f")],
+    # Khafre's cap and the few casing stones left at Khufu's foot, weathered.
+    "casing_today": [(0.0, "c2b294"), (0.5, "cfc1a3"), (1.0, "b5a482")],
+    # Red Aswan granite, weathered.
+    "granite": [(0.0, "6e4a40"), (0.35, "7f5446"), (0.7, "5d4038"), (1.0, "86604f")],
+    "mastaba": [(0.0, "b39673"), (0.5, "c7ab85"), (1.0, "a28565")],
+    "city": [(0.0, "a8987f"), (0.2, "9a8269"), (0.4, "8e8a82"), (0.6, "a88c74"), (0.75, "86604c"),
+             (0.9, "bdb4a5"), (1.0, "7a766e")],
+    "people": [(0.0, "f2f0ea"), (0.2, "202020"), (0.35, "2f4f8f"), (0.5, "a3312a"), (0.65, "d8c7a0"),
+               (0.8, "3f6b3a"), (1.0, "e0a33a")],
+}
+
+
+def stops(name):
+    return [(p, hexlin(c)) for p, c in PALETTES[name]]
+
+
+def stone(name, palette, rough=0.88, tex_role="core", tex_amt=0.75, sand_tops=0.8, bump=0.5, instanced=True):
+    """
+    Weathered stone: a tone per block off its palette, the photograph for grain in the
+    block's own metres, a little darkening for wear, and sand settled on upward faces.
+    Non-instanced meshes (the core behind the blocks, mastaba fills) take their tone
+    from noise in world space instead.
+    """
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    if instanced:
+        tone, wear = t.attr("tone"), t.attr("wear")
+    else:
+        tone = t.noise(geo.outputs["Position"], 0.6, 2.0)
+        wear = t.math("MULTIPLY", tone, 0.8)
+    base = t.ramp(tone, stops(palette))
+
+    local = t.node("ShaderNodeVectorMath", operation="MULTIPLY")
+    if instanced:
+        tc = t.node("ShaderNodeTexCoord")
+        t.link(tc.outputs["Object"], local.inputs[0])
+        t.link(t.attr("scl", "Vector"), local.inputs[1])
+    else:
+        t.link(geo.outputs["Position"], local.inputs[0])
+        local.inputs[1].default_value = (1.0, 1.0, 1.0)
+    off = t.node("ShaderNodeVectorMath", operation="MULTIPLY")
+    t.link(tone, off.inputs[0])
+    off.inputs[1].default_value = (173.1, 91.7, 57.3)
+    offv = t.node("ShaderNodeVectorMath", operation="ADD")
+    t.link(local.outputs[0], offv.inputs[0])
+    t.link(off.outputs[0], offv.inputs[1])
+    size = TEX[tex_role]["tile_m"][0]
+    mp = t.node("ShaderNodeMapping")
+    mp.inputs["Scale"].default_value = (1 / size, 1 / size, 1 / size)
+    t.link(offv.outputs[0], mp.inputs["Vector"])
+    diff = t.node("ShaderNodeTexImage", image=image(tex_role, "Diffuse"), projection="BOX", projection_blend=0.3)
+    disp = t.node("ShaderNodeTexImage", image=image(tex_role, "Displacement", True), projection="BOX", projection_blend=0.3)
+    t.link(mp.outputs[0], diff.inputs["Vector"])
+    t.link(mp.outputs[0], disp.inputs["Vector"])
+    bw = t.node("ShaderNodeRGBToBW")
+    t.link(diff.outputs["Color"], bw.inputs[0])
+    grain = t.math("ADD", t.math("MULTIPLY", t.math("MULTIPLY", bw.outputs[0], 2.6), tex_amt), 1.0 - tex_amt)
+    col = t.mix(1.0, base, t.grey(grain), "MULTIPLY")
+    col = t.mix(t.math("MULTIPLY", wear, 0.35), col, hexlin("5a4632"))
+
+    if sand_tops > 0:
+        sep = t.node("ShaderNodeSeparateXYZ")
+        t.link(geo.outputs["Normal"], sep.inputs[0])
+        up = t.band(sep.outputs["Z"], 0.72, 0.95)
+        patchy = t.math("ADD", t.math("MULTIPLY", t.noise(geo.outputs["Position"], 0.9), 1.2), -0.1)
+        m = t.math("MULTIPLY", up, patchy, clamp=True)
+        col = t.mix(t.math("MULTIPLY", m, sand_tops), col, hexlin("c7a47a"))
+
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = rough
+    pit = t.noise(mp.outputs[0], 9.0, 6.0)
+    h = t.math("ADD", disp.outputs["Color"], t.math("MULTIPLY", pit, 0.35))
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = bump
+    bmp.inputs["Distance"].default_value = 0.03
+    t.link(h, bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
+def dressed(name, colours=("e9e2d4", "f3eee5"), rough=0.38, grain_scale=0.05):
+    """
+    Dressed casing as the eye takes it from any distance: satin, not mirror, with only
+    a slow drift of tone. The joints are finer than a pixel from every station.
+    """
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    drift = t.noise(geo.outputs["Position"], grain_scale, 3.0)
+    t.link(t.ramp(drift, [(0.35, hexlin(colours[0])), (0.65, hexlin(colours[1]))]), bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = rough
+    bsdf.inputs["Specular IOR Level"].default_value = 0.5
+    return mat
+
+
+def dressed_granite(name="dressed granite"):
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    v = t.node("ShaderNodeTexVoronoi")
+    v.inputs["Scale"].default_value = 60.0
+    t.link(geo.outputs["Position"], v.inputs["Vector"])
+    t.link(t.ramp(v.outputs["Distance"], [(0.0, hexlin("4a302a")), (0.3, hexlin("7a4d42")), (0.8, hexlin("8c5d4f"))]),
+           bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.35
+    return mat
+
+
+def flat(name, palette, rough=0.8):
+    """One colour per instance off a palette, for the city's boxes and the people."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    t.link(t.ramp(t.attr("tone"), stops(palette), "CONSTANT"), bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = rough
+    return mat
+
+
+def dark(name="dark mouth"):
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    bsdf.inputs["Base Color"].default_value = (0.01, 0.008, 0.006, 1)
+    bsdf.inputs["Roughness"].default_value = 1.0
+    return mat
+
+
+def ground(state, displace=False):
+    """
+    The plateau's ground: packed beige sand, gravel patches and white limestone chips,
+    varied at three scales. Below the plateau's foot the valley floor is cultivation in
+    the ancient states and the town's dust today. With `displace`, the height maps move
+    the surface for real (outward only, so a lifted patch always covers the grid under it).
+    """
+    mat = bpy.data.materials.new("ground" + (" displaced" if displace else ""))
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    pos = geo.outputs["Position"]
+
+    def sampled(role, kind, noncolor=False):
+        sz = TEX[role]["tile_m"][0]
+        mp = t.node("ShaderNodeMapping")
+        mp.inputs["Scale"].default_value = (1 / sz, 1 / sz, 1 / sz)
+        t.link(pos, mp.inputs["Vector"])
+        im = t.node("ShaderNodeTexImage", image=image(role, kind, noncolor))
+        t.link(mp.outputs[0], im.inputs["Vector"])
+        return im.outputs["Color"]
+
+    def lum(sock):
+        bw = t.node("ShaderNodeRGBToBW")
+        t.link(sock, bw.inputs[0])
+        return bw.outputs[0]
+
+    sand_l, grav_l = lum(sampled("sand", "Diffuse")), lum(sampled("gravel", "Diffuse"))
+    sand_h, grav_h = sampled("sand", "Displacement", True), sampled("gravel", "Displacement", True)
+    m_grav = t.band(t.noise(pos, 0.018, 6.0, 0.62), 0.52, 0.64)
+    m_chip = t.band(t.noise(pos, 0.05, 5.0, 0.6), 0.56, 0.68)
+    grain = t.math("ADD", t.math("MULTIPLY", sand_l, t.math("SUBTRACT", 1.0, m_grav)), t.math("MULTIPLY", grav_l, m_grav))
+    grain = t.math("ADD", t.math("MULTIPLY", grain, 1.35), 0.42)
+    col = t.mix(m_grav, hexlin("e3c596"), hexlin("c4a883"))
+    col = t.mix(t.math("MULTIPLY", m_chip, 0.55), col, hexlin("e6dccb"))
+    col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.0025, 3.0), [(0.3, hexlin("dcc39f")), (0.5, hexlin("ffffff")), (0.72, hexlin("f1e4cc"))]), "MULTIPLY")
+    col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.09, 4.0), [(0.35, hexlin("d8ccba")), (0.65, hexlin("ffffff"))]), "MULTIPLY")
+    col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
+    sep = t.node("ShaderNodeSeparateXYZ")
+    t.link(pos, sep.inputs[0])
+    valley = t.band(t.math("MULTIPLY", sep.outputs["Z"], -1.0), 26.0, 31.0)
+    fields = t.noise(pos, 0.006, 3.0)
+    if state == "today":
+        vcol = t.ramp(fields, [(0.35, hexlin("8a7a64")), (0.55, hexlin("6f6a52")), (0.7, hexlin("98876c"))])
+    else:
+        vcol = t.ramp(fields, [(0.3, hexlin("3f5a26")), (0.5, hexlin("56702f")), (0.62, hexlin("6d7a3a")), (0.75, hexlin("3a4f22"))])
+    col = t.mix(valley, col, vcol)
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.95
+    h = t.mix(m_grav, sand_h, grav_h)
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 0.45
+    bmp.inputs["Distance"].default_value = 0.06
+    t.link(h, bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    if displace:
+        dn = t.node("ShaderNodeDisplacement")
+        dn.inputs["Midlevel"].default_value = 0.0
+        dn.inputs["Scale"].default_value = 0.12
+        t.link(h, dn.inputs["Height"])
+        t.link(dn.outputs["Displacement"], out.inputs["Displacement"])
+        mat.displacement_method = "BOTH"
+    return mat
