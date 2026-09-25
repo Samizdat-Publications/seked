@@ -11,8 +11,22 @@ import os
 
 import bpy
 
+from . import states
 from .data import REPO, load_json
 from .nodes import Tree, hexlin
+
+# The plateau's ground by era: (sand, gravel, chips) colours, and how much gravel shows.
+GROUND = {
+    "desert": ("e3c596", "c4a883", "e6dccb", (0.52, 0.64)),
+    "sand": ("e8c99a", "d2b58c", "eadfcc", (0.62, 0.72)),
+    "savanna": ("9d9a52", "7f8a44", "b3a868", (0.40, 0.62)),
+    "dry-savanna": ("bba56a", "9a9150", "cdb98a", (0.45, 0.62)),
+}
+VALLEY = {
+    "town": [(0.35, "8a7a64"), (0.55, "6f6a52"), (0.7, "98876c")],
+    "fields": [(0.3, "3f5a26"), (0.5, "56702f"), (0.62, "6d7a3a"), (0.75, "3a4f22")],
+    "lush": [(0.3, "2d4a1c"), (0.5, "3d5e22"), (0.65, "4b6a2a"), (0.8, "2a4219")],
+}
 
 TEXTURES = os.path.join(REPO, "build", "textures")
 TEX = load_json(TEXTURES, "index.json")["sets"]
@@ -155,6 +169,60 @@ def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
     return mat
 
 
+def weathered_casing(name="weathered casing"):
+    """Casing that has stood through wet millennia (the lion's claim): buff, with rain streaks down the faces."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    streak_space = t.node("ShaderNodeMapping")
+    streak_space.inputs["Scale"].default_value = (0.9, 0.9, 0.05)
+    t.link(geo.outputs["Position"], streak_space.inputs["Vector"])
+    streaks = t.band(t.noise(streak_space.outputs[0], 1.2, 4.0), 0.45, 0.75)
+    base = t.ramp(t.noise(geo.outputs["Position"], 0.03, 3.0), [(0.3, hexlin("d8cab0")), (0.7, hexlin("c8b593"))])
+    col = t.mix(t.math("MULTIPLY", streaks, 0.45), base, hexlin("8e7b5e"))
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.72
+    return mat
+
+
+def metal(name, rgb_hex, rough):
+    """Gold or electrum for the pyramidions."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    bsdf.inputs["Base Color"].default_value = hexlin(rgb_hex)
+    bsdf.inputs["Metallic"].default_value = 1.0
+    bsdf.inputs["Roughness"].default_value = rough
+    return mat
+
+
+def water(name="water"):
+    """Open water: dark, glossy, rippled by a slow wind."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    bsdf.inputs["Base Color"].default_value = hexlin("1d3a3a")
+    bsdf.inputs["Roughness"].default_value = 0.05
+    bsdf.inputs["IOR"].default_value = 1.33
+    geo = t.node("ShaderNodeNewGeometry")
+    ripple_space = t.node("ShaderNodeMapping")
+    ripple_space.inputs["Scale"].default_value = (1.0, 2.2, 1.0)
+    t.link(geo.outputs["Position"], ripple_space.inputs["Vector"])
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 0.12
+    bmp.inputs["Distance"].default_value = 0.05
+    t.link(t.noise(ripple_space.outputs[0], 0.35, 5.0, 0.6), bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
 def dressed_granite(name="dressed granite"):
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
@@ -201,6 +269,8 @@ def ground(state, displace=False):
     the ancient states and the town's dust today. With `displace`, the height maps move
     the surface for real (outward only, so a lifted patch always covers the grid under it).
     """
+    S = states.spec(state)
+    sand_hex, grav_hex, chip_hex, grav_band = GROUND[S["ground"]]
     mat = bpy.data.materials.new("ground" + (" displaced" if displace else ""))
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
@@ -225,12 +295,12 @@ def ground(state, displace=False):
 
     sand_l, grav_l = lum(sampled("sand", "Diffuse")), lum(sampled("gravel", "Diffuse"))
     sand_h, grav_h = sampled("sand", "Displacement", True), sampled("gravel", "Displacement", True)
-    m_grav = t.band(t.noise(pos, 0.018, 6.0, 0.62), 0.52, 0.64)
+    m_grav = t.band(t.noise(pos, 0.018, 6.0, 0.62), *grav_band)
     m_chip = t.band(t.noise(pos, 0.05, 5.0, 0.6), 0.56, 0.68)
     grain = t.math("ADD", t.math("MULTIPLY", sand_l, t.math("SUBTRACT", 1.0, m_grav)), t.math("MULTIPLY", grav_l, m_grav))
     grain = t.math("ADD", t.math("MULTIPLY", grain, 1.35), 0.42)
-    col = t.mix(m_grav, hexlin("e3c596"), hexlin("c4a883"))
-    col = t.mix(t.math("MULTIPLY", m_chip, 0.55), col, hexlin("e6dccb"))
+    col = t.mix(m_grav, hexlin(sand_hex), hexlin(grav_hex))
+    col = t.mix(t.math("MULTIPLY", m_chip, 0.55), col, hexlin(chip_hex))
     col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.0025, 3.0), [(0.3, hexlin("dcc39f")), (0.5, hexlin("ffffff")), (0.72, hexlin("f1e4cc"))]), "MULTIPLY")
     col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.09, 4.0), [(0.35, hexlin("d8ccba")), (0.65, hexlin("ffffff"))]), "MULTIPLY")
     col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
@@ -239,10 +309,7 @@ def ground(state, displace=False):
     # The valley floor: low ground east of the valley temples (x > 430 m), not the Sphinx's ditch.
     valley = t.math("MULTIPLY", t.band(t.math("MULTIPLY", sep.outputs["Z"], -1.0), 26.0, 31.0), t.band(sep.outputs["X"], 430.0, 520.0))
     fields = t.noise(pos, 0.006, 3.0)
-    if state == "today":
-        vcol = t.ramp(fields, [(0.35, hexlin("8a7a64")), (0.55, hexlin("6f6a52")), (0.7, hexlin("98876c"))])
-    else:
-        vcol = t.ramp(fields, [(0.3, hexlin("3f5a26")), (0.5, hexlin("56702f")), (0.62, hexlin("6d7a3a")), (0.75, hexlin("3a4f22"))])
+    vcol = t.ramp(fields, [(p, hexlin(c)) for p, c in VALLEY[S["valley"]]])
     col = t.mix(valley, col, vcol)
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = 0.95

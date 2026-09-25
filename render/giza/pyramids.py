@@ -12,7 +12,7 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector, noise
 
-from . import data
+from . import data, states
 from .instancing import Field
 from .variants import N_CORE, SHEARS, block
 
@@ -227,7 +227,7 @@ def pyramidion(P, coll, mat):
     return ob
 
 
-def khufu_north_face(coll, mats):
+def khufu_north_face(coll, mats, mast=True):
     """The gable stones over the original entrance, the dark mouths, and the summit mast."""
     g1 = data.PYRAMIDS["g1"]
     cot = g1["half"] / g1["H"]
@@ -251,6 +251,8 @@ def khufu_north_face(coll, mats):
         ob.location = (x0, g1["half"] - zc * cot - T - 2.6, zc)
         ob.scale = (w, 3.0, hh)
     # David Gill's mast of 1874 stands on the summit platform to the original apex.
+    if not mast:
+        return
     top = g1["today"]
     bm = bmesh.new()
     bmesh.ops.create_cone(bm, cap_ends=True, segments=6, radius1=0.09, radius2=0.05, depth=g1["H"] - top)
@@ -263,36 +265,51 @@ def khufu_north_face(coll, mats):
     ob.location = (0, 0, top + (g1["H"] - top) / 2)
 
 
+CASING_FOR = {"dressed": "dressed", "pristine": "pristine casing", "weathered": "weathered casing"}
+CAP_FOR = {"gold": "gold", "electrum": "electrum"}
+
+
 def build(state, rng, coll, mats, lib, log=print):
-    """Every pyramid in the state. Returns the footprints the terrain must flatten under."""
+    """Every pyramid the state has. Returns the footprints the terrain must flatten under."""
+    S = states.spec(state)
+    mode, queens_mode = S["pyramids"], S["queens"]
+    main = [dict(data.PYRAMIDS[k], key=k) for k in ("g1", "g2", "g3")]
+    queens = [dict(q, key="queen") for q in data.QUEENS] if queens_mode else []
     core, casing, gran = Field(), Field(), Field()
-    everything = [dict(data.PYRAMIDS[k], key=k) for k in ("g1", "g2", "g3")] + [dict(q, key="queen") for q in data.QUEENS]
-    if state == "today":
-        for P in everything:
-            key = P["key"]
-            spec = dict(LOOK[key])
-            if key == "queen":
-                spec["top"] = P["H"] * rng.uniform(0.55, 0.7)
-                courses = course_heights(P["H"], rng, *COURSES["queen"])
-            else:
-                spec["top"] = P["today"]
-                courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
-            if key == "g2":
-                spec["cap_z"] = P["today"] - P["cap_depth"]
-            if P.get("granite_to"):
-                spec["granite_to"] = P["granite_to"]
-            backing = lay(P, courses, rng, core, casing, gran, spec)
-            backing_mesh(P, backing, coll, mats["core behind"])
-        khufu_north_face(coll, mats)
-        core.emit("core blocks", lib["core"], coll, log)
-        casing.emit("casing blocks", lib["casing"], coll, log)
-        gran.emit("granite blocks", lib["granite"], coll, log)
+
+    def laid(P):
+        key = P["key"]
+        spec = dict(LOOK[key])
+        if key == "queen":
+            spec["top"] = P["H"] * rng.uniform(0.55, 0.7)
+            courses = course_heights(P["H"], rng, *COURSES["queen"])
+        else:
+            spec["top"] = P["today"]
+            courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
+        if key == "g2":
+            spec["cap_z"] = P["today"] - P["cap_depth"]
+        if P.get("granite_to"):
+            spec["granite_to"] = P["granite_to"]
+        backing_mesh(P, lay(P, courses, rng, core, casing, gran, spec), coll, mats["core behind"])
+
+    if mode in ("today", "stripped"):
+        for P in main:
+            laid(P)
+        # Khufu's entrance and tunnel are there in both; David Gill's mast only since 1874.
+        khufu_north_face(coll, mats, mast=(mode == "today"))
     else:
-        for P in everything:
-            if P["key"] == "queen":
-                dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["dressed"], mats["dressed granite"])
-            else:
-                dressed_mesh(P, P["H"] - PYRAMIDION_HEIGHT, P.get("granite_to") or 0.0, coll, mats["dressed"], mats["dressed granite"])
-                pyramidion(P, coll, mats["dressed"])
-        log(f"dressed faces on {len(everything)} pyramids")
-    return [(P["cx"], P["cy"], P["half"], P["base"]) for P in everything]
+        face = mats[CASING_FOR[mode]]
+        for P in main:
+            dressed_mesh(P, P["H"] - PYRAMIDION_HEIGHT, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"])
+            pyramidion(P, coll, mats[CAP_FOR[S["caps"]]] if S["caps"] else face)
+    if queens_mode == "ruin":
+        for P in queens:
+            laid(P)
+    elif queens_mode == "dressed":
+        for P in queens:
+            dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["dressed"], mats["dressed granite"])
+    core.emit("core blocks", lib["core"], coll, log)
+    casing.emit("casing blocks", lib["casing"], coll, log)
+    gran.emit("granite blocks", lib["granite"], coll, log)
+    log(f"pyramids {mode}, caps {S['caps']}, {len(queens)} queens {queens_mode}")
+    return [(P["cx"], P["cy"], P["half"], P["base"]) for P in main + queens]

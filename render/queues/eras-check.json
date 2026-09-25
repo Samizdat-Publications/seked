@@ -1,0 +1,7 @@
+{"renders": [
+  {"state": "first-time", "shot": "sphinx", "size": "960x540", "samples": 16, "out": "build/render/check/era-first-time.png"},
+  {"state": "lion", "shot": "sphinx", "size": "960x540", "samples": 16, "out": "build/render/check/era-lion.png"},
+  {"state": "built", "shot": "sphinx", "size": "960x540", "samples": 16, "out": "build/render/check/era-built.png"},
+  {"state": "stripped", "shot": "sphinx", "size": "960x540", "samples": 16, "out": "build/render/check/era-stripped.png"},
+  {"state": "today", "shot": "sphinx", "size": "960x540", "samples": 16, "out": "build/render/check/era-today.png"}
+]}

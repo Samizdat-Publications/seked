@@ -14,7 +14,7 @@ import bmesh
 import bpy
 import numpy as np
 
-from . import data
+from . import data, states
 from .instancing import Field
 from .variants import N_CORE
 
@@ -54,10 +54,13 @@ def _frames(line):
 
 
 def build(state, rng, terrain, coll, mats, lib, log=print):
+    mode = states.spec(state)["causeway"]
+    if not mode:
+        return None
     line = centreline()
     d, n = _frames(line)
     z = terrain.z(line[:, 0], line[:, 1])
-    today = state == "today"
+    today = mode == "ruin"
     bm = bmesh.new()
     half = WIDTH / 2
     # The road: a strip with sloped shoulders, draped on the ground.

@@ -154,5 +154,9 @@ def library(parent, mats, state, rng):
     lib["dressed limestone"] = collection(parent, "v dressed limestone", [block(620 + i, rounding=0.012, erosion=0.002, chips=0, cuts=2, smooth=False)
                                                                           for i in range(N_DRESSED)], mats["limestone blocks"])
     lib["box"] = collection(parent, "v box", [block(700, rounding=0.0, erosion=0.0, chips=0, cuts=1, base_zero=True, smooth=False)], mats["city"])
+    lib["mud box"] = collection(parent, "v mud box", [block(710 + i, rounding=0.04, erosion=0.02, chips=0, cuts=4, base_zero=True)
+                                                      for i in range(3)], mats["mudbrick"])
+    lib["core fresh"] = collection(parent, "v core fresh", [block(140 + i, rounding=rng.uniform(0.03, 0.06), erosion=0.012, chips=0)
+                                                            for i in range(N_CORE)], mats["core fresh"])
     lib["people"] = collection(parent, "v people", [person(800 + i) for i in range(4)], mats["people"])
     return lib

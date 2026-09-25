@@ -12,7 +12,7 @@ import bmesh
 import bpy
 from mathutils import Vector, noise
 
-from . import data
+from . import data, states
 from .instancing import Field
 from .variants import N_CORE
 
@@ -22,14 +22,19 @@ RUIN = (0.4, 1.0)     # look choice: what share of its height a mastaba keeps to
 
 
 def build(state, rng, terrain, coll, mats, lib, log=print):
+    mode = states.spec(state)["mastabas"]
+    if not mode:
+        return
     bm = bmesh.new()
     blocks = Field()
-    today = state == "today"
+    today = mode in ("ruin", "buried")
+    ruin = (0.25, 0.7) if mode == "buried" else RUIN
+    sunk = 1.4 if mode == "buried" else 0.6
     for m in data.mastabas():
         L_, W_, yaw = m["length"], m["width"], m["yaw"]
-        H_ = m["height"] * (rng.uniform(*RUIN) if today else 1.0)
+        H_ = m["height"] * (rng.uniform(*ruin) if today else 1.0)
         zc = float(terrain.surface([m["cx"]], [m["cy"]])[0])
-        base_z = min(zc, m["base"] if m["base"] is not None else zc) - 0.6
+        base_z = min(zc, m["base"] if m["base"] is not None else zc) - sunk
         ca, sa = math.cos(yaw), math.sin(yaw)
         if today:
             nco = max(1, int(H_ / COURSE))
@@ -53,7 +58,7 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                         dd = rng.uniform(0.7, 0.95)
                         vv = out - dd / 2 + rng.gauss(0, 0.03)
                         hh = COURSE - 0.03 - rng.random() * 0.03
-                        blocks.add((m["cx"] + uc * cs - vv * sn, m["cy"] + uc * sn + vv * cs, base_z + zb + hh / 2 + 0.6),
+                        blocks.add((m["cx"] + uc * cs - vv * sn, m["cy"] + uc * sn + vv * cs, base_z + zb + hh / 2 + sunk),
                                    (rng.gauss(0, 0.01), rng.gauss(0, 0.01), ang + rng.gauss(0, 0.02)),
                                    (bl - 0.04, dd, hh), rng.randrange(N_CORE), rng.random(), rng.random())
         # The core (today, inside the laid shell and a little lower) or the dressed form.

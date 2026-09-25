@@ -20,14 +20,17 @@ import sys
 import bpy
 import numpy as np
 
-from . import data
+from . import data, states
 from .nodes import Tree, hexlin
 
 BLENDER_DIR = os.path.join(data.REPO, "blender")
 if BLENDER_DIR not in sys.path:
     sys.path.insert(0, BLENDER_DIR)
 
-MODEL_FOR = {"today": "sphinx-meshy", "built": "sphinx-carved", "ancient": "sphinx-carved"}
+# Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
+MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion", None), "carved": ("sphinx-carved", None),
+             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
+TINTED = {"sphinx-meshy", "sphinx-lion"}      # generated textures with a pink cast
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 
@@ -36,8 +39,8 @@ def _records(name):
     return {r["key"]: r["value"] for r in data.records(name)}
 
 
-def enclosure():
-    """The ditch as (x0, x1, y0, y1, floor_z)."""
+def enclosure(state="today"):
+    """The ditch as (x0, x1, y0, y1, floor_z); filled to the chest in the buried state."""
     parts = [f for f in data.FOOTPRINTS if f.get("group") == "sphinx"]
     xs = [p[0] for f in parts for p in f["ring"]]
     ys = [p[1] for f in parts for p in f["ring"]]
@@ -53,14 +56,27 @@ def statue(state, coll, log=print):
     models = {m["id"]: m for m in json.load(io.open(os.path.join(BLENDER_DIR, "models.json"), encoding="utf-8"))["models"]}
     index = json.load(io.open(os.path.join(data.REPO, "build", "models", "index.json"), encoding="utf-8"))
     index = index.get("models", index)
-    model = models[MODEL_FOR[state]]
+    model_id, finish = MODEL_FOR[states.spec(state)["sphinx"]]
+    model = models[model_id]
     path = os.path.join(data.REPO, "build", "models", index[model["id"]]["file"])
+    surface = (model.get("finishes") or {}).get(finish, {}) if finish else {}
+    if finish:
+        finished = os.path.join(data.REPO, "build", "models", f"{model['id']}-{finish}", "model.glb")
+        if os.path.exists(finished):
+            path = finished
+        else:
+            log(f"sphinx: finish {finish} not on disk; the plain surface")
+            surface = {}
     if not os.path.exists(path):
         log(f"sphinx: {path} is not on disk (python scripts/models.py fetches it); no statue")
         return None
     mesh = rs.import_model(path, model["name"], keep_materials=True)
     obj = rs.cut_and_reduce(mesh, model.get("cut_z"), model.get("faces", 300000), model.get("largest_part_only", False))
     done = rs.fit(obj, model, data.FOOTPRINTS)
+    if surface.get("gilded"):
+        for mat in obj.data.materials:
+            if mat is not None:
+                rs.add_gilding(mat)
     for c in list(obj.users_collection):
         c.objects.unlink(obj)
     coll.objects.link(obj)
@@ -72,7 +88,7 @@ def statue(state, coll, log=print):
                     continue
                 nd.inputs["Roughness"].default_value = 0.9
                 base = nd.inputs["Base Color"]
-                if state == "today" and base.is_linked:
+                if model_id in TINTED and base.is_linked:
                     src = base.links[0].from_socket
                     hsv = tree.nodes.new("ShaderNodeHueSaturation")
                     hsv.inputs["Hue"].default_value = 0.525
@@ -86,7 +102,7 @@ def statue(state, coll, log=print):
                     tree.links.new(hsv.outputs["Color"], tint.inputs["Color1"])
                     tree.links.new(tint.outputs["Color"], base)
     obj["seked"] = "stand-in: " + model["name"]
-    log(f"sphinx: {model['id']}, {len(obj.data.polygons):,} faces, {done['length_m']:.1f} m long, {done['height_m']:.1f} m high")
+    log(f"sphinx: {model['id']}{' ' + finish if finish else ''}, {len(obj.data.polygons):,} faces, {done['length_m']:.1f} m long, {done['height_m']:.1f} m high")
     return obj
 
 
@@ -124,9 +140,9 @@ def bedrock_material():
     return mat
 
 
-def walls(terrain, coll, material):
+def walls(terrain, coll, material, state="today"):
     """Cut faces round the ditch's west, north and south sides, from its floor up to the ground outside."""
-    x0, x1, y0, y1, floor = enclosure()
+    x0, x1, y0, y1, floor = enclosure(state)
     runs = [((x0, y0), (x0, y1)), ((x0, y1), (x1, y1)), ((x1, y0), (x0, y0))]   # west, north, south
     verts, faces = [], []
     for (ax, ay), (bx, by) in runs:

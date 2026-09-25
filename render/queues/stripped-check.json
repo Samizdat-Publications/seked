@@ -1,0 +1,4 @@
+{"renders": [
+  {"state": "stripped", "shot": "sphinx", "size": "960x540", "samples": 16, "out": "build/render/check/era-stripped.png"},
+  {"state": "stripped", "station": "sphinx", "size": "1024x512", "samples": 12, "out": "build/render/check/era-stripped-station.png"}
+]}

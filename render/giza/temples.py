@@ -14,7 +14,7 @@ import math
 import bpy
 import numpy as np
 
-from . import data
+from . import data, states
 from .instancing import Field
 from .walls import ccw, inset_ring, lay_ring, simplify
 from .variants import N_DRESSED
@@ -44,14 +44,16 @@ def outlines(terrain_z=None):
     return out
 
 
-def flats():
-    """Platforms the terrain levels to: (cx, cy, half-x, half-y, z) per temple with a registered base."""
+def flats(state="today"):
+    """Platforms the terrain levels to: (cx, cy, half-x, half-y, z) per temple the state has, with a registered base."""
+    S = states.spec(state)
+    lift = 2.5 if S["temple_mode"] == "buried" else 0.0     # look choice: the sand in the courts by 1800
     res = []
     for f in data.FOOTPRINTS:
-        if f["id"] in TEMPLES and f.get("base"):
+        if f["id"] in S["temples"] and f.get("base"):
             xs = [p[0] for p in f["ring"]]
             ys = [p[1] for p in f["ring"]]
-            res.append(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, (max(xs) - min(xs)) / 2, (max(ys) - min(ys)) / 2, f["base"]))
+            res.append(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, (max(xs) - min(xs)) / 2, (max(ys) - min(ys)) / 2, f["base"] + lift))
     return res
 
 
@@ -118,12 +120,25 @@ def _mouths(doors, base, coll, material):
 
 
 def build(state, rng, terrain, coll, mats, lib, log=print):
-    today = state == "today"
-    core_blocks, granite_blocks, lime_blocks = Field(), Field(), Field()
+    S = states.spec(state)
+    mode = S["temple_mode"]
+    core_blocks, granite_blocks, lime_blocks, fresh_blocks = Field(), Field(), Field(), Field()
     for t in outlines(terrain.z):
+        if t["id"] not in S["temples"]:
+            continue
         ring, base = t["ring"], t["base"]
         doors = doorways(t)
-        if today:
+        if mode.startswith("megalithic"):
+            # The claim's temples: megalithic limestone walls standing whole, roofed with slabs of the same stone.
+            target = fresh_blocks if mode == "megalithic" else core_blocks
+            laid = lay_ring(ring, base, HEIGHT_BUILT, rng, target, course=1.6, length=3.4, depth=2.4, miss=0.0 if mode == "megalithic" else 0.03,
+                            openings=doors)
+            lean = HEIGHT_BUILT / math.tan(math.radians(82.0))
+            _slab(inset_ring(ring, 2.4 + lean + 0.2), base - 0.3, base + HEIGHT_BUILT - 0.05, coll, t["id"] + " core", mats["core behind"])
+            _slab(inset_ring(ring, lean + 0.1), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.6, coll, t["id"] + " roof",
+                  mats["core behind"])
+            log(f"{t['id']}: {laid} megalithic blocks ({mode})")
+        elif mode in ("ruin", "buried"):
             lo, hi = HEIGHT_TODAY[t["id"]]
             laid = lay_ring(ring, base, HEIGHT_BUILT * hi, rng, core_blocks, course=1.15, length=2.4, depth=2.0,
                             ruin=(lo / hi, 1.0), miss=0.05, seed=rng.random() * 100, openings=doors)
@@ -143,5 +158,6 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                 log(f"{t['id']}: {laid} dressed {casing} blocks to {HEIGHT_BUILT:.0f} m")
         _mouths(doors, base, coll, mats["dark"])
     core_blocks.emit("temple blocks", lib["core"], coll, log)
+    fresh_blocks.emit("temple megaliths", lib["core fresh"], coll, log)
     granite_blocks.emit("temple granite", lib["dressed granite"], coll, log)
     lime_blocks.emit("temple limestone", lib["dressed limestone"], coll, log)

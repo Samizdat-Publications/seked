@@ -12,8 +12,11 @@ covers the grid beneath it and needs no hole cut per view.
 import numpy as np
 import bpy
 
-from . import data
+from . import data, states
 from .noise import ValueNoise, smoothstep
+
+# Look choice: how much sand has drifted against the big pyramids' feet in each era.
+DRIFT = {"today": 0.8, "stripped": 1.7}
 
 NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
@@ -31,13 +34,15 @@ class Terrain:
     which the invented relief is held down so nothing pokes through a road.
     """
 
-    def __init__(self, state, footprints, flats=(), cuts=(), calm=None):
+    def __init__(self, state, footprints, flats=(), cuts=(), calm=None, sand=None):
         self.state = state
         self.footprints = footprints
         self.flats = list(flats)
         self.cuts = list(cuts)
         self.calm = None if calm is None else np.asarray(calm, np.float64)
         self.noise = ValueNoise(11, 2400.0)
+        self.drift = DRIFT.get(state, 0.0)
+        self.sand = sand
 
     def _calm_distance(self, X, Y):
         d = np.full(np.shape(X), 1e9, dtype=np.float64)
@@ -61,8 +66,8 @@ class Terrain:
             t = smoothstep(8.0, 60.0, d)
             Z = bz * (1 - t) + Z * t
             keep = np.minimum(keep, smoothstep(0.0, 30.0, d) * 0.8 + 0.2)
-            if self.state == "today" and half > 40:
-                drift += 0.8 * np.exp(-np.maximum(d, 0.0) / 6.0) * (d > -1.0)
+            if self.drift and half > 40:
+                drift += self.drift * np.exp(-np.maximum(d, 0.0) / 6.0) * (d > -1.0)
         for cx, cy, hx, hy, bz in self.flats:
             d = np.maximum(np.abs(X - cx) - hx, np.abs(Y - cy) - hy)
             t = smoothstep(3.0, 25.0, d)
@@ -77,6 +82,14 @@ class Terrain:
         for x0, x1, y0, y1, floor in self.cuts:
             inside = np.minimum(np.minimum(X - x0, x1 - X), np.minimum(Y - y0, y1 - Y))
             Z = np.where(inside > 0.0, np.minimum(Z, floor + 0.02 * self.noise.fbm(X, Y, 8.0, 2, key=4)), Z)
+        if self.sand is not None and not far:
+            s = self.sand
+            t = smoothstep(s["x_top"], s["x_bottom"], X)
+            fill = s["z_top"] * (1 - t) + s["z_bottom"] * t + 0.6 * self.noise.fbm(X, Y, 25.0, 3, key=5)
+            # Fade the drift out past its edges so it meets the ground it lies on.
+            edge = np.minimum(np.minimum(X - s["x_west"], s["x_bottom"] + 40.0 - X), np.minimum(Y - s["y0"], s["y1"] - Y))
+            w = smoothstep(0.0, s["margin"], edge)
+            Z = np.maximum(Z, Z * (1 - w) + fill * w)
         return Z
 
     def surface(self, x, y):

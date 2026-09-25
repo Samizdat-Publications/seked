@@ -9,6 +9,25 @@ from . import data
 from .instancing import field
 
 
+# Look choice: the village at the plateau's east foot before the city reached it
+# (Nazlet el-Samman and Kafr el-Gebel), drawn as a thinned, lowered subset of today's buildings there.
+VILLAGE_BOX = (420.0, 1600.0, -1600.0, 900.0)
+
+
+def village(terrain, coll, lib, log=print):
+    x, y, w, d, yaw, h = data.city_boxes().T
+    x0, x1, y0, y1 = VILLAGE_BOX
+    keep = (x > x0) & (x < x1) & (y > y0) & (y < y1)
+    keep &= (np.arange(len(x)) % 4) == 0
+    x, y, w, d, yaw = (a[keep] for a in (x, y, w, d, yaw))
+    n = len(x)
+    g = np.random.default_rng(12)
+    pos = np.stack([x, y, terrain.surface(x, y) - 0.3], 1)
+    rot = np.stack([np.zeros(n), np.zeros(n), np.radians(yaw)], 1)
+    scl = np.stack([np.clip(w, 3, 14), np.clip(d, 3, 14), g.uniform(3.0, 6.5, n)], 1)
+    return field("village", lib["mud box"], pos, rot, scl, g.integers(0, 3, n), g.random(n), np.zeros(n), coll, log)
+
+
 def build(terrain, coll, lib, log=print):
     x, y, w, d, yaw, h = data.city_boxes().T
     keep = np.ones(len(x), bool)
