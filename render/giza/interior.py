@@ -379,6 +379,79 @@ def queens_chamber(state, coll, mats, log=print):
     return (x0, x1, y0, y1, z0, ridge_z)
 
 
+def subterranean_chamber(state, coll, mats, log=print):
+    """
+    The unfinished chamber cut in the bedrock under the pyramid, from §37 (g1-interior.json): its
+    centre and roof, its walls' lengths north and south and its widths east and west, and the two
+    passages at its north-east and south-east corners. Its floor was never finished: §37 gives it
+    140 in under the roof over the flat eastern part, 155 on a knob beside the pit and 198 at the
+    best worked surface round it, and the western part rises in rough masses of rock towards the
+    roof. The eastern floor, the knob and the worked surface are set at those depths; where the pit
+    is, and the masses and trenches of the western part, are look choices.
+    """
+    import numpy as np
+    r = _r()
+    cx, cy, roof = r["chamber.subterranean.centre.east"], r["chamber.subterranean.centre.north"], r["chamber.subterranean.centre.up"]
+    y1 = r["passage.subterranean_north.end.north"]
+    y0 = r["passage.subterranean_south.begin.north"]
+    half_n, half_s = r["chamber.subterranean.length.north"] / 2, r["chamber.subterranean.length.south"] / 2
+    flat = roof - r["chamber.subterranean.height"]
+    knob, worked = roof - r["chamber.subterranean.depth.knob"], roof - r["chamber.subterranean.depth.worked"]
+    pit = (cx + 1.6, cy - 0.8, 0.9)                                     # look choice: where the pit opens, and its half width
+    rng = np.random.default_rng(37)
+
+    def floor_z(x, y):
+        """The unfinished floor: flat in the east, the pit's basin, rough masses and trenches in the west."""
+        west = np.clip((cx + 1.0 - x) / 4.0, 0.0, 1.0)                  # 0 in the east, 1 well into the west
+        ridges = 0.5 + 0.5 * np.sin(x * 1.9 + 0.7 * np.sin(y * 1.3)) * np.cos(y * 0.45)
+        mass = roof - 1.1 - 2.2 * (1.0 - ridges) ** 1.5                  # up to 1.1 m under the roof, down to 3.3
+        z = flat * (1 - west) + mass * west
+        d = np.hypot(x - pit[0], y - pit[1])
+        z = np.where(d < 2.6, np.minimum(z, worked + (knob - worked) * np.clip((d - 1.6) / 1.0, 0.0, 1.0)), z)
+        return z
+
+    bm = bmesh.new()
+    V = bm.verts.new
+    step = 0.25
+    xs = np.arange(cx - max(half_n, half_s), cx + max(half_n, half_s) + 1e-6, step)
+    ys = np.arange(y0, y1 + 1e-6, step)
+    X, Y = np.meshgrid(xs, ys)
+    Z = floor_z(X, Y) + rng.normal(0.0, 0.03, X.shape)
+    grid = [[V((float(X[j, i]), float(Y[j, i]), float(Z[j, i]))) for i in range(len(xs))] for j in range(len(ys))]
+    for j in range(len(ys) - 1):
+        for i in range(len(xs) - 1):
+            px, py = X[j, i] + step / 2, Y[j, i] + step / 2
+            if max(abs(px - pit[0]), abs(py - pit[1])) < pit[2]:
+                continue                                                # the pit's mouth, left open
+            bm.faces.new((grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]))
+    # The pit: its four walls going down three metres, and its bottom.
+    px0, px1, py0, py1 = pit[0] - pit[2], pit[0] + pit[2], pit[1] - pit[2], pit[1] + pit[2]
+    top, bot = worked, worked - 3.0
+    for a, b in (((px0, py0), (px1, py0)), ((px1, py0), (px1, py1)), ((px1, py1), (px0, py1)), ((px0, py1), (px0, py0))):
+        bm.faces.new([V((a[0], a[1], top)), V((b[0], b[1], top)), V((b[0], b[1], bot)), V((a[0], a[1], bot))])
+    bm.faces.new([V((px0, py0, bot)), V((px0, py1, bot)), V((px1, py1, bot)), V((px1, py0, bot))])
+    # The walls, from the lowest floor to the roof, the north and south a little different in length.
+    lo = min(float(Z.min()), bot) - 0.2
+    corners = [(cx - half_s, y0), (cx + half_s, y0), (cx + half_n, y1), (cx - half_n, y1)]
+    for k in range(4):
+        a, b = corners[k], corners[(k + 1) % 4]
+        bm.faces.new([V((a[0], a[1], lo)), V((b[0], b[1], lo)), V((b[0], b[1], roof)), V((a[0], a[1], roof))])
+    bm.faces.new([V((x, y, roof)) for x, y in corners])
+    _emit("subterranean chamber", bm, mats["bedrock rough"], coll)
+    # The passages' mouths: the one from the entrance passage at the north-east corner, the dead-end drift at the south-east.
+    bm = bmesh.new()
+    V = bm.verts.new
+    for x, y, z, w, h, dy in ((r["passage.subterranean_north.end.east"], y1, r["passage.subterranean_north.end.up"],
+                               r["passage.subterranean.width"], r["passage.subterranean.height"], -0.02),
+                              (r["passage.subterranean_south.begin.east"], y0, r["passage.subterranean_south.begin.up"],
+                               0.72, 0.76, 0.02)):
+        bm.faces.new([V((x - w / 2, y + dy, z)), V((x + w / 2, y + dy, z)), V((x + w / 2, y + dy, z + h)), V((x - w / 2, y + dy, z + h))])
+    _emit("subterranean mouths", bm, mats["dark"], coll)
+    log(f"subterranean chamber: {2 * half_n:.2f} x {y1 - y0:.2f} m under a roof at {roof:.2f} m; the floor flat at "
+        f"{flat:.2f} in the east, {worked:.2f} round the pit, rising in rough masses in the west")
+    return (cx - half_n, cx + half_n, y0, y1, flat, roof)
+
+
 def _area(name, coll, at, size, emit, along, energy, colour):
     lamp = bpy.data.lights.new(name, "AREA")
     lamp.shape = "RECTANGLE"
@@ -442,6 +515,43 @@ def lights(state, coll, r, room, log=print):
     return lamps
 
 
+def rough_rock(name, colours, soot=0.0):
+    """Bedrock left as the quarrymen's picks left it: blotched, lumpy, sooted towards the roof."""
+    mat = bpy.data.materials.new(name)
+    t = Tree(mat)
+    out = t.node("ShaderNodeOutputMaterial")
+    bsdf = t.node("ShaderNodeBsdfPrincipled")
+    t.link(bsdf.outputs[0], out.inputs["Surface"])
+    geo = t.node("ShaderNodeNewGeometry")
+    col = t.ramp(t.noise(geo.outputs["Position"], 1.2, 6.0, 0.62), [(0.25, hexlin(colours[0])), (0.75, hexlin(colours[1]))])
+    if soot:
+        sep = t.node("ShaderNodeSeparateXYZ")
+        t.link(geo.outputs["Position"], sep.inputs[0])
+        grime = t.math("MULTIPLY", t.band(sep.outputs["Z"], -30.0, -27.0), soot)
+        col = t.mix(grime, col, hexlin("2a241e"))
+    t.link(col, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.93
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 0.8
+    bmp.inputs["Distance"].default_value = 0.08
+    t.link(t.noise(geo.outputs["Position"], 4.0, 8.0, 0.7), bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
+def subterranean_lights(state, coll, room, log=print):
+    """Two lamps on the flat eastern floor today; three oil lamps before."""
+    x0, x1, y0, y1, flat, roof = room
+    lamps = []
+    modern = state in MODERN
+    colour = (1.0, 0.82, 0.6) if modern else (1.0, 0.52, 0.2)
+    spots = ((0.78, 0.35), (0.55, 0.7)) if modern else ((0.8, 0.3), (0.6, 0.72), (0.35, 0.45))
+    for fx, fy in spots:
+        at = (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, flat + (1.8 if modern else 0.15))
+        lamps.append(_point("subterranean lamp", coll, at, 60.0 if modern else 35.0, colour, 0.05))
+    return lamps
+
+
 def queens_lights(state, coll, room, log=print):
     """Two strips at the foot of the long walls today; three oil lamps on the floor before."""
     x0, x1, y0, y1, z0, _ = room
@@ -485,9 +595,13 @@ def build(state, coll, mats, log=print):
                                      joint=0.0, speckle="1c1715")
     mats["qc limestone"] = masonry("qc limestone", lime, rough, 0.8, 1.7, room_frame(r["qc.corner.ne.up"]),
                                    soot=soot * 0.6, height=r["qc.gable.height"])
+    mats["bedrock rough"] = rough_rock("bedrock rough", ("8f7f68", "a8977d") if state in MODERN or state == "stripped" else ("b7a88f", "cbbca2"),
+                                       soot=0.7 if state in MODERN or state == "stripped" else 0.2)
     mats.setdefault("timber", _flat("timber", (0.24, 0.15, 0.08), 0.7))
     mats.setdefault("iron", _flat("iron", (0.05, 0.05, 0.05), 0.4))
     gallery(state, coll, mats, log)
     room = kings_chamber(state, coll, mats, log)
     queen = queens_chamber(state, coll, mats, log)
-    return lights(state, coll, r, room, log) + queens_lights(state, coll, queen, log)
+    under = subterranean_chamber(state, coll, mats, log)
+    return (lights(state, coll, r, room, log) + queens_lights(state, coll, queen, log)
+            + subterranean_lights(state, coll, under, log))

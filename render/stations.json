@@ -130,7 +130,8 @@
       "neighbours": [
         "east",
         "gallery",
-        "orion"
+        "orion",
+        "subterranean"
       ]
     },
     {
@@ -427,6 +428,46 @@
         }
       ],
       "note": "z is the floor at the north wall (§64) plus 1.6 m."
+    },
+    {
+      "id": "subterranean",
+      "name": "The subterranean chamber",
+      "where": "Cut in the bedrock thirty metres under the pyramid, and never finished",
+      "inside": true,
+      "x": 5.2,
+      "y": -3.0,
+      "z": -28.78,
+      "light": "by the era's lamps",
+      "view": {
+        "yaw": 262,
+        "pitch": -4,
+        "fov": 72
+      },
+      "neighbours": [
+        "north",
+        "gallery"
+      ],
+      "landmarks": [
+        {
+          "name": "The pit",
+          "x": 2.26,
+          "y": -5.96,
+          "z": -31.6
+        },
+        {
+          "name": "From the descending passage",
+          "x": 7.27,
+          "y": -1.02,
+          "z": -29.4
+        },
+        {
+          "name": "The dead-end drift",
+          "x": 7.24,
+          "y": -9.3,
+          "z": -30.5
+        }
+      ],
+      "note": "z is the flat eastern floor (§37: 140 in under the roof) plus 1.6 m."
     }
   ]
 }

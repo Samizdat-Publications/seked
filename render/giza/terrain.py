@@ -18,6 +18,13 @@ from .noise import ValueNoise, smoothstep
 # Look choice: how much sand has drifted against the big pyramids' feet in each era.
 DRIFT = {"today": 0.8, "stripped": 1.7}
 
+# GLO-30 is a surface model: east of the temples it carries the modern town's roofs. Before the
+# town, the valley floor was the flood plain, so in the eras without it the low ground there is
+# eased to a plain at these heights (look choices): just under the claim eras' flood, so it lies
+# across the valley with islands where the relief lifts the ground; a little above the harbour
+# as built and in 1800, so the fields stand dry.
+FLOODPLAIN = {"first-time": -43.2, "lion": -43.1, "built": -42.4, "stripped": -42.2}
+
 NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
 FAR_HALF = 11500.0
@@ -61,6 +68,11 @@ class Terrain:
     def z(self, X, Y, far=False):
         grid = data.FAR if far else data.NEAR
         Z = grid.sample(X, Y) + data.TERRAIN_SHIFT
+        plain = FLOODPLAIN.get(self.state)
+        if plain is not None:
+            # East of the temples and below the escarpment, the flood plain instead of the town's roofs.
+            m = smoothstep(470.0, 560.0, X) * smoothstep(-33.0, -37.0, Z)
+            Z = Z * (1 - m) + plain * m
         keep = np.ones_like(Z)
         drift = np.zeros_like(Z)
         for cx, cy, half, bz in self.footprints:
