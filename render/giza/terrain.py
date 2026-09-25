@@ -29,7 +29,7 @@ NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
 FAR_HALF = 11500.0
 FAR_STEP = 60.0
-HORIZON = 150000.0         # how far the plain beyond the far grid runs (look choice)
+HORIZON = 150000.0         # how far the plain beyond the far grid runs (look choice); the haze covers 30 km of it
 PATCH_HALF = 150.0
 PATCH_LIFT = 0.05
 
@@ -142,7 +142,8 @@ class Terrain:
                           hole=(NEAR_BOX[0] + 60, NEAR_BOX[1] - 60, NEAR_BOX[2] + 60, NEAR_BOX[3] - 60))
         far.data.materials.append(material)
         # Beyond the far grid, a plain out to HORIZON at the grid's median edge height, tucked two metres
-        # under its rim: without it an aerial view sees the sky's lower half as a band under the horizon.
+        # under its rim, so an aerial view's horizon is hazed ground rather than the edge of the grid or the
+        # sky model's lower half (Blender 5.1's multiple-scattering sky takes no direction to clamp).
         edge = np.concatenate([self.z(f, np.full_like(f, s * FAR_HALF), far=True) for s in (-1, 1)] +
                               [self.z(np.full_like(f, s * FAR_HALF), f, far=True) for s in (-1, 1)])
         zr = float(np.median(edge)) - 2.8

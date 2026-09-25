@@ -69,6 +69,45 @@ def configure(scene, exposure=-3.8):
     scene.render.resolution_percentage = 100
 
 
+def post(scene, grade):
+    """
+    The camera's own response after the render (look choices, per era, from states.py `grade`):
+    a bloom round what is brighter than white, so a sunlit gold cap flares as it would in a lens,
+    then the era's tint and saturation, cool and wet for the claim's green eras, warm and dry as
+    built. Blender 5.1's compositor: a CompositorNodeTree set as the scene's compositing group.
+    """
+    g = bpy.data.node_groups.new("grade", "CompositorNodeTree")
+    g.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
+    rl = g.nodes.new("CompositorNodeRLayers")
+    img = rl.outputs["Image"]
+    if grade.get("bloom"):
+        gl = g.nodes.new("CompositorNodeGlare")
+        gl.inputs["Type"].default_value = "Bloom"
+        # the render's radiance before the view's exposure (-3.8 stops outdoors): only what shows
+        # brighter than white, a glint or the sun, blooms
+        gl.inputs["Threshold"].default_value = 20.0
+        gl.inputs["Strength"].default_value = grade["bloom"]
+        g.links.new(img, gl.inputs["Image"])
+        img = gl.outputs["Image"]
+    if grade.get("tint"):
+        mix = g.nodes.new("ShaderNodeMix")
+        mix.data_type = "RGBA"
+        mix.blend_type = "MULTIPLY"
+        mix.inputs["Factor"].default_value = 1.0
+        mix.inputs[7].default_value = tuple(grade["tint"]) + (1.0,)
+        g.links.new(img, mix.inputs[6])
+        img = mix.outputs[2]
+    if grade.get("saturation", 1.0) != 1.0:
+        hs = g.nodes.new("CompositorNodeHueSat")
+        hs.inputs["Saturation"].default_value = grade["saturation"]
+        g.links.new(img, hs.inputs["Image"])
+        img = hs.outputs["Image"]
+    out = g.nodes.new("NodeGroupOutput")
+    g.links.new(img, out.inputs[0])
+    scene.compositing_node_group = g
+    scene.render.use_compositing = True
+
+
 def render(scene, out, width, height, samples):
     scene.render.resolution_x, scene.render.resolution_y = width, height
     scene.cycles.samples = samples

@@ -50,7 +50,7 @@ def beam(altitude_deg, aerosol):
 
 
 class Sky:
-    def __init__(self, scene, aerosol=1.1, haze=1.0, coll=None):
+    def __init__(self, scene, aerosol=1.1, haze=1.0, coll=None, colours=None, mist=None):
         self.scene = scene
         self.aerosol = aerosol
         world = bpy.data.worlds.new("sky")
@@ -80,8 +80,10 @@ class Sky:
         scene.collection.objects.link(self.sun)
         self.sun.visible_camera = False
         if haze > 0 and coll is not None:
-            for z0, z1, dens, col in HAZE:
-                self._slab(coll, z0, z1, dens * haze, col)
+            for k, (z0, z1, dens, col) in enumerate(HAZE):
+                self._slab(coll, z0, z1, dens * haze, colours[k] if colours else col)
+        if mist and coll is not None:
+            self._slab(coll, *mist)
 
     def clouds(self, kind, log=print):
         """Hang the era's photographed skies (CLOUDS[kind]) behind the scene; set_sun picks and turns one."""
@@ -231,7 +233,7 @@ class Sky:
         bm.free()
         ob = bpy.data.objects.new("air", me)
         coll.objects.link(ob)
-        ob.scale = (300000, 300000, z1 - z0)       # out past the horizon plain, so the horizon hazes over
+        ob.scale = (60000, 60000, z1 - z0)         # 30 km out every way, as far as the horizon plain
         ob.location = (0, 0, (z0 + z1) / 2)
         mat = bpy.data.materials.new("air")
         t = Tree(mat)

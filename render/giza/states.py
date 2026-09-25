@@ -15,8 +15,10 @@ inherited and restored them, so as built their casing shows its age. Temple's An
 stays a stand-in on disk (sphinx.MODEL_FOR), outside the sequence.
 
 `gild` is the height in metres of each main pyramid's metal apex (the pyramidion and
-the sheathed courses under it), `clouds` the sky's cloud field (sky.CLOUDS) and `air`
-the era's aerosol and haze against the defaults: look choices all.
+the sheathed courses under it), `clouds` the sky's cloud field (sky.CLOUDS), `air`
+the era's aerosol and haze against the defaults, `haze_colour` the hazes' colours low to high,
+`mist` a layer of it lying on the valley floor (bottom, top, density, colour), and `grade` the
+camera's response (renderer.post): look choices all.
 
 Everything a key names here is looked up by the modules; nothing else decides what
 exists in an era.
@@ -29,21 +31,26 @@ MEGALITHIC = ("khafre.valley_temple", "sphinx.temple")
 STATES = {
     "first-time": dict(
         label="c. 10,500 BCE", title="The First Time", honesty="claim", year=-10499,
-        pyramids="pristine", caps="electrum", gild=11.0, queens=None, mastabas=None, causeway=None,
+        pyramids="pristine", caps="electrum", gild=15.0, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic", sphinx="lion-fresh",
-        ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.7, 1.35),
+        ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.8, 1.8),
+        haze_colour=("e6ebe6", "edf0ec", "f1f3f0"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
+        grade=dict(bloom=0.25, tint=(0.96, 1.0, 1.02), saturation=1.06),
         rubble=False, people=False, stones=False),
     "lion": dict(
         label="c. 7000 BCE", title="The long rains", honesty="claim", year=-6999,
         pyramids="weathered", caps="electrum", gild=11.0, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic-weathered", sphinx="lion",
-        ground="dry-savanna", valley="lush", water="flood", city=None, clouds="showers", air=(1.5, 1.25),
+        ground="dry-savanna", valley="lush", water="flood", city=None, clouds="showers", air=(1.6, 1.6),
+        haze_colour=("dfe3e2", "e6e9e8", "eef0ef"), mist=(-50.0, -34.0, 6e-4, "e7ebea"),
+        grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92),
         rubble=False, people=False, stones=True),
     "built": dict(
         label="c. 2560 BCE", title="As built", honesty="reconstruction", year=-2559,
-        pyramids="dressed", caps="gold", gild=6.0, queens="dressed", mastabas="dressed", causeway="corridor",
+        pyramids="dressed", caps="gold", gild=8.0, queens="dressed", mastabas="dressed", causeway="corridor",
         temples=ALL_TEMPLES, temple_mode="built", sphinx="carved",
         ground="desert", valley="fields", water="harbour", city=None,
+        grade=dict(bloom=0.25, tint=(1.04, 1.0, 0.93), saturation=1.04),
         rubble=False, people=True, stones=False),
     "stripped": dict(
         label="c. 1800 CE", title="Stripped and buried", honesty="reconstruction", year=1800,

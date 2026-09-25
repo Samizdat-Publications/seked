@@ -32,6 +32,9 @@ MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx
              "lion-fresh": ("sphinx-lion-fresh", None), "carved": ("sphinx-carved", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
+# The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
+# taken down to the bedrock's warm limestone (a look choice; traces of red ochre survive on it).
+WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0)}
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
@@ -109,6 +112,14 @@ def statue(state, coll, log=print):
                     continue
                 nd.inputs["Roughness"].default_value = 0.9
                 base = nd.inputs["Base Color"]
+                if model_id in WARMED and base.is_linked:
+                    src = base.links[0].from_socket
+                    warm = tree.nodes.new("ShaderNodeMixRGB")
+                    warm.blend_type = "MULTIPLY"
+                    warm.inputs["Fac"].default_value = 1.0
+                    warm.inputs["Color2"].default_value = WARMED[model_id]
+                    tree.links.new(src, warm.inputs["Color1"])
+                    tree.links.new(warm.outputs["Color"], base)
                 if model_id in TINTED and base.is_linked:
                     src = base.links[0].from_socket
                     hsv = tree.nodes.new("ShaderNodeHueSaturation")

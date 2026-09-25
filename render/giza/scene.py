@@ -62,15 +62,18 @@ class Plateau:
             # Tura limestone a shade under paper white, so a sunlit face keeps its courses instead of burning out.
             "coursed casing": materials.coursed_casing("coursed casing", colours=("e0d9ca", "e9e3d6"), rough=0.4, tone=0.16, line=0.22,
                                                        mortar=0.012, mottle=0.05),
-            "limestone flat": materials.dressed("limestone flat", colours=("e3dccd", "ebe5d8"), rough=0.55),
+            # The mastabas' dressed faces: the pyramids' restored stone in smaller courses, no grime at the foot.
+            "limestone flat": materials.restored_casing("limestone flat", rough=0.55, course=0.5, width=1.0, foot=False),
             "pavement": materials.pavement(),
             # The claim's casing, polished further than any reconstruction would draw it.
             "pristine casing": materials.polished_casing("pristine casing"),
             # As built: the inherited casing, restored, showing its age (Stewart's reading, 2026-09-25).
             "restored casing": materials.restored_casing("restored casing"),
             "weathered casing": materials.weathered_casing(),
-            "gold": materials.metal("gold", "eeb94c", 0.3, metallic=0.78),
-            "electrum": materials.metal("electrum", "f1e3ae", 0.3, metallic=0.7),
+            # Burnished in part and in part left as matte leaf, which is what makes gold read as gold from the
+            # ground: a polished face there mirrors only the deep sky overhead.
+            "gold": materials.metal("gold", "ffd46e", 0.32, metallic=0.6),
+            "electrum": materials.metal("electrum", "fbf0c8", 0.22, metallic=0.65),
             "dressed granite": materials.dressed_granite(),
             "dark": materials.dark(),
             "water": materials.water(),
@@ -124,12 +127,15 @@ class Plateau:
             if herd_lib is not None:
                 fauna.place(state, self.terrain, self.world, herd_lib, log=self.log)
         air = S.get("air", (1.0, 1.0))
-        self.sky = Sky(self.scene, aerosol=aerosol * air[0], haze=haze * air[1], coll=self.world)
+        self.sky = Sky(self.scene, aerosol=aerosol * air[0], haze=haze * air[1], coll=self.world,
+                       colours=S.get("haze_colour"), mist=S.get("mist"))
         if S.get("clouds"):
             self.sky.clouds(S["clouds"], self.log)
         self.camera = cameras.make(self.scene)
         renderer.gpu(self.scene, self.log)
         renderer.configure(self.scene)
+        if S.get("grade"):
+            renderer.post(self.scene, S["grade"])
         self.exposure = self.scene.view_settings.exposure
         self.inside_lamps = None       # the interior is built the first time a view goes inside
         self.night = None              # and the star dome the first time a moment is a night
