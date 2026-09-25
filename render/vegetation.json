@@ -1,0 +1,181 @@
+{
+  "about": "The plants render/giza/vegetation.py scatters, by instancing, in the path-traced plateau. Nothing here is a measurement and nothing is evidence: what grew where in each era, and how tall, is a look choice named in vegetation.py (STATES, KINDS). `blender -b --factory-startup -P render/giza/vegetation.py -- prepare` builds the library into build/vegetation/plants.blend (gitignored) and writes each asset's measured `variants` (native height in metres and triangles) back into this file. Each kind is a collection `veg <kind>` of variants `veg <kind> NN`, parked at z = -20000 as render/giza/variants.py parks its originals; the scatter scales a variant to the height it wants. Licences are recorded for provenance, not as a constraint (Stewart, 2026-09-17).",
+  "library": {
+    "file": "build/vegetation/plants.blend",
+    "made_by": "render/giza/vegetation.py prepare()",
+    "prepared_in_s": 21
+  },
+  "assets": [
+    {
+      "id": "date-palm",
+      "name": "Date palm (Phoenix dactylifera)",
+      "made": "generated: vegetation.date_palm()",
+      "source": "The trunk, fronds and leaflets are generated here. The bark photograph and its normal map are the Sketchfab date palm's.",
+      "author": "bark texture: evolveduk; geometry: this project",
+      "url": "https://sketchfab.com/3d-models/date-palm-11acf710e6c149daa8d6fb8cdc5d087f",
+      "license": "CC BY 4.0 (the bark texture)",
+      "height_range_m": [10, 20],
+      "note": "Four variants, built for 10, 13, 16 and 19 m of trunk and crown and measuring 11.6 to 20.5 m to the tips of the youngest fronds (`variants`), so a tall palm is a longer trunk and not a bigger crown; two carry a skirt of dead fronds, two are clean as a tended grove's are. Every leaflet is geometry (110 a frond, 58 to 72 fronds): the Sketchfab palm's fronds are alpha-tested cards, and a crown of cards seen from under it runs through more transparent layers than the renderer's four transparent bounces allow, which draws black. Proportions, frond count and droop are look choices.",
+      "variants": [
+        {"height_m": 11.7, "triangles": 26556},
+        {"height_m": 14.6, "triangles": 21740},
+        {"height_m": 17.32, "triangles": 28606},
+        {"height_m": 20.6, "triangles": 24832}
+      ]
+    },
+    {
+      "id": "doum-palm",
+      "name": "Doum palm (Hyphaene thebaica)",
+      "made": "generated: vegetation.doum_palm()",
+      "source": "Generated here; no downloaded part.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [8, 15],
+      "note": "The Nile's branching palm: a trunk that forks once or twice, each branch ending in a round crown of 16 to 22 pleated fan leaves split into segments at the rim, with a few dead leaves hanging under it. Three variants (about 9, 11.5 and 13.5 m, one and two forks). No free model of a doum palm was at hand, and nothing about its form is a measurement.",
+      "variants": [
+        {"height_m": 9.43, "triangles": 4957},
+        {"height_m": 11.5, "triangles": 9156},
+        {"height_m": 13.76, "triangles": 8339}
+      ]
+    },
+    {
+      "id": "acacia",
+      "name": "Savanna tree standing in for an umbrella acacia (Vachellia tortilis)",
+      "made": "downloaded and reshaped: vegetation._island_trees()",
+      "source": "Poly Haven island_tree_01: the trunk keeps half its triangles and the branches 18 %, and each of its 44,168 leaves becomes a hexagon through six of its own vertices (4 triangles, not 24), which stays inside the leaf's outline in the texture as well and so needs no alpha. The crown is squashed and widened into an umbrella above 2.1 m (two variants, one wider).",
+      "author": "Poly Haven",
+      "url": "https://polyhaven.com/a/island_tree_01",
+      "license": "CC0 1.0",
+      "height_range_m": [4, 10],
+      "note": "A stand-in, and the reshaping is a look choice: the island tree is an olive-like tree, and flattening its crown is what makes it read as the flat-topped acacia of a savanna from across the plateau.",
+      "variants": [
+        {"height_m": 3.71, "triangles": 284888},
+        {"height_m": 3.31, "triangles": 284888}
+      ]
+    },
+    {
+      "id": "tree",
+      "name": "Valley tree standing in for a sycamore fig or tamarisk",
+      "made": "downloaded: vegetation._island_trees()",
+      "source": "Poly Haven island_tree_01, reduced as the acacia is, its own crown kept.",
+      "author": "Poly Haven",
+      "url": "https://polyhaven.com/a/island_tree_01",
+      "license": "CC0 1.0",
+      "height_range_m": [6, 11],
+      "note": "A stand-in for the broad trees of the valley. Its textures are halved to 1024 pixels.",
+      "variants": [
+        {"height_m": 5.03, "triangles": 284888}
+      ]
+    },
+    {
+      "id": "shrub",
+      "name": "Desert shrub",
+      "made": "downloaded: vegetation._shrubs()",
+      "source": "Poly Haven shrub_02, all four of the pack's bushes, each stood on its own foot; textures halved to 1024 pixels.",
+      "author": "Poly Haven",
+      "url": "https://polyhaven.com/a/shrub_02",
+      "license": "CC0 1.0",
+      "height_range_m": [0.7, 1.7],
+      "note": "Sparse and twiggy, which suits the lion's drier scrub; the leafy bush below carries the green eras.",
+      "variants": [
+        {"height_m": 1.71, "triangles": 7590},
+        {"height_m": 1.19, "triangles": 5242},
+        {"height_m": 1.17, "triangles": 9234},
+        {"height_m": 1.24, "triangles": 5188}
+      ]
+    },
+    {
+      "id": "bush",
+      "name": "Leafy savanna bush",
+      "made": "generated: vegetation.bush()",
+      "source": "Generated here: stems from a few crowns at the foot out to twig ends, each with a cluster of small leaves. Three variants (round, wide and low, tall).",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.6, 2.0],
+      "note": "A generic shrub, not any one species. It replaces Poly Haven's wild_rooibos_bush, whose leaf cards need an alpha channel the Poly Haven glTF does not ship, so its leaves draw as dark rectangles.",
+      "variants": [
+        {"height_m": 1.41, "triangles": 5280},
+        {"height_m": 1.19, "triangles": 5280},
+        {"height_m": 2.04, "triangles": 5280}
+      ]
+    },
+    {
+      "id": "papyrus",
+      "name": "Papyrus (Cyperus papyrus)",
+      "made": "generated: vegetation.papyrus()",
+      "source": "Generated here: clumps of triangular stems, each topped by a mop of fine rays.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [2, 3.8],
+      "note": "On the era's shorelines, from 0.45 m under the water plane to 0.8 m above it.",
+      "variants": [
+        {"height_m": 3.18, "triangles": 10015},
+        {"height_m": 3.43, "triangles": 11930},
+        {"height_m": 3.38, "triangles": 14485}
+      ]
+    },
+    {
+      "id": "reed",
+      "name": "Reed (Phragmites)",
+      "made": "generated: vegetation.reed()",
+      "source": "Generated here: clumps of culms with arching leaves and a plume leaning with one wind.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [1.8, 2.9],
+      "note": "On the shorelines with the papyrus.",
+      "variants": [
+        {"height_m": 2.63, "triangles": 4561},
+        {"height_m": 2.61, "triangles": 5469},
+        {"height_m": 2.63, "triangles": 6426}
+      ]
+    },
+    {
+      "id": "tussock",
+      "name": "Grass tussock",
+      "made": "generated: vegetation.grass_tuft()",
+      "source": "Generated here: 120 to 150 blade strips, a fifth of them dead, with a few seed heads; four variants.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.4, 1.0],
+      "note": "The state-wide grass: sparse clumps over the near grid, which read as tussocky ground from mid distance.",
+      "variants": [
+        {"height_m": 0.78, "triangles": 1244},
+        {"height_m": 0.95, "triangles": 1334},
+        {"height_m": 1.11, "triangles": 1424},
+        {"height_m": 1.2, "triangles": 1514}
+      ]
+    },
+    {
+      "id": "grass",
+      "name": "Grass tuft",
+      "made": "generated: vegetation.grass_tuft()",
+      "source": "Generated here: 34 to 50 blade strips; four short, four medium and two tall with seed stalks.",
+      "author": "this project",
+      "license": "the project's own",
+      "height_range_m": [0.2, 0.8],
+      "note": "The tufts near_camera lays within 120 m of a camera. Each blade carries its own random draw (`blade`) and a dead flag, so a tuft is not one colour.",
+      "variants": [
+        {"height_m": 0.27, "triangles": 306},
+        {"height_m": 0.28, "triangles": 306},
+        {"height_m": 0.31, "triangles": 306},
+        {"height_m": 0.33, "triangles": 306},
+        {"height_m": 0.5, "triangles": 450},
+        {"height_m": 0.51, "triangles": 450},
+        {"height_m": 0.52, "triangles": 450},
+        {"height_m": 0.57, "triangles": 450},
+        {"height_m": 0.99, "triangles": 647},
+        {"height_m": 1.05, "triangles": 647}
+      ]
+    }
+  ],
+  "not_used": [
+    {
+      "id": "rooibos-bush",
+      "why": "its leaf cards need an alpha channel the Poly Haven glTF does not ship, so they draw as dark rectangles"
+    },
+    {
+      "id": "date-palm fronds",
+      "why": "alpha-tested cards; the generated fronds are geometry, so they need no transparent bounces"
+    }
+  ]
+}
