@@ -178,7 +178,7 @@ def rollback():
 
 
 def sphinx():
-    """The Sphinx's sequence forward in time, from above its temple with Khafre's pyramid behind."""
+    """The Sphinx's sequence forward in time, from over the head of the causeway with Khufu's pyramid behind."""
     order = ["first-time", "lion", "built", "stripped", "today"]
     stills = [os.path.join(REPO, "build", "render", "shots", f"sphinx-sequence-{st}.png") for st in order]
     missing = [p for p in stills if not os.path.exists(p)]
