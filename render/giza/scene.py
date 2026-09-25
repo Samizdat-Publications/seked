@@ -51,11 +51,14 @@ class Plateau:
             "city": materials.flat("city", "city", 0.85),
             "people": materials.flat("people", "people", 0.7),
             "dressed": materials.dressed("dressed casing"),
-            "coursed casing": materials.coursed_casing("coursed casing"),
+            # Tura limestone a shade under paper white, so a sunlit face keeps its courses instead of burning out.
+            "coursed casing": materials.coursed_casing("coursed casing", colours=("e0d9ca", "e9e3d6"), rough=0.4, tone=0.16, line=0.22,
+                                                       mortar=0.012, mottle=0.05),
             "limestone flat": materials.dressed("limestone flat", colours=("e3dccd", "ebe5d8"), rough=0.55),
             "pavement": materials.pavement(),
             # The claim's casing, polished further than any reconstruction would draw it.
-            "pristine casing": materials.coursed_casing("pristine casing", colours=("f4f0e8", "fbf9f4"), rough=0.14, tone=0.025, line=0.04),
+            "pristine casing": materials.coursed_casing("pristine casing", colours=("e8e3d7", "f0ece3"), rough=0.2, tone=0.08, line=0.12,
+                                                        mortar=0.01, mottle=0.04),
             "weathered casing": materials.weathered_casing(),
             "gold": materials.metal("gold", "f2c35a", 0.2),
             "electrum": materials.metal("electrum", "efe0a8", 0.14),

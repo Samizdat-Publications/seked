@@ -59,7 +59,10 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
     Lay courses round a closed outline, outer faces leaning in at `batter_deg`.
     `ruin` is (low, high): the share of `height` a stretch of wall keeps, varying
     slowly along it; None keeps it whole. `openings` are doorways (x, y, width,
-    height): no block is laid across one below its head. Returns the blocks laid.
+    height): no block is laid across one below its head. `erosion_jitter` is
+    weathered masonry: blocks knocked a little askew, with the open bed joints of
+    worn stone; without it the courses close to the fine joints of dressed work.
+    Returns the blocks laid.
     """
     pts = simplify(ring)
     inset_per_m = 1.0 / math.tan(math.radians(batter_deg))
@@ -110,7 +113,7 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
                     continue
                 cx = ax + dx * sc - nx * inset
                 cy = ay + dy * sc - ny * inset
-                hh = ch - 0.03 - rng.random() * 0.04
+                hh = ch - 0.03 - rng.random() * 0.04 if erosion_jitter else ch - 0.006 - rng.random() * 0.004
                 jit = 0.008 if erosion_jitter else 0.0005
                 field.add((cx, cy, base_z + zb + hh / 2), (rng.gauss(0, jit), rng.gauss(0, jit), yaw + rng.gauss(0, jit * 2)),
                           (bl - joint, depth * rng.uniform(0.9, 1.1), hh), rng.randrange(variants), rng.random(), rng.random())

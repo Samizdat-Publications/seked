@@ -98,7 +98,9 @@
       "neighbours": [
         "south",
         "north",
-        "sphinx"
+        "sphinx",
+        "temple",
+        "cemetery"
       ]
     },
     {
@@ -136,6 +138,46 @@
       "neighbours": [
         "south"
       ]
+    },
+    {
+      "id": "temple",
+      "name": "Khufu's mortuary temple",
+      "where": "On the basalt pavement of its court, the Great Pyramid's east face above",
+      "x": 160.0,
+      "y": -5.0,
+      "z": 2.2,
+      "moment": "sphinx-morning",
+      "view": {
+        "yaw": 270,
+        "pitch": 22,
+        "fov": 70
+      },
+      "neighbours": [
+        "east",
+        "cemetery",
+        "north"
+      ],
+      "note": "z is absolute: 1.7 m over the pavement top (Petrie's thickness), the same floor in every era that has it."
+    },
+    {
+      "id": "cemetery",
+      "name": "The Eastern Cemetery",
+      "where": "At the Eastern Cemetery's south-west corner, the queens' pyramids between it and Khufu",
+      "x": 224.0,
+      "y": -156.0,
+      "eye": 1.7,
+      "moment": "sphinx-morning",
+      "view": {
+        "yaw": 305,
+        "pitch": 8,
+        "fov": 62
+      },
+      "neighbours": [
+        "temple",
+        "east",
+        "sphinx"
+      ],
+      "note": "Chosen from the mastaba footprints: 11 m from the nearest wall, ten mastabas within 45 m, and Khufu in clear view."
     },
     {
       "id": "harbour",

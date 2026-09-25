@@ -1,0 +1,18 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 32,
+   "out": "build/render/check/east-first-time-c.png"
+  },
+  {
+   "state": "built",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 32,
+   "out": "build/render/check/east-built-c.png"
+  }
+ ]
+}

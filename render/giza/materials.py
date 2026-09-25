@@ -180,11 +180,14 @@ def _face_bricks(t, geo, course, width, mortar):
     return br.outputs["Fac"], bw.outputs[0]
 
 
-def coursed_casing(name, colours=("ece5d8", "f3eee5"), rough=0.55, course=0.85, width=1.5, mortar=0.008, tone=0.07, line=0.12):
+def coursed_casing(name, colours=("ece5d8", "f3eee5"), rough=0.55, course=0.85, width=1.5, mortar=0.008, tone=0.07, line=0.12,
+                   mottle=0.0):
     """
     Dressed casing laid in courses: each stone a shade off its neighbours, the joints a
     hairline. From the stations a course is three or four pixels high, so the face reads
     as masonry rather than a colour, and still as the satin white the reference shows.
+    `mottle` is a slow patchiness over tens of metres, stone from different beds and
+    quarry seasons, so a whole sunlit face is not one flat tone.
     """
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
@@ -194,6 +197,10 @@ def coursed_casing(name, colours=("ece5d8", "f3eee5"), rough=0.55, course=0.85, 
     geo = t.node("ShaderNodeNewGeometry")
     drift = t.noise(geo.outputs["Position"], 0.05, 3.0)
     col = t.ramp(drift, [(0.35, hexlin(colours[0])), (0.65, hexlin(colours[1]))])
+    if mottle:
+        patch = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", t.noise(geo.outputs["Position"], 0.035, 2.0, 0.5), 0.5),
+                                     2.0 * mottle), 1.0)
+        col = t.mix(1.0, col, t.grey(patch), "MULTIPLY")
     joint, stone_tone = _face_bricks(t, geo, course, width, mortar)
     shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone_tone, 0.5), tone * 2.0), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
