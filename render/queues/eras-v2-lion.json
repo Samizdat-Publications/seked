@@ -1,0 +1,18 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  }
+ ]
+}

@@ -35,13 +35,20 @@ def _render_sky():
 
 
 def night(night_id):
-    """The baked night, or None with a warning when the bake is missing or lacks it."""
+    """
+    The baked night, or None with a warning when the bake is missing or lacks it. A night is
+    one of the bake's `nights`, or one of the skies of its `alignments` (the claims' pictures,
+    render/alignments.py: an equinox dawn, a shaft star's culmination), which are baked the
+    same way and read the same way.
+    """
     if not os.path.exists(BAKE):
         print(f"WARNING: {BAKE} is missing; run pnpm run sky-bake. The night has no stars.")
         return None
     with io.open(BAKE, encoding="utf-8") as f:
         bake = json.load(f)
     n = bake.get("nights", {}).get(night_id)
+    if n is None:
+        n = bake.get("alignments", {}).get("skies", {}).get(night_id)
     if n is None:
         print(f"WARNING: the sky bake has no night {night_id!r}; run pnpm run sky-bake.")
     return n
@@ -106,7 +113,9 @@ class Night:
         if self.night_id != night_id:
             if self.dome is not None:
                 bpy.data.objects.remove(self.dome, do_unlink=True)
-            self.dome = rs.build_star_dome(self.scene, {"stars": n}, centre)
+            # render_sky tags the dome with its meridian star; a dawn has none, so it is tagged with its label.
+            tagged = n if n.get("meridian") else dict(n, meridian={"name": "no star", "from": n.get("label", night_id)})
+            self.dome = rs.build_star_dome(self.scene, {"stars": tagged}, centre)
             self.night_id = night_id
         self.dome.location = centre
         self.dome.hide_render = False
@@ -115,8 +124,11 @@ class Night:
             self.turn.inputs["Rotation"].default_value = Matrix(n["icrsToEnu"]).transposed().to_euler("XYZ")
             self.glow.inputs["Strength"].default_value = MILKY_WAY_STRENGTH
         up = sum(1 for row in n["stars"] if row[1] > 0)
-        self.log(f"night {night_id}: epoch {n['epoch']}, {n['meridian']['name']} on the meridian at sidereal time "
-                 f"{n['lstDeg']:.2f} deg, {up} stars up, the {n['season']} sun at {n['sun']['altitudeDeg']:.1f} deg")
+        # An alignment sky may have no star on the meridian (a dawn) and no season (its sun is the dawn's own).
+        on = f"{n['meridian']['name']} on the meridian" if n.get("meridian") else "no star set on the meridian"
+        season = f"the {n['season']} sun" if n.get("season") else "the sun"
+        self.log(f"night {night_id}: epoch {n['epoch']}, {on} at sidereal time "
+                 f"{n['lstDeg']:.2f} deg, {up} stars up, {season} at {n['sun']['altitudeDeg']:.1f} deg")
         return n
 
     def show_frame(self, rollback, f, centre):

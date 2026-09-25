@@ -951,7 +951,12 @@ def eyes(state, terrain, water=()):
         z = v["z"] if "z" in v else _ground_at(terrain, water, v["x"], v["y"]) + v.get("eye", 1.7)
         own = [tuple(v["target"])] if "target" in v else []
         m = v.get("moment")
-        lit = _towards_sun(moments.get(m) if isinstance(m, str) else m, state, float(v["x"]), float(v["y"]), float(z))
+        mm = moments.get(m) if isinstance(m, str) else m
+        if isinstance(mm, dict) and "night" in mm:
+            # A night station is there for the stars over the pyramids, which starlight barely shows
+            # against a treeline: its avenue is kept open down to the pyramids' feet (a look choice).
+            own += _feet(float(v["x"]), float(v["y"]))
+        lit = _towards_sun(mm, state, float(v["x"]), float(v["y"]), float(z))
         out.append((float(v["x"]), float(v["y"]), float(z), own + ([lit] if lit else [])))
     try:
         films = data.load_json(data.RENDER, "films.json")["films"]
@@ -975,6 +980,21 @@ def eyes(state, terrain, water=()):
     for e in EYES:
         out.append((e["x"], e["y"], _ground_at(terrain, water, e["x"], e["y"]) + e["above"], [tuple(e["target"])]))
     return out
+
+
+def _feet(ex, ey):
+    """Points low on the faces of each pyramid turned towards (ex, ey), for a view kept open to the ground."""
+    pts = []
+    for P in data.PYRAMIDS.values():
+        cx, cy, h, H, z0 = P["cx"], P["cy"], P["half"], P["H"], P["base"]
+        for nx, ny in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if (ex - cx) * nx + (ey - cy) * ny <= h:
+                continue
+            for f in (0.04, 0.15):
+                r = h * (1 - f)
+                for s in (-0.6, 0.0, 0.6):
+                    pts.append((cx + nx * r - ny * s * r, cy + ny * r + nx * s * r, z0 + f * H))
+    return pts
 
 
 def _sight_targets(ex, ey, ez, extra):

@@ -1,0 +1,41 @@
+{
+ "note": "The alignment pictures' cameras and moments (render/alignments.py). Where a camera stands, its lens and the exposure are look choices; every sky is one of build/sky-bake.json's (`pnpm run sky-bake`): a night of `nights`, or a sky of `alignments.skies`. Camera `at` is metres in the project frame (+x east, +y north, +z up from Khufu's base); `az` is degrees from north through east and `pitch` degrees above level; `shift` is Blender's lens shift.",
+ "views": {
+  "c4-night": {
+   "era": "first-time", "claim": "C4", "sky": "first-time", "exposure": 7.3,
+   "camera": {"at": [-130.0, 1300.0, 150.0], "az": 182.0, "pitch": 0.0, "lens": 23.0, "shift": [0.0, 0.15]},
+   "why": "A drone's view from 1.3 km north of Khufu and 150 m up, looking south along the meridian, level with the frame shifted up so the pyramids stand straight: the whole of Orion on the horizon over the three pyramids on the night of 10,450 BCE, Alnitak on the meridian."
+  },
+  "c4-plan": {
+   "era": "first-time", "claim": "C4", "kind": "plan",
+   "moment": {"date": "03-21", "solar": 9.5, "label": "mid-morning at the equinox, the pyramids' shadows thrown north-west"},
+   "camera": {"centre": [-230.0, -330.0], "width": 1900.0, "z": 3000.0},
+   "why": "The plateau from straight above, north up, for laying the belt on the ground."
+  },
+  "c5-dawn-10500": {
+   "era": "first-time", "claim": "C5", "sky": "c5-dawn-10500", "exposure": 4.2, "star_gain": 25.0,
+   "camera": {"at": [255.0, -421.0, 2.0], "az": 90.0, "pitch": -4.0, "lens": 20.0},
+   "why": "Close behind and above the lion, 12 m north of its axis so its head stands clear of the sun, looking due east along its gaze at the equinox dawn of 10,500 BCE. The stars are brightened 25-fold (star_gain) so they show against the twilight as the eye sees them; the dome is tuned for a dark night."
+  },
+  "c5-dawn-2500": {
+   "era": "built", "claim": "C5", "sky": "c5-dawn-2500", "exposure": 4.2, "star_gain": 25.0,
+   "camera": {"at": [255.0, -421.0, 2.0], "az": 90.0, "pitch": -4.0, "lens": 20.0},
+   "why": "The same place and the same moment of the equinox dawn, 2500 BCE, the Sphinx as Khafre's people recut it."
+  },
+  "c2-xray-2450": {
+   "era": "built", "claim": "C2", "sky": "c2-2450", "exposure": 6.5, "xray": true,
+   "camera": {"at": [1500.0, 0.0, 100.0], "az": 270.0, "pitch": 0.0, "lens": 76.0, "shift": [0.0, 0.07]},
+   "why": "The Great Pyramid from due east, level, so the north-south plane its shafts lie in faces the camera and every slope reads true; high enough to see the Queen's Chamber over the queens' pyramids."
+  },
+  "c2-xray-10450": {
+   "era": "first-time", "claim": "C2", "sky": "first-time", "exposure": 6.5, "xray": true,
+   "camera": {"at": [1500.0, 0.0, 100.0], "az": 270.0, "pitch": 0.0, "lens": 76.0, "shift": [0.0, 0.07]},
+   "why": "The same, under the sky of 10,450 BCE."
+  }
+ },
+ "portholes": {
+  "note": "One per shaft and epoch, generated from the bake's C2 section: a camera out along the shaft's line looking up it, the zenith up, under the sky of the star that crossed the line. The lens gives a 30 degree field on a square frame.",
+  "era": {"2450": "built", "10450": "first-time"},
+  "out_m": 200.0, "lens": 67.18, "size": "360x360", "final_size": "640x640", "samples": 16, "exposure": 6.5
+ }
+}

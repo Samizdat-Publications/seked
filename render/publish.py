@@ -24,7 +24,7 @@ WALK = os.path.join(data.REPO, "apps", "walk")
 PANO_OUT = os.path.join(WALK, "pano")
 
 # How tall each Sphinx of the sequence stands, as the fitted stand-ins came out (render logs).
-SPHINX_HEIGHT = {"anubis": 35.7, "lion": 30.1, "carved": 25.3, "buried": 24.3, "excavated": 24.3}
+SPHINX_HEIGHT = {"anubis": 35.7, "lion": 30.1, "lion-fresh": 21.1, "carved": 25.3, "buried": 24.3, "excavated": 24.3}
 SPHINX_BASE = -38.65
 
 

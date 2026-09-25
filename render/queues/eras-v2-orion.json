@@ -1,0 +1,11 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "orion",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/orion-first-time.png"
+  }
+ ]
+}

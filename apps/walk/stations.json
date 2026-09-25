@@ -9,13 +9,13 @@
   {
    "id": "lion",
    "label": "c. 7000 BCE",
-   "title": "The lion",
+   "title": "The long rains",
    "honesty": "claim"
   },
   {
    "id": "built",
    "label": "c. 2560 BCE",
-   "title": "As built",
+   "title": "Khufu's Giza",
    "honesty": "reconstruction"
   },
   {
@@ -122,7 +122,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -259,7 +259,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -396,7 +396,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -559,7 +559,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -693,7 +693,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -826,7 +826,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -959,7 +959,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -1093,7 +1093,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -1254,7 +1254,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -1386,7 +1386,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -1516,7 +1516,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -1646,7 +1646,7 @@
      "x": 337.0,
      "y": -433.0,
      "z": {
-      "first-time": -2.95,
+      "first-time": -17.55,
       "lion": -8.55,
       "built": -13.35,
       "stripped": -14.35,
@@ -1982,7 +1982,8 @@
     "fov": 80
    },
    "panoramas": {
-    "built": "pano/valley-temple-built.jpg"
+    "built": "pano/valley-temple-built.jpg",
+    "today": "pano/valley-temple-today.jpg"
    },
    "neighbours": [
     "harbour",
@@ -2020,6 +2021,12 @@
      "z": -39.68
     }
    ],
+   "titles": {
+    "today": {
+     "name": "In Khafre's granite hall, open to the sky",
+     "where": "The valley temple's T-shaped hall as it stands, its roof gone and a third of its beams with it"
+    }
+   },
    "inside": true
   }
  ]
