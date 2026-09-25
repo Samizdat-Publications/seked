@@ -83,7 +83,7 @@ def film(film_id, opts):
         t = k / (n - 1)
         t = t * t * (3 - 2 * t)                    # ease in and out
         cameras.frame(plateau.camera, _catmull(spec["path"], t), _catmull(spec["look"], t), spec["lens"])
-        plateau.render(out, w, h, int(spec["samples"]), view_id=f"{film_id} {k}", kind="film", moment=spec["moment"])
+        plateau.render(out, w, h, int(spec["samples"]), view_id=f"{film_id} {k}", kind="film", moment=spec.get("moment"))
     print(f"film {film_id}: {n} frames in {frames}")
 
 

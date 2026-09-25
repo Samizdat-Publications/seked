@@ -20,10 +20,10 @@ DRIFT = {"today": 0.8, "stripped": 1.7}
 
 # GLO-30 is a surface model: east of the temples it carries the modern town's roofs. Before the
 # town, the valley floor was the flood plain, so in the eras without it the low ground there is
-# eased to a plain at these heights (look choices): just under the claim eras' flood, so it lies
-# across the valley with islands where the relief lifts the ground; a little above the harbour
+# eased to a plain at these heights (look choices): a metre under the claim eras' flood, so it lies
+# across the valley with reed islands where the relief lifts the ground; a little above the harbour
 # as built and in 1800, so the fields stand dry.
-FLOODPLAIN = {"first-time": -43.2, "lion": -43.1, "built": -42.4, "stripped": -42.2}
+FLOODPLAIN = {"first-time": -43.6, "lion": -43.5, "built": -42.4, "stripped": -42.2}
 
 NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
