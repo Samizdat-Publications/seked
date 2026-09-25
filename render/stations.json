@@ -88,7 +88,8 @@
         "south",
         "east",
         "harbour",
-        "sphinx-face"
+        "sphinx-face",
+        "valley-temple"
       ],
       "z": -29.5,
       "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it."
@@ -248,7 +249,8 @@
       "neighbours": [
         "sphinx",
         "south",
-        "town"
+        "town",
+        "valley-temple"
       ],
       "note": "Only where an era has open water here: the harbour basin as built (render/giza/harbour.py BASIN) and the flood of the claim eras. The raft sets the eye 1.7 m above the water."
     },
