@@ -1,0 +1,32 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "temple",
+   "size": "2048x1024",
+   "samples": 32,
+   "out": "build/render/check/temple-built-people.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "2048x1024",
+   "samples": 32,
+   "out": "build/render/check/harbour-built-people.png"
+  },
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "2048x1024",
+   "samples": 32,
+   "out": "build/render/check/cemetery-built-people.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "size": "2048x1024",
+   "samples": 32,
+   "out": "build/render/check/south-today-people.png"
+  }
+ ]
+}

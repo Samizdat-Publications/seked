@@ -1,0 +1,242 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "orion",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/pano/orion-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-lion.png"
+  },
+  {
+   "state": "built",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-built.png"
+  },
+  {
+   "state": "built",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-built.png"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/harbour-built.png"
+  },
+  {
+   "state": "built",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/temple-built.png"
+  },
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-built.png"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/pano/orion-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/temple-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/south-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/east-today.png"
+  },
+  {
+   "state": "today",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/north-today.png"
+  },
+  {
+   "state": "today",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/panorama-today.png"
+  },
+  {
+   "state": "today",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/temple-today.png"
+  },
+  {
+   "state": "today",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-today.png"
+  }
+ ]
+}

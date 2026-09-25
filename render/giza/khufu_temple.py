@@ -33,6 +33,17 @@ def pavement_corners():
     return out, r["g1.basalt_pavement.thickness"]
 
 
+def flats(state):
+    """The ground levelled under the temple, so the terrain's relief cannot rise through the basalt."""
+    if states.spec(state)["pyramids"] not in ("today", "stripped", "dressed"):
+        return []
+    corners, _ = pavement_corners()
+    xs = [c[0] for c in corners]
+    ys = [c[1] for c in corners]
+    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    return [(cx, cy, (max(xs) - min(xs)) / 2 + WALL + 4.0, (max(ys) - min(ys)) / 2 + WALL, data.PYRAMIDS["g1"]["base"])]
+
+
 def basalt_material():
     mat = bpy.data.materials.new("basalt")
     t = Tree(mat)

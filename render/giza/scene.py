@@ -79,7 +79,7 @@ class Plateau:
         self.lib = variants.library(self.library, self.mats, state, rng)
         footprints = pyramids.build(state, rng, self.world, self.mats, self.lib, self.log)
         footprints = footprints + precincts.footprints(state)
-        self.terrain = Terrain(state, footprints, flats=temples.flats(state), cuts=[sphinx.enclosure(state)],
+        self.terrain = Terrain(state, footprints, flats=temples.flats(state) + khufu_temple.flats(state), cuts=[sphinx.enclosure(state)],
                                calm=causeway.centreline() if S["causeway"] else None,
                                sand=states.SPHINX_SAND if S["sphinx"] == "buried" else None,
                                basins=harbour.basins(state))
@@ -164,7 +164,7 @@ class Plateau:
         if self.want_stones:
             scatter.stones((x, y), self.terrain, self.per_view, self.lib, self.log)
         if self.spec["people"]:
-            scatter.people((x, y), self.terrain, self.per_view, self.lib, self.log)
+            scatter.people((x, y), self.terrain, self.per_view, self.lib, self.log, state=self.state)
         if vegetation is not None and hasattr(vegetation, "near_camera"):
             vegetation.near_camera(self.state, self.terrain, self.per_view, (x, y), self.log)
         self.log(f"{kind} {v['id']} at ({x:.0f}, {y:.0f}, {z:.1f})")

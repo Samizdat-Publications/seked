@@ -158,5 +158,9 @@ def library(parent, mats, state, rng):
                                                       for i in range(3)], mats["mudbrick"])
     lib["core fresh"] = collection(parent, "v core fresh", [block(140 + i, rounding=rng.uniform(0.03, 0.06), erosion=0.012, chips=0)
                                                             for i in range(N_CORE)], mats["core fresh"])
-    lib["people"] = collection(parent, "v people", [person(800 + i) for i in range(4)], mats["people"])
+    # The era's Meshy figures (render/giza/figures.py) where they are on disk, the capsules where not.
+    from . import figures
+    lib["people"] = figures.library(parent, state) or collection(parent, "v people", [person(800 + i) for i in range(4)],
+                                                                   mats["people"])
+    lib["figures"] = lib["people"].name.startswith("v figures")
     return lib

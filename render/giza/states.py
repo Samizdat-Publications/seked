@@ -36,7 +36,7 @@ STATES = {
         pyramids="dressed", caps="gold", queens="dressed", mastabas="dressed", causeway="corridor",
         temples=ALL_TEMPLES, temple_mode="built", sphinx="carved",
         ground="desert", valley="fields", water="harbour", city=None,
-        rubble=False, people=False, stones=False),
+        rubble=False, people=True, stones=False),
     "stripped": dict(
         label="c. 1800 CE", title="Stripped and buried", honesty="reconstruction", year=1800,
         pyramids="stripped", caps=None, queens="ruin", mastabas="buried", causeway="ruin",
