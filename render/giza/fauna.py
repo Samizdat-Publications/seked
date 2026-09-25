@@ -63,7 +63,7 @@ brightness and saturation a few per cent, so a herd of one model is not a herd o
     blender -b --factory-startup -P render/giza/fauna.py -- herds --era built
     blender -b --factory-startup -P render/giza/fauna.py -- measure --era built
 
-`sheet` stands the era's variants side by side in profile beside a 1.75 m figure; `test` puts
+`sheet` stands the era's variants side by side in profile beside a 1.75 m figure, a few to a page; `test` puts
 a few of each at 20, 60 and 150 m from a camera in the late afternoon sun; `herds` builds the
 era as the walkthrough does, places its herds and renders HERD_SHOTS, framed views of them from
 the stations; `measure` prints each variant's size and triangles and keeps its mesh, with each
@@ -106,7 +106,7 @@ SHARP_DEG = 60.0                   # faces meeting at more than this keep a hard
 TONE = dict(value=(0.9, 1.1), saturation=(0.88, 1.12))   # what an instance's tone moves (a look choice)
 ROUGHNESS = (0.5, 1.0)             # a roughness map is read into this range; hide and hair are matte (a look choice)
 SPECULAR = 0.3                     # the Principled BSDF's specular IOR level for every animal material (a look choice)
-SHEEN = (0.2, 0.6)                 # sheen weight and roughness (a look choice)
+SHEEN = (0.05, 0.6)                # sheen weight and roughness: a faint rim; more greys a dark coat (a look choice)
 ALPHA_CARDS = 0.05                 # an alpha material on less than this share of a model's faces is dropped
 STATION_CLEAR = 12.0               # metres kept clear round every station (a look choice)
 
@@ -118,54 +118,58 @@ STATION_CLEAR = 12.0               # metres kept clear round every station (a lo
 # "axis" with the axis its head points along ("axis-x"): the plan's principal axis is turned
 # onto Y, head forward. `faces`: triangles kept. `drop`: fragments of material or object names
 # whose faces are removed. `cut`: a plinth, as a share of the model's height from its lowest
-# point, cut away with the loose pieces left standing on it. `kneel`, `graze` and `bend` are the
+# point, cut away with the loose pieces left standing on it. `value` and `saturation`: what the
+# texture's brightness and saturation are multiplied by, which brings the coat's mean albedo to
+# about the figure after "albedo" in the comment (a texture painted to look right on a screen is
+# far brighter than hide and hair are in the sun: a giraffe's coat reflects about a quarter of the
+# light, a Cape buffalo's a twelfth), read off the texture by `measure`. `kneel`, `graze` and `bend` are the
 # model's parts for the poses a variant asks for with "@kneel", "@graze" or "@bend" (see _kneel,
 # _graze and _bend): its rig's bones, or for a model with no rig the neck's place as shares of
 # its size.
 MODELS = {
     # The savanna of the claim eras.
-    "animal-giraffe": dict(height=4.7, ref=("loopIdle01", 0.5), turn=180.0),            # withers ~2.9 m
-    "animal-giraffe-reticulated": dict(height=4.5, turn=-90.0, faces=14000),           # withers ~2.9 m
-    "animal-elephant-cow": dict(height=2.7, turn=180.0, faces=14000),                   # shoulder ~2.5 m
-    "animal-elephant-bull": dict(height=3.4, turn=180.0, faces=14000),                  # shoulder ~3.2 m
-    "animal-elephant-calf": dict(height=1.35, turn=180.0),                              # shoulder ~1.2 m
-    "animal-gazelle": dict(height=1.2, turn=180.0,                                      # shoulder ~0.7 m
+    "animal-giraffe": dict(value=0.51, saturation=1.3, height=4.7, ref=("loopIdle01", 0.5), turn=180.0),            # withers ~2.9 m, albedo ~0.24
+    "animal-giraffe-reticulated": dict(value=0.75, saturation=1.1, height=4.5, turn=-90.0, faces=14000),           # withers ~2.9 m, albedo ~0.21
+    "animal-elephant-cow": dict(value=0.53, height=2.7, turn=180.0, faces=14000),                   # shoulder ~2.5 m, albedo ~0.16
+    "animal-elephant-bull": dict(value=0.53, height=3.4, turn=180.0, faces=14000),                  # shoulder ~3.2 m, albedo ~0.16
+    "animal-elephant-calf": dict(value=0.53, height=1.35, turn=180.0),                              # shoulder ~1.2 m, albedo ~0.16
+    "animal-gazelle": dict(value=0.7, height=1.2, turn=180.0,                                      # shoulder ~0.7 m, albedo ~0.26
                            bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),
-    "animal-oryx": dict(height=2.0, turn="axis-x", bend=dict(at=0.68, z=0.46, reach=0.16, floor=0.38)),   # shoulder ~1.15 m
-    "animal-addax": dict(height=1.75, turn=-90.0, cut=0.075, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # shoulder ~1.05 m
-    "animal-hartebeest": dict(height=1.65, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # shoulder ~1.2 m
-    "animal-ostrich": dict(height=2.3, turn=180.0),                                     # head up, back ~1.3 m
-    "animal-buffalo": dict(height=1.65, ref=("Animation", 0.0), turn=180.0, faces=14000,   # shoulder ~1.5 m
+    "animal-oryx": dict(value=0.71, height=2.0, turn="axis-x", bend=dict(at=0.68, z=0.46, reach=0.16, floor=0.38)),   # shoulder ~1.15 m, albedo ~0.44
+    "animal-addax": dict(value=0.78, height=1.75, turn=-90.0, cut=0.075, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # shoulder ~1.05 m, albedo ~0.4
+    "animal-hartebeest": dict(value=0.53, saturation=1.1, height=1.65, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # shoulder ~1.2 m, albedo ~0.21
+    "animal-ostrich": dict(value=0.54, height=2.3, turn=180.0),                                     # head up, back ~1.3 m, albedo ~0.14
+    "animal-buffalo": dict(value=0.3, height=1.65, ref=("Animation", 0.0), turn=180.0, faces=14000,   # shoulder ~1.5 m, albedo ~0.09
                            graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
                                       forward=(0.0, -1.0, 0.0))),
-    "animal-hippo": dict(height=1.55, turn=180.0),                                      # shoulder ~1.5 m
+    "animal-hippo": dict(value=0.37, height=1.55, turn=180.0),                                      # shoulder ~1.5 m, albedo ~0.14
     # As built.
-    "animal-cattle-ankole": dict(height=2.05, ref=("Animation", 0.0), turn=180.0, faces=14000,    # withers ~1.3 m
+    "animal-cattle-ankole": dict(value=0.54, height=2.05, ref=("Animation", 0.0), turn=180.0, faces=14000,    # withers ~1.3 m, albedo ~0.13
                                  graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
                                             forward=(0.0, -1.0, 0.0))),
-    "animal-cattle-piebald": dict(height=1.95, turn="axis-y", faces=14000),             # withers ~1.25 m
-    "animal-donkey-pack": dict(height=1.4, turn="axis-x"),                              # withers ~1.05 m
-    "animal-donkey-pack-2": dict(height=1.45, turn=90.0),                               # withers ~1.05 m
-    "animal-donkey": dict(height=1.45, turn="axis+x"),                                  # withers ~1.05 m
-    "animal-goat-white": dict(height=1.2, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # withers ~0.7 m
-    "animal-goat-brown": dict(height=1.05, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # withers ~0.65 m
+    "animal-cattle-piebald": dict(value=0.45, height=1.95, turn="axis-y", faces=14000),             # withers ~1.25 m, albedo ~0.12
+    "animal-donkey-pack": dict(value=0.53, height=1.4, turn="axis-x"),                              # withers ~1.05 m, albedo ~0.2
+    "animal-donkey-pack-2": dict(value=0.6, height=1.45, turn=90.0),                               # withers ~1.05 m, albedo ~0.18
+    "animal-donkey": dict(value=0.53, height=1.45, turn="axis+x"),                                  # withers ~1.05 m, albedo ~0.16
+    "animal-goat-white": dict(value=0.94, height=1.2, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # withers ~0.7 m, albedo ~0.45
+    "animal-goat-brown": dict(value=0.52, height=1.05, turn=180.0, bend=dict(at=0.64, z=0.52, reach=0.2, floor=0.4)),   # withers ~0.65 m, albedo ~0.22
     # Today (and 1800).
-    "animal-camel-saddled": dict(height=2.35, turn=90.0),                               # shoulder ~1.9 m
-    "animal-camel-blanket": dict(height=2.35, ref=("Armature|Idle_02", 0.5), turn=0.0, drop=("CamelHair",),
+    "animal-camel-saddled": dict(value=0.55, height=2.35, turn=90.0),                               # shoulder ~1.9 m, albedo ~0.3
+    "animal-camel-blanket": dict(value=0.85, height=2.35, ref=("Armature|Idle_02", 0.5), turn=0.0, drop=("CamelHair",),  # albedo ~0.28
                                  kneel=dict(body="Back.001_02", forward=(0.0, 1.0, 0.0), ground=0.05, start="rest",
                                             front=(("FrontLeg.001_L_05", "FrontLeg.002_L_06", "FrontFoot_R_07"),
                                                    ("FrontLeg.001_R_010", "FrontLeg.002_R_011", "FrontFoot_L_012")),
                                             hind=(("BackLeg.001_L_060", "BackLeg.002_L_061", "BackFoot_L_062"),
                                                   ("BackLeg.001_R_064", "BackLeg.002_R_065", "BackFoot_R_066")))),
-    "animal-camel": dict(height=2.3, ref=("Animation", 0.0), turn=180.0, drop=("EyeSurface",),     # shoulder ~1.85 m
+    "animal-camel": dict(value=0.8, height=2.3, ref=("Animation", 0.0), turn=180.0, drop=("EyeSurface",),     # shoulder ~1.85 m, albedo ~0.28
                          kneel=dict(body="Body_25", forward=(0.0, -1.0, 0.0), ground=0.05,
                                     front=(("FrontUpLeg.R_2", "FrontLowLeg.R_1", "FrontFoot.R_0"),
                                            ("FrontUpLeg.L_8", "FrontLowLeg.L_7", "FrontFoot.L_27")),
                                     hind=(("BackUpLeg.R_5", "BackLowLeg.R_4", "BackFoot.R_26"),
                                           ("BackUpLeg.L_11", "BackLowLeg.L_10", "BackFoot.L_28")))),
-    "animal-horse-arabian": dict(height=2.15, turn=-90.0),                              # withers ~1.5 m
-    "animal-horse-bay": dict(height=2.1, turn=180.0),                                   # withers ~1.55 m
-    "animal-horse-cart": dict(height=2.2, turn=90.0, drop=("Floor", "Stone")),          # the horse's withers ~1.5 m
+    "animal-horse-arabian": dict(value=0.75, height=2.15, turn=-90.0),                              # withers ~1.5 m, albedo ~0.42
+    "animal-horse-bay": dict(value=0.46, height=2.1, turn=180.0),                                   # withers ~1.55 m, albedo ~0.13
+    "animal-horse-cart": dict(value=0.68, height=2.2, turn=90.0, drop=("Floor", "Stone")),          # the horse's withers ~1.5 m, albedo ~0.15
 }
 
 # The variants the libraries are built from: a model in a pose, which is an action and the
@@ -275,38 +279,39 @@ Herd = collections.namedtuple("Herd", "x y half_w half_d count kinds")
 # today at the panorama stand south-west of Menkaure and along the plateau's roads.
 HERDS = {
     "first-time": [
-        Herd(320.0, 85.0, 32.0, 22.0, 7, ("elephant",)),             # below the east station, where the plateau falls to the valley
+        Herd(300.0, -30.0, 25.0, 16.0, 7, ("elephant",)),            # east of the east station, where the plateau falls to the valley
         Herd(465.0, -655.0, 28.0, 45.0, 6, ("elephant",)),           # at the flood south of the megalithic temples
         Herd(545.0, -625.0, 22.0, 30.0, 4, ("hippo",)),              # in the flood beside them
         Herd(580.0, -490.0, 25.0, 22.0, 5, ("hippo",)),              # in the flood behind the harbour station
         Herd(400.0, 205.0, 32.0, 20.0, 8, ("buffalo",)),             # the valley's edge north-east of Khufu
         Herd(175.0, -335.0, 35.0, 25.0, 5, ("giraffe",)),            # the open plateau south-east of Khufu
         Herd(-280.0, 330.0, 35.0, 28.0, 4, ("giraffe",)),            # north-west of Khufu
-        Herd(60.0, -415.0, 25.0, 15.0, 10, ("gazelle",)),            # behind the south station
+        Herd(105.0, -365.0, 18.0, 15.0, 10, ("gazelle",)),           # east of the south station
+        Herd(-20.0, -250.0, 15.0, 10.0, 4, ("oryx",)),               # between the south station and Khufu
         Herd(-70.0, -560.0, 50.0, 30.0, 14, ("gazelle", "ostrich")),  # the plateau south of the pyramids
         Herd(-300.0, -870.0, 25.0, 18.0, 6, ("oryx", "addax")),      # behind the Menkaure station
         Herd(-650.0, -930.0, 40.0, 28.0, 9, ("oryx", "addax")),      # south of Menkaure
-        Herd(-10.0, 315.0, 30.0, 18.0, 8, ("hartebeest",)),          # behind the north station
-        Herd(-905.0, -1760.0, 20.0, 12.0, 8, ("gazelle",)),          # in front of the panorama rise
-        Herd(-860.0, -1700.0, 30.0, 20.0, 5, ("ostrich",)),          # below the panorama rise
-        Herd(-1120.0, -1660.0, 35.0, 25.0, 7, ("addax", "gazelle")),  # west of the panorama rise
+        Herd(-140.0, 200.0, 25.0, 18.0, 8, ("hartebeest",)),         # west of the north station
+        Herd(-915.0, -1895.0, 18.0, 12.0, 8, ("gazelle",)),          # south-east of the panorama rise
+        Herd(-870.0, -1860.0, 22.0, 16.0, 5, ("ostrich",)),          # east of the panorama rise
+        Herd(-1045.0, -1905.0, 22.0, 16.0, 7, ("addax", "gazelle")),  # south-west of the panorama rise
         Herd(-1150.0, -850.0, 60.0, 40.0, 12, ("gazelle",)),         # the western plateau, for the wide views
         Herd(-760.0, -260.0, 40.0, 30.0, 4, ("giraffe",)),           # west of Khafre, for the wide views
     ],
     "lion": [
         Herd(465.0, -655.0, 28.0, 45.0, 5, ("elephant",)),
         Herd(545.0, -625.0, 22.0, 30.0, 3, ("hippo",)),
-        Herd(320.0, 85.0, 30.0, 20.0, 4, ("elephant",)),
+        Herd(300.0, -30.0, 25.0, 16.0, 4, ("elephant",)),
         Herd(400.0, 205.0, 32.0, 20.0, 6, ("buffalo",)),
         Herd(175.0, -335.0, 35.0, 25.0, 4, ("giraffe",)),
-        Herd(60.0, -415.0, 25.0, 15.0, 12, ("gazelle", "ostrich")),
+        Herd(105.0, -365.0, 20.0, 16.0, 12, ("gazelle", "ostrich")),
         Herd(-70.0, -560.0, 55.0, 32.0, 16, ("gazelle", "ostrich")),
         Herd(-300.0, -870.0, 25.0, 18.0, 6, ("oryx",)),
         Herd(-650.0, -930.0, 45.0, 30.0, 10, ("oryx", "addax")),
-        Herd(-10.0, 315.0, 32.0, 20.0, 10, ("hartebeest",)),
-        Herd(-905.0, -1760.0, 20.0, 12.0, 10, ("gazelle",)),
-        Herd(-860.0, -1700.0, 30.0, 20.0, 6, ("ostrich",)),
-        Herd(-1120.0, -1660.0, 40.0, 28.0, 9, ("addax", "gazelle")),
+        Herd(-140.0, 200.0, 28.0, 20.0, 10, ("hartebeest",)),
+        Herd(-915.0, -1895.0, 20.0, 12.0, 10, ("gazelle",)),
+        Herd(-870.0, -1860.0, 22.0, 16.0, 6, ("ostrich",)),
+        Herd(-1045.0, -1905.0, 25.0, 18.0, 9, ("addax", "gazelle")),
         Herd(-1150.0, -850.0, 60.0, 40.0, 14, ("gazelle", "oryx")),
     ],
     "built": [
@@ -676,11 +681,12 @@ def _unlit_to_lit(tree):
     return bsdf
 
 
-def _coat(mat, texture_px):
+def _coat(mat, texture_px, value=1.0, saturation=1.0):
     """
     Keep the model's maps, drop what would trouble Cycles (the alpha, emission, metal, textures
-    larger than `texture_px`), keep hide and hair from shining, add a little sheen, and let the
-    instance's tone move brightness and saturation.
+    larger than `texture_px`), keep hide and hair from shining, add a little sheen, bring the
+    coat's brightness and saturation to the model's look (`value`, `saturation`: what the texture's
+    are multiplied by), and let the instance's tone move both a little about that.
     """
     tree = mat.node_tree if mat is not None else None
     if tree is None or mat.get("seked_animal_material"):
@@ -696,14 +702,14 @@ def _coat(mat, texture_px):
                 img.scale(min(img.size[0], texture_px), min(img.size[1], texture_px))
     bsdfs = [nd for nd in tree.nodes if nd.type == "BSDF_PRINCIPLED"] or [_unlit_to_lit(tree)]
     for bsdf in bsdfs:
-        for key, value in (("Alpha", 1.0), ("Emission Strength", 0.0), ("Metallic", 0.0), ("Transmission Weight", 0.0),
-                           ("Coat Weight", 0.0), ("Specular IOR Level", SPECULAR), ("Sheen Weight", SHEEN[0]),
-                           ("Sheen Roughness", SHEEN[1])):
+        for key, setting in (("Alpha", 1.0), ("Emission Strength", 0.0), ("Metallic", 0.0), ("Transmission Weight", 0.0),
+                             ("Coat Weight", 0.0), ("Specular IOR Level", SPECULAR), ("Sheen Weight", SHEEN[0]),
+                             ("Sheen Roughness", SHEEN[1])):
             if key not in bsdf.inputs:
                 continue
             for link in list(bsdf.inputs[key].links):
                 tree.links.remove(link)
-            bsdf.inputs[key].default_value = value
+            bsdf.inputs[key].default_value = setting
         rough = bsdf.inputs["Roughness"]
         if rough.is_linked:
             mr = tree.nodes.new("ShaderNodeMapRange")
@@ -714,6 +720,7 @@ def _coat(mat, texture_px):
             rough.default_value = ROUGHNESS[0] + (ROUGHNESS[1] - ROUGHNESS[0]) * rough.default_value
         base = bsdf.inputs["Base Color"]
         if not base.is_linked:
+            base.default_value = [min(1.0, c * value) for c in base.default_value[:3]] + [1.0]
             continue
         src = base.links[0].from_socket
         tone = tree.nodes.new("ShaderNodeAttribute")
@@ -722,9 +729,10 @@ def _coat(mat, texture_px):
         hsv = tree.nodes.new("ShaderNodeHueSaturation")
         hsv.inputs["Hue"].default_value = 0.5
         for key, (lo, hi) in TONE.items():
+            k = value if key == "value" else saturation
             mr = tree.nodes.new("ShaderNodeMapRange")
-            mr.inputs["To Min"].default_value = lo
-            mr.inputs["To Max"].default_value = hi
+            mr.inputs["To Min"].default_value = lo * k
+            mr.inputs["To Max"].default_value = hi * k
             tree.links.new(tone.outputs["Fac"], mr.inputs["Value"])
             tree.links.new(mr.outputs["Result"], hsv.inputs[key.capitalize()])
         tree.links.new(src, hsv.inputs["Color"])
@@ -792,7 +800,7 @@ def model_variants(model_id, path, variants, model, look, faces=None, texture_px
                 _bend(me, look["bend"], bend)
             _normals(me)
             for mat in me.materials:
-                _coat(mat, texture_px)
+                _coat(mat, texture_px, look.get("value", 1.0), look.get("saturation", 1.0))
             for c in list(obj.users_collection):
                 c.objects.unlink(obj)
             obj.location = PARKED
@@ -1247,42 +1255,48 @@ def _reference(lib_parent, log):
 
 
 def _sheet(opts):
-    """The era's variants side by side in profile (heads to the left), a 1.75 m person among them, seen from a few metres."""
+    """
+    The era's variants side by side in profile (heads to the left) beside a 1.75 m person, seen
+    from a few metres, `per` to a page: build/fauna/sheet-<era>-<page>.png.
+    """
     from . import cameras, renderer
     from .instancing import field
     era = opts.get("era", "first-time")
     scene, world, lib_parent, lib, log = _scene(opts, era)
     objs = list(lib.objects)
-    lengths = []
-    for ob in objs:
-        co = _coords(ob.data)
-        lengths.append(float(co[:, 1].max() - co[:, 1].min()))
-    gap = 0.6
-    xs, x = [], 0.0
-    for L in lengths:
-        xs.append(x + L / 2)
-        x += L + gap
-    width = x - gap
-    xs = np.array(xs) - width / 2
-    n = len(objs)
-    # Facing -X: the instance turned +90 degrees about Z, so a camera looking north sees each in profile.
-    pos = np.stack([xs, np.zeros(n), np.zeros(n)], 1)
-    rot = np.array([(0.0, 0.0, math.pi / 2)] * n)
-    field("animals", lib, pos, rot, np.ones((n, 3)), np.arange(n), np.full(n, 0.5), np.zeros(n), world, log)
     ref, idx = _reference(lib_parent, log)
-    field("reference", ref, np.array([(xs[0] - lengths[0] / 2 - 1.2, 0.0, 0.0)]), np.array([(0.0, 0.0, math.pi)]),
-          np.ones((1, 3)), np.array([idx]), np.full(1, 0.5), np.zeros(1), world, log)
-    tallest = max(float(_coords(ob.data)[:, 2].max()) for ob in objs)
     cam = cameras.make(scene)
     lens = float(opts.get("lens", 35.0))
-    span = width + 3.0
-    d = float(opts.get("distance", max(span, tallest * 1.9) * lens / 36.0 * 1.05 + 2.0))
-    cameras.frame(cam, (-0.6, -d, tallest * 0.45), (-0.6, 0.0, tallest * 0.42), lens)
     w, h = (int(v) for v in opts.get("size", "1280x720").split("x"))
-    out = os.path.abspath(opts.get("out", os.path.join(OUT, f"sheet-{era}.png")))
-    t = time.time()
-    renderer.render(scene, out, w, h, int(opts.get("samples", 64)))
-    log(f"rendered {out} in {time.time() - t:.0f}s")
+    per = int(opts.get("per", 6))
+    for page, first in enumerate(range(0, len(objs), per)):
+        which = list(range(first, min(first + per, len(objs))))
+        lengths = [float(np.ptp(_coords(objs[i].data)[:, 1])) for i in which]
+        gap = 0.8
+        xs, x = [], 0.0
+        for L in lengths:
+            xs.append(x + L / 2)
+            x += L + gap
+        width = x - gap
+        xs = np.array(xs) - width / 2
+        n = len(which)
+        # Facing -X: the instance turned +90 degrees about Z, so a camera looking north sees each in profile.
+        points = [field("animals", lib, np.stack([xs, np.zeros(n), np.zeros(n)], 1), np.array([(0.0, 0.0, math.pi / 2)] * n),
+                        np.ones((n, 3)), np.array(which), np.full(n, 0.5), np.zeros(n), world, log),
+                  field("reference", ref, np.array([(xs[0] - lengths[0] / 2 - 1.2, 0.0, 0.0)]), np.array([(0.0, 0.0, math.pi)]),
+                        np.ones((1, 3)), np.array([idx]), np.full(1, 0.5), np.zeros(1), world, log)]
+        tallest = max(float(_coords(objs[i].data)[:, 2].max()) for i in which)
+        span = width + 3.0
+        d = float(opts.get("distance", max(span, tallest * 1.9 * w / h) * lens / 36.0 * 1.05 + 2.0))
+        cameras.frame(cam, (-0.6, -d, tallest * 0.45), (-0.6, 0.0, tallest * 0.42), lens)
+        out = os.path.abspath(os.path.join(OUT, f"sheet-{era}-{page + 1}.png"))
+        t = time.time()
+        renderer.render(scene, out, w, h, int(opts.get("samples", 64)))
+        log(f"rendered {out} ({', '.join(objs[i]['variant'] for i in which)}) in {time.time() - t:.0f}s")
+        for ob in points:
+            me = ob.data
+            bpy.data.objects.remove(ob, do_unlink=True)
+            bpy.data.meshes.remove(me)
 
 
 def _test(opts):
@@ -1325,16 +1339,17 @@ def _test(opts):
 # (name, camera x, y, eye above the ground, target x, y, target above the ground, lens mm).
 HERD_SHOTS = {
     "first-time": [
-        ("south-gazelles", 20.0, -330.0, 1.7, 60.0, -415.0, 0.6, 85.0),
-        ("east-elephants", 205.0, 8.0, 1.7, 320.0, 85.0, 1.2, 70.0),
+        ("south-gazelles", 20.0, -330.0, 1.7, 105.0, -365.0, 0.6, 70.0),
+        ("east-elephants", 205.0, 8.0, 1.7, 300.0, -30.0, 1.2, 50.0),
         ("panorama", -980.0, -1830.0, 1.7, -600.0, -1000.0, 20.0, 40.0),
-        ("north-hartebeest", 20.0, 205.0, 1.7, -10.0, 315.0, 0.8, 85.0),
+        ("north-hartebeest", 20.0, 205.0, 1.7, -140.0, 200.0, 0.8, 70.0),
         ("flood-elephants", 439.0, -445.0, 16.0, 465.0, -655.0, 1.0, 85.0),
-        ("raft-hippos", 500.0, -468.0, 1.7, 580.0, -490.0, 0.3, 70.0),
+        ("raft-hippos", 500.0, -468.0, 1.7, 580.0, -490.0, 0.3, 50.0),
+        ("panorama-south", -980.0, -1830.0, 1.7, -960.0, -1900.0, 0.8, 50.0),
         ("east-buffalo", 205.0, 8.0, 1.7, 400.0, 205.0, 0.8, 135.0),
     ],
     "lion": [
-        ("south-gazelles", 20.0, -330.0, 1.7, 60.0, -415.0, 0.6, 85.0),
+        ("south-gazelles", 20.0, -330.0, 1.7, 105.0, -365.0, 0.6, 70.0),
         ("menkaure-oryx", -400.0, -800.0, 1.7, -300.0, -870.0, 0.8, 85.0),
     ],
     "built": [
@@ -1360,12 +1375,24 @@ def _herds(opts):
     from .scene import Plateau
     era = opts.get("era", "first-time")
     p = Plateau(era)
-    lib = library(p.library, era, p.log)
-    place(era, p.terrain, p.world, lib, log=p.log)
+    if bpy.data.objects.get("animals") is None:
+        # The scene places the herds itself once it is wired to (render/giza/scene.py); only an unwired one needs this.
+        lib = library(p.library, era, p.log)
+        place(era, p.terrain, p.world, lib, log=p.log)
+    water = _water(era)
+
+    def floor(x, y):
+        """The ground, or the water where the era has water over it (a camera on the harbour stands on a raft)."""
+        z = float(p.terrain.surface([x], [y])[0])
+        for level, (x0, x1, y0, y1) in water:
+            if x0 < x < x1 and y0 < y < y1:
+                z = max(z, level)
+        return z
+
     w, h = (int(v) for v in opts.get("size", "1280x720").split("x"))
     for name, x, y, eye, tx, ty, th, lens in HERD_SHOTS.get(era, []):
-        z = float(p.terrain.surface([x], [y])[0]) + eye
-        tz = float(p.terrain.surface([tx], [ty])[0]) + th
+        z = floor(x, y) + eye
+        tz = floor(tx, ty) + th
         v = {"id": f"herds-{name}", "x": x, "y": y, "z": z, "target": (tx, ty, tz), "lens": lens}
         p.view(v, "shot")
         p.moment({"date": opts.get("date", "10-20"), "solar": float(opts.get("solar", 16.2))})
