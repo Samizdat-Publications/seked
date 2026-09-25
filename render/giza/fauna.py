@@ -60,11 +60,14 @@ brightness and saturation a few per cent, so a herd of one model is not a herd o
 
     blender -b --factory-startup -P render/giza/fauna.py -- sheet --era first-time
     blender -b --factory-startup -P render/giza/fauna.py -- test --era today
+    blender -b --factory-startup -P render/giza/fauna.py -- herds --era built
     blender -b --factory-startup -P render/giza/fauna.py -- measure --era built
 
 `sheet` stands the era's variants side by side in profile beside a 1.75 m figure; `test` puts
-a few of each at 20, 60 and 150 m from a camera in the late afternoon sun; `measure` prints
-each variant's size and triangles and keeps its mesh under build/fauna/check/.
+a few of each at 20, 60 and 150 m from a camera in the late afternoon sun; `herds` builds the
+era as the walkthrough does, places its herds and renders HERD_SHOTS, framed views of them from
+the stations; `measure` prints each variant's size and triangles and keeps its mesh, with each
+triangle's texture colour, under build/fauna/check/. All write into build/fauna/.
 """
 import collections
 import hashlib
@@ -1318,6 +1321,59 @@ def _test(opts):
     log(f"rendered {out} in {time.time() - t:.0f}s")
 
 
+# Framed shots of each era's herds from its stations, for checking them in the built plateau:
+# (name, camera x, y, eye above the ground, target x, y, target above the ground, lens mm).
+HERD_SHOTS = {
+    "first-time": [
+        ("south-gazelles", 20.0, -330.0, 1.7, 60.0, -415.0, 0.6, 85.0),
+        ("east-elephants", 205.0, 8.0, 1.7, 320.0, 85.0, 1.2, 70.0),
+        ("panorama", -980.0, -1830.0, 1.7, -600.0, -1000.0, 20.0, 40.0),
+        ("north-hartebeest", 20.0, 205.0, 1.7, -10.0, 315.0, 0.8, 85.0),
+        ("flood-elephants", 439.0, -445.0, 16.0, 465.0, -655.0, 1.0, 85.0),
+        ("raft-hippos", 500.0, -468.0, 1.7, 580.0, -490.0, 0.3, 70.0),
+        ("east-buffalo", 205.0, 8.0, 1.7, 400.0, 205.0, 0.8, 135.0),
+    ],
+    "lion": [
+        ("south-gazelles", 20.0, -330.0, 1.7, 60.0, -415.0, 0.6, 85.0),
+        ("menkaure-oryx", -400.0, -800.0, 1.7, -300.0, -870.0, 0.8, 85.0),
+    ],
+    "built": [
+        ("town-cattle", 516.0, -841.5, 1.7, 470.0, -715.0, 1.0, 50.0),
+        ("sphinx-cattle", 439.0, -445.0, 14.0, 650.0, -300.0, 1.0, 70.0),
+        ("south-donkeys", 20.0, -330.0, 1.7, 100.0, -262.0, 0.8, 70.0),
+        ("quay-donkeys", 500.0, -560.0, 1.7, 445.0, -605.0, 0.8, 50.0),
+    ],
+    "stripped": [
+        ("village", 439.0, -445.0, 16.0, 520.0, -330.0, 1.0, 50.0),
+    ],
+    "today": [
+        ("panorama-camels", -980.0, -1830.0, 1.7, -930.0, -1845.0, 1.0, 35.0),
+        ("panorama-west", -980.0, -1830.0, 1.7, -1020.0, -1805.0, 1.0, 35.0),
+        ("south-road", 20.0, -330.0, 1.7, 95.0, -248.0, 1.0, 50.0),
+        ("sphinx-road", 439.0, -445.0, 16.0, 460.0, -383.0, 1.0, 50.0),
+    ],
+}
+
+
+def _herds(opts):
+    """The era built as the walkthrough builds it, its herds placed, and HERD_SHOTS rendered into build/fauna/."""
+    from .scene import Plateau
+    era = opts.get("era", "first-time")
+    p = Plateau(era)
+    lib = library(p.library, era, p.log)
+    place(era, p.terrain, p.world, lib, log=p.log)
+    w, h = (int(v) for v in opts.get("size", "1280x720").split("x"))
+    for name, x, y, eye, tx, ty, th, lens in HERD_SHOTS.get(era, []):
+        z = float(p.terrain.surface([x], [y])[0]) + eye
+        tz = float(p.terrain.surface([tx], [ty])[0]) + th
+        v = {"id": f"herds-{name}", "x": x, "y": y, "z": z, "target": (tx, ty, tz), "lens": lens}
+        p.view(v, "shot")
+        p.moment({"date": opts.get("date", "10-20"), "solar": float(opts.get("solar", 16.2))})
+        if opts.get("dry"):
+            continue            # --dry 1 sets every view up without rendering it
+        p.render(os.path.join(OUT, f"herds-{era}-{name}.png"), w, h, int(opts.get("samples", 64)), view_id=v["id"], kind="shot")
+
+
 def _base_image(mat):
     """The image a material's base colour is read from, through whatever tone nodes stand between, or None."""
     tree = mat.node_tree if mat is not None else None
@@ -1399,8 +1455,10 @@ def _main():
         _test(opts)
     elif cmd == "measure":
         _measure(opts)
+    elif cmd == "herds":
+        _herds(opts)
     else:
-        raise SystemExit(f"unknown command {cmd!r}: sheet, test or measure")
+        raise SystemExit(f"unknown command {cmd!r}: sheet, test, herds or measure")
 
 
 if __name__ == "__main__":
