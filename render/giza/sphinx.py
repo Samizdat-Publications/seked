@@ -29,12 +29,14 @@ if BLENDER_DIR not in sys.path:
 
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion", None),
-             "lion-fresh": ("sphinx-lion-fresh", None), "carved": ("sphinx-carved", None),
+             "lion-fresh": ("sphinx-lion-pristine", None), "carved": ("sphinx-carved", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
 # taken down to the bedrock's warm limestone (a look choice; traces of red ochre survive on it).
-WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0)}
+WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
+          # the First Time's freshly carved lion (sphinx-lion-pristine) renders pale ivory beside the bedrock walls
+          "sphinx-lion-pristine": (0.9, 0.8, 0.66, 1.0)}
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
