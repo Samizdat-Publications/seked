@@ -176,5 +176,29 @@
     "method": "scaled from plate",
     "note": "How far north of the centroid of the temple's OSM footprint the southern entrance's centre line crosses the front face, which is negative because it is south of it: the midpoint of the jambs at y 2310 and y 2430.5, taken on the front face at x 3985. Frame, registration and sigma as khafre_valley_temple.entrance.north.centre.north.",
     "verified": false
+  },
+  {
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "unit": "m",
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "verified": false,
+    "key": "khafre_valley_temple.hall.socket.pitch",
+    "value": 2.411,
+    "sigma": 0.2,
+    "note": "How far apart the statue sockets Hölscher draws in red along the north wall of the pillared hall's east-west arm stand, scaled off Blatt XVII with the same bar and shrinkage as khafre_valley_temple.pillar.across: the seven socket centres detected at x 2103, 2238, 2361, 2484, 2609, 2739 and 2868 of the scan (listed under khafre_valley_temple.hall.pillar.first.east) span 765 px in six intervals, 127.5 px each at 0.0189118 m per pixel. Sigma sums the pixel term 0.109 m, the drafting tolerance 0.075 m and the shrinkage 0.013 m."
+  },
+  {
+    "structure": "khafre-valley-temple",
+    "quantity": "length",
+    "unit": "m",
+    "source": "hoelscher-1912",
+    "method": "scaled from plate",
+    "verified": false,
+    "key": "khafre_valley_temple.hall.socket.first.east",
+    "value": -13.21,
+    "sigma": 1.6,
+    "note": "The westernmost of the seven statue sockets along the north wall of the pillared hall's east-west arm, its centre at x 2103 of the scan, 62 px east of the arm's west face at x 2041 (khafre_valley_temple.hall.stem.west). With khafre_valley_temple.hall.socket.pitch it steps the row out east. Frame, registration and sigma as khafre_valley_temple.hall.stem.west, which states the convention."
   }
 ]

@@ -93,14 +93,24 @@ def _battered_shell(ring, z0, height, coll, name, material, batter_deg=82.0):
 DOOR_HEAD = 5.0      # look choice: the height of a doorway's lintel
 
 
+def centroid(ring):
+    """A ring's area centroid, the point Hölscher's plate is registered to (the vertices' mean leans towards where they crowd)."""
+    a = cx = cy = 0.0
+    for (x0, y0), (x1, y1) in zip(ring, ring[1:] + ring[:1]):
+        c = x0 * y1 - x1 * y0
+        a += c
+        cx += (x0 + x1) * c
+        cy += (y0 + y1) * c
+    return cx / (3.0 * a), cy / (3.0 * a)
+
+
 def doorways(t):
     """The valley temple's two east entrances, read off Hoelscher's Blatt XVII."""
     if t["id"] != "khafre.valley_temple":
         return []
     r = {rec["key"]: rec["value"] for rec in data.records("khafre-valley-temple.json")}
     xs = [p[0] for p in t["ring"]]
-    ys = [p[1] for p in t["ring"]]
-    cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
+    cx, cy = centroid(t["ring"])
     east = max(xs)
     return [(east, cy + r["khafre_valley_temple.entrance.north.centre.north"], r["khafre_valley_temple.entrance.north.width"], DOOR_HEAD),
             (east, cy + r["khafre_valley_temple.entrance.south.centre.north"], r["khafre_valley_temple.entrance.south.width"], DOOR_HEAD)]

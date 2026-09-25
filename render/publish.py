@@ -138,7 +138,7 @@ def main():
                     camera = cameras[st]
             over = s.get("by_state", {}).get(st, {})
             by_night = "night" in moments.get(over.get("moment", s.get("moment")), {})
-            if not s.get("inside") and not by_night:
+            if not (s.get("inside") or s.get("hall")) and not by_night:
                 dark, blue = in_shadow(png)
                 if dark < 0.45 and blue > 0.95:        # grey basalt in sun reads 0.9; sky-lit shade 1.8 and more
                     print(f"  WARNING: {s['id']}-{st}: the ground under the camera is {dark:.2f} of the lit ground and blue "
@@ -157,14 +157,14 @@ def main():
             "view": s.get("view", {"yaw": 0, "pitch": 4, "fov": 58}),
             "panoramas": panos,
             "neighbours": [n for n in s.get("neighbours", [])],
-            # An inside station names what is round it; the plateau's landmarks are behind the walls.
-            "landmarks": s["landmarks"] if s.get("inside") else marks + star_marks(s, moments, cameras),
+            # An inside station (in the pyramid, or in a temple's hall) names what is round it; the plateau's landmarks are behind the walls.
+            "landmarks": s["landmarks"] if (s.get("inside") or s.get("hall")) else marks + star_marks(s, moments, cameras),
         }
         if len({tuple(c) for c in cameras.values()}) > 1:
             entry["cameras"] = cameras
         if titles:
             entry["titles"] = titles
-        if s.get("inside"):
+        if s.get("inside") or s.get("hall"):
             entry["inside"] = True
         manifest["stations"].append(entry)
         print(f"{s['id']}: {', '.join(panos)}")

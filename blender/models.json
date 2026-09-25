@@ -1026,6 +1026,17 @@
         "task": "01a0d7c4-a671-74ef-b218-9b551190855a",
         "sha256": "cda6f503e2c82d93e3b8fec60132276798b0f43462ff586b1ab85fc32f5eda03"
       }
+    },
+    {
+      "id": "khafre-statue",
+      "sketchfab": "071b25978c054c73bd179f89c33a5ffe",
+      "name": "Statue of Khafre, Egyptian Museum, Cairo",
+      "author": "danderson4",
+      "url": "https://sketchfab.com/3d-models/statue-of-khafre-egyptian-museum-cairo-071b25978c054c73bd179f89c33a5ffe",
+      "license": "CC Attribution",
+      "attribution": "\"Statue of Khafre, Egyptian Museum, Cairo\" by danderson4 on Sketchfab (CC BY 4.0), photogrammetry from 80 photographs taken in January 2020.",
+      "use": "render/giza/valley_temple.py stands 23 copies along the walls of the valley temple's granite hall as built",
+      "why": "Mariette found Khafre's statues thrown into the well in the valley temple's east hall, and Hölscher found 23 sockets for statues along the walls of the T-shaped hall. This scan of one seated Khafre stands in for all of them, each drawn at 1.68 m, the height of the diorite Khafre in Cairo (JE 10062); nothing of its form is a measurement, and its size and the statues' places are look choices."
     }
   ]
 }

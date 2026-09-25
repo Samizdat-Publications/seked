@@ -468,6 +468,59 @@
         }
       ],
       "note": "z is the flat eastern floor (§37: 140 in under the roof) plus 1.6 m."
+    },
+    {
+      "id": "valley-temple",
+      "name": "In Khafre's granite hall",
+      "where": "In the valley temple's T-shaped hall as built, east of the transverse colonnade, looking west down the middle aisle of the long hall",
+      "x": 400.29,
+      "y": -493.654,
+      "z": -40.48,
+      "hall": "valley-temple",
+      "moment": "temple-morning",
+      "exposure": 2.8,
+      "view": {
+        "yaw": 270,
+        "pitch": 4,
+        "fov": 80
+      },
+      "neighbours": [
+        "harbour",
+        "sphinx"
+      ],
+      "note": "Built era only. The hall stands where Hölscher's plate puts it in the footprint, with Petrie's dimensions; the light, the floor and the statues are look choices.",
+      "landmarks": [
+        {
+          "name": "The long hall, to its west wall",
+          "x": 378.723,
+          "y": -493.654,
+          "z": -39.28
+        },
+        {
+          "name": "A large pillar at the junction",
+          "x": 394.261,
+          "y": -491.801,
+          "z": -38.88
+        },
+        {
+          "name": "A slit, where the shaft's light comes in",
+          "x": 385.849,
+          "y": -488.651,
+          "z": -36.71
+        },
+        {
+          "name": "Khafre (a stand-in scan)",
+          "x": 401.248,
+          "y": -491.313,
+          "z": -40.68
+        },
+        {
+          "name": "The passage to the vestibule",
+          "x": 403.798,
+          "y": -493.654,
+          "z": -39.68
+        }
+      ]
     }
   ]
 }

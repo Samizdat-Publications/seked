@@ -14,8 +14,8 @@ import bpy
 from mathutils import Vector
 
 from . import (causeway, cameras, city, data, harbour, instancing, interior, khufu_temple, mastabas, materials, night,
-               precincts, pyramids, renderer, roads, scatter, sphinx, states, sun, temples, town, variants, wall_of_the_crow,
-               water)
+               precincts, pyramids, renderer, roads, scatter, sphinx, states, sun, temples, town, valley_temple, variants,
+               wall_of_the_crow, water)
 from .sky import Sky
 from .terrain import Terrain
 
@@ -129,6 +129,7 @@ class Plateau:
         self.exposure = self.scene.view_settings.exposure
         self.inside_lamps = None       # the interior is built the first time a view goes inside
         self.night = None              # and the star dome the first time a moment is a night
+        self.hall = None               # and the valley temple's hall the first time a station stands in it
         self.log(f"built {state} ({S['label']}, {S['honesty']})")
 
     def _coll(self, name):
@@ -158,6 +159,27 @@ class Plateau:
             deck = harbour.float_raft(self.state, (x, y), v["raft"], self.per_view, self.log)
             if deck is not None:
                 z = deck
+        # Khafre's valley temple's hall: built the first time a station stands in it, lit by the sun through
+        # its slits, with the temple's solid core and roof hidden round it while the camera is inside.
+        self.in_hall = v.get("hall") == "valley-temple"
+        if self.in_hall and self.hall is None:
+            coll = self._coll("valley temple hall")
+            self.hall = valley_temple.build(self.state, coll, self.mats, self.log) + valley_temple.statues(self.state, coll, self.log)
+        for name in valley_temple.exterior():
+            ob = bpy.data.objects.get(name)
+            if ob is not None:
+                ob.hide_render = self.in_hall
+        for ob in self.hall or ():
+            ob.hide_render = not self.in_hall
+        if self.in_hall:
+            if kind == "station":
+                cameras.station(self.camera, (x, y, z))
+            else:
+                cameras.frame(self.camera, (x, y, z), v["target"], v["lens"])
+            if self.spec["people"]:
+                scatter.people((x, y), self.terrain, self.per_view, self.lib, self.log, state=self.state)
+            self.log(f"{kind} {v['id']} in the valley temple's hall at ({x:.1f}, {y:.1f}, {z:.2f})")
+            return
         if self.inside:
             if kind == "station":
                 cameras.station(self.camera, (x, y, z))
@@ -203,7 +225,7 @@ class Plateau:
         self.sun_now = (alt, az)
         colour, energy = self.sky.set_sun(alt, az)
         self.log(f"sun at {alt:.1f} deg altitude, {az:.1f} deg azimuth (declination {dec:.1f}), beam {energy:.0f}")
-        if not getattr(self, "inside", False):
+        if not getattr(self, "inside", False) and not getattr(self, "in_hall", False):
             self._shadow_check(alt, az)
 
     def _shadow_check(self, alt, az):
