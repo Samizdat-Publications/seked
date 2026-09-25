@@ -128,10 +128,14 @@ MODELS = {
     "animal-addax": dict(height=1.75, turn=-90.0, cut=0.075),                           # shoulder ~1.05 m
     "animal-hartebeest": dict(height=1.65, turn=180.0),                                 # shoulder ~1.2 m
     "animal-ostrich": dict(height=2.3, turn=180.0),                                     # head up, back ~1.3 m
-    "animal-buffalo": dict(height=1.65, ref=("Animation", 0.0), turn=180.0, faces=14000),  # shoulder ~1.5 m
+    "animal-buffalo": dict(height=1.65, ref=("Animation", 0.0), turn=180.0, faces=14000,   # shoulder ~1.5 m
+                           graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
+                                      forward=(0.0, -1.0, 0.0))),
     "animal-hippo": dict(height=1.55, turn=180.0),                                      # shoulder ~1.5 m
     # As built.
-    "animal-cattle-ankole": dict(height=2.05, ref=("Animation", 0.0), turn=180.0, faces=14000),   # withers ~1.3 m
+    "animal-cattle-ankole": dict(height=2.05, ref=("Animation", 0.0), turn=180.0, faces=14000,    # withers ~1.3 m
+                                 graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
+                                            forward=(0.0, -1.0, 0.0))),
     "animal-cattle-piebald": dict(height=1.95, turn="axis-y", faces=14000),             # withers ~1.25 m
     "animal-donkey-pack": dict(height=1.4, turn="axis-x"),                              # withers ~1.05 m
     "animal-donkey-pack-2": dict(height=1.45, turn=90.0),                               # withers ~1.05 m
@@ -141,7 +145,7 @@ MODELS = {
     # Today (and 1800).
     "animal-camel-saddled": dict(height=2.35, turn=90.0),                               # shoulder ~1.9 m
     "animal-camel-blanket": dict(height=2.35, ref=("Armature|Idle_02", 0.5), turn=0.0, drop=("CamelHair",),
-                                 kneel=dict(body="Back.001_02", forward=(0.0, 1.0, 0.0), ground=0.05,
+                                 kneel=dict(body="Back.001_02", forward=(0.0, 1.0, 0.0), ground=0.05, start="rest",
                                             front=(("FrontLeg.001_L_05", "FrontLeg.002_L_06", "FrontFoot_R_07"),
                                                    ("FrontLeg.001_R_010", "FrontLeg.002_R_011", "FrontFoot_L_012")),
                                             hind=(("BackLeg.001_L_060", "BackLeg.002_L_061", "BackFoot_L_062"),
@@ -173,8 +177,11 @@ VARIANTS = {
     "hartebeest": dict(model="animal-hartebeest"),
     "ostrich": dict(model="animal-ostrich"),
     "buffalo": dict(model="animal-buffalo", pose=("Animation", 0.0)),
+    # Head down to the grass: the neck bent by _graze.
+    "buffalo-graze": dict(model="animal-buffalo", pose=("@graze", 80.0)),
     "hippo": dict(model="animal-hippo"),
     "cattle-ankole": dict(model="animal-cattle-ankole", pose=("Animation", 0.0)),
+    "cattle-ankole-graze": dict(model="animal-cattle-ankole", pose=("@graze", 80.0)),     # head down, as buffalo-graze
     "cattle-piebald": dict(model="animal-cattle-piebald"),
     "donkey-pack": dict(model="animal-donkey-pack"),
     "donkey-pack-2": dict(model="animal-donkey-pack-2"),
@@ -210,9 +217,9 @@ KINDS = {
     "addax": dict(variants=("addax",), spacing=2.4, slope=20.0, young=(0.12, (0.6, 0.75))),
     "hartebeest": dict(variants=("hartebeest",), spacing=2.6, slope=20.0, young=(0.12, (0.6, 0.75))),
     "ostrich": dict(variants=("ostrich",), spacing=2.4, slope=20.0, young=(0.1, (0.6, 0.75))),
-    "buffalo": dict(variants=("buffalo",), spacing=3.2, slope=14.0, young=(0.12, (0.6, 0.75))),
+    "buffalo": dict(variants=("buffalo", "buffalo-graze"), weights=(1, 2), spacing=3.2, slope=14.0, young=(0.12, (0.6, 0.75))),
     "hippo": dict(variants=("hippo",), spacing=4.0, slope=10.0, young=(0.2, (0.5, 0.7)), water=(0.75, 1.25)),
-    "cattle": dict(variants=("cattle-ankole", "cattle-piebald"), weights=(3, 2), spacing=3.0, slope=14.0,
+    "cattle": dict(variants=("cattle-ankole", "cattle-ankole-graze", "cattle-piebald"), weights=(2, 3, 2), spacing=3.0, slope=14.0,
                    young=(0.15, (0.55, 0.7))),
     "donkey": dict(variants=("donkey-pack", "donkey-pack-2", "donkey"), weights=(2, 2, 1), spacing=2.2, slope=18.0, young=None),
     "goat": dict(variants=("goat-white", "goat-brown"), spacing=1.3, slope=32.0, young=(0.2, (0.55, 0.7))),
@@ -225,11 +232,12 @@ KINDS = {
 
 # Which variants each era's library holds, in Collection Info's order.
 SAVANNA = ("giraffe-stand", "giraffe-browse", "giraffe-walk", "giraffe-look", "elephant-cow", "elephant-bull",
-           "elephant-calf", "gazelle", "oryx", "addax", "hartebeest", "ostrich", "buffalo", "hippo")
+           "elephant-calf", "gazelle", "oryx", "addax", "hartebeest", "ostrich", "buffalo", "buffalo-graze", "hippo")
 ERAS = {
     "first-time": SAVANNA,
     "lion": SAVANNA,
-    "built": ("cattle-ankole", "cattle-piebald", "donkey-pack", "donkey-pack-2", "donkey", "goat-white", "goat-brown"),
+    "built": ("cattle-ankole", "cattle-ankole-graze", "cattle-piebald", "donkey-pack", "donkey-pack-2", "donkey", "goat-white",
+              "goat-brown"),
     "stripped": ("camel", "camel-kneeling", "donkey-pack", "donkey", "goat-white", "goat-brown"),
     "today": ("camel-saddled", "camel-blanket", "camel-blanket-graze", "camel-blanket-walk", "camel-blanket-kneeling", "camel",
               "camel-kneeling", "horse-arabian", "horse-bay", "horse-cart"),
@@ -351,6 +359,9 @@ def _import(path):
     meshes = [o for o in new if o.type == "MESH" and o not in shapes]
     animated = [o for o in new if o.animation_data is not None]
     slots = {o.name: (o.animation_data.action_slot.identifier if o.animation_data.action_slot else None) for o in animated}
+    # The pose each bone imports in, which a pose starts from: an action may key only some bones (the IK targets,
+    # say), and a bone it leaves alone must keep the pose the file gives it, not fall back to the rest pose.
+    slots["@imported"] = {(o.name, pb.name): pb.matrix_basis.copy() for o in new if o.type == "ARMATURE" for pb in o.pose.bones}
     return new, meshes, animated, slots
 
 
@@ -364,18 +375,24 @@ def _pose(new, animated, slots, pose, look):
         return True
     name, at = pose
     arms = [o for o in new if o.type == "ARMATURE"]
+    imported = slots.get("@imported", {})
     for arm in arms:
         for pb in arm.pose.bones:
-            pb.matrix_basis = Matrix.Identity(4)
-    if name == "@kneel":
-        if not arms or "kneel" not in look:
+            pb.matrix_basis = imported.get((arm.name, pb.name), Matrix.Identity(4))
+    if name in ("@kneel", "@graze"):
+        rig = look.get(name[1:])
+        if not arms or rig is None:
             return False
         for o in animated:
             for track in o.animation_data.nla_tracks:
                 track.mute = True
             o.animation_data.action = None
+        if rig.get("start") == "rest":
+            # Some rigs import in a pose the recipe cannot start from; they start from the rest pose instead.
+            for pb in arms[0].pose.bones:
+                pb.matrix_basis = Matrix.Identity(4)
         bpy.context.view_layer.update()
-        _kneel(arms[0], look["kneel"], at)
+        (_kneel if name == "@kneel" else _graze)(arms[0], rig, at)
         return True
     if not animated:
         return True
@@ -444,6 +461,25 @@ def _kneel(arm, rig, drop):
             tip = fetlock + (-f if foot_back else f) * foot_len
             tip.z = floor + 0.6 * (g - floor)
             _aim(arm, foot, fetlock, tip)
+
+
+def _graze(arm, rig, degrees):
+    """
+    A head-down pose, as cattle graze: the neck chain `rig["neck"]` (from its root to the head)
+    bent down about the animal's own left-right axis by `degrees` in all, shared out by
+    `rig["weights"]`; `forward` is the model's own facing, a unit vector.
+    """
+    from mathutils import Matrix as M4, Vector
+    W = arm.matrix_world
+    Wi3 = W.inverted().to_3x3()
+    f = Vector(rig["forward"])
+    axis = (Wi3 @ Vector((0.0, 0.0, 1.0)).cross(f)).normalized()     # nose down is a turn about up x forward
+    for name, share in zip(rig["neck"], rig["weights"]):
+        pb = arm.pose.bones[name]
+        head = pb.matrix.translation.copy()
+        turn = M4.Translation(head) @ M4.Rotation(math.radians(degrees * share), 4, axis) @ M4.Translation(-head)
+        pb.matrix = turn @ pb.matrix
+        bpy.context.view_layer.update()
 
 
 def _alpha_material(mat):
@@ -755,8 +791,8 @@ def _cache_key(era, wanted, index, manifest, faces, texture_px):
 def _code_digest():
     """The functions that shape a variant, so a change to how a model is read makes a new cache."""
     import inspect
-    parts = [inspect.getsource(f) for f in (_import, _pose, _aim, _kneel, _alpha_material, _bake, _turn_angle, _cut, _decimate,
-                                            _stand, _normals, _unlit_to_lit, _coat, model_variants)]
+    parts = [inspect.getsource(f) for f in (_import, _pose, _aim, _kneel, _graze, _alpha_material, _bake, _turn_angle, _cut,
+                                            _decimate, _stand, _normals, _unlit_to_lit, _coat, model_variants)]
     return hashlib.sha256("".join(parts).encode("utf-8")).hexdigest()
 
 
