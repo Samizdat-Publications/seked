@@ -101,16 +101,16 @@
     },
     {
       "id": "sphinx-sequence",
-      "name": "The Sphinx before Khafre's pyramid, from above its temple, 40 mm",
-      "x": 439.0,
-      "y": -445.0,
-      "z": -29.5,
+      "name": "The Sphinx from the south-south-east over the head of the causeway, Khufu's pyramid behind, 28 mm",
+      "x": 362.0,
+      "y": -490.0,
+      "z": -28.0,
       "target": [
-        337.5,
-        -441.6,
-        -25.9
+        332.0,
+        -438.0,
+        -22.75
       ],
-      "lens": 40,
+      "lens": 28,
       "moment": "sphinx-morning"
     }
   ]

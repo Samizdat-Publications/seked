@@ -93,13 +93,13 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
     col = t.mix(1.0, col, t.grey(t.math("ADD", t.math("MULTIPLY", tone.outputs[0], 0.14), 0.93)), "MULTIPLY")
     if speckle:        # granite: a mosaic of crystals a centimetre or two across, feldspar, quartz and mica
         vor = t.node("ShaderNodeTexVoronoi")
-        vor.inputs["Scale"].default_value = 55.0
+        vor.inputs["Scale"].default_value = 110.0
         t.link(geo.outputs["Position"], vor.inputs["Vector"])
         cell = t.node("ShaderNodeSeparateColor")
         t.link(vor.outputs["Color"], cell.inputs[0])
-        crystal = t.ramp(cell.outputs[0], [(0.0, hexlin(colours[1])), (0.45, hexlin(colours[0])), (0.62, hexlin(quartz)),
-                                           (0.84, hexlin(speckle))], interp="CONSTANT")
-        col = t.mix(0.7, col, crystal)
+        crystal = t.ramp(cell.outputs[0], [(0.0, hexlin(colours[1])), (0.4, hexlin(colours[0])), (0.66, hexlin(quartz)),
+                                           (0.9, hexlin(speckle))], interp="CONSTANT")
+        col = t.mix(0.42, col, crystal)
     if soot:
         grime = t.math("MULTIPLY", t.band(up, 0.0, height), soot)
         grime = t.math("MULTIPLY", grime, t.band(t.noise(geo.outputs["Position"], 0.7, 3.0), 0.25, 0.75))
