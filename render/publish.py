@@ -95,15 +95,18 @@ def star_marks(s, moments, cameras):
 
 def in_shadow(png):
     """
-    How dark the ground under the camera is against the sunlit ground near the horizon.
-    A station lit by the sky alone, or standing over dark water, comes out below about
-    0.38; a lit one, even on stony ground in raking light, above 0.44.
+    Whether the camera seems to stand in a shadow: the ground under it both dark against
+    the lit ground near the horizon and blue, lit by the sky alone. Darkness alone is not
+    enough: grass, black basalt and silty water are dark in full sun, but warm. Returns
+    (darkness ratio, blue over red); a shadow comes out below 0.45 and above 0.95.
     """
     import numpy as np
     from PIL import Image
-    a = np.asarray(Image.open(png).convert("L").resize((512, 256)), dtype=float)
+    a = np.asarray(Image.open(png).convert("RGB").resize((512, 256)), dtype=float)
     h = a.shape[0]
-    return a[int(h * 0.92):, :].mean() / max(1.0, np.percentile(a[int(h * 0.505):int(h * 0.53), :], 80))
+    under = a[int(h * 0.92):, :, :]
+    ratio = under.mean() / max(1.0, np.percentile(a[int(h * 0.505):int(h * 0.53), :, :].mean(2), 80))
+    return ratio, under[:, :, 2].mean() / max(1.0, under[:, :, 0].mean())
 
 
 def main():
@@ -136,10 +139,10 @@ def main():
             over = s.get("by_state", {}).get(st, {})
             by_night = "night" in moments.get(over.get("moment", s.get("moment")), {})
             if not s.get("inside") and not by_night:
-                dark = in_shadow(png)
-                if dark < 0.38:
-                    print(f"  WARNING: {s['id']}-{st}: the ground under the camera is {dark:.2f} of the lit ground; "
-                          "in shadow or over dark water?")
+                dark, blue = in_shadow(png)
+                if dark < 0.45 and blue > 0.95:        # grey basalt in sun reads 0.9; sky-lit shade 1.8 and more
+                    print(f"  WARNING: {s['id']}-{st}: the ground under the camera is {dark:.2f} of the lit ground and blue "
+                          f"({blue:.2f}): in a shadow?")
             if "name" in over or "where" in over or "moment" in over:
                 titles[st] = {"name": over.get("name", s["name"]), "where": over.get("where", s.get("where", ""))}
                 if "moment" in over:

@@ -66,9 +66,10 @@ def asphalt_material():
     bsdf = t.node("ShaderNodeBsdfPrincipled")
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     geo = t.node("ShaderNodeNewGeometry")
-    base = t.ramp(t.noise(geo.outputs["Position"], 0.4, 5.0), [(0.3, hexlin("4a4744")), (0.7, hexlin("5d5853"))])
-    dust = t.band(t.noise(geo.outputs["Position"], 0.08, 4.0), 0.5, 0.75)
-    col = t.mix(t.math("MULTIPLY", dust, 0.6), base, hexlin("b7a282"))
+    # Sun-bleached, sand-blown asphalt: grey-tan from any distance, not a black band.
+    base = t.ramp(t.noise(geo.outputs["Position"], 0.4, 5.0), [(0.3, hexlin("6a645c")), (0.7, hexlin("7b746a"))])
+    dust = t.band(t.noise(geo.outputs["Position"], 0.08, 4.0), 0.35, 0.7)
+    col = t.mix(t.math("MULTIPLY", dust, 0.7), base, hexlin("b7a282"))
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = 0.9
     return mat

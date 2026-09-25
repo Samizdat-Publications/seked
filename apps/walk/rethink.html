@@ -80,6 +80,8 @@
   .lede { font-size: 20px; line-height: 1.55; color: var(--ink); }
   .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--granite); margin: 0 0 14px; }
   .muted { color: var(--muted); }
+.col ul { padding-left: 1.2em; margin: 12px 0 8px; }
+.col ul li { margin: 10px 0; }
   code, .num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
   a { color: var(--accent); text-underline-offset: 3px; }
 
@@ -146,12 +148,22 @@
 </nav>
 
 <main>
-  <p class="credits">Path traced in Blender Cycles from the project's own data: Petrie's and Cole's base dimensions, Goyon's 201 measured course heights for Khufu, the Copernicus GLO-30 terrain, OpenStreetMap footprints, Google Open Buildings for the modern city. The individual blocks, the erosion and the rubble are a reconstruction at block scale. Temples, causeways and the Sphinx are not built yet.</p>
+  <p class="credits">Path traced in Blender Cycles from the project's own data: Petrie's and Cole's base dimensions, Goyon's 201 measured course heights for Khufu, the Copernicus GLO-30 terrain, OpenStreetMap footprints, Google Open Buildings for the modern city. The individual blocks, the erosion and the rubble are a reconstruction at block scale. The temples, causeways, harbour, Wall of the Crow and the Sphinx's five forms stand on their surveyed footprints, with their look choices named in the code; the vegetation is a look choice throughout. The interiors are Petrie's survey. The stars are the project's sky engine, precessed to each night's epoch.</p>
 
   <div class="col">
     <p class="eyebrow">Seked &middot; 24 September 2026</p>
     <h1>Keep going. The fidelity is there.</h1>
     <p class="lede">You asked whether this could ever look the way you want. It can. What held it back was not effort and not the data. It was where the detail lived and what was drawing it. The first station of the <a href="index.html">walkthrough</a> was built in an afternoon from numbers the project already had, laid block by block, and lit by a path tracer instead of a game renderer.</p>
+  </div>
+
+  <div class="col">
+    <h2>Since the first station</h2>
+    <p>The same evening, the walkthrough grew into this:</p>
+    <ul>
+      <li><strong>Five eras on one timeline.</strong> The First Time, c.&nbsp;10,500&nbsp;BCE, drawn as the lost-civilisation claim describes it: green savanna, pristine casing, the Anubis Sphinx. The lion era, c.&nbsp;7000&nbsp;BCE, drier, also a claim. The plateau as built, c.&nbsp;2560&nbsp;BCE, with gold and electrum caps, enclosure walls, dressed mastabas, the roofed causeway, the red granite temples, the harbour with its quay and boats, and the Wall of the Crow. The plateau of c.&nbsp;1800, the Sphinx buried to its chest. And today.</li>
+      <li><strong>Eleven stations.</strong> Among them a papyrus raft on the harbour, the court of Khufu's mortuary temple, the Eastern Cemetery, and two inside the Great Pyramid: the Grand Gallery and the King's Chamber, built from Petrie's interior survey, with the coffer where he found it.</li>
+      <li><strong>Orion over Giza.</strong> The night of 10,450&nbsp;BCE, the date the claim gives. The project's own sky engine precesses every star to that epoch, and Orion's belt barely clears the horizon between Khufu and Khafre. The as-built night is 2450&nbsp;BCE, with the belt high in the south.</li>
+    </ul>
   </div>
 
   <div class="wide">
@@ -242,11 +254,11 @@
 
     <h2>The plan</h2>
     <ol class="plan">
-      <li><div><h3>The generator</h3><p>Today's spike becomes the project's pipeline: terrain, pyramids, mastabas, rubble, city, sky, and stations described as data. The render queue runs as detached jobs so no session is woken by a finished frame.</p></div></li>
-      <li><div><h3>The rest of the plateau</h3><p>Khafre's valley and mortuary temples in red granite, the causeways, the Sphinx in its enclosure, the boat pits and enclosure walls. Today's roads and the Mena House; the green valley and the harbour for the as-built plateau.</p></div></li>
-      <li><div><h3>Twelve to twenty stations</h3><p>Each rendered today, as built, and as the First Time for the lost-civilisation claim, starting at golden hour.</p></div></li>
-      <li><div><h3>Inside Khufu</h3><p>The descending passage, the Grand Gallery, the King's and Queen's Chambers, the relieving chambers and the subterranean chamber, path traced in granite and limestone from the interior survey already in the database.</p></div></li>
-      <li><div><h3>Night stations</h3><p>The shafts and their stars, Orion over the three, with the live star overlay for 2500 BCE and 10,500 BCE drawn on the night panorama.</p></div></li>
+      <li><div><h3>The generator <span class="muted">(done)</span></h3><p>Today's spike became the project's pipeline: terrain, pyramids, mastabas, rubble, city, sky, and stations described as data. The render queue runs as detached jobs so no session is woken by a finished frame.</p></div></li>
+      <li><div><h3>The rest of the plateau <span class="muted">(done, but for the Mena House)</span></h3><p>Khafre's valley and mortuary temples in red granite, the causeways, the Sphinx in its enclosure, the enclosure walls, today's roads, the green valley and the harbour for the as-built plateau.</p></div></li>
+      <li><div><h3>Twelve to twenty stations <span class="muted">(eleven so far)</span></h3><p>Each rendered in every era it exists in, starting at golden hour.</p></div></li>
+      <li><div><h3>Inside Khufu <span class="muted">(the Grand Gallery and the King's Chamber)</span></h3><p>Next: the descending passage, the Queen's Chamber, the relieving chambers and the subterranean chamber, from the interior survey already in the database.</p></div></li>
+      <li><div><h3>Night stations <span class="muted">(Orion over Giza)</span></h3><p>Next: the shafts and their stars, with the live star overlay drawn on the night panorama.</p></div></li>
       <li><div><h3>Films</h3><p>Flights between stations, and the rollback from today to the First Time.</p></div></li>
     </ol>
 
@@ -256,7 +268,8 @@
         <thead><tr><th>Render, on your RTX 5070 Ti laptop</th><th>Time</th></tr></thead>
         <tbody>
           <tr><td>Full-HD hero frame, 128 samples</td><td class="num">about 1 min</td></tr>
-          <tr><td>4K station panorama, 48 samples</td><td class="num">about 1&frac12; min</td></tr>
+          <tr><td>4K station panorama, 48 samples</td><td class="num">about 40 s</td></tr>
+          <tr><td>The whole walkthrough, 38 panoramas in five eras</td><td class="num">about 40 min</td></tr>
           <tr><td>8K station panorama, 64 samples (estimate)</td><td class="num">about 5 min</td></tr>
           <tr><td>Twenty stations in three eras at 8K</td><td class="num">one night</td></tr>
         </tbody>

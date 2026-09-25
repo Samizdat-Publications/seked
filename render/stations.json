@@ -38,6 +38,11 @@
     "night-2450": {
       "night": "c2-2450",
       "label": "night, 2450 BCE: Alnitak on the meridian"
+    },
+    "temple-morning": {
+      "date": "11-15",
+      "solar": 10.0,
+      "label": "mid-morning, November, the sun high enough to clear the walls' shadows"
     }
   },
   "stations": [
@@ -146,7 +151,7 @@
       "x": 160.0,
       "y": -5.0,
       "z": 2.2,
-      "moment": "sphinx-morning",
+      "moment": "temple-morning",
       "view": {
         "yaw": 270,
         "pitch": 22,
@@ -162,14 +167,14 @@
     {
       "id": "cemetery",
       "name": "The Eastern Cemetery",
-      "where": "At the Eastern Cemetery's south-west corner, the queens' pyramids between it and Khufu",
-      "x": 224.0,
-      "y": -156.0,
+      "where": "At the Eastern Cemetery's southern edge, the three queens' pyramids stepping up to Khufu",
+      "x": 270.0,
+      "y": -200.0,
       "eye": 1.7,
-      "moment": "sphinx-morning",
+      "moment": "temple-morning",
       "view": {
-        "yaw": 305,
-        "pitch": 8,
+        "yaw": 312,
+        "pitch": 10,
         "fov": 62
       },
       "neighbours": [
@@ -177,7 +182,7 @@
         "east",
         "sphinx"
       ],
-      "note": "Chosen from the mastaba footprints: 11 m from the nearest wall, ten mastabas within 45 m, and Khufu in clear view."
+      "note": "Chosen from the mastaba and queens' footprints: 9 m from the nearest mastaba, twelve within 50 m, and Khufu's apex 6 degrees above the nearest queen."
     },
     {
       "id": "harbour",
@@ -239,7 +244,8 @@
       },
       "neighbours": [
         "kings-chamber",
-        "north"
+        "north",
+        "queens-chamber"
       ],
       "landmarks": [
         {
@@ -294,13 +300,13 @@
         },
         {
           "name": "North shaft",
-          "x": 1.9,
+          "x": 1.57,
           "y": -8.4,
           "z": 44.0
         },
         {
           "name": "South shaft",
-          "x": 1.3,
+          "x": 5.2,
           "y": -13.64,
           "z": 44.0
         },
@@ -311,6 +317,51 @@
           "z": 43.6
         }
       ]
+    },
+    {
+      "id": "queens-chamber",
+      "name": "The Queen's Chamber",
+      "where": "Under its gabled roof, the corbelled niche in the east wall",
+      "inside": true,
+      "x": 3.3,
+      "y": 1.3,
+      "z": 22.79,
+      "light": "by the era's lamps",
+      "view": {
+        "yaw": 113,
+        "pitch": 12,
+        "fov": 70
+      },
+      "neighbours": [
+        "gallery"
+      ],
+      "landmarks": [
+        {
+          "name": "The niche",
+          "x": 7.82,
+          "y": -0.63,
+          "z": 23.6
+        },
+        {
+          "name": "From the gallery",
+          "x": 7.29,
+          "y": 2.59,
+          "z": 22.2
+        },
+        {
+          "name": "North shaft",
+          "x": 4.95,
+          "y": 2.59,
+          "z": 22.8
+        },
+        {
+          "name": "South shaft",
+          "x": 4.95,
+          "y": -2.64,
+          "z": 22.8
+        }
+      ],
+      "note": "z is the floor at the north wall (§64) plus 1.6 m."
     }
   ]
 }

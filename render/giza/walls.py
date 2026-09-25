@@ -80,6 +80,10 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
         dx, dy = ex / L, ey / L
         nx, ny = dy, -dx                           # outward for a counter-clockwise ring
         yaw = math.atan2(ny, nx) - 0.5 * math.pi   # turns a block's +Y onto the outward normal
+        # +1 where the corner at an end of this edge is convex (the edge shortens as the wall leans in), -1 where concave.
+        (px, py), (qx, qy) = pts[i - 1], pts[(i + 2) % len(pts)]
+        turn_in = 1.0 if (ax - px) * ey - (ay - py) * ex > 0 else -1.0
+        turn_out = 1.0 if ex * (qy - by) - ey * (qx - bx) > 0 else -1.0
         # Doorways on this edge: (distance along it, half width, head height).
         doors = []
         for ox, oy, ow, oh in openings:
@@ -91,9 +95,12 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
             zb = k * ch
             inset = zb * inset_per_m + depth / 2
             # Alternate which wall runs through the corner, course by course; a short run is one block.
+            # A battered edge shortens as it rises, the neighbouring faces leaning in with it, so each
+            # course starts and stops that much further in; without it the upper courses overhang the corners.
             through = (i + k) % 2 == 0 or L < 3 * depth
-            s0 = 0.0 if through else depth
-            s1 = L if through else L - depth
+            lean = zb * inset_per_m
+            s0 = lean * turn_in + (0.0 if through else depth)
+            s1 = L - lean * turn_out - (0.0 if through else depth)
             s = s0
             while s < s1 - 0.2:
                 bl = min(max(rng.lognormvariate(math.log(length), 0.35), 0.8), length * 2.5)

@@ -1,7 +1,7 @@
 """
-Inside the Great Pyramid: the Grand Gallery and the King's Chamber, from Petrie's interior
-survey (data/measurements/g1-interior.json, all in the project frame: metres east of
-Khufu's axis, north of it, and up from his base).
+Inside the Great Pyramid: the Grand Gallery, the King's Chamber and the Queen's Chamber,
+from Petrie's interior survey (data/measurements/g1-interior.json and g1.json, all in the
+project frame: metres east of Khufu's axis, north of it, and up from his base).
 
 The gallery rises from its foot at the top of the ascending passage to the great step at
 26.28 degrees; on each side a ramp, a vertical wall, then seven corbelled courses each
@@ -36,7 +36,10 @@ def exposure(state):
 
 
 def _r():
-    return {rec["key"]: rec["value"] for rec in data.records("g1-interior.json")}
+    """The interior records, with g1.json's chamber means and shaft outlets beside them."""
+    r = {rec["key"]: rec["value"] for rec in data.records("g1.json")}
+    r.update({rec["key"]: rec["value"] for rec in data.records("g1-interior.json")})
+    return r
 
 
 def _gallery_frame(r):
@@ -298,13 +301,82 @@ def kings_chamber(state, coll, mats, log=print):
     dw = r["passage.ascending.width"] / 2
     bm.faces.new([bm.verts.new(p) for p in ((door_x - dw, y1 - 0.01, z0), (door_x + dw, y1 - 0.01, z0),
                                             (door_x + dw, y1 - 0.01, z0 + PASSAGE_HEIGHT), (door_x - dw, y1 - 0.01, z0 + PASSAGE_HEIGHT))])
-    for yy, shaft_x, dy in ((y1, 1.9, -0.01), (y0, 1.3, 0.01)):
+    # The shafts' mouths at their outlets' offsets east, the shafts taken as straight in plan (the north one jogs).
+    for yy, shaft_x, dy in ((y1, r["kc.shaft.north.outlet.east"], -0.01), (y0, r["kc.shaft.south.outlet.east"], 0.01)):
         bm.faces.new([bm.verts.new(p) for p in ((shaft_x - 0.1, yy + dy, z0 + 0.9), (shaft_x + 0.1, yy + dy, z0 + 0.9),
                                                 (shaft_x + 0.1, yy + dy, z0 + 1.12), (shaft_x - 0.1, yy + dy, z0 + 1.12))])
     _emit("chamber mouths", bm, mats["dark"], coll)
     log(f"king's chamber: {x1 - x0:.2f} x {y1 - y0:.2f} x {z1 - z0:.2f} m in granite under nine beams; "
         f"the coffer {L:.3f} x {W:.3f} x {H:.3f} m, {west - x0:.2f} m off the west wall")
     return (x0, x1, y0, y1, z0, z1)
+
+
+def queens_chamber(state, coll, mats, log=print):
+    """
+    The Queen's Chamber from §41-43: Petrie's mean length and width (g1.json), its floor and
+    north wall (§64), the gabled roof springing from the north and south walls, and the
+    corbelled niche in the east wall, its five tiers and four laps from §43's table. §64
+    puts the east wall 236 in from the west against §41's 226.47 in length; the east wall
+    is kept, since the passage from the gallery enters the north wall at its east corner
+    and needs it there, and the west wall follows from the length. The shafts' mouths and
+    the doorway's height are look choices.
+    """
+    r = _r()
+    x1 = r["qc.corner.ne.east"]
+    x0 = x1 - r["qc.length"]
+    y1 = r["qc.corner.ne.north"]
+    y0 = y1 - r["qc.width"]
+    z0 = r["qc.corner.ne.up"]
+    wall = z0 + r["qc.wall.height"]
+    ridge_z = z0 + r["qc.gable.height"]
+    ridge_y = r["qc.roof.mid_west.north"]
+    bm = bmesh.new()
+    V = bm.verts.new
+    # Floor, the north and south walls, the two roof slopes and the west gable.
+    bm.faces.new([V((x0, y0, z0)), V((x1, y0, z0)), V((x1, y1, z0)), V((x0, y1, z0))])
+    bm.faces.new([V((x0, y1, z0)), V((x1, y1, z0)), V((x1, y1, wall)), V((x0, y1, wall))])
+    bm.faces.new([V((x1, y0, z0)), V((x0, y0, z0)), V((x0, y0, wall)), V((x1, y0, wall))])
+    bm.faces.new([V((x0, y1, wall)), V((x1, y1, wall)), V((x1, ridge_y, ridge_z)), V((x0, ridge_y, ridge_z))])
+    bm.faces.new([V((x1, y0, wall)), V((x0, y0, wall)), V((x0, ridge_y, ridge_z)), V((x1, ridge_y, ridge_z))])
+    bm.faces.new([V((x0, y0, z0)), V((x0, y1, z0)), V((x0, y1, wall)), V((x0, ridge_y, ridge_z)), V((x0, y0, wall))])
+    # The east wall, band by band round the niche, then its gable.
+    depth = r["qc.niche.depth"]
+    yc = ridge_y - r["qc.niche.offset.south"]
+    widths = [r[f"qc.niche.tier{k}.width"] for k in range(1, 6)]
+    levels = [0.0] + [r[f"qc.niche.lap{k}.up"] for k in range(1, 5)] + [r["qc.niche.height"]]
+    for k, w in enumerate(widths):
+        za, zb = z0 + levels[k], z0 + levels[k + 1]
+        s, n = yc - w / 2, yc + w / 2
+        bm.faces.new([V((x1, y0, za)), V((x1, s, za)), V((x1, s, zb)), V((x1, y0, zb))])
+        bm.faces.new([V((x1, n, za)), V((x1, y1, za)), V((x1, y1, zb)), V((x1, n, zb))])
+        bm.faces.new([V((x1 + depth, s, za)), V((x1 + depth, n, za)), V((x1 + depth, n, zb)), V((x1 + depth, s, zb))])
+        bm.faces.new([V((x1, s, za)), V((x1 + depth, s, za)), V((x1 + depth, s, zb)), V((x1, s, zb))])
+        bm.faces.new([V((x1 + depth, n, za)), V((x1, n, za)), V((x1, n, zb)), V((x1 + depth, n, zb))])
+        if k > 0:          # the lap: the narrower tier above overhangs the one below
+            wb = widths[k - 1]
+            for a, b in ((yc - wb / 2, s), (n, yc + wb / 2)):
+                bm.faces.new([V((x1, a, za)), V((x1, b, za)), V((x1 + depth, b, za)), V((x1 + depth, a, za))])
+    top = z0 + levels[-1]
+    s, n = yc - widths[-1] / 2, yc + widths[-1] / 2
+    bm.faces.new([V((x1, s, top)), V((x1, n, top)), V((x1 + depth, n, top)), V((x1 + depth, s, top))])
+    bm.faces.new([V((x1, y0, top)), V((x1, y1, top)), V((x1, y1, wall)), V((x1, y0, wall))])
+    bm.faces.new([V((x1, y0, wall)), V((x1, y1, wall)), V((x1, ridge_y, ridge_z))])
+    _emit("queen's chamber", bm, mats["qc limestone"], coll)
+    # The doorway at the east end of the north wall, and the shafts' mouths.
+    bm = bmesh.new()
+    V = bm.verts.new          # bound to the new mesh: the old one was freed by _emit
+    door_x = r["passage.ascending.floor.end.east"]
+    dw = r["passage.ascending.width"] / 2
+    bm.faces.new([V((door_x - dw, y1 - 0.01, z0)), V((door_x + dw, y1 - 0.01, z0)),
+                  V((door_x + dw, y1 - 0.01, z0 + PASSAGE_HEIGHT)), V((door_x - dw, y1 - 0.01, z0 + PASSAGE_HEIGHT))])
+    for yy, dy in ((y1, -0.01), (y0, 0.01)):
+        cx = (x0 + x1) / 2
+        bm.faces.new([V((cx - 0.1, yy + dy, z0 + 1.5)), V((cx + 0.1, yy + dy, z0 + 1.5)),
+                      V((cx + 0.1, yy + dy, z0 + 1.7)), V((cx - 0.1, yy + dy, z0 + 1.7))])
+    _emit("queen's chamber mouths", bm, mats["dark"], coll)
+    log(f"queen's chamber: {x1 - x0:.2f} x {y1 - y0:.2f} m, walls {wall - z0:.2f} m, ridge {ridge_z - z0:.2f} m; "
+        f"the niche {widths[0]:.2f} m narrowing to {widths[-1]:.2f} m in five tiers, {depth:.2f} m deep")
+    return (x0, x1, y0, y1, z0, ridge_z)
 
 
 def _area(name, coll, at, size, emit, along, energy, colour):
@@ -370,6 +442,22 @@ def lights(state, coll, r, room, log=print):
     return lamps
 
 
+def queens_lights(state, coll, room, log=print):
+    """Two strips at the foot of the long walls today; three oil lamps on the floor before."""
+    x0, x1, y0, y1, z0, _ = room
+    lamps = []
+    if state in MODERN:
+        warm = (1.0, 0.82, 0.6)
+        for yy, sign in ((y1 - 0.12, 1.0), (y0 + 0.12, -1.0)):
+            at = ((x0 + x1) / 2, yy, z0 + 0.06)
+            lamps.append(_area("queen's strip", coll, at, (3.6, 0.08), (0.0, sign * 0.2, 1.0), (1.0, 0.0, 0.0), 90.0, warm))
+    else:
+        flame = (1.0, 0.52, 0.2)
+        for fx, fy in ((0.25, 0.7), (0.55, 0.25), (0.8, 0.75)):
+            lamps.append(_point("oil lamp", coll, (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, z0 + 0.12), 30.0, flame, 0.03))
+    return lamps
+
+
 def _flat(name, rgb, rough):
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
@@ -395,8 +483,11 @@ def build(state, coll, mats, log=print):
                                       soot=soot * 0.8, height=course * KC_COURSES, joint=0.8, speckle="1c1715", mortar=0.01)
     mats["coffer granite"] = masonry("coffer granite", granite, rough, 10.0, 10.0, room_frame(r["kc.floor.elevation"]),
                                      joint=0.0, speckle="1c1715")
+    mats["qc limestone"] = masonry("qc limestone", lime, rough, 0.8, 1.7, room_frame(r["qc.corner.ne.up"]),
+                                   soot=soot * 0.6, height=r["qc.gable.height"])
     mats.setdefault("timber", _flat("timber", (0.24, 0.15, 0.08), 0.7))
     mats.setdefault("iron", _flat("iron", (0.05, 0.05, 0.05), 0.4))
     gallery(state, coll, mats, log)
     room = kings_chamber(state, coll, mats, log)
-    return lights(state, coll, r, room, log)
+    queen = queens_chamber(state, coll, mats, log)
+    return lights(state, coll, r, room, log) + queens_lights(state, coll, queen, log)

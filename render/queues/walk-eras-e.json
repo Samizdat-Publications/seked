@@ -1,0 +1,67 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/temple-built.png"
+  },
+  {
+   "state": "built",
+   "station": "queens-chamber",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/queens-chamber-built.png"
+  },
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/temple-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "queens-chamber",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/queens-chamber-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/temple-today.png"
+  },
+  {
+   "state": "today",
+   "station": "queens-chamber",
+   "size": "4096x2048",
+   "samples": 128,
+   "out": "build/render/pano/queens-chamber-today.png"
+  },
+  {
+   "state": "today",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-today.png"
+  }
+ ]
+}

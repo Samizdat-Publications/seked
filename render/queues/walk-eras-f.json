@@ -1,0 +1,25 @@
+{
+ "renders": [
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 48,
+   "out": "build/render/pano/cemetery-today.png"
+  }
+ ]
+}
