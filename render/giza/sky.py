@@ -36,8 +36,8 @@ HAZE = ((-120.0, 160.0, 4.2e-5, "f4dfc2"), (160.0, 520.0, 1.5e-5, "f3e7d4"), (52
 # tried first, 2026-09-25: grey smoke at 200 s for a 960 x 540 frame on the laptop.)
 SKIES = os.path.join(data.REPO, "build", "skies")
 CLOUDS = {
-    "tropical": dict(high="kloofendal_48d_partly_cloudy_puresky", low="citrus_orchard_puresky", split=24.0),
-    "showers": dict(high="farm_field_puresky", low="industrial_sunset_puresky", split=24.0),
+    "tropical": dict(high="kloofendal_48d_partly_cloudy_puresky", low="citrus_orchard_puresky", split=0.0),
+    "showers": dict(high="farm_field_puresky", low="industrial_sunset_puresky", split=0.0),
     "dry": dict(high="kloofendal_43d_clear_puresky", low="qwantani_late_afternoon_puresky", split=24.0),
 }
 
@@ -82,7 +82,10 @@ class Sky:
         self.sun.visible_camera = False
         if haze > 0 and coll is not None:
             for k, (z0, z1, dens, col) in enumerate(HAZE):
-                self._slab(coll, z0, z1, dens * haze, colours[k] if colours else col)
+                # The era's thicker air lies near the ground, where it puts the pyramids kilometres off;
+                # carried into the upper slabs too, it washed the photographed skies to a grey card
+                # across 30 km of haze (critic rounds 6 to 12).
+                self._slab(coll, z0, z1, dens * (haze if k == 0 else min(haze, 1.5)), colours[k] if colours else col)
         if mist and coll is not None:
             self._slab(coll, *mist)
 

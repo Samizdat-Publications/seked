@@ -358,7 +358,15 @@ def build(state, rng, coll, mats, lib, log=print):
             laid(P)
     elif queens_mode == "dressed":
         for P in queens:
-            dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["restored casing"], mats["dressed granite"])
+            if mode in BLOCK_CASING:
+                # laid like the kings' (critic round 13: "untextured white triangles" beside them)
+                spec = dict(LOOK["queen"], all_casing=True, casing_miss=0.0, miss=0.0, top=P["H"] - 0.8, flush_corners=True)
+                backing_mesh(P, lay(P, course_heights(P["H"], rng, *COURSES["queen"]), rng, core, casing, gran, spec), coll,
+                             mats["core behind"])
+                inner = dict(P, half=P["half"] - 0.04, H=P["H"] * (P["half"] - 0.04) / P["half"])
+                dressed_mesh(inner, inner["H"] - 0.8, 0.0, coll, mats["restored casing"], mats["dressed granite"], arris=0.01)
+            else:
+                dressed_mesh(P, P["H"] - 0.8, 0.0, coll, mats["restored casing"], mats["dressed granite"])
     core.emit("core blocks", lib["core"], coll, log)
     casing.emit("casing blocks", lib["casing"], coll, log)
     gran.emit("granite blocks", lib["granite"], coll, log)

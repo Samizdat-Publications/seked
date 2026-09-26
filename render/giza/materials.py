@@ -486,7 +486,7 @@ def _contact(t, col, bsdf, reach=0.8, dirt="8a7658", amount=0.55, arris=0.015):
     return col
 
 
-def dressed_blocks(name, stops_hex, rough=0.4, speckle=True, broad=0.0):
+def dressed_blocks(name, stops_hex, rough=0.4, speckle=True, broad=0.0, arris=0.015):
     """
     Dressed stone on instanced blocks: each block its own tone off the palette, grime where it meets
     its neighbours and the ground, worn arrises, and for granite its coarse grain: pink feldspar in
@@ -520,11 +520,14 @@ def dressed_blocks(name, stops_hex, rough=0.4, speckle=True, broad=0.0):
     t.link(geo.outputs["Normal"], nz.inputs[0])
     lying = t.math("MULTIPLY", t.band(nz.outputs["Z"], 0.8, 0.95), t.band(t.noise(geo.outputs["Position"], 0.5, 4.0, 0.6), 0.35, 0.65))
     col = t.mix(t.math("MULTIPLY", lying, 0.6), col, hexlin("cdb38c"))
-    col = _contact(t, col, bsdf, reach=1.5, amount=0.8)
+    col = _contact(t, col, bsdf, reach=1.5, amount=0.8, arris=arris)
     if broad:
         # laid as a pyramid's casing: the face's weathering at the scale a camera reads (see _broad)
-        stain = t.band(t.noise(geo.outputs["Position"], 0.05, 5.0, 0.62), 0.52, 0.72)
-        col = t.mix(t.math("MULTIPLY", stain, 0.3), col, hexlin("a8977a"))
+        stain = t.band(t.noise(geo.outputs["Position"], 0.05, 5.0, 0.62), 0.5, 0.72)
+        col = t.mix(t.math("MULTIPLY", stain, 0.45), col, hexlin("a8977a"))
+        # whole stretches relaid in the restoration, brighter stone over tens of metres
+        relaid = t.band(t.noise(geo.outputs["Position"], 0.012, 2.0, 0.5), 0.6, 0.7)
+        col = t.mix(t.math("MULTIPLY", relaid, 0.35), col, hexlin("e8e3d8"))
         col, normal = _broad(t, geo.outputs["Position"], col, bsdf.inputs["Normal"].links[0].from_socket, amount=broad, undulation=0.0001)
         t.link(normal, bsdf.inputs["Normal"])
     t.link(col, bsdf.inputs["Base Color"])
@@ -595,10 +598,13 @@ def weathered_casing(name="weathered casing", instanced=False):
         start = t.math("ADD", t.math("MULTIPLY", n.outputs["Fac"], span), top)
         return t.band(t.math("SUBTRACT", start, hb), 0.0, fall)
 
+    # laid as blocks the stone's own texture competes with the stains (critic round 13: "so faint the
+    # casing reads as clean"), so the runs are stronger there
+    k = 1.35 if instanced else 1.0
     wash = t.math("MULTIPLY", stripes(run, 0.035, 0.48, 0.72, 3.0), begins(0.01, 11.0, 30.0, 110.0, 40.0))
-    col = t.mix(t.math("MULTIPLY", wash, 0.55), col, hexlin("8a887a"))
+    col = t.mix(t.math("MULTIPLY", wash, 0.55 * k), col, hexlin("7e7c6e" if instanced else "8a887a"))
     runs = t.math("MULTIPLY", stripes(waver, 0.3, 0.56, 0.78, 17.0), begins(0.06, 23.0, 10.0, 130.0, 25.0))
-    col = t.mix(t.math("MULTIPLY", runs, 0.65), col, hexlin("686b5d"))
+    col = t.mix(t.math("MULTIPLY", runs, min(0.65 * k, 0.9)), col, hexlin("5e6154" if instanced else "686b5d"))
     threads = t.math("MULTIPLY", stripes(waver, 1.7, 0.6, 0.8, 41.0), begins(0.4, 37.0, 5.0, 140.0, 12.0))
     col = t.mix(t.math("MULTIPLY", threads, 0.3), col, hexlin("5d6155"))
     foot = t.math("SUBTRACT", 1.0, t.band(hb, 0.0, 30.0))
