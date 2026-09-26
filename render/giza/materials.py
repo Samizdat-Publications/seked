@@ -477,7 +477,8 @@ def metal(name, rgb_hex, rough, metallic=0.8):
     bmp = t.node("ShaderNodeBump")
     bmp.inputs["Strength"].default_value = 0.2
     bmp.inputs["Distance"].default_value = 0.05
-    t.link(t.math("ADD", dents.outputs["Distance"], t.math("MULTIPLY", leaf, 0.3)), bmp.inputs["Height"])
+    height = t.math("ADD", dents.outputs["Distance"], t.math("MULTIPLY", leaf, 0.3))
+    t.link(height, bmp.inputs["Height"])
     t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 

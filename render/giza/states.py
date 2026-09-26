@@ -33,7 +33,7 @@ STATES = {
         label="c. 10,500 BCE", title="The First Time", honesty="claim", year=-10499,
         pyramids="pristine", caps="electrum", gild=15.0, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic", sphinx="lion-fresh",
-        ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.8, 1.8),
+        ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.8, 2.6),
         haze_colour=("e6ebe6", "edf0ec", "f1f3f0"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
         grade=dict(bloom=0.25, tint=(0.96, 1.0, 1.02), saturation=1.06),
         rubble=False, people=False, stones=False),
@@ -50,7 +50,7 @@ STATES = {
         pyramids="dressed", caps="gold", gild=8.0, queens="dressed", mastabas="dressed", causeway="corridor",
         temples=ALL_TEMPLES, temple_mode="built", sphinx="carved",
         ground="desert", valley="fields", water="harbour", city=None,
-        grade=dict(bloom=0.25, tint=(1.04, 1.0, 0.93), saturation=1.04),
+        air=(0.7, 0.75), grade=dict(bloom=0.25, tint=(1.04, 1.0, 0.93), saturation=1.04),
         rubble=False, people=True, stones=False),
     "stripped": dict(
         label="c. 1800 CE", title="Stripped and buried", honesty="reconstruction", year=1800,
