@@ -171,7 +171,7 @@
    "id": "sphinx",
    "name": "Above the Sphinx Temple",
    "where": "On the line from Khafre's apex through the Sphinx's head",
-   "moment": "early morning, November, low light across the Sphinx's face",
+   "moment": "just after sunrise, midsummer, the only season the sun reaches the north face",
    "camera": [
     439.0,
     -445.0,
@@ -608,7 +608,7 @@
    "id": "panorama",
    "name": "The panorama stand",
    "where": "The rise south-west of Menkaure where the three stand in a row",
-   "moment": "late afternoon, October",
+   "moment": "late afternoon, midsummer, the sun low in the west-north-west: the west faces lit, the south faces in shade",
    "camera": [
     -980.0,
     -1830.0,
@@ -742,7 +742,7 @@
    "id": "temple",
    "name": "Khufu's mortuary temple",
    "where": "On the basalt pavement of its court, the Great Pyramid's east face above",
-   "moment": "mid-morning, November, the sun high enough to clear the walls' shadows",
+   "moment": "early afternoon, midwinter, the sun low in the south-south-west: the south faces lit, the east faces in shade, high enough to clear the walls",
    "camera": [
     160.0,
     -5.0,
@@ -875,7 +875,7 @@
    "id": "cemetery",
    "name": "The Eastern Cemetery",
    "where": "At the Eastern Cemetery's southern edge, the three queens' pyramids stepping up to Khufu",
-   "moment": "mid-morning, November, the sun high enough to clear the walls' shadows",
+   "moment": "early afternoon, midwinter, the sun low in the south-south-west: the south faces lit, the east faces in shade, high enough to clear the walls",
    "camera": [
     270.0,
     -200.0,
@@ -1169,7 +1169,7 @@
    "id": "menkaure",
    "name": "Menkaure",
    "where": "South-east of his mortuary temple, his three queens to the left",
-   "moment": "mid-morning, November, the sun high enough to clear the walls' shadows",
+   "moment": "early afternoon, midwinter, the sun low in the south-south-west: the south faces lit, the east faces in shade, high enough to clear the walls",
    "camera": [
     -400.0,
     -800.0,
@@ -1303,7 +1303,7 @@
    "id": "harbour",
    "name": "On the harbour",
    "where": "On a papyrus raft in the basin before the valley temples",
-   "moment": "early morning, November, low light across the Sphinx's face",
+   "moment": "just after sunrise, midsummer, the only season the sun reaches the north face",
    "camera": [
     500.0,
     -468.0,
