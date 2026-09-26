@@ -1,5 +1,5 @@
 {
-  "about": "Photographed skies (Poly Haven pure-sky HDRIs, CC0) that the humid eras show behind the plateau and in reflections, in place of Blender's clear physical sky, which still lights the scene. Fetched by python scripts/skies.py into build/skies/. Which sky an era uses and at what sun is render/giza/sky.py's CLOUDS: a look choice, and never evidence of any past weather.",
+  "about": "Photographed skies (Poly Haven pure-sky HDRIs, CC0) that the humid eras show behind the plateau and in reflections, chosen with no aircraft or contrails in them, in place of Blender's clear physical sky, which still lights the scene. Fetched by python scripts/skies.py into build/skies/. Which sky an era uses and at what sun is render/giza/sky.py's CLOUDS: a look choice, and never evidence of any past weather.",
   "resolution": "4k",
   "format": "hdr",
   "skies": [
@@ -8,6 +8,6 @@
     {"id": "kloppenheim_06_puresky", "why": "Cumulus lit gold by a low sun: the First Time's mornings and evenings."},
     {"id": "citrus_orchard_puresky", "why": "A broken cumulus field at a low sun."},
     {"id": "farm_field_puresky", "why": "Heavy, dark-bellied cumulus: the long rains under a high sun."},
-    {"id": "drackenstein_quarry_puresky", "why": "A layered, stormy low-sun sky: the long rains at dawn and dusk."}
+    {"id": "industrial_sunset_puresky", "why": "Grey broken cumulus over a low sun, rain falling from the cloud base: the long rains at dawn and dusk. It replaced drackenstein_quarry_puresky, whose jet contrails showed in the 7000 BCE sky."}
   ]
 }

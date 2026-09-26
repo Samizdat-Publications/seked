@@ -37,7 +37,7 @@ HAZE = ((-120.0, 160.0, 4.2e-5, "f4dfc2"), (160.0, 520.0, 1.5e-5, "f3e7d4"), (52
 SKIES = os.path.join(data.REPO, "build", "skies")
 CLOUDS = {
     "tropical": dict(high="kloofendal_48d_partly_cloudy_puresky", low="kloppenheim_06_puresky", split=24.0),
-    "showers": dict(high="farm_field_puresky", low="drackenstein_quarry_puresky", split=24.0),
+    "showers": dict(high="farm_field_puresky", low="industrial_sunset_puresky", split=24.0),
 }
 
 
@@ -235,6 +235,10 @@ class Sky:
         bm.free()
         ob = bpy.data.objects.new("air", me)
         coll.objects.link(ob)
+        # Stacked slabs would share a cap: two coincident surfaces, which confuse Cycles' volume stack,
+        # and from the air a streaked, hard-edged patch showed where rays crossed them. A metre apart,
+        # they never touch.
+        z0, z1 = z0 + 0.5, z1 - 0.5
         ob.scale = (60000, 60000, z1 - z0)
         ob.location = (0, 0, (z0 + z1) / 2)
         mat = bpy.data.materials.new("air")
