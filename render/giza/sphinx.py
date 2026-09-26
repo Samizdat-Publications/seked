@@ -40,9 +40,9 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
-CARVED = {"sphinx-lion-pristine"}
+CARVED = {"sphinx-lion-pristine": 1.0, "sphinx-carved": 0.7}
 # Painted stand-ins whose generated colours come out saturated like plastic: their saturation (a look choice).
-WEATHERED_PAINT = {"sphinx-carved": 0.62}
+WEATHERED_PAINT = {"sphinx-carved": 0.45}
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
@@ -133,11 +133,12 @@ def statue(state, coll, log=print):
                     src = base.links[0].from_socket
                     fade = tree.nodes.new("ShaderNodeHueSaturation")
                     fade.inputs["Saturation"].default_value = WEATHERED_PAINT[model_id]
-                    fade.inputs["Value"].default_value = 0.95
+                    fade.inputs["Value"].default_value = 0.88
+                    fade.inputs["Hue"].default_value = 0.515      # the pink towards the red-brown of ochre
                     tree.links.new(src, fade.inputs["Color"])
                     tree.links.new(fade.outputs["Color"], base)
                 if model_id in CARVED and base.is_linked:
-                    _in_bedrock(tree, nd)
+                    _in_bedrock(tree, nd, CARVED[model_id])
                 if model_id in TINTED and base.is_linked:
                     src = base.links[0].from_socket
                     hsv = tree.nodes.new("ShaderNodeHueSaturation")
@@ -156,7 +157,7 @@ def statue(state, coll, log=print):
     return obj
 
 
-def _in_bedrock(tree, bsdf):
+def _in_bedrock(tree, bsdf, strength=1.0):
     """Multiply the bedrock's members and grain into a stand-in's colour, and bump it with the rock's relief."""
     from .materials import TEX, image
     nodes, links = tree.nodes, tree.links
@@ -172,7 +173,8 @@ def _in_bedrock(tree, bsdf):
     nz.inputs["Detail"].default_value = 3.0
     links.new(bands.outputs[0], nz.inputs["Vector"])
     ramp = nodes.new("ShaderNodeValToRGB")
-    ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[0].color = 0.3, (0.74, 0.66, 0.55, 1.0)
+    lo = 1.0 - 0.38 * strength
+    ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[0].color = 0.3, (lo, lo * 0.9, lo * 0.76, 1.0)
     ramp.color_ramp.elements[1].position, ramp.color_ramp.elements[1].color = 0.7, (1.0, 0.97, 0.9, 1.0)
     links.new(nz.outputs["Fac"], ramp.inputs["Fac"])
     # the grain: the bedrock photograph's light and dark, box-projected at its own scale
@@ -202,7 +204,7 @@ def _in_bedrock(tree, bsdf):
     links.new(gain.outputs[0], m2.inputs["Color2"])
     links.new(m2.outputs["Color"], base)
     bmp = nodes.new("ShaderNodeBump")
-    bmp.inputs["Strength"].default_value = 0.35
+    bmp.inputs["Strength"].default_value = 0.8 * strength
     bmp.inputs["Distance"].default_value = 0.05
     links.new(hm.outputs["Color"], bmp.inputs["Height"])
     normal = bsdf.inputs["Normal"]
