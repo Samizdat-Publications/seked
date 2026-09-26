@@ -147,9 +147,21 @@ class Terrain:
         edge = np.concatenate([self.z(f, np.full_like(f, s * FAR_HALF), far=True) for s in (-1, 1)] +
                               [self.z(np.full_like(f, s * FAR_HALF), f, far=True) for s in (-1, 1)])
         zr = float(np.median(edge)) - 2.8
-        a, b = FAR_HALF - 300.0, HORIZON
-        verts = [(-a, -a, zr), (a, -a, zr), (a, a, zr), (-a, a, zr), (-b, -b, zr), (b, -b, zr), (b, b, zr), (-b, b, zr)]
-        faces = [(e, e + 4, (e + 1) % 4 + 4, (e + 1) % 4) for e in range(4)]
+        # Its inner rim follows the grid's own edge, a few metres under it, and rises or falls to the plain
+        # over the next few kilometres: at one height all round, the plain stood 28 m over the valley on the
+        # north edge, and the rays that passed under its lip met nothing, a black line across aerial views.
+        a, m, b = FAR_HALF - 300.0, FAR_HALF + 3000.0, HORIZON
+        k = int(round(2 * a / 300.0))
+        t = np.linspace(-1.0, 1.0, k + 1, dtype=np.float32)[:-1]
+        side = [np.stack([t, -np.ones_like(t)], 1), np.stack([np.ones_like(t), t], 1),
+                np.stack([-t, np.ones_like(t)], 1), np.stack([-np.ones_like(t), -t], 1)]
+        unit = np.concatenate(side)                        # the square's perimeter, counter-clockwise
+        zi = self.z(unit[:, 0] * a, unit[:, 1] * a, far=True) - 0.8 - 2.8
+        n = len(unit)
+        verts = [(float(u[0] * a), float(u[1] * a), float(z)) for u, z in zip(unit, zi)]
+        verts += [(float(u[0] * m), float(u[1] * m), zr) for u in unit]
+        verts += [(float(u[0] * b), float(u[1] * b), zr) for u in unit]
+        faces = [(r * n + i, (r + 1) * n + i, (r + 1) * n + (i + 1) % n, r * n + (i + 1) % n) for r in (0, 1) for i in range(n)]
         me = bpy.data.meshes.new("ground horizon")
         me.from_pydata(verts, [], faces)
         me.materials.append(material)

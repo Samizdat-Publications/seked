@@ -488,13 +488,39 @@ def weathered_casing(name="weathered casing"):
     t.link(geo.outputs["Normal"], nsep.inputs[0])
     ew = t.math("GREATER_THAN", t.math("ABSOLUTE", nsep.outputs["X"]), t.math("ABSOLUTE", nsep.outputs["Y"]))
     run = t.math("ADD", t.math("MULTIPLY", ew, sep.outputs["Y"]), t.math("MULTIPLY", t.math("SUBTRACT", 1.0, ew), sep.outputs["X"]))
-    for scale_run, scale_z, lo, hi, amt, hexc in ((0.7, 0.02, 0.5, 0.78, 0.55, "6e7163"), (0.18, 0.008, 0.52, 0.72, 0.35, "8a8a7a")):
-        sv = t.node("ShaderNodeCombineXYZ")
-        t.link(t.math("MULTIPLY", run, scale_run), sv.inputs[0])
-        t.link(t.math("MULTIPLY", sep.outputs["Z"], scale_z), sv.inputs[1])
-        streak = t.band(t.noise(sv.outputs[0], 1.0, 5.0, 0.62), lo, hi)
-        col = t.mix(t.math("MULTIPLY", streak, amt), col, hexlin(hexc))
     hb = _mesh_attr(t, "hb")
+    # The runs of rain (critic round 5: one scale of streak, full height, read as pencil hatching). Each
+    # streak is a stripe across the face at its own width, found by a one-dimensional noise along the
+    # face; it wavers a little as it runs down, begins at its own height (under a course where water
+    # sheeting off the face above gathered) and darkens as it runs down from there. Three widths: broad
+    # washes of tens of metres, runs of a few metres, threads under a metre.
+    waver = t.math("ADD", run, t.math("MULTIPLY", t.math("SUBTRACT", t.noise(pos, 0.06, 2.0), 0.5), 3.0))
+
+    def stripes(along, scale, lo, hi, key):
+        n = t.node("ShaderNodeTexNoise")
+        n.noise_dimensions = "1D"
+        n.inputs["Scale"].default_value = 1.0
+        n.inputs["Detail"].default_value = 3.0
+        n.inputs["Roughness"].default_value = 0.6
+        t.link(t.math("ADD", t.math("MULTIPLY", along, scale), key), n.inputs["W"])
+        return t.band(n.outputs["Fac"], lo, hi)
+
+    def begins(scale, key, top, span, fall):
+        """How far down its run a stripe is: 0 above where it begins, 1 once `fall` metres below it."""
+        n = t.node("ShaderNodeTexNoise")
+        n.noise_dimensions = "1D"
+        n.inputs["Scale"].default_value = 1.0
+        n.inputs["Detail"].default_value = 1.0
+        t.link(t.math("ADD", t.math("MULTIPLY", run, scale), key), n.inputs["W"])
+        start = t.math("ADD", t.math("MULTIPLY", n.outputs["Fac"], span), top)
+        return t.band(t.math("SUBTRACT", start, hb), 0.0, fall)
+
+    wash = t.math("MULTIPLY", stripes(run, 0.035, 0.48, 0.72, 3.0), begins(0.01, 11.0, 30.0, 110.0, 40.0))
+    col = t.mix(t.math("MULTIPLY", wash, 0.55), col, hexlin("8a887a"))
+    runs = t.math("MULTIPLY", stripes(waver, 0.3, 0.56, 0.78, 17.0), begins(0.06, 23.0, 10.0, 130.0, 25.0))
+    col = t.mix(t.math("MULTIPLY", runs, 0.65), col, hexlin("686b5d"))
+    threads = t.math("MULTIPLY", stripes(waver, 1.7, 0.6, 0.8, 41.0), begins(0.4, 37.0, 5.0, 140.0, 12.0))
+    col = t.mix(t.math("MULTIPLY", threads, 0.3), col, hexlin("5d6155"))
     foot = t.math("SUBTRACT", 1.0, t.band(hb, 0.0, 30.0))
     col = t.mix(t.math("MULTIPLY", foot, 0.45), col, hexlin("6f6c5c"))
     # black-green growth where the runs gather: in the streaks, thickest low down

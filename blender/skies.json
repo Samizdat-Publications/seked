@@ -9,5 +9,8 @@
     {"id": "citrus_orchard_puresky", "why": "A broken cumulus field at a low sun."},
     {"id": "farm_field_puresky", "why": "Heavy, dark-bellied cumulus: the long rains under a high sun."},
     {"id": "industrial_sunset_puresky", "why": "Grey broken cumulus over a low sun, rain falling from the cloud base: the long rains at dawn and dusk. It replaced drackenstein_quarry_puresky, whose jet contrails showed in the 7000 BCE sky."}
+,
+    {"id": "kloofendal_43d_clear_puresky", "why": "A clear sky with a few thin wisps under a high sun: Khufu's Giza, dry air rather than weather."},
+    {"id": "qwantani_late_afternoon_puresky", "why": "A clear sky veiled in haze at a low sun: Khufu's Giza in the dusty morning and evening light."}
   ]
 }

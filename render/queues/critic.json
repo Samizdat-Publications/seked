@@ -1,0 +1,102 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "shot": "overview",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/overview-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/panorama-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "sphinx-sequence",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/sphinx-sequence-first-time.png"
+  },
+  {
+   "state": "lion",
+   "shot": "overview",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/overview-lion.png"
+  },
+  {
+   "state": "lion",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/panorama-lion.png"
+  },
+  {
+   "state": "lion",
+   "shot": "sphinx-sequence",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/sphinx-sequence-lion.png"
+  },
+  {
+   "state": "built",
+   "shot": "overview",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/overview-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "panorama",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/panorama-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "sphinx-sequence",
+   "size": "1920x1080",
+   "samples": 64,
+   "out": "build/render/critic/sphinx-sequence-built.png"
+  },
+  {
+   "state": "lion",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/critic/station-east-lion.png"
+  },
+  {
+   "state": "first-time",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/critic/station-south-first-time.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/critic/station-sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/critic/station-temple-built.png"
+  },
+  {
+   "state": "first-time",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 64,
+   "out": "build/render/critic/station-north-first-time.png"
+  }
+ ]
+}

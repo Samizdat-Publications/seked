@@ -38,6 +38,7 @@ SKIES = os.path.join(data.REPO, "build", "skies")
 CLOUDS = {
     "tropical": dict(high="kloofendal_48d_partly_cloudy_puresky", low="kloppenheim_06_puresky", split=24.0),
     "showers": dict(high="farm_field_puresky", low="industrial_sunset_puresky", split=24.0),
+    "dry": dict(high="kloofendal_43d_clear_puresky", low="qwantani_late_afternoon_puresky", split=24.0),
 }
 
 
