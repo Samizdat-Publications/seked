@@ -18,8 +18,7 @@ stays a stand-in on disk (sphinx.MODEL_FOR), outside the sequence.
 the sheathed courses under it), `clouds` the sky's cloud field (sky.CLOUDS), `air`
 the era's aerosol and haze against the defaults, `haze_colour` the hazes' colours low to high,
 `mist` a layer of it lying on the valley floor (bottom, top, density, colour), and `grade` the
-camera's response (renderer.post, and its `look` and `exposure` offset on the view transform): look
-choices all.
+camera's response (renderer.post): look choices all.
 
 Everything a key names here is looked up by the modules; nothing else decides what
 exists in an era.
@@ -36,7 +35,7 @@ STATES = {
         temples=MEGALITHIC, temple_mode="megalithic", sphinx="lion-fresh",
         ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.5, 4.5),
         haze_colour=("e3ebef", "e9eff3", "eef3f6"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
-        grade=dict(bloom=0.1, tint=(0.96, 1.0, 1.02), saturation=1.06, look="AgX - Medium Low Contrast", exposure=0.1),
+        grade=dict(bloom=0.25, tint=(0.96, 1.0, 1.02), saturation=1.06),
         rubble=False, people=False, stones=False),
     "lion": dict(
         label="c. 7000 BCE", title="The long rains", honesty="claim", year=-6999,
@@ -44,14 +43,14 @@ STATES = {
         temples=MEGALITHIC, temple_mode="megalithic-weathered", sphinx="lion",
         ground="dry-savanna", valley="lush", water="flood", city=None, clouds="showers", air=(1.6, 6.0),
         haze_colour=("dfe3e2", "e6e9e8", "eef0ef"), mist=(-50.0, -34.0, 6e-4, "e7ebea"),
-        grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92, look="AgX - Medium Low Contrast", exposure=0.0),
+        grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92),
         rubble=False, people=False, stones=True),
     "built": dict(
         label="c. 2560 BCE", title="Khufu's Giza", honesty="reconstruction", year=-2559,
         pyramids="dressed", caps="gold", gild=11.0, queens="dressed", mastabas="dressed", causeway="corridor",
         temples=ALL_TEMPLES, temple_mode="built", sphinx="carved",
         ground="desert", valley="fields", water="harbour", city=None, clouds="dry",
-        air=(0.7, 4.5), grade=dict(bloom=0.25, tint=(1.04, 1.0, 0.93), saturation=1.04, look="AgX - Base Contrast", exposure=-0.15),
+        air=(0.7, 4.5), grade=dict(bloom=0.25, tint=(1.04, 1.0, 0.93), saturation=1.04),
         rubble=False, people=True, stones=False),
     "stripped": dict(
         label="c. 1800 CE", title="Stripped and buried", honesty="reconstruction", year=1800,

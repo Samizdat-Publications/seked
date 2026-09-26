@@ -142,13 +142,6 @@ class Plateau:
         renderer.configure(self.scene)
         if S.get("grade"):
             renderer.post(self.scene, S["grade"])
-            # the era's own tone curve and exposure offset (renderer.configure's are the defaults)
-            if S["grade"].get("look"):
-                try:
-                    self.scene.view_settings.look = S["grade"]["look"]
-                except TypeError:
-                    self.log(f"no view look {S['grade']['look']!r}; the default stands")
-            self.scene.view_settings.exposure += S["grade"].get("exposure", 0.0)
         self.exposure = self.scene.view_settings.exposure
         self.inside_lamps = None       # the interior is built the first time a view goes inside
         self.night = None              # and the star dome the first time a moment is a night

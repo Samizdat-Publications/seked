@@ -334,12 +334,7 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     col = t.mix(t.math("MULTIPLY", pit, 0.12), col, hexlin("8c7b62"))
     col = t.mix(t.math("MULTIPLY", joint, 0.5), col, hexlin("8f8168"))
     if contact:
-        # small buildings: grime where the walls meet the sand, and worn arrises (with `contact`), and
-        # sand lying on every flat roof (from the air they read as white cubes without it)
-        nz = t.node("ShaderNodeSeparateXYZ")
-        t.link(geo.outputs["Normal"], nz.inputs[0])
-        roof = t.math("MULTIPLY", t.band(nz.outputs["Z"], 0.8, 0.95), t.band(t.noise(pos, 0.3, 4.0, 0.6), 0.3, 0.6))
-        col = t.mix(t.math("MULTIPLY", roof, 0.75), col, hexlin("cdb38c"))
+        # small buildings: grime where the walls meet the sand, and worn arrises (with `contact`)
         col = _contact(t, col, bsdf, reach=1.2, amount=0.6)
     t.link(col, bsdf.inputs["Base Color"])
     t.link(t.math("ADD", rough, t.math("MULTIPLY", t.math("ADD", grime, pit), 0.2)), bsdf.inputs["Roughness"])
@@ -503,11 +498,6 @@ def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
     t.link(t.grey(t.math("MULTIPLY", t.attr("tone"), 173.0)), shifted.inputs[1])
     dust = t.band(t.noise(shifted.outputs[0], 0.6, 3.0, 0.6), 0.45, 0.8)
     col = t.mix(t.math("MULTIPLY", dust, 0.14), col, hexlin("c2ab86"))
-    # sand lying on every upward face, the tops of courses and of walls
-    nz = t.node("ShaderNodeSeparateXYZ")
-    t.link(geo.outputs["Normal"], nz.inputs[0])
-    lying = t.math("MULTIPLY", t.band(nz.outputs["Z"], 0.8, 0.95), t.band(t.noise(geo.outputs["Position"], 0.5, 4.0, 0.6), 0.35, 0.65))
-    col = t.mix(t.math("MULTIPLY", lying, 0.6), col, hexlin("cdb38c"))
     col = _contact(t, col, bsdf, reach=1.5, amount=0.8)
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = rough
@@ -725,8 +715,7 @@ def _field_patchwork(t, pos, under):
     grain = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", t.noise(rows.outputs[0], 1.0, 2.0), 0.5), 0.18), 1.0)
     crop = t.mix(1.0, crop, t.grey(grain), "MULTIPLY")
     col = t.mix(0.8, under, crop)
-    # the dykes a softer, narrower line than a map's outline (critic round 7: "flat green tiles with hard dark outlines")
-    return t.mix(t.math("MULTIPLY", cells.outputs["Fac"], 0.45), col, hexlin("4a5634"))
+    return t.mix(t.math("MULTIPLY", cells.outputs["Fac"], 0.75), col, hexlin("34472a"))
 
 
 def ground(state, displace=False):
@@ -768,7 +757,7 @@ def ground(state, displace=False):
     grain = t.math("ADD", t.math("MULTIPLY", grain, 1.35), 0.42)
     col = t.mix(m_grav, hexlin(sand_hex), hexlin(grav_hex))
     col = t.mix(t.math("MULTIPLY", m_chip, 0.55), col, hexlin(chip_hex))
-    col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.0025, 3.0), [(0.3, hexlin("e3d2b8")), (0.5, hexlin("ffffff")), (0.72, hexlin("f4eadb"))]), "MULTIPLY")
+    col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.0025, 3.0), [(0.3, hexlin("dcc39f")), (0.5, hexlin("ffffff")), (0.72, hexlin("f1e4cc"))]), "MULTIPLY")
     col = t.mix(1.0, col, t.ramp(t.noise(pos, 0.09, 4.0), [(0.35, hexlin("d8ccba")), (0.65, hexlin("ffffff"))]), "MULTIPLY")
     # From the air the desert is streaked along the wind, which comes from the north-north-west, and
     # patched with darker gravel sheets; both are look choices, made so a flight over it is not a blur.
@@ -789,11 +778,7 @@ def ground(state, displace=False):
     sep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, sep.inputs[0])
     # The valley floor: low ground east of the valley temples (x > 430 m), not the Sphinx's ditch.
-    # the edge of the cultivation wanders and frays over a few metres of height and tens along it,
-    # rather than following one contour like a knife cut
-    fray = t.math("MULTIPLY", t.math("SUBTRACT", t.noise(pos, 0.02, 4.0, 0.6), 0.5), 5.0)
-    valley = t.math("MULTIPLY", t.band(t.math("ADD", t.math("MULTIPLY", sep.outputs["Z"], -1.0), fray), 25.0, 32.0),
-                    t.band(sep.outputs["X"], 430.0, 520.0))
+    valley = t.math("MULTIPLY", t.band(t.math("MULTIPLY", sep.outputs["Z"], -1.0), 26.0, 31.0), t.band(sep.outputs["X"], 430.0, 520.0))
     # Where the builders' town stands (as built), its streets are packed earth, not the valley's fields.
     from . import town
     for x0, x1, y0, y1 in town.extents(state):
