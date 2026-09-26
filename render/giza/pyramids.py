@@ -86,6 +86,11 @@ def lay(P, courses, rng, core, casing, gran, spec):
             backing.append((zb, zt, max(W - 0.9, 0.2)))
         cased_course = all_casing or (cap_z is not None and zb > cap_z - 4.0) or zb < granite_to
         Wrow = Wc_m if cased_course else W
+        if all_casing and spec.get("flush_corners"):
+            # the corner stones end at the course's top, so no vertical end juts past the arris and the
+            # silhouette does not saw (critic round 11: "stair-stepped, like Lego"); a plane just behind
+            # the blocks fills the notch left below
+            Wrow = half - zt * cot
         if Wrow < 0.6:
             break
         inset = D_case if cased_course else 1.25
@@ -292,7 +297,7 @@ def khufu_north_face(coll, mats, mast=True):
 CASING_FOR = {"dressed": "restored casing", "pristine": "pristine casing", "weathered": "weathered casing"}
 # Eras whose casing is laid stone by stone rather than drawn on four planes (critic rounds 4 to 10: a
 # drawn face read as one flat value from every distance; the laid pyramids of today read as stone).
-BLOCK_CASING = {"dressed"}
+BLOCK_CASING = {"dressed", "weathered", "pristine"}
 CAP_FOR = {"gold": "gold", "electrum": "electrum"}
 
 
@@ -333,11 +338,13 @@ def build(state, rng, coll, mats, lib, log=print):
             ph = max(PYRAMIDION_HEIGHT, S.get("gild", PYRAMIDION_HEIGHT) * P["H"] / g1_H) if S["caps"] else PYRAMIDION_HEIGHT
             if mode in BLOCK_CASING:
                 key = P["key"]
-                spec = dict(LOOK[key], all_casing=True, casing_miss=0.0, top=P["H"] - ph)
+                spec = dict(LOOK[key], all_casing=True, casing_miss=0.0, top=P["H"] - ph, flush_corners=True)
                 if P.get("granite_to"):
                     spec["granite_to"] = P["granite_to"]
                 courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
                 backing_mesh(P, lay(P, courses, rng, core, casing, gran, spec), coll, mats["core behind"])
+                inner = dict(P, half=P["half"] - 0.04, H=P["H"] * (P["half"] - 0.04) / P["half"])
+                dressed_mesh(inner, inner["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"], arris=0.01)
             else:
                 # after the long rains the arrises have worn round (a look choice: 0.6 m against 5 cm)
                 dressed_mesh(P, P["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"],

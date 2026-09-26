@@ -97,6 +97,9 @@ class Plateau:
             "restored blocks": materials.dressed_blocks("restored blocks", [(0.0, "e0d8c6"), (0.05, "d8cfbb"), (0.5, "d3c8b0"),
                                                                             (0.93, "cdbfa4"), (1.0, "bfa988")],
                                                         rough=0.46, speckle=False, broad=0.12),
+            # the long rains' casing laid as blocks: worn round, streaked, grimed in the joints
+            "weathered blocks": materials.weathered_casing("weathered blocks", instanced=True),
+            "pristine blocks": materials.polished_casing("pristine blocks", instanced=True),
             "bedrock": sphinx.bedrock_material(),
         }
         self.lib = variants.library(self.library, self.mats, state, rng)

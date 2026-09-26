@@ -365,7 +365,7 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     return mat
 
 
-def polished_casing(name="pristine casing"):
+def polished_casing(name="pristine casing", instanced=False):
     """
     The claim's first casing (Stewart, 2026-09-25: "super pristine, almost high tech"): stone
     dressed and polished past anything known from the Old Kingdom, the joints finer than the
@@ -381,9 +381,13 @@ def polished_casing(name="pristine casing"):
     pos = geo.outputs["Position"]
     # a shade under white, so the sun and the mirrored sky have room to show on it
     col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("cbc6ba")), (0.7, hexlin("d4d0c5"))])
-    # slabs of one size in perfect courses, the joints a ruled line: from afar a faint grid, the mark
-    # of an engineered surface rather than a laid one
-    joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.022)
+    if instanced:
+        # laid as blocks (pyramids.BLOCK_CASING): the joints are the blocks' own, each stone's tone its own
+        joint, stone = 0.0, t.attr("tone")
+    else:
+        # slabs of one size in perfect courses, the joints a ruled line: from afar a faint grid, the mark
+        # of an engineered surface rather than a laid one
+        joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.022)
     shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.05), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
     col = t.mix(t.math("MULTIPLY", joint, 0.55), col, hexlin("7d7568"))
@@ -416,8 +420,16 @@ def polished_casing(name="pristine casing"):
     bmp.inputs["Strength"].default_value = 1.0
     bmp.inputs["Distance"].default_value = 1.0
     t.link(h, bmp.inputs["Height"])
-    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.05, undulation=0.3, foot=_mesh_attr(t, "hb"),
-                         foot_hex="6f6a4e")
+    if instanced:
+        # hairline joints, faintly shadowed, the arrises barely eased: near seamless
+        col = _contact(t, col, bsdf, reach=0.3, amount=0.35, dirt="8f8a7e", arris=0.004)
+        t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
+        wsep = t.node("ShaderNodeSeparateXYZ")
+        t.link(pos, wsep.inputs[0])
+        foot = t.math("SUBTRACT", wsep.outputs["Z"], t.math("MULTIPLY", t.math("LESS_THAN", wsep.outputs["X"], -160.0), 10.5))
+    else:
+        foot = _mesh_attr(t, "hb")
+    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.05, undulation=0.3, foot=foot, foot_hex="6f6a4e")
     t.link(col, bsdf.inputs["Base Color"])
     t.link(normal, bsdf.inputs["Normal"])
     t.link(normal, bsdf.inputs["Coat Normal"])
@@ -520,7 +532,7 @@ def dressed_blocks(name, stops_hex, rough=0.4, speckle=True, broad=0.0):
     return mat
 
 
-def weathered_casing(name="weathered casing"):
+def weathered_casing(name="weathered casing", instanced=False):
     """
     The First Time's casing after three thousand years of rain (the long rains, Schoch's reading):
     the same ruled slabs, the polish gone to a matte skin, the joints opened a little, and the faces
@@ -536,7 +548,11 @@ def weathered_casing(name="weathered casing"):
     pos = geo.outputs["Position"]
     # a greyer, darker skin than the First Time's, so the long rains read from any distance
     col = t.ramp(t.noise(pos, 0.03, 3.0), [(0.3, hexlin("bdb6a6")), (0.7, hexlin("b1a996"))])
-    joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.03)
+    if instanced:
+        # laid as blocks (pyramids.BLOCK_CASING): the joints are real, each stone's tone its own
+        joint, stone = 0.0, t.attr("tone")
+    else:
+        joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.03)
     shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.1), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
     sep = t.node("ShaderNodeSeparateXYZ")
@@ -545,7 +561,14 @@ def weathered_casing(name="weathered casing"):
     t.link(geo.outputs["Normal"], nsep.inputs[0])
     ew = t.math("GREATER_THAN", t.math("ABSOLUTE", nsep.outputs["X"]), t.math("ABSOLUTE", nsep.outputs["Y"]))
     run = t.math("ADD", t.math("MULTIPLY", ew, sep.outputs["Y"]), t.math("MULTIPLY", t.math("SUBTRACT", 1.0, ew), sep.outputs["X"]))
-    hb = _mesh_attr(t, "hb")
+    if instanced:
+        # instances carry no `hb`: the height over the pyramid's base from world height, Khafre's and
+        # Menkaure's bases standing 10 and 12 m over Khufu's (to about a metre and a half)
+        wsep = t.node("ShaderNodeSeparateXYZ")
+        t.link(pos, wsep.inputs[0])
+        hb = t.math("SUBTRACT", wsep.outputs["Z"], t.math("MULTIPLY", t.math("LESS_THAN", wsep.outputs["X"], -160.0), 10.5))
+    else:
+        hb = _mesh_attr(t, "hb")
     # The runs of rain (critic round 5: one scale of streak, full height, read as pencil hatching). Each
     # streak is a stripe across the face at its own width, found by a one-dimensional noise along the
     # face; it wavers a little as it runs down, begins at its own height (under a course where water
@@ -592,7 +615,11 @@ def weathered_casing(name="weathered casing"):
     bmp.inputs["Strength"].default_value = 0.3
     bmp.inputs["Distance"].default_value = 0.02
     t.link(t.math("ADD", t.math("MULTIPLY", joint, -1.0), t.math("MULTIPLY", t.noise(pos, 2.0, 4.0), 0.4)), bmp.inputs["Height"])
-    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.07, undulation=0.3, foot=hb, foot_hex="5a5443")
+    if instanced:
+        col = _contact(t, col, bsdf, reach=1.0, amount=0.7, dirt="4f4a3c", arris=0.05)
+        t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
+    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.07, undulation=0.3 if not instanced else 0.0001,
+                         foot=hb, foot_hex="5a5443")
     t.link(col, bsdf.inputs["Base Color"])
     t.link(normal, bsdf.inputs["Normal"])
     return mat
