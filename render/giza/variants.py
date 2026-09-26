@@ -147,7 +147,7 @@ def library(parent, mats, state, rng):
         # as built the casing is the restored stone laid whole (pyramids.BLOCK_CASING); otherwise the ragged remnant
         worn = state == "lion"
         fresh = state == "first-time"
-        lib["casing"] = collection(parent, "v casing", [block(300 + i, rounding=0.07 if worn else (0.004 if fresh else 0.012),
+        lib["casing"] = collection(parent, "v casing", [block(300 + i, rounding=0.07 if worn else (0.0015 if fresh else 0.012),
                                                               erosion=0.02 if worn else (0.0 if fresh else 0.002),
                                                               chips=1 if worn else 0, cuts=4 if worn else 2, shear=s)
                                                         for i, s in enumerate(SHEARS)],

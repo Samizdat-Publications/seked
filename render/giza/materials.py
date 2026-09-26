@@ -422,7 +422,7 @@ def polished_casing(name="pristine casing", instanced=False):
     t.link(h, bmp.inputs["Height"])
     if instanced:
         # hairline joints, faintly shadowed, the arrises barely eased: near seamless
-        col = _contact(t, col, bsdf, reach=0.15, amount=0.1, dirt="b5afa2", arris=0.002)
+        col = _contact(t, col, bsdf, reach=0.1, amount=0.0, dirt="b5afa2", arris=0.0005)   # no drawn joint at all (round 14: "cobblestones")
         t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
         wsep = t.node("ShaderNodeSeparateXYZ")
         t.link(pos, wsep.inputs[0])
