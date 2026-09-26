@@ -151,8 +151,12 @@ def library(parent, mats, state, rng):
     lib["rock"] = collection(parent, "v rock", [rock(500 + i) for i in range(12)], mats["rock"])
     lib["dressed granite"] = collection(parent, "v dressed granite", [block(600 + i, rounding=0.012, erosion=0.002, chips=0, cuts=2, smooth=False)
                                                                       for i in range(N_DRESSED)], mats["granite blocks"])
-    lib["dressed limestone"] = collection(parent, "v dressed limestone", [block(620 + i, rounding=0.012, erosion=0.002, chips=0, cuts=2, smooth=False)
-                                                                          for i in range(N_DRESSED)], mats["limestone blocks"])
+    # After the long rains the dressed walls are worn and grey like the casing (a look choice).
+    worn = state == "lion"
+    lib["dressed limestone"] = collection(parent, "v dressed limestone",
+                                          [block(620 + i, rounding=0.06 if worn else 0.012, erosion=0.03 if worn else 0.002,
+                                                 chips=2 if worn else 0, cuts=4 if worn else 2, smooth=worn)
+                                           for i in range(N_DRESSED)], mats["limestone blocks worn" if worn else "limestone blocks"])
     lib["box"] = collection(parent, "v box", [block(700, rounding=0.0, erosion=0.0, chips=0, cuts=1, base_zero=True, smooth=False)], mats["city"])
     lib["mud box"] = collection(parent, "v mud box", [block(710 + i, rounding=0.04, erosion=0.02, chips=0, cuts=4, base_zero=True)
                                                       for i in range(3)], mats["mudbrick"])

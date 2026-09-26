@@ -437,11 +437,16 @@ def weathered_casing(name="weathered casing"):
         streak = t.band(t.noise(sv.outputs[0], 1.0, 5.0, 0.62), lo, hi)
         col = t.mix(t.math("MULTIPLY", streak, amt), col, hexlin(hexc))
     hb = _mesh_attr(t, "hb")
-    foot = t.math("SUBTRACT", 1.0, t.band(hb, 0.0, 25.0))
-    col = t.mix(t.math("MULTIPLY", foot, 0.4), col, hexlin("7d7a68"))
+    foot = t.math("SUBTRACT", 1.0, t.band(hb, 0.0, 30.0))
+    col = t.mix(t.math("MULTIPLY", foot, 0.45), col, hexlin("6f6c5c"))
+    # black-green growth where the runs gather: in the streaks, thickest low down
+    growth = t.band(t.noise(pos, 0.12, 4.0, 0.6), 0.5, 0.7)
+    growth = t.math("MULTIPLY", growth, t.math("ADD", t.math("MULTIPLY", foot, 0.7), 0.2))
+    col = t.mix(t.math("MULTIPLY", growth, 0.7), col, hexlin("3b4034"))
     col = t.mix(t.math("MULTIPLY", joint, 0.6), col, hexlin("5f5b50"))
     t.link(col, bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = 0.78
+    # a satin wetness, the polish long gone
+    bsdf.inputs["Roughness"].default_value = 0.6
     bmp = t.node("ShaderNodeBump")
     bmp.inputs["Strength"].default_value = 0.3
     bmp.inputs["Distance"].default_value = 0.02

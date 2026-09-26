@@ -106,4 +106,39 @@ def build(state, rng, coll, mats, lib, log=print):
             pillars.add((px, py, z + thick + (HEIGHT - 1.0) / 2), (0.0, 0.0, 0.0), (PILLAR_SIDE, PILLAR_SIDE, HEIGHT - 1.0),
                         rng.randrange(N_DRESSED), rng.random(), 0.0)
     pillars.emit("Khufu's mortuary temple pillars", lib["dressed granite"], coll, log)
-    log(f"Khufu's mortuary temple: {laid} wall blocks and a colonnade on the basalt court")
+    # The colonnade carries granite architraves, and a limestone roof spans from them to the walls, so
+    # the court is an open square ringed by a shaded walk (look choices after Lauer's reconstruction).
+    top = z + thick + HEIGHT - 1.0
+    beam = 1.0
+    ax0, ax1, ay0, ay1 = inner[0] - PILLAR_SIDE / 2, inner[1] + PILLAR_SIDE / 2, inner[2] - PILLAR_SIDE / 2, inner[3] + PILLAR_SIDE / 2
+    for (cx, cy, sx, sy) in (((ax0 + ax1) / 2, ay0 + PILLAR_SIDE / 2, ax1 - ax0, PILLAR_SIDE),
+                             ((ax0 + ax1) / 2, ay1 - PILLAR_SIDE / 2, ax1 - ax0, PILLAR_SIDE),
+                             (ax0 + PILLAR_SIDE / 2, (ay0 + ay1) / 2, PILLAR_SIDE, ay1 - ay0),
+                             (ax1 - PILLAR_SIDE / 2, (ay0 + ay1) / 2, PILLAR_SIDE, ay1 - ay0)):
+        _box("Khufu's mortuary temple architrave", (cx, cy, top + beam / 2), (sx, sy, beam), mats["dressed granite"], coll)
+    slab = 0.8
+    rz = top + beam + slab / 2
+    px0, px1, py0, py1 = min(xs), max(xs), min(ys), max(ys)
+    for (cx, cy, sx, sy) in (((px0 + px1) / 2, (py0 + ay0 + PILLAR_SIDE) / 2, px1 - px0, ay0 + PILLAR_SIDE - py0),
+                             ((px0 + px1) / 2, (ay1 - PILLAR_SIDE + py1) / 2, px1 - px0, py1 - ay1 + PILLAR_SIDE),
+                             ((px0 + ax0 + PILLAR_SIDE) / 2, (ay0 + ay1) / 2, ax0 + PILLAR_SIDE - px0, ay1 - ay0),
+                             ((ax1 - PILLAR_SIDE + px1) / 2, (ay0 + ay1) / 2, px1 - ax1 + PILLAR_SIDE, ay1 - ay0)):
+        _box("Khufu's mortuary temple roof", (cx, cy, rz), (sx, sy, slab), mats["limestone flat"], coll)
+    log(f"Khufu's mortuary temple: {laid} wall blocks and a roofed colonnade round the basalt court")
+
+
+def _box(name, centre, size, mat, coll):
+    import bmesh
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.append(mat)
+    ob = bpy.data.objects.new(name, me)
+    coll.objects.link(ob)
+    ob.location = centre
+    ob.scale = size
+    bev = ob.modifiers.new("arris", "BEVEL")
+    bev.width = 0.03
+    return ob

@@ -120,7 +120,7 @@ FOREST = (240.0, 0.72)
 LOW_FOREST = (300.0, 0.82)
 PALMS = (130.0, 0.16)
 FRAME = (16.0, 160.0)      # the ring of forest round each eye on the ground, metres from it (`frame`)
-WOODS = (240.0, 0.25)      # the lion's open woods
+WOODS = (240.0, 0.5)       # the long rains' woods: half the plateau under trees
 
 # LOOK CHOICES: each era's planting. `cover` is the grass cover by zone (0..1) with the share
 # of it left bare in patches of about `wavelength` metres, and, where `shade` (wavelength, share,
@@ -222,13 +222,13 @@ STATES = {
     # stands, lone giant figs; palms, figs and broadleaf trees thicker in the low ground, papyrus on
     # the shore and a few lilies in the shallows. Thinner and drier than the First Time throughout.
     "lion": dict(
-        cover=dict(plateau=0.72, lowland=0.95, bare=0.3, wavelength=55.0),
-        tint=dict(grass=("62783a", "7a8a47"), strength=0.82, soil=("9a8460", "ac9670"), mottle=(0.06, 0.35)),
+        cover=dict(plateau=0.85, lowland=0.95, bare=0.18, wavelength=55.0),
+        tint=dict(grass=("56703a", "6c8246"), strength=0.85, soil=("7d6d52", "8e7d60"), mottle=(0.06, 0.35)),
         near=dict(per_m2=14.0, falloff=30.0, dry=(0.05, 0.4)),
         plants=[
-            dict(kind="fig", zone="plateau", per_ha=3.0, height=(12.0, 20.0), clump=WOODS, patch=(80.0, 0.6), far=True),
-            dict(kind="broadleaf", zone="plateau", per_ha=6.0, height=(6.0, 12.0), clump=WOODS, far=True),
-            dict(kind="acacia", zone="plateau", per_ha=1.6, height=(4.5, 9.0), clump=(240.0, 0.45), far=True),
+            dict(kind="fig", zone="plateau", per_ha=7.0, height=(12.0, 20.0), clump=WOODS, patch=(80.0, 0.6), far=True),
+            dict(kind="broadleaf", zone="plateau", per_ha=11.0, height=(6.0, 12.0), clump=WOODS, far=True),
+            dict(kind="acacia", zone="plateau", per_ha=0.25, height=(4.5, 9.0), clump=(240.0, 0.45), far=True),
             dict(kind="broadleaf", zone="plateau", per_ha=0.5, height=(6.0, 11.0), far=True),
             dict(kind="fig", zone="plateau", per_ha=0.08, height=(12.0, 18.0), far=True),
             dict(kind="tree", zone="plateau", per_ha=0.3, height=(6.0, 10.0), far=True),

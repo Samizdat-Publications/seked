@@ -181,7 +181,7 @@ def backing_mesh(P, backing, coll, mat):
     return mesh_object(P["name"] + " core behind", verts, faces, coll, (mat,))
 
 
-def dressed_mesh(P, top, granite_to, coll, m_case, m_gran):
+def dressed_mesh(P, top, granite_to, coll, m_case, m_gran, arris=0.05):
     """A cased pyramid: four dressed faces to `top`, granite below `granite_to`, sharp arrises."""
     cx, cy, base, half, H = P["cx"], P["cy"], P["base"], P["half"], P["H"]
     cot = half / H
@@ -211,7 +211,7 @@ def dressed_mesh(P, top, granite_to, coll, m_case, m_gran):
     hb = ob.data.attributes.new("hb", "FLOAT", "POINT")
     hb.data.foreach_set("value", [v[2] - base for v in verts])
     bev = ob.modifiers.new("arris", "BEVEL")
-    bev.width = 0.05
+    bev.width = arris
     bev.segments = 2
     return ob
 
@@ -229,6 +229,26 @@ def pyramidion(P, coll, mat, ph=PYRAMIDION_HEIGHT):
     coll.objects.link(ob)
     ob.location = (P["cx"], P["cy"], P["base"] + P["H"] - ph / 2)
     return ob
+
+
+def fallen(pyramids, rng, casing, log=print):
+    """
+    Casing stones the long rains have loosened, lying at the foot of each face, most within a few
+    metres and a few rolled further (a look choice: about one stone for every four metres of side).
+    """
+    n = 0
+    for P in pyramids:
+        half, cx, cy, base = P["half"], P["cx"], P["cy"], P["base"]
+        for f in range(4):
+            for _ in range(int(2 * half / 4.0)):
+                u = rng.uniform(-half + 3.0, half - 3.0)
+                v = half + 0.4 + rng.expovariate(1.0 / 3.5)
+                x, y = to_world(P, f, u, v)
+                L, D, h = rng.uniform(1.0, 1.9), rng.uniform(0.9, 1.5), rng.uniform(0.6, 1.1)
+                casing.add((x, y, base + h * 0.35), (rng.gauss(0, 0.25), rng.gauss(0, 0.25), rng.uniform(0, 6.3)),
+                           (L, D, h), rng.randrange(len(SHEARS)), rng.random(), 0.6 + 0.4 * rng.random())
+                n += 1
+    log(f"pyramids: {n} casing stones fallen at the feet")
 
 
 def khufu_north_face(coll, mats, mast=True):
@@ -308,8 +328,13 @@ def build(state, rng, coll, mats, lib, log=print):
         g1_H = data.PYRAMIDS["g1"]["H"]
         for P in main:
             ph = max(PYRAMIDION_HEIGHT, S.get("gild", PYRAMIDION_HEIGHT) * P["H"] / g1_H) if S["caps"] else PYRAMIDION_HEIGHT
-            dressed_mesh(P, P["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"])
+            # after the long rains the arrises have worn round (a look choice: 0.6 m against 5 cm)
+            dressed_mesh(P, P["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"],
+                         arris=0.6 if mode == "weathered" else 0.05)
             pyramidion(P, coll, mats[CAP_FOR[S["caps"]]] if S["caps"] else face, ph)
+        if mode == "weathered":
+            import random
+            fallen(main, random.Random(71), casing, log)        # its own generator: the rest of the era is unchanged
     if queens_mode == "ruin":
         for P in queens:
             laid(P)

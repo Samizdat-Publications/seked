@@ -88,6 +88,9 @@ class Plateau:
             # Tura and Mokattam limestone, dressed: white with a faint drift from block to block.
             "limestone blocks": materials.dressed_blocks("limestone blocks", [(0.0, "e6dfd1"), (0.5, "efe9dd"), (1.0, "ddd4c3")],
                                                          rough=0.45, speckle=False),
+            # the same walls after the long rains: grey, streaked dark, a stone a shade off the next
+            "limestone blocks worn": materials.dressed_blocks("limestone blocks worn", [(0.0, "a9a391"), (0.4, "bdb6a3"),
+                                                              (0.7, "979181"), (1.0, "b3ab96")], rough=0.7, speckle=False),
             "bedrock": sphinx.bedrock_material(),
         }
         self.lib = variants.library(self.library, self.mats, state, rng)
