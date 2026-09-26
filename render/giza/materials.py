@@ -350,7 +350,11 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
         t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
     normal = bmp.outputs["Normal"]
     if foot:
-        col, normal = _broad(t, pos, col, normal, amount=0.08, undulation=0.2)
+        # weathering at the scale a camera reads (critic round 7: the faces still one value): broad
+        # tone of 16 per cent either way, and stains of dust and old water in organic drifts
+        stain = t.band(t.noise(pos, 0.05, 5.0, 0.62), 0.52, 0.72)
+        col = t.mix(t.math("MULTIPLY", stain, 0.35), col, hexlin("a8977a"))
+        col, normal = _broad(t, pos, col, normal, amount=0.16, undulation=0.2)
         t.link(col, bsdf.inputs["Base Color"])
     t.link(normal, bsdf.inputs["Normal"])
     return mat
@@ -514,7 +518,8 @@ def weathered_casing(name="weathered casing"):
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     geo = t.node("ShaderNodeNewGeometry")
     pos = geo.outputs["Position"]
-    col = t.ramp(t.noise(pos, 0.03, 3.0), [(0.3, hexlin("d3ccbc")), (0.7, hexlin("c9c0ad"))])
+    # a greyer, darker skin than the First Time's, so the long rains read from any distance
+    col = t.ramp(t.noise(pos, 0.03, 3.0), [(0.3, hexlin("bdb6a6")), (0.7, hexlin("b1a996"))])
     joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.03)
     shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.1), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")

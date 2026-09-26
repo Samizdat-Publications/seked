@@ -54,6 +54,11 @@
       "solar": 13.75,
       "label": "early afternoon, midwinter, the sun low in the south-south-west: the south faces lit, the east faces in shade, high enough to clear the walls"
     },
+    "april-glint": {
+      "date": "04-01",
+      "solar": 14.75,
+      "label": "mid-afternoon, early April, the sun in the west-south-west at 44 degrees: its reflection off the south faces reaches the aerial camera over the valley, the east faces in shade"
+    },
     "sphinx-noon": {
       "date": "11-15",
       "solar": 12.0,
