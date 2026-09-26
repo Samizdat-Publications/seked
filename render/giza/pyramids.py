@@ -100,7 +100,10 @@ def lay(P, courses, rng, core, casing, gran, spec):
             u = -Wrow if full else -(Wrow - inset)
             u_end = Wrow if full else (Wrow - inset)
             while u < u_end - 0.05:
-                L = min(max(rng.lognormvariate(math.log(1.25 * (0.65 + 0.35 * h)), 0.33), 0.55), 2.8)
+                # casing stones run longer than core blocks (1.5 to 2.5 m at Giza); at core lengths a cased face
+                # read as a wall of bricks (critic round 15)
+                stretch = 1.6 if cased_course and all_casing else 1.0
+                L = min(max(rng.lognormvariate(math.log(1.25 * stretch * (0.65 + 0.35 * h)), 0.33), 0.55), 2.8 * stretch)
                 if u + L > u_end - 0.4:
                     L = u_end - u
                 uc = u + L / 2
@@ -297,7 +300,9 @@ def khufu_north_face(coll, mats, mast=True):
 CASING_FOR = {"dressed": "restored casing", "pristine": "pristine casing", "weathered": "weathered casing"}
 # Eras whose casing is laid stone by stone rather than drawn on four planes (critic rounds 4 to 10: a
 # drawn face read as one flat value from every distance; the laid pyramids of today read as stone).
-BLOCK_CASING = {"dressed", "weathered", "pristine"}
+# The First Time stays one drawn, polished plane: laid as blocks it read as shingles and cobblestones in
+# every critic round (12 to 15), against "near seamless".
+BLOCK_CASING = {"dressed", "weathered"}
 CAP_FOR = {"gold": "gold", "electrum": "electrum"}
 
 
