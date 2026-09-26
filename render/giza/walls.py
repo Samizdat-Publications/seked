@@ -118,8 +118,20 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
                     bl = s1 - s
                 sc = s + bl / 2
                 s += bl
-                if any(abs(sc - a) < hw + bl / 2 - 0.05 and zb < oh for a, hw, oh in doors):
+                # A block that runs into a doorway below its head is cut back to the jamb, so every course
+                # ends at the same line; dropped whole, the courses beside a door ended raggedly and the
+                # blocks above a dropped one hung in the air (critic round 11).
+                lo, hi = sc - bl / 2, sc + bl / 2
+                for a, hw, oh in doors:
+                    if zb >= oh or hi <= a - hw or lo >= a + hw:
+                        continue
+                    if a - hw - lo >= hi - (a + hw):
+                        hi = a - hw
+                    else:
+                        lo = a + hw
+                if hi - lo < 0.35:
                     continue
+                sc, bl = (lo + hi) / 2, hi - lo
                 if ruin is not None:
                     keep = ruin[0] + (ruin[1] - ruin[0]) * (0.5 + 0.5 * noise.noise(Vector(((perimeter_s + sc) * 0.06 + seed, 0.0, 0.0))))
                     if zb + ch > keep * height + 0.01:
