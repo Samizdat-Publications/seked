@@ -21,7 +21,7 @@ sys.path.insert(0, HERE)
 from giza import data  # noqa: E402
 from giza.scene import Plateau  # noqa: E402
 
-DEFAULTS = {"station": {"size": "4096x2048", "samples": 48}, "shot": {"size": "1920x1080", "samples": 128}}
+DEFAULTS = {"station": {"size": "4096x2048", "samples": 96}, "shot": {"size": "1920x1080", "samples": 128}}
 
 
 def parse(argv):

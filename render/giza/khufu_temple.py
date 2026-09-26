@@ -45,27 +45,34 @@ def flats(state):
 
 
 def basalt_material():
+    """
+    Khufu's basalt floor: slabs of irregular outline fitted tight, the joints dark hairlines, sand
+    blown into them and lying in drifts over the floor, the stone dulled in patches and polished
+    by feet elsewhere (look choices; critic round 5 read a regular grid with bright grout as tile).
+    """
     mat = bpy.data.materials.new("basalt")
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
     bsdf = t.node("ShaderNodeBsdfPrincipled")
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     geo = t.node("ShaderNodeNewGeometry")
-    sep = t.node("ShaderNodeSeparateXYZ")
-    t.link(geo.outputs["Position"], sep.inputs[0])
-    uv = t.node("ShaderNodeCombineXYZ")
-    t.link(sep.outputs["X"], uv.inputs[0])
-    t.link(sep.outputs["Y"], uv.inputs[1])
-    br = t.node("ShaderNodeTexBrick")
-    br.inputs["Scale"].default_value = 1.0
-    br.inputs["Mortar Size"].default_value = 0.012
-    br.inputs["Brick Width"].default_value = 1.3
-    br.inputs["Row Height"].default_value = 0.9
-    t.link(uv.outputs[0], br.inputs["Vector"])
-    base = t.ramp(t.noise(geo.outputs["Position"], 0.6, 4.0), [(0.3, hexlin("2a2826")), (0.7, hexlin("3a3632"))])
-    col = t.mix(t.math("MULTIPLY", br.outputs["Fac"], 0.5), base, hexlin("6b6358"))
+    pos = geo.outputs["Position"]
+    slabs = t.node("ShaderNodeTexVoronoi")
+    slabs.feature = "DISTANCE_TO_EDGE"
+    slabs.inputs["Scale"].default_value = 0.8
+    t.link(pos, slabs.inputs["Vector"])
+    tone = t.node("ShaderNodeTexVoronoi")
+    tone.inputs["Scale"].default_value = 0.8
+    t.link(pos, tone.inputs["Vector"])
+    joint = t.math("SUBTRACT", 1.0, t.band(slabs.outputs["Distance"], 0.0, 0.006))
+    base = t.ramp(tone.outputs["Distance"], [(0.0, hexlin("2c2a27")), (0.6, hexlin("35322e")), (1.0, hexlin("2a2724"))])
+    base = t.mix(1.0, base, t.ramp(t.noise(pos, 3.0, 4.0), [(0.3, hexlin("d8d8d8")), (0.7, hexlin("ffffff"))]), "MULTIPLY")
+    sand = t.band(t.noise(pos, 0.15, 4.0, 0.6), 0.55, 0.78)
+    col = t.mix(t.math("MULTIPLY", sand, 0.55), base, hexlin("a8916c"))
+    col = t.mix(t.math("MULTIPLY", joint, 0.7), col, hexlin("1c1a18"))
     t.link(col, bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = 0.55
+    t.link(t.math("ADD", 0.32, t.math("MULTIPLY", t.math("ADD", sand, t.band(t.noise(pos, 0.5, 2.0), 0.4, 0.7)), 0.3)),
+           bsdf.inputs["Roughness"])
     return mat
 
 

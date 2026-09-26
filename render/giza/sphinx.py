@@ -41,6 +41,8 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
 CARVED = {"sphinx-lion-pristine"}
+# Painted stand-ins whose generated colours come out saturated like plastic: their saturation (a look choice).
+WEATHERED_PAINT = {"sphinx-carved": 0.62}
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
@@ -126,6 +128,14 @@ def statue(state, coll, log=print):
                     warm.inputs["Color2"].default_value = WARMED[model_id]
                     tree.links.new(src, warm.inputs["Color1"])
                     tree.links.new(warm.outputs["Color"], base)
+                if model_id in WEATHERED_PAINT and base.is_linked:
+                    # paint four hundred years in the sun: chalky and faded, not a toy's gloss
+                    src = base.links[0].from_socket
+                    fade = tree.nodes.new("ShaderNodeHueSaturation")
+                    fade.inputs["Saturation"].default_value = WEATHERED_PAINT[model_id]
+                    fade.inputs["Value"].default_value = 0.95
+                    tree.links.new(src, fade.inputs["Color"])
+                    tree.links.new(fade.outputs["Color"], base)
                 if model_id in CARVED and base.is_linked:
                     _in_bedrock(tree, nd)
                 if model_id in TINTED and base.is_linked:

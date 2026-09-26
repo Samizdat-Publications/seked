@@ -43,6 +43,12 @@ def configure(scene, exposure=-3.8):
         c.denoising_use_gpu = True
     except Exception:
         pass
+    # the best OIDN offers: at a station's 48 samples its default left foliage smeared like watercolour
+    for k, v in (("denoising_prefilter", "ACCURATE"), ("denoising_quality", "HIGH")):
+        try:
+            setattr(c, k, v)
+        except Exception:
+            pass
     c.max_bounces = 6
     c.diffuse_bounces = 3
     c.glossy_bounces = 2

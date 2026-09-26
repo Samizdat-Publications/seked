@@ -212,6 +212,32 @@ def coursed_casing(name, colours=("ece5d8", "f3eee5"), rough=0.55, course=0.85, 
     return mat
 
 
+def _broad(t, pos, col, bsdf_normal_in, amount=0.07, undulation=0.25, foot=None, foot_hex="7d6a4f"):
+    """
+    What a pyramid face shows at the scale a camera sees it (critic rounds 4 to 6: every face read as
+    one flat value, its stone detail finer than a pixel): tone varying over thirty metres and over
+    eight, by `amount` either way; the face undulating by a degree or so over tens of metres
+    (`undulation`, metres of height), so a sheen or the sky in it varies across the face as it does
+    on any real cladding; and with `foot` (the mesh's `hb`) soil splashed and grimed onto the lowest
+    few metres, so the monument stands on the ground rather than on it. Returns (colour, normal).
+    """
+    big = t.math("SUBTRACT", t.noise(pos, 0.033, 3.0, 0.55), 0.5)
+    mid = t.math("SUBTRACT", t.noise(pos, 0.12, 3.0, 0.55), 0.5)
+    k = t.math("ADD", 1.0, t.math("ADD", t.math("MULTIPLY", big, 2.0 * amount), t.math("MULTIPLY", mid, amount)))
+    col = t.mix(1.0, col, t.grey(k), "MULTIPLY")
+    if foot is not None:
+        splash = t.math("SUBTRACT", 1.0, t.band(foot, 0.0, 3.5))
+        splash = t.math("MULTIPLY", splash, t.math("ADD", 0.55, t.math("MULTIPLY", t.noise(pos, 0.8, 3.0), 0.45)))
+        col = t.mix(t.math("MULTIPLY", splash, 0.7), col, hexlin(foot_hex))
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 1.0
+    bmp.inputs["Distance"].default_value = undulation
+    t.link(t.noise(pos, 0.025, 2.0, 0.5), bmp.inputs["Height"])
+    if bsdf_normal_in is not None:
+        t.link(bsdf_normal_in, bmp.inputs["Normal"])
+    return col, bmp.outputs["Normal"]
+
+
 def _mesh_attr(t, name):
     """A float attribute stored on the mesh's vertices (not the instancer's)."""
     a = t.node("ShaderNodeAttribute", attribute_type="GEOMETRY", attribute_name=name)
@@ -322,7 +348,11 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     t.link(h, bmp.inputs["Height"])
     if contact:
         t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
-    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    normal = bmp.outputs["Normal"]
+    if foot:
+        col, normal = _broad(t, pos, col, normal, amount=0.08, undulation=0.2)
+        t.link(col, bsdf.inputs["Base Color"])
+    t.link(normal, bsdf.inputs["Normal"])
     return mat
 
 
@@ -348,7 +378,6 @@ def polished_casing(name="pristine casing"):
     shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.05), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
     col = t.mix(t.math("MULTIPLY", joint, 0.55), col, hexlin("7d7568"))
-    t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = 0.3
     bsdf.inputs["Specular IOR Level"].default_value = 0.5
     # the polish: a clear coat that mirrors the clouds, strongest where the face is seen at a slant
@@ -378,8 +407,11 @@ def polished_casing(name="pristine casing"):
     bmp.inputs["Strength"].default_value = 1.0
     bmp.inputs["Distance"].default_value = 1.0
     t.link(h, bmp.inputs["Height"])
-    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
-    t.link(bmp.outputs["Normal"], bsdf.inputs["Coat Normal"])
+    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.05, undulation=0.3, foot=_mesh_attr(t, "hb"),
+                         foot_hex="6f6a4e")
+    t.link(col, bsdf.inputs["Base Color"])
+    t.link(normal, bsdf.inputs["Normal"])
+    t.link(normal, bsdf.inputs["Coat Normal"])
     return mat
 
 
@@ -454,10 +486,14 @@ def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
                                               (0.45, hexlin("b8968a")), (0.8, hexlin("c49e8e")), (1.0, hexlin("bdb2ab"))], "CONSTANT")
         # the grain shows within the block's own tone, which still carries the stone's red-to-grey drift
         col = t.mix(0.8, col, t.mix(1.0, crystals, col, "MULTIPLY"))
-        col = t.mix(1.0, col, (1.25, 1.2, 1.2, 1.0), "MULTIPLY")
+        col = t.mix(1.0, col, (1.1, 1.08, 1.08, 1.0), "MULTIPLY")
     # a slow dust over each face, heavier low down
-    dust = t.band(t.noise(geo.outputs["Position"], 0.4, 3.0, 0.6), 0.4, 0.75)
-    col = t.mix(t.math("MULTIPLY", dust, 0.32), col, hexlin("c2ab86"))
+    # dust over each face, each block its own (a world-space field ran across the joints as one blotch)
+    shifted = t.node("ShaderNodeVectorMath", operation="ADD")
+    t.link(geo.outputs["Position"], shifted.inputs[0])
+    t.link(t.grey(t.math("MULTIPLY", t.attr("tone"), 173.0)), shifted.inputs[1])
+    dust = t.band(t.noise(shifted.outputs[0], 0.6, 3.0, 0.6), 0.45, 0.8)
+    col = t.mix(t.math("MULTIPLY", dust, 0.14), col, hexlin("c2ab86"))
     col = _contact(t, col, bsdf, reach=1.5, amount=0.8)
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = rough
@@ -535,7 +571,9 @@ def weathered_casing(name="weathered casing"):
     bmp.inputs["Strength"].default_value = 0.3
     bmp.inputs["Distance"].default_value = 0.02
     t.link(t.math("ADD", t.math("MULTIPLY", joint, -1.0), t.math("MULTIPLY", t.noise(pos, 2.0, 4.0), 0.4)), bmp.inputs["Height"])
-    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
+    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.07, undulation=0.3, foot=hb, foot_hex="5a5443")
+    t.link(col, bsdf.inputs["Base Color"])
+    t.link(normal, bsdf.inputs["Normal"])
     return mat
 
 
@@ -598,19 +636,8 @@ def water(name="water"):
 
 
 def dressed_granite(name="dressed granite"):
-    mat = bpy.data.materials.new(name)
-    t = Tree(mat)
-    out = t.node("ShaderNodeOutputMaterial")
-    bsdf = t.node("ShaderNodeBsdfPrincipled")
-    t.link(bsdf.outputs[0], out.inputs["Surface"])
-    geo = t.node("ShaderNodeNewGeometry")
-    v = t.node("ShaderNodeTexVoronoi")
-    v.inputs["Scale"].default_value = 60.0
-    t.link(geo.outputs["Position"], v.inputs["Vector"])
-    t.link(t.ramp(v.outputs["Distance"], [(0.0, hexlin("4a302a")), (0.3, hexlin("7a4d42")), (0.8, hexlin("8c5d4f"))]),
-           bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = 0.35
-    return mat
+    """Single granite members (architraves, beams): the dressed blocks' grain, grime and worn arrises in one tone."""
+    return dressed_blocks(name, [(0.0, "6a4238"), (1.0, "74463a")], rough=0.38)
 
 
 def flat(name, palette, rough=0.8):

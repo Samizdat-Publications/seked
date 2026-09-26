@@ -83,8 +83,8 @@ class Plateau:
             "ground displaced": materials.ground(state, displace=True),
             "mudbrick": materials.dressed("mudbrick", colours=("6c533f", "7d6149"), rough=0.95, grain_scale=0.3),
             # Aswan granite: red-brown to grey, a tone per block.
-            "granite blocks": materials.dressed_blocks("granite blocks", [(0.0, "5e3a31"), (0.3, "74463a"), (0.55, "6a4a42"),
-                                                                          (0.8, "7e5244"), (1.0, "5a403b")], rough=0.42),
+            "granite blocks": materials.dressed_blocks("granite blocks", [(0.0, "6d4a45"), (0.3, "7a5048"), (0.55, "735049"),
+                                                                          (0.8, "86584e"), (1.0, "665049")], rough=0.42),
             # Tura and Mokattam limestone, dressed: ivory with a drift from block to block, a shade under white so a sunlit
             # wall keeps its texture (it read as paper-white boxes in critic round 4).
             "limestone blocks": materials.dressed_blocks("limestone blocks", [(0.0, "cdc3af"), (0.5, "d6cebd"), (1.0, "c4b9a3")],

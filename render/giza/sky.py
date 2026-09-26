@@ -36,7 +36,7 @@ HAZE = ((-120.0, 160.0, 4.2e-5, "f4dfc2"), (160.0, 520.0, 1.5e-5, "f3e7d4"), (52
 # tried first, 2026-09-25: grey smoke at 200 s for a 960 x 540 frame on the laptop.)
 SKIES = os.path.join(data.REPO, "build", "skies")
 CLOUDS = {
-    "tropical": dict(high="kloofendal_48d_partly_cloudy_puresky", low="kloppenheim_06_puresky", split=24.0),
+    "tropical": dict(high="kloofendal_48d_partly_cloudy_puresky", low="citrus_orchard_puresky", split=24.0),
     "showers": dict(high="farm_field_puresky", low="industrial_sunset_puresky", split=24.0),
     "dry": dict(high="kloofendal_43d_clear_puresky", low="qwantani_late_afternoon_puresky", split=24.0),
 }
