@@ -474,7 +474,7 @@ def _contact(t, col, bsdf, reach=0.8, dirt="8a7658", amount=0.55, arris=0.015):
     return col
 
 
-def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
+def dressed_blocks(name, stops_hex, rough=0.4, speckle=True, broad=0.0):
     """
     Dressed stone on instanced blocks: each block its own tone off the palette, grime where it meets
     its neighbours and the ground, worn arrises, and for granite its coarse grain: pink feldspar in
@@ -509,6 +509,12 @@ def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
     lying = t.math("MULTIPLY", t.band(nz.outputs["Z"], 0.8, 0.95), t.band(t.noise(geo.outputs["Position"], 0.5, 4.0, 0.6), 0.35, 0.65))
     col = t.mix(t.math("MULTIPLY", lying, 0.6), col, hexlin("cdb38c"))
     col = _contact(t, col, bsdf, reach=1.5, amount=0.8)
+    if broad:
+        # laid as a pyramid's casing: the face's weathering at the scale a camera reads (see _broad)
+        stain = t.band(t.noise(geo.outputs["Position"], 0.05, 5.0, 0.62), 0.52, 0.72)
+        col = t.mix(t.math("MULTIPLY", stain, 0.3), col, hexlin("a8977a"))
+        col, normal = _broad(t, geo.outputs["Position"], col, bsdf.inputs["Normal"].links[0].from_socket, amount=broad, undulation=0.0001)
+        t.link(normal, bsdf.inputs["Normal"])
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = rough
     return mat

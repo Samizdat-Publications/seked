@@ -92,6 +92,11 @@ class Plateau:
             # the same walls after the long rains: grey, streaked dark, a stone a shade off the next
             "limestone blocks worn": materials.dressed_blocks("limestone blocks worn", [(0.0, "a9a391"), (0.4, "bdb6a3"),
                                                               (0.7, "979181"), (1.0, "b3ab96")], rough=0.7, speckle=False),
+            # Khufu's casing laid as blocks (as built): each stone its own tone of the restored ivory, a few
+            # renewed whiter and a few honeyed, grime in the joints, the face's weathering at a readable scale.
+            "restored blocks": materials.dressed_blocks("restored blocks", [(0.0, "e0d8c6"), (0.05, "d8cfbb"), (0.5, "d3c8b0"),
+                                                                            (0.93, "cdbfa4"), (1.0, "bfa988")],
+                                                        rough=0.46, speckle=False, broad=0.12),
             "bedrock": sphinx.bedrock_material(),
         }
         self.lib = variants.library(self.library, self.mats, state, rng)

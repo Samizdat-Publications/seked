@@ -290,6 +290,9 @@ def khufu_north_face(coll, mats, mast=True):
 
 
 CASING_FOR = {"dressed": "restored casing", "pristine": "pristine casing", "weathered": "weathered casing"}
+# Eras whose casing is laid stone by stone rather than drawn on four planes (critic rounds 4 to 10: a
+# drawn face read as one flat value from every distance; the laid pyramids of today read as stone).
+BLOCK_CASING = {"dressed"}
 CAP_FOR = {"gold": "gold", "electrum": "electrum"}
 
 
@@ -328,9 +331,17 @@ def build(state, rng, coll, mats, lib, log=print):
         g1_H = data.PYRAMIDS["g1"]["H"]
         for P in main:
             ph = max(PYRAMIDION_HEIGHT, S.get("gild", PYRAMIDION_HEIGHT) * P["H"] / g1_H) if S["caps"] else PYRAMIDION_HEIGHT
-            # after the long rains the arrises have worn round (a look choice: 0.6 m against 5 cm)
-            dressed_mesh(P, P["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"],
-                         arris=0.6 if mode == "weathered" else 0.05)
+            if mode in BLOCK_CASING:
+                key = P["key"]
+                spec = dict(LOOK[key], all_casing=True, casing_miss=0.0, top=P["H"] - ph)
+                if P.get("granite_to"):
+                    spec["granite_to"] = P["granite_to"]
+                courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
+                backing_mesh(P, lay(P, courses, rng, core, casing, gran, spec), coll, mats["core behind"])
+            else:
+                # after the long rains the arrises have worn round (a look choice: 0.6 m against 5 cm)
+                dressed_mesh(P, P["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"],
+                             arris=0.6 if mode == "weathered" else 0.05)
             pyramidion(P, coll, mats[CAP_FOR[S["caps"]]] if S["caps"] else face, ph)
         if mode == "weathered":
             import random

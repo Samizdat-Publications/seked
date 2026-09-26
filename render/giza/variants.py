@@ -144,8 +144,10 @@ def library(parent, mats, state, rng):
         lib["casing"] = collection(parent, "v casing", [block(300 + i, rounding=0.05, erosion=0.018, chips=1, cuts=6, shear=s)
                                                         for i, s in enumerate(SHEARS)], mats["casing"])
     else:
-        lib["casing"] = collection(parent, "v casing", [block(300 + i, rounding=0.008, erosion=0.0, chips=0, cuts=2, shear=s)
-                                                        for i, s in enumerate(SHEARS)], mats["casing"])
+        # as built the casing is the restored stone laid whole (pyramids.BLOCK_CASING); otherwise the ragged remnant
+        lib["casing"] = collection(parent, "v casing", [block(300 + i, rounding=0.012, erosion=0.002, chips=0, cuts=2, shear=s)
+                                                        for i, s in enumerate(SHEARS)],
+                                   mats["restored blocks"] if state == "built" else mats["casing"])
     lib["granite"] = collection(parent, "v granite", [block(400 + i, rounding=0.12, erosion=0.07, chips=1, cuts=8, shear=s, front_bias=2.5)
                                                       for i, s in enumerate(SHEARS)], mats["granite"])
     lib["rock"] = collection(parent, "v rock", [rock(500 + i) for i in range(12)], mats["rock"])
