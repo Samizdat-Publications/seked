@@ -160,8 +160,12 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                 _battered_shell(ring, base - 0.3, HEIGHT_BUILT + 0.3, coll, t["id"], mats["mudbrick"])
             else:
                 target = granite_blocks if casing == "granite" else lime_blocks
+                # granite laid as Khafre's masons laid it, courses and blocks of very different sizes (a look
+                # choice after the photographs); the limestone temples in more even courses
+                spread = (0.35, 0.6) if casing == "granite" else (0.12, 0.35)
                 laid = lay_ring(ring, base, HEIGHT_BUILT, rng, target, course=1.3, length=3.0, depth=1.6, miss=0.0,
-                                variants=N_DRESSED, openings=doors, joint=0.025, erosion_jitter=False)
+                                variants=N_DRESSED, openings=doors, joint=0.025, erosion_jitter=False,
+                                course_spread=spread[0], length_spread=spread[1], seed=len(t["id"]) * 0.37)
                 lean = HEIGHT_BUILT / math.tan(math.radians(82.0))
                 _slab(inset_ring(ring, 1.6 + lean + 0.2), base - 0.3, base + HEIGHT_BUILT - 0.05, coll, t["id"] + " core", mats["core behind"])
                 _slab(inset_ring(ring, lean + 0.05), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.35, coll, t["id"] + " roof", mats["pavement"])

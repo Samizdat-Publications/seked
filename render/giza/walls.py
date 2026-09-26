@@ -54,7 +54,8 @@ def simplify(ring, tol=1.2):
 
 
 def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8, batter_deg=82.0,
-             ruin=None, miss=0.04, seed=0.0, variants=N_CORE, openings=(), joint=0.05, erosion_jitter=True):
+             ruin=None, miss=0.04, seed=0.0, variants=N_CORE, openings=(), joint=0.05, erosion_jitter=True,
+             course_spread=0.0, length_spread=0.35):
     """
     Lay courses round a closed outline, outer faces leaning in at `batter_deg`.
     `ruin` is (low, high): the share of `height` a stretch of wall keeps, varying
@@ -62,12 +63,21 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
     height): no block is laid across one below its head. `erosion_jitter` is
     weathered masonry: blocks knocked a little askew, with the open bed joints of
     worn stone; without it the courses close to the fine joints of dressed work.
+    `course_spread` varies the courses' heights (a lognormal spread; 0 lays them all
+    alike) and `length_spread` the blocks' lengths, for work like Khafre's granite,
+    whose courses run from under a metre to over two and whose blocks vary as much.
     Returns the blocks laid.
     """
     pts = simplify(ring)
     inset_per_m = 1.0 / math.tan(math.radians(batter_deg))
     n_courses = max(1, int(round(height / course)))
-    ch = height / n_courses
+    if course_spread > 0:
+        crng = __import__("random").Random(int(seed * 1000) + len(pts))
+        hs = [crng.lognormvariate(0.0, course_spread) for _ in range(n_courses)]
+        heights = [height * h / sum(hs) for h in hs]
+    else:
+        heights = [height / n_courses] * n_courses
+    bases = [sum(heights[:k]) for k in range(n_courses)]
     laid = 0
     perimeter_s = 0.0
     for i in range(len(pts)):
@@ -92,7 +102,7 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
             if -1.0 < along < L + 1.0 and abs(across) < 4.0:
                 doors.append((along, ow / 2, oh))
         for k in range(n_courses):
-            zb = k * ch
+            zb, ch = bases[k], heights[k]
             inset = zb * inset_per_m + depth / 2
             # Alternate which wall runs through the corner, course by course; a short run is one block.
             # A battered edge shortens as it rises, the neighbouring faces leaning in with it, so each
@@ -103,7 +113,7 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
             s1 = L - lean * turn_out - (0.0 if through else depth)
             s = s0
             while s < s1 - 0.2:
-                bl = min(max(rng.lognormvariate(math.log(length), 0.35), 0.8), length * 2.5)
+                bl = min(max(rng.lognormvariate(math.log(length), length_spread), 0.8), length * 2.5)
                 if s + bl > s1 - 0.5:
                     bl = s1 - s
                 sc = s + bl / 2

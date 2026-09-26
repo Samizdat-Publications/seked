@@ -13,7 +13,7 @@
         56.0
       ],
       "lens": 120,
-      "moment": "golden-west"
+      "moment": "summer-evening"
     },
     {
       "id": "south",
@@ -41,7 +41,7 @@
         -16.0
       ],
       "lens": 55,
-      "moment": "sphinx-morning"
+      "moment": "june-dawn"
     },
     {
       "id": "debug-vt",
@@ -111,7 +111,7 @@
         -22.75
       ],
       "lens": 28,
-      "moment": "sphinx-morning",
+      "moment": "june-dawn",
       "by_state": {
         "stripped": {
           "z": -16.0,
@@ -146,9 +146,13 @@
       "x": 1400.0,
       "y": -1600.0,
       "z": 330.0,
-      "target": [-150.0, -250.0, 20.0],
+      "target": [
+        -150.0,
+        -250.0,
+        20.0
+      ],
       "lens": 35,
-      "moment": "golden-south"
+      "moment": "june-dawn"
     }
   ]
 }

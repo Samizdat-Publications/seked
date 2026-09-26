@@ -63,7 +63,7 @@ class Plateau:
             "coursed casing": materials.coursed_casing("coursed casing", colours=("e0d9ca", "e9e3d6"), rough=0.4, tone=0.16, line=0.22,
                                                        mortar=0.012, mottle=0.05),
             # The mastabas' dressed faces: the pyramids' restored stone in smaller courses, no grime at the foot.
-            "limestone flat": materials.restored_casing("limestone flat", rough=0.55, course=0.5, width=1.0, foot=False),
+            "limestone flat": materials.restored_casing("limestone flat", rough=0.55, course=0.5, width=1.0, foot=False, contact=True),
             "pavement": materials.pavement(),
             # The claim's casing, polished further than any reconstruction would draw it.
             "pristine casing": materials.polished_casing("pristine casing"),
@@ -75,7 +75,7 @@ class Plateau:
             "gold": materials.metal("gold", "ffd46e", 0.32, metallic=0.6),
             # Pale white-gold, so the claim's electrum reads apart from Khufu's yellow gold; matte in part for
             # the same reason as the gold (faceting it was tried: from the ground the facets mirror the sky, grey).
-            "electrum": materials.metal("electrum", "fbf1cf", 0.26, metallic=0.5),
+            "electrum": materials.metal("electrum", "efd27e", 0.42, metallic=0.85, dent=0.4),
             "dressed granite": materials.dressed_granite(),
             "dark": materials.dark(),
             "water": materials.water(),
@@ -85,8 +85,9 @@ class Plateau:
             # Aswan granite: red-brown to grey, a tone per block.
             "granite blocks": materials.dressed_blocks("granite blocks", [(0.0, "5e3a31"), (0.3, "74463a"), (0.55, "6a4a42"),
                                                                           (0.8, "7e5244"), (1.0, "5a403b")], rough=0.42),
-            # Tura and Mokattam limestone, dressed: white with a faint drift from block to block.
-            "limestone blocks": materials.dressed_blocks("limestone blocks", [(0.0, "e6dfd1"), (0.5, "efe9dd"), (1.0, "ddd4c3")],
+            # Tura and Mokattam limestone, dressed: ivory with a drift from block to block, a shade under white so a sunlit
+            # wall keeps its texture (it read as paper-white boxes in critic round 4).
+            "limestone blocks": materials.dressed_blocks("limestone blocks", [(0.0, "cdc3af"), (0.5, "d6cebd"), (1.0, "c4b9a3")],
                                                          rough=0.45, speckle=False),
             # the same walls after the long rains: grey, streaked dark, a stone a shade off the next
             "limestone blocks worn": materials.dressed_blocks("limestone blocks worn", [(0.0, "a9a391"), (0.4, "bdb6a3"),

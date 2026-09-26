@@ -218,7 +218,7 @@ def _mesh_attr(t, name):
     return a.outputs["Fac"]
 
 
-def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35, foot=True):
+def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35, foot=True, contact=False):
     """
     The casing as the Egyptians of c. 2560 BCE kept it, in Stewart's reading (2026-09-25): stone
     that had stood for ages before them, restored. Cream Tura limestone laid in courses, every
@@ -237,9 +237,11 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     geo = t.node("ShaderNodeNewGeometry")
     pos = geo.outputs["Position"]
     joint, stone = _face_bricks(t, geo, course, width, 0.016)
-    # the stone's own colour: mostly ivory, a few renewed whiter, a few old and honey-stained
-    col = t.ramp(stone, [(0.0, hexlin("e2dccd")), (0.06, hexlin("dbd2bf")), (0.1, hexlin("d6ccb6")), (0.5, hexlin("d2c6ad")),
-                         (0.9, hexlin("cdbfa3")), (0.96, hexlin("c6b393")), (1.0, hexlin("c1ac8a"))])
+    # the stone's own colour: mostly ivory, each stone close to its neighbours (from the stations a
+    # stone is a pixel or two, and a strong stone-to-stone spread reads as a tiled mosaic), a few
+    # renewed whiter, a few old and honey-stained
+    col = t.ramp(stone, [(0.0, hexlin("e0d9c9")), (0.04, hexlin("d8cfbc")), (0.5, hexlin("d4c9b1")),
+                         (0.96, hexlin("cfc2a7")), (1.0, hexlin("c3af8e"))])
     # course by course: each course a shade off the next, the way a laid face bands from afar
     zsep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, zsep.inputs[0])
@@ -253,18 +255,40 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     col = t.mix(1.0, col, t.grey(patch), "MULTIPLY")
     relaid = t.band(t.noise(pos, 0.009, 2.0, 0.5), 0.55, 0.62)
     col = t.mix(t.math("MULTIPLY", relaid, 0.45), col, hexlin("e6e1d5"))
-    # streaks run down the faces: noise stretched vertically along whichever way the face runs
     sep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, sep.inputs[0])
     nsep = t.node("ShaderNodeSeparateXYZ")
     t.link(geo.outputs["Normal"], nsep.inputs[0])
     ew = t.math("GREATER_THAN", t.math("ABSOLUTE", nsep.outputs["X"]), t.math("ABSOLUTE", nsep.outputs["Y"]))
     run = t.math("ADD", t.math("MULTIPLY", ew, sep.outputs["Y"]), t.math("MULTIPLY", t.math("SUBTRACT", 1.0, ew), sep.outputs["X"]))
+    # the repairs: whole patches a few courses high and a dozen stones wide, laid in one campaign,
+    # snapped to the courses, so from afar the face reads as masonry mended in places: some patches
+    # newer and whiter, some the oldest stone left, greyed and honeyed
+    # Each band of courses has its own offset, and the patch edges step stone by stone, so the
+    # patches neither line up into a grid nor run ruler-straight.
+    band_row = t.math("FLOOR", t.math("DIVIDE", sep.outputs["Z"], 5.0 * course))
+    rn = t.node("ShaderNodeTexWhiteNoise")
+    rn.noise_dimensions = "1D"
+    t.link(band_row, rn.inputs["W"])
+    ragged = t.math("ADD", t.math("ADD", run, t.math("MULTIPLY", rn.outputs["Value"], 97.0)), t.math("MULTIPLY", stone, 2.5 * width))
+    cell = t.node("ShaderNodeCombineXYZ")
+    t.link(t.math("FLOOR", t.math("DIVIDE", ragged, 9.0 * width)), cell.inputs[0])
+    t.link(band_row, cell.inputs[1])
+    t.link(t.math("ADD", t.math("MULTIPLY", nsep.outputs["X"], 7.0), t.math("MULTIPLY", nsep.outputs["Y"], 13.0)), cell.inputs[2])
+    wn = t.node("ShaderNodeTexWhiteNoise")
+    wn.noise_dimensions = "3D"
+    t.link(cell.outputs[0], wn.inputs["Vector"])
+    campaign = wn.outputs["Value"]
+    newer = t.math("GREATER_THAN", campaign, 0.93)
+    older = t.math("LESS_THAN", campaign, 0.05)
+    col = t.mix(t.math("MULTIPLY", newer, 0.3), col, hexlin("e9e5da"))
+    col = t.mix(t.math("MULTIPLY", older, 0.28), col, hexlin("b8a98e"))
+    # streaks run down the faces: noise stretched vertically along whichever way the face runs
     sv = t.node("ShaderNodeCombineXYZ")
     t.link(t.math("MULTIPLY", run, 0.9), sv.inputs[0])
     t.link(t.math("MULTIPLY", sep.outputs["Z"], 0.03), sv.inputs[1])
     streak = t.band(t.noise(sv.outputs[0], 1.0, 5.0, 0.6), 0.5, 0.8)
-    col = t.mix(t.math("MULTIPLY", streak, 0.42), col, hexlin("a08e70"))
+    col = t.mix(t.math("MULTIPLY", streak, 0.22), col, hexlin("a08e70"))
     wide = t.node("ShaderNodeCombineXYZ")
     t.link(t.math("MULTIPLY", run, 0.12), wide.inputs[0])
     t.link(t.math("MULTIPLY", sep.outputs["Z"], 0.01), wide.inputs[1])
@@ -283,6 +307,9 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     pit = t.band(t.noise(pos, 7.0, 3.0, 0.7), 0.64, 0.72)
     col = t.mix(t.math("MULTIPLY", pit, 0.12), col, hexlin("8c7b62"))
     col = t.mix(t.math("MULTIPLY", joint, 0.5), col, hexlin("8f8168"))
+    if contact:
+        # small buildings: grime where the walls meet the sand, and worn arrises (with `contact`)
+        col = _contact(t, col, bsdf, reach=1.2, amount=0.6)
     t.link(col, bsdf.inputs["Base Color"])
     t.link(t.math("ADD", rough, t.math("MULTIPLY", t.math("ADD", grime, pit), 0.2)), bsdf.inputs["Roughness"])
     bsdf.inputs["Specular IOR Level"].default_value = 0.5
@@ -293,6 +320,8 @@ def restored_casing(name="restored casing", rough=0.46, course=0.74, width=1.35,
     bmp.inputs["Strength"].default_value = 0.35
     bmp.inputs["Distance"].default_value = 0.02
     t.link(h, bmp.inputs["Height"])
+    if contact:
+        t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
     t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
@@ -312,7 +341,7 @@ def polished_casing(name="pristine casing"):
     geo = t.node("ShaderNodeNewGeometry")
     pos = geo.outputs["Position"]
     # a shade under white, so the sun and the mirrored sky have room to show on it
-    col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("dcd7cc")), (0.7, hexlin("e4e0d7"))])
+    col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("cbc6ba")), (0.7, hexlin("d4d0c5"))])
     # slabs of one size in perfect courses, the joints a ruled line: from afar a faint grid, the mark
     # of an engineered surface rather than a laid one
     joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.022)
@@ -324,8 +353,8 @@ def polished_casing(name="pristine casing"):
     bsdf.inputs["Specular IOR Level"].default_value = 0.5
     # the polish: a clear coat that mirrors the clouds, strongest where the face is seen at a slant
     bsdf.inputs["Coat Weight"].default_value = 1.0
-    bsdf.inputs["Coat Roughness"].default_value = 0.03
-    bsdf.inputs["Coat IOR"].default_value = 1.65
+    bsdf.inputs["Coat Roughness"].default_value = 0.08
+    bsdf.inputs["Coat IOR"].default_value = 1.7
     # No two slabs lie in quite the same plane: each is tilted a fraction of a degree its own way,
     # so each mirrors its own patch of sky, as polished stone cladding does on any building.
     sep = t.node("ShaderNodeSeparateXYZ")
@@ -386,21 +415,50 @@ def pavement(name="pavement"):
     return mat
 
 
+def _contact(t, col, bsdf, reach=0.8, dirt="8a7658", amount=0.55, arris=0.015):
+    """
+    What makes a laid stone read as laid rather than as a box: dust and grime gathered where it meets
+    the sand or its neighbour (ambient occlusion within `reach` metres, darkened towards `dirt`), and
+    arrises worn round, so an edge catches the light (a bevel of `arris` metres in the shading).
+    """
+    ao = t.node("ShaderNodeAmbientOcclusion")
+    ao.samples = 8
+    ao.inputs["Distance"].default_value = reach
+    grime = t.math("POWER", t.math("SUBTRACT", 1.0, ao.outputs["AO"]), 0.7)
+    col = t.mix(t.math("MULTIPLY", grime, amount), col, hexlin(dirt))
+    bev = t.node("ShaderNodeBevel")
+    bev.samples = 4
+    bev.inputs["Radius"].default_value = arris
+    t.link(bev.outputs["Normal"], bsdf.inputs["Normal"])
+    return col
+
+
 def dressed_blocks(name, stops_hex, rough=0.4, speckle=True):
-    """Dressed stone on instanced blocks: each block its own tone off the palette, a fine speckle for granite."""
+    """
+    Dressed stone on instanced blocks: each block its own tone off the palette, grime where it meets
+    its neighbours and the ground, worn arrises, and for granite its coarse grain: pink feldspar in
+    crystals a thumb across, black mica between, the grey of quartz.
+    """
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
     bsdf = t.node("ShaderNodeBsdfPrincipled")
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     col = t.ramp(t.attr("tone"), [(p, hexlin(c)) for p, c in stops_hex])
+    geo = t.node("ShaderNodeNewGeometry")
     if speckle:
-        geo = t.node("ShaderNodeNewGeometry")
         v = t.node("ShaderNodeTexVoronoi")
-        v.inputs["Scale"].default_value = 45.0
+        v.inputs["Scale"].default_value = 30.0
         t.link(geo.outputs["Position"], v.inputs["Vector"])
-        grain = t.math("ADD", t.math("MULTIPLY", v.outputs["Distance"], 0.9), 0.6)
-        col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
+        crystals = t.ramp(v.outputs["Color"], [(0.0, hexlin("2a2422")), (0.18, hexlin("3a3230")), (0.2, hexlin("b9aca4")),
+                                              (0.45, hexlin("b8968a")), (0.8, hexlin("c49e8e")), (1.0, hexlin("bdb2ab"))], "CONSTANT")
+        # the grain shows within the block's own tone, which still carries the stone's red-to-grey drift
+        col = t.mix(0.8, col, t.mix(1.0, crystals, col, "MULTIPLY"))
+        col = t.mix(1.0, col, (1.25, 1.2, 1.2, 1.0), "MULTIPLY")
+    # a slow dust over each face, heavier low down
+    dust = t.band(t.noise(geo.outputs["Position"], 0.4, 3.0, 0.6), 0.4, 0.75)
+    col = t.mix(t.math("MULTIPLY", dust, 0.32), col, hexlin("c2ab86"))
+    col = _contact(t, col, bsdf, reach=1.5, amount=0.8)
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = rough
     return mat
@@ -455,7 +513,7 @@ def weathered_casing(name="weathered casing"):
     return mat
 
 
-def metal(name, rgb_hex, rough, metallic=0.8):
+def metal(name, rgb_hex, rough, metallic=0.8, dent=0.2):
     """
     Gold or electrum for the pyramidions. A polished face seen from the ground shows only the
     deep sky above it and reads dark (the sun's reflection reaches the ground only when the sun
@@ -480,7 +538,7 @@ def metal(name, rgb_hex, rough, metallic=0.8):
     dents.inputs["Scale"].default_value = 3.0
     t.link(geo.outputs["Position"], dents.inputs["Vector"])
     bmp = t.node("ShaderNodeBump")
-    bmp.inputs["Strength"].default_value = 0.2
+    bmp.inputs["Strength"].default_value = dent
     bmp.inputs["Distance"].default_value = 0.05
     height = t.math("ADD", dents.outputs["Distance"], t.math("MULTIPLY", leaf, 0.3))
     t.link(height, bmp.inputs["Height"])
@@ -654,9 +712,10 @@ def ground(state, displace=False):
     streak.inputs["Detail"].default_value = 3.0
     streak.inputs["Roughness"].default_value = 0.55
     t.link(wind.outputs[0], streak.inputs["Vector"])
-    col = t.mix(1.0, col, t.ramp(streak.outputs["Fac"], [(0.3, hexlin("e2d3bc")), (0.55, hexlin("ffffff")), (0.75, hexlin("fff8ea"))]), "MULTIPLY")
+    col = t.mix(1.0, col, t.ramp(streak.outputs["Fac"], [(0.3, hexlin("ebdfcb")), (0.55, hexlin("ffffff")), (0.75, hexlin("fffaf0"))]), "MULTIPLY")
     sheet = t.band(t.noise(pos, 0.0012, 4.0, 0.6), 0.56, 0.66)
-    col = t.mix(t.math("MULTIPLY", sheet, 0.45), col, hexlin(grav_hex))
+    # (softened after critic round 4, 2026-09-26: at 0.45 the sheets read as muddy blotches from the air)
+    col = t.mix(t.math("MULTIPLY", sheet, 0.28), col, hexlin(grav_hex))
     col = t.mix(1.0, col, t.grey(grain), "MULTIPLY")
     sep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, sep.inputs[0])

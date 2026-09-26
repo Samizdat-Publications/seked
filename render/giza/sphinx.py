@@ -37,6 +37,10 @@ TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated t
 WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
           # the First Time's freshly carved lion (sphinx-lion-pristine) renders pale ivory beside the bedrock walls
           "sphinx-lion-pristine": (0.9, 0.8, 0.66, 1.0)}
+# Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
+# enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
+# (a look choice; the Sphinx is carved from the plateau's layered limestone).
+CARVED = {"sphinx-lion-pristine"}
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
@@ -122,6 +126,8 @@ def statue(state, coll, log=print):
                     warm.inputs["Color2"].default_value = WARMED[model_id]
                     tree.links.new(src, warm.inputs["Color1"])
                     tree.links.new(warm.outputs["Color"], base)
+                if model_id in CARVED and base.is_linked:
+                    _in_bedrock(tree, nd)
                 if model_id in TINTED and base.is_linked:
                     src = base.links[0].from_socket
                     hsv = tree.nodes.new("ShaderNodeHueSaturation")
@@ -138,6 +144,61 @@ def statue(state, coll, log=print):
     obj["seked"] = "stand-in: " + model["name"]
     log(f"sphinx: {model['id']}{' ' + finish if finish else ''}, {len(obj.data.polygons):,} faces, {done['length_m']:.1f} m long, {done['height_m']:.1f} m high")
     return obj
+
+
+def _in_bedrock(tree, bsdf):
+    """Multiply the bedrock's members and grain into a stand-in's colour, and bump it with the rock's relief."""
+    from .materials import TEX, image
+    nodes, links = tree.nodes, tree.links
+    base = bsdf.inputs["Base Color"]
+    src = base.links[0].from_socket
+    geo = nodes.new("ShaderNodeNewGeometry")
+    # the members: bands a metre or two thick, a little wavy, from grey-buff to honey
+    bands = nodes.new("ShaderNodeMapping")
+    bands.inputs["Scale"].default_value = (0.05, 0.05, 1.6)
+    links.new(geo.outputs["Position"], bands.inputs["Vector"])
+    nz = nodes.new("ShaderNodeTexNoise")
+    nz.inputs["Scale"].default_value = 0.7
+    nz.inputs["Detail"].default_value = 3.0
+    links.new(bands.outputs[0], nz.inputs["Vector"])
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position, ramp.color_ramp.elements[0].color = 0.3, (0.74, 0.66, 0.55, 1.0)
+    ramp.color_ramp.elements[1].position, ramp.color_ramp.elements[1].color = 0.7, (1.0, 0.97, 0.9, 1.0)
+    links.new(nz.outputs["Fac"], ramp.inputs["Fac"])
+    # the grain: the bedrock photograph's light and dark, box-projected at its own scale
+    sz = TEX["bedrock"]["tile_m"][0]
+    mp = nodes.new("ShaderNodeMapping")
+    mp.inputs["Scale"].default_value = (1 / sz, 1 / sz, 1 / sz)
+    links.new(geo.outputs["Position"], mp.inputs["Vector"])
+    im = nodes.new("ShaderNodeTexImage")
+    im.image, im.projection, im.projection_blend = image("bedrock", "Diffuse"), "BOX", 0.3
+    hm = nodes.new("ShaderNodeTexImage")
+    hm.image, hm.projection, hm.projection_blend = image("bedrock", "Displacement", True), "BOX", 0.3
+    links.new(mp.outputs[0], im.inputs["Vector"])
+    links.new(mp.outputs[0], hm.inputs["Vector"])
+    bw = nodes.new("ShaderNodeRGBToBW")
+    links.new(im.outputs["Color"], bw.inputs[0])
+    gain = nodes.new("ShaderNodeMath")
+    gain.operation = "MULTIPLY_ADD"
+    gain.inputs[1].default_value, gain.inputs[2].default_value = 1.1, 0.55
+    links.new(bw.outputs[0], gain.inputs[0])
+    m1 = nodes.new("ShaderNodeMixRGB")
+    m1.blend_type, m1.inputs["Fac"].default_value = "MULTIPLY", 1.0
+    links.new(src, m1.inputs["Color1"])
+    links.new(ramp.outputs["Color"], m1.inputs["Color2"])
+    m2 = nodes.new("ShaderNodeMixRGB")
+    m2.blend_type, m2.inputs["Fac"].default_value = "MULTIPLY", 1.0
+    links.new(m1.outputs["Color"], m2.inputs["Color1"])
+    links.new(gain.outputs[0], m2.inputs["Color2"])
+    links.new(m2.outputs["Color"], base)
+    bmp = nodes.new("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 0.35
+    bmp.inputs["Distance"].default_value = 0.05
+    links.new(hm.outputs["Color"], bmp.inputs["Height"])
+    normal = bsdf.inputs["Normal"]
+    if normal.is_linked:
+        links.new(normal.links[0].from_socket, bmp.inputs["Normal"])
+    links.new(bmp.outputs["Normal"], normal)
 
 
 def bedrock_material():

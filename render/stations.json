@@ -6,6 +6,11 @@
       "solar": 16.86,
       "label": "late afternoon, October"
     },
+    "summer-evening": {
+      "date": "06-21",
+      "solar": 17.5,
+      "label": "late afternoon, midsummer, the sun low in the west-north-west: the west faces lit, the south faces in shade"
+    },
     "morning-east": {
       "date": "04-20",
       "solar": 7.4,
@@ -44,6 +49,11 @@
       "solar": 10.0,
       "label": "mid-morning, November, the sun high enough to clear the walls' shadows"
     },
+    "winter-afternoon": {
+      "date": "12-21",
+      "solar": 13.75,
+      "label": "early afternoon, midwinter, the sun low in the south-south-west: the south faces lit, the east faces in shade, high enough to clear the walls"
+    },
     "sphinx-noon": {
       "date": "11-15",
       "solar": 12.0,
@@ -78,7 +88,7 @@
       "x": 439.0,
       "y": -445.0,
       "eye": 16.0,
-      "moment": "sphinx-morning",
+      "moment": "june-dawn",
       "view": {
         "yaw": 277,
         "pitch": 2,
@@ -142,7 +152,7 @@
       "x": -980.0,
       "y": -1830.0,
       "eye": 1.7,
-      "moment": "golden-west",
+      "moment": "summer-evening",
       "view": {
         "yaw": 24,
         "pitch": 1,
@@ -160,7 +170,7 @@
       "x": 160.0,
       "y": -5.0,
       "z": 2.2,
-      "moment": "temple-morning",
+      "moment": "winter-afternoon",
       "view": {
         "yaw": 270,
         "pitch": 22,
@@ -180,7 +190,7 @@
       "x": 270.0,
       "y": -200.0,
       "eye": 1.7,
-      "moment": "temple-morning",
+      "moment": "winter-afternoon",
       "view": {
         "yaw": 312,
         "pitch": 10,
@@ -219,7 +229,7 @@
       "x": -400.0,
       "y": -800.0,
       "eye": 1.7,
-      "moment": "temple-morning",
+      "moment": "winter-afternoon",
       "view": {
         "yaw": 282,
         "pitch": 8,
@@ -240,7 +250,7 @@
       "raft": {
         "heading": 180
       },
-      "moment": "sphinx-morning",
+      "moment": "june-dawn",
       "view": {
         "yaw": 280,
         "pitch": 5,
