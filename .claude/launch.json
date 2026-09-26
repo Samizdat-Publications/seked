@@ -55,7 +55,7 @@
         "http.server",
         "5190",
         "--directory",
-        "apps/walk"
+        "C:/Users/stewa/ClaudeProjects/seked/apps/walk"
       ],
       "port": 5190
     }
