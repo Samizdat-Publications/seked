@@ -24,6 +24,14 @@ DRIFT = {"today": 0.8, "stripped": 1.7}
 # across the valley with reed islands where the relief lifts the ground; a little above the harbour
 # as built and in 1800, so the fields stand dry.
 FLOODPLAIN = {"first-time": -43.6, "lion": -43.5, "built": -42.4, "stripped": -42.2}
+# The town's taller roofs stand above the easing's reach and were left as mounds a few metres high on
+# the plain; in the eras with fields (whose edge is fields.EDGE) they read as sandy islands
+# in the crops, so there the plain also takes any ground whose surroundings, sampled on two rings
+# ROOF_RINGS metres out, lie at the plain's level (the escarpment's foot keeps its slope: half of its
+# ring stands high). The claim's eras keep them, as the reed islands in their flood.
+ROOFLESS = ("built", "stripped")
+ROOF_RINGS = (70.0, 140.0)
+ROOFLESS_FROM = (750.0, 5000.0)    # between these x the valley floor is all plain (the escarpment lies west of it)
 
 NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
@@ -75,6 +83,12 @@ class Terrain:
         if plain is not None:
             # East of the temples and below the escarpment, the flood plain instead of the town's roofs.
             m = smoothstep(470.0, 560.0, X) * smoothstep(-33.0, -37.0, Z)
+            if self.state in ROOFLESS:
+                ring = [grid.sample(X + r * np.cos(a), Y + r * np.sin(a)) + data.TERRAIN_SHIFT
+                        for r in ROOF_RINGS for a in np.arange(8) * (np.pi / 4)]
+                m = np.maximum(m, smoothstep(470.0, 560.0, X) * smoothstep(-36.5, -39.0, np.median(ring, axis=0)))
+                # well out on the valley floor the city is dense enough to fill the rings: there, all of it
+                m = np.maximum(m, smoothstep(ROOFLESS_FROM[0], ROOFLESS_FROM[0] + 100.0, X) * smoothstep(ROOFLESS_FROM[1] + 100.0, ROOFLESS_FROM[1], X))
             Z = Z * (1 - m) + plain * m
         keep = np.ones_like(Z)
         drift = np.zeros_like(Z)

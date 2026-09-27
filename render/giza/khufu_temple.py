@@ -12,11 +12,11 @@ import math
 
 import bpy
 
-from . import data, states
+from . import data, materials, states
 from .instancing import Field
 from .nodes import Tree, hexlin
-from .variants import N_DRESSED
-from .walls import lay_ring
+from .temples import DRESSED_BLOCK
+from .walls import battered_variants, lay_masonry
 
 WALL = 2.6          # look choices: wall thickness, height, pillar pitch and side
 HEIGHT = 8.0
@@ -46,10 +46,13 @@ def flats(state):
 
 def basalt_material():
     """
-    Khufu's basalt floor: slabs of irregular outline fitted tight, the joints dark hairlines, sand
-    blown into them and lying in drifts over the floor, the stone dulled in patches and polished
-    by feet elsewhere (look choices; critic round 5 read a regular grid with bright grout as tile).
+    Khufu's basalt floor as the photographs show what is left of it: slabs of irregular outline, each
+    a shade off the next and tilted a hair its own way, a dusty dark grey rather than black; the
+    joints a finger wide and packed with sand; sand lying thicker against the walls and pillars and
+    in drifts across the floor; the stone's own pitted grain in between (look choices; critic: "a real
+    paved floor, no crushed blacks", and round 5 read a regular grid with bright grout as tile).
     """
+    from . import materials
     mat = bpy.data.materials.new("basalt")
     t = Tree(mat)
     out = t.node("ShaderNodeOutputMaterial")
@@ -57,22 +60,83 @@ def basalt_material():
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     geo = t.node("ShaderNodeNewGeometry")
     pos = geo.outputs["Position"]
+    # the slabs: a metre to two across, their outlines wandering a little
+    warp = t.node("ShaderNodeVectorMath", operation="MULTIPLY_ADD")
+    wn = t.node("ShaderNodeTexNoise")
+    wn.inputs["Scale"].default_value = 0.9
+    wn.inputs["Detail"].default_value = 2.0
+    t.link(pos, wn.inputs["Vector"])
+    t.link(wn.outputs["Color"], warp.inputs[0])
+    warp.inputs[1].default_value = (0.12, 0.12, 0.0)
+    t.link(pos, warp.inputs[2])
     slabs = t.node("ShaderNodeTexVoronoi")
     slabs.feature = "DISTANCE_TO_EDGE"
-    slabs.inputs["Scale"].default_value = 0.8
-    t.link(pos, slabs.inputs["Vector"])
-    tone = t.node("ShaderNodeTexVoronoi")
-    tone.inputs["Scale"].default_value = 0.8
-    t.link(pos, tone.inputs["Vector"])
-    joint = t.math("SUBTRACT", 1.0, t.band(slabs.outputs["Distance"], 0.0, 0.006))
-    base = t.ramp(tone.outputs["Distance"], [(0.0, hexlin("2c2a27")), (0.6, hexlin("35322e")), (1.0, hexlin("2a2724"))])
-    base = t.mix(1.0, base, t.ramp(t.noise(pos, 3.0, 4.0), [(0.3, hexlin("d8d8d8")), (0.7, hexlin("ffffff"))]), "MULTIPLY")
-    sand = t.band(t.noise(pos, 0.15, 4.0, 0.6), 0.55, 0.78)
-    col = t.mix(t.math("MULTIPLY", sand, 0.55), base, hexlin("a8916c"))
-    col = t.mix(t.math("MULTIPLY", joint, 0.7), col, hexlin("1c1a18"))
+    slabs.inputs["Scale"].default_value = 0.65
+    slabs.inputs["Randomness"].default_value = 0.85
+    t.link(warp.outputs[0], slabs.inputs["Vector"])
+    cell = t.node("ShaderNodeTexVoronoi")
+    cell.inputs["Scale"].default_value = 0.65
+    cell.inputs["Randomness"].default_value = 0.85
+    t.link(warp.outputs[0], cell.inputs["Vector"])
+    pick = t.node("ShaderNodeRGBToBW")
+    t.link(cell.outputs["Color"], pick.inputs[0])
+    edge = slabs.outputs["Distance"]
+    # (distances are in the Voronoi's cells, 1.5 m each): the sand-packed joint about 1.5 cm across, and the
+    # slab's worn edge beside it (at 3 and 8 cm they read as cartoon crazy paving underfoot)
+    joint = t.math("SUBTRACT", 1.0, t.band(edge, 0.005, 0.011))
+    lip = t.math("SUBTRACT", 1.0, t.band(edge, 0.011, 0.025))
+    base = t.ramp(pick.outputs[0], [(0.0, hexlin("3d3c3a")), (0.3, hexlin("4f4d49")), (0.6, hexlin("353433")),
+                                    (0.85, hexlin("59564f")), (1.0, hexlin("444240"))])
+    # the stone's pitted grain, from the photograph, in world metres
+    size = materials.TEX["core"]["tile_m"][0]
+    mp = t.node("ShaderNodeMapping")
+    mp.inputs["Scale"].default_value = (1 / size, 1 / size, 1 / size)
+    t.link(pos, mp.inputs["Vector"])
+    diff = t.node("ShaderNodeTexImage", image=materials.image("core", "Diffuse"))
+    t.link(mp.outputs[0], diff.inputs["Vector"])
+    bw = t.node("ShaderNodeRGBToBW")
+    t.link(diff.outputs["Color"], bw.inputs[0])
+    grain = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", bw.outputs[0], 0.35), 2.4), 1.0)
+    col = t.mix(1.0, base, t.grey(t.math("MAXIMUM", grain, 0.3)), "MULTIPLY")
+    # the vesicles and pits of the lava, a couple of centimetres across, darker where dust has not filled them
+    ves = t.node("ShaderNodeTexVoronoi")
+    ves.inputs["Scale"].default_value = 55.0
+    t.link(pos, ves.inputs["Vector"])
+    pits = t.math("MULTIPLY", t.math("SUBTRACT", 1.0, t.band(ves.outputs["Distance"], 0.04, 0.14)),
+                  t.band(t.noise(pos, 3.0, 2.0), 0.3, 0.6))
+    col = t.mix(t.math("MULTIPLY", pits, 0.6), col, hexlin("1e1d1c"))
+    # weathering at a finger's breadth and a hand's, so a slab underfoot is stone and not poured concrete
+    col = t.mix(1.0, col, t.ramp(t.noise(pos, 14.0, 6.0, 0.7), [(0.3, hexlin("a8a8a8")), (0.7, hexlin("ffffff"))]), "MULTIPLY")
+    col = t.mix(1.0, col, t.ramp(t.noise(pos, 2.5, 4.0, 0.6), [(0.3, hexlin("c4c4c4")), (0.7, hexlin("ffffff"))]), "MULTIPLY")
+    # a film of dust everywhere, thicker in patches, and drifts of sand across the floor
+    film = t.band(t.noise(pos, 0.5, 4.0, 0.6), 0.45, 0.78)
+    col = t.mix(t.math("ADD", 0.03, t.math("MULTIPLY", film, 0.4)), col, hexlin("8f806a"))
+    drift = t.band(t.noise(pos, 0.12, 5.0, 0.62), 0.56, 0.72)
+    col = t.mix(t.math("MULTIPLY", drift, 0.85), col, hexlin("bda57d"))
+    col = t.mix(t.math("MULTIPLY", lip, 0.15), col, hexlin("2f2d2a"))
+    col = t.mix(t.math("MULTIPLY", joint, 0.6), col, hexlin("8e7a60"))
+    # sand gathered against the walls and the pillars' feet
+    ao = t.node("ShaderNodeAmbientOcclusion")
+    ao.samples = 8
+    ao.inputs["Distance"].default_value = 1.8
+    banked = t.math("POWER", t.math("SUBTRACT", 1.0, ao.outputs["AO"]), 0.6)
+    col = t.mix(t.math("MULTIPLY", banked, 0.75), col, hexlin("b59c76"))
     t.link(col, bsdf.inputs["Base Color"])
-    t.link(t.math("ADD", 0.32, t.math("MULTIPLY", t.math("ADD", sand, t.band(t.noise(pos, 0.5, 2.0), 0.4, 0.7)), 0.3)),
-           bsdf.inputs["Roughness"])
+    sandy = t.math("MAXIMUM", t.math("MAXIMUM", drift, joint), banked)
+    t.link(t.math("ADD", 0.5, t.math("MULTIPLY", sandy, 0.45)), bsdf.inputs["Roughness"])
+    # relief: each slab tilted a hair its own way, its edge worn down, the joint sunk under the sand
+    tilt = t.math("MULTIPLY", t.math("SUBTRACT", pick.outputs[0], 0.5), 0.02)
+    sep = t.node("ShaderNodeSeparateXYZ")
+    t.link(pos, sep.inputs[0])
+    h = t.math("ADD", t.math("MULTIPLY", tilt, t.math("ADD", sep.outputs["X"], sep.outputs["Y"])),
+               t.math("MULTIPLY", t.math("ADD", lip, joint), -0.008))
+    h = t.math("ADD", h, t.math("MULTIPLY", t.noise(mp.outputs[0], 8.0, 4.0), 0.002))
+    h = t.math("ADD", h, t.math("MULTIPLY", t.math("ADD", bw.outputs[0], t.math("MULTIPLY", pits, -0.5)), 0.004))
+    bmp = t.node("ShaderNodeBump")
+    bmp.inputs["Strength"].default_value = 1.0
+    bmp.inputs["Distance"].default_value = 1.0
+    t.link(h, bmp.inputs["Height"])
+    t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
@@ -96,10 +160,19 @@ def build(state, rng, coll, mats, lib, log=print):
     ys = [c[1] for c in corners]
     x0, x1, y0, y1 = min(xs) - WALL, max(xs) + WALL + 4.0, min(ys) - WALL, max(ys) + WALL
     ring = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    materials.masonry_set(mats)
     walls = Field()
-    laid = lay_ring(ring, z + thick, HEIGHT, rng, walls, course=1.0, length=2.0, depth=WALL, batter_deg=84.0, miss=0.0,
-                    variants=N_DRESSED, openings=[(x1, 0.0, 4.0, 5.0), (x0, 0.0, 6.0, 6.0)], joint=0.02, erosion_jitter=False)
-    walls.emit("Khufu's mortuary temple walls", lib["dressed limestone"], coll, log)
+    # Dressed limestone laid as the period laid it (critic: "plain grey boxes with regular joints"): blocks
+    # of different lengths and heights, the beds stepping, the faces leaning with the batter.
+    # The walls stand outside the pavement, on the rock levelled round it: founded half a metre down, so
+    # no daylight shows under them (it drew a bright seam along every wall's foot).
+    foot = z - 0.5
+    laid = lay_masonry(ring, foot, HEIGHT + z + thick - foot, rng, walls, course=1.05, block=2.3, depth=WALL, batter_deg=84.0,
+                       openings=[(x1, 0.0, 4.0, 5.0 + z + thick - foot), (x0, 0.0, 6.0, 6.0 + z + thick - foot)], joint=0.012,
+                       course_spread=0.28,
+                       block_spread=0.45, min_len=0.8, max_course=1.9)
+    walls.emit("Khufu's mortuary temple walls", battered_variants(lib, "limestone masonry", mats["limestone masonry"], **DRESSED_BLOCK),
+               coll, log)
     pillars = Field()
     inner = (min(xs) + 3.0, max(xs) - 3.0, min(ys) + 3.0, max(ys) - 3.0)
     n_x = int((inner[1] - inner[0]) / PILLAR_PITCH)
@@ -111,18 +184,25 @@ def build(state, rng, coll, mats, lib, log=print):
             px = inner[0] + i * (inner[1] - inner[0]) / n_x
             py = inner[2] + j * (inner[3] - inner[2]) / n_y
             pillars.add((px, py, z + thick + (HEIGHT - 1.0) / 2), (0.0, 0.0, 0.0), (PILLAR_SIDE, PILLAR_SIDE, HEIGHT - 1.0),
-                        rng.randrange(N_DRESSED), rng.random(), 0.0)
-    pillars.emit("Khufu's mortuary temple pillars", lib["dressed granite"], coll, log)
-    # The colonnade carries granite architraves, and a limestone roof spans from them to the walls, so
-    # the court is an open square ringed by a shaded walk (look choices after Lauer's reconstruction).
+                        rng.randrange(2), rng.random(), 0.0)
+    # The colonnade carries granite architraves, a beam from each pillar to the next, and a limestone roof
+    # spans from them to the walls, so the court is an open square ringed by a shaded walk (look choices
+    # after Lauer's reconstruction).
     top = z + thick + HEIGHT - 1.0
     beam = 1.0
+    xs_p = [inner[0] + i * (inner[1] - inner[0]) / n_x for i in range(n_x + 1)]
+    ys_p = [inner[2] + j * (inner[3] - inner[2]) / n_y for j in range(n_y + 1)]
+    for y_row in (inner[2], inner[3]):
+        for a, b in zip(xs_p[:-1], xs_p[1:]):
+            pillars.add(((a + b) / 2, y_row, top + beam / 2), (0.0, 0.0, 0.0), (b - a - 0.012, PILLAR_SIDE, beam),
+                        rng.randrange(2), rng.random(), 0.0)
+    for x_row in (inner[0], inner[1]):
+        for a, b in zip(ys_p[:-1], ys_p[1:]):
+            pillars.add((x_row, (a + b) / 2, top + beam / 2), (0.0, 0.0, 0.5 * math.pi), (b - a - 0.012, PILLAR_SIDE, beam),
+                        rng.randrange(2), rng.random(), 0.0)
+    pillars.emit("Khufu's mortuary temple pillars", battered_variants(lib, "granite masonry", mats["granite masonry"], **DRESSED_BLOCK),
+                 coll, log)
     ax0, ax1, ay0, ay1 = inner[0] - PILLAR_SIDE / 2, inner[1] + PILLAR_SIDE / 2, inner[2] - PILLAR_SIDE / 2, inner[3] + PILLAR_SIDE / 2
-    for (cx, cy, sx, sy) in (((ax0 + ax1) / 2, ay0 + PILLAR_SIDE / 2, ax1 - ax0, PILLAR_SIDE),
-                             ((ax0 + ax1) / 2, ay1 - PILLAR_SIDE / 2, ax1 - ax0, PILLAR_SIDE),
-                             (ax0 + PILLAR_SIDE / 2, (ay0 + ay1) / 2, PILLAR_SIDE, ay1 - ay0),
-                             (ax1 - PILLAR_SIDE / 2, (ay0 + ay1) / 2, PILLAR_SIDE, ay1 - ay0)):
-        _box("Khufu's mortuary temple architrave", (cx, cy, top + beam / 2), (sx, sy, beam), mats["dressed granite"], coll)
     slab = 0.8
     rz = top + beam + slab / 2
     px0, px1, py0, py1 = min(xs), max(xs), min(ys), max(ys)
@@ -130,7 +210,7 @@ def build(state, rng, coll, mats, lib, log=print):
                              ((px0 + px1) / 2, (ay1 - PILLAR_SIDE + py1) / 2, px1 - px0, py1 - ay1 + PILLAR_SIDE),
                              ((px0 + ax0 + PILLAR_SIDE) / 2, (ay0 + ay1) / 2, ax0 + PILLAR_SIDE - px0, ay1 - ay0),
                              ((ax1 - PILLAR_SIDE + px1) / 2, (ay0 + ay1) / 2, px1 - ax1 + PILLAR_SIDE, ay1 - ay0)):
-        _box("Khufu's mortuary temple roof", (cx, cy, rz), (sx, sy, slab), mats["limestone flat"], coll)
+        _box("Khufu's mortuary temple roof", (cx, cy, rz), (sx, sy, slab), mats["limestone roof"], coll)
     log(f"Khufu's mortuary temple: {laid} wall blocks and a roofed colonnade round the basalt court")
 
 

@@ -52,7 +52,7 @@ STATES = {
         temples=ALL_TEMPLES, temple_mode="built", sphinx="carved",
         ground="desert", valley="fields", water="harbour", city=None, clouds="dry",
         air=(0.7, 4.5), grade=dict(bloom=0.25, tint=(1.04, 1.0, 0.93), saturation=1.04),
-        rubble=False, people=True, stones=False),
+        rubble=False, people=True, stones=True),
     "stripped": dict(
         label="c. 1800 CE", title="Stripped and buried", honesty="reconstruction", year=1800,
         pyramids="stripped", caps=None, queens="ruin", mastabas="buried", causeway="ruin",

@@ -1,6 +1,8 @@
 """
 What lies on the ground: rubble at the pyramids' feet, stones round the camera, and
-people for scale. All of it is a look choice and belongs to the present day.
+people for scale. All of it is a look choice. The rubble belongs to the eras after the
+casing was stripped; the stones to any era whose plateau is bare (as built, the chips and
+cobbles of a worked desert).
 """
 import math
 

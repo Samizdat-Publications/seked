@@ -14,9 +14,11 @@ import bmesh
 import bpy
 import numpy as np
 
-from . import data, states
+from . import data, materials, states
 from .instancing import Field
-from .variants import N_CORE, N_DRESSED
+from .temples import DRESSED_BLOCK
+from .variants import N_CORE
+from .walls import battered_variants
 
 WIDTH = {r["key"]: r["value"] for r in data.records("giza-temples.json")}["khafre.causeway.width"]
 CORRIDOR = 4.5
@@ -75,7 +77,9 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
     me = bpy.data.meshes.new("khafre causeway")
     bm.to_mesh(me)
     bm.free()
-    me.materials.append(mats["core behind"] if today else mats["dressed"])
+    if not today:
+        materials.masonry_set(mats)
+    me.materials.append(mats["core behind"] if today else mats["limestone roof"])
     ob = bpy.data.objects.new("khafre causeway", me)
     coll.objects.link(ob)
     if today:
@@ -125,19 +129,24 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                         hh = course - 0.02
                         blocks.add((p[0] + n[i, 0] * off, p[1] + n[i, 1] * off, zz + 0.3 + k * course + hh / 2),
                                    (0.0, 0.0, yaw + (0.0 if side > 0 else math.pi)), (bl - 0.02, WALL, hh),
-                                   rng.randrange(N_DRESSED), rng.random(), rng.random() * 0.1)
+                                   rng.randrange(2), rng.random(), rng.random() * 0.2)
                 s += bl
-            # Roof slabs across the corridor, one every metre or so.
+            # Roof slabs across the corridor, one every metre or so, lying with the slope (laid level they
+            # stepped down it like a stair, every riser catching the sun).
+            pitch = math.atan2(z[i + 1] - z[i], seg)
             s = 0.0
             while s < seg - 0.1:
                 w = min(rng.uniform(0.9, 1.3), seg - s)
                 t = (s + w / 2) / seg
                 p = p0 + (p1 - p0) * t
                 zz = z[i] + (z[i + 1] - z[i]) * t
-                slabs.add((p[0], p[1], zz + 0.3 + n_courses * course + 0.4), (0.0, 0.0, yaw),
-                          (w - 0.02, WIDTH + 2 * WALL + 0.3, 0.8), rng.randrange(N_DRESSED), rng.random(), rng.random() * 0.1)
+                slabs.add((p[0], p[1], zz + 0.3 + n_courses * course + 0.4), (0.0, -pitch, yaw),
+                          (w - 0.02, WIDTH + 2 * WALL + 0.3, 0.8), rng.randrange(2), rng.random(), rng.random() * 0.2)
                 s += w
-        blocks.emit("causeway corridor walls", lib["dressed limestone"], coll, log)
-        slabs.emit("causeway corridor roof", lib["dressed limestone"], coll, log)
+        # dressed limestone in the temples' stone, dusty and sanded on its roof (it read as white steps)
+        blocks.emit("causeway corridor walls", battered_variants(lib, "limestone masonry", mats["limestone masonry"], **DRESSED_BLOCK),
+                    coll, log)
+        slabs.emit("causeway corridor roof", battered_variants(lib, "limestone roof blocks", mats["limestone roof blocks"],
+                                                               **DRESSED_BLOCK), coll, log)
         log(f"causeway: corridor {CORRIDOR} m high, laid in blocks, on {len(line)} stations")
     return line

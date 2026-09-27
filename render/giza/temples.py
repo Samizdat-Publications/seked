@@ -14,10 +14,13 @@ import math
 import bpy
 import numpy as np
 
-from . import data, states
+from . import data, materials, states
 from .instancing import Field
-from .walls import ccw, inset_ring, lay_ring, simplify
+from .walls import battered_variants, ccw, inset_ring, lay_masonry, lay_ring, simplify
 from .variants import N_DRESSED
+
+# The dressed blocks' variants (variants.block): arrises barely eased, faces flat, as dressed stone is.
+DRESSED_BLOCK = dict(rounding=0.01, erosion=0.002, chips=0, cuts=2, smooth=False)
 
 TEMPLES = ["khafre.valley_temple", "sphinx.temple", "khafre.mortuary_temple", "menkaure.mortuary_temple",
            "menkaure.valley_temple"]
@@ -132,6 +135,7 @@ def _mouths(doors, base, coll, material):
 def build(state, rng, terrain, coll, mats, lib, log=print):
     S = states.spec(state)
     mode = S["temple_mode"]
+    materials.masonry_set(mats)
     core_blocks, granite_blocks, lime_blocks, fresh_blocks = Field(), Field(), Field(), Field()
     for t in outlines(terrain.z):
         if t["id"] not in S["temples"]:
@@ -157,21 +161,31 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
         else:
             casing = CASING[t["id"]]
             if casing == "mudbrick":
-                _battered_shell(ring, base - 0.3, HEIGHT_BUILT + 0.3, coll, t["id"], mats["mudbrick"])
+                # plastered with mud, sand on the roof (drawn flat red-brown it read as a box from the air)
+                _battered_shell(ring, base - 0.3, HEIGHT_BUILT + 0.3, coll, t["id"], mats["mud plaster"])
             else:
                 target = granite_blocks if casing == "granite" else lime_blocks
-                # granite laid as Khafre's masons laid it, courses and blocks of very different sizes (a look
-                # choice after the photographs); the limestone temples in more even courses
-                spread = (0.35, 0.6) if casing == "granite" else (0.12, 0.35)
-                laid = lay_ring(ring, base, HEIGHT_BUILT, rng, target, course=1.3, length=3.0, depth=1.6, miss=0.0,
-                                variants=N_DRESSED, openings=doors, joint=0.025, erosion_jitter=False,
-                                course_spread=spread[0], length_spread=spread[1], seed=len(t["id"]) * 0.37)
+                # Laid as Khafre's masons laid it (critic: "painted brick"): blocks of very different sizes,
+                # the granite megalithic, some a metre high and some three, their beds stepping along the
+                # wall, the fronts leaning with the batter; the limestone temple in smaller, evener work.
+                # The sizes are look choices after the photographs of the valley temple.
+                if casing == "granite":
+                    laid = lay_masonry(ring, base, HEIGHT_BUILT, rng, target, course=1.35, block=3.2, depth=1.6, openings=doors,
+                                       joint=0.012, course_spread=0.42, block_spread=0.55, min_len=0.9, max_course=2.3)
+                else:
+                    laid = lay_masonry(ring, base, HEIGHT_BUILT, rng, target, course=1.0, block=2.2, depth=1.6, openings=doors,
+                                       joint=0.012, course_spread=0.22, block_spread=0.4, min_len=0.8, max_course=1.8)
                 lean = HEIGHT_BUILT / math.tan(math.radians(82.0))
                 _slab(inset_ring(ring, 1.6 + lean + 0.2), base - 0.3, base + HEIGHT_BUILT - 0.05, coll, t["id"] + " core", mats["core behind"])
-                _slab(inset_ring(ring, lean + 0.05), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.35, coll, t["id"] + " roof", mats["pavement"])
+                # the roof set back on the top course, so the wall ends in its own stone rather than a pale band
+                _slab(inset_ring(ring, lean + 0.7), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.25, coll, t["id"] + " roof",
+                      mats["limestone roof"])
                 log(f"{t['id']}: {laid} dressed {casing} blocks to {HEIGHT_BUILT:.0f} m")
         _mouths(doors, base, coll, mats["dark"])
     core_blocks.emit("temple blocks", lib["core"], coll, log)
     fresh_blocks.emit("temple megaliths", lib["core fresh"], coll, log)
-    granite_blocks.emit("temple granite", lib["dressed granite"], coll, log)
-    lime_blocks.emit("temple limestone", lib["dressed limestone"], coll, log)
+    if len(granite_blocks):
+        granite_blocks.emit("temple granite", battered_variants(lib, "granite masonry", mats["granite masonry"], **DRESSED_BLOCK), coll, log)
+    if len(lime_blocks):
+        lime_blocks.emit("temple limestone", battered_variants(lib, "limestone masonry", mats["limestone masonry"], **DRESSED_BLOCK),
+                         coll, log)

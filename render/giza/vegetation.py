@@ -260,7 +260,8 @@ STATES = {
         plants=[
             dict(kind="date-palm", zone="valley", per_ha=4.0, height=(10.0, 18.0), clump=(250.0, 0.35), far=True),
             dict(kind="date-palm", zone="valley", height=(9.0, 16.0),
-                 rows=dict(field=(60.0, 140.0), spacing=(7.0, 10.0), share=0.3, angle=-8.0, box=(430.0, 2600.0, -2000.0, 1500.0))),
+                 rows=dict(field=(60.0, 140.0), spacing=(7.0, 10.0), share=0.18, angle=-8.0, box=(430.0, 2600.0, -2000.0, 1500.0),
+                           layout="fields")),
             dict(kind="date-palm", zone="box", box=(420.0, 520.0, -560.0, -380.0), count=22, height=(10.0, 16.0)),
             dict(kind="tree", zone="valley", per_ha=0.6, height=(6.0, 10.0), far=True),
             dict(kind="acacia", zone="valley", per_ha=0.3, height=(5.0, 8.0), far=True),
@@ -277,7 +278,8 @@ STATES = {
             dict(kind="date-palm", zone="valley", per_ha=2.0, height=(10.0, 19.0), clump=(220.0, 0.3),
                  box=(430.0, 2800.0, -2200.0, 1800.0), far=True),
             dict(kind="date-palm", zone="valley", height=(10.0, 18.0),
-                 rows=dict(field=(70.0, 160.0), spacing=(8.0, 12.0), share=0.15, angle=-8.0, box=(430.0, 2600.0, -2000.0, 1500.0))),
+                 rows=dict(field=(70.0, 160.0), spacing=(8.0, 12.0), share=0.1, angle=-8.0, box=(430.0, 2600.0, -2000.0, 1500.0),
+                           layout="fields")),
             dict(kind="date-palm", zone="village", per_ha=5.0, height=(10.0, 19.0), avoid="village"),
             dict(kind="tree", zone="valley", per_ha=0.3, height=(6.0, 10.0)),
         ]),
@@ -728,8 +730,28 @@ def _outside_buildings(x, y, which, margin=2.5):
 
 
 def _rows(grid, far, entry, kind, rng):
-    """Palms along some of the field edges of a rotated grid of fields: the valley's field boundaries."""
+    """
+    Palms along some of the field edges of a rotated grid of fields: the valley's field boundaries.
+    With `layout: "fields"`, along the canals and dykes of render/giza/fields.py, the fields the ground
+    draws, and only where the ground is fields (below fields.EDGE).
+    """
     R = entry["rows"]
+    if R.get("layout") == "fields":
+        from . import fields
+        x, y = fields.palms(rng, R["share"], R["spacing"], R["box"])
+        margin = KINDS[kind]["margin"]
+        keep = np.zeros(len(x), bool)
+        z = np.zeros(len(x))
+        ins = grid.inside(x, y)
+        m = grid.zone(entry["zone"]) * grid.clear(margin)
+        keep[ins] = grid.at(m, x[ins], y[ins]) > 0.5
+        z[ins] = grid.at(grid.Z, x[ins], y[ins])
+        if far is not None:
+            out = ~ins & far.inside(x, y)
+            keep[out] = far.at(far.zone(entry["zone"]), x[out], y[out]) > 0.5
+            z[out] = _far_surface(grid.terrain, x[out], y[out])
+        keep &= z < fields.EDGE - 0.3
+        return x[keep], y[keep], z[keep]
     a = math.radians(R["angle"])
     ca, sa = math.cos(a), math.sin(a)
     x0, x1, y0, y1 = R["box"]

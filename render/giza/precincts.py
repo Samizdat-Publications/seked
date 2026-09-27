@@ -14,10 +14,10 @@ import math
 
 import bpy
 
-from . import data, states
+from . import data, materials, states
 from .instancing import Field
 from .variants import N_DRESSED
-from .walls import lay_ring
+from .walls import battered_variants, lay_masonry, lay_ring
 
 # pyramid: (distance of the wall's inner face from the base, thickness, height, east opening half-width)
 WALLS = {"g1": (10.2, 3.2, 8.0, 25.0), "g2": (10.0, 3.2, 8.0, 24.0), "g3": (8.0, 2.6, 6.5, 27.0)}
@@ -49,18 +49,32 @@ def footprints(state):
 
 
 def build(state, rng, coll, mats, lib, log=print):
+    from .temples import DRESSED_BLOCK
     S = states.spec(state)
     if S["pyramids"] not in ("dressed", "pristine", "weathered"):
         return
     blocks = Field()
+    built = state == "built"
+    if built:
+        # as built the courts are dusty and the walls laid in the temples' dressed limestone (look choices)
+        materials.masonry_set(mats)
+        if "court" not in mats:
+            mats["court"] = materials.pavement("court", dusty=True)
     for key, (reach, thick, height, open_half) in WALLS.items():
         P = data.PYRAMIDS[key]
-        _pavement(P, reach, coll, mats["pavement"])
+        _pavement(P, reach, coll, mats["court"] if built else mats["pavement"])
         h = P["half"] + reach + thick       # the wall's outer face
         ring = [(P["cx"] - h, P["cy"] - h), (P["cx"] + h, P["cy"] - h), (P["cx"] + h, P["cy"] + h), (P["cx"] - h, P["cy"] + h)]
         # The mortuary temple meets the wall on the east: leave it open there, full height.
         opening = [(P["cx"] + h, P["cy"], open_half * 2.0, height + 1.0)]
-        laid = lay_ring(ring, P["base"], height, rng, blocks, course=COURSE, length=2.0, depth=thick, batter_deg=86.0,
-                        miss=0.0, variants=N_DRESSED, openings=opening, joint=0.02, erosion_jitter=False)
+        if built:
+            laid = lay_masonry(ring, P["base"], height, rng, blocks, course=COURSE, block=2.2, depth=thick, batter_deg=86.0,
+                               openings=opening, joint=0.012, course_spread=0.25, block_spread=0.45, min_len=0.8, max_course=1.9)
+        else:
+            laid = lay_ring(ring, P["base"], height, rng, blocks, course=COURSE, length=2.0, depth=thick, batter_deg=86.0,
+                            miss=0.0, variants=N_DRESSED, openings=opening, joint=0.02, erosion_jitter=False)
         log(f"{P['name']}: court and enclosure wall, {laid} blocks")
-    blocks.emit("enclosure walls", lib["dressed limestone"], coll, log)
+    if built:
+        blocks.emit("enclosure walls", battered_variants(lib, "limestone masonry", mats["limestone masonry"], **DRESSED_BLOCK), coll, log)
+    else:
+        blocks.emit("enclosure walls", lib["dressed limestone"], coll, log)

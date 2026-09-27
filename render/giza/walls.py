@@ -151,6 +151,92 @@ def lay_ring(ring, base_z, height, rng, field, course=1.1, length=2.2, depth=1.8
     return laid
 
 
+# The fronts of battered blocks lean back by these shares of their depth over their height (variants.block's
+# `shear`); a block takes the variant nearest the lean its height and the wall's batter ask for.
+SHEARS = (0.0, 0.035, 0.07, 0.105, 0.14, 0.18, 0.22, 0.27, 0.33, 0.4)
+
+
+def battered_variants(lib, key, material, seeds=2, **block_kw):
+    """
+    Block variants whose fronts lean back (one set per shear in SHEARS, `seeds` of each), for walls
+    laid by lay_masonry with a continuous batter; made once per library and kept in it under `key`.
+    """
+    if key in lib:
+        return lib[key]
+    import bpy
+    from . import variants
+    parent = bpy.data.collections.get("library") or bpy.context.scene.collection
+    meshes = [variants.block(900 + 17 * len(lib) + k * seeds + j, shear=s, **block_kw)
+              for k, s in enumerate(SHEARS) for j in range(seeds)]
+    lib[key] = variants.collection(parent, "v " + key, meshes, material)
+    lib[key + " seeds"] = seeds
+    return lib[key]
+
+
+def lay_masonry(ring, base_z, height, rng, field, course=1.3, block=3.0, depth=1.6, batter_deg=82.0, openings=(),
+                joint=0.02, course_spread=0.35, block_spread=0.5, min_len=0.7, snap=0.3, seeds=2, tone=None, wear=(0.0, 0.3),
+                max_course=2.2):
+    """
+    Lay a battered wall round a closed outline as the Old Kingdom laid its temples: each face filled by
+    packing.skyline, blocks of very different lengths and heights whose beds step along the wall, the
+    fronts leaning back with the batter (the variants from battered_variants, chosen by index), the
+    joints a hairline. `openings` are doorways (x, y, width, height) as in lay_ring. At a convex
+    corner one face runs through and the other stops short against it. `tone` is (low, high) for the
+    blocks' tones (all of 0..1 by default); `wear` likewise. Returns the blocks laid.
+    """
+    from .packing import skyline
+    pts = simplify(ring)
+    per_m = 1.0 / math.tan(math.radians(batter_deg))
+    laid = 0
+    for i in range(len(pts)):
+        ax, ay = pts[i]
+        bx, by = pts[(i + 1) % len(pts)]
+        ex, ey = bx - ax, by - ay
+        L = math.hypot(ex, ey)
+        (px, py), (qx, qy) = pts[i - 1], pts[(i + 2) % len(pts)]
+        turn_in = 1.0 if (ax - px) * ey - (ay - py) * ex > 0 else -1.0
+        turn_out = 1.0 if ex * (qy - by) - ey * (qx - bx) > 0 else -1.0
+        short = depth if turn_out > 0 else 0.0
+        run = L - short
+        if run < min_len:
+            continue
+        dx, dy = ex / L, ey / L
+        nx, ny = dy, -dx
+        yaw = math.atan2(ny, nx) - 0.5 * math.pi
+        voids = []
+        for ox, oy, ow, oh in openings:
+            along = (ox - ax) * dx + (oy - ay) * dy
+            across = (ox - ax) * nx + (oy - ay) * ny
+            if -1.0 < along < L + 1.0 and abs(across) < 4.0:
+                voids.append((along - ow / 2, along + ow / 2, oh))
+        for a, b, z0, z1 in skyline(run, height, rng, course=course, block=block, course_spread=course_spread,
+                                    block_spread=block_spread, min_len=min_len, snap=snap, max_course=max_course, voids=voids):
+            lean = z0 * per_m
+            # the faces draw in as they rise: an end at a corner moves along with the face it meets, taken
+            # at the block's mid-height, so its square end neither stands proud of the leaning face at its
+            # top nor leaves a notch at its foot by more than half the lean across its own height
+            mid = (z0 + z1) / 2 * per_m
+            if a <= 1e-6:
+                a = mid * turn_in
+            if b >= run - 1e-6:
+                b = run - mid * turn_out
+            if b - a < 0.3:
+                continue
+            hh = z1 - z0 - joint * 0.5
+            bl = b - a - joint
+            sc = (a + b) / 2
+            inset = lean + depth / 2
+            cx = ax + dx * sc - nx * inset
+            cy = ay + dy * sc - ny * inset
+            want = per_m * hh / depth
+            level = min(range(len(SHEARS)), key=lambda k: abs(SHEARS[k] - want))
+            tn = rng.random() if tone is None else rng.uniform(*tone)
+            field.add((cx, cy, base_z + z0 + hh / 2), (0.0, 0.0, yaw), (bl, depth, hh),
+                      level * seeds + rng.randrange(seeds), tn, rng.uniform(*wear))
+            laid += 1
+    return laid
+
+
 def inset_ring(ring, d):
     """Offset a counter-clockwise ring inward by d (mitred corners), for the core behind a facing."""
     pts = ccw(ring)

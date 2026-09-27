@@ -249,14 +249,26 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
     top = water_z + QUAY_TOP_ABOVE_WATER
     base = water_z - 2.0
     n = int(round((top - base) / course))
-    yy = y0
-    while yy < y1:
-        bl = rng.uniform(1.4, 2.4)
-        for k in range(n):
-            blocks.add((x + 1.5, yy + bl / 2, base + k * course + course / 2), (0.0, 0.0, -0.5 * math.pi),
-                       (bl - 0.03, 3.0, course - 0.03), rng.randrange(N_DRESSED), rng.random(), rng.random() * 0.1)
-        yy += bl
-    blocks.emit("quay", lib["dressed limestone"], coll, log)
+    # Each course breaks joint with the one below (stacked in columns they read as toy bricks).
+    for k in range(n):
+        yy = y0 - rng.uniform(0.0, 1.2)
+        while yy < y1:
+            bl = rng.uniform(1.2, 2.6)
+            a, b = max(yy, y0), min(yy + bl, y1)
+            if b - a > 0.4:
+                blocks.add((x + 1.5, (a + b) / 2, base + k * course + course / 2), (0.0, 0.0, -0.5 * math.pi),
+                           (b - a - 0.015, 3.0, course - 0.012), rng.randrange(2), rng.random(), rng.random() * 0.3)
+            yy += bl
+    from . import materials
+    from .temples import DRESSED_BLOCK
+    from .walls import battered_variants
+    # The quay's stone: the temples' dressed limestone, darkened and greened where the inundation stands on
+    # it and a band above where it rises and falls, dusty on top (look choices; it read as white toy blocks).
+    if "quay stone" not in mats:
+        mats["quay stone"] = materials.stone("quay stone", "tura_dressed", rough=0.75, tex_role="core", tex_amt=0.5, sand_tops=0.9,
+                                             bump=0.35, wear_amt=0.3, stain=(water_z + 0.45, "5f5a44", 0.8),
+                                             contact=dict(reach=1.0, dirt="7d6a4c", amount=0.5, arris=0.015))
+    blocks.emit("quay", battered_variants(lib, "quay stone", mats["quay stone"], **DRESSED_BLOCK), coll, log)
     hull, cabin, rig = boat_materials()
     ship = ship_model(log)
     barques = 0

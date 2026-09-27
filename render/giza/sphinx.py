@@ -36,13 +36,19 @@ TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated t
 # taken down to the bedrock's warm limestone (a look choice; traces of red ochre survive on it).
 WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
           # the First Time's freshly carved lion (sphinx-lion-pristine) renders pale ivory beside the bedrock walls
-          "sphinx-lion-pristine": (0.9, 0.8, 0.66, 1.0)}
+          "sphinx-lion-pristine": (0.93, 0.87, 0.77, 1.0)}
 # Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
-CARVED = {"sphinx-lion-pristine": 1.0, "sphinx-carved": 0.7}
+CARVED = {"sphinx-lion-pristine": 0.55, "sphinx-carved": 0.7}
+# Stand-ins that stand in a wet green world: dark growth in their hollows and the runs of rain below
+# them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
+# fresh limestone in a humid forest greys and greens in its first years).
+DAMP = {"sphinx-lion-pristine": 1.0}
+# Generated textures whose colour runs to orange clay (critic round 15): their saturation (a look choice).
+DESATURATED = {"sphinx-lion-pristine": 0.7}
 # Painted stand-ins whose generated colours come out saturated like plastic: their saturation (a look choice).
-WEATHERED_PAINT = {"sphinx-carved": 0.45}
+WEATHERED_PAINT = {"sphinx-carved": 0.32}
 SOUTH_MARGIN = 9.0        # look choice
 EAST_EDGE = 367.0         # the Sphinx Temple's west wall stands at x 369
 # GLO-30's 30 m cells average the ditch into the rock round it, leaving faces a metre or two high
@@ -133,12 +139,20 @@ def statue(state, coll, log=print):
                     src = base.links[0].from_socket
                     fade = tree.nodes.new("ShaderNodeHueSaturation")
                     fade.inputs["Saturation"].default_value = WEATHERED_PAINT[model_id]
-                    fade.inputs["Value"].default_value = 0.88
+                    fade.inputs["Value"].default_value = 0.84
                     fade.inputs["Hue"].default_value = 0.515      # the pink towards the red-brown of ochre
                     tree.links.new(src, fade.inputs["Color"])
                     tree.links.new(fade.outputs["Color"], base)
                 if model_id in CARVED and base.is_linked:
                     _in_bedrock(tree, nd, CARVED[model_id])
+                if model_id in DESATURATED and base.is_linked:
+                    src = base.links[0].from_socket
+                    grey = tree.nodes.new("ShaderNodeHueSaturation")
+                    grey.inputs["Saturation"].default_value = DESATURATED[model_id]
+                    tree.links.new(src, grey.inputs["Color"])
+                    tree.links.new(grey.outputs["Color"], base)
+                if model_id in DAMP and base.is_linked:
+                    _damp(tree, nd, DAMP[model_id])
                 if model_id in TINTED and base.is_linked:
                     src = base.links[0].from_socket
                     hsv = tree.nodes.new("ShaderNodeHueSaturation")
@@ -211,6 +225,84 @@ def _in_bedrock(tree, bsdf, strength=1.0):
     if normal.is_linked:
         links.new(normal.links[0].from_socket, bmp.inputs["Normal"])
     links.new(bmp.outputs["Normal"], normal)
+
+
+def _damp(tree, bsdf, strength=1.0):
+    """Darken a stand-in's hollows towards a green-grey growth and draw the runs of rain down its flanks."""
+    nodes, links = tree.nodes, tree.links
+    base = bsdf.inputs["Base Color"]
+    src = base.links[0].from_socket
+    geo = nodes.new("ShaderNodeNewGeometry")
+    ao = nodes.new("ShaderNodeAmbientOcclusion")
+    ao.samples = 8
+    ao.inputs["Distance"].default_value = 3.0
+    hollow = nodes.new("ShaderNodeMapRange")          # 1 deep in a hollow, 0 in the open
+    hollow.inputs["From Min"].default_value, hollow.inputs["From Max"].default_value = 0.85, 0.35
+    links.new(ao.outputs["AO"], hollow.inputs["Value"])
+    # the runs: noise drawn out down the fall line, strongest on the steep flanks
+    runs_space = nodes.new("ShaderNodeMapping")
+    runs_space.inputs["Scale"].default_value = (2.5, 2.5, 0.12)
+    links.new(geo.outputs["Position"], runs_space.inputs["Vector"])
+    nz = nodes.new("ShaderNodeTexNoise")
+    nz.inputs["Scale"].default_value = 1.4
+    nz.inputs["Detail"].default_value = 4.0
+    links.new(runs_space.outputs[0], nz.inputs["Vector"])
+    runs = nodes.new("ShaderNodeMapRange")
+    runs.inputs["From Min"].default_value, runs.inputs["From Max"].default_value = 0.52, 0.68
+    links.new(nz.outputs["Fac"], runs.inputs["Value"])
+    sep = nodes.new("ShaderNodeSeparateXYZ")
+    links.new(geo.outputs["Normal"], sep.inputs[0])
+    steep = nodes.new("ShaderNodeMapRange")
+    steep.inputs["From Min"].default_value, steep.inputs["From Max"].default_value = 0.8, 0.2
+    links.new(sep.outputs["Z"], steep.inputs["Value"])
+    streak = nodes.new("ShaderNodeMath")
+    streak.operation = "MULTIPLY"
+    links.new(runs.outputs[0], streak.inputs[0])
+    links.new(steep.outputs[0], streak.inputs[1])
+    m1 = nodes.new("ShaderNodeMixRGB")
+    m1.blend_type = "MULTIPLY"
+    k = nodes.new("ShaderNodeMath")
+    k.operation = "MULTIPLY"
+    k.inputs[1].default_value = 0.9 * strength
+    links.new(hollow.outputs[0], k.inputs[0])
+    links.new(k.outputs[0], m1.inputs["Fac"])
+    links.new(src, m1.inputs["Color1"])
+    m1.inputs["Color2"].default_value = (0.2, 0.22, 0.14, 1.0)
+    m2 = nodes.new("ShaderNodeMixRGB")
+    m2.blend_type = "MULTIPLY"
+    k2 = nodes.new("ShaderNodeMath")
+    k2.operation = "MULTIPLY"
+    k2.inputs[1].default_value = 0.45 * strength
+    links.new(streak.outputs[0], k2.inputs[0])
+    links.new(k2.outputs[0], m2.inputs["Fac"])
+    links.new(m1.outputs["Color"], m2.inputs["Color1"])
+    m2.inputs["Color2"].default_value = (0.55, 0.55, 0.5, 1.0)
+    # the growth that settles where rain stands, on the tops, in patches a few metres across
+    patch = nodes.new("ShaderNodeTexNoise")
+    patch.inputs["Scale"].default_value = 0.6
+    patch.inputs["Detail"].default_value = 8.0
+    patch.inputs["Roughness"].default_value = 0.65
+    links.new(geo.outputs["Position"], patch.inputs["Vector"])
+    patchy = nodes.new("ShaderNodeMapRange")
+    patchy.inputs["From Min"].default_value, patchy.inputs["From Max"].default_value = 0.45, 0.62
+    links.new(patch.outputs["Fac"], patchy.inputs["Value"])
+    up = nodes.new("ShaderNodeMapRange")
+    up.inputs["From Min"].default_value, up.inputs["From Max"].default_value = 0.3, 0.9
+    links.new(sep.outputs["Z"], up.inputs["Value"])
+    grow = nodes.new("ShaderNodeMath")
+    grow.operation = "MULTIPLY"
+    links.new(patchy.outputs[0], grow.inputs[0])
+    links.new(up.outputs[0], grow.inputs[1])
+    k3 = nodes.new("ShaderNodeMath")
+    k3.operation = "MULTIPLY"
+    k3.inputs[1].default_value = 0.8 * strength
+    links.new(grow.outputs[0], k3.inputs[0])
+    m3 = nodes.new("ShaderNodeMixRGB")
+    m3.blend_type = "MIX"
+    links.new(k3.outputs[0], m3.inputs["Fac"])
+    links.new(m2.outputs["Color"], m3.inputs["Color1"])
+    m3.inputs["Color2"].default_value = (0.27, 0.3, 0.19, 1.0)
+    links.new(m3.outputs["Color"], base)
 
 
 def bedrock_material():
