@@ -71,7 +71,7 @@ CROWDS = {
               (-125, -40, 20, 50, 60, None), (215, -60, 15, 80, 60, None), (150, -250, 60, 40, 60, None),
               (-8, -318, 10, 8, 9, None), (-70, -300, 14, 10, 9, None), (392, -484, 14, 6, 30, None),
               (300, -458, 22, 3, 18, None)],
-    "built": [(417.6, -470.0, 0.8, 68.0, 34, QUAY_TOP), (156.0, 0.0, 8.0, 19.0, 14, 0.5),
+    "built": [(417.6, -470.0, 0.8, 68.0, 34, QUAY_TOP, 7), (156.0, 0.0, 8.0, 19.0, 14, 0.5),
               (300.0, -120.0, 50.0, 75.0, 18, None), (60.0, -140.0, 40.0, 8.0, 8, None),
               (-300.0, 50.0, 110.0, 70.0, 22, None),                                      # the Western Cemetery's streets
               (535.0, -841.5, 64.0, 1.6, 24, None), (516.0, -841.5, 1.4, 34.0, 12, None)],   # the town's streets
@@ -95,9 +95,18 @@ def people(camera_xy, terrain, coll, lib, log=print, state="today"):
     near = NEAR_CAMERA[bool(lib.get("figures"))]
     kinds = max(1, len(lib["people"].objects))
     pos, rot, scl, var, tone, floors = [], [], [], [], [], []
-    for sx, sy, rx, ry, n, floor in CROWDS.get(state, []):
+    for crowd in CROWDS.get(state, []):
+        sx, sy, rx, ry, n, floor = crowd[:6]
+        # A crowd given a seventh number stands in that many knots, of uneven size, along its length
+        # (critic round 18: the quay's people "in a chess-piece row"); otherwise spread evenly.
+        knots = [sy + rng.uniform(-ry, ry) for _ in range(crowd[6])] if len(crowd) > 6 else None
+        weights = [rng.uniform(0.3, 1.0) ** 2 for _ in knots] if knots else None
         for _ in range(n):
-            x, y = sx + rng.uniform(-rx, rx), sy + rng.uniform(-ry, ry)
+            x = sx + rng.uniform(-rx, rx)
+            if knots:
+                y = min(max(rng.choices(knots, weights)[0] + rng.gauss(0.0, 1.3), sy - ry), sy + ry)
+            else:
+                y = sy + rng.uniform(-ry, ry)
             if floor is None and abs(x) < 118 and abs(y) < 118:
                 continue
             if math.hypot(x - camera_xy[0], y - camera_xy[1]) < near:

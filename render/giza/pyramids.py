@@ -29,6 +29,7 @@ LOOK = {
 }
 # Generated course heights where no survey gives them: (bottom, top) in metres.
 COURSES = {"g2": (1.35, 0.6), "g3": (1.05, 0.6), "queen": (0.9, 0.55)}
+CLAIM_COURSES = (1.5, 1.2)       # the claim eras' casing courses, bottom and top (a look choice)
 PYRAMIDION_HEIGHT = 1.4          # data/measurements/pristine.json, g1/g2/g3.pyramidion.height
 
 # Faces: N, W, S, E, each the outward +Y of a block turned about Z.
@@ -102,7 +103,7 @@ def lay(P, courses, rng, core, casing, gran, spec):
             while u < u_end - 0.05:
                 # casing stones run longer than core blocks (1.5 to 2.5 m at Giza); at core lengths a cased face
                 # read as a wall of bricks (critic round 15)
-                stretch = 1.6 if cased_course and all_casing else 1.0
+                stretch = spec.get("stretch", 1.6) if cased_course and all_casing else 1.0
                 L = min(max(rng.lognormvariate(math.log(1.25 * stretch * (0.65 + 0.35 * h)), 0.33), 0.55), 2.8 * stretch)
                 if u + L > u_end - 0.4:
                     L = u_end - u
@@ -346,7 +347,14 @@ def build(state, rng, coll, mats, lib, log=print):
                 spec = dict(LOOK[key], all_casing=True, casing_miss=0.0, top=P["H"] - ph, flush_corners=True)
                 if P.get("granite_to"):
                     spec["granite_to"] = P["granite_to"]
-                courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
+                if mode == "weathered":
+                    # The long rains wore the claim's own casing, the First Time's slabs (materials.polished_casing,
+                    # 1.4 by 2.8 m), not Khufu's courses: laid at that scale (critic rounds 17 and 18: Khufu's
+                    # courses here read as "bathroom tile" and shrank the pyramid). Look choices.
+                    spec["stretch"] = 2.2
+                    courses = course_heights(P["H"], rng, *CLAIM_COURSES)
+                else:
+                    courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
                 backing_mesh(P, lay(P, courses, rng, core, casing, gran, spec), coll, mats["core behind"])
                 inner = dict(P, half=P["half"] - 0.04, H=P["H"] * (P["half"] - 0.04) / P["half"])
                 dressed_mesh(inner, inner["H"] - ph, P.get("granite_to") or 0.0, coll, face, mats["dressed granite"], arris=0.01)

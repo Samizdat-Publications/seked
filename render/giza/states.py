@@ -18,7 +18,8 @@ stays a stand-in on disk (sphinx.MODEL_FOR), outside the sequence.
 the sheathed courses under it), `clouds` the sky's cloud field (sky.CLOUDS), `air`
 the era's aerosol and haze against the defaults, `haze_colour` the hazes' colours low to high,
 `mist` a layer of it lying on the valley floor (bottom, top, density, colour), and `grade` the
-camera's response (renderer.post, and its `look` and `exposure` offset on the view transform): look
+camera's response (renderer.post, and its `look` and `exposure` offset on the view transform), and
+`sun` the sun seen through the era's cloud (its lamp's `scale` and its disc's `angle` in degrees): look
 choices all.
 
 Everything a key names here is looked up by the modules; nothing else decides what
@@ -44,7 +45,7 @@ STATES = {
         temples=MEGALITHIC, temple_mode="megalithic-weathered", sphinx="lion",
         ground="dry-savanna", valley="lush", water="flood", city=None, clouds="showers", air=(1.6, 6.0),
         haze_colour=("cfdbe8", "dae3ed"), mist=(-50.0, -34.0, 6e-4, "e7ebea"),
-        grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92),
+        grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92), sun=dict(scale=0.45, angle=3.0),
         rubble=False, people=False, stones=True),
     "built": dict(
         label="c. 2560 BCE", title="Khufu's Giza", honesty="reconstruction", year=-2559,

@@ -6,6 +6,7 @@ to 60 seconds (the Sphinx stand-in is most of it); a view only rebuilds what
 depends on the camera (the displaced patch of ground, the stones and the people
 round it) and moves the sun.
 """
+import math
 import os
 import random
 import time
@@ -256,6 +257,12 @@ class Plateau:
         alt, az, dec = sun.parse_moment(m, self.spec["year"])
         self.sun_now = (alt, az)
         colour, energy = self.sky.set_sun(alt, az)
+        veil = self.spec.get("sun")
+        if veil:
+            # the sun through the era's cloud: dimmer and its shadows softer, the photographed sky's light
+            # unchanged (critic round 18: "hard sun shadows under a fully overcast sky")
+            self.sky.sun.data.energy = energy * veil["scale"]
+            self.sky.sun.data.angle = math.radians(veil["angle"])
         self.log(f"sun at {alt:.1f} deg altitude, {az:.1f} deg azimuth (declination {dec:.1f}), beam {energy:.0f}")
         if not getattr(self, "inside", False) and not getattr(self, "in_hall", False):
             self._shadow_check(alt, az)
