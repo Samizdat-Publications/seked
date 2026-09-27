@@ -1,5 +1,5 @@
 {
-  "about": "Photographed skies (Poly Haven pure-sky HDRIs, CC0) that the humid eras show behind the plateau and in reflections, chosen with no aircraft or contrails in them, in place of Blender's clear physical sky, which still lights the scene. Fetched by python scripts/skies.py into build/skies/. Which sky an era uses and at what sun is render/giza/sky.py's CLOUDS: a look choice, and never evidence of any past weather.",
+  "about": "Photographed skies (Poly Haven pure-sky HDRIs, CC0) that the eras with weather show behind the plateau and light it by, beside the sun lamp, chosen with no aircraft or contrails in them, in place of Blender's clear physical sky while the sun is up. Fetched by python scripts/skies.py into build/skies/. Which sky an era uses and at what sun is render/giza/sky.py's CLOUDS: a look choice, and never evidence of any past weather.",
   "resolution": "4k",
   "format": "hdr",
   "skies": [
@@ -7,10 +7,8 @@
     {"id": "sunflowers_puresky", "why": "Cumulus rows under a high sun, a second day sky."},
     {"id": "kloppenheim_06_puresky", "why": "Cumulus lit gold by a low sun: the First Time's mornings and evenings."},
     {"id": "citrus_orchard_puresky", "why": "A broken cumulus field at a low sun."},
-    {"id": "farm_field_puresky", "why": "Heavy, dark-bellied cumulus: the long rains under a high sun."},
-    {"id": "industrial_sunset_puresky", "why": "Grey broken cumulus over a low sun, rain falling from the cloud base: the long rains at dawn and dusk. It replaced drackenstein_quarry_puresky, whose jet contrails showed in the 7000 BCE sky."}
-,
     {"id": "kloofendal_43d_clear_puresky", "why": "A clear sky with a few thin wisps under a high sun: Khufu's Giza, dry air rather than weather."},
-    {"id": "qwantani_late_afternoon_puresky", "why": "A clear sky veiled in haze at a low sun: Khufu's Giza in the dusty morning and evening light."}
+    {"id": "qwantani_late_afternoon_puresky", "why": "A clear sky veiled in haze at a low sun: Khufu's Giza in the dusty morning and evening light."},
+    {"id": "overcast_soil_puresky", "why": "A dark, textured deck of rain cloud with its structure down to the horizon and a bright band under its edge: the long rains, the land lit by a sun low under the deck. It replaced farm_field_puresky, whose smooth charcoal rain mass filled the dawn views looking west."}
   ]
 }

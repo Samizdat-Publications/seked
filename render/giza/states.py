@@ -34,8 +34,8 @@ STATES = {
         label="c. 10,500 BCE", title="The First Time", honesty="claim", year=-10499,
         pyramids="pristine", caps="electrum", gild=22.0, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic", sphinx="lion-fresh",
-        ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.5, 4.5),
-        haze_colour=("e3ebef", "e9eff3", "eef3f6"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
+        ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.5, 3.5),
+        haze_colour=("e3ebef", "e9eff3"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
         grade=dict(bloom=0.1, tint=(0.96, 1.0, 1.02), saturation=1.06),
         rubble=False, people=False, stones=False),
     "lion": dict(
@@ -43,7 +43,7 @@ STATES = {
         pyramids="weathered", caps="electrum", gild=16.0, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic-weathered", sphinx="lion",
         ground="dry-savanna", valley="lush", water="flood", city=None, clouds="showers", air=(1.6, 6.0),
-        haze_colour=("dfe3e2", "e6e9e8", "eef0ef"), mist=(-50.0, -34.0, 6e-4, "e7ebea"),
+        haze_colour=("cfdbe8", "dae3ed"), mist=(-50.0, -34.0, 6e-4, "e7ebea"),
         grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92),
         rubble=False, people=False, stones=True),
     "built": dict(
