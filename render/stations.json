@@ -184,8 +184,8 @@
       "moment": "temple-morning",
       "view": {
         "yaw": 270,
-        "pitch": 14,
-        "fov": 64
+        "pitch": 22,
+        "fov": 70
       },
       "neighbours": [
         "east",

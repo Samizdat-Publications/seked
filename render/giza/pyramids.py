@@ -30,6 +30,8 @@ LOOK = {
 # Generated course heights where no survey gives them: (bottom, top) in metres.
 COURSES = {"g2": (1.35, 0.6), "g3": (1.05, 0.6), "queen": (0.9, 0.55)}
 CLAIM_COURSES = (1.5, 1.2)       # the claim eras' casing courses, bottom and top (a look choice)
+# Off (round 19: laid at the claim's slab scale the long rains lost a point in every frame, still "brick-sized")
+CLAIM_SLABS = False
 PYRAMIDION_HEIGHT = 1.4          # data/measurements/pristine.json, g1/g2/g3.pyramidion.height
 
 # Faces: N, W, S, E, each the outward +Y of a block turned about Z.
@@ -347,7 +349,7 @@ def build(state, rng, coll, mats, lib, log=print):
                 spec = dict(LOOK[key], all_casing=True, casing_miss=0.0, top=P["H"] - ph, flush_corners=True)
                 if P.get("granite_to"):
                     spec["granite_to"] = P["granite_to"]
-                if mode == "weathered":
+                if mode == "weathered" and CLAIM_SLABS:
                     # The long rains wore the claim's own casing, the First Time's slabs (materials.polished_casing,
                     # 1.4 by 2.8 m), not Khufu's courses: laid at that scale (critic rounds 17 and 18: Khufu's
                     # courses here read as "bathroom tile" and shrank the pyramid). Look choices.

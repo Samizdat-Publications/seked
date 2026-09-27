@@ -74,8 +74,8 @@ INDEX = os.path.join(data.REPO, "build", "models", "index.json")
 OUT = os.path.join(data.REPO, "build", "figures")
 PARKED = (0.0, 0.0, -20000.0)      # where the originals wait, as variants.PARKED
 
-FACES = 10000                      # triangles a figure is decimated to (a look choice)
-TEXTURE_PX = 1024                  # the most pixels on a side its textures keep (a look and memory choice)
+FACES = 30000                      # triangles a figure is decimated to (a look choice; 10000 read as "low-poly game NPCs" at the temple, round 18)
+TEXTURE_PX = 2048                  # the most pixels on a side its textures keep (a look and memory choice)
 SHARP_DEG = 60.0                   # faces meeting at more than this keep a hard edge (a look choice)
 TONE = dict(value=(0.92, 1.08), saturation=(0.9, 1.1))   # what an instance's tone moves (a look choice)
 # Meshy's roughness map, 0..1, is read into this range: as generated, bare skin shines like

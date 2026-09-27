@@ -404,8 +404,8 @@ def polished_casing(name="pristine casing", instanced=False):
     geo = t.node("ShaderNodeNewGeometry")
     pos = geo.outputs["Position"]
     # a shade under white, so the sun and the mirrored sky have room to show on it
-    # (critic round 16: "matte paper, not polish") greyer, so the sky the coat mirrors shows on it
-    col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("aea99d")), (0.7, hexlin("bab5a9"))])
+    # (critic round 16: "matte paper, not polish") a shade greyer again, so the sky the coat mirrors shows on it
+    col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("bcb7ab")), (0.7, hexlin("c7c2b6"))])
     if instanced:
         # laid as blocks (pyramids.BLOCK_CASING): the joints are the blocks' own, each stone's tone its own
         joint, stone = 0.0, t.attr("tone")
@@ -425,17 +425,17 @@ def polished_casing(name="pristine casing", instanced=False):
     near.inputs["To Min"].default_value, near.inputs["To Max"].default_value = 1.0, 0.0
     t.link(cam.outputs["View Distance"], near.inputs["Value"])
     col = t.mix(t.math("MULTIPLY", t.math("MULTIPLY", joint, 0.3), near.outputs[0]), col, hexlin("7d7568"))
-    # the stone's own polish a shade uneven from slab to slab, too faint to draw a joint, so the sky in it
-    # is broken across thousands of stones rather than lying on one sheet (blind A/B, 2026-09-27)
-    t.link(t.math("ADD", 0.15, t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.1)), bsdf.inputs["Roughness"])
+    # (round 19: a glossier stone at 0.15 and a coat of IOR 3.0 won a blind A/B of two frames, then lost a
+    # point in every First Time frame of the full set, "a white smear no mirror would show": back to 0.3 and 2.0)
+    bsdf.inputs["Roughness"].default_value = 0.3
     bsdf.inputs["Specular IOR Level"].default_value = 0.5
     # the polish: a clear coat that mirrors the clouds, strongest where the face is seen at a slant
     bsdf.inputs["Coat Weight"].default_value = 1.0
     # A 52 degree face seen from the ground mirrors the sky near the zenith, the deepest blue and the
-    # clouds overhead: a coat bright enough to carry them (IOR 3.0, chosen over 2.0 in a blind A/B; a lacquer rather than a stone's own
+    # clouds overhead: a coat bright enough to carry them (IOR 2.0, a lacquer rather than a stone's own
     # polish, a look choice for the claim's "almost high tech") is what makes the faces read as polished.
     bsdf.inputs["Coat Roughness"].default_value = 0.04
-    bsdf.inputs["Coat IOR"].default_value = 3.0
+    bsdf.inputs["Coat IOR"].default_value = 2.0
     # No two slabs lie in quite the same plane: each is tilted a fraction of a degree its own way,
     # so each mirrors its own patch of sky, as polished stone cladding does on any building.
     sep = t.node("ShaderNodeSeparateXYZ")
