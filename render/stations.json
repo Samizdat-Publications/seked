@@ -107,7 +107,13 @@
         "valley-temple"
       ],
       "z": -29.5,
-      "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it."
+      "by_state": {
+        "built": {
+          "x": 480.0,
+          "z": -21.5
+        }
+      },
+      "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it. As built the eye stands 8 m higher and 41 m further east, over the Sphinx Temple's granite wall and clear of its roof, which at -29.5 filled two thirds of the view (critic round 16; a look choice)."
     },
     {
       "id": "east",

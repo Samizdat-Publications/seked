@@ -40,7 +40,7 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
-CARVED = {"sphinx-lion-pristine": 0.55, "sphinx-carved": 0.7}
+CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7}
 # Stand-ins that stand in a wet green world: dark growth in their hollows and the runs of rain below
 # them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
 # fresh limestone in a humid forest greys and greens in its first years).

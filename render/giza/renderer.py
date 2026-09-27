@@ -103,6 +103,13 @@ def post(scene, grade):
         mix.inputs[7].default_value = tuple(grade["tint"]) + (1.0,)
         g.links.new(img, mix.inputs[6])
         img = mix.outputs[2]
+    if grade.get("gamma", 1.0) != 1.0:
+        # a power on the radiance under 1: the deep shade under a forest canopy opens a little and the
+        # sunlit stone hardly moves (critic round 16: "the foreground crushed to mud" at the lush stations)
+        gm = g.nodes.new("ShaderNodeGamma")
+        gm.inputs["Gamma"].default_value = grade["gamma"]
+        g.links.new(img, gm.inputs["Color"])
+        img = gm.outputs["Color"]
     if grade.get("saturation", 1.0) != 1.0:
         hs = g.nodes.new("CompositorNodeHueSat")
         hs.inputs["Saturation"].default_value = grade["saturation"]

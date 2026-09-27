@@ -70,11 +70,21 @@ def build(state, rng, coll, mats, lib, log=print):
         if built:
             laid = lay_masonry(ring, P["base"], height, rng, blocks, course=COURSE, block=2.2, depth=thick, batter_deg=86.0,
                                openings=opening, joint=0.012, course_spread=0.25, block_spread=0.45, min_len=0.8, max_course=1.9)
+        elif state in ("first-time", "lion"):
+            # The claim's builders laid in megaliths, as its temples are (critic round 16: at the foot of the
+            # pyramid a ring of 1 x 2 m blocks read as "a garden wall of cinder blocks" and shrank it). A look choice.
+            laid = lay_masonry(ring, P["base"], height, rng, blocks, course=1.6, block=4.0, depth=thick, batter_deg=86.0,
+                               openings=opening, joint=0.008, course_spread=0.3, block_spread=0.5, min_len=1.5, max_course=2.8)
         else:
             laid = lay_ring(ring, P["base"], height, rng, blocks, course=COURSE, length=2.0, depth=thick, batter_deg=86.0,
                             miss=0.0, variants=N_DRESSED, openings=opening, joint=0.02, erosion_jitter=False)
         log(f"{P['name']}: court and enclosure wall, {laid} blocks")
     if built:
         blocks.emit("enclosure walls", battered_variants(lib, "limestone masonry", mats["limestone masonry"], **DRESSED_BLOCK), coll, log)
+    elif state in ("first-time", "lion"):
+        worn = state == "lion"
+        blocks.emit("enclosure walls", battered_variants(lib, "claim masonry", mats["limestone blocks worn" if worn else "limestone blocks"],
+                                                         rounding=0.06 if worn else 0.008, erosion=0.03 if worn else 0.001,
+                                                         chips=2 if worn else 0, cuts=4 if worn else 2, smooth=worn), coll, log)
     else:
         blocks.emit("enclosure walls", lib["dressed limestone"], coll, log)

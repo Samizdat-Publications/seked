@@ -404,7 +404,8 @@ def polished_casing(name="pristine casing", instanced=False):
     geo = t.node("ShaderNodeNewGeometry")
     pos = geo.outputs["Position"]
     # a shade under white, so the sun and the mirrored sky have room to show on it
-    col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("cbc6ba")), (0.7, hexlin("d4d0c5"))])
+    # (critic round 16: "matte paper, not polish") a shade greyer again, so the sky the coat mirrors shows on it
+    col = t.ramp(t.noise(pos, 0.02, 2.0, 0.4), [(0.3, hexlin("bcb7ab")), (0.7, hexlin("c7c2b6"))])
     if instanced:
         # laid as blocks (pyramids.BLOCK_CASING): the joints are the blocks' own, each stone's tone its own
         joint, stone = 0.0, t.attr("tone")
@@ -427,8 +428,11 @@ def polished_casing(name="pristine casing", instanced=False):
     bsdf.inputs["Specular IOR Level"].default_value = 0.5
     # the polish: a clear coat that mirrors the clouds, strongest where the face is seen at a slant
     bsdf.inputs["Coat Weight"].default_value = 1.0
-    bsdf.inputs["Coat Roughness"].default_value = 0.08
-    bsdf.inputs["Coat IOR"].default_value = 1.7
+    # A 52 degree face seen from the ground mirrors the sky near the zenith, the deepest blue and the
+    # clouds overhead: a coat bright enough to carry them (IOR 2.8, a lacquer rather than a stone's own
+    # polish, a look choice for the claim's "almost high tech") is what makes the faces read as polished.
+    bsdf.inputs["Coat Roughness"].default_value = 0.04
+    bsdf.inputs["Coat IOR"].default_value = 2.8
     # No two slabs lie in quite the same plane: each is tilted a fraction of a degree its own way,
     # so each mirrors its own patch of sky, as polished stone cladding does on any building.
     sep = t.node("ShaderNodeSeparateXYZ")
@@ -662,8 +666,10 @@ def weathered_casing(name="weathered casing", instanced=False):
     if instanced:
         wash = t.math("MULTIPLY", stripes(run, 0.035, 0.46, 0.56, 3.0), begins(0.01, 11.0, 60.0, 80.0, 50.0))
         col = t.mix(t.math("MULTIPLY", wash, 0.9), col, hexlin("7a786a"))
-        runs = t.math("MULTIPLY", stripes(waver, 0.2, 0.5, 0.6, 17.0), begins(0.06, 23.0, 20.0, 120.0, 30.0))
-        col = t.mix(t.math("MULTIPLY", runs, 0.75), col, hexlin("626556"))
+        # (round 16: "barcode", evenly spaced) fewer runs, each at its own strength
+        runs = t.math("MULTIPLY", stripes(waver, 0.2, 0.55, 0.63, 17.0), begins(0.06, 23.0, 20.0, 120.0, 30.0))
+        runs = t.math("MULTIPLY", runs, t.band(t.noise(pos, 0.04, 2.0), 0.4, 0.62))
+        col = t.mix(t.math("MULTIPLY", runs, 0.8), col, hexlin("626556"))
     else:
         wash = t.math("MULTIPLY", stripes(run, 0.035, 0.48, 0.72, 3.0), begins(0.01, 11.0, 30.0, 110.0, 40.0))
         col = t.mix(t.math("MULTIPLY", wash, 0.55 * k), col, hexlin("8a887a"))
@@ -675,7 +681,8 @@ def weathered_casing(name="weathered casing", instanced=False):
     col = t.mix(t.math("MULTIPLY", foot, 0.45), col, hexlin("6f6c5c"))
     # black-green growth where the runs gather: in the streaks, thickest low down
     growth = t.band(t.noise(pos, 0.12, 4.0, 0.6), 0.5, 0.7)
-    growth = t.math("MULTIPLY", growth, t.math("ADD", t.math("MULTIPLY", foot, 0.7), 0.2))
+    # (round 16: "repeating dark blotches" up the face) the growth kept to the foot where the runs gather
+    growth = t.math("MULTIPLY", growth, t.math("ADD", t.math("MULTIPLY", foot, 0.7), 0.2 if not instanced else 0.04))
     col = t.mix(t.math("MULTIPLY", growth, 0.7), col, hexlin("3b4034"))
     col = t.mix(t.math("MULTIPLY", joint, 0.6), col, hexlin("5f5b50"))
     t.link(col, bsdf.inputs["Base Color"])
