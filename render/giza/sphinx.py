@@ -343,6 +343,13 @@ def walls(terrain, coll, material, state="today"):
     """Cut faces round the ditch's west, north and south sides, from its floor up to the ground outside."""
     x0, x1, y0, y1, floor = enclosure(state)
     runs = [((x0, y0), (x0, y1)), ((x0, y1), (x1, y1)), ((x1, y0), (x0, y0))]   # west, north, south
+    # The cut face is not a plane (critic rounds 16 and 17: "a blank tan slab with a straight top edge"):
+    # each bed of the rock stands out or is worn back by its own amount, and the face wavers along its
+    # run, a little on the day it was cut and deeply after the long rains (metres, look choices).
+    relief = {"first-time": 0.3, "built": 0.6}.get(state, 1.0)
+    rng = np.random.default_rng(29)
+    rows = 9
+    beds = rng.uniform(-1.0, 1.0, rows + 1)
     verts, faces = [], []
     for (ax, ay), (bx, by) in runs:
         n = max(2, int(np.hypot(bx - ax, by - ay) / 1.0))
@@ -352,14 +359,24 @@ def walls(terrain, coll, material, state="today"):
         dx, dy = by - ay, -(bx - ax)
         nl = np.hypot(dx, dy)
         ox, oy = -dx / nl * 1.5, -dy / nl * 1.5
+        ux, uy = -dx / nl, -dy / nl                  # into the rock
         top = terrain.z(px + ox, py + oy)
+        along = np.convolve(rng.uniform(-1.0, 1.0, n + 9), np.ones(9) / 9.0, mode="valid")[:n + 1]
         base = len(verts)
         for i in range(n + 1):
-            verts.append((px[i], py[i], floor - 0.5))
-            verts.append((px[i], py[i], max(top[i], floor + 0.5) + 0.3))
+            # sunk just under the ground outside, so no rim of the face stands proud of it
+            hi = max(top[i], floor + 0.5) + 0.05
+            for r in range(rows + 1):
+                f = r / rows
+                z = floor - 0.5 + (hi - floor + 0.5) * f
+                # recessed only between the foot and the brink, which stay where the cut put them
+                d = relief * (0.55 * beds[r] + 0.45 * along[i] + 0.25 * rng.uniform(-1.0, 1.0)) * (0.0 if r in (0, rows) else 1.0)
+                d = max(d, -0.2 * relief)
+                verts.append((px[i] + ux * d, py[i] + uy * d, z))
         for i in range(n):
-            a = base + 2 * i
-            faces.append((a, a + 2, a + 3, a + 1))
+            for r in range(rows):
+                a = base + (rows + 1) * i + r
+                faces.append((a, a + rows + 1, a + rows + 2, a + 1))
     me = bpy.data.meshes.new("sphinx enclosure walls")
     me.from_pydata(verts, [], faces)
     me.materials.append(material)

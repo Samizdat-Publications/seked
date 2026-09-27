@@ -413,26 +413,27 @@ def polished_casing(name="pristine casing", instanced=False):
         # slabs of one size in perfect courses, the joints a ruled line: from afar a faint grid, the mark
         # of an engineered surface rather than a laid one
         joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.022)
-    shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.05), 1.0)
+    # each slab a shade off the next, as cut from its own bed (round 17: the lit face "untextured")
+    shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.09), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
     # The ruled joint fades out with distance (critic rounds 12 to 15: "horizontal pinstripes" from afar,
-    # where a 2 cm line is a fraction of a pixel and only its aliasing shows): drawn full within 60 m,
-    # gone by 300 m, where polished stone reads as one plane.
+    # where a 2 cm line is a fraction of a pixel and only its aliasing shows): drawn faint within 250 m,
+    # where it gives the face its scale (round 17: "no joints, nothing gives scale"), gone by 900 m.
     cam = t.node("ShaderNodeCameraData")
     near = t.node("ShaderNodeMapRange")
-    near.inputs["From Min"].default_value, near.inputs["From Max"].default_value = 60.0, 300.0
+    near.inputs["From Min"].default_value, near.inputs["From Max"].default_value = 250.0, 900.0
     near.inputs["To Min"].default_value, near.inputs["To Max"].default_value = 1.0, 0.0
     t.link(cam.outputs["View Distance"], near.inputs["Value"])
-    col = t.mix(t.math("MULTIPLY", t.math("MULTIPLY", joint, 0.4), near.outputs[0]), col, hexlin("7d7568"))
+    col = t.mix(t.math("MULTIPLY", t.math("MULTIPLY", joint, 0.3), near.outputs[0]), col, hexlin("7d7568"))
     bsdf.inputs["Roughness"].default_value = 0.3
     bsdf.inputs["Specular IOR Level"].default_value = 0.5
     # the polish: a clear coat that mirrors the clouds, strongest where the face is seen at a slant
     bsdf.inputs["Coat Weight"].default_value = 1.0
     # A 52 degree face seen from the ground mirrors the sky near the zenith, the deepest blue and the
-    # clouds overhead: a coat bright enough to carry them (IOR 2.8, a lacquer rather than a stone's own
+    # clouds overhead: a coat bright enough to carry them (IOR 2.0, a lacquer rather than a stone's own
     # polish, a look choice for the claim's "almost high tech") is what makes the faces read as polished.
     bsdf.inputs["Coat Roughness"].default_value = 0.04
-    bsdf.inputs["Coat IOR"].default_value = 2.8
+    bsdf.inputs["Coat IOR"].default_value = 2.0
     # No two slabs lie in quite the same plane: each is tilted a fraction of a degree its own way,
     # so each mirrors its own patch of sky, as polished stone cladding does on any building.
     sep = t.node("ShaderNodeSeparateXYZ")
@@ -449,7 +450,8 @@ def polished_casing(name="pristine casing", instanced=False):
     other = t.node("ShaderNodeCombineXYZ")
     t.link(t.math("MULTIPLY", stone, 37.3), other.inputs[0])
     r2 = t.noise(other.outputs[0], 1.0, 0.0)
-    tilt = 0.012
+    # (round 17: the tilted slabs mirrored the sky as "a low-resolution mosaic smear") a tenth of it
+    tilt = 0.0012
     h = t.math("ADD", t.math("MULTIPLY", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 2.0 * tilt * width), u),
                t.math("MULTIPLY", t.math("MULTIPLY", t.math("SUBTRACT", r2, 0.5), 4.0 * tilt * course), v))
     bmp = t.node("ShaderNodeBump")
@@ -465,7 +467,7 @@ def polished_casing(name="pristine casing", instanced=False):
         foot = t.math("SUBTRACT", wsep.outputs["Z"], t.math("MULTIPLY", t.math("LESS_THAN", wsep.outputs["X"], -160.0), 10.5))
     else:
         foot = _mesh_attr(t, "hb")
-    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.05, undulation=0.3, foot=foot, foot_hex="6f6a4e")
+    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.08, undulation=0.3, foot=foot, foot_hex="6f6a4e")
     t.link(col, bsdf.inputs["Base Color"])
     t.link(normal, bsdf.inputs["Normal"])
     t.link(normal, bsdf.inputs["Coat Normal"])
@@ -616,7 +618,9 @@ def weathered_casing(name="weathered casing", instanced=False):
         joint, stone = 0.0, t.attr("tone")
     else:
         joint, stone = _face_bricks(t, geo, 1.4, 2.8, 0.03)
-    shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.1), 1.0)
+    # laid as blocks each stone's own tone read as "brick wallpaper" (round 17): kept faint there, the
+    # weathering left to vary over the broad patches below
+    shade = t.math("ADD", t.math("MULTIPLY", t.math("SUBTRACT", stone, 0.5), 0.035 if instanced else 0.1), 1.0)
     col = t.mix(1.0, col, t.grey(shade), "MULTIPLY")
     sep = t.node("ShaderNodeSeparateXYZ")
     t.link(pos, sep.inputs[0])
@@ -694,9 +698,9 @@ def weathered_casing(name="weathered casing", instanced=False):
     t.link(t.math("ADD", t.math("MULTIPLY", joint, -1.0), t.math("MULTIPLY", t.noise(pos, 2.0, 4.0), 0.4)), bmp.inputs["Height"])
     if instanced:
         # grime only just into the joints (round 15: every block outlined read as "small bricks")
-        col = _contact(t, col, bsdf, reach=0.35, amount=0.35, dirt="4f4a3c", arris=0.025)
+        col = _contact(t, col, bsdf, reach=0.3, amount=0.15, dirt="4f4a3c", arris=0.015)
         t.link(bsdf.inputs["Normal"].links[0].from_socket, bmp.inputs["Normal"])
-    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.07, undulation=0.3 if not instanced else 0.0001,
+    col, normal = _broad(t, pos, col, bmp.outputs["Normal"], amount=0.07 if not instanced else 0.12, undulation=0.3 if not instanced else 0.0001,
                          foot=hb, foot_hex="5a5443")
     t.link(col, bsdf.inputs["Base Color"])
     t.link(normal, bsdf.inputs["Normal"])

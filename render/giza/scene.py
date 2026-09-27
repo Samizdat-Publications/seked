@@ -72,11 +72,11 @@ class Plateau:
             "weathered casing": materials.weathered_casing(),
             # Burnished in part and in part left as matte leaf, which is what makes gold read as gold from the
             # ground: a polished face there mirrors only the deep sky overhead.
-            "gold": materials.metal("gold", "ffd46e", 0.16, metallic=0.75, facet=0.6, tilt=0.35),
+            "gold": materials.metal("gold", "ffd46e", 0.2, metallic=0.75, facet=1.5, tilt=0.15),
             # Pale white-gold, so the claim's electrum reads apart from Khufu's yellow gold; matte in part for
             # the same reason as the gold (plain facets were tried: from the ground they mirror the sky, grey; the
             # plates are tilted at random instead, so a few of them always hold the sun).
-            "electrum": materials.metal("electrum", "efd27e", 0.14, metallic=0.88, dent=0.3, facet=0.6, tilt=0.35),
+            "electrum": materials.metal("electrum", "efd27e", 0.18, metallic=0.88, dent=0.3, facet=1.5, tilt=0.15),
             "dressed granite": materials.dressed_granite(),
             "dark": materials.dark(),
             "water": materials.water(),
