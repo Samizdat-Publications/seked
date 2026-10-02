@@ -1,253 +1,100 @@
 # Seked
 
-A survey-accurate 3D model of the Giza necropolis in which every "encoded
+**Version 1.0 · live at https://seked.pages.dev**
+
+[Walk the plateau](https://seked.pages.dev/walk/) · [Films](https://seked.pages.dev/films/) · [Sky alignments](https://seked.pages.dev/alignments/) · [Claims dossier](https://seked.pages.dev/docs/dossier.html) · [Realtime viewer](https://seked.pages.dev/viewer/)
+
+The Giza plateau rebuilt from the survey, path traced in five eras from the
+claimed First Time of 10,500 BCE to today, in which every "encoded
 mathematics" claim (π and φ in the profile, the 1:43,200 Earth scale, the
-Orion Correlation, the shaft alignments, and the rest) is a live overlay,
-computed from the same measurements that build the geometry.
+Orion Correlation, the shaft alignments and the rest) is computed from the
+same measurements that build the geometry.
 
-*Seked* is the Egyptian unit of slope: palms of run per cubit of rise. A seked
-of 5½ is the whole π-and-φ story. The name is a placeholder.
+*Seked* is the Egyptian unit of slope: palms of run per cubit of rise. A
+seked of 5½ is the whole π-and-φ story.
 
-## The idea
+![The three pyramids cased and gold-capped in a tropical forest beside a flooded valley: the First Time, a claim](apps/home/img/overview-first-time.jpg)
 
-Numbers first, then the model. Every dimension lives in a database with its
-source and uncertainty. The geometry is generated from those numbers. Each
-claim is a formula over the same numbers, so the app shows the fit rather
-than asserting it. Switch the survey preset from Petrie 1883 to Dash 2015,
-nudge the cubit, drag the sky back to 10,500 BCE, and watch each claim's
-residual move.
+## What is in 1.0
 
-Five rules:
+| | |
+|---|---|
+| **The walkthrough** (`/walk/`) | Seventeen 360-degree stations, outdoors and inside the Great Pyramid and Khafre's valley temple, each in every era it stands in, path traced in Blender Cycles at 4096 by 2048. |
+| **Five eras** | The First Time (c. 10,500 BCE, claim), the long rains (c. 7000 BCE, claim), Khufu's Giza (c. 2560 BCE, reconstruction), stripped and buried (c. 1800 CE, reconstruction), today (2026, survey). |
+| **The films** (`/films/`) | The rollback from today to the First Time, the Sphinx's sequence from lion to excavation, and a flight up the approach as built. |
+| **The sky alignments** (`/alignments/`) | Orion over the pyramids, the lion facing Leo, the shafts and their stars, each drawn as its strongest case with the size of its miss stated. |
+| **The claims dossier** (`/docs/dossier.html`) | Twenty-two claims, each with its residual, tolerance and the free choices it needs; fifteen land within their own tolerance. |
+| **The realtime viewer** (`/viewer/`) | The first, browser-rendered model, with live claim overlays, source presets, a section cut and a sky at any epoch. |
 
-1. **One source of truth.** Every number has provenance.
-2. **Claims are data.** A claim is a file: inputs, formula, target, tolerance, sources, overlay.
-3. **Two monuments.** "As built" (reconstructed, with error bars) and "as today".
-4. **Show the fit.** Measured, claimed, residual, and a count of the free choices the claim needed.
-5. **One frame.** Origin at the Great Pyramid's base centre, east-north-up, georeferenced to WGS84.
+## The rules that keep it honest
 
-## Plan
+1. **Nothing is typed twice.** Every number lives once in `data/measurements/` with a source in `data/sources.json`; derived quantities are computed, never stored.
+2. **Claims are data.** One YAML file per claim in `data/claims/`: inputs, formulas, targets, tolerance, free choices, sources, overlay.
+3. **Presets are preference orders over sources.** Switch from Petrie 1883 to Dash 2015 and every result recomputes.
+4. **The sky is computed.** HYG 4.2 stars, Vondrák 2011 precession pinned in tests to ERFA.
+5. **Pyramids from the survey; everything else placed, then labelled.** Temples, tombs and the Sphinx stand on surveyed footprints to about a metre and are marked as visual stand-ins.
+6. **Every era says what it is**: survey, reconstruction, or claim drawn so it can be tested.
 
-The full project plan, with the measurement starting sheet, the claims
-registry, the sky-engine spec, the architecture, the Blender pipeline, the
-phases and the sourcing check, is in [`docs/plan.html`](docs/plan.html).
+`CLAUDE.md` carries the full set, and `docs/plan.html` the original plan.
 
-## Status
-
-Phases 0 and 1 are done, Phase 4 is closed, and Phases 2, 3 and 5 are
-under way. Every Petrie 1883 record for all three pyramids and the Dash
-2015 records are verified against the source page, and so are Cole's 1925
-sides and azimuths, read from a scan of the Survey of Egypt paper. The Great Pyramid's interior is generated
-from Petrie's positions in both the Blender scene and the browser, and its
-four shafts are bores that bend: Gantenbrink's inlet runs and angles, the
-northern shafts' dog-legs round the Grand Gallery, the slab 59 m up the
-Queen's Chamber's southern shaft, and Petrie's mouths on the faces, with the
-few figures only his drawings give entered as labelled estimates; Khafre's
-and Menkaure's sheets carry Petrie's dimensions but he gives no positions,
-so Khafre's descending corridor and burial chamber are placed from
-Maragioglio and Rinaldi's published lengths, slope and levels, and
-Menkaure's descending corridor from Petrie's entrance, their length and the
-slope Perring measured for Vyse's 1840 table; his chambers wait on a level.
-The Great Pyramid as it stands is
-built course by course from Goyon's 1978 survey of its 201 courses, in
-Blender and in the browser alike. The terrain is cut from Copernicus
-GLO-30 with the ground under each pyramid set to its surveyed base level,
-and a coarser ring of the same heightfield carries the horizon out to
-12 km, so the renders no longer stop at the edge of the near grid.
-The sky package is checked against Stellarium 26.2: transit altitudes
-agree to within 25 arcseconds for five stars at 2500, 2450 and 10,500
-BCE, and the one disagreement, Sirius, is a proper-motion difference
-between catalogues that the test states rather than hides
-(see [`docs/stellarium.md`](docs/stellarium.md)). Blender renders are lit
-from the same package: a script bakes the sun and the star dome, and the
-render script lights four views from it under a physical sky. A second bake
-writes every bright star's place at each of the 480 frames of the plan's
-sky-rollback cinematic, and a Blender script films it: the sky from 2000 CE
-back to 10,500 BCE with Alnitak held on the meridian, the King's Chamber's
-south shaft drawn out of the pyramid at its measured angle, and the star
-sliding into its line of sight at 2450 BCE, which is claim C2 as a film.
-Menkaure's lowest sixteen courses and the foot of Khafre's render as granite
-from two verified Petrie records. All twenty-two claims of the plan's table compute, C7 on the
-Orion engine with Collins's Cygnus stars, D3 against cited positions for
-the Delta, D4 from Nell and Ruggles's 2014 survey of the temples at the
-Sphinx's feet. Every overlay a claim declares now draws, and a test says
-so: the ghost profiles, the King's Chamber wireframe, the casing and socket
-outlines, the compass rose, the shaft and passage rays, the Orion and
-Cygnus projections, the bearings from the Sphinx and from the Great
-Pyramid, Legon's rectangle, the Heliopolis line, the ghost Earth, and B3's
-three parallels with the Egypt 1907 datum shift beside the WGS84 one. The
-web viewer builds the same meshes in the browser, with live preset, cubit
-and epoch controls, a section cut, a fly camera, a star dome at any epoch
-and sidereal time, a dated sun, and a twelve-step narrated tour. Milestone
-renders and screenshots are collected in
-[`docs/progress/`](docs/progress/README.md), and a GitHub Pages workflow
-assembles the viewer, the snapshots and the documents into one site.
+## Running it
 
 ```
 pnpm install
-pnpm test        # 441 tests across units, geometry, data, claims, sky, the viewer, the scripts and the Blender reader
-pnpm typecheck   # the packages, the scripts and the viewer
-pnpm dossier     # regenerates docs/dossier.md from data/
-pnpm shafts      # solves the shaft alignment epochs into docs/shafts.md
-pnpm run stars   # rebuilds data/stars/ from the HYG 4.2 catalogue (run, not a bare pnpm stars)
-pnpm run footprints  # rebuilds data/footprints/giza.json from OpenStreetMap, registered onto the survey
-pnpm run courses # rebuilds data/measurements/g1-courses.json from Goyon 1978's transcription
-pnpm sky-bake    # writes build/sky-bake.json, the sun and the stars for Blender
-pnpm sky-rollback # writes build/sky-rollback.json and .f32, the stars frame by frame for the cinematic
-pnpm bundle      # writes apps/web/public/seked.json for the viewer
-pnpm dev:web     # the viewer on a Vite dev server
-pnpm build:web   # static site in apps/web/dist
-pnpm site        # the Pages site: viewer, progress snapshots and documents, in site/
+pnpm test           # vitest, every package, the scripts and the Blender reader (1,014 tests)
+pnpm typecheck      # the packages, the scripts and the viewer
+python -m unittest discover -s render/tests   # the path tracer's bpy-free parts
+pnpm dossier        # regenerate docs/dossier.md from data/
+pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
+pnpm dev:web        # the realtime viewer on a Vite dev server
+pnpm site           # assemble site/: landing page, walkthrough, films, alignments, viewer, progress, docs
+pnpm run deploy     # assemble and upload to Cloudflare Pages (https://seked.pages.dev)
 ```
 
-Blender is driven headless (5.1, usually not on PATH; see
-[`blender/README.md`](blender/README.md)):
+The path-traced scenes are built and rendered headless in Blender 5.1
+(`C:\Program Files\Blender Foundation\Blender 5.1\blender.exe`, not on PATH):
 
 ```
-blender -b -P blender/generate.py -- --preset canonical --save build/seked.blend --gltf build/seked.glb
-blender -b build/seked.blend -P blender/check.py
-blender -b build/seked.blend -P blender/render.py -- --view dawn --out build/hero.png
-blender -b build/seked.blend -P blender/rollback.py -- --out build/rollback --mp4 build/rollback.mp4
+blender -b --factory-startup -P render/build.py -- --state built --shot panorama
+blender -b --factory-startup -P render/build.py -- --queue render/queues/eras-v7.json
+python render/publish.py          # build/render/pano/ -> apps/walk/pano/ and stations.json
+python render/film.py rollback    # and `sphinx`: films cut from the hero stills
 ```
 
-`packages/sky` carries Vondrák 2011 long-term precession, tested against
-ERFA's reference values, the horizon frame, the equinox and solstice sun
-from the obliquity of date, a calendar to put a date on it (Julian Days in
-the proleptic Julian and Gregorian calendars, ΔT from the Stephenson,
-Morrison and Hohenkerk long-term parabola, sidereal time, Meeus's
-low-precision solar position, the equation of time and the instants of the
-four seasons, all checked against his own worked examples), and enough
-meridian geometry to solve the shaft alignments; see `docs/shafts.md`.
-`skyEnvironment` flattens it into `star.<id>.ra`, `.dec`,
-`.transit.altitude`, `.rise.azimuth`, `sun.*` and similar keys, among them
-`sun.june_solstice.jd` and the local mean times of that morning's sunrise
-and sunset, so a claim that names an `epoch` can reach the sky from its
-YAML without the claims package learning any astronomy.
-
-The five chambers of construction over the King's Chamber are in, from
-Petrie §62 and the table of dimensions in Vyse's second volume. Their levels
-are the one thing in the Great Pyramid that is solved rather than stored:
-nobody measured how thick the granite beams between them are, and Petrie
-says outright that the beams are "very unequal in depth", so the stack is
-closed instead against the one figure Vyse gives for the whole of it, 69 ft
-3 in from the King's Chamber floor to the roof of Campbell's. That leaves
-1.85 m a beam. Sharing it evenly is the only assumption in the five.
-
-The ScanPyramids North Face Corridor is in too, out of Procureur and the
-others' 2023 paper, and it is the first solid here that nobody has stood in.
-Its size is theirs to a few centimetres, with their error bars; where it
-stands is derived, its east-west axis being the descending corridor's, which
-the paper states, and its north end standing 0.84 m behind the north face at
-its own mid-height, the Chevron standing in that face. The section draws it
-as an outline with no fill, because a shape fitted to a muon deficit should
-not read like a room with a floor.
-
-A verification pass on the shafts, 2026-09-16, closed the open question in
-`kc.shaft.north.angle`'s own note and turned up two things. The Upuaut
-report's upper northern shaft page settles the angle outright: "The angle
-between this point and the point of the shaft's outlet on the flank of the
-pyramid (we measured both points) is 32.60°", which is 32° 36′, so the
-stored figure is the report's and not Bauval's 32° 28′. Three of claim
-C2's four shaft angles are now verified against the report's text.
-
-The fourth is not, and cannot be. `qc.shaft.north.angle` was entered on the
-starting sheet as 39° 07′ and **the report does not state it**. What the
-lower northern shaft page gives is a fluctuation, "between 33.3° and 40.1°"
-over 14 measurements, and an explicit refusal to name the intended angle. The
-two measured bounds are now recorded beside it; the old value is left in place
-and unverified rather than changed, because claim C2 draws a ray from it and
-which replacement the claim should use is a decision rather than a correction.
-
-The second finding was cheaper to fix. All four shaft inlet positions were
-estimates reading "the middle of the chamber wall", entered because
-"Gantenbrink's inlet positions are on his drawing and not in his text". They
-are in his text, on the findings page rather than the four shaft pages. The
-King's Chamber southern inlet moves 2.75 m east onto his measured 2.49 m, and
-its computed outlet moves with it to within 0.16 m of the 5.20 m east of the
-axis that the same page measures, which is about what his east-wall convention
-costs. Those outlet figures are now in the database purely as a check: nothing
-is built from them, and the one end-to-end test the shafts have compares them
-with a run the scene computes. The northern shaft still misses, its dog-leg
-round the Grand Gallery being two estimates, and the test says so rather than
-only reporting the shaft that agrees.
-
-The Big Void is in as well, and it is the clearest case in the project of a
-solid built out of sentences rather than coordinates. Morishima and the
-others' 2017 paper states no position for it anywhere in its text. It says
-the void is above the Grand Gallery, that its cross section is comparable to
-the Gallery's, that it is at least 30 m long, and that its centre lies
-between 40 m and 50 m from the floor of the Queen's Chamber. That is enough:
-"above the Grand Gallery" fixes two coordinates and the distance fixes the
-third, which lands 61.5 m over the pavement, ten metres over the Gallery's
-roof. The paper says the void "could be inclined or horizontal" and leaves it
-there, so both are drawn on the one solved centre and neither is preferred.
-The figures carry more, and a position read off a figure by eye is not a
-measurement, so none was.
-
-The plateau is populated. Its lesser monuments come from OpenStreetMap by
-`pnpm run footprints`: the queens' and satellite pyramids, Khentkawes, the
-temples of Khafre and Menkaure, the Sphinx Temple and Amenhotep II's, the boat
-pits east of Khufu, the Wall of the Crow, Hemiunu's mastaba and 577 mastabas
-from the cemetery fields. The import fits OSM onto the three pyramids whose
-places the survey knows, and the residuals are 0.45, 0.96 and 0.54 m with the
-unfitted scale at 0.99962; the 6.2 arcminute rotation is Petrie orienting his
-offsets to the pyramids' own mean azimuth rather than to true north. Every
-outline is set on the scene's own ground, so the Sphinx and the valley temples
-stand forty metres below Khufu's base, where they are. The Sphinx is OSM's own
-three-dimensional model of it, forepaws, body and head, and it replaces the
-box, which floated on the datum plane at the old commonly cited coordinates.
-Heights are OSM's where it tags one and a seked-estimate where it does not.
-
-Two monuments are built from Petrie rather than from OSM. Khufu's mortuary
-temple is gone but its basalt floor is not, and section 28 gives the four
-corners of its rock-cut bed in the Pyramid's own frame, two squares of about
-1060 inches. Khafre's causeway joins his two temples at the "about 15 feet
-wide" section 95 gives it and runs 495 m, which is his "over quarter of a
-mile"; it is laid on its ridge in 24 segments, because a straight ramp between
-the two temple floors ran up to three and a half metres underground. Petrie's
-trench axes in section 29 also check the OSM registration where nothing was
-fitted: the boat pits east of Khufu land within 3.3 and 1.5 m of them.
-
-Next, in order. The sky-rollback film is being re-rendered at 1920 by 1080
-over the populated plateau. The site is live at https://seked.pages.dev, on
-Cloudflare Pages by direct upload with `pnpm run deploy` (pnpm has a
-`deploy` command of its own). GitHub Pages is not
-available for a private repository on this account's plan, so the Pages
-workflow still runs the tests and assembles the site on every push but does
-not publish unless PAGES_ENABLED is set. The deploy pins wrangler 4.20.0,
-because later releases route `pages deploy` from a workspace root into
-Workers and fail. The next round is planned in docs/geometry-blockers.md: the
-four holes left in the geometry (the well shaft, now built from
-Maragioglio and Rinaldi's Parte IV plates with `scripts/plate.py`, Khafre's casing
-cap and Menkaure's chambers from the same authors' plates volumes,
-and the mastabas, now a plausible field rather than a surveyed one), a rule
-agreed for reading drawings without eyeballing them, and a visual track
-(PBR materials, atmosphere, stand-in models fitted to their footprints, a
-Milky Way that precesses with the stars) that the project's purpose puts on
-an equal footing with the measurements. What no public source gives is entered as an estimate on its own
-source, with a sigma, and stays unverified until a figure turns up.
+A full era queue takes about two hours on an RTX 5070 Ti laptop; long jobs
+run detached through `python scripts/job.py start` (see `CLAUDE.md`, "One
+session at a time"). The panoramas and films are build outputs and are not
+committed; `pnpm site` assembles whatever is present and says what it left
+out.
 
 ## Layout
 
 ```
-data/
-  sources.json          every source a record or a claim may cite
-  sites.json            sites with body, datum and origin (giza; a cydonia placeholder on Mars)
-  structures.json       every structure with an evidence tier: excavated, instrumented, claimed, legendary
-  presets.json          preference orders over sources (canonical, petrie-1883, cole-1925, dash-2015)
-  measurements/*.json   one record per measured quantity, metres and degrees, with provenance
-  claims/*.yaml         one claim per file: comparisons, tolerance, free choices, sources, overlay
-  stars/                the fourteen named stars and the HYG 4.2 catalogue to magnitude 6.5 (imported, never typed)
-  terrain/              the GLO-30 heightfield around Giza in the project frame (the tiles are not tracked)
-  footprints/           the plateau's lesser monuments from OSM, registered and set on the ground (imported, never typed)
-packages/
-  units/       cubit, pyramid inch, seked <-> degrees, DMS formatting
-  geometry/    pyramid profile numbers, eight-sided mesh generator, interior solids, ground, landmarks, expression environment
-  data/        zod-validated loader, preset resolver, terrain reader, Blender parity tests
-  claims/      expression parser (no eval), registry, evaluator, dossier renderer
-  sky/         Vondrák 2011 precession (ERFA-verified), horizon frame, sun, star dome, named stars, claim environment
-blender/       generate.py (the scene from data/), seked_data.py (stdlib reader and mesh mirrors), check.py, render.py
-apps/web/      Vite + React + React Three Fiber viewer
-scripts/       dossier generator, shaft solver, star import, web bundle, terrain cutter, site assembly, render log
-docs/          plan.html, dossier.md, shafts.md, progress/ (chosen snapshots) and progress/log/ (every render, stamped and indexed)
-.github/       the Pages workflow: tests, typecheck, site assembly, deploy when PAGES_ENABLED is true
+data/            measurements, sources, presets, claims, stars, terrain, footprints, the city
+packages/        units, geometry, data (loader, presets), claims (parser, evaluator, dossier), sky, runner
+render/          the path tracer: render/giza/ builds each era in Blender; stations, shots, queues, films, publish
+apps/home/       the landing page
+apps/walk/       the walkthrough (panoramas published into pano/)
+apps/films/      the films page
+apps/alignments/ the sky alignments page
+apps/web/        the realtime viewer (Vite, React Three Fiber)
+blender/         the original scene generator and its stdlib data reader
+scripts/         dossier, shafts, star, footprint and city imports, sky bakes, site assembly, the job runner
+docs/            plan, dossier, shafts, progress snapshots, history, design specs
 ```
+
+## Where it stops
+
+1.0 is a stopping point, not an ending. Left open:
+
+- **The First Time's lion and its figures** are the weakest frames; they wait on new Meshy generations.
+- **Unverified records**: entries from the starting sheet that nobody has yet checked against the cited page stay `verified: false`, and `qc.shaft.north.angle` (claim C2) cannot be verified from Gantenbrink's report at all.
+- **Geometry holes** listed in `docs/geometry-blockers.md`: Khafre's casing cap, Menkaure's chambers, the mastaba field as surveyed rather than plausible.
+- **Next ideas**: a guided tour of the star alignments inside the walkthrough, and an LLM that runs a claim in somebody's own words against the model (`pnpm claim` is the start of it).
+
+How the model got here, stage by stage, is in [`docs/history.md`](docs/history.md)
+and the milestone renders in [`docs/progress/`](docs/progress/README.md).
+
+## Credits and data licences
+
+Star catalogue HYG 4.2 (CC BY-SA 4.0, David Nash). Monument footprints © OpenStreetMap contributors (ODbL). City footprints and heights from Google Open Buildings v3 and 2.5D Temporal (CC BY 4.0). Terrain from Copernicus GLO-30. Skies and textures from Poly Haven (CC0). Stand-in models as listed with their licences in `blender/models.json`. Surveys and claims as cited in `data/sources.json`.

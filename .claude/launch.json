@@ -58,6 +58,18 @@
         "C:/Users/stewa/ClaudeProjects/seked/apps/walk"
       ],
       "port": 5190
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5191",
+        "--directory",
+        "C:/Users/stewa/ClaudeProjects/seked/site"
+      ],
+      "port": 5191
     }
   ]
 }

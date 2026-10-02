@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seked</title>
+<meta name="description" content="The Giza plateau at block scale, path traced in five eras from 10,500 BCE to today, with every encoded-mathematics claim computed from the survey database.">
+<meta property="og:title" content="Seked: Giza at block scale">
+<meta property="og:description" content="Walk the plateau in five eras, from the claimed First Time to today, and test the pyramid claims against the survey.">
+<meta property="og:image" content="img/overview-first-time.jpg">
+<meta name="theme-color" content="#0f0e0c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%230f0e0c'/%3E%3Cpath%20d='M16%207.5%2027%2024.5H5z'%20fill='%23d9b56a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Marcellus&display=swap">
+<style>
+  /* The walkthrough's own dark look: one stage, warm ink, gold for claims. */
+  :root {
+    color-scheme: dark;
+    --stage: #0f0e0c;
+    --panel: #17140f;
+    --ink: #efe8dc;
+    --muted: #b3a896;
+    --rule: rgba(239, 232, 220, 0.18);
+    --claim: #f2b544;
+    --recon: #9cc3d9;
+    --survey: #b7d39a;
+    --display: "Marcellus", "Palatino Linotype", Georgia, serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--stage); }
+  body { margin: 0; background: var(--stage); color: var(--ink); font: 400 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .hero { position: relative; min-height: min(92vh, 900px); display: grid; align-items: end; overflow: hidden; }
+  .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,14,12,0) 35%, rgba(15,14,12,.55) 65%, var(--stage) 100%); }
+  .hero-text { position: relative; z-index: 1; max-width: 1240px; width: 100%; margin: 0 auto; padding: 0 16px 48px; display: grid; gap: 16px; }
+  .kicker { margin: 0; font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin: 0; font: 400 clamp(48px, 9vw, 104px)/1 var(--display); letter-spacing: .02em; }
+  .lead { margin: 0; max-width: 62ch; font-size: clamp(16px, 1.6vw, 19px); color: var(--ink); text-shadow: 0 1px 12px rgba(0,0,0,.6); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid var(--rule); border-radius: 999px;
+    background: rgba(15,14,12,.55); color: var(--ink); text-decoration: none; font: 500 14px/1 var(--body); backdrop-filter: blur(6px); }
+  .btn.primary { background: var(--claim); border-color: var(--claim); color: #1a1408; }
+  .btn:hover { border-color: var(--ink); }
+  .btn.primary:hover { filter: brightness(1.08); }
+
+  .page { max-width: 1240px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 72px; }
+  section { display: grid; gap: 24px; }
+  h2 { margin: 0; padding-top: 18px; border-top: 1px solid var(--rule); font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--claim); }
+  .intro { margin: 0; max-width: 70ch; color: var(--muted); }
+  .intro strong { color: var(--ink); font-weight: 500; }
+
+  .eras { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .era { margin: 0; display: grid; gap: 10px; align-content: start; }
+  .era img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; border: 1px solid var(--rule); display: block; background: #000; }
+  .era h3 { margin: 0; font: 400 20px/1.2 var(--display); }
+  .era p { margin: 0; font-size: 14px; color: var(--muted); }
+  .tag { display: inline-block; font: 500 10.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 4px 7px; border-radius: 3px; border: 1px solid currentColor; }
+  .tag.claim { color: var(--claim); } .tag.recon { color: var(--recon); } .tag.survey { color: var(--survey); }
+
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .card { display: grid; grid-template-rows: auto 1fr; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--panel); text-decoration: none; transition: border-color .15s; }
+  .card:hover { border-color: var(--ink); }
+  .card img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+  .card div { padding: 16px 18px 20px; display: grid; gap: 8px; align-content: start; }
+  .card h3 { margin: 0; font: 400 22px/1.2 var(--display); }
+  .card p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .card .go { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--claim); margin-top: 6px; }
+
+  .more { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .more a { display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; }
+  .more a:hover { border-color: var(--ink); }
+  .more b { font: 400 19px/1.2 var(--display); }
+  .more span { font-size: 14px; color: var(--muted); }
+
+  .rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .rules li { display: grid; gap: 6px; }
+  .rules b { font-weight: 600; }
+  .rules span { color: var(--muted); font-size: 14.5px; }
+
+  .numbers { display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 0; }
+  .numbers div { display: grid; gap: 2px; }
+  .numbers dt { font: 500 11px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .numbers dd { margin: 0; font: 400 34px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+
+  footer { border-top: 1px solid var(--rule); padding-top: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; display: grid; gap: 10px; }
+  footer p { margin: 0; max-width: 100ch; }
+
+  @media (max-width: 960px) {
+    .eras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cards, .more, .rules { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 15px; }
+    .eras { grid-template-columns: 1fr; }
+    .hero { min-height: 82vh; }
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <img src="img/overview-first-time.jpg" alt="The three Giza pyramids, cased white with gold caps, rising from a tropical forest beside a flooded valley, seen from the air." width="1920" height="1080">
+  <div class="hero-text">
+    <p class="kicker">Giza at block scale · Version 1.0</p>
+    <h1>Seked</h1>
+    <p class="lead">The Giza plateau rebuilt from the survey, path traced in five eras from the claimed First Time of 10,500 BCE to today. Every "encoded mathematics" claim about the pyramids is computed live from the measurement database, so you can see a claim and test it in the same place.</p>
+    <div class="ctas">
+      <a class="btn primary" href="walk/">Walk the plateau &rarr;</a>
+      <a class="btn" href="films/">Watch the films</a>
+      <a class="btn" href="alignments/">See the sky</a>
+      <a class="btn" href="https://github.com/Samizdat-Publications/seked">Source on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section aria-labelledby="eras">
+    <h2 id="eras">Five eras, one plateau</h2>
+    <p class="intro">The same stand, the same survey numbers, five moments. Each era says what it is: <strong>survey</strong> where it is measured, <strong>reconstruction</strong> where the holes are filled in and said to be filled, <strong>claim</strong> where it is drawn as a theory's strongest case so it can be tested, not as the record.</p>
+    <div class="eras">
+      <figure class="era">
+        <img src="img/panorama-first-time.jpg" alt="The three pyramids, white and gold-capped, above tall grass and tropical trees." loading="lazy" width="1400" height="788">
+        <figcaption><span class="tag claim">Claim</span><h3>The First Time</h3><p>c. 10,500 BCE. Polished casing and gold caps in a green Sahara, as the lost-civilisation reading has it.</p></figcaption>
+      </figure>
+      <figure class="era">
+        <img src="img/panorama-lion.jpg" alt="The pyramids weathered and rain-streaked in a wooded valley." loading="lazy" width="1400" height="788">
+        <figcaption><span class="tag claim">Claim</span><h3>The long rains</h3><p>c. 7000 BCE. The water-erosion case for an older Sphinx, under a wetter sky.</p></figcaption>
+      </figure>
+      <figure class="era">
+        <img src="img/panorama-built.jpg" alt="The pyramids in fresh white limestone casing with small gilded caps over a desert plateau." loading="lazy" width="1400" height="788">
+        <figcaption><span class="tag recon">Reconstruction</span><h3>Khufu's Giza</h3><p>c. 2560 BCE. The plateau as built, cased and capped, temples and causeways standing.</p></figcaption>
+      </figure>
+      <figure class="era">
+        <img src="img/panorama-stripped.jpg" alt="The pyramids stripped of most of their casing, with sand drifted around them." loading="lazy" width="1400" height="788">
+        <figcaption><span class="tag recon">Reconstruction</span><h3>Stripped and buried</h3><p>c. 1800 CE. The casing quarried away for Cairo, the Sphinx in sand to the chest.</p></figcaption>
+      </figure>
+      <figure class="era">
+        <img src="img/panorama-today.jpg" alt="The pyramids today, stepped core blocks with Khafre's casing remnant at the top." loading="lazy" width="1400" height="788">
+        <figcaption><span class="tag survey">Survey</span><h3>Today</h3><p>2026. The plateau as measured, with the modern city behind it from Open Buildings.</p></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="explore">
+    <h2 id="explore">Explore</h2>
+    <div class="cards">
+      <a class="card" href="walk/">
+        <img src="img/panorama-built.jpg" alt="" loading="lazy" width="1400" height="788">
+        <div><h3>The walkthrough</h3><p>Seventeen 360-degree stations, from the desert approach to the King's Chamber, each in every era it stands in. Drag to look, switch the era, step to the next station.</p><span class="go">Walk the plateau &rarr;</span></div>
+      </a>
+      <a class="card" href="films/">
+        <img src="img/sphinx-sequence-built.jpg" alt="" loading="lazy" width="1400" height="788">
+        <div><h3>The films</h3><p>The rollback from today to the First Time, the Sphinx's sequence from lion to excavation, and a flight up the approach as built.</p><span class="go">Watch &rarr;</span></div>
+      </a>
+      <a class="card" href="alignments/">
+        <img src="img/cap-built.jpg" alt="" loading="lazy" width="1400" height="788">
+        <div><h3>The sky alignments</h3><p>Orion over the three pyramids, the lion facing Leo, the shafts reaching for their stars, each with its stars precessed by the sky engine and the size of its miss stated.</p><span class="go">See the sky &rarr;</span></div>
+      </a>
+    </div>
+    <div class="more">
+      <a href="docs/dossier.html"><b>The claims dossier</b><span>Twenty-two claims, from π in the profile to the Orion correlation, each with its residual, its tolerance and the free choices it needs.</span></a>
+      <a href="viewer/"><b>The realtime viewer</b><span>The first, browser-rendered model: orbit the plateau, toggle the claim overlays, run the sky. Needs a decent GPU.</span></a>
+      <a href="progress/"><b>How it got here</b><span>Milestone renders, oldest first, from the first low-poly plateau to the path-traced eras.</span></a>
+      <a href="https://github.com/Samizdat-Publications/seked"><b>The source</b><span>Every measurement, claim, script and render recipe, on GitHub. Change a number and rebuild the lot.</span></a>
+      <a href="docs/shafts.html"><b>The shaft dates</b><span>When each of the Great Pyramid's four shafts pointed at its star, and how far the date moves per arcminute of angle.</span></a>
+      <a href="docs/plan.html"><b>The original plan</b><span>The measurement sheet, the claims registry and the sky engine as they were first set out.</span></a>
+    </div>
+  </section>
+
+  <section aria-labelledby="honest">
+    <h2 id="honest">What keeps it honest</h2>
+    <dl class="numbers">
+      <div><dt>Claims tested</dt><dd>22</dd></div>
+      <div><dt>Within their own tolerance</dt><dd>14</dd></div>
+      <div><dt>Walkthrough stations</dt><dd>17</dd></div>
+      <div><dt>Eras</dt><dd>5</dd></div>
+    </dl>
+    <ul class="rules">
+      <li><b>Nothing is typed twice.</b><span>Every number lives once in the measurement database with a cited source. Perimeters, apothems and volumes are computed, never stored, so they cannot drift.</span></li>
+      <li><b>Claims are data.</b><span>A claim is its inputs, formulas, target, tolerance and the free choices it needs. Switch the source preset and every result recomputes.</span></li>
+      <li><b>The sky is computed.</b><span>Star positions come from the HYG 4.2 catalogue, carried back with Vondr&aacute;k 2011 precession and pinned in tests to ERFA's values.</span></li>
+      <li><b>Pyramids from the survey.</b><span>The three pyramids follow Petrie and later surveys as closely as the sources allow; they are what the claims are about.</span></li>
+      <li><b>Stand-ins are labelled.</b><span>Temples, tombs and the Sphinx are placed on their surveyed footprints to about a metre; their forms are visual stand-ins and say so.</span></li>
+      <li><b>Tiers are never promoted.</b><span>Each structure is excavated, instrumented, claimed or legendary, and no claim moves one up a tier because it needs it.</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><strong>Seked 1.0</strong>, 1 October 2026. Modelled, lit and rendered in Blender 5.1 Cycles; data, claims and sky engine in TypeScript. Source on <a href="https://github.com/Samizdat-Publications/seked">GitHub</a>. The plan is <a href="docs/plan.html">here</a>; the shaft solutions <a href="docs/shafts.html">here</a>.</p>
+    <p>Data: star catalogue HYG 4.2 (CC BY-SA 4.0, David Nash); monument footprints &copy; OpenStreetMap contributors (ODbL); city footprints and heights from Google Open Buildings (CC BY 4.0); skies and textures from Poly Haven (CC0). Surveys: Petrie (1883), Lehner and others as cited in the dossier.</p>
+  </footer>
+</main>
+</body>
+</html>

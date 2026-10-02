@@ -1,0 +1,60 @@
+{
+ "renders": [
+  {
+   "state": "first-time",
+   "shot": "panorama",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/panorama-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "overview",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/overview-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "south",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/south-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "sphinx-sequence",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/sphinx-sequence-first-time.png"
+  },
+  {
+   "state": "built",
+   "shot": "panorama",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/panorama-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "overview",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/overview-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "south",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/south-built.png"
+  },
+  {
+   "state": "built",
+   "shot": "sphinx-sequence",
+   "size": "960x540",
+   "samples": 48,
+   "out": "build/render/lookdev/sphinx-sequence-built.png"
+  }
+ ]
+}

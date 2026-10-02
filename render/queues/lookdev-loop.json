@@ -1,0 +1,18 @@
+{
+ "renders": [
+  {
+   "state": "lion",
+   "station": "east",
+   "size": "2048x1024",
+   "samples": 32,
+   "out": "build/render/lookdev/station-east-lion-f1.png"
+  },
+  {
+   "state": "first-time",
+   "shot": "panorama",
+   "size": "960x540",
+   "samples": 32,
+   "out": "build/render/lookdev/panorama-first-time-f1.png"
+  }
+ ]
+}

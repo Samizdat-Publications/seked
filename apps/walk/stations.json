@@ -302,7 +302,34 @@
       "today": 10.0
      }
     }
-   ]
+   ],
+   "cameras": {
+    "first-time": [
+     439.0,
+     -445.0,
+     -29.5
+    ],
+    "lion": [
+     439.0,
+     -445.0,
+     -29.5
+    ],
+    "built": [
+     480.0,
+     -445.0,
+     -21.5
+    ],
+    "stripped": [
+     439.0,
+     -445.0,
+     -29.5
+    ],
+    "today": [
+     439.0,
+     -445.0,
+     -29.5
+    ]
+   }
   },
   {
    "id": "east",
@@ -742,7 +769,7 @@
    "id": "temple",
    "name": "Khufu's mortuary temple",
    "where": "On the basalt pavement of its court, the Great Pyramid's east face above",
-   "moment": "early afternoon, midwinter, the sun low in the south-south-west: the south faces lit, the east faces in shade, high enough to clear the walls",
+   "moment": "mid-morning, November, the sun high enough to clear the walls' shadows",
    "camera": [
     160.0,
     -5.0,
