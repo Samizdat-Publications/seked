@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<style>html, body { background: #0f0e0c; }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0f0e0c">
@@ -1889,7 +1890,7 @@
       arriveStop(s);
     } else {
       goStation(s.station, "tour", s.eras[0]);
-      waitForStation(s.station, function () { writeHash(); arriveStop(s); });
+      waitForStation(s.station, function () { writeHash(); arriveStop(s, true); });
     }
   }
 
@@ -1908,8 +1909,8 @@
   // view move on. Neighbouring eras glide; eras further apart dissolve through dark, so the eras
   // between them do not flicker past.
   var tourWant = null;
-  function arriveStop(s) {
-    lookAt(s.view, 1600);
+  function arriveStop(s, fresh) {
+    lookAt(s.view, fresh ? 0 : 1600);   // a new station is still behind the curtain: no swing to watch
     if (s.pan && !still()) {
       later(1700, function () {
         if (turnTween || drag) return;
@@ -1957,7 +1958,8 @@
     if (on) {
       featureEl.hidden = false;
       featureEl.removeAttribute("aria-hidden");
-      requestAnimationFrame(function () { featureEl.classList.add("on"); });
+      void featureEl.offsetWidth;   // lay it out at opacity 0 first, so the fade runs
+      featureEl.classList.add("on");
     } else {
       featureEl.classList.remove("on");
       featureEl.setAttribute("aria-hidden", "true");
@@ -1977,7 +1979,7 @@
       if (edge < W * 0.6) yaw -= Math.atan((edge / 2) / (W / 2) * Math.tan(f / 2) * (W / H));
     }
     view.vy = view.vp = 0;
-    if (still()) { view.yaw = wrapAngle(yaw); view.pitch = pitch; setFov(f); request(); return; }
+    if (still() || !dur) { turnTween = null; view.yaw = wrapAngle(yaw); view.pitch = pitch; setFov(f); request(); return; }
     turnTween = { y0: view.yaw, dy: wrapAngle(yaw - view.yaw), p0: view.pitch, dp: pitch - view.pitch, f0: fov(), df: f - fov(), t0: performance.now(), dur: dur };
     request();
   }
