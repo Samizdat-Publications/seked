@@ -1934,7 +1934,7 @@
       tourWant = urlAt(to);
       need(tourWant);
       var shown = settledEntry(entry(urlAt(here))), next = settledEntry(entry(tourWant));
-      var calm = !eraTween && !turnTween && !switching && !document.hidden && !curtain.classList.contains("on");
+      var calm = !eraTween && !(turnTween && !turnTween.linear) && !switching && !document.hidden && !curtain.classList.contains("on");
       if (!(shown && next && calm)) { readySince = 0; later(150, tick); return; }
       var now = performance.now();
       if (!readySince) readySince = now;
