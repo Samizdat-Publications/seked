@@ -71,36 +71,6 @@
   .veil.top { top: 0; height: 160px; background: linear-gradient(rgba(10, 9, 8, 0.66), rgba(10, 9, 8, 0)); }
   .veil.bottom { bottom: 0; height: 230px; background: linear-gradient(rgba(10, 9, 8, 0), rgba(10, 9, 8, 0.78)); }
 
-  .claim-frame {
-    position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
-    border: 3px solid var(--claim);
-    box-shadow: inset 0 0 90px rgba(242, 181, 68, 0.2);
-  }
-  .claim-frame span {
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    background: var(--claim); color: var(--claim-ink);
-    font: 600 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
-    padding: 5px 11px 6px; border-radius: 0 0 5px 5px; white-space: nowrap;
-  }
-
-  /* landmark labels, as in the first station */
-  .labels, .spots { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-  .tag {
-    position: absolute; left: 0; top: 0; opacity: 0;
-    transform: translate(-50%, calc(-100% - 14px));
-    text-align: center; white-space: nowrap;
-    font: 500 12px/1.25 var(--body); letter-spacing: 0.03em;
-    color: var(--ink);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
-    transition: opacity 0.18s;
-    will-change: transform, opacity;
-  }
-  .tag::after {
-    content: ""; position: absolute; left: calc(50% + var(--tick, 0px)); top: calc(100% + 3px);
-    width: 1px; height: 9px; background: rgba(239, 232, 220, 0.75);
-  }
-  .tag small { display: block; font: 400 11px/1.3 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
-
   /* hotspots: the neighbouring stations */
   .spot {
     position: absolute; left: 0; top: 0;
@@ -151,7 +121,7 @@
   }
   .hint.on { opacity: 1; }
 
-  /* sits on the era panel, so the view above stays free for the labels it points to */
+  /* sits on the era panel, so the view above stays free for the hotspots */
   .notice {
     width: min(430px, 100%); margin: 0 auto 14px;
     padding: 14px 18px; text-align: center;
@@ -250,11 +220,10 @@
   }
   .pill.survey, .pill.other { color: var(--ink); border-color: var(--rule-hi); background: rgba(239, 232, 220, 0.1); }
   .pill.reconstruction { color: var(--recon); border-color: rgba(169, 189, 240, 0.62); background: rgba(169, 189, 240, 0.12); }
-  .pill.claim { color: var(--claim-ink); background: var(--claim); border-color: var(--claim); }
+  .pill.claim { color: var(--claim); border-color: rgba(242, 181, 68, 0.5); background: rgba(242, 181, 68, 0.1); }
   .era-title { font: 400 23px/1.15 var(--display); letter-spacing: 0.02em; }
   .era-label { font: 500 13px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
   .note { font-size: 12.5px; line-height: 1.45; color: var(--muted); margin: 6px auto 0; max-width: 64ch; text-wrap: balance; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
-  .note.claim { color: var(--claim); font-weight: 500; }
 
   .track { margin-top: 8px; padding: 0 40px; pointer-events: auto; }
   .rail { position: relative; height: 28px; }
@@ -311,7 +280,6 @@
   .stop.missing .sub { display: block; }
 
   @media (max-width: 700px) {
-    .claim-frame span { display: none; }
   }
   @media (max-width: 560px) {
     .name { font-size: 21px; }
@@ -329,13 +297,13 @@
     .panel { top: calc(var(--top) + 44px); }
   }
   @media (max-height: 480px) {
-    /* a phone on its side: the pill still names the honesty, and a claim keeps its note */
-    .note:not(.claim) { display: none; }
+    /* a phone on its side: the pill still names the kind of era */
+    .note { display: none; }
     .veil.bottom { height: 160px; }
     .kicker { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .curtain, .hint, .spot, .spot-card, .tag { transition: none; }
+    .curtain, .hint, .spot, .spot-card { transition: none; }
     .panel { animation: none; }
   }
 </style>
@@ -372,8 +340,6 @@
   <div class="flat" id="flat" tabindex="0" aria-label="The panorama, laid out flat. Scroll sideways to look around." hidden></div>
   <div class="veil top" aria-hidden="true"></div>
   <div class="veil bottom" aria-hidden="true"></div>
-  <div class="claim-frame" id="claim-frame" aria-hidden="true"><span>A claim, not the record</span></div>
-  <div class="labels" id="labels" aria-hidden="true"></div>
   <div class="spots" id="spots"></div>
   <div class="curtain on" id="curtain" aria-hidden="true"></div>
   <p class="hint" id="hint" aria-hidden="true">Drag to look around</p>
@@ -419,8 +385,10 @@
   var HONESTY = {
     survey: "Measured. The blocks, the weathering and the rubble are a reconstruction at block scale.",
     reconstruction: "Rebuilt from the evidence. What is filled in is said to be filled in.",
-    claim: "Somebody's claim, drawn so it can be tested. Not the record."
+    claim: "The case for an older Giza, drawn at its strongest."
   };
+  // What each kind of era is called on screen; "claim" stays the data's own word.
+  var WORD = { survey: "Survey", reconstruction: "Reconstruction", claim: "Theorized" };
   var COMPASS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
   var ARROWS = { ArrowLeft: 1, ArrowRight: 1, ArrowUp: 1, ArrowDown: 1 };
 
@@ -430,8 +398,8 @@
 
   function $(id) { return document.getElementById(id); }
   var stage = $("stage"), canvas = $("view"), flat = $("flat");
-  var labelsEl = $("labels"), spotsEl = $("spots"), curtain = $("curtain"), hintEl = $("hint");
-  var claimFrame = $("claim-frame"), live = $("live");
+  var spotsEl = $("spots"), curtain = $("curtain"), hintEl = $("hint");
+  var live = $("live");
   var kickerEl = $("kicker"), nameEl = $("name"), whereEl = $("where");
   var bearingEl = $("bearing"), facingEl = $("facing");
   var stationsBtn = $("stations-btn"), panel = $("stations"), listEl = $("station-list");
@@ -534,7 +502,7 @@
   var fitted = 58 * DEG;       // the station's field of view, fitted to this screen
   var W = 1, H = 1;
   var eraTween = null, turnTween = null, keys = new Set();
-  var tags = [], spots = [];
+  var spots = [];
   var mode = "gl";
   var revealAt = 0, switching = false, hintDone = false, settledState = null;
 
@@ -965,8 +933,8 @@
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
-  // ------------------------------------------------------------------ labels and hotspots
-  // The camera between the two eras on screen, so labels hold still through a crossfade.
+  // ------------------------------------------------------------------ hotspots
+  // The camera between the two eras on screen, so hotspots hold still through a crossfade.
   function cameraNow() {
     var s = segment(), t = station.cameras;
     if (!s || !t) return station.camera;
@@ -988,59 +956,6 @@
     if (rz <= 0.02) return null;
     var t = Math.tan(f / 2);
     return [(rx / (rz * t * (W / H)) * 0.5 + 0.5) * W, (0.5 - ry / (rz * t) * 0.5) * H];
-  }
-
-  function buildTags() {
-    labelsEl.textContent = "";
-    tags = station.landmarks.map(function (L) {
-      var el = document.createElement("div");
-      el.className = "tag";
-      el.textContent = L.name;
-      var small = null;
-      if (L.height != null) { small = document.createElement("small"); el.appendChild(small); }
-      labelsEl.appendChild(el);
-      return { L: L, el: el, small: small, shown: false };
-    });
-  }
-
-  function lerpState(v, A, B, w) {
-    var a = perState(v, A), b = perState(v, B);
-    if (a != null && b != null) return a + (b - a) * w;
-    return a != null ? a : b;
-  }
-
-  var tagBoxes = [];
-  function placeTags(f) {
-    var s = segment();
-    var A = s ? station.stops[s.a] : null, B = s ? station.stops[s.b] : null, w = s ? s.w : 0;
-    tagBoxes = [];
-    for (var i = 0; i < tags.length; i++) {
-      var t = tags[i], L = t.L;
-      var za = perState(L.z, A), zb = perState(L.z, B);
-      var vis = A === B ? (za != null ? 1 : 0) : (za != null ? 1 - w : 0) + (zb != null ? w : 0);
-      var z = lerpState(L.z, A, B, w);
-      var p = z == null || vis < 0.02 ? null : project(num(L.x, 0), num(L.y, 0), z, f);
-      // fade a label out as the thing it names leaves the screen
-      var o = p ? vis * smooth(-10, 40, p[0]) * smooth(-10, 40, W - p[0]) : 0;
-      if (!p || o < 0.02 || p[1] < -80 || p[1] > H + 80) {
-        if (t.shown) { t.el.style.opacity = "0"; t.shown = false; }
-        continue;
-      }
-      if (t.small) {
-        var h = lerpState(L.height, A, B, w);
-        var txt = h == null ? "" : h.toFixed(1) + " m high";
-        if (t.small.textContent !== txt) t.small.textContent = txt;
-      }
-      if (!t.w) { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; }
-      // keep the words on screen; the tick still points at the thing itself
-      var half = t.w / 2, cx = W > t.w + 16 ? clamp(p[0], half + 8, W - half - 8) : p[0];
-      if (overChrome(cx - half, p[1] - 14 - t.h, cx + half, p[1] - 14)) o = 0;
-      if (o > 0.25) tagBoxes.push([cx - half, p[1] - 14 - t.h, cx + half, p[1]]);
-      t.shown = true;
-      t.el.style.opacity = o.toFixed(3);
-      t.el.style.setProperty("--tick", (p[0] - cx).toFixed(1) + "px");
-      t.el.style.transform = "translate(" + cx.toFixed(1) + "px," + p[1].toFixed(1) + "px) translate(-50%, calc(-100% - 14px))";
-    }
   }
 
   function fmtDist(m) { return m >= 1000 ? (m / 1000).toFixed(1) + " km" : Math.round(m / 10) * 10 + " m"; }
@@ -1070,7 +985,7 @@
     });
   }
 
-  // The station head, its buttons and the era panel: labels and hotspots give way to them.
+  // The station head, its buttons and the era panel: hotspots give way to them.
   var chrome = [];
   function measureChrome() {
     chrome = [];
@@ -1092,6 +1007,7 @@
   function overChrome(x0, y0, x1, y1) { return overlaps(chrome, x0, y0, x1, y1); }
 
   function placeSpots(f) {
+    var taken = [];   // cards already placed this frame, so two neighbours in one direction do not overlap
     for (var i = 0; i < spots.length; i++) {
       var s = spots[i], c = s.n.camera;
       var p = project(c[0], c[1], c[2], f);
@@ -1101,15 +1017,18 @@
         if (!s.w) { s.w = s.card.offsetWidth; s.h = s.el.offsetHeight; }
         half = s.w / 2;
         cx = W > s.w + 16 ? clamp(p[0], half + 8, W - half - 8) : p[0];
-        // The card floats above its pin, or hangs below it when above would cover a label.
+        // The card floats above its pin, or hangs below it when above would cover the controls or another card.
         var x0 = cx - half, x1 = cx + half, up0 = p[1] - s.h, dn1 = p[1] - 6 + s.h;
-        var upChrome = overChrome(x0, up0, x1, p[1]), dnChrome = overChrome(x0, p[1] - 6, x1, dn1);
-        var upTags = overlaps(tagBoxes, x0, up0, x1, p[1]), dnTags = overlaps(tagBoxes, x0, p[1] - 6, x1, dn1);
-        if (!upChrome && !upTags) below = false;
-        else if (!dnChrome && !dnTags) below = true;
-        else if (!upChrome) below = false;
-        else if (!dnChrome) below = true;
+        // Cards are tested against each other by the card alone, not its stem and pin.
+        if (!s.ch) s.ch = s.card.offsetHeight;
+        var upCard = [x0, up0, x1, up0 + s.ch], dnCard = [x0, dn1 - s.ch, x1, dn1];
+        var upFree = !overChrome(x0, up0, x1, p[1]) && !overlaps(taken, upCard[0], upCard[1], upCard[2], upCard[3]);
+        var dnFree = !overChrome(x0, p[1] - 6, x1, dn1) && !overlaps(taken, dnCard[0], dnCard[1], dnCard[2], dnCard[3]);
+        if (upFree) below = false;
+        else if (dnFree) below = true;
+        else if (!overChrome(x0, up0, x1, p[1])) below = false;
         else off = true;
+        if (!off) taken.push(below ? dnCard : upCard);
       }
       if (off !== s.off) { s.off = off; s.el.classList.toggle("off", off); }
       if (off) continue;
@@ -1193,7 +1112,7 @@
     var id = station.stops[i], s = M.stateById[id], h = hclass(s.honesty);
     pillEl.hidden = false;
     pillEl.className = "pill " + h;
-    pillEl.textContent = s.honesty || "unlabelled";
+    pillEl.textContent = WORD[s.honesty] || s.honesty || "unlabelled";
     eraTitleEl.textContent = s.title;
     eraLabelEl.textContent = s.label;
     noteEl.textContent = s.note || HONESTY[s.honesty] || "";
@@ -1392,7 +1311,6 @@
     fitted = fitFov(st.view.fov);
     forgetStaleMisses(st);
     buildTimeline();
-    buildTags();
     buildSpots();
     markList();
     if (mode === "flat") flat.removeAttribute("data-url");
@@ -1423,7 +1341,7 @@
   function describeState(id) {
     if (!id) return "Nothing has been rendered here yet.";
     var s = M.stateById[id];
-    return s.title + ", " + s.label + ". " + (s.honesty === "claim" ? "This is a claim, not the record." : s.honesty ? "A " + s.honesty + "." : "");
+    return s.title + ", " + s.label + ". " + (s.honesty === "claim" ? "Theorized: the case for an older Giza." : s.honesty ? "A " + s.honesty + "." : "");
   }
   function landmarkSentence() {
     var id = currentStateId(), parts = [];
@@ -1504,11 +1422,9 @@
     var f = fov();
     if (mode === "gl" && gl && !lost) {
       render(mx);
-      placeTags(f);
       placeSpots(f);
     }
     compass();
-    claimFrame.style.opacity = mx.claim.toFixed(3);
     showNotice(mx);
     showLoading(mx);
     reveal(mx, now);
@@ -1752,7 +1668,6 @@
     if (mode === "flat") {
       canvas.hidden = true;
       flat.hidden = false;
-      labelsEl.hidden = true;
       spotsEl.hidden = true;
       hintEl.textContent = "Scroll sideways to look around";
     } else {
@@ -1763,8 +1678,7 @@
     window.addEventListener("resize", resize);
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () {
-        tags.forEach(function (t) { t.w = 0; });
-        spots.forEach(function (s) { s.w = 0; });
+        spots.forEach(function (s) { s.w = 0; s.ch = 0; });
         measureChrome();
         request();
       });

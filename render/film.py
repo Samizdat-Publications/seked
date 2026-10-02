@@ -173,7 +173,7 @@ def rollback():
     labels = [f"{states.STATES[st]['title']}, {states.STATES[st]['label']}" for st in order]
     notes = [{"survey": "the present plateau, from the survey",
               "reconstruction": "a reconstruction: what is filled in is said to be filled in",
-              "claim": "a claim, drawn so it can be tested; not the record"}[states.STATES[st]["honesty"]] for st in order]
+              "claim": "theorized: the case for an older Giza"}[states.STATES[st]["honesty"]] for st in order]
     return crossfade(stills, labels, notes, os.path.join(REPO, "build", "films", "rollback"))
 
 
@@ -186,8 +186,8 @@ def sphinx():
         raise SystemExit(f"not rendered yet: {missing}")
     labels = ["The lion, freshly carved, c. 10,500 BCE", "The lion weathered by the rains, c. 7000 BCE",
               "Khafre's Sphinx, c. 2560 BCE", "Buried to the chest, c. 1800 CE", "Excavated, 2026"]
-    notes = ["a claim: a lion facing Leo's rising, the statue the recut Sphinx is said to hide",
-             "a claim: the lion worn by rain, before the king's head was cut from its own",
+    notes = ["theorized: a lion facing Leo's rising, the statue the recut Sphinx may hide",
+             "theorized: the lion worn by rain, before the king's head was cut from its own",
              "a reconstruction: the king's head, the ditch swept, his temple before it",
              "a reconstruction: the sand in the ditch as the first surveyors found it",
              "the present Sphinx, from the survey; the statue is a labelled stand-in"]
