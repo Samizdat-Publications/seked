@@ -48,7 +48,7 @@ STATES = {
         grade=dict(bloom=0.2, tint=(0.95, 0.99, 1.02), saturation=0.92),
         rubble=False, people=False, stones=True),
     "built": dict(
-        label="c. 2560 BCE", title="Khufu's Giza", honesty="reconstruction", year=-2559,
+        label="c. 2500 BCE", title="Giza as built", honesty="reconstruction", year=-2559,
         pyramids="dressed", caps="gold", gild=11.0, queens="dressed", mastabas="dressed", causeway="corridor",
         temples=ALL_TEMPLES, temple_mode="built", sphinx="carved",
         ground="desert", valley="fields", water="harbour", city=None, clouds="dry",

@@ -24,23 +24,23 @@
     "Watch the plateau run back to it."
    ],
    "detail": [
-    "This tour puts their case at its strongest, one station at a time, with the project's own measurements beside each argument. The eras you will see: today, as surveyed; Khufu's Giza as built, a reconstruction; and two theorized ages, the long rains of about 7000 BCE and the First Time."
+    "This tour puts their case at its strongest, one station at a time, with the project's own measurements beside each argument. The eras you will see: today, as surveyed; Giza as its Fourth Dynasty builders finished it, a reconstruction; and two theorized ages, the long rains of about 7000 BCE and the First Time."
    ],
    "who": "West, Serpent in the Sky (1979) · Hancock, Fingerprints of the Gods (1995) · Hancock and Bauval, Keeper of Genesis (1996)"
   },
   {
    "id": "erosion",
    "summary": "Schoch's geology: the Sphinx worn by rain, not wind.",
-   "station": "sphinx-face",
+   "station": "sphinx-flank",
    "eras": [
     "first-time",
     "lion",
     "today"
    ],
    "view": {
-    "yaw": 236,
+    "yaw": 44,
     "pitch": 16,
-    "fov": 62
+    "fov": 84
    },
    "title": "Weathered by rain",
    "text": [
@@ -180,7 +180,7 @@
    "summary": "Four shafts, four stars, and a monument to an older moment.",
    "station": "kings-chamber",
    "eras": [
-    "built"
+    "today"
    ],
    "view": {
     "yaw": 237,

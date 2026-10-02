@@ -104,7 +104,8 @@
         "east",
         "harbour",
         "sphinx-face",
-        "valley-temple"
+        "valley-temple",
+        "sphinx-flank"
       ],
       "z": -29.5,
       "by_state": {
@@ -229,9 +230,29 @@
       },
       "neighbours": [
         "sphinx",
-        "harbour"
+        "harbour",
+        "sphinx-flank"
       ],
       "note": "Eye 1.7 m over whatever floor the era has: the ditch where it is open, the drift of c. 1800 CE where it is not."
+    },
+    {
+      "id": "sphinx-flank",
+      "name": "Along the Sphinx's flank",
+      "where": "In the ditch south of the body, between the flank and the ditch's south wall, looking west along them",
+      "x": 330.0,
+      "y": -449.0,
+      "eye": 1.7,
+      "moment": "high-noon",
+      "view": {
+        "yaw": 285,
+        "pitch": 10,
+        "fov": 70
+      },
+      "neighbours": [
+        "sphinx-face",
+        "sphinx"
+      ],
+      "note": "Eye 1.7 m over the ditch floor. The weathering Schoch read is on both sides of this view: the body's flank cut back in its beds and the ditch wall's fissures."
     },
     {
       "id": "menkaure",

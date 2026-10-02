@@ -1252,11 +1252,17 @@
 
   // The tour's own figure over the current stop's station: lines between points of the project frame
   // and labels pinned to points, all computed by render/publish.py from the survey numbers.
+  // Its labels come in one at a time, from when the overlay is first on screen, so a figure
+  // with several (the proportions on Khufu's face) can be read in order rather than all at once.
+  var LABEL_STEP = 1800, LABEL_FADE = 600, overlayShown = { stop: null, t0: 0 }, overlayBusy = false;
   function drawTourOverlay(f) {
+    overlayBusy = false;
     if (!tour.on || !TOUR) return;
     var st = TOUR.stops[tour.i];
     var o = st && st.overlay && OVERLAYS[st.overlay];
     if (!o || !station || station.id !== st.station || curtain.classList.contains("on") || featureOn) return;
+    var now = performance.now();
+    if (overlayShown.stop !== st) overlayShown = { stop: st, t0: now };
     var ctx = skyCtx;
     ctx.lineCap = "round";
     // A point is either [x, y, z] in the frame or {dir: [azimuth, altitude, metres]} from the camera.
@@ -1292,11 +1298,15 @@
       ctx.arc(p[0], p[1], S.radius, 0, 2 * Math.PI);
       ctx.fill();
     });
-    var era = currentStateId();
+    var era = currentStateId(), shown = 0;
     o.labels.forEach(function (L) {
       if (L.eras && L.eras.indexOf(era) < 0) return;
+      var alpha = clamp((now - overlayShown.t0 - LABEL_STEP * shown++) / LABEL_FADE, 0, 1);
+      if (alpha < 1) overlayBusy = true;
+      if (alpha <= 0) return;
       var p = at(L.at);
       if (!p) return;
+      ctx.globalAlpha = alpha;
       var dx = 0, dy = 0, align = "center";
       if (L.place === "above") dy = -30;
       else if (L.place === "below") dy = 22;
@@ -1320,6 +1330,7 @@
       ctx.textBaseline = "middle";
       tag(L.text, L.sub, p[0] + dx, p[1] + dy, align);
     });
+    ctx.globalAlpha = 1;
   }
 
   // A label on a dark plate, so it reads over bright stone and sky alike.
@@ -1859,6 +1870,7 @@
     tourDetail.open = false;
     stopStarted = performance.now();
     canvas.style.filter = s.exposure !== 1 ? "brightness(" + s.exposure + ")" : "";
+    overlayShown.stop = null;   // its labels come in again from the start
     showFeature(false);
     tourShow.hidden = !s.figure;
     // The figure is fetched now, so it is ready when it is shown, but put in the frame only then:
@@ -2054,7 +2066,7 @@
     showNotice(mx);
     showLoading(mx);
     reveal(mx, now);
-    if (busy || mx.fading) request(); else last = 0;
+    if (busy || mx.fading || overlayBusy) request(); else last = 0;
   }
 
   var lastBearing = -1;

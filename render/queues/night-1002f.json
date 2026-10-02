@@ -1,0 +1,40 @@
+{
+ "about": "2026-10-02 night: a station in the ditch along the Sphinx's south flank, for the tour's erosion stop (critic round 12: the paws filled the frame and the weathering was out of it).",
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-lion.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-stripped.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-today.png"
+  }
+ ]
+}
