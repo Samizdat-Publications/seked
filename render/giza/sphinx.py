@@ -347,12 +347,31 @@ def walls(terrain, coll, material, state="today"):
     # each bed of the rock stands out or is worn back by its own amount, and the face wavers along its
     # run, a little on the day it was cut and deeply after the long rains (metres, look choices).
     relief = {"first-time": 0.3, "built": 0.6}.get(state, 1.0)
+    # And the fissures Schoch reads as rain's work: vertical runnels at uneven spacing, cut deepest
+    # near the top where the water first ran over the brink. None on the day it was cut; shallow
+    # as built (look choices: their spacing, width and depth).
+    fissure = {"first-time": 0.0, "built": 0.3}.get(state, 1.0)
     rng = np.random.default_rng(29)
-    rows = 9
-    beds = rng.uniform(-1.0, 1.0, rows + 1)
+    rows = 18
+    # the beds: one value every three rows, eased between, so a bed is a bed and not a zigzag
+    knots = rng.uniform(-1.0, 1.0, rows // 3 + 2)
+    kx = np.arange(rows + 1) / 3.0
+    k0 = np.floor(kx).astype(int)
+    kt = (1 - np.cos(np.pi * (kx - k0))) / 2
+    beds = knots[k0] * (1 - kt) + knots[k0 + 1] * kt
+    step = 0.3
     verts, faces = [], []
     for (ax, ay), (bx, by) in runs:
-        n = max(2, int(np.hypot(bx - ax, by - ay) / 1.0))
+        length = np.hypot(bx - ax, by - ay)
+        n = max(2, int(length / step))
+        s_at = np.linspace(0.0, length, n + 1)
+        centres, c = [], rng.uniform(0.5, 2.0)
+        while c < length:
+            centres.append((c, rng.uniform(0.12, 0.3), rng.uniform(0.35, 1.0)))
+            c += rng.uniform(1.2, 3.8)
+        cut = np.zeros(n + 1)
+        for cc, w, depth in centres:
+            cut = np.maximum(cut, depth * np.exp(-((s_at - cc) / w) ** 2))
         ts = np.linspace(0.0, 1.0, n + 1)
         px, py = ax + (bx - ax) * ts, ay + (by - ay) * ts
         # The ground just outside the cut, 1.5 m beyond the edge.
@@ -361,7 +380,7 @@ def walls(terrain, coll, material, state="today"):
         ox, oy = -dx / nl * 1.5, -dy / nl * 1.5
         ux, uy = -dx / nl, -dy / nl                  # into the rock
         top = terrain.z(px + ox, py + oy)
-        along = np.convolve(rng.uniform(-1.0, 1.0, n + 9), np.ones(9) / 9.0, mode="valid")[:n + 1]
+        along = np.convolve(rng.uniform(-1.0, 1.0, n + 30), np.ones(30) / 30.0 * 1.8, mode="valid")[:n + 1]
         base = len(verts)
         for i in range(n + 1):
             # sunk just under the ground outside, so no rim of the face stands proud of it
@@ -370,8 +389,10 @@ def walls(terrain, coll, material, state="today"):
                 f = r / rows
                 z = floor - 0.5 + (hi - floor + 0.5) * f
                 # recessed only between the foot and the brink, which stay where the cut put them
-                d = relief * (0.55 * beds[r] + 0.45 * along[i] + 0.25 * rng.uniform(-1.0, 1.0)) * (0.0 if r in (0, rows) else 1.0)
+                d = relief * (0.55 * beds[r] + 0.45 * along[i] + 0.06 * rng.uniform(-1.0, 1.0)) * (0.0 if r in (0, rows) else 1.0)
                 d = max(d, -0.2 * relief)
+                if 0 < r < rows:
+                    d += fissure * cut[i] * (0.35 + 0.65 * f) * min(1.0, (rows - r) / 2.0)
                 verts.append((px[i] + ux * d, py[i] + uy * d, z))
         for i in range(n):
             for r in range(rows):
@@ -379,6 +400,7 @@ def walls(terrain, coll, material, state="today"):
                 faces.append((a, a + rows + 1, a + rows + 2, a + 1))
     me = bpy.data.meshes.new("sphinx enclosure walls")
     me.from_pydata(verts, [], faces)
+    me.shade_smooth()
     me.materials.append(material)
     ob = bpy.data.objects.new("sphinx enclosure walls", me)
     coll.objects.link(ob)

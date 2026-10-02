@@ -1,0 +1,110 @@
+{
+ "about": "2026-10-02 night: the Sphinx's ditch walls with the vertical fissures Schoch reads, in rounded coves; beds eased, faces smooth-shaded.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-stripped.png"
+  }
+ ]
+}
