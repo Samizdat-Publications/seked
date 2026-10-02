@@ -1,0 +1,54 @@
+{
+ "about": "2026-10-02: the long rains' lion weathered bed by bed (the head in the hard bed kept) and the Sphinx as finished, both Meshy 7.1.",
+ "renders": [
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/harbour-built.png"
+  }
+ ]
+}

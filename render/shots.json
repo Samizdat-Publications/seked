@@ -167,6 +167,20 @@
       ],
       "lens": 28,
       "moment": "sphinx-noon"
+    },
+    {
+      "id": "sphinx-khafre",
+      "name": "The Sphinx before Khafre's pyramid, from the east on the line through both, 70 mm",
+      "x": 456.7,
+      "y": -446.9,
+      "eye": 6.0,
+      "target": [
+        -334.4,
+        -353.9,
+        52.0
+      ],
+      "lens": 70,
+      "moment": "sphinx-morning"
     }
   ]
 }

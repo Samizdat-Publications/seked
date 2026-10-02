@@ -1,0 +1,33 @@
+{
+ "about": "2026-10-02: the Sphinx as finished, stylised as the monument is (sphinx-built v3).",
+ "renders": [
+  {
+   "state": "built",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/harbour-built.png"
+  }
+ ]
+}

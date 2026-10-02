@@ -1040,7 +1040,7 @@
    "camera": [
     365.5,
     -433.0,
-    -40.406
+    -38.395
    ],
    "view": {
     "yaw": 272,
@@ -1170,17 +1170,17 @@
     "first-time": [
      365.5,
      -433.0,
-     -40.406
+     -38.395
     ],
     "lion": [
      365.5,
      -433.0,
-     -40.406
+     -38.395
     ],
     "built": [
      365.5,
      -433.0,
-     -40.406
+     -38.395
     ],
     "stripped": [
      365.5,
@@ -1190,8 +1190,20 @@
     "today": [
      365.5,
      -433.0,
-     -40.406
+     -38.395
     ]
+   },
+   "titles": {
+    "first-time": {
+     "name": "Before the Sphinx",
+     "where": "On the floor of the ditch at the tips of the paws, looking up at the face",
+     "moment": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim"
+    },
+    "built": {
+     "name": "Before the Sphinx",
+     "where": "On the floor of the ditch at the tips of the paws, looking up at the face",
+     "moment": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim"
+    }
    }
   },
   {

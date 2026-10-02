@@ -63,6 +63,11 @@
       "date": "11-15",
       "solar": 12.0,
       "label": "midday, November, the sun over the south wall of the ditch"
+    },
+    "equinox-dawn": {
+      "date": "03-20",
+      "solar": 7.25,
+      "label": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim"
     }
   },
   "stations": [
@@ -233,7 +238,15 @@
         "harbour",
         "sphinx-flank"
       ],
-      "note": "Eye 1.7 m over whatever floor the era has: the ditch where it is open, the drift of c. 1800 CE where it is not."
+      "note": "Eye 1.7 m over whatever floor the era has: the ditch where it is open, the drift of c. 1800 CE where it is not.",
+      "by_state": {
+        "first-time": {
+          "moment": "equinox-dawn"
+        },
+        "built": {
+          "moment": "equinox-dawn"
+        }
+      }
     },
     {
       "id": "sphinx-flank",

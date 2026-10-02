@@ -1,0 +1,33 @@
+{
+ "about": "2026-10-02: the Sphinx's face at the equinox morning (the leo stop's argument), the First Time lion in more of its bedrock's layering (critic round 16: smooth clay).",
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-built.png"
+  }
+ ]
+}

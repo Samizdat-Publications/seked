@@ -22,7 +22,7 @@ LOOK = {
                # (face, u0, u1, z0, z1, probability): the recess round the original
                # entrance on the north face, 7.29 m east of the axis, and al-Ma'mun's tunnel.
                holes=[(0, 4.0, 10.8, 14.5, 24.0, 0.85), (0, -3.2, 2.2, 4.0, 10.5, 0.9)]),
-    "g2": dict(T=1.9, conc=0.0, miss=0.03, corner=0.6, casing_miss=0.03, casing_wear=0.6, granite_miss=0.55),
+    "g2": dict(T=1.9, conc=0.0, miss=0.03, corner=0.6, casing_miss=0.006, casing_wear=0.6, granite_miss=0.55),
     "g3": dict(T=1.6, conc=0.0, miss=0.03, corner=0.5, granite_miss=0.35,
                holes=[(0, -7.0, 7.0, 12.0, 38.0, 0.8)]),        # the gash of 1196
     "queen": dict(T=1.0, conc=0.0, miss=0.12, corner=0.7),
@@ -75,9 +75,12 @@ def lay(P, courses, rng, core, casing, gran, spec):
     z = 0.0
     backing = []
     seed = rng.random() * 1000
+    decay = spec.get("decay", 1.0)
     for k, h in enumerate(courses):
         zb, zt = z, z + h
         z = zt
+        # each course quarried from its own bed: a little lighter or darker than the next (a look choice)
+        band = rng.gauss(0.0, 1.0)
         if zt > spec["top"] + 1e-6:
             break
         Wc_b = half - zb * cot
@@ -134,10 +137,11 @@ def lay(P, courses, rng, core, casing, gran, spec):
                     # the granite is gone here, and the core behind it shows
                 if abs(uc) > W - 0.2:
                     continue
-                p = spec["miss"] + spec["corner"] * math.exp(-(W - abs(uc)) / 3.0) * (1.0 if zb < 0.55 * H else 0.5)
+                p = spec["miss"] * decay + spec["corner"] * math.exp(-(W - abs(uc)) / 3.0) * (1.0 if zb < 0.55 * H else 0.5)
                 patch = noise.noise(Vector((uc * 0.035 + f * 31.7, zb * 0.06, seed + 5.0)))
-                if patch > 0.38:
-                    p += (patch - 0.38) * 1.6
+                threshold = 0.38 - 0.12 * (decay - 1.0)
+                if patch > threshold:
+                    p += (patch - threshold) * 1.6 * decay
                 if zt > spec["top"] - 4.0:
                     p += 0.25
                 for (fx, u0, u1, z0, z1, pp) in spec.get("holes", ()):
@@ -154,9 +158,14 @@ def lay(P, courses, rng, core, casing, gran, spec):
                 if dmg > 0.93:
                     vj -= rng.uniform(0.1, 0.35)      # the face spalled back
                 x, y = to_world(P, f, uc, vj)
+                # The stone's tone in broad patches of lighter and darker beds and weathering, banded by course,
+                # each block only a little off its neighbours: drawn independently per block the faces read as a
+                # mosaic of tiles from across the plateau (Stewart, 2026-10-02, against photographs of Khafre).
+                broad = noise.noise(Vector((uc * 0.045 + f * 13.1, zb * 0.045, seed + 9.0)))
+                tone = min(max(0.5 + 0.42 * broad + 0.07 * band + rng.gauss(0, 0.05), 0.01), 0.99)
                 core.add((x, y, base + zb + hh / 2 + 0.01),
                          (rng.gauss(0, 0.012), rng.gauss(0, 0.012), FACE_ROT[f] + rng.gauss(0, 0.02)),
-                         (L - rng.uniform(0.03, 0.09), D, hh), rng.randrange(N_CORE), rng.random(), rng.random())
+                         (L - rng.uniform(0.03, 0.09), D, hh), rng.randrange(N_CORE), tone, rng.random())
     return backing
 
 
@@ -328,6 +337,10 @@ def build(state, rng, coll, mats, lib, log=print):
             courses = data.G1_COURSES if key == "g1" else course_heights(P["H"], rng, *COURSES[key])
         if key == "g2":
             spec["cap_z"] = P["today"] - P["cap_depth"]
+        # Two more centuries of weather, quarrying for lime and climbing since c. 1800: more blocks gone, in
+        # larger broken patches (a look choice; the casing itself was stripped long before 1800).
+        if mode == "today":
+            spec["decay"] = 1.5
         if P.get("granite_to"):
             spec["granite_to"] = P["granite_to"]
         backing_mesh(P, lay(P, courses, rng, core, casing, gran, spec), coll, mats["core behind"])

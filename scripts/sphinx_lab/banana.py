@@ -34,8 +34,11 @@ def main():
     ap.add_argument("--model", default="gemini-3-pro-image")
     ap.add_argument("--aspect", default="3:2")
     ap.add_argument("--size", default="2K")
+    ap.add_argument("--meshy", action="store_true", help="run nano-banana-pro through Meshy's image-to-image (9 credits)")
     a = ap.parse_args()
     prompt = a.prompt or open(a.prompt_file, encoding="utf-8").read()
+    if a.meshy:
+        return via_meshy(a, prompt)
     parts = []
     for path in a.image:
         mime = mimetypes.guess_type(path)[0] or "image/png"
@@ -61,6 +64,23 @@ def main():
             if p.get("text"):
                 print("text:", p["text"][:300])
     sys.exit("no image in the reply: " + json.dumps(res)[:600])
+
+
+def via_meshy(a, prompt):
+    """The same model through Meshy's image-to-image: 16:9 at most, 9 credits an image."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import meshy
+    refs = []
+    for path in a.image:
+        mime = mimetypes.guess_type(path)[0] or "image/png"
+        refs.append(f"data:{mime};base64," + base64.b64encode(open(path, "rb").read()).decode())
+    aspect = a.aspect if a.aspect in ("1:1", "16:9", "9:16", "4:3", "3:4") else "16:9"
+    task = meshy.call("POST", "image-to-image", {"ai_model": "nano-banana-pro", "prompt": prompt[:4000],
+                                                 "reference_image_urls": refs, "aspect_ratio": aspect})["result"]
+    done = meshy.wait("image-to-image", task)
+    os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+    open(a.out, "wb").write(urllib.request.urlopen(done["image_urls"][0], timeout=300).read())
+    print("wrote", a.out, f"({done.get('consumed_credits')} Meshy credits)")
 
 
 if __name__ == "__main__":

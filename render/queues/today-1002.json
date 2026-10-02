@@ -1,0 +1,82 @@
+{
+ "about": "2026-10-02: today's pyramids decayed past c. 1800 (more blocks gone, in larger patches), their stone toned in broad patches and by course instead of block by block; Khafre's cap less perforated; the Sphinx before Khafre as a hero shot.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-today.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/south-today.png"
+  },
+  {
+   "state": "today",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/east-today.png"
+  },
+  {
+   "state": "today",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/north-today.png"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/menkaure-today.png"
+  },
+  {
+   "state": "today",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/panorama-today.png"
+  },
+  {
+   "state": "today",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/cemetery-today.png"
+  },
+  {
+   "state": "today",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/temple-today.png"
+  },
+  {
+   "state": "today",
+   "shot": "sphinx-khafre",
+   "size": "1920x1080",
+   "samples": 160,
+   "out": "build/render/shots/sphinx-khafre-today.png"
+  }
+ ]
+}
