@@ -143,6 +143,13 @@ def night_sky(s, moments):
     return out
 
 
+def dms(deg):
+    """26.5231 -> 26°31′, the way the dossier and the cards write an angle."""
+    d = int(deg)
+    m = int(round((deg - d) * 60))
+    return f"{d}°{m:02d}′"
+
+
 def overlays():
     """
     Figures the guided tour draws over a station, in the project frame, computed here from the survey
@@ -192,7 +199,9 @@ def overlays():
     sx, sy, sz = v["sphinx"]["east"], v["sphinx"]["north"], -20.0
     gap = [(p["cx"] - h + g2["cx"] + g2["half"]) / 2, (p["cy"] - h + g2["cy"] + g2["half"]) / 2, 0.0]
     a = math.radians(v["akhet"]["sunsetAzimuth"])
-    sun = [sx + 2600 * math.sin(a), sy + 2600 * math.cos(a), sz + 18.0]
+    # The disc is drawn a few degrees up the bearing, where the plateau's edge meets the gap as seen
+    # from the Sphinx: a diagram of where it goes down, not the sun's altitude at that moment.
+    sun = [sx + 2600 * math.sin(a), sy + 2600 * math.cos(a), sz + 2600 * math.tan(math.radians(5.0))]
     out["akhet"] = {
         "lines": [
             {"from": r([sx, sy, sz]), "to": r(sun), "style": "dash"},
@@ -219,7 +228,7 @@ def overlays():
         ],
         "labels": [
             {"at": r(mouth), "text": "To the descending passage", "sub": f"{foot[1] - mouth[1]:.0f} m north, then up through the rock", "place": "below"},
-            {"at": r(up), "text": f"Up the passage at {v['passage']['angle']:.2f}°, to the north sky", "sub": "where Thuban, the pole star of its age, crossed at its lowest", "place": "above"},
+            {"at": r(up), "text": f"Up the passage at {dms(v['passage']['angle'])}, to the north sky", "sub": "where Thuban, the pole star of its age, crossed at its lowest", "place": "above"},
         ],
     }
     # `valley-hall`: what the granite hall's walls are, as the older-Giza reading has them (directions
