@@ -1,0 +1,40 @@
+{
+ "about": "2026-10-02 morning: Aswan granite with crystals that read across a room (critic round 13: plaster), polished a little more; the King's Chamber's floor strips softer.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "kings-chamber",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/kings-chamber-today.png"
+  },
+  {
+   "state": "today",
+   "station": "valley-temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/valley-temple-today.png"
+  },
+  {
+   "state": "built",
+   "station": "kings-chamber",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/kings-chamber-built.png"
+  },
+  {
+   "state": "built",
+   "station": "valley-temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/valley-temple-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "kings-chamber",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/kings-chamber-stripped.png"
+  }
+ ]
+}

@@ -92,14 +92,23 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
     col = t.ramp(t.noise(geo.outputs["Position"], 1.8, 5.0), [(0.3, hexlin(colours[0])), (0.7, hexlin(colours[1]))])
     col = t.mix(1.0, col, t.grey(t.math("ADD", t.math("MULTIPLY", tone.outputs[0], 0.14), 0.93)), "MULTIPLY")
     if speckle:        # granite: a mosaic of crystals a centimetre or two across, feldspar, quartz and mica
+        # Aswan's crystals are large, a centimetre to three, and read across the chamber: big
+        # feldspars over a finer ground of quartz and mica (critic round 13: "plaster").
         vor = t.node("ShaderNodeTexVoronoi")
-        vor.inputs["Scale"].default_value = 110.0
+        vor.inputs["Scale"].default_value = 45.0
         t.link(geo.outputs["Position"], vor.inputs["Vector"])
         cell = t.node("ShaderNodeSeparateColor")
         t.link(vor.outputs["Color"], cell.inputs[0])
-        crystal = t.ramp(cell.outputs[0], [(0.0, hexlin(colours[1])), (0.4, hexlin(colours[0])), (0.66, hexlin(quartz)),
-                                           (0.9, hexlin(speckle))], interp="CONSTANT")
-        col = t.mix(0.42, col, crystal)
+        crystal = t.ramp(cell.outputs[0], [(0.0, hexlin(colours[1])), (0.45, hexlin(colours[0])), (0.7, hexlin(quartz)),
+                                           (0.88, hexlin(speckle))], interp="CONSTANT")
+        fine = t.node("ShaderNodeTexVoronoi")
+        fine.inputs["Scale"].default_value = 160.0
+        t.link(geo.outputs["Position"], fine.inputs["Vector"])
+        fcell = t.node("ShaderNodeSeparateColor")
+        t.link(fine.outputs["Color"], fcell.inputs[0])
+        mica = t.math("GREATER_THAN", fcell.outputs[0], 0.86)
+        col = t.mix(0.5, col, crystal)
+        col = t.mix(t.math("MULTIPLY", mica, 0.6), col, hexlin(speckle))
     if soot:
         grime = t.math("MULTIPLY", t.band(up, 0.0, height), soot)
         grime = t.math("MULTIPLY", grime, t.band(t.noise(geo.outputs["Position"], 0.7, 3.0), 0.25, 0.75))
@@ -596,7 +605,7 @@ def lights(state, coll, r, room, log=print):
         for yy, sign in ((y1 - 0.12, 1.0), (y0 + 0.12, -1.0)):     # each washes the wall behind it
             for fx in (0.4, 0.63, 0.86):                           # kept clear of the coffer, which they would burn out
                 at = (x0 + (x1 - x0) * fx, yy, z0 + 0.06)
-                lamps.append(_area("chamber strip", coll, at, (2.4, 0.08), (0.0, sign * 0.2, 1.0), (1.0, 0.0, 0.0), 160.0, warm))
+                lamps.append(_area("chamber strip", coll, at, (2.4, 0.08), (0.0, sign * 0.2, 1.0), (1.0, 0.0, 0.0), 110.0, warm))
         # A softer wash up the west wall, so the coffer stands dark against lit granite.
         lamps.append(_area("chamber strip", coll, (x0 + 0.12, (y0 + y1) / 2, z0 + 0.06), (0.08, 4.4), (-0.2, 0.0, 1.0), (0.0, 1.0, 0.0), 70.0, warm))
         log(f"interior light: {len(lamps)} electric strips")
@@ -711,7 +720,7 @@ def build(state, coll, mats, log=print):
     # Aswan's red granite: pink feldspar, grey quartz and black mica, muted enough that lamplight
     # does not turn it to orange plaster; the coffer's stone is darker, as it is.
     if state in MODERN:
-        lime, granite, soot, rough, quartz = ("b2a38c", "c4b59d"), ("4b3530", "644740"), 0.75, 0.5, "6e6964"
+        lime, granite, soot, rough, quartz = ("b2a38c", "c4b59d"), ("5a3830", "7a4a3e"), 0.75, 0.4, "6e6964"
     elif state == "stripped":
         lime, granite, soot, rough, quartz = ("a89985", "baab95"), ("45322d", "5a413a"), 0.9, 0.55, "66615c"
     else:
