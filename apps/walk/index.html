@@ -319,7 +319,7 @@
   .tour-more { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0 0 10px; }
   .tour-more a { font: 500 13px/1.4 var(--body); color: var(--claim); text-decoration: none; border-bottom: 1px solid rgba(242, 181, 68, 0.4); }
   .tour-more a:hover { border-bottom-color: var(--claim); }
-  .tour-show { display: inline-flex; align-items: center; gap: 8px; margin: 2px 0 12px; min-height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--claim); background: rgba(242, 181, 68, 0.1); color: var(--claim); font: 600 13px/1 var(--body); cursor: pointer; }
+  .tour-show { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--claim); background: rgba(242, 181, 68, 0.1); color: var(--claim); font: 600 13px/1 var(--body); cursor: pointer; }
   .tour-show:hover { background: rgba(242, 181, 68, 0.2); }
   /* a stop's figure, featured over the dimmed panorama in the space the card leaves */
   .feature {
@@ -451,7 +451,6 @@
     <div class="tour-body" id="tour-body" tabindex="-1">
       <h2 id="tour-title"></h2>
       <div id="tour-text"></div>
-      <button type="button" class="tour-show" id="tour-show" hidden></button>
       <p class="tour-numbers" id="tour-numbers" hidden><b>The numbers</b><span id="tour-numbers-text"></span></p>
       <details class="tour-more-text" id="tour-detail">
         <summary>Read more</summary>
@@ -463,6 +462,7 @@
     <div class="tour-nav">
       <button type="button" class="btn" id="tour-prev">Back</button>
       <span class="grow" id="tour-count"></span>
+      <button type="button" class="tour-show" id="tour-show" hidden></button>
       <button type="button" class="btn go" id="tour-next">Next</button>
     </div>
   </aside>
@@ -1255,7 +1255,7 @@
     if (!tour.on || !TOUR) return;
     var st = TOUR.stops[tour.i];
     var o = st && st.overlay && OVERLAYS[st.overlay];
-    if (!o || !station || station.id !== st.station || curtain.classList.contains("on")) return;
+    if (!o || !station || station.id !== st.station || curtain.classList.contains("on") || featureOn) return;
     var ctx = skyCtx;
     ctx.lineCap = "round";
     // A point is either [x, y, z] in the frame or {dir: [azimuth, altitude, metres]} from the camera.
@@ -1864,7 +1864,7 @@
       featureImg.src = s.figure.src;   // fetched now, so it is ready when it is shown
       featureImg.alt = s.figure.alt;
       featureCap.textContent = s.figure.caption;
-      tourShow.textContent = "Show the figure";
+      tourShow.textContent = "The figure";
     }
     tourCount.textContent = (i + 1) + " of " + n;
     tourPrev.textContent = "Back";
@@ -1963,7 +1963,8 @@
       featureEl.setAttribute("aria-hidden", "true");
       setTimeout(function () { if (!featureOn) featureEl.hidden = true; }, 650);
     }
-    tourShow.textContent = featureOn ? "Back to the view" : "Show the figure";
+    tourShow.textContent = featureOn ? "The view" : "The figure";
+    request();   // redraw, so the overlay steps aside for the figure and returns after it
     if (on) say(featureCap.textContent);
   }
 
