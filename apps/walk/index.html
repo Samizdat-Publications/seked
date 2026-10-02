@@ -283,7 +283,67 @@
   .stop .sub { display: none; margin-top: 5px; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
   .stop.missing .sub { display: block; }
 
+  /* ---------- the guided tour ---------- */
+  .btn.tour-btn { background: var(--claim); border-color: var(--claim); color: var(--claim-ink); font-weight: 600; }
+  .btn.tour-btn:hover { filter: brightness(1.08); }
+  .btn.tour-btn[aria-pressed="true"] { background: var(--glass); border-color: var(--claim); color: var(--claim); }
+  .tour {
+    position: absolute; z-index: 7; left: var(--left);
+    bottom: calc(var(--bottom) + 132px);
+    width: min(410px, calc(100% - var(--left) - var(--right)));
+    max-height: calc(100% - var(--top) - var(--bottom) - 250px); min-height: 220px;
+    display: flex; flex-direction: column;
+    background: rgba(17, 15, 12, 0.82); border: 1px solid var(--rule); border-radius: 14px;
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+    animation: tour-in 0.35s ease-out;
+  }
+  @keyframes tour-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .tour-top { display: flex; align-items: center; gap: 10px; padding: 14px 14px 0 18px; }
+  .tour-kicker { flex: 1; margin: 0; font: 500 10.5px/1.3 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--claim); }
+  .tour-x { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--rule); background: none; color: var(--muted); font: 400 18px/1 var(--body); cursor: pointer; }
+  .tour-x:hover { color: var(--ink); border-color: var(--rule-hi); }
+  .tour-bar { display: flex; gap: 4px; padding: 12px 18px 0; }
+  .tour-bar button { flex: 1; height: 14px; padding: 5px 0; border: 0; background: none; cursor: pointer; }
+  .tour-bar button::before { content: ""; display: block; height: 4px; border-radius: 2px; background: rgba(239, 232, 220, 0.2); transition: background-color 0.2s; }
+  .tour-bar button.done::before { background: rgba(242, 181, 68, 0.55); }
+  .tour-bar button[aria-current="step"]::before { background: var(--claim); }
+  .tour-bar button:hover::before { background: rgba(242, 181, 68, 0.8); }
+  .tour-body { flex: 1; overflow: auto; overscroll-behavior: contain; padding: 14px 18px 4px; outline: none; }
+  .tour-body h2 { margin: 0 0 10px; font: 400 26px/1.15 var(--display); letter-spacing: 0.01em; text-wrap: balance; }
+  .tour-body p { margin: 0 0 11px; font-size: 14.5px; line-height: 1.58; color: rgba(239, 232, 220, 0.92); }
+  .tour-numbers { margin: 14px 0 12px; padding: 10px 12px; border-left: 2px solid var(--claim); background: rgba(242, 181, 68, 0.07); border-radius: 0 6px 6px 0; }
+  .tour-numbers b { display: block; margin-bottom: 4px; font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--claim); }
+  .tour-numbers span { font: 400 12.5px/1.55 var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tour-more { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0 0 10px; }
+  .tour-more a { font: 500 13px/1.4 var(--body); color: var(--claim); text-decoration: none; border-bottom: 1px solid rgba(242, 181, 68, 0.4); }
+  .tour-more a:hover { border-bottom-color: var(--claim); }
+  .tour-who { margin: 0 0 6px; font: 400 11px/1.5 var(--mono); color: var(--muted); }
+  .tour-nav { display: flex; gap: 8px; align-items: center; padding: 12px 14px 14px 18px; border-top: 1px solid rgba(239, 232, 220, 0.12); }
+  .tour-nav .grow { flex: 1; font: 500 11px/1.3 var(--mono); color: var(--muted); letter-spacing: 0.04em; }
+  .tour-nav .btn.go { background: var(--claim); border-color: var(--claim); color: var(--claim-ink); font-weight: 600; }
+  .tour-nav .btn.go:hover { filter: brightness(1.08); }
+  .tour-nav .btn:disabled { opacity: 0.35; cursor: default; }
+  .tour.offer { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); min-height: 0; max-height: none; width: min(440px, calc(100% - 32px)); animation: none; }
+  .tour.offer .tour-body h2 { font-size: 28px; }
+  /* touring: the stations' own hotspots step aside for the story */
+  .touring .spots, .touring .hint { display: none; }
+
   @media (max-width: 700px) {
+    /* a phone: the buttons in one row that scrolls sideways, the station's name on its own row below */
+    .head { flex-wrap: wrap; row-gap: 10px; }
+    .head .title { order: 2; flex: 1 1 100%; min-width: 0; }
+    .tools { order: 1; flex: 1 1 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+    .buttons { min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+    .buttons::-webkit-scrollbar { display: none; }
+    .compass { flex: none; }
+    .touring .where { display: none; }
+    .tour { left: 0; right: 0; bottom: 0; width: 100%; max-height: 54%; min-height: 0; border-radius: 16px 16px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
+    .tour.offer { bottom: auto; left: 50%; border-radius: 14px; border-bottom: 1px solid var(--rule); }
+    .touring .era { display: none; }
+    .tour-body h2 { font-size: 22px; }
+    .tour-body p { font-size: 14px; }
   }
   @media (max-width: 560px) {
     .name { font-size: 21px; }
@@ -322,6 +382,7 @@
     </div>
     <div class="tools">
       <div class="buttons">
+        <button type="button" class="btn tour-btn" id="tour-btn" aria-pressed="false" hidden>Tour</button>
         <button type="button" class="btn" id="stations-btn" aria-expanded="false" aria-controls="stations">
           <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="3" cy="11" r="1.9" fill="currentColor"/><circle cx="11" cy="3" r="1.9" fill="currentColor"/><path d="M3.6 9.4C4.6 5.6 9.4 8.4 10.4 4.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="1.6 2"/></svg>
           Stations
@@ -349,6 +410,26 @@
   <div class="spots" id="spots"></div>
   <div class="curtain on" id="curtain" aria-hidden="true"></div>
   <p class="hint" id="hint" aria-hidden="true">Drag to look around</p>
+
+  <aside class="tour" id="tour" aria-labelledby="tour-title" hidden>
+    <div class="tour-top">
+      <p class="tour-kicker" id="tour-kicker"></p>
+      <button type="button" class="tour-x" id="tour-close" aria-label="Leave the tour">&times;</button>
+    </div>
+    <div class="tour-bar" id="tour-bar"></div>
+    <div class="tour-body" id="tour-body" tabindex="-1">
+      <h2 id="tour-title"></h2>
+      <div id="tour-text"></div>
+      <p class="tour-numbers" id="tour-numbers" hidden><b>The numbers</b><span id="tour-numbers-text"></span></p>
+      <p class="tour-more" id="tour-more" hidden></p>
+      <p class="tour-who" id="tour-who"></p>
+    </div>
+    <div class="tour-nav">
+      <button type="button" class="btn" id="tour-prev">Back</button>
+      <span class="grow" id="tour-count"></span>
+      <button type="button" class="btn go" id="tour-next">Next</button>
+    </div>
+  </aside>
 
   <section class="era" id="era" aria-label="Era">
     <div class="notice" id="notice" hidden>
@@ -1377,6 +1458,7 @@
   function goStation(id, how, stateId) {
     var st = M.byId[id];
     if (!st || switching) return;
+    if (tour.on && how !== "tour") endTour(true);   // the visitor took the wheel
     if (st === station) {
       closePanel(how === "list");
       if (stateId && st.stops.indexOf(stateId) >= 0) glideTo(st.stops.indexOf(stateId));
@@ -1460,18 +1542,218 @@
     var h = (location.hash || "").replace(/^#/, "");
     if (!h) return null;
     var parts = h.split("/").map(function (x) { try { return decodeURIComponent(x); } catch (e) { return x; } });
+    if (parts[0] === "tour") return { tour: Math.max(1, parseInt(parts[1], 10) || 1) };
     return { station: parts[0], state: parts[1] || null };
   }
   function writeHash() {
     if (!station) return;
     var id = currentStateId();
-    var h = "#" + encodeURIComponent(station.id) + (id ? "/" + encodeURIComponent(id) : "");
+    var h = tour.on ? "#tour/" + (tour.i + 1) : "#" + encodeURIComponent(station.id) + (id ? "/" + encodeURIComponent(id) : "");
     if (location.hash !== h) { try { history.replaceState(null, "", h); } catch (e) { /* a sandboxed frame */ } }
   }
   window.addEventListener("hashchange", function () {
     var want = parseHash();
-    if (want && M && M.byId[want.station]) goStation(want.station, "hash", want.state);
+    if (want && want.tour && TOUR) { if (!tour.on || want.tour - 1 !== tour.i) startTour(want.tour - 1); return; }
+    if (want && M && M.byId[want.station]) { if (tour.on) endTour(true); goStation(want.station, "hash", want.state); }
   });
+
+  // ------------------------------------------------------------------ the guided tour
+  // tour.json: stops, each a station, the eras it runs through in order and where the view turns.
+  // A stop arrives at its station in its first era, turns the view, then glides through the rest.
+  var TOUR = null;
+  var tour = { on: false, i: 0, timers: [], token: 0 };
+  var tourEl = $("tour"), tourBtn = $("tour-btn"), tourKicker = $("tour-kicker"), tourBar = $("tour-bar");
+  var tourBody = $("tour-body"), tourTitle = $("tour-title"), tourText = $("tour-text"), tourNumbers = $("tour-numbers");
+  var tourNumbersText = $("tour-numbers-text"), tourMore = $("tour-more"), tourWho = $("tour-who");
+  var tourPrev = $("tour-prev"), tourNext = $("tour-next"), tourCount = $("tour-count");
+  var TOUR_HOLD = 2600;   // ms an era is held before the next glide
+
+  function normaliseTour(t) {
+    if (!t || !Array.isArray(t.stops)) return null;
+    var stops = t.stops.filter(function (s) { return s && M.byId[s.station]; }).map(function (s) {
+      var st = M.byId[s.station];
+      var eras = (Array.isArray(s.eras) ? s.eras : []).map(String).filter(function (e) { return st.stops.indexOf(e) >= 0; });
+      if (!eras.length) eras = [st.stops[st.stops.length - 1]];
+      var v = s.view || {};
+      return {
+        id: String(s.id || s.station), station: st.id, eras: eras,
+        view: { yaw: num(v.yaw, st.view.yaw / DEG), pitch: num(v.pitch, st.view.pitch / DEG), fov: num(v.fov, st.view.fov / DEG) },
+        title: String(s.title || st.name),
+        text: (Array.isArray(s.text) ? s.text : [s.text]).filter(Boolean).map(String),
+        numbers: s.numbers ? String(s.numbers) : "",
+        more: (Array.isArray(s.more) ? s.more : []).filter(function (m) { return m && m.href; }),
+        who: s.who ? String(s.who) : "",
+        summary: s.summary ? String(s.summary) : ""
+      };
+    });
+    return stops.length ? { title: String(t.title || "The tour"), stops: stops } : null;
+  }
+
+  function countWord(n) {
+    var w = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"][n];
+    return w || String(n);
+  }
+  function offered() { try { return localStorage.getItem("seked-tour-offered") === "1"; } catch (e) { return true; } }
+  function markOffered() { try { localStorage.setItem("seked-tour-offered", "1"); } catch (e) { /* private mode */ } }
+
+  function clearTourTimers() {
+    tour.timers.forEach(clearTimeout);
+    tour.timers = [];
+    tour.token++;
+  }
+  function later(ms, fn) {
+    var token = tour.token;
+    tour.timers.push(setTimeout(function () { if (tour.token === token) fn(); }, ms));
+  }
+  function paragraphs(list) {
+    tourText.textContent = "";
+    list.forEach(function (t) { var p = document.createElement("p"); p.textContent = t; tourText.appendChild(p); });
+  }
+
+  // The first-visit invitation: the same card, centred, before the story starts.
+  function offerTour() {
+    tourEl.hidden = false;
+    tourEl.classList.add("offer");
+    tourEl.dataset.mode = "offer";
+    tourKicker.textContent = "New here?";
+    tourBar.textContent = "";
+    tourTitle.textContent = TOUR.title;
+    paragraphs([countWord(TOUR.stops.length) + " stops across the plateau, about six minutes: the Sphinx's weathering, the lion and Leo, Orion's belt on the ground, the shafts and their stars. The argument that Giza is far older than the record, at its strongest, with the project's own measurements beside it."]);
+    tourNumbers.hidden = true;
+    tourMore.hidden = true;
+    tourWho.textContent = "";
+    tourPrev.textContent = "Explore on my own";
+    tourPrev.disabled = false;
+    tourNext.textContent = "Start the tour";
+    tourCount.textContent = "";
+    tourNext.focus({ preventScroll: true });
+  }
+
+  function startTour(i) {
+    markOffered();
+    tour.on = true;
+    tourEl.dataset.mode = "tour";
+    tourEl.classList.remove("offer");
+    tourEl.hidden = false;
+    stage.classList.add("touring");
+    tourBtn.setAttribute("aria-pressed", "true");
+    tourBtn.textContent = "Touring";
+    if (!panel.hidden) closePanel(false);
+    buildTourBar();
+    showStop(clamp(i, 0, TOUR.stops.length - 1));
+  }
+
+  function endTour(quiet) {
+    clearTourTimers();
+    var was = tour.on;
+    tour.on = false;
+    tourEl.hidden = true;
+    tourEl.classList.remove("offer");
+    stage.classList.remove("touring");
+    tourBtn.setAttribute("aria-pressed", "false");
+    tourBtn.textContent = "Tour";
+    markOffered();
+    measureChrome();
+    if (was) writeHash();
+    if (!quiet) { canvas.focus({ preventScroll: true }); say("The tour is closed. Drag to look around, and choose an era or a station."); }
+    request();
+  }
+
+  function buildTourBar() {
+    tourBar.textContent = "";
+    TOUR.stops.forEach(function (s, k) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", "Stop " + (k + 1) + ": " + s.title);
+      b.title = s.title + (s.summary ? ": " + s.summary : "");
+      b.addEventListener("click", function () { showStop(k); });
+      tourBar.appendChild(b);
+    });
+  }
+
+  function showStop(i) {
+    clearTourTimers();
+    tour.i = i;
+    var s = TOUR.stops[i], n = TOUR.stops.length;
+    tourKicker.textContent = TOUR.title;
+    tourTitle.textContent = s.title;
+    paragraphs(s.text);
+    tourNumbers.hidden = !s.numbers;
+    tourNumbersText.textContent = s.numbers;
+    tourMore.textContent = "";
+    tourMore.hidden = !s.more.length;
+    s.more.forEach(function (m) {
+      var a = document.createElement("a");
+      a.href = String(m.href);
+      a.textContent = String(m.label || m.href) + " \u2192";
+      tourMore.appendChild(a);
+    });
+    tourWho.textContent = s.who ? "Argued by " + s.who : "";
+    tourCount.textContent = (i + 1) + " of " + n;
+    tourPrev.textContent = "Back";
+    tourPrev.disabled = i === 0;
+    tourNext.textContent = i === n - 1 ? "Walk freely" : "Next";
+    Array.prototype.forEach.call(tourBar.children, function (b, k) {
+      b.classList.toggle("done", k < i);
+      if (k === i) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    tourBody.scrollTop = 0;
+    say("Stop " + (i + 1) + " of " + n + ": " + s.title + ".");
+    if (station && station.id === s.station) {
+      var k0 = station.stops.indexOf(s.eras[0]);
+      if (Math.abs(pos - k0) > 1e-3) glideTo(k0);
+      writeHash();
+      arriveStop(s);
+    } else {
+      goStation(s.station, "tour", s.eras[0]);
+      waitForStation(s.station, function () { writeHash(); arriveStop(s); });
+    }
+  }
+
+  // goStation swaps behind the curtain; the stop's camera move waits for the new station to be entered.
+  function waitForStation(id, fn) {
+    var token = tour.token, tries = 0;
+    (function poll() {
+      if (tour.token !== token) return;
+      if (!switching && station && station.id === id) { fn(); return; }
+      if (++tries < 100) setTimeout(poll, 50);
+    })();
+  }
+
+  function arriveStop(s) {
+    lookAt(s.view, 1600);
+    var t = 2200;
+    for (var k = 1; k < s.eras.length; k++) {
+      (function (era, at) {
+        later(at, function () {
+          var idx = station.stops.indexOf(era);
+          if (idx >= 0) glideTo(idx);
+        });
+      })(s.eras[k], t);
+      t += TOUR_HOLD + 1300;
+    }
+  }
+
+  function lookAt(v, dur) {
+    var yaw = v.yaw * DEG, pitch = clamp(v.pitch * DEG, -PITCH_MAX, PITCH_MAX);
+    var f = clamp(v.fov * DEG, MIN_FOV, MAX_FOV);
+    view.vy = view.vp = 0;
+    if (still()) { view.yaw = wrapAngle(yaw); view.pitch = pitch; setFov(f); request(); return; }
+    turnTween = { y0: view.yaw, dy: wrapAngle(yaw - view.yaw), p0: view.pitch, dp: pitch - view.pitch, f0: fov(), df: f - fov(), t0: performance.now(), dur: dur };
+    request();
+  }
+
+  tourNext.addEventListener("click", function () {
+    if (tourEl.dataset.mode === "offer") { startTour(0); return; }
+    if (tour.i >= TOUR.stops.length - 1) { endTour(); return; }
+    showStop(tour.i + 1);
+  });
+  tourPrev.addEventListener("click", function () {
+    if (tourEl.dataset.mode === "offer") { endTour(); return; }
+    if (tour.i > 0) showStop(tour.i - 1);
+  });
+  $("tour-close").addEventListener("click", function () { endTour(); });
+  tourBtn.addEventListener("click", function () { if (tour.on) endTour(); else startTour(0); });
 
   // ------------------------------------------------------------------ the frame loop
   var raf = 0, last = 0, noticeOn = false, noticeKey = "", curtainOpen = false;
@@ -1502,6 +1784,7 @@
       var tt = clamp((now - turnTween.t0) / turnTween.dur, 0, 1), et = ease(tt);
       view.yaw = turnTween.y0 + turnTween.dy * et;
       view.pitch = turnTween.p0 + turnTween.dp * et;
+      if (turnTween.df) setFov(turnTween.f0 + turnTween.df * et);
       if (tt >= 1) turnTween = null; else busy = true;
     }
     if (eraTween) {
@@ -1709,6 +1992,7 @@
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !panel.hidden) { e.preventDefault(); closePanel(true); return; }
+    if (e.key === "Escape" && !tourEl.hidden) { e.preventDefault(); endTour(); return; }
     if (e.altKey || e.ctrlKey || e.metaKey || !station || mode !== "gl") return;
     var t = e.target;
     if (!(t === canvas || t === document.body || t === document.documentElement)) return;
@@ -1790,8 +2074,16 @@
       });
     }
     var want = parseHash();
+    if (TOUR) tourBtn.hidden = false;
+    if (want && want.tour && TOUR) {
+      var first = TOUR.stops[clamp(want.tour - 1, 0, TOUR.stops.length - 1)];
+      enter(M.byId[first.station], first.eras[0]);
+      startTour(want.tour - 1);
+      return;
+    }
     var st = want && M.byId[want.station] ? M.byId[want.station] : M.stations[0];
     enter(st, want && M.byId[want.station] ? want.state : null);
+    if (TOUR && !want && !offered()) offerTour();
   }
 
   fetch("stations.json", { cache: "no-cache" })
@@ -1804,7 +2096,14 @@
       if (!m.stations.length) throw new Error("it lists no stations");
       return m;
     })
-    .then(function (m) { M = m; boot(); }, function (err) {
+    .then(function (m) {
+      M = m;
+      // The tour is a story told over the stations; without it the walkthrough still stands.
+      return fetch("tour.json", { cache: "no-cache" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (t) { TOUR = normaliseTour(t); }, function () { TOUR = null; })
+        .then(boot);
+    }, function (err) {
       fatal("The list of stations, stations.json, could not be read: " + (err && err.message ? err.message : String(err)) + ".");
     });
 })();

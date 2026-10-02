@@ -2,7 +2,7 @@
 
 **Version 1.0 · live at https://seked.pages.dev**
 
-[Walk the plateau](https://seked.pages.dev/walk/) · [Films](https://seked.pages.dev/films/) · [Sky alignments](https://seked.pages.dev/alignments/) · [Claims dossier](https://seked.pages.dev/docs/dossier.html) · [Realtime viewer](https://seked.pages.dev/viewer/)
+[Take the tour](https://seked.pages.dev/walk/#tour/1) · [Walk the plateau](https://seked.pages.dev/walk/) · [Films](https://seked.pages.dev/films/) · [Sky alignments](https://seked.pages.dev/alignments/) · [Claims dossier](https://seked.pages.dev/docs/dossier.html) · [Realtime viewer](https://seked.pages.dev/viewer/)
 
 The Giza plateau rebuilt from the survey, path traced in five eras from the
 claimed First Time of 10,500 BCE to today, in which every "encoded
@@ -19,8 +19,9 @@ seked of 5½ is the whole π-and-φ story.
 
 | | |
 |---|---|
-| **The walkthrough** (`/walk/`) | Seventeen 360-degree stations, outdoors and inside the Great Pyramid and Khafre's valley temple, each in every era it stands in, path traced in Blender Cycles at 4096 by 2048. |
-| **Five eras** | The First Time (c. 10,500 BCE, claim), the long rains (c. 7000 BCE, claim), Khufu's Giza (c. 2560 BCE, reconstruction), stripped and buried (c. 1800 CE, reconstruction), today (2026, survey). |
+| **The guided tour** (`/walk/#tour/1`) | The case for an older Giza in nine stops: the Sphinx's rain weathering, the head too small for its body, the valley temple's megaliths, the lion facing Leo, Orion's belt on the ground, the shafts and their stars, the Earth-scale numbers, and the Younger Dryas. Each stop moves the view and runs the eras; the text is in `apps/walk/tour.json`. |
+| **The walkthrough** (`/walk/`) | Seventeen 360-degree stations, outdoors and inside the Great Pyramid and Khafre's valley temple, each in every era it stands in, path traced in Blender Cycles at 4096 by 2048. The night station draws Orion's figure on its stars and a line from each belt star to its pyramid. |
+| **Five eras** | The First Time (c. 10,500 BCE, theorized), the long rains (c. 7000 BCE, theorized), Khufu's Giza (c. 2560 BCE, reconstruction), stripped and buried (c. 1800 CE, reconstruction), today (2026, survey). |
 | **The films** (`/films/`) | The rollback from today to the First Time, the Sphinx's sequence from lion to excavation, and a flight up the approach as built. |
 | **The sky alignments** (`/alignments/`) | Orion over the pyramids, the lion facing Leo, the shafts and their stars, each drawn as its strongest case with the size of its miss stated. |
 | **The claims dossier** (`/docs/dossier.html`) | Twenty-two claims, each with its residual, tolerance and the free choices it needs; fifteen land within their own tolerance. |
@@ -33,7 +34,7 @@ seked of 5½ is the whole π-and-φ story.
 3. **Presets are preference orders over sources.** Switch from Petrie 1883 to Dash 2015 and every result recomputes.
 4. **The sky is computed.** HYG 4.2 stars, Vondrák 2011 precession pinned in tests to ERFA.
 5. **Pyramids from the survey; everything else placed, then labelled.** Temples, tombs and the Sphinx stand on surveyed footprints to about a metre and are marked as visual stand-ins.
-6. **Every era says what it is**: survey, reconstruction, or claim drawn so it can be tested.
+6. **Every era says what it is**: survey, reconstruction, or theorized, the case for an older Giza drawn at its strongest.
 
 `CLAUDE.md` carries the full set, and `docs/plan.html` the original plan.
 
@@ -90,7 +91,7 @@ docs/            plan, dossier, shafts, progress snapshots, history, design spec
 - **The First Time's lion and its figures** are the weakest frames; they wait on new Meshy generations.
 - **Unverified records**: entries from the starting sheet that nobody has yet checked against the cited page stay `verified: false`, and `qc.shaft.north.angle` (claim C2) cannot be verified from Gantenbrink's report at all.
 - **Geometry holes** listed in `docs/geometry-blockers.md`: Khafre's casing cap, Menkaure's chambers, the mastaba field as surveyed rather than plausible.
-- **Next ideas**: a guided tour of the star alignments inside the walkthrough, and an LLM that runs a claim in somebody's own words against the model (`pnpm claim` is the start of it).
+- **Next ideas**: an LLM that runs a claim in somebody's own words against the model (`pnpm claim` is the start of it).
 
 How the model got here, stage by stage, is in [`docs/history.md`](docs/history.md)
 and the milestone renders in [`docs/progress/`](docs/progress/README.md).

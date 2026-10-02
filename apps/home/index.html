@@ -55,6 +55,12 @@
   .intro { margin: 0; max-width: 70ch; color: var(--muted); }
   .intro strong { color: var(--ink); font-weight: 500; }
 
+  .stops { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; counter-reset: stop; }
+  .stops a { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; padding: 14px 16px; height: 100%; border: 1px solid var(--rule); border-radius: 6px; text-decoration: none; background: var(--panel); transition: border-color .15s; }
+  .stops a:hover { border-color: var(--claim); }
+  .stops .n { grid-row: span 2; font: 400 28px/1 var(--display); color: var(--claim); font-variant-numeric: tabular-nums; }
+  .stops b { font: 400 19px/1.25 var(--display); }
+  .stops .t { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   .eras { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
   .era { margin: 0; display: grid; gap: 10px; align-content: start; }
   .era img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; border: 1px solid var(--rule); display: block; background: #000; }
@@ -93,7 +99,7 @@
 
   @media (max-width: 960px) {
     .eras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .cards, .more, .rules { grid-template-columns: 1fr; }
+    .cards, .more, .rules, .stops { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
     body { font-size: 15px; }
@@ -110,7 +116,8 @@
     <h1>Seked</h1>
     <p class="lead">The Giza plateau rebuilt from the survey, path traced in five eras from the First Time of 10,500 BCE to today. Every "encoded mathematics" claim about the pyramids is computed live from the measurement database, so you can see a claim and test it in the same place.</p>
     <div class="ctas">
-      <a class="btn primary" href="walk/">Walk the plateau &rarr;</a>
+      <a class="btn primary" href="walk/#tour/1">Take the tour &rarr;</a>
+      <a class="btn" href="walk/">Walk freely</a>
       <a class="btn" href="films/">Watch the films</a>
       <a class="btn" href="alignments/">See the sky</a>
       <a class="btn" href="https://github.com/Samizdat-Publications/seked">Source on GitHub</a>
@@ -119,6 +126,22 @@
 </header>
 
 <main class="page">
+  <section aria-labelledby="tour">
+    <h2 id="tour">The guided tour</h2>
+    <p class="intro"><strong>The case for an older Giza</strong>, in nine stops across the plateau: the argument of West, Schoch, Bauval and Hancock that the plateau is far older than the record, put at its strongest, with the project's own measurements beside each step. About six minutes; each stop moves the view and runs the eras for you.</p>
+    <ol class="stops">
+      <li><a href="walk/#tour/1"><span class="n">1</span><b>The case for an older Giza</b><span class="t">The plateau runs back from today to 10,500 BCE, and the case is set out.</span></a></li>
+      <li><a href="walk/#tour/2"><span class="n">2</span><b>Weathered by rain</b><span class="t">Schoch's geology: the Sphinx's body worn by rain, not wind.</span></a></li>
+      <li><a href="walk/#tour/3"><span class="n">3</span><b>A head too small for its body</b><span class="t">Why the king's face may be a recut of something older.</span></a></li>
+      <li><a href="walk/#tour/4"><span class="n">4</span><b>Megaliths from the Sphinx's own quarry</b><span class="t">Hundred-tonne blocks from the Sphinx's ditch, faced later in granite.</span></a></li>
+      <li><a href="walk/#tour/5"><span class="n">5</span><b>The lion faces the lion</b><span class="t">The lion looking at the dawn of the Age of Leo.</span></a></li>
+      <li><a href="walk/#tour/6"><span class="n">6</span><b>Orion's belt on the ground</b><span class="t">Bauval's correlation, with the belt at its lowest in 10,450 BCE.</span></a></li>
+      <li><a href="walk/#tour/7"><span class="n">7</span><b>Shafts aimed at the stars</b><span class="t">Four shafts, four stars, and two dates for one building.</span></a></li>
+      <li><a href="walk/#tour/8"><span class="n">8</span><b>The shape of the Earth</b><span class="t">True north, pi and the 1:43,200 scale of the Earth.</span></a></li>
+      <li><a href="walk/#tour/9"><span class="n">9</span><b>A lost chapter</b><span class="t">The Younger Dryas, Göbekli Tepe and a lost chapter of history.</span></a></li>
+    </ol>
+  </section>
+
   <section aria-labelledby="eras">
     <h2 id="eras">Five eras, one plateau</h2>
     <p class="intro">The same stand, the same survey numbers, five moments. Today is the survey and Khufu's Giza the conventional reconstruction. The two oldest eras follow Hancock, Bauval and Schoch's case that the plateau is far older than 2500 BCE, from the water-worn Sphinx enclosure to Orion's belt in 10,500 BCE, and draw it at its strongest.</p>
@@ -151,7 +174,7 @@
     <div class="cards">
       <a class="card" href="walk/">
         <img src="img/panorama-built.jpg" alt="" loading="lazy" width="1400" height="788">
-        <div><h3>The walkthrough</h3><p>Seventeen 360-degree stations, from the desert approach to the King's Chamber, each in every era it stands in. Drag to look, switch the era, step to the next station.</p><span class="go">Walk the plateau &rarr;</span></div>
+        <div><h3>The walkthrough</h3><p>Seventeen 360-degree stations, from the desert approach to the King's Chamber, each in every era it stands in. Take the guided tour, or drag to look, switch the era and step to the next station on your own.</p><span class="go">Walk the plateau &rarr;</span></div>
       </a>
       <a class="card" href="films/">
         <img src="img/sphinx-sequence-built.jpg" alt="" loading="lazy" width="1400" height="788">
