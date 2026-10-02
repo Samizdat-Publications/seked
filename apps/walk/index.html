@@ -328,7 +328,7 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
     padding: calc(var(--top) + 86px) var(--right) calc(var(--bottom) + 64px) calc(var(--left) + 466px);
     background: rgba(10, 9, 8, 0.92);
-    opacity: 0; pointer-events: none; transition: opacity 0.6s ease;
+    opacity: 0; pointer-events: none; transition: opacity 1.2s ease-in-out;
   }
   .feature.on { opacity: 1; }
   .feature a { display: block; max-width: 100%; max-height: 100%; min-height: 0; pointer-events: auto; }
@@ -1954,7 +1954,7 @@
     } else {
       featureEl.classList.remove("on");
       featureEl.setAttribute("aria-hidden", "true");
-      setTimeout(function () { if (!featureOn) featureEl.hidden = true; }, 650);
+      setTimeout(function () { if (!featureOn) featureEl.hidden = true; }, 1250);
     }
     tourShow.textContent = featureOn ? "The view" : "The figure";
     request();   // redraw, so the overlay steps aside for the figure and returns after it
