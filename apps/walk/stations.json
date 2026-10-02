@@ -2805,14 +2805,14 @@
    "where": "Cut in the bedrock thirty metres under the pyramid, and never finished",
    "moment": "by the era's lamps",
    "camera": [
-    5.2,
-    -3.0,
+    3.5,
+    -8.6,
     -28.78
    ],
    "view": {
-    "yaw": 262,
-    "pitch": -4,
-    "fov": 72
+    "yaw": 350,
+    "pitch": 2,
+    "fov": 80
    },
    "panoramas": {
     "built": "pano/subterranean-built.jpg",

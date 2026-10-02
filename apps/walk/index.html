@@ -1861,11 +1861,11 @@
     canvas.style.filter = s.exposure !== 1 ? "brightness(" + s.exposure + ")" : "";
     showFeature(false);
     tourShow.hidden = !s.figure;
+    // The figure is fetched now, so it is ready when it is shown, but put in the frame only then:
+    // swapped in here it would show in the last stop's figure while that one fades out.
+    pendingFigure = s.figure;
     if (s.figure) {
-      featureLink.href = s.figure.src;
-      featureImg.src = s.figure.src;   // fetched now, so it is ready when it is shown
-      featureImg.alt = s.figure.alt;
-      featureCap.textContent = s.figure.caption;
+      new Image().src = s.figure.src;
       tourShow.textContent = "The figure";
     }
     tourCount.textContent = (i + 1) + " of " + n;
@@ -1944,8 +1944,15 @@
     })();
   }
 
+  var pendingFigure = null;
   function showFeature(on) {
     featureOn = !!on;
+    if (on && pendingFigure) {
+      featureLink.href = pendingFigure.src;
+      featureImg.src = pendingFigure.src;
+      featureImg.alt = pendingFigure.alt;
+      featureCap.textContent = pendingFigure.caption;
+    }
     if (on) {
       featureEl.hidden = false;
       featureEl.removeAttribute("aria-hidden");

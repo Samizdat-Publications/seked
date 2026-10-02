@@ -133,6 +133,12 @@ def city_boxes():
     return raw[:, :6]
 
 
+def city_measured():
+    """Whether each Open Buildings box's height was measured by the 2.5D raster (the record's seventh field)."""
+    raw = np.fromfile(os.path.join(DATA, "footprints", "city.bin"), dtype="<f4").reshape(-1, 7)
+    return raw[:, 6] > 0.5
+
+
 def views():
     """The stations and shots the walkthrough renders (render/stations.json, render/shots.json)."""
     return load_json(RENDER, "stations.json"), load_json(RENDER, "shots.json")

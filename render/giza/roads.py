@@ -91,8 +91,22 @@ def build(state, terrain, coll, log=print):
     mat = asphalt_material()
     bm = bmesh.new()
     total = 0.0
+    # No way is paved across the Sphinx's ditch: OSM's lines there are visitors' paths over its floor,
+    # and draped on the cut they came out as a slab of asphalt at the statue's paws.
+    from .sphinx import enclosure
+    ex0, ex1, ey0, ey1, _ = enclosure(state)
+    runs = []
     for width, pts in roads:
         line = _resample(pts)
+        inside = (line[:, 0] > ex0 - 2) & (line[:, 0] < ex1 + 2) & (line[:, 1] > ey0 - 2) & (line[:, 1] < ey1 + 2)
+        start = None
+        for i, cut in enumerate(list(inside) + [True]):
+            if not cut and start is None:
+                start = i
+            elif cut and start is not None:
+                runs.append((width, line[start:i]))
+                start = None
+    for width, line in runs:
         if len(line) < 2:
             continue
         d = np.gradient(line, axis=0)

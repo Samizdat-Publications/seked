@@ -386,6 +386,28 @@ def queens_chamber(state, coll, mats, log=print):
     return (x0, x1, y0, y1, z0, ridge_z)
 
 
+def _sheet(name, P, keep, material, coll, flip=False):
+    """
+    A smooth-shaded sheet from a (rows, columns, 3) array of points; `keep[j, i]` says whether
+    the quad whose lower corner is (j, i) is laid. `flip` turns its faces the other way.
+    """
+    import numpy as np
+    ny, nx = P.shape[:2]
+    j, i = np.nonzero(keep[:ny - 1, :nx - 1])
+    a = j * nx + i
+    quads = np.stack([a, a + 1, a + nx + 1, a + nx], axis=1)
+    if flip:
+        quads = quads[:, ::-1]
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(P.reshape(-1, 3).tolist(), [], quads.tolist())
+    me.validate()
+    me.polygons.foreach_set("use_smooth", [True] * len(me.polygons))
+    me.materials.append(material)
+    ob = bpy.data.objects.new(name, me)
+    coll.objects.link(ob)
+    return ob
+
+
 def subterranean_chamber(state, coll, mats, log=print):
     """
     The unfinished chamber cut in the bedrock under the pyramid, from §37 (g1-interior.json): its
@@ -393,69 +415,138 @@ def subterranean_chamber(state, coll, mats, log=print):
     passages at its north-east and south-east corners. Its floor was never finished: §37 gives it
     140 in under the roof over the flat eastern part, 155 on a knob beside the pit and 198 at the
     best worked surface round it, and the western part rises in rough masses of rock towards the
-    roof. The eastern floor, the knob and the worked surface are set at those depths; where the pit
-    is, and the masses and trenches of the western part, are look choices.
+    roof. The eastern floor, the knob and the worked surface are set at those depths. Where the pit
+    is and how deep, the masses' terraces and the quarrymen's trenches between them, the hewn
+    roughness of the walls and roof, and how far the two passages run before the dark, are look
+    choices.
     """
     import numpy as np
+    from .noise import ValueNoise, smoothstep
     r = _r()
     cx, cy, roof = r["chamber.subterranean.centre.east"], r["chamber.subterranean.centre.north"], r["chamber.subterranean.centre.up"]
     y1 = r["passage.subterranean_north.end.north"]
     y0 = r["passage.subterranean_south.begin.north"]
     half_n, half_s = r["chamber.subterranean.length.north"] / 2, r["chamber.subterranean.length.south"] / 2
+    half = max(half_n, half_s)
     flat = roof - r["chamber.subterranean.height"]
     knob, worked = roof - r["chamber.subterranean.depth.knob"], roof - r["chamber.subterranean.depth.worked"]
     pit = (cx + 1.6, cy - 0.8, 0.9)                                     # look choice: where the pit opens, and its half width
-    rng = np.random.default_rng(37)
+    nz = ValueNoise(37, 40.0)
+    step = 0.07
 
     def floor_z(x, y):
-        """The unfinished floor: flat in the east, the pit's basin, rough masses and trenches in the west."""
-        west = np.clip((cx + 1.0 - x) / 4.0, 0.0, 1.0)                  # 0 in the east, 1 well into the west
-        ridges = 0.5 + 0.5 * np.sin(x * 1.9 + 0.7 * np.sin(y * 1.3)) * np.cos(y * 0.45)
-        mass = roof - 1.1 - 2.2 * (1.0 - ridges) ** 1.5                  # up to 1.1 m under the roof, down to 3.3
-        z = flat * (1 - west) + mass * west
-        d = np.hypot(x - pit[0], y - pit[1])
-        z = np.where(d < 2.6, np.minimum(z, worked + (knob - worked) * np.clip((d - 1.6) / 1.0, 0.0, 1.0)), z)
-        return z
+        """
+        The unfinished floor: flat in the east with a pick-worked skin, the pit's basin and the knob
+        beside it, and in the west masses of rock left standing in rough terraces, split by trenches
+        the quarrymen sank to free the next blocks, their east faces cut back nearly sheer.
+        """
+        skin = 0.025 * nz.fbm(x, y, 0.5, 3, key=1)
+        east = flat + 0.06 * nz.fbm(x, y, 3.0, 2, key=2) + skin
+        # The masses: a broad field quantised into terraces about 0.45 m high, the risers steep but not knife-cut.
+        field = 0.5 + 0.5 * nz.fbm(x, y, 2.6, 3, key=3)
+        tiers = (field * 5.0) + 3.0 * (cx - x) / half
+        k = np.floor(tiers)
+        terr = (k + smoothstep(0.78, 1.0, tiers - k)) / 5.0
+        mass = roof - 0.45 - np.clip(1.0 - terr, 0.0, 1.0) * 2.6 + skin * 2.0
+        # Trenches: two running east and west, one north and south, each about 0.6 m wide and sunk 1.2 m.
+        def trench(d, w):
+            return 1.0 - smoothstep(w * 0.35, w * 0.6, np.abs(d))
+        wob = 0.35 * nz.fbm(x, y, 3.5, 2, key=4) + 0.06 * nz.fbm(x, y, 0.6, 2, key=8)
+        cut = np.maximum.reduce([trench(y - (cy + 1.7) + wob + 0.08 * (x - cx), 0.7),
+                                 trench(y - (cy - 2.0) + wob, 0.55) * smoothstep(cx - 6.5, cx - 5.5, x),
+                                 trench(x - (cx - 3.4) + wob - 0.12 * (y - cy), 0.6) * smoothstep(cy - 3.6, cy - 2.4, y)])
+        mass = mass - cut * 1.25
+        # Where the masses begin: a ragged front about 1.2 m west of the centre, nearly sheer.
+        # Round the pit, a squared cut: the worked surface a pace wide, a riser to the knob's level, a
+        # second up to the flat floor, their edges as ragged as the picks left them.
+        rag = 0.18 * nz.fbm(x, y, 0.9, 2, key=7)
+        d = 0.75 * np.maximum(np.abs(x - pit[0]), np.abs(y - pit[1])) + 0.25 * np.hypot(x - pit[0], y - pit[1]) + rag
+        basin = worked + (knob - worked) * smoothstep(1.45, 1.6, d) + (flat - knob) * smoothstep(1.95, 2.1, d) + skin
+        near = smoothstep(2.3, 2.1, d)
+        east = east * (1 - near) + np.minimum(east, basin) * near
+        front = cx - 0.1 + 0.7 * nz.fbm(x, y, 2.0, 2, key=5)
+        west = smoothstep(front, front - 0.45, x)
+        z = np.maximum(east, east * (1 - west) + mass * west)
+        # The floor cut down to the drift's sill at the south-east corner, where it leaves 0.58 m below the flat.
+        sill = r["passage.subterranean_south.begin.up"]
+        dd = np.hypot((x - r["passage.subterranean_south.begin.east"]) / 1.6, (y - y0) / 1.4)
+        w = smoothstep(1.3, 0.9, dd)
+        z = z * (1 - w) + np.minimum(z, sill + skin + (flat - sill) * smoothstep(0.4, 0.9, dd)) * w
+        return np.minimum(z, roof - 0.12)
 
-    bm = bmesh.new()
-    V = bm.verts.new
-    step = 0.25
-    xs = np.arange(cx - max(half_n, half_s), cx + max(half_n, half_s) + 1e-6, step)
-    ys = np.arange(y0, y1 + 1e-6, step)
+    mat = mats["bedrock rough"]
+    # The floor, laid 0.2 m past the walls on every side so that the hewn walls always cut it.
+    xs = np.arange(cx - half - 0.2, cx + half + 0.2 + 1e-6, step)
+    ys = np.arange(y0 - 0.2, y1 + 0.2 + 1e-6, step)
     X, Y = np.meshgrid(xs, ys)
-    Z = floor_z(X, Y) + rng.normal(0.0, 0.03, X.shape)
-    grid = [[V((float(X[j, i]), float(Y[j, i]), float(Z[j, i]))) for i in range(len(xs))] for j in range(len(ys))]
-    for j in range(len(ys) - 1):
-        for i in range(len(xs) - 1):
-            px, py = X[j, i] + step / 2, Y[j, i] + step / 2
-            if max(abs(px - pit[0]), abs(py - pit[1])) < pit[2]:
-                continue                                                # the pit's mouth, left open
-            bm.faces.new((grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]))
-    # The pit: its four walls going down three metres, and its bottom.
-    px0, px1, py0, py1 = pit[0] - pit[2], pit[0] + pit[2], pit[1] - pit[2], pit[1] + pit[2]
-    top, bot = worked, worked - 3.0
-    for a, b in (((px0, py0), (px1, py0)), ((px1, py0), (px1, py1)), ((px1, py1), (px0, py1)), ((px0, py1), (px0, py0))):
-        bm.faces.new([V((a[0], a[1], top)), V((b[0], b[1], top)), V((b[0], b[1], bot)), V((a[0], a[1], bot))])
-    bm.faces.new([V((px0, py0, bot)), V((px0, py1, bot)), V((px1, py1, bot)), V((px1, py0, bot))])
-    # The walls, from the lowest floor to the roof, the north and south a little different in length.
-    lo = min(float(Z.min()), bot) - 0.2
+    Z = floor_z(X, Y)
+    # The pit's mouth snapped to the grid, so its walls share the floor's rim.
+    i0, i1 = np.searchsorted(xs, pit[0] - pit[2]), np.searchsorted(xs, pit[0] + pit[2])
+    j0, j1 = np.searchsorted(ys, pit[1] - pit[2]), np.searchsorted(ys, pit[1] + pit[2])
+    keep = np.ones(X.shape, bool)
+    keep[j0:j1, i0:i1] = False
+    _sheet("subterranean floor", np.dstack([X, Y, Z]), keep, mat, coll)
+    # The pit, sunk five metres (Perring took it deeper; its bottom is out of sight).
+    bot = worked - 5.0
+    rim = [(xs[i], ys[j0]) for i in range(i0, i1 + 1)] + [(xs[i1], ys[j]) for j in range(j0 + 1, j1 + 1)] + \
+          [(xs[i], ys[j1]) for i in range(i1 - 1, i0 - 1, -1)] + [(xs[i0], ys[j]) for j in range(j1 - 1, j0 - 1, -1)]
+    rx, ry = np.array([p[0] for p in rim]), np.array([p[1] for p in rim])
+    top = floor_z(rx, ry)
+    depths = np.linspace(0.0, 1.0, 40)[:, None]
+    PZ = top[None, :] * (1 - depths) + bot * depths
+    ox, oy = rx - pit[0], ry - pit[1]
+    n = np.hypot(ox, oy)
+    jag = 0.04 * nz.fbm(np.broadcast_to(rx + ry, PZ.shape), PZ, 0.4, 3, key=6)
+    PX, PY = rx[None, :] + ox / n * jag, ry[None, :] + oy / n * jag
+    PX[0], PY[0] = rx, ry
+    _sheet("subterranean pit", np.dstack([PX, PY, PZ]), np.ones(PX.shape, bool), mat, coll)
+    # The walls: each a sheet from below the lowest floor to over the roof, hewn in and out about 5 cm,
+    # with holes where the two passages leave.
+    lo = min(float(Z.min()), flat - 0.4) - 0.2
+    passages = {
+        "north": (r["passage.subterranean_north.end.east"], r["passage.subterranean_north.end.up"],
+                  r["passage.subterranean.width"], r["passage.subterranean.height"], 3.5),
+        "south": (r["passage.subterranean_south.begin.east"], r["passage.subterranean_south.begin.up"], 0.72, 0.76, 5.0),
+    }
     corners = [(cx - half_s, y0), (cx + half_s, y0), (cx + half_n, y1), (cx - half_n, y1)]
+    names = ("south", "east", "north", "west")
     for k in range(4):
-        a, b = corners[k], corners[(k + 1) % 4]
-        bm.faces.new([V((a[0], a[1], lo)), V((b[0], b[1], lo)), V((b[0], b[1], roof)), V((a[0], a[1], roof))])
-    bm.faces.new([V((x, y, roof)) for x, y in corners])
-    _emit("subterranean chamber", bm, mats["bedrock rough"], coll)
-    # The passages' mouths: the one from the entrance passage at the north-east corner, the dead-end drift at the south-east.
+        (ax, ay), (bx, by) = corners[k], corners[(k + 1) % 4]
+        length = math.hypot(bx - ax, by - ay)
+        ux, uy = (bx - ax) / length, (by - ay) / length
+        nx_, ny_ = uy, -ux                                       # outward, the corners being walked anticlockwise
+        s = np.arange(-0.15, length + 0.15 + 1e-6, step)
+        zz = np.arange(lo, roof + 0.15 + 1e-6, step)
+        S, ZZ = np.meshgrid(s, zz)
+        BX, BY = ax + ux * S, ay + uy * S
+        hew = 0.05 * nz.fbm(BX + BY, ZZ, 1.2, 4, key=10 + k) + 0.015 * nz.fbm(BX - BY, ZZ * 2.0, 0.18, 2, key=20 + k)
+        WX, WY = BX + nx_ * hew, BY + ny_ * hew
+        keep = np.ones(S.shape, bool)
+        if names[k] in passages:
+            px_, pz, pw, ph, _ = passages[names[k]]
+            keep &= ~((np.abs(BX - px_) < pw / 2) & (ZZ > pz - 0.02) & (ZZ < pz + ph))
+            keep[:-1, :-1] &= keep[1:, :-1] & keep[:-1, 1:] & keep[1:, 1:]
+        _sheet(f"subterranean {names[k]} wall", np.dstack([WX, WY, ZZ]), keep, mat, coll, flip=True)
+    # The roof: level, dressed no better than the walls.
+    rxs = np.arange(cx - half - 0.2, cx + half + 0.2 + 1e-6, step * 1.5)
+    rys = np.arange(y0 - 0.2, y1 + 0.2 + 1e-6, step * 1.5)
+    RX, RY = np.meshgrid(rxs, rys)
+    RZ = roof + 0.03 * nz.fbm(RX, RY, 0.9, 4, key=30) + 0.05 * nz.fbm(RX, RY, 4.0, 1, key=31)
+    _sheet("subterranean roof", np.dstack([RX, RY, RZ]), np.ones(RX.shape, bool), mat, coll, flip=True)
+    # The passages: square-cut tunnels running out of the chamber into the dark, the entrance passage
+    # north from the north-east corner and the dead-end drift south from the south-east one.
     bm = bmesh.new()
-    V = bm.verts.new
-    for x, y, z, w, h, dy in ((r["passage.subterranean_north.end.east"], y1, r["passage.subterranean_north.end.up"],
-                               r["passage.subterranean.width"], r["passage.subterranean.height"], -0.02),
-                              (r["passage.subterranean_south.begin.east"], y0, r["passage.subterranean_south.begin.up"],
-                               0.72, 0.76, 0.02)):
-        bm.faces.new([V((x - w / 2, y + dy, z)), V((x + w / 2, y + dy, z)), V((x + w / 2, y + dy, z + h)), V((x - w / 2, y + dy, z + h))])
-    _emit("subterranean mouths", bm, mats["dark"], coll)
+    for name, sign, yw in (("north", 1.0, y1), ("south", -1.0, y0)):
+        px_, pz, pw, ph, run = passages[name]
+        ya, yb = yw - sign * 0.06, yw + sign * run
+        _box(bm, px_ - pw / 2 - 0.15, px_ - pw / 2, min(ya, yb), max(ya, yb), pz - 0.15, pz + ph + 0.15)
+        _box(bm, px_ + pw / 2, px_ + pw / 2 + 0.15, min(ya, yb), max(ya, yb), pz - 0.15, pz + ph + 0.15)
+        _box(bm, px_ - pw / 2, px_ + pw / 2, min(ya, yb), max(ya, yb), pz - 0.15, pz)
+        _box(bm, px_ - pw / 2, px_ + pw / 2, min(ya, yb), max(ya, yb), pz + ph, pz + ph + 0.15)
+        _box(bm, px_ - pw / 2, px_ + pw / 2, yb, yb + sign * 0.15, pz, pz + ph)
+    _emit("subterranean passages", bm, mat, coll)
     log(f"subterranean chamber: {2 * half_n:.2f} x {y1 - y0:.2f} m under a roof at {roof:.2f} m; the floor flat at "
-        f"{flat:.2f} in the east, {worked:.2f} round the pit, rising in rough masses in the west")
+        f"{flat:.2f} in the east, {worked:.2f} round the pit, rising in terraced masses in the west")
     return (cx - half_n, cx + half_n, y0, y1, flat, roof)
 
 
@@ -530,32 +621,62 @@ def rough_rock(name, colours, soot=0.0):
     bsdf = t.node("ShaderNodeBsdfPrincipled")
     t.link(bsdf.outputs[0], out.inputs["Surface"])
     geo = t.node("ShaderNodeNewGeometry")
-    col = t.ramp(t.noise(geo.outputs["Position"], 1.2, 6.0, 0.62), [(0.25, hexlin(colours[0])), (0.75, hexlin(colours[1]))])
+    pos = geo.outputs["Position"]
+    sep = t.node("ShaderNodeSeparateXYZ")
+    t.link(pos, sep.inputs[0])
+    col = t.ramp(t.noise(pos, 0.9, 3.0, 0.5), [(0.3, hexlin(colours[0])), (0.7, hexlin(colours[1]))])
+    # The limestone's beds: level bands a hand or two thick, a little warmer or greyer, wandering slightly.
+    wander = t.math("MULTIPLY", t.math("SUBTRACT", t.noise(pos, 0.5, 3.0), 0.5), 0.7)
+    bed = t.math("SINE", t.math("MULTIPLY", t.math("ADD", sep.outputs["Z"], wander), 2 * math.pi / 0.45))
+    fade = t.band(t.noise(pos, 0.9, 2.0), 0.35, 0.7)          # beds that show here and fade there
+    nrm = t.node("ShaderNodeSeparateXYZ")
+    t.link(geo.outputs["Normal"], nrm.inputs[0])
+    fade = t.math("MULTIPLY", fade, t.band(t.math("ABSOLUTE", nrm.outputs["Z"]), 0.8, 0.4))   # on cut faces, not floors
+    col = t.mix(t.math("MULTIPLY", t.math("MULTIPLY", t.band(bed, 0.7, 1.0), fade), 0.2), col, hexlin("7a6a55"))
     if soot:
-        sep = t.node("ShaderNodeSeparateXYZ")
-        t.link(geo.outputs["Position"], sep.inputs[0])
         grime = t.math("MULTIPLY", t.band(sep.outputs["Z"], -30.0, -27.0), soot)
+        grime = t.math("MULTIPLY", grime, t.math("ADD", 0.75, t.math("MULTIPLY", t.noise(pos, 3.0, 2.0), 0.25)))
         col = t.mix(grime, col, hexlin("2a241e"))
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = 0.93
+    # The picks' bites: small facets a few centimetres across over a lumpier hewn surface.
+    vor = t.node("ShaderNodeTexVoronoi")
+    vor.feature = "F1"
+    vor.inputs["Scale"].default_value = 10.0
+    t.link(pos, vor.inputs["Vector"])
+    height = t.math("ADD", t.math("MULTIPLY", t.noise(pos, 4.0, 8.0, 0.7), 0.7), t.math("MULTIPLY", vor.outputs["Distance"], 0.3))
     bmp = t.node("ShaderNodeBump")
-    bmp.inputs["Strength"].default_value = 0.8
-    bmp.inputs["Distance"].default_value = 0.08
-    t.link(t.noise(geo.outputs["Position"], 4.0, 8.0, 0.7), bmp.inputs["Height"])
+    bmp.inputs["Strength"].default_value = 0.55
+    bmp.inputs["Distance"].default_value = 0.05
+    t.link(height, bmp.inputs["Height"])
     t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
 def subterranean_lights(state, coll, room, log=print):
-    """Two lamps on the flat eastern floor today; three oil lamps before."""
+    """
+    Low light that rakes across the rock, so the masses and trenches read: today two work lamps
+    on the eastern floor, one in the pit's basin and a small one hidden in the far trench, with a
+    glow down the entrance passage; three oil lamps on the floor and one on a mass before.
+    """
     x0, x1, y0, y1, flat, roof = room
     lamps = []
     modern = state in MODERN
-    colour = (1.0, 0.82, 0.6) if modern else (1.0, 0.52, 0.2)
-    spots = ((0.78, 0.35), (0.55, 0.7)) if modern else ((0.8, 0.3), (0.6, 0.72), (0.35, 0.45))
-    for fx, fy in spots:
-        at = (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, flat + (1.8 if modern else 0.15))
-        lamps.append(_point("subterranean lamp", coll, at, 60.0 if modern else 35.0, colour, 0.05))
+    colour = (1.0, 0.8, 0.58) if modern else (1.0, 0.6, 0.3)
+    if modern:
+        # work lamps on stands, high enough that no floor burns out under them; one up among the masses
+        spots = ((0.86, 0.22, 1.7, 55.0), (0.72, 0.8, 1.9, 40.0), (0.52, 0.2, 1.3, 14.0), (0.12, 0.62, 0.6, 14.0),
+                 (0.3, 0.4, 2.2, 6.0))
+    else:
+        spots = ((0.85, 0.3, 0.35, 14.0), (0.62, 0.75, 0.3, 12.0), (0.5, 0.2, 0.3, 7.0), (0.3, 0.45, 0.4, 6.0))
+    for fx, fy, up, watts in spots:
+        at = (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, flat + up)
+        lamps.append(_point("subterranean lamp", coll, at, watts, colour, 0.18 if modern else 0.02))
+    if modern:          # the entrance passage lit a few metres up towards the descending passage
+        r = _r()
+        lamps.append(_point("subterranean lamp", coll, (r["passage.subterranean_north.end.east"], y1 + 2.4,
+                                                        r["passage.subterranean_north.end.up"] + 0.7), 12.0, colour, 0.03))
+    log(f"subterranean light: {len(lamps)} lamps")
     return lamps
 
 
@@ -607,7 +728,7 @@ def build(state, coll, mats, log=print):
     mats["qc limestone"] = masonry("qc limestone", lime, rough, 0.8, 1.7, room_frame(r["qc.corner.ne.up"]),
                                    soot=soot * 0.6, height=r["qc.gable.height"])
     mats["bedrock rough"] = rough_rock("bedrock rough", ("8f7f68", "a8977d") if state in MODERN or state == "stripped" else ("b7a88f", "cbbca2"),
-                                       soot=0.7 if state in MODERN or state == "stripped" else 0.2)
+                                       soot=0.45 if state in MODERN or state == "stripped" else 0.15)
     mats.setdefault("timber", _flat("timber", (0.24, 0.15, 0.08), 0.7))
     mats.setdefault("iron", _flat("iron", (0.05, 0.05, 0.05), 0.4))
     gallery(state, coll, mats, log)

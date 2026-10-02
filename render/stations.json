@@ -457,14 +457,14 @@
       "name": "The subterranean chamber",
       "where": "Cut in the bedrock thirty metres under the pyramid, and never finished",
       "inside": true,
-      "x": 5.2,
-      "y": -3.0,
+      "x": 3.5,
+      "y": -8.6,
       "z": -28.78,
       "light": "by the era's lamps",
       "view": {
-        "yaw": 262,
-        "pitch": -4,
-        "fov": 72
+        "yaw": 350,
+        "pitch": 2,
+        "fov": 80
       },
       "neighbours": [
         "north",

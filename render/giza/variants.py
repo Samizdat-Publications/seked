@@ -23,12 +23,16 @@ def fbm3(p, octaves=4):
     return total / norm
 
 
-def block(seed, rounding, erosion, chips=2, cuts=10, shear=0.0, front_bias=1.0, base_zero=False, batter=0.0, smooth=True):
+def block(seed, rounding, erosion, chips=2, cuts=10, shear=0.0, front_bias=1.0, base_zero=False, batter=0.0, smooth=True,
+          strata=0.0, bands=3.5):
     """
     A unit block (-0.5..0.5; front +Y, up +Z), rounded and eroded, most on the front
     and top where the weather reaches. `shear` slopes the front back at the top, for a
     casing stone; `batter` draws the walls in towards the top; `base_zero` puts the
-    base at z = 0 for things that stand on the ground.
+    base at z = 0 for things that stand on the ground. `strata` cuts the block's faces back
+    in level bands, `bands` to its height, the softer beds hollowed into rounded coves and
+    the harder standing proud, deepest towards the top where the water ran longest: the
+    profile Schoch reads on the Sphinx's body and its temples' core blocks.
     """
     rnd = random.Random(seed)
     bm = bmesh.new()
@@ -47,6 +51,13 @@ def block(seed, rounding, erosion, chips=2, cuts=10, shear=0.0, front_bias=1.0, 
         exposed = 1.0 + front_bias * max(0.0, nrm.y) + 0.6 * max(0.0, nrm.z)
         edge = sum(1 for c in (p0.x, p0.y, p0.z) if abs(c) > 0.5 - 1.6 * r)
         p = p + nrm * (fbm3(p * 2.7 + off) * erosion * exposed * (1.0 + 0.7 * max(0, edge - 1)))
+        if strata:
+            side = max(0.0, 1.0 - abs(nrm.z) * 1.4)
+            # Beds of uneven thickness that wander, deep in one stretch and shallow in the next.
+            phase = bands * p0.z + 0.45 * fbm3(p * Vector((0.8, 0.8, 2.2)) + off) + off.x
+            band = 0.5 - 0.5 * math.cos(2.0 * math.pi * (phase + 0.12 * math.sin(2.0 * math.pi * phase)))
+            depth = max(0.0, 0.55 + 0.9 * fbm3(p * 1.1 + off * 1.7))
+            p = p - nrm * (strata * side * depth * band ** 2.2 * (0.5 + 0.9 * (p0.z + 0.5)) * (0.6 + 0.4 * exposed))
         for c, cr in chip_pts:
             dd = (p - c).length
             if dd < cr:
@@ -167,6 +178,11 @@ def library(parent, mats, state, rng):
     lib["box"] = collection(parent, "v box", [block(700, rounding=0.0, erosion=0.0, chips=0, cuts=1, base_zero=True, smooth=False)], mats["city"])
     lib["mud box"] = collection(parent, "v mud box", [block(710 + i, rounding=0.04, erosion=0.02, chips=0, cuts=4, base_zero=True)
                                                       for i in range(3)], mats["mudbrick"])
+    # The temples' core today and in the long rains: the same blocks cut back in their beds by the weather.
+    lib["core weathered"] = collection(parent, "v core weathered",
+                                       [block(160 + i, rounding=rng.uniform(0.09, 0.15), erosion=0.04, cuts=22,
+                                              strata=rng.uniform(0.02, 0.055), bands=rng.uniform(1.7, 3.0)) for i in range(N_CORE)],
+                                       mats["core"])
     lib["core fresh"] = collection(parent, "v core fresh", [block(140 + i, rounding=rng.uniform(0.03, 0.06), erosion=0.012, chips=0)
                                                             for i in range(N_CORE)], mats["core fresh"])
     # The era's Meshy figures (render/giza/figures.py) where they are on disk, the capsules where not.

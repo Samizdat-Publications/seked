@@ -182,7 +182,7 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
                       mats["limestone roof"])
                 log(f"{t['id']}: {laid} dressed {casing} blocks to {HEIGHT_BUILT:.0f} m")
         _mouths(doors, base, coll, mats["dark"])
-    core_blocks.emit("temple blocks", lib["core"], coll, log)
+    core_blocks.emit("temple blocks", lib["core weathered"], coll, log)
     fresh_blocks.emit("temple megaliths", lib["core fresh"], coll, log)
     if len(granite_blocks):
         granite_blocks.emit("temple granite", battered_variants(lib, "granite masonry", mats["granite masonry"], **DRESSED_BLOCK), coll, log)

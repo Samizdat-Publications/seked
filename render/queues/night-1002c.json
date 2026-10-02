@@ -1,0 +1,75 @@
+{
+ "about": "2026-10-02 night, third pass: today's stations without the unmeasured Open Buildings boxes that stood on the plateau as pale blocks, and without the road across the Sphinx's ditch.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "station": "valley-temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/valley-temple-today.png"
+  },
+  {
+   "state": "today",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/temple-today.png"
+  },
+  {
+   "state": "today",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/cemetery-today.png"
+  },
+  {
+   "state": "today",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/east-today.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/south-today.png"
+  },
+  {
+   "state": "today",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/north-today.png"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/menkaure-today.png"
+  },
+  {
+   "state": "today",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/panorama-today.png"
+  }
+ ]
+}

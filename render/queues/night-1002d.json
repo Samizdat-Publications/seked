@@ -1,0 +1,26 @@
+{
+ "about": "2026-10-02 night, fourth pass: the subterranean chamber's soot even, not smoke; its work lamps on stands, after critic round 11 (the floor burnt out under a lamp).",
+ "renders": [
+  {
+   "state": "today",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-today.png"
+  },
+  {
+   "state": "built",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-stripped.png"
+  }
+ ]
+}

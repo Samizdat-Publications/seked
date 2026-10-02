@@ -1,0 +1,47 @@
+{
+ "about": "2026-10-02 night, second pass: the subterranean chamber from its south side, so pit, masses and passage mouth share the tour's view; the Sphinx stations and the temple-core still without the road drawn across the ditch.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "shot": "sphinx-temple-core",
+   "size": "1920x1080",
+   "samples": 160,
+   "out": "build/render/shots/sphinx-temple-core-today.png"
+  },
+  {
+   "state": "today",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-today.png"
+  },
+  {
+   "state": "built",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-stripped.png"
+  }
+ ]
+}

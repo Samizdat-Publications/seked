@@ -1,0 +1,82 @@
+{
+ "about": "2026-10-02 night: the subterranean chamber rebuilt as a hewn quarry; the temples' core blocks cut back in their beds; the Sphinx Temple core still for the tour's temples stop.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "station": "valley-temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/valley-temple-today.png"
+  },
+  {
+   "state": "today",
+   "shot": "sphinx-temple-core",
+   "size": "1920x1080",
+   "samples": 160,
+   "out": "build/render/shots/sphinx-temple-core-today.png"
+  },
+  {
+   "state": "built",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-built.png"
+  },
+  {
+   "state": "stripped",
+   "station": "subterranean",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/subterranean-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-stripped.png"
+  },
+  {
+   "state": "stripped",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-stripped.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-lion.png"
+  }
+ ]
+}

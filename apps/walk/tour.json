@@ -12,7 +12,7 @@
     "lion",
     "first-time"
    ],
-   "hold": 6500,
+   "hold": 8000,
    "view": {
     "yaw": 24,
     "pitch": 1,
@@ -68,11 +68,16 @@
    },
    "title": "Megaliths from the Sphinx's own quarry",
    "text": [
-    "Beside the Sphinx stands Khafre's valley temple. Its core is built of limestone blocks cut from the Sphinx's own ditch, some estimated at over a hundred tonnes; Hancock puts the largest at two hundred.",
-    "Schoch and West argue that this limestone carries the same rain weathering as the ditch, and that the red granite you see here was cut on its back to fit surfaces that had already worn. The temple, they say, was old when Khafre faced it."
+    "Beside the Sphinx stand two temples, Khafre's valley temple and the Sphinx Temple. Their cores are built of limestone blocks cut from the Sphinx's own ditch, some estimated at over a hundred tonnes; Hancock puts the largest at two hundred.",
+    "Schoch and West argue that this limestone carries the same rain weathering as the ditch, and that the red granite you see here was cut on its back to fit surfaces that had already worn. The temples, they say, were old when Khafre faced them."
    ],
    "who": "Schoch (1992) · West (1979) · Hancock (1995)",
-   "overlay": "valley-hall"
+   "overlay": "valley-hall",
+   "figure": {
+    "src": "../img/sphinx-temple-core.jpg",
+    "alt": "Huge limestone core blocks of the Sphinx Temple, their faces cut back in uneven horizontal layers, stacked in a wall beside the Sphinx's ditch.",
+    "caption": "Next door, the Sphinx Temple's core today, from the ditch at the Sphinx's paws: blocks of the ditch's own limestone, their beds worn back in layers. A reconstruction; the blocks' sizes and wear are look choices after photographs."
+   }
   },
   {
    "id": "leo",
@@ -119,7 +124,7 @@
    ],
    "overlay": "akhet",
    "view": {
-    "yaw": 303,
+    "yaw": 290,
     "pitch": 4,
     "fov": 50
    },
@@ -178,9 +183,9 @@
     "built"
    ],
    "view": {
-    "yaw": 180,
-    "pitch": 14,
-    "fov": 76
+    "yaw": 237,
+    "pitch": 4,
+    "fov": 86
    },
    "title": "Shafts aimed at the stars",
    "text": [
@@ -214,9 +219,9 @@
    ],
    "overlay": "passage",
    "view": {
-    "yaw": 12,
-    "pitch": 8,
-    "fov": 84
+    "yaw": 4,
+    "pitch": 4,
+    "fov": 86
    },
    "title": "The chamber under the rock",
    "text": [
@@ -234,7 +239,7 @@
     }
    ],
    "who": "Herschel, in Vyse, Operations Carried On at the Pyramids of Gizeh (1840) · Smyth (1864)",
-   "exposure": 2.1
+   "exposure": 1.3
   },
   {
    "id": "earth",
@@ -242,7 +247,7 @@
    "station": "south",
    "eras": [
     "today",
-    "first-time"
+    "built"
    ],
    "overlay": "g1-proportions",
    "hold": 6000,
@@ -271,14 +276,14 @@
   {
    "id": "lost",
    "summary": "The Younger Dryas, Göbekli Tepe and a lost chapter of history.",
-   "station": "east",
+   "station": "sphinx",
    "eras": [
     "first-time"
    ],
    "view": {
-    "yaw": 270,
-    "pitch": 10,
-    "fov": 62
+    "yaw": 184,
+    "pitch": 0,
+    "fov": 70
    },
    "title": "A lost chapter",
    "text": [

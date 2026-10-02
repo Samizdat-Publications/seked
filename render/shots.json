@@ -153,6 +153,20 @@
       ],
       "lens": 35,
       "moment": "june-dawn"
+    },
+    {
+      "id": "sphinx-temple-core",
+      "name": "The Sphinx Temple's limestone core, from the ditch at the Sphinx's paws, 28 mm",
+      "x": 365.5,
+      "y": -433.0,
+      "eye": 1.7,
+      "target": [
+        371.5,
+        -443.39,
+        -39.99
+      ],
+      "lens": 28,
+      "moment": "sphinx-noon"
     }
   ]
 }
