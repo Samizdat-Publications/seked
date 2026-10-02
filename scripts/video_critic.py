@@ -52,9 +52,11 @@ def upload(path, k):
     return info
 
 
-def critique(video, brief, model, k):
+def critique(video, brief, model, k, fps=4):
     f = upload(video, k)
-    body = {"contents": [{"parts": [{"file_data": {"mime_type": f["mimeType"], "file_uri": f["uri"]}}, {"text": brief}]}],
+    # Sampled at `fps` frames a second (the API's default is 1, at which a fade looks like a cut).
+    video = {"file_data": {"mime_type": f["mimeType"], "file_uri": f["uri"]}, "video_metadata": {"fps": fps}}
+    body = {"contents": [{"parts": [video, {"text": brief}]}],
             "generationConfig": {"temperature": 0.4}}
     r = requests.post(f"{API}/v1beta/models/{model}:generateContent", params={"key": k}, json=body, timeout=900)
     if r.status_code != 200:
@@ -69,10 +71,11 @@ def main():
     ap.add_argument("--brief", required=True)
     ap.add_argument("--model", default="gemini-3.8-flash")
     ap.add_argument("--out")
+    ap.add_argument("--fps", type=float, default=4)
     a = ap.parse_args()
     with open(a.brief, encoding="utf-8") as f:
         brief = f.read()
-    text = critique(a.video, brief, a.model, key())
+    text = critique(a.video, brief, a.model, key(), a.fps)
     out = a.out or os.path.join(REPO, "build", "critic", f"{os.path.splitext(os.path.basename(a.video))[0]}-{a.model}.md")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:

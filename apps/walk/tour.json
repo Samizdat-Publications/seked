@@ -72,8 +72,7 @@
     "Schoch and West argue that this limestone carries the same rain weathering as the ditch, and that the red granite you see here was cut on its back to fit surfaces that had already worn. The temple, they say, was old when Khafre faced it."
    ],
    "who": "Schoch (1992) · West (1979) · Hancock (1995)",
-   "overlay": "valley-hall",
-   "pan": -10
+   "overlay": "valley-hall"
   },
   {
    "id": "leo",
@@ -235,8 +234,7 @@
     }
    ],
    "who": "Herschel, in Vyse, Operations Carried On at the Pyramids of Gizeh (1840) · Smyth (1864)",
-   "exposure": 2.1,
-   "pan": 8
+   "exposure": 2.1
   },
   {
    "id": "earth",
@@ -295,8 +293,7 @@
     "alt": "The three Giza pyramids, cased white with gold caps, rising from a tropical forest beside a flooded valley, seen from the air.",
     "caption": "The First Time from the air, as the case for an older Giza imagines it: the three pyramids cased and gold-capped above a green valley."
    },
-   "who": "Hancock, Magicians of the Gods (2015) · Schmidt, Göbekli Tepe excavations (from 1995)",
-   "pan": 6
+   "who": "Hancock, Magicians of the Gods (2015) · Schmidt, Göbekli Tepe excavations (from 1995)"
   }
  ]
 }

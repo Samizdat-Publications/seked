@@ -1595,7 +1595,7 @@
     if (to && !panel.contains(to) && to !== stationsBtn) closePanel(false);
   });
 
-  function goStation(id, how, stateId) {
+  function goStation(id, how, stateId, then) {
     var st = M.byId[id];
     if (!st || switching) return;
     if (tour.on && how !== "tour") endTour(true);   // the visitor took the wheel
@@ -1610,6 +1610,7 @@
     curtain.classList.add("on");
     var swap = function () {
       enter(st, keep);
+      if (then) then();   // in the same tick as entering, before the curtain can lift
       switching = false;
       if (how === "spot") canvas.focus({ preventScroll: true });
     };
@@ -1889,19 +1890,9 @@
       writeHash();
       arriveStop(s);
     } else {
-      goStation(s.station, "tour", s.eras[0]);
-      waitForStation(s.station, function () { writeHash(); arriveStop(s, true); });
+      var token = tour.token;
+      goStation(s.station, "tour", s.eras[0], function () { if (tour.token === token) { writeHash(); arriveStop(s, true); } });
     }
-  }
-
-  // goStation swaps behind the curtain; the stop's camera move waits for the new station to be entered.
-  function waitForStation(id, fn) {
-    var token = tour.token, tries = 0;
-    (function poll() {
-      if (tour.token !== token) return;
-      if (!switching && station && station.id === id) { fn(); return; }
-      if (++tries < 100) setTimeout(poll, 50);
-    })();
   }
 
   // A stop's eras play in turn, paced by what is on screen rather than by the clock: an era is held
