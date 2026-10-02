@@ -127,8 +127,15 @@ class Terrain:
             cap = floor + np.maximum(0.0, bank - inside) * (4.0 / bank)
             Z = np.where((X >= x0 - 2.0) & (inside > 0.0), np.minimum(Z, cap), Z)
         for x0, x1, y0, y1, floor in self.cuts:
+            # A ditch's floor is the level bedrock it was cut to: dug where the ground stands above it
+            # and filled where GLO-30's 30 m cells sag below it (by two metres round the Sphinx's paws,
+            # which left the statue standing on air), and carried three metres on past its open east
+            # side so it meets the temple's floor without a step.
             inside = np.minimum(np.minimum(X - x0, x1 - X), np.minimum(Y - y0, y1 - Y))
-            Z = np.where(inside > 0.0, np.minimum(Z, floor + 0.02 * self.noise.fbm(X, Y, 8.0, 2, key=4)), Z)
+            level = floor + 0.02 * self.noise.fbm(X, Y, 8.0, 2, key=4)
+            Z = np.where(inside > 0.0, level, Z)
+            east = (X >= x1) & (X < x1 + 3.0) & (Y > y0) & (Y < y1)
+            Z = np.where(east, np.maximum(Z, level), Z)
         if self.sand is not None and not far:
             s = self.sand
             t = smoothstep(s["x_top"], s["x_bottom"], X)

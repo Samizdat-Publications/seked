@@ -28,8 +28,8 @@ if BLENDER_DIR not in sys.path:
     sys.path.insert(0, BLENDER_DIR)
 
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
-MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion", None),
-             "lion-fresh": ("sphinx-lion-pristine", None), "carved": ("sphinx-carved", None),
+MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion-rain", None),
+             "lion-fresh": ("sphinx-lion-first", None), "carved": ("sphinx-carved", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
@@ -40,11 +40,15 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
-CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7}
+CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.55}
 # Stand-ins that stand in a wet green world: dark growth in their hollows and the runs of rain below
 # them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
 # fresh limestone in a humid forest greys and greens in its first years).
-DAMP = {"sphinx-lion-pristine": 1.0}
+DAMP = {"sphinx-lion-pristine": 1.0, "sphinx-lion-first": 0.4}
+# Generated textures with brush-stroke striations baked in that read as wood grain: their colour is
+# taken most of the way to plain fresh limestone, the carving left to the geometry and the normal map
+# (how far, and the stone's colour, are look choices).
+FLATTENED = {"sphinx-lion-first": (0.8, (0.86, 0.72, 0.52, 1.0))}
 # Generated textures whose colour runs to orange clay (critic round 15): their saturation (a look choice).
 DESATURATED = {"sphinx-lion-pristine": 0.7}
 # Painted stand-ins whose generated colours come out saturated like plastic: their saturation (a look choice).
@@ -143,6 +147,13 @@ def statue(state, coll, log=print):
                     fade.inputs["Hue"].default_value = 0.515      # the pink towards the red-brown of ochre
                     tree.links.new(src, fade.inputs["Color"])
                     tree.links.new(fade.outputs["Color"], base)
+                if model_id in FLATTENED and base.is_linked:
+                    src = base.links[0].from_socket
+                    flat = tree.nodes.new("ShaderNodeMixRGB")
+                    flat.inputs["Fac"].default_value = FLATTENED[model_id][0]
+                    flat.inputs["Color2"].default_value = FLATTENED[model_id][1]
+                    tree.links.new(src, flat.inputs["Color1"])
+                    tree.links.new(flat.outputs["Color"], base)
                 if model_id in CARVED and base.is_linked:
                     _in_bedrock(tree, nd, CARVED[model_id])
                 if model_id in DESATURATED and base.is_linked:
