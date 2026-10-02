@@ -93,6 +93,56 @@ def star_marks(s, moments, cameras):
     return out
 
 
+# The figures drawn over a night station: Orion and its neighbours down the meridian sky.
+SKY_FIGURES = ("Ori", "CMa", "Tau")
+SKY_NAMES = ("Alnitak", "Alnilam", "Mintaka", "Betelgeuse", "Rigel", "Sirius", "Aldebaran")
+# Bauval's reading: each belt star over its pyramid.
+BELT = (("Alnitak", "g1"), ("Alnilam", "g2"), ("Mintaka", "g3"))
+
+
+def night_sky(s, moments):
+    """
+    What the walkthrough draws over a night station's sky, per era: the constellation figures
+    (Stellarium's modern lines, render/giza/alignments/lines.json) and the named stars, as the sky
+    bake's azimuth and altitude for that era's night, and a line from each belt star down to the
+    apex of its pyramid. Directions, not points, so the viewer sets them at any distance.
+    """
+    path = os.path.join(data.REPO, "build", "sky-bake.json")
+    if not os.path.exists(path):
+        return {}
+    with io.open(path, encoding="utf-8") as f:
+        bake = json.load(f)
+    catalogue = data.load_json(data.DATA, "stars", "hyg-bright.json")
+    cols = catalogue["columns"]
+    id_col, name_col = cols.index("id"), cols.index("name")
+    by_id = {row[id_col]: i for i, row in enumerate(catalogue["stars"])}
+    by_name = {row[name_col]: i for i, row in enumerate(catalogue["stars"]) if row[name_col]}
+    figures = data.load_json(os.path.join(HERE, "giza", "alignments"), "lines.json")["figures"]
+    out = {}
+    for st in states.ORDER:
+        over = s.get("by_state", {}).get(st, {})
+        m = moments.get(over.get("moment", s.get("moment")), {})
+        night = bake.get("nights", {}).get(m.get("night"))
+        if night is None:
+            continue
+        stars = night["stars"]
+        at = lambda i: [round(stars[i][0], 3), round(stars[i][1], 3)]
+        figs = []
+        for key in SKY_FIGURES:
+            f = figures[key]
+            segs = [at(by_id[a]) + at(by_id[b]) for a, b in f["segments"] if a in by_id and b in by_id]
+            figs.append({"name": f["name"], "segments": segs})
+        names = [{"name": n, "at": at(by_name[n]), "mag": stars[by_name[n]][2]} for n in SKY_NAMES if n in by_name]
+        apex = {}
+        for key in ("g1", "g2", "g3"):
+            p = data.PYRAMIDS[key]
+            h = p["today"] if states.STATES[st]["pyramids"] in ("today", "stripped") else p["H"]
+            apex[key] = [round(p["cx"], 2), round(p["cy"], 2), round(p["base"] + h, 2)]
+        links = [{"star": n, "at": at(by_name[n]), "to": apex[k], "pyramid": data.PYRAMIDS[k]["name"]} for n, k in BELT]
+        out[st] = {"label": night.get("label", ""), "figures": figs, "stars": names, "links": links}
+    return out
+
+
 def in_shadow(png):
     """
     Whether the camera seems to stand in a shadow: the ground under it both dark against
@@ -166,6 +216,9 @@ def main():
             entry["titles"] = titles
         if s.get("inside") or s.get("hall"):
             entry["inside"] = True
+        sky = {st: v for st, v in night_sky(s, moments).items() if st in panos}
+        if sky:
+            entry["sky"] = sky
         manifest["stations"].append(entry)
         print(f"{s['id']}: {', '.join(panos)}")
     ids = {st["id"] for st in manifest["stations"]}

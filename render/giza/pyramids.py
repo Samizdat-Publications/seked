@@ -306,7 +306,7 @@ CASING_FOR = {"dressed": "restored casing", "pristine": "pristine casing", "weat
 # The First Time stays one drawn, polished plane: laid as blocks it read as shingles and cobblestones in
 # every critic round (12 to 15), against "near seamless".
 BLOCK_CASING = {"dressed", "weathered"}
-CAP_FOR = {"gold": "gold", "electrum": "electrum"}
+CAP_FOR = {"gold": "gold", "electrum": "electrum", "bright gold": "bright gold"}
 
 
 def build(state, rng, coll, mats, lib, log=print):

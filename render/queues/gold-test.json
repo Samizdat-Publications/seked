@@ -1,0 +1,7 @@
+{
+ "renders": [
+  {"state": "first-time", "shot": "cap", "size": "960x540", "samples": 48, "out": "build/render/lookdev/gold-cap-first-time.png"},
+  {"state": "first-time", "shot": "panorama", "size": "960x540", "samples": 48, "out": "build/render/lookdev/gold-panorama-first-time.png"},
+  {"state": "first-time", "shot": "overview", "size": "960x540", "samples": 48, "out": "build/render/lookdev/gold-overview-first-time.png"}
+ ]
+}

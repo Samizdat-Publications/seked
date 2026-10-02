@@ -78,6 +78,10 @@ class Plateau:
             # the same reason as the gold (plain facets were tried: from the ground they mirror the sky, grey; the
             # plates are tilted at random instead, so a few of them always hold the sun).
             "electrum": materials.metal("electrum", "efd27e", 0.18, metallic=0.88, dent=0.3, facet=1.5, tilt=0.15),
+            # The First Time's caps (Stewart, 2026-10-01: the electrum "looks very mute" against the polished
+            # casing): a deep, saturated gold, more of it matte leaf that shows its own colour to any eye, its
+            # plates tilted further so more of them hold the sun. A look choice.
+            "bright gold": materials.metal("bright gold", "ffbe2e", 0.22, metallic=0.55, dent=0.25, facet=1.2, tilt=0.3),
             "dressed granite": materials.dressed_granite(),
             "dark": materials.dark(),
             "water": materials.water(),

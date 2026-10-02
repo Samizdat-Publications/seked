@@ -71,6 +71,10 @@
   .veil.top { top: 0; height: 160px; background: linear-gradient(rgba(10, 9, 8, 0.66), rgba(10, 9, 8, 0)); }
   .veil.bottom { bottom: 0; height: 230px; background: linear-gradient(rgba(10, 9, 8, 0), rgba(10, 9, 8, 0.78)); }
 
+  /* the night sky's figures, drawn over a night station's panorama */
+  .sky { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+  .btn[aria-pressed="true"] { background: var(--ink); color: var(--stage); border-color: var(--ink); }
+
   /* hotspots: the neighbouring stations */
   .spot {
     position: absolute; left: 0; top: 0;
@@ -324,6 +328,7 @@
         </button>
         <a class="btn" href="https://claude.ai/artifact/6si9SFFKc5drsxbpzdhfBN">Films</a>
         <a class="btn" href="https://claude.ai/artifact/EhViyh79Z58gmX1xnZy2oE">Sky</a>
+        <button type="button" class="btn" id="sky-btn" aria-pressed="true" hidden>Star lines</button>
         <a class="btn" href="rethink.html">About</a>
       </div>
       <p class="compass" aria-hidden="true"><b id="bearing">000&deg;</b><span id="facing">facing north</span></p>
@@ -338,6 +343,7 @@
 
   <canvas id="view" tabindex="0" role="application" aria-roledescription="panorama" aria-label="Panorama. Drag, or use the arrow keys, to look around. Plus and minus zoom."></canvas>
   <div class="flat" id="flat" tabindex="0" aria-label="The panorama, laid out flat. Scroll sideways to look around." hidden></div>
+  <canvas class="sky" id="sky" aria-hidden="true"></canvas>
   <div class="veil top" aria-hidden="true"></div>
   <div class="veil bottom" aria-hidden="true"></div>
   <div class="spots" id="spots"></div>
@@ -398,6 +404,7 @@
 
   function $(id) { return document.getElementById(id); }
   var stage = $("stage"), canvas = $("view"), flat = $("flat");
+  var skyEl = $("sky"), skyCtx = skyEl.getContext("2d"), skyBtn = $("sky-btn"), skyOn = true;
   var spotsEl = $("spots"), curtain = $("curtain"), hintEl = $("hint");
   var live = $("live");
   var kickerEl = $("kicker"), nameEl = $("name"), whereEl = $("where");
@@ -441,7 +448,8 @@
         // the states this station has, oldest first, in the manifest's order
         stops: states.filter(function (x) { return typeof pan[x.id] === "string" && pan[x.id]; }).map(function (x) { return x.id; }),
         neighbours: Array.isArray(s.neighbours) ? s.neighbours.map(String) : [],
-        landmarks: (Array.isArray(s.landmarks) ? s.landmarks : []).filter(function (L) { return L && L.name; })
+        landmarks: (Array.isArray(s.landmarks) ? s.landmarks : []).filter(function (L) { return L && L.name; }),
+        sky: s.sky && typeof s.sky === "object" ? s.sky : null
       };
       byId[st.id] = st;
       return st;
@@ -1038,6 +1046,98 @@
     }
   }
 
+  // ------------------------------------------------------------------ the night sky's figures
+  // A night station carries, per era, the constellation figures and named stars as the sky bake's
+  // azimuth and altitude, and a line from each belt star down to its pyramid's apex. A direction is
+  // drawn as a point 20 km out, far enough that the camera's few metres of travel do not move it.
+  var SKY_D = 20000;
+  function skyPoint(at) {
+    var c = cameraNow(), az = at[0] * DEG, alt = at[1] * DEG;
+    return [c[0] + SKY_D * Math.cos(alt) * Math.sin(az), c[1] + SKY_D * Math.cos(alt) * Math.cos(az), c[2] + SKY_D * Math.sin(alt)];
+  }
+  function skyProject(at, f) { var q = skyPoint(at); return project(q[0], q[1], q[2], f); }
+
+  function drawSky(f) {
+    skyCtx.clearRect(0, 0, W, H);
+    var sky = station && station.sky, s = segment();
+    if (!sky || !skyOn || !s) return;
+    var ids = [station.stops[s.a], station.stops[s.b]], wts = [1 - s.w, s.w];
+    if (s.a === s.b) wts = [1, 0];
+    for (var k = 0; k < 2; k++) {
+      var night = sky[ids[k]];
+      if (!night || wts[k] < 0.02) continue;
+      skyCtx.globalAlpha = wts[k];
+      drawNight(night, f);
+    }
+    skyCtx.globalAlpha = 1;
+  }
+
+  function drawNight(night, f) {
+    var ctx = skyCtx;
+    ctx.lineCap = "round";
+    // The figures: thin and quiet, so the rendered stars stay the thing that is seen.
+    ctx.strokeStyle = "rgba(190, 210, 255, 0.42)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    night.figures.forEach(function (fig) {
+      fig.segments.forEach(function (g) {
+        if (g[1] < -1 && g[3] < -1) return;
+        var a = skyProject([g[0], g[1]], f), b = skyProject([g[2], g[3]], f);
+        if (!a || !b) return;
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+      });
+    });
+    ctx.stroke();
+    // Each belt star down to the apex of the pyramid the reading gives it.
+    var apexes = [];
+    ctx.setLineDash([5, 6]);
+    ctx.strokeStyle = "rgba(242, 181, 68, 0.75)";
+    ctx.lineWidth = 1.25;
+    night.links.forEach(function (L) {
+      var a = skyProject(L.at, f), b = project(L.to[0], L.to[1], L.to[2], f);
+      if (!a || !b) return;
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(b[0], b[1], 3, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(242, 181, 68, 0.9)";
+      ctx.fill();
+      apexes.push({ p: b, text: L.pyramid + " · " + L.star });
+    });
+    ctx.setLineDash([]);
+    // The named stars: a ring round each and its name beside it.
+    ctx.font = "500 12px " + getComputedStyle(document.body).getPropertyValue("--body");
+    ctx.textBaseline = "middle";
+    night.stars.forEach(function (n) {
+      if (n.at[1] < 0.5) return;
+      var p = skyProject(n.at, f);
+      if (!p || p[0] < -40 || p[0] > W + 40 || p[1] < -20 || p[1] > H + 20) return;
+      var belt = night.links.some(function (L) { return L.star === n.name; });
+      ctx.strokeStyle = belt ? "rgba(242, 181, 68, 0.95)" : "rgba(239, 232, 220, 0.75)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], belt ? 5 : 7, 0, 2 * Math.PI);
+      ctx.stroke();
+      if (!belt) skyLabel(n.name, p[0] + 11, p[1], "rgba(239, 232, 220, 0.92)", "left");
+    });
+    // The belt's three stars stand a degree apart: named once as a group, and each again at its pyramid.
+    var top = night.stars.filter(function (n) { return n.name === "Mintaka"; })[0];
+    var tp = top && top.at[1] > 0.5 ? skyProject(top.at, f) : null;
+    if (tp) skyLabel("Orion's belt", tp[0] + 12, tp[1] - 14, "rgba(248, 214, 140, 1)", "left");
+    apexes.forEach(function (a) { skyLabel(a.text, a.p[0], a.p[1] + 14, "rgba(248, 214, 140, 1)", "center"); });
+  }
+
+  function skyLabel(text, x, y, colour, align) {
+    skyCtx.textAlign = align;
+    skyCtx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    skyCtx.fillText(text, x + 1, y + 1);
+    skyCtx.fillStyle = colour;
+    skyCtx.fillText(text, x, y);
+  }
+
   function turnTo(n) {
     var c = station.camera;
     var dx = n.camera[0] - c[0], dy = n.camera[1] - c[1], dz = n.camera[2] - c[2];
@@ -1268,6 +1368,7 @@
     if (!panel.contains(e.target) && !stationsBtn.contains(e.target)) closePanel(false);
   }
   stationsBtn.addEventListener("click", function () { if (panel.hidden) openPanel(); else closePanel(true); });
+  skyBtn.addEventListener("click", function () { skyOn = !skyOn; skyBtn.setAttribute("aria-pressed", String(skyOn)); request(); });
   panel.addEventListener("focusout", function (e) {
     var to = e.relatedTarget;
     if (to && !panel.contains(to) && to !== stationsBtn) closePanel(false);
@@ -1312,6 +1413,7 @@
     forgetStaleMisses(st);
     buildTimeline();
     buildSpots();
+    skyBtn.hidden = !st.sky;
     markList();
     if (mode === "flat") flat.removeAttribute("data-url");
     shownIdx = -1;
@@ -1422,6 +1524,7 @@
     var f = fov();
     if (mode === "gl" && gl && !lost) {
       render(mx);
+      drawSky(f);
       placeSpots(f);
     }
     compass();
@@ -1635,6 +1738,9 @@
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
     }
+    skyEl.width = Math.round(W * dpr);
+    skyEl.height = Math.round(H * dpr);
+    skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (station) {
       fitted = fitFov(station.view.fov);
       view.zoom = clamp(view.zoom, MIN_FOV / fitted, MAX_FOV / fitted);

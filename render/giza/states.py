@@ -33,7 +33,7 @@ MEGALITHIC = ("khafre.valley_temple", "sphinx.temple")
 STATES = {
     "first-time": dict(
         label="c. 10,500 BCE", title="The First Time", honesty="claim", year=-10499,
-        pyramids="pristine", caps="electrum", gild=22.0, queens=None, mastabas=None, causeway=None,
+        pyramids="pristine", caps="bright gold", gild=22.0, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic", sphinx="lion-fresh",
         ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.5, 3.5),
         haze_colour=("e3ebef", "e9eff3"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
