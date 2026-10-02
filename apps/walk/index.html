@@ -319,6 +319,21 @@
   .tour-more { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0 0 10px; }
   .tour-more a { font: 500 13px/1.4 var(--body); color: var(--claim); text-decoration: none; border-bottom: 1px solid rgba(242, 181, 68, 0.4); }
   .tour-more a:hover { border-bottom-color: var(--claim); }
+  .tour-show { display: inline-flex; align-items: center; gap: 8px; margin: 2px 0 12px; min-height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--claim); background: rgba(242, 181, 68, 0.1); color: var(--claim); font: 600 13px/1 var(--body); cursor: pointer; }
+  .tour-show:hover { background: rgba(242, 181, 68, 0.2); }
+  /* a stop's figure, featured over the dimmed panorama in the space the card leaves */
+  .feature {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    padding: calc(var(--top) + 86px) var(--right) calc(var(--bottom) + 64px) calc(var(--left) + 466px);
+    background: rgba(10, 9, 8, 0.92);
+    opacity: 0; pointer-events: none; transition: opacity 0.6s ease;
+  }
+  .feature.on { opacity: 1; }
+  .feature a { display: block; max-width: 100%; max-height: 100%; min-height: 0; pointer-events: auto; }
+  .feature img { display: block; max-width: 100%; max-height: calc(100vh - var(--top) - var(--bottom) - 230px); width: auto; height: auto; border-radius: 10px; border: 1px solid var(--rule-hi); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+  .feature figcaption { margin-top: 8px; max-width: 72ch; text-align: center; font: 400 13px/1.5 var(--body); color: var(--ink); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
+  .feature figcaption small { display: block; margin-top: 2px; font: 400 11px/1.4 var(--mono); color: var(--muted); }
   .tour-who { margin: 0 0 6px; font: 400 11px/1.5 var(--mono); color: var(--muted); }
   .tour-nav { display: flex; gap: 8px; align-items: center; padding: 12px 14px 14px 18px; border-top: 1px solid rgba(239, 232, 220, 0.12); }
   .tour-nav .grow { flex: 1; font: 500 11px/1.3 var(--mono); color: var(--muted); letter-spacing: 0.04em; }
@@ -328,9 +343,20 @@
   .tour.offer { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); min-height: 0; max-height: none; width: min(440px, calc(100% - 32px)); animation: none; }
   .tour.offer .tour-body h2 { font-size: 28px; }
   /* touring: the stations' own hotspots step aside for the story */
-  .touring .spots, .touring .hint { display: none; }
+  .touring .spots, .touring .hint, .touring .track, .touring .note { display: none; }
+  .touring .head .title { visibility: hidden; }
+  /* the slider is gone while touring, so the card can stand lower and taller */
+  .touring .tour:not(.offer) { bottom: calc(var(--bottom) + 58px); width: min(440px, calc(100% - var(--left) - var(--right))); max-height: calc(100% - var(--top) - var(--bottom) - 150px); }
+  .tour-more-text { margin: 4px 0 10px; }
+  .tour-more-text summary { cursor: pointer; font: 600 12.5px/1.4 var(--body); color: var(--claim); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+  .tour-more-text summary::-webkit-details-marker { display: none; }
+  .tour-more-text summary::before { content: "+"; font: 600 14px/1 var(--mono); }
+  .tour-more-text[open] summary::before { content: "\2212"; }
+  .tour-more-text[open] summary { margin-bottom: 10px; }
 
   @media (max-width: 700px) {
+    .feature { padding: calc(var(--top) + 96px) 10px 56% 10px; justify-content: flex-start; }
+    .feature img { max-height: 36vh; }
     /* a phone: the buttons in one row that scrolls sideways, the station's name on its own row below */
     .head { flex-wrap: wrap; row-gap: 10px; }
     .head .title { order: 2; flex: 1 1 100%; min-width: 0; }
@@ -411,6 +437,11 @@
   <div class="curtain on" id="curtain" aria-hidden="true"></div>
   <p class="hint" id="hint" aria-hidden="true">Drag to look around</p>
 
+  <figure class="feature" id="feature" aria-hidden="true" hidden>
+    <a id="feature-link" target="_blank" rel="noopener" title="Open at full resolution"><img id="feature-img" alt="" width="1920" height="1080"></a>
+    <figcaption><span id="feature-cap"></span><small>Click the picture to open it at full resolution</small></figcaption>
+  </figure>
+
   <aside class="tour" id="tour" aria-labelledby="tour-title" hidden>
     <div class="tour-top">
       <p class="tour-kicker" id="tour-kicker"></p>
@@ -420,9 +451,14 @@
     <div class="tour-body" id="tour-body" tabindex="-1">
       <h2 id="tour-title"></h2>
       <div id="tour-text"></div>
+      <button type="button" class="tour-show" id="tour-show" hidden></button>
       <p class="tour-numbers" id="tour-numbers" hidden><b>The numbers</b><span id="tour-numbers-text"></span></p>
+      <details class="tour-more-text" id="tour-detail">
+        <summary>Read more</summary>
+        <div id="tour-detail-text"></div>
+        <p class="tour-who" id="tour-who"></p>
+      </details>
       <p class="tour-more" id="tour-more" hidden></p>
-      <p class="tour-who" id="tour-who"></p>
     </div>
     <div class="tour-nav">
       <button type="button" class="btn" id="tour-prev">Back</button>
@@ -617,7 +653,7 @@
     for (var i = Math.max(0, s.a - 1); i <= Math.min(stopCount() - 1, s.b + 1); i++) out.push(urlAt(i));
     return out;
   }
-  function wanted(url) { return !!station && wantedUrls().indexOf(url) >= 0; }
+  function wanted(url) { return !!station && (wantedUrls().indexOf(url) >= 0 || url === tourWant); }
 
   function fitFov(vfov) {
     var need = 2 * Math.atan(Math.tan(MIN_HFOV / 2) / (W / Math.max(H, 1)));
@@ -829,13 +865,14 @@
     evict();
   }
 
-  // Keep at most MAX_TEXTURES on the GPU, never the two being crossed.
+  // Keep at most MAX_TEXTURES on the GPU, never the two being crossed (nor the tour's next far era).
   function evict() {
     var ready = [];
     cache.forEach(function (e) { if (e.tex) ready.push(e); });
     var extra = ready.length - MAX_TEXTURES;
     if (extra <= 0) return;
     var pinned = coreUrls();
+    if (tourWant) pinned.push(tourWant);   // the far era the tour is about to cut to
     ready.sort(function (a, b) { return a.used - b.used; });
     for (var i = 0; i < ready.length && extra > 0; i++) {
       var e = ready[i];
@@ -1140,6 +1177,7 @@
 
   function drawSky(f) {
     skyCtx.clearRect(0, 0, W, H);
+    drawTourOverlay(f);
     var sky = station && station.sky, s = segment();
     if (!sky || !skyOn || !s) return;
     var ids = [station.stops[s.a], station.stops[s.b]], wts = [1 - s.w, s.w];
@@ -1209,6 +1247,107 @@
     var tp = top && top.at[1] > 0.5 ? skyProject(top.at, f) : null;
     if (tp) skyLabel("Orion's belt", tp[0] + 12, tp[1] - 14, "rgba(248, 214, 140, 1)", "left");
     apexes.forEach(function (a) { skyLabel(a.text, a.p[0], a.p[1] + 14, "rgba(248, 214, 140, 1)", "center"); });
+  }
+
+  // The tour's own figure over the current stop's station: lines between points of the project frame
+  // and labels pinned to points, all computed by render/publish.py from the survey numbers.
+  function drawTourOverlay(f) {
+    if (!tour.on || !TOUR) return;
+    var st = TOUR.stops[tour.i];
+    var o = st && st.overlay && OVERLAYS[st.overlay];
+    if (!o || !station || station.id !== st.station || curtain.classList.contains("on")) return;
+    var ctx = skyCtx;
+    ctx.lineCap = "round";
+    // A point is either [x, y, z] in the frame or {dir: [azimuth, altitude, metres]} from the camera.
+    var at = function (v) {
+      if (Array.isArray(v)) return project(v[0], v[1], v[2], f);
+      var c = cameraNow(), az = v.dir[0] * DEG, al = v.dir[1] * DEG, d = v.dir[2];
+      return project(c[0] + d * Math.cos(al) * Math.sin(az), c[1] + d * Math.cos(al) * Math.cos(az), c[2] + d * Math.sin(al), f);
+    };
+    o.lines.forEach(function (L) {
+      var a = at(L.from), b = at(L.to);
+      if (!a || !b) return;
+      ctx.setLineDash(L.style === "edge" ? [] : L.style === "faint" ? [3, 7] : [6, 6]);
+      ctx.strokeStyle = L.style === "edge" ? "rgba(242, 181, 68, 0.95)" : L.style === "faint" ? "rgba(239, 232, 220, 0.6)" : "rgba(248, 214, 140, 0.9)";
+      ctx.lineWidth = L.style === "edge" ? 2 : L.style === "faint" ? 1.2 : 1.6;
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    (o.suns || []).forEach(function (S) {
+      var p = at(S.at);
+      if (!p) return;
+      var g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], S.radius * 3);
+      g.addColorStop(0, "rgba(255, 214, 120, 0.55)");
+      g.addColorStop(1, "rgba(255, 180, 80, 0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], S.radius * 3, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255, 200, 96, 0.95)";
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], S.radius, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+    var era = currentStateId();
+    o.labels.forEach(function (L) {
+      if (L.eras && L.eras.indexOf(era) < 0) return;
+      var p = at(L.at);
+      if (!p) return;
+      var dx = 0, dy = 0, align = "center";
+      if (L.place === "above") dy = -30;
+      else if (L.place === "below") dy = 22;
+      if (typeof L.dy === "number") dy = L.dy;
+      if (Math.abs(dy) > 34) {
+        // a label stood off from its point keeps a leader to it
+        ctx.strokeStyle = "rgba(242, 181, 68, 0.7)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(p[0], p[1]);
+        ctx.lineTo(p[0], p[1] + dy + (dy < 0 ? 19 : -19));
+        ctx.stroke();
+      }
+      else if (L.place === "right") { dx = 12; align = "left"; }
+      else if (L.place === "left") { dx = -12; align = "right"; }
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], 3, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(242, 181, 68, 0.95)";
+      ctx.fill();
+      ctx.font = "600 13px " + getComputedStyle(document.body).getPropertyValue("--body");
+      ctx.textBaseline = "middle";
+      tag(L.text, L.sub, p[0] + dx, p[1] + dy, align);
+    });
+  }
+
+  // A label on a dark plate, so it reads over bright stone and sky alike.
+  function tag(text, sub, x, y, align) {
+    var ctx = skyCtx, body = getComputedStyle(document.body).getPropertyValue("--body");
+    ctx.font = "600 13px " + body;
+    var w1 = ctx.measureText(text).width;
+    ctx.font = "400 11.5px " + body;
+    var w2 = sub ? ctx.measureText(sub).width : 0;
+    var w = Math.max(w1, w2) + 16, h = sub ? 38 : 22;
+    var x0 = align === "left" ? x : align === "right" ? x - w : x - w / 2;
+    x0 = clamp(x0, 6, W - w - 6);
+    var y0 = clamp(y - h / 2, 6, H - h - 6);
+    ctx.fillStyle = "rgba(17, 15, 12, 0.78)";
+    ctx.strokeStyle = "rgba(242, 181, 68, 0.6)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x0, y0, w, h, 6); else ctx.rect(x0, y0, w, h);
+    ctx.fill();
+    ctx.stroke();
+    ctx.textAlign = "left";
+    ctx.fillStyle = "rgba(248, 214, 140, 1)";
+    ctx.font = "600 13px " + body;
+    ctx.fillText(text, x0 + 8, y0 + 11);
+    if (sub) {
+      ctx.fillStyle = "rgba(239, 232, 220, 0.9)";
+      ctx.font = "400 11.5px " + body;
+      ctx.fillText(sub, x0 + 8, y0 + 27);
+    }
   }
 
   function skyLabel(text, x, y, colour, align) {
@@ -1314,14 +1453,14 @@
     request();
   }
 
-  function glideTo(i) {
+  function glideTo(i, dur) {
     var n = stopCount();
     if (!n) return;
     i = clamp(i, 0, n - 1);
     eraTween = null;
     var dist = Math.abs(i - pos);
     if (still() || dist < 1e-3) { setPos(i); settle(); return; }
-    eraTween = { from: pos, to: i, t0: performance.now(), dur: Math.min(2200, 1100 + 450 * (dist - 1)) };
+    eraTween = { from: pos, to: i, t0: performance.now(), dur: dur || Math.min(2200, 1100 + 450 * (dist - 1)) };
     request();
   }
 
@@ -1566,7 +1705,13 @@
   var tourBody = $("tour-body"), tourTitle = $("tour-title"), tourText = $("tour-text"), tourNumbers = $("tour-numbers");
   var tourNumbersText = $("tour-numbers-text"), tourMore = $("tour-more"), tourWho = $("tour-who");
   var tourPrev = $("tour-prev"), tourNext = $("tour-next"), tourCount = $("tour-count");
-  var TOUR_HOLD = 2600;   // ms an era is held before the next glide
+  var featureEl = $("feature"), featureLink = $("feature-link"), featureImg = $("feature-img"), featureCap = $("feature-cap");
+  var tourShow = $("tour-show"), featureOn = false;
+  var tourDetail = $("tour-detail"), tourDetailText = $("tour-detail-text"), stopStarted = 0;
+  var OVERLAYS = {};   // overlays.json: figures the tour draws over a station, from render/publish.py
+  var TOUR_FIRST = 3200;  // ms the first era of a stop is held, the view settling and the reader starting
+  var TOUR_HOLD = 3600;   // ms each later era is held once it is on screen
+  var TOUR_GLIDE = 1800;  // ms a glide between neighbouring eras takes on the tour
 
   function normaliseTour(t) {
     if (!t || !Array.isArray(t.stops)) return null;
@@ -1583,7 +1728,14 @@
         numbers: s.numbers ? String(s.numbers) : "",
         more: (Array.isArray(s.more) ? s.more : []).filter(function (m) { return m && m.href; }),
         who: s.who ? String(s.who) : "",
-        summary: s.summary ? String(s.summary) : ""
+        summary: s.summary ? String(s.summary) : "",
+        figure: s.figure && s.figure.src ? { src: String(s.figure.src), alt: String(s.figure.alt || ""), caption: String(s.figure.caption || "") } : null,
+        overlay: s.overlay ? String(s.overlay) : "",
+        detail: (Array.isArray(s.detail) ? s.detail : s.detail ? [s.detail] : []).map(String),
+        hold: num(s.hold, 0),
+        cut: !!s.cut,
+        exposure: num(s.exposure, 1),
+        pan: num(s.pan, 0)
       };
     });
     return stops.length ? { title: String(t.title || "The tour"), stops: stops } : null;
@@ -1597,13 +1749,18 @@
   function markOffered() { try { localStorage.setItem("seked-tour-offered", "1"); } catch (e) { /* private mode */ } }
 
   function clearTourTimers() {
+    tourWant = null;
     tour.timers.forEach(clearTimeout);
     tour.timers = [];
     tour.token++;
   }
   function later(ms, fn) {
     var token = tour.token;
-    tour.timers.push(setTimeout(function () { if (tour.token === token) fn(); }, ms));
+    var id = setTimeout(function () {
+      tour.timers.splice(tour.timers.indexOf(id), 1);
+      if (tour.token === token) fn();
+    }, ms);
+    tour.timers.push(id);
   }
   function paragraphs(list) {
     tourText.textContent = "";
@@ -1618,9 +1775,12 @@
     tourKicker.textContent = "New here?";
     tourBar.textContent = "";
     tourTitle.textContent = TOUR.title;
-    paragraphs([countWord(TOUR.stops.length) + " stops across the plateau, about six minutes: the Sphinx's weathering, the lion and Leo, Orion's belt on the ground, the shafts and their stars. The argument that Giza is far older than the record, at its strongest, with the project's own measurements beside it."]);
+    paragraphs([countWord(TOUR.stops.length) + " stops across the plateau, about eight minutes: the Sphinx's weathering, the lion and Leo, the sun in the horizon sign, Orion's belt on the ground, the shafts and the chamber under the rock. The argument that Giza is far older than the record, at its strongest, with the project's own measurements beside it."]);
     tourNumbers.hidden = true;
     tourMore.hidden = true;
+    tourShow.hidden = true;
+    showFeature(false);
+    tourDetail.hidden = true;
     tourWho.textContent = "";
     tourPrev.textContent = "Explore on my own";
     tourPrev.disabled = false;
@@ -1649,6 +1809,8 @@
     tour.on = false;
     tourEl.hidden = true;
     tourEl.classList.remove("offer");
+    showFeature(false);
+    canvas.style.filter = "";
     stage.classList.remove("touring");
     tourBtn.setAttribute("aria-pressed", "false");
     tourBtn.textContent = "Tour";
@@ -1689,6 +1851,21 @@
       tourMore.appendChild(a);
     });
     tourWho.textContent = s.who ? "Argued by " + s.who : "";
+    tourDetailText.textContent = "";
+    s.detail.forEach(function (t) { var p = document.createElement("p"); p.textContent = t; tourDetailText.appendChild(p); });
+    tourDetail.hidden = !s.detail.length && !s.who;
+    tourDetail.open = false;
+    stopStarted = performance.now();
+    canvas.style.filter = s.exposure !== 1 ? "brightness(" + s.exposure + ")" : "";
+    showFeature(false);
+    tourShow.hidden = !s.figure;
+    if (s.figure) {
+      featureLink.href = s.figure.src;
+      featureImg.src = s.figure.src;   // fetched now, so it is ready when it is shown
+      featureImg.alt = s.figure.alt;
+      featureCap.textContent = s.figure.caption;
+      tourShow.textContent = "Show the figure";
+    }
     tourCount.textContent = (i + 1) + " of " + n;
     tourPrev.textContent = "Back";
     tourPrev.disabled = i === 0;
@@ -1701,7 +1878,13 @@
     say("Stop " + (i + 1) + " of " + n + ": " + s.title + ".");
     if (station && station.id === s.station) {
       var k0 = station.stops.indexOf(s.eras[0]);
-      if (Math.abs(pos - k0) > 1e-3) glideTo(k0);
+      if (Math.abs(pos - k0) > 1.001) {
+        // a far era: through dark, as a stop's own far cuts are
+        curtain.classList.add("on");
+        later(340, function () { setPos(k0); settle(); request(); later(60, function () { curtain.classList.remove("on"); }); });
+      } else if (Math.abs(pos - k0) > 1e-3) {
+        glideTo(k0, TOUR_GLIDE);
+      }
       writeHash();
       arriveStop(s);
     } else {
@@ -1720,23 +1903,78 @@
     })();
   }
 
+  // A stop's eras play in turn, paced by what is on screen rather than by the clock: an era is held
+  // for TOUR_HOLD once its panorama is showing and the next one has loaded, and only then does the
+  // view move on. Neighbouring eras glide; eras further apart dissolve through dark, so the eras
+  // between them do not flicker past.
+  var tourWant = null;
   function arriveStop(s) {
     lookAt(s.view, 1600);
-    var t = 2200;
-    for (var k = 1; k < s.eras.length; k++) {
-      (function (era, at) {
-        later(at, function () {
-          var idx = station.stops.indexOf(era);
-          if (idx >= 0) glideTo(idx);
-        });
-      })(s.eras[k], t);
-      t += TOUR_HOLD + 1300;
+    if (s.pan && !still()) {
+      later(1700, function () {
+        if (turnTween || drag) return;
+        turnTween = { y0: view.yaw, dy: s.pan * DEG, p0: view.pitch, dp: 0, t0: performance.now(), dur: 18000, linear: true };
+        request();
+      });
     }
+    var k = 1, readySince = 0, hold = s.hold || TOUR_FIRST;
+    (function tick() {
+      if (!station || station.id !== s.station) { tourWant = null; return; }
+      if (k >= s.eras.length) {
+        tourWant = null;
+        // the eras have played: the stop's figure, after the last one has been seen a while
+        if (s.figure) {
+          var wait = Math.max(k > 1 ? TOUR_HOLD : TOUR_FIRST + 1200, 10000 - (performance.now() - stopStarted));
+          later(wait, function () { showFeature(true); });
+        }
+        return;
+      }
+      var here = clamp(Math.round(pos), 0, stopCount() - 1), to = station.stops.indexOf(s.eras[k]);
+      if (to < 0) { k++; later(0, tick); return; }
+      tourWant = urlAt(to);
+      need(tourWant);
+      var shown = settledEntry(entry(urlAt(here))), next = settledEntry(entry(tourWant));
+      var calm = !eraTween && !turnTween && !switching && !document.hidden && !curtain.classList.contains("on");
+      if (!(shown && next && calm)) { readySince = 0; later(150, tick); return; }
+      var now = performance.now();
+      if (!readySince) readySince = now;
+      if (now - readySince < hold) { later(150, tick); return; }
+      if (Math.abs(to - here) <= 1 && !s.cut) {
+        glideTo(to, TOUR_GLIDE);
+      } else {
+        curtain.classList.add("on");
+        later(340, function () { setPos(to); settle(); request(); later(60, function () { curtain.classList.remove("on"); }); });
+      }
+      k++;
+      readySince = 0;
+      hold = s.hold || TOUR_HOLD;
+      later(400, tick);
+    })();
+  }
+
+  function showFeature(on) {
+    featureOn = !!on;
+    if (on) {
+      featureEl.hidden = false;
+      featureEl.removeAttribute("aria-hidden");
+      requestAnimationFrame(function () { featureEl.classList.add("on"); });
+    } else {
+      featureEl.classList.remove("on");
+      featureEl.setAttribute("aria-hidden", "true");
+      setTimeout(function () { if (!featureOn) featureEl.hidden = true; }, 650);
+    }
+    tourShow.textContent = featureOn ? "Back to the view" : "Show the figure";
+    if (on) say(featureCap.textContent);
   }
 
   function lookAt(v, dur) {
     var yaw = v.yaw * DEG, pitch = clamp(v.pitch * DEG, -PITCH_MAX, PITCH_MAX);
     var f = clamp(v.fov * DEG, MIN_FOV, MAX_FOV);
+    // With the card open beside the view, centre the subject in the open space to its right.
+    if (tour.on && !tourEl.hidden && W > 760 && !tourEl.classList.contains("offer")) {
+      var edge = tourEl.offsetLeft + tourEl.offsetWidth;
+      if (edge < W * 0.6) yaw -= Math.atan((edge / 2) / (W / 2) * Math.tan(f / 2) * (W / H));
+    }
     view.vy = view.vp = 0;
     if (still()) { view.yaw = wrapAngle(yaw); view.pitch = pitch; setFov(f); request(); return; }
     turnTween = { y0: view.yaw, dy: wrapAngle(yaw - view.yaw), p0: view.pitch, dp: pitch - view.pitch, f0: fov(), df: f - fov(), t0: performance.now(), dur: dur };
@@ -1753,6 +1991,7 @@
     if (tour.i > 0) showStop(tour.i - 1);
   });
   $("tour-close").addEventListener("click", function () { endTour(); });
+  tourShow.addEventListener("click", function () { clearTourTimers(); showFeature(!featureOn); });
   tourBtn.addEventListener("click", function () { if (tour.on) endTour(); else startTour(0); });
 
   // ------------------------------------------------------------------ the frame loop
@@ -1781,7 +2020,7 @@
       view.vy = view.vp = 0;
     }
     if (turnTween) {
-      var tt = clamp((now - turnTween.t0) / turnTween.dur, 0, 1), et = ease(tt);
+      var tt = clamp((now - turnTween.t0) / turnTween.dur, 0, 1), et = turnTween.linear ? tt : ease(tt);
       view.yaw = turnTween.y0 + turnTween.dy * et;
       view.pitch = turnTween.p0 + turnTween.dp * et;
       if (turnTween.df) setFov(turnTween.f0 + turnTween.df * et);
@@ -2099,10 +2338,13 @@
     .then(function (m) {
       M = m;
       // The tour is a story told over the stations; without it the walkthrough still stands.
-      return fetch("tour.json", { cache: "no-cache" })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (t) { TOUR = normaliseTour(t); }, function () { TOUR = null; })
-        .then(boot);
+      return Promise.all([
+        fetch("tour.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }),
+        fetch("overlays.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; })
+      ]).then(function (got) {
+        try { TOUR = normaliseTour(got[0]); } catch (e) { TOUR = null; }
+        OVERLAYS = got[1] && typeof got[1] === "object" ? got[1] : {};
+      }).then(boot);
     }, function (err) {
       fatal("The list of stations, stations.json, could not be read: " + (err && err.message ? err.message : String(err)) + ".");
     });

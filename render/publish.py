@@ -143,6 +143,122 @@ def night_sky(s, moments):
     return out
 
 
+def overlays():
+    """
+    Figures the guided tour draws over a station, in the project frame, computed here from the survey
+    numbers (data.py) and the Earth's figures in data/measurements, so the labels cannot drift from the
+    database. `g1-proportions`: the Great Pyramid's south face as built, seen from the station south of
+    it, with the ratios the encoded-geometry reading draws from it: pi in perimeter over height, phi in
+    slant height over half the side, and the 1:43,200 scale of the Earth.
+    """
+    import math
+    p = data.PYRAMIDS["g1"]
+    earth = {x["key"]: x["value"] for x in data.records("units-and-constants.json") if x.get("key", "").startswith("earth.")}
+    polar, equator = earth["earth.radius.polar"], earth["earth.circumference.equatorial"]
+    h, H, top, z0 = p["half"], p["H"], p["today"], p["base"]
+    side, perim = 2 * h, 8 * h
+    slant = math.hypot(H, h)
+    phi = (1 + math.sqrt(5)) / 2
+    apex, se, sw, mid = [0.0, 0.0, z0 + H], [h, -h, z0], [-h, -h, z0], [0.0, -h, z0]
+    r = lambda v: [round(c, 2) for c in v]
+    km = lambda m: f"{m / 1000:,.0f} km"
+    out = {
+        "g1-proportions": {
+            "lines": [
+                {"from": r(sw), "to": r(apex), "style": "edge"},
+                {"from": r(apex), "to": r(se), "style": "edge"},
+                {"from": r(sw), "to": r(se), "style": "edge"},
+                {"from": r(apex), "to": r(mid), "style": "dash"},
+            ],
+            "labels": [
+                {"at": r(apex), "text": f"Height as built {H:.1f} m", "sub": f"× 43,200 = {km(H * 43200)}; the Earth's polar radius is {km(polar)}", "place": "above"},
+                {"at": r([0.0, 0.0, z0 + top]), "text": f"Today's top, {top:.1f} m", "sub": f"the top {H - top:.1f} m, capstone and all, is gone", "place": "right", "dy": 34, "eras": ["stripped", "today"]},
+                {"at": r([0.0, -h * 0.5, z0 + H * 0.5]), "text": f"Slant height {slant:.1f} m", "sub": f"÷ half the side = {slant / h:.4f}; φ = {phi:.4f}", "place": "left"},
+                {"at": r([0.0, -h, z0 + H * 0.14]), "text": f"Perimeter ÷ height = {perim / H:.4f}", "sub": f"2π = {2 * math.pi:.4f}", "place": "center"},
+                {"at": r(mid), "text": f"Side {side:.1f} m, perimeter {perim:.1f} m", "sub": f"× 43,200 = {km(perim * 43200)}; the equator is {km(equator)}", "place": "below"},
+            ],
+        },
+    }
+    # The rest needs the claims engine's own values: `pnpm tsx scripts/tour-values.ts` writes them.
+    path = os.path.join(data.REPO, "build", "tour-values.json")
+    if not os.path.exists(path):
+        print("  no build/tour-values.json (npx tsx scripts/tour-values.ts): the akhet and passage overlays are left out")
+        return out
+    with io.open(path, encoding="utf-8") as f:
+        v = json.load(f)
+    # `akhet` (C6): from the Sphinx, the midsummer sunset of 2500 BCE and the middle of the gap between
+    # Khufu's south-west corner and Khafre's north-east corner, at the bearings the claim computes.
+    g2 = data.PYRAMIDS["g2"]
+    sx, sy, sz = v["sphinx"]["east"], v["sphinx"]["north"], -20.0
+    gap = [(p["cx"] - h + g2["cx"] + g2["half"]) / 2, (p["cy"] - h + g2["cy"] + g2["half"]) / 2, 0.0]
+    a = math.radians(v["akhet"]["sunsetAzimuth"])
+    sun = [sx + 2600 * math.sin(a), sy + 2600 * math.cos(a), sz + 18.0]
+    out["akhet"] = {
+        "lines": [
+            {"from": r([sx, sy, sz]), "to": r(sun), "style": "dash"},
+            {"from": r([sx, sy, sz]), "to": r(gap), "style": "faint"},
+        ],
+        "suns": [{"at": r(sun), "radius": 16}],
+        "labels": [
+            {"at": r(sun), "text": "The midsummer sun sets here, seen from the Sphinx", "sub": f"2500 BCE: bearing {v['akhet']['sunsetAzimuth']:.1f}°, the gap's middle {v['akhet']['gapAzimuth']:.1f}°", "place": "above", "dy": -66},
+        ],
+    }
+    # `passage` (C3): the descending passage from the chamber's north mouth to its foot, then up its
+    # slope towards the pole star's lowest crossing of the meridian.
+    rec = {}
+    for name in ("g1.json", "g1-interior.json"):
+        rec.update({x["key"]: x.get("value") for x in data.records(name)})
+    mouth = [rec["passage.subterranean_north.end.east"], rec["passage.subterranean_north.end.north"], rec["passage.subterranean_north.end.up"] + 0.6]
+    foot = [rec["passage.descending.floor.end.east"], rec["passage.descending.floor.end.north"], rec["passage.descending.floor.end.up"] + 0.6]
+    slope = math.radians(v["passage"]["angle"])
+    up = [foot[0], foot[1] + 120 * math.cos(slope), foot[2] + 120 * math.sin(slope)]
+    out["passage"] = {
+        "lines": [
+            {"from": r(mouth), "to": r(foot), "style": "dash"},
+            {"from": r(foot), "to": r(up), "style": "dash"},
+        ],
+        "labels": [
+            {"at": r(mouth), "text": "To the descending passage", "sub": f"{foot[1] - mouth[1]:.0f} m north, then up through the rock", "place": "below"},
+            {"at": r(up), "text": f"Up the passage at {v['passage']['angle']:.2f}°, to the north sky", "sub": "where Thuban, the pole star of its age, crossed at its lowest", "place": "above"},
+        ],
+    }
+    # `valley-hall`: what the granite hall's walls are, as the older-Giza reading has them (directions
+    # from the station's camera, so the callouts sit on the walls in view).
+    out["valley-hall"] = {
+        "lines": [],
+        "labels": [
+            {"at": {"dir": [250, 16, 9]}, "text": "Red granite from Aswan", "sub": "the facing; Schoch and West argue it was cut to fit worn stone", "place": "center"},
+            {"at": {"dir": [290, -6, 7]}, "text": "Behind it, limestone", "sub": "quarried from the Sphinx's ditch, weathered by rain, argue Schoch and West", "place": "center"},
+        ],
+    }
+    # `kc-shaft`: the King's Chamber's southern shaft from its mouth through the masonry to the outlet
+    # on the south face and on into the sky, from Gantenbrink's segments (data/measurements/g1-interior.json).
+    rec = {}
+    for name in sorted(os.listdir(os.path.join(data.DATA, "measurements"))):
+        if name.startswith("g1") and name.endswith(".json"):
+            rec.update({x["key"]: x.get("value") for x in data.records(name) if "key" in x})
+    px, py, pz = rec["kc.shaft.south.outlet.east"], rec["kc.wall.south.north"], rec["kc.floor.elevation"] + rec["kc.shaft.south.inlet.from_floor"]
+    pts = [[px, py, pz]]
+    for k in (1, 2, 3):
+        a, d = math.radians(rec[f"kc.shaft.south.segment.{k}.angle"]), rec[f"kc.shaft.south.segment.{k}.length"]
+        py, pz = py - d * math.cos(a), pz + d * math.sin(a)
+        pts.append([px, py, pz])
+    a = math.radians(rec["kc.shaft.south.angle"])
+    run = (rec["kc.shaft.south.outlet.up"] - pz) / math.tan(a)
+    outlet = [px, py - run, rec["kc.shaft.south.outlet.up"]]
+    pts.append(outlet)
+    sky = [px, outlet[1] - 60 * math.cos(a), outlet[2] + 60 * math.sin(a)]
+    out["kc-shaft"] = {
+        "lines": [{"from": r(pts[i]), "to": r(pts[i + 1]), "style": "dash"} for i in range(len(pts) - 1)]
+                 + [{"from": r(outlet), "to": r(sky), "style": "edge"}],
+        "labels": [
+            {"at": r(pts[0]), "text": "The southern shaft", "sub": f"{rec['kc.shaft.south.width'] * 100:.0f} by {rec['kc.shaft.south.height'] * 100:.0f} cm, climbing through the masonry", "place": "below", "dy": 40},
+            {"at": r(sky), "text": f"Out of the south face at {rec['kc.shaft.south.angle']:.0f}°", "sub": "to Alnitak, in Orion's belt, crossing the meridian around 2450 BCE", "place": "above"},
+        ],
+    }
+    return out
+
+
 def in_shadow(png):
     """
     Whether the camera seems to stand in a shadow: the ground under it both dark against
@@ -226,6 +342,9 @@ def main():
         st["neighbours"] = [n for n in st["neighbours"] if n in ids]
     with io.open(os.path.join(WALK, "stations.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=1)
+    figures = overlays()   # computed first, so a failure leaves the old file whole
+    with io.open(os.path.join(WALK, "overlays.json"), "w", encoding="utf-8") as f:
+        json.dump(figures, f, indent=1, ensure_ascii=False)
     print(f"wrote apps/walk/stations.json: {len(manifest['stations'])} stations")
 
 

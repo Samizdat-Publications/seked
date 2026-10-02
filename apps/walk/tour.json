@@ -1,137 +1,302 @@
 {
  "title": "The case for an older Giza",
- "about": "The guided tour: each stop names a station, the eras it runs through in order (the first is shown on arrival, the rest glided to in turn), and where the view turns (degrees: yaw from north, pitch above the horizon, vertical field of view). Figures in `numbers` are the project's own, from docs/dossier.md, docs/shafts.md and the sky page; the arguments are the proponents', put at their strongest.",
+ "about": "The guided tour. Each stop names a station, the eras it runs through in order (the first shown on arrival, the rest glided or cut to in turn, each held once it is on screen), where the view turns (degrees: yaw from north, pitch above the horizon, vertical field of view), an optional overlay from overlays.json (written by render/publish.py from the database and the claims engine) and an optional figure featured after the eras. `text` is the card's lead, kept short; `detail` and `who` sit under Read more. Figures in `numbers` are the project's own, from docs/dossier.md, docs/shafts.md and the sky page; the arguments are the proponents', put at their strongest.",
  "stops": [
   {
    "id": "intro",
    "summary": "The plateau runs back from today to 10,500 BCE, and the case is set out.",
    "station": "panorama",
-   "eras": ["today", "stripped", "built", "lion", "first-time"],
-   "view": { "yaw": 24, "pitch": 1, "fov": 30 },
+   "eras": [
+    "today",
+    "built",
+    "lion",
+    "first-time"
+   ],
+   "hold": 6500,
+   "view": {
+    "yaw": 24,
+    "pitch": 1,
+    "fov": 24
+   },
    "title": "The case for an older Giza",
    "text": [
-    "The record dates the Giza plateau to Egypt's Fourth Dynasty: Khufu's pyramid around 2560 BCE, Khafre's pyramid and the Sphinx a generation later.",
-    "A line of researchers, among them John Anthony West, the geologist Robert Schoch, Robert Bauval and Graham Hancock, argue that the plateau is much older than that: that its plan, its alignments and some of its stones belong to a forgotten age around 10,500 BCE. They identify it with Zep Tepi, the First Time, the Egyptians' own name for the age when the gods ruled the land.",
-    "This tour lays out their case at its strongest, one station at a time, with the project's own measurements beside each argument. Watch the plateau run back from today to the First Time."
+    "The record dates Giza to Egypt's Fourth Dynasty, around 2560 BCE. Graham Hancock, Robert Bauval, the geologist Robert Schoch and John Anthony West argue that the plateau is far older: that its plan, its alignments and some of its stones go back to around 10,500 BCE, the age they identify with Zep Tepi, the Egyptians' own \"First Time\".",
+    "Watch the plateau run back to it."
+   ],
+   "detail": [
+    "This tour puts their case at its strongest, one station at a time, with the project's own measurements beside each argument. The eras you will see: today, as surveyed; Khufu's Giza as built, a reconstruction; and two theorized ages, the long rains of about 7000 BCE and the First Time."
    ],
    "who": "West, Serpent in the Sky (1979) · Hancock, Fingerprints of the Gods (1995) · Hancock and Bauval, Keeper of Genesis (1996)"
   },
   {
    "id": "erosion",
-   "summary": "Schoch's geology: the Sphinx's body worn by rain, not wind.",
+   "summary": "Schoch's geology: the Sphinx worn by rain, not wind.",
    "station": "sphinx-face",
-   "eras": ["today", "lion"],
-   "view": { "yaw": 242, "pitch": 12, "fov": 74 },
+   "eras": [
+    "first-time",
+    "lion",
+    "today"
+   ],
+   "view": {
+    "yaw": 236,
+    "pitch": 16,
+    "fov": 62
+   },
    "title": "Weathered by rain",
    "text": [
-    "The Sphinx is carved out of the bedrock, and the ditch around it is the quarry it came from. Look along its flank: the softer layers of rock are worn back into deep, rounded hollows, and the walls of the ditch are cut by vertical fissures.",
-    "In 1991 the Boston University geologist Robert Schoch told the Geological Society of America that this is the mark of rain running down rock for a very long time, not of wind-blown sand. Egypt's last long wet phase ended thousands of years before Khafre. If rain did this work, the Sphinx was already old when he came to the throne.",
-    "Seismic soundings that Schoch made with Thomas Dobecki found the weathering under the floor of the ditch deeper in front of the Sphinx than behind it, which he read as the front being cut first, long before the rest. Watch the body as the long rains wear it."
+    "If rain did this, the Sphinx was old before Khafre. In 1991 the geologist Robert Schoch argued that the deep, rounded hollows worn into the Sphinx's body, layer by layer, and the fissures in the walls of its ditch were cut by rain running down the rock for thousands of years, not by wind-blown sand. Egypt's last long wet age ended well before 2500 BCE.",
+    "Watch the fresh-cut lion wear under the long rains, then see the body as it stands today, its flank cut back in deep layers."
    ],
-   "numbers": "Schoch's 1992 estimate for the carving of the Sphinx's core body: 7000 to 5000 BCE at the latest. West and Hancock argue for the eleventh millennium BCE.",
+   "numbers": "Schoch's estimate for the carving of the core body: 7000 to 5000 BCE at the latest. West and Hancock argue for the eleventh millennium BCE.",
+   "detail": [
+    "Seismic soundings Schoch made with Thomas Dobecki found the weathering under the floor of the ditch deeper in front of the Sphinx than behind it. He read this as the front being cut first, long before the rest."
+   ],
    "who": "Schoch, Redating the Great Sphinx of Giza, KMT (1992) · Dobecki and Schoch, Geoarchaeology (1992) · West (1979)"
-  },
-  {
-   "id": "head",
-   "summary": "Why the king's face may be a recut of something older.",
-   "station": "sphinx",
-   "eras": ["today"],
-   "view": { "yaw": 277, "pitch": 1, "fov": 34 },
-   "title": "A head too small for its body",
-   "text": [
-    "From the east the Sphinx's head is small, out of proportion with its long body. West and others read this as a recutting: a king's face of Khafre's time carved out of an older, larger head.",
-    "Hancock and Bauval go further. The body, they argue, was a lion's from the start, gazing due east, and only took a pharaoh's head when the Egyptians restored it. At the next stop you will see that lion."
-   ],
-      "who": "West (1979) · Hancock and Bauval (1996)"
   },
   {
    "id": "temples",
    "summary": "Hundred-tonne blocks from the Sphinx's ditch, faced later in granite.",
    "station": "valley-temple",
-   "eras": ["today", "built"],
-   "view": { "yaw": 270, "pitch": 6, "fov": 80 },
+   "eras": [
+    "today",
+    "built"
+   ],
+   "view": {
+    "yaw": 270,
+    "pitch": 6,
+    "fov": 80
+   },
    "title": "Megaliths from the Sphinx's own quarry",
    "text": [
-    "Beside the Sphinx stands Khafre's valley temple. Its walls are built of limestone blocks cut from the Sphinx's ditch, some of them estimated at over a hundred tonnes; Hancock puts the largest at two hundred. They were later faced with polished red granite brought down the Nile from Aswan.",
-    "Schoch and West argue that the limestone behind the granite carries the same rain weathering as the ditch walls, and that the granite was cut on its back to fit the worn surfaces. On that reading the temple's core was already standing and weathered when Khafre's builders faced it."
+    "Beside the Sphinx stands Khafre's valley temple. Its core is built of limestone blocks cut from the Sphinx's own ditch, some estimated at over a hundred tonnes; Hancock puts the largest at two hundred.",
+    "Schoch and West argue that this limestone carries the same rain weathering as the ditch, and that the red granite you see here was cut on its back to fit surfaces that had already worn. The temple, they say, was old when Khafre faced it."
    ],
-   "who": "Schoch (1992) · Hancock (1995)"
+   "who": "Schoch (1992) · West (1979) · Hancock (1995)",
+   "overlay": "valley-hall",
+   "pan": -10
   },
   {
    "id": "leo",
-   "summary": "The lion looking at the dawn of the Age of Leo.",
+   "summary": "A head too small, and a lion facing the dawn of the Age of Leo.",
    "station": "sphinx-face",
-   "eras": ["built", "first-time"],
-   "view": { "yaw": 272, "pitch": 28, "fov": 70 },
+   "eras": [
+    "built",
+    "first-time"
+   ],
+   "view": {
+    "yaw": 272,
+    "pitch": 28,
+    "fov": 70
+   },
    "title": "The lion faces the lion",
    "text": [
-    "The Sphinx looks due east, to the point where the sun rises at the spring and autumn equinoxes. Because the Earth's axis slowly wobbles, the constellation standing behind that sunrise changes, one sign in about 2,150 years. Today it is Pisces. In Khafre's day it was Taurus, the bull.",
-    "Hancock and Bauval point out that around 10,500 BCE the constellation on the equinox horizon was Leo, the lion. A lion-bodied monument facing the dawn of the Age of the Lion is, they argue, the plateau telling us when it was laid out.",
-    "Here at its paws, watch Khafre's king's head give way to the lion the First Time proposes, looking out past you to where Leo rose."
+    "The Sphinx's head is small for its body, and West and others read it as a recut. Hancock and Bauval argue the statue began as a lion, gazing due east to where the sun rises at the equinoxes, and that around 10,500 BCE the constellation rising behind that sun was Leo: a lion facing the dawn of the Age of the Lion.",
+    "Watch the king's head give way to that lion."
    ],
-   "numbers": "The lion is a visual stand-in fitted to the Sphinx's surveyed outline. From the project's sky engine: at the spring equinox of 10,500 BCE the sun rose at 89°31′, with Regulus, Leo's brightest star, clearing the horizon 50 minutes ahead of it, 10°14′ south of due east.",
-   "more": [{ "label": "Leo on the dawn horizon, drawn", "href": "../alignments/#leo" }],
-   "who": "Hancock and Bauval, Keeper of Genesis (1996)"
+   "numbers": "Spring equinox, 10,500 BCE: the sun rose at 89°31′, with Regulus, Leo's brightest star, 50 minutes ahead of it. The lion is a stand-in fitted to the Sphinx's outline.",
+   "detail": [
+    "Because the Earth's axis slowly wobbles, the constellation behind the equinox sunrise changes, one sign in about 2,150 years. Today it is Pisces; in Khafre's day it was Taurus, the bull. The last time a lion stood on that horizon was around 10,500 BCE."
+   ],
+   "figure": {
+    "src": "../alignments/img/c5-leo-dawn-10500.jpg",
+    "alt": "The spring equinox dawn of 10,500 BCE seen from behind the lion: Leo stretched along the eastern horizon above the point where the sun is about to rise.",
+    "caption": "From behind the lion at the spring equinox of 10,500 BCE: Leo lies along the dawn horizon, the sun about to rise beneath it."
+   },
+   "more": [
+    {
+     "label": "Leo on the dawn horizon, on the sky page",
+     "href": "../alignments/#leo"
+    }
+   ],
+   "who": "West (1979) · Hancock and Bauval, Keeper of Genesis (1996)"
+  },
+  {
+   "id": "akhet",
+   "summary": "The midsummer sun sets between two pyramids: the horizon hieroglyph.",
+   "station": "sphinx",
+   "eras": [
+    "today",
+    "built"
+   ],
+   "overlay": "akhet",
+   "view": {
+    "yaw": 303,
+    "pitch": 4,
+    "fov": 50
+   },
+   "title": "The sun in the horizon sign",
+   "text": [
+    "Seen from the Sphinx at midsummer, the sun goes down in the gap between the Great Pyramid and Khafre's. The two pyramids become the two hills of akhet, the hieroglyph for the horizon, with the sun's disc between them, and the Sphinx lies before them on guard.",
+    "The line drawn here runs from the Sphinx to that sunset, in 2500 BCE: monuments credited to different kings, composed as one image of the sky."
+   ],
+   "numbers": "The midsummer sun set at 298.5° from the Sphinx; the middle of the gap is at 295.9°, about five sun-widths away.",
+   "detail": [
+    "The Egyptologist Mark Lehner reads the plateau as this single sign. For the case for an older Giza it is a mark of one plan behind monuments credited to different kings: a design, they argue, that came first."
+   ],
+   "who": "Lehner, The Complete Pyramids (1997) · Lehner and Hawass, Giza and the Pyramids (2017)"
   },
   {
    "id": "orion",
    "summary": "Bauval's correlation, with the belt at its lowest in 10,450 BCE.",
    "station": "orion",
-   "eras": ["built", "first-time"],
-   "view": { "yaw": 182, "pitch": 20, "fov": 64 },
+   "eras": [
+    "built",
+    "first-time"
+   ],
+   "cut": true,
+   "view": {
+    "yaw": 182,
+    "pitch": 20,
+    "fov": 74
+   },
    "title": "Orion's belt on the ground",
    "text": [
-    "In 1994 Robert Bauval proposed that the three pyramids are laid out as the three stars of Orion's belt: two bright stars nearly in line and a fainter third set off to one side, as Menkaure's smaller pyramid is set off the line of the other two. To the Egyptians Orion was Osiris, god of death and rebirth.",
-    "As the sky precesses, the belt climbs and sinks over a cycle of some 26,000 years. Watch it sink from 2450 BCE to 10,450 BCE, when it stood at its lowest. That, Bauval and Hancock argue, is the moment the ground plan records: the belt at the start of its cycle, set down in stone."
+    "In 1994 Robert Bauval proposed that the three pyramids are laid out as Orion's belt: two stars nearly in line and a fainter third set off to one side, as Menkaure's smaller pyramid is. As the sky precesses the belt climbs and sinks; it stood at its lowest around 10,450 BCE, and that, Bauval and Hancock argue, is the moment the plan records.",
+    "Watch the sky drop from 2450 to 10,450 BCE."
    ],
-   "numbers": "Fitted on the ground, the three stars land 7.5, 14.9 and 7.4 m from the pyramids' centres across 936 m, once the belt is turned 13° to match. In 10,450 BCE Alnitak crossed the meridian 9°13′ above the horizon.",
-   "more": [{ "label": "The belt fitted to the plan", "href": "../alignments/#orion" }],
+   "numbers": "Fitted on the ground, the three stars land 7.5, 14.9 and 7.4 m from the pyramids' centres across 936 m, once the belt is turned 13° to match.",
+   "detail": [
+    "To the Egyptians Orion was Osiris, god of death and rebirth. In 10,450 BCE Alnitak crossed the meridian 9°13′ above the horizon, the lowest of its 26,000-year swing."
+   ],
+   "figure": {
+    "src": "../alignments/img/c4-orion-plan.jpg",
+    "alt": "The three pyramids from straight above with Orion's belt laid over them and fitted, with an inset chart of the belt's angle through precession.",
+    "caption": "Orion's belt laid on the plan of the three pyramids: Alnitak on Khufu, Alnilam on Khafre, Mintaka on Menkaure."
+   },
+   "more": [
+    {
+     "label": "The belt fitted to the plan, on the sky page",
+     "href": "../alignments/#orion"
+    }
+   ],
    "who": "Bauval and Gilbert, The Orion Mystery (1994) · Hancock and Bauval (1996)"
   },
   {
    "id": "shafts",
-   "summary": "Four shafts, four stars, and two dates for one building.",
+   "summary": "Four shafts, four stars, and a monument to an older moment.",
    "station": "kings-chamber",
-   "eras": ["built"],
-   "view": { "yaw": 180, "pitch": -4, "fov": 74 },
+   "eras": [
+    "built"
+   ],
+   "view": {
+    "yaw": 180,
+    "pitch": 14,
+    "fov": 76
+   },
    "title": "Shafts aimed at the stars",
    "text": [
-    "Two narrow shafts climb from the King's Chamber through the masonry to the open air, one north and one south, and two more rise from the Queen's Chamber below. The small dark square low in the south wall in front of you is the mouth of the southern shaft. In 1964 the astronomer Virginia Trimble and the architect Alexander Badawy showed that the southern shaft here pointed at Orion's belt as it crossed the meridian.",
-    "Rudolf Gantenbrink's robot surveyed the shafts in 1993, and Bauval matched all four: Orion's belt and Sirius to the south, Thuban, the pole star of its age, and Kochab to the north.",
-    "The case now runs on two clocks. The shafts date the building to around 2450 BCE; the plan on the ground records the sky of 10,450 BCE. Bauval reads them together: a monument built to remember an older moment, its First Time."
+    "Narrow shafts climb from the King's and Queen's Chambers through the masonry; the line drawn here follows this one from its mouth in the south wall. Measured by Rudolf Gantenbrink's robot in 1993, all four point at stars crossing the meridian around 2450 BCE: Orion's belt and Sirius to the south, Thuban and Kochab to the north.",
+    "Why does 2450 BCE help the older case? Because, Bauval argues, the same builders laid the pyramids out as Orion's belt stood in 10,450 BCE: a monument of one age built to record another."
    ],
    "numbers": "Around 2450 BCE each star crosses within 0°40′ of its shaft: Alnitak 0°12′, Sirius 0°15′, Kochab 0°14′, Thuban 0°39′.",
-   "more": [{ "label": "The four shafts and their stars", "href": "../alignments/#shafts" }],
-   "who": "Badawy and Trimble (1964) · Gantenbrink (1993) · Bauval and Gilbert (1994)"
+   "detail": [
+    "In 1964 the astronomer Virginia Trimble and the architect Alexander Badawy were the first to show that the King's Chamber's southern shaft pointed at Orion's belt as it crossed the meridian."
+   ],
+   "figure": {
+    "src": "../alignments/img/c2-shafts-2450.jpg",
+    "alt": "The Great Pyramid from the east, its casing seen through, its four shafts carried out into the sky to Orion's belt, Sirius, Thuban and Kochab.",
+    "caption": "The four shafts carried out into the sky of 2450 BCE: Alnitak and Sirius to the south, Thuban and Kochab to the north."
+   },
+   "more": [
+    {
+     "label": "The shafts and their stars, on the sky page",
+     "href": "../alignments/#shafts"
+    }
+   ],
+   "who": "Badawy and Trimble (1964) · Gantenbrink (1993) · Bauval and Gilbert (1994)",
+   "overlay": "kc-shaft"
+  },
+  {
+   "id": "underground",
+   "summary": "An unfinished chamber in the bedrock, and a passage aimed at the pole star.",
+   "station": "subterranean",
+   "eras": [
+    "today"
+   ],
+   "overlay": "passage",
+   "view": {
+    "yaw": 12,
+    "pitch": 8,
+    "fov": 84
+   },
+   "title": "The chamber under the rock",
+   "text": [
+    "Thirty metres under the pyramid lies a chamber cut into the bedrock and never finished: a rough floor, a pit, a blind passage. Some who argue for an older Giza ask whether it belonged to a sacred site the pyramid was later built over.",
+    "The passage that leads down here points at the sky. The line drawn here runs up it towards the north, where Thuban, the pole star of its age, stood at its lowest: first near 3409 BCE, long before the pyramid's conventional date."
+   ],
+   "numbers": "The passage slopes at 26°31′. Thuban's lowest crossing of the meridian reaches that height twice: near 3409 BCE, some eight centuries before Khufu, and again near 2185 BCE.",
+   "detail": [
+    "When Colonel Vyse surveyed the pyramid in the 1830s, the astronomer John Herschel pointed out that the pole star of the age would have shone straight down the passage at its lowest crossing of the meridian."
+   ],
+   "more": [
+    {
+     "label": "The claim computed, with both dates",
+     "href": "../docs/dossier.html"
+    }
+   ],
+   "who": "Herschel, in Vyse, Operations Carried On at the Pyramids of Gizeh (1840) · Smyth (1864)",
+   "exposure": 2.1,
+   "pan": 8
   },
   {
    "id": "earth",
-   "summary": "True north, pi and the 1:43,200 scale of the Earth.",
-   "station": "north",
-   "eras": ["today", "first-time"],
-   "view": { "yaw": 180, "pitch": 14, "fov": 66 },
+   "summary": "True north, pi, phi and the 1:43,200 scale of the Earth.",
+   "station": "south",
+   "eras": [
+    "today",
+    "first-time"
+   ],
+   "overlay": "g1-proportions",
+   "hold": 6000,
+   "view": {
+    "yaw": 0,
+    "pitch": 14,
+    "fov": 72
+   },
    "title": "The shape of the Earth",
    "text": [
-    "The Great Pyramid's sides run within four arcminutes of true north, about a fifteenth of a degree. Its proportions are as exact: the perimeter of its base over its height is two times pi, to three hundredths of one per cent.",
-    "Hancock takes the next step. Multiply the height by 43,200 and you have the Earth's polar radius; the perimeter by 43,200, and you have the equator. And 43,200 is a number of the sky's own clock: the equinox moves one degree in about 72 years, and 43,200 is 600 times 72. On this reading the pyramid is a model of the northern hemisphere, drawn to the scale of precession."
+    "The Great Pyramid's sides run within four arcminutes of true north. Its proportions, drawn on the face here, carry pi and the golden ratio, and Hancock finds a scale: its height times 43,200 is the Earth's polar radius, its perimeter times 43,200 the equator.",
+    "Builders who knew the size of the Earth and the slow clock of the sky were not, he argues, a young civilisation."
    ],
-   "numbers": "True north: 3′54″ off (Cole and Dash surveys). Perimeter over height: 6.2850 against 2π, 6.2832. Height × 43,200: 6,333 km against a polar radius of 6,357 km. Perimeter × 43,200: 39,801 km against an equator of 40,075 km.",
-   "more": [{ "label": "All twenty-two claims, computed", "href": "../docs/dossier.html" }],
+   "numbers": "True north: 3′54″ off. Perimeter over height: 6.2850 against 2π, 6.2832. Slant height over half the side: 1.6187 against φ, 1.6180.",
+   "detail": [
+    "43,200 is 600 times 72, and 72 years is about how long the sky takes to precess one degree. On this reading the pyramid is a model of the northern hemisphere, drawn to the scale of the sky's own clock."
+   ],
+   "more": [
+    {
+     "label": "All twenty-two claims, computed",
+     "href": "../docs/dossier.html"
+    }
+   ],
    "who": "Hancock (1995) · Tompkins, Secrets of the Great Pyramid, with Stecchini (1971)"
   },
   {
    "id": "lost",
    "summary": "The Younger Dryas, Göbekli Tepe and a lost chapter of history.",
-   "station": "sphinx",
-   "eras": ["first-time"],
-   "view": { "yaw": 288, "pitch": 15, "fov": 58 },
+   "station": "east",
+   "eras": [
+    "first-time"
+   ],
+   "view": {
+    "yaw": 270,
+    "pitch": 10,
+    "fov": 62
+   },
    "title": "A lost chapter",
    "text": [
-    "Hancock's larger argument is that these clues point to a civilisation lost at the end of the last Ice Age. The Younger Dryas, about 12,900 to 11,700 years ago, swung the climate violently, and as the ice sheets melted the seas rose by more than a hundred metres, drowning the coasts where people lived. The survivors, he proposes, carried their knowledge of the sky to those who came after.",
-    "What was once easy to dismiss became harder in 1995, when Klaus Schmidt began to excavate Göbekli Tepe in Turkey: great carved stone pillars raised around 9500 BCE, thousands of years before the first cities. Monumental building at the date of the First Time is no longer unthinkable.",
-    "Now walk the plateau yourself. Every station can be seen in every era it was rendered in."
+    "Hancock's larger argument is that these clues point to a civilisation lost at the end of the last Ice Age, when the Younger Dryas, 12,900 to 11,700 years ago, swung the climate and the melting ice raised the seas by over a hundred metres.",
+    "Göbekli Tepe in Turkey, great carved pillars raised around 9500 BCE, shows that monumental building at that age is no longer unthinkable. Now walk the plateau yourself."
    ],
-   "who": "Hancock, Magicians of the Gods (2015) · Schmidt, Göbekli Tepe excavations (from 1995)"
+   "detail": [
+    "Its survivors, he proposes, carried their knowledge of the sky to those who came after, and the plateau's plan is their record. Every station can be seen in every era it was rendered in."
+   ],
+   "figure": {
+    "src": "../img/overview-first-time.jpg",
+    "alt": "The three Giza pyramids, cased white with gold caps, rising from a tropical forest beside a flooded valley, seen from the air.",
+    "caption": "The First Time from the air, as the case for an older Giza imagines it: the three pyramids cased and gold-capped above a green valley."
+   },
+   "who": "Hancock, Magicians of the Gods (2015) · Schmidt, Göbekli Tepe excavations (from 1995)",
+   "pan": 6
   }
  ]
 }

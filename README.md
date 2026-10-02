@@ -19,7 +19,7 @@ seked of 5½ is the whole π-and-φ story.
 
 | | |
 |---|---|
-| **The guided tour** (`/walk/#tour/1`) | The case for an older Giza in nine stops: the Sphinx's rain weathering, the head too small for its body, the valley temple's megaliths, the lion facing Leo, Orion's belt on the ground, the shafts and their stars, the Earth-scale numbers, and the Younger Dryas. Each stop moves the view and runs the eras; the text is in `apps/walk/tour.json`. |
+| **The guided tour** (`/walk/#tour/1`) | The case for an older Giza in ten stops: the Sphinx's rain weathering, the valley temple's megaliths, the head too small for its body and the lion facing Leo, the midsummer sun in the horizon sign, Orion's belt on the ground, the shafts and their stars, the unfinished chamber under the rock, the Earth-scale numbers, and the Younger Dryas. Each stop moves the view and runs the eras; the text is in `apps/walk/tour.json`. |
 | **The walkthrough** (`/walk/`) | Seventeen 360-degree stations, outdoors and inside the Great Pyramid and Khafre's valley temple, each in every era it stands in, path traced in Blender Cycles at 4096 by 2048. The night station draws Orion's figure on its stars and a line from each belt star to its pyramid. |
 | **Five eras** | The First Time (c. 10,500 BCE, theorized), the long rains (c. 7000 BCE, theorized), Khufu's Giza (c. 2560 BCE, reconstruction), stripped and buried (c. 1800 CE, reconstruction), today (2026, survey). |
 | **The films** (`/films/`) | The rollback from today to the First Time, the Sphinx's sequence from lion to excavation, and a flight up the approach as built. |
@@ -95,6 +95,10 @@ docs/            plan, dossier, shafts, progress snapshots, history, design spec
 
 How the model got here, stage by stage, is in [`docs/history.md`](docs/history.md)
 and the milestone renders in [`docs/progress/`](docs/progress/README.md).
+
+## Licence
+
+Code: [MIT](LICENSE). The project's renders, films, images and writing: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Imported data keeps its own licence; see [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md).
 
 ## Credits and data licences
 

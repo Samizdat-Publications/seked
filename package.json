@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "license": "MIT",
   "description": "Survey-accurate 3D model of the Giza necropolis with the encoded-mathematics claims as live overlays",
   "scripts": {
     "test": "vitest run",

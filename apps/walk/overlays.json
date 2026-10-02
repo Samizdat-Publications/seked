@@ -1,0 +1,341 @@
+{
+ "g1-proportions": {
+  "lines": [
+   {
+    "from": [
+     -115.17,
+     -115.17,
+     0.0
+    ],
+    "to": [
+     0.0,
+     0.0,
+     146.59
+    ],
+    "style": "edge"
+   },
+   {
+    "from": [
+     0.0,
+     0.0,
+     146.59
+    ],
+    "to": [
+     115.17,
+     -115.17,
+     0.0
+    ],
+    "style": "edge"
+   },
+   {
+    "from": [
+     -115.17,
+     -115.17,
+     0.0
+    ],
+    "to": [
+     115.17,
+     -115.17,
+     0.0
+    ],
+    "style": "edge"
+   },
+   {
+    "from": [
+     0.0,
+     0.0,
+     146.59
+    ],
+    "to": [
+     0.0,
+     -115.17,
+     0.0
+    ],
+    "style": "dash"
+   }
+  ],
+  "labels": [
+   {
+    "at": [
+     0.0,
+     0.0,
+     146.59
+    ],
+    "text": "Height as built 146.6 m",
+    "sub": "× 43,200 = 6,333 km; the Earth's polar radius is 6,357 km",
+    "place": "above"
+   },
+   {
+    "at": [
+     0.0,
+     0.0,
+     138.75
+    ],
+    "text": "Today's top, 138.7 m",
+    "sub": "the top 7.8 m, capstone and all, is gone",
+    "place": "right",
+    "dy": 34,
+    "eras": [
+     "stripped",
+     "today"
+    ]
+   },
+   {
+    "at": [
+     0.0,
+     -57.58,
+     73.3
+    ],
+    "text": "Slant height 186.4 m",
+    "sub": "÷ half the side = 1.6187; φ = 1.6180",
+    "place": "left"
+   },
+   {
+    "at": [
+     0.0,
+     -115.17,
+     20.52
+    ],
+    "text": "Perimeter ÷ height = 6.2850",
+    "sub": "2π = 6.2832",
+    "place": "center"
+   },
+   {
+    "at": [
+     0.0,
+     -115.17,
+     0.0
+    ],
+    "text": "Side 230.3 m, perimeter 921.3 m",
+    "sub": "× 43,200 = 39,801 km; the equator is 40,075 km",
+    "place": "below"
+   }
+  ]
+ },
+ "akhet": {
+  "lines": [
+   {
+    "from": [
+     347.8,
+     -432.44,
+     -20.0
+    ],
+    "to": [
+     -1936.63,
+     809.07,
+     -2.0
+    ],
+    "style": "dash"
+   },
+   {
+    "from": [
+     347.8,
+     -432.44,
+     -20.0
+    ],
+    "to": [
+     -170.98,
+     -180.7,
+     0.0
+    ],
+    "style": "faint"
+   }
+  ],
+  "suns": [
+   {
+    "at": [
+     -1936.63,
+     809.07,
+     -2.0
+    ],
+    "radius": 16
+   }
+  ],
+  "labels": [
+   {
+    "at": [
+     -1936.63,
+     809.07,
+     -2.0
+    ],
+    "text": "The midsummer sun sets here, seen from the Sphinx",
+    "sub": "2500 BCE: bearing 298.5°, the gap's middle 295.9°",
+    "place": "above",
+    "dy": -66
+   }
+  ]
+ },
+ "passage": {
+  "lines": [
+   {
+    "from": [
+     7.27,
+     -1.02,
+     -29.32
+    ],
+    "to": [
+     7.27,
+     7.77,
+     -29.4
+    ],
+    "style": "dash"
+   },
+   {
+    "from": [
+     7.27,
+     7.77,
+     -29.4
+    ],
+    "to": [
+     7.27,
+     115.14,
+     24.19
+    ],
+    "style": "dash"
+   }
+  ],
+  "labels": [
+   {
+    "at": [
+     7.27,
+     -1.02,
+     -29.32
+    ],
+    "text": "To the descending passage",
+    "sub": "9 m north, then up through the rock",
+    "place": "below"
+   },
+   {
+    "at": [
+     7.27,
+     115.14,
+     24.19
+    ],
+    "text": "Up the passage at 26.52°, to the north sky",
+    "sub": "where Thuban, the pole star of its age, crossed at its lowest",
+    "place": "above"
+   }
+  ]
+ },
+ "valley-hall": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      250,
+      16,
+      9
+     ]
+    },
+    "text": "Red granite from Aswan",
+    "sub": "the facing; Schoch and West argue it was cut to fit worn stone",
+    "place": "center"
+   },
+   {
+    "at": {
+     "dir": [
+      290,
+      -6,
+      7
+     ]
+    },
+    "text": "Behind it, limestone",
+    "sub": "quarried from the Sphinx's ditch, weathered by rain, argue Schoch and West",
+    "place": "center"
+   }
+  ]
+ },
+ "kc-shaft": {
+  "lines": [
+   {
+    "from": [
+     5.2,
+     -13.64,
+     43.9
+    ],
+    "to": [
+     5.2,
+     -15.36,
+     43.9
+    ],
+    "style": "dash"
+   },
+   {
+    "from": [
+     5.2,
+     -15.36,
+     43.9
+    ],
+    "to": [
+     5.2,
+     -16.52,
+     44.85
+    ],
+    "style": "dash"
+   },
+   {
+    "from": [
+     5.2,
+     -16.52,
+     44.85
+    ],
+    "to": [
+     5.2,
+     -18.43,
+     47.16
+    ],
+    "style": "dash"
+   },
+   {
+    "from": [
+     5.2,
+     -18.43,
+     47.16
+    ],
+    "to": [
+     5.2,
+     -48.81,
+     77.55
+    ],
+    "style": "dash"
+   },
+   {
+    "from": [
+     5.2,
+     -48.81,
+     77.55
+    ],
+    "to": [
+     5.2,
+     -91.24,
+     119.98
+    ],
+    "style": "edge"
+   }
+  ],
+  "labels": [
+   {
+    "at": [
+     5.2,
+     -13.64,
+     43.9
+    ],
+    "text": "The southern shaft",
+    "sub": "22 by 22 cm, climbing through the masonry",
+    "place": "below",
+    "dy": 40
+   },
+   {
+    "at": [
+     5.2,
+     -91.24,
+     119.98
+    ],
+    "text": "Out of the south face at 45°",
+    "sub": "to Alnitak, in Orion's belt, crossing the meridian around 2450 BCE",
+    "place": "above"
+   }
+  ]
+ }
+}
