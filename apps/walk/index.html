@@ -327,12 +327,16 @@
     position: absolute; inset: 0; z-index: 5;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
     padding: calc(var(--top) + 86px) var(--right) calc(var(--bottom) + 64px) calc(var(--left) + 466px);
-    background: rgba(10, 9, 8, 0.92);
-    opacity: 0; pointer-events: none; transition: opacity 1.2s ease-in-out;
+    /* the panorama dimmed, not blacked out, so the figure reads as laid over the place it explains
+       (critic rounds 16 to 19: the figure "slams down" and "blinds the visitor to the panorama") */
+    background: radial-gradient(ellipse at 62% 50%, rgba(10, 9, 8, 0.72), rgba(10, 9, 8, 0.38) 75%);
+    opacity: 0; pointer-events: none; transition: opacity 1.6s ease-in-out;
   }
   .feature.on { opacity: 1; }
+  .feature a, .feature figcaption { transform: translateY(22px) scale(0.97); transition: transform 1.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .feature.on a, .feature.on figcaption { transform: none; }
   .feature a { display: block; max-width: 100%; max-height: 100%; min-height: 0; pointer-events: auto; }
-  .feature img { display: block; max-width: 100%; max-height: calc(100vh - var(--top) - var(--bottom) - 230px); width: auto; height: auto; border-radius: 10px; border: 1px solid var(--rule-hi); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+  .feature img { display: block; max-width: 88%; margin: 0 auto; max-height: calc(100vh - var(--top) - var(--bottom) - 300px); width: auto; height: auto; border-radius: 10px; border: 1px solid var(--rule-hi); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
   .feature figcaption { margin-top: 8px; max-width: 72ch; text-align: center; font: 400 13px/1.5 var(--body); color: var(--ink); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
   .feature figcaption small { display: block; margin-top: 2px; font: 400 11px/1.4 var(--mono); color: var(--muted); }
   .tour-who { margin: 0 0 6px; font: 400 11px/1.5 var(--mono); color: var(--muted); }
@@ -1275,9 +1279,13 @@
       var c = cameraNow(), az = v.dir[0] * DEG, al = v.dir[1] * DEG, d = v.dir[2];
       return project(c[0] + d * Math.cos(al) * Math.sin(az), c[1] + d * Math.cos(al) * Math.cos(az), c[2] + d * Math.sin(al), f);
     };
+    // The lines draw themselves out and the suns fade up, rather than snapping in (critic rounds 17 to 19).
+    var since = now - overlayShown.t0, grow = ease(clamp(since / 1200, 0, 1)), glow = clamp((since - 300) / 900, 0, 1);
+    if (grow < 1 || glow < 1) overlayBusy = true;
     o.lines.forEach(function (L) {
       var a = at(L.from), b = at(L.to);
       if (!a || !b) return;
+      if (grow < 1) b = [a[0] + (b[0] - a[0]) * grow, a[1] + (b[1] - a[1]) * grow];
       ctx.setLineDash(L.style === "edge" ? [] : L.style === "faint" ? [3, 7] : [6, 6]);
       ctx.strokeStyle = L.style === "edge" ? "rgba(242, 181, 68, 0.95)" : L.style === "faint" ? "rgba(239, 232, 220, 0.6)" : "rgba(248, 214, 140, 0.9)";
       ctx.lineWidth = L.style === "edge" ? 2 : L.style === "faint" ? 1.2 : 1.6;
@@ -1289,7 +1297,8 @@
     ctx.setLineDash([]);
     (o.suns || []).forEach(function (S) {
       var p = at(S.at);
-      if (!p) return;
+      if (!p || glow <= 0) return;
+      ctx.globalAlpha = glow;
       var g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], S.radius * 3);
       g.addColorStop(0, "rgba(255, 214, 120, 0.55)");
       g.addColorStop(1, "rgba(255, 180, 80, 0)");
@@ -1301,6 +1310,7 @@
       ctx.beginPath();
       ctx.arc(p[0], p[1], S.radius, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.globalAlpha = 1;
     });
     var era = currentStateId(), shown = 0;
     o.labels.forEach(function (L) {
@@ -1987,7 +1997,7 @@
     } else {
       featureEl.classList.remove("on");
       featureEl.setAttribute("aria-hidden", "true");
-      setTimeout(function () { if (!featureOn) featureEl.hidden = true; }, 1250);
+      setTimeout(function () { if (!featureOn) featureEl.hidden = true; }, 1700);
     }
     tourShow.textContent = featureOn ? "The view" : "The figure";
     request();   // redraw, so the overlay steps aside for the figure and returns after it
