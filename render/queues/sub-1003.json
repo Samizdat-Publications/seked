@@ -1,0 +1,12 @@
+{
+  "about": "2026-10-03: the subterranean chamber in near-white raking work light on greyer rock.",
+  "renders": [
+    {
+      "state": "today",
+      "station": "subterranean",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/subterranean-today.png"
+    }
+  ]
+}

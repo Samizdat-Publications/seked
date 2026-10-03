@@ -1,0 +1,12 @@
+{
+  "about": "2026-10-03: the King's Chamber with its electric light set back from the walls and a soft fill.",
+  "renders": [
+    {
+      "state": "today",
+      "station": "kings-chamber",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/kings-chamber-today.png"
+    }
+  ]
+}

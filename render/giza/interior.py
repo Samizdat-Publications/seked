@@ -602,6 +602,8 @@ def lights(state, coll, r, room, log=print):
                 at = (x + side * (half - 0.1), y, floor_z(r, y) + RAMP_HEIGHT + 0.04)
                 lamps.append(_area("gallery strip", coll, at, (0.08, 2.0), (side * 0.12, 0.0, 1.0), slope, 40.0, warm))
             y -= 2.4
+        # The chamber's floor lamps throw cones up the walls, as the real ones do; a ceiling fill tried on
+        # 2026-10-03 only burned a wedge onto the upper walls, so they stay as they were.
         for yy, sign in ((y1 - 0.12, 1.0), (y0 + 0.12, -1.0)):     # each washes the wall behind it
             for fx in (0.4, 0.63, 0.86):                           # kept clear of the coffer, which they would burn out
                 at = (x0 + (x1 - x0) * fx, yy, z0 + 0.06)
@@ -655,8 +657,8 @@ def rough_rock(name, colours, soot=0.0):
     t.link(pos, vor.inputs["Vector"])
     height = t.math("ADD", t.math("MULTIPLY", t.noise(pos, 4.0, 8.0, 0.7), 0.7), t.math("MULTIPLY", vor.outputs["Distance"], 0.3))
     bmp = t.node("ShaderNodeBump")
-    bmp.inputs["Strength"].default_value = 0.55
-    bmp.inputs["Distance"].default_value = 0.05
+    bmp.inputs["Strength"].default_value = 0.8
+    bmp.inputs["Distance"].default_value = 0.06
     t.link(height, bmp.inputs["Height"])
     t.link(bmp.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
@@ -671,7 +673,9 @@ def subterranean_lights(state, coll, room, log=print):
     x0, x1, y0, y1, flat, roof = room
     lamps = []
     modern = state in MODERN
-    colour = (1.0, 0.8, 0.58) if modern else (1.0, 0.6, 0.3)
+    # Today's work lamps a near-white, and small, so their light rakes and the masses throw hard shadows
+    # (critic rounds 16 to 19: "muddy", "flat monochromatic sepia").
+    colour = (1.0, 0.9, 0.78) if modern else (1.0, 0.6, 0.3)
     if modern:
         # work lamps on stands, high enough that no floor burns out under them; one up among the masses
         spots = ((0.86, 0.22, 1.7, 55.0), (0.72, 0.8, 1.9, 40.0), (0.52, 0.2, 1.3, 14.0), (0.12, 0.62, 0.6, 14.0),
@@ -680,7 +684,7 @@ def subterranean_lights(state, coll, room, log=print):
         spots = ((0.85, 0.3, 0.35, 14.0), (0.62, 0.75, 0.3, 12.0), (0.5, 0.2, 0.3, 7.0), (0.3, 0.45, 0.4, 6.0))
     for fx, fy, up, watts in spots:
         at = (x0 + (x1 - x0) * fx, y0 + (y1 - y0) * fy, flat + up)
-        lamps.append(_point("subterranean lamp", coll, at, watts, colour, 0.18 if modern else 0.02))
+        lamps.append(_point("subterranean lamp", coll, at, watts, colour, 0.05 if modern else 0.02))
     if modern:          # the entrance passage lit a few metres up towards the descending passage
         r = _r()
         lamps.append(_point("subterranean lamp", coll, (r["passage.subterranean_north.end.east"], y1 + 2.4,
@@ -736,7 +740,7 @@ def build(state, coll, mats, log=print):
                                      joint=0.0, speckle="161210", quartz=quartz)
     mats["qc limestone"] = masonry("qc limestone", lime, rough, 0.8, 1.7, room_frame(r["qc.corner.ne.up"]),
                                    soot=soot * 0.6, height=r["qc.gable.height"])
-    mats["bedrock rough"] = rough_rock("bedrock rough", ("8f7f68", "a8977d") if state in MODERN or state == "stripped" else ("b7a88f", "cbbca2"),
+    mats["bedrock rough"] = rough_rock("bedrock rough", ("8c8476", "a59d8e") if state in MODERN or state == "stripped" else ("b7a88f", "cbbca2"),
                                        soot=0.45 if state in MODERN or state == "stripped" else 0.15)
     mats.setdefault("timber", _flat("timber", (0.24, 0.15, 0.08), 0.7))
     mats.setdefault("iron", _flat("iron", (0.05, 0.05, 0.05), 0.4))
