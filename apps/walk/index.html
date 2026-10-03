@@ -628,6 +628,9 @@
   var fitted = 58 * DEG;       // the station's field of view, fitted to this screen
   var W = 1, H = 1;
   var eraTween = null, turnTween = null, keys = new Set();
+  // A dissolve straight from the era on screen to one further along, past the eras between (the tour's
+  // far changes; critic rounds 17 and 18 read the old cut through dark as a black flash).
+  var jump = null;
   var spots = [];
   var mode = "gl";
   var revealAt = 0, switching = false, hintDone = false, settledState = null;
@@ -639,6 +642,7 @@
     var n = stopCount();
     if (!n) return null;
     if (n === 1) return { a: 0, b: 0, w: 0 };
+    if (jump) return { a: jump.a, b: jump.b, w: jump.w };
     var i = clamp(Math.floor(pos), 0, n - 2);
     return { a: i, b: i + 1, w: clamp(pos - i, 0, 1) };
   }
@@ -1458,10 +1462,20 @@
   }
 
   function setPos(p, fromSlider) {
+    if (fromSlider) jump = null;
     pos = clamp(p, 0, Math.max(0, stopCount() - 1));
     if (!fromSlider) slider.value = String(Math.round(pos * 1000));
     refresh();
     updateReadout();
+    request();
+  }
+
+  function dissolveTo(i, dur) {
+    var n = stopCount(), from = clamp(Math.round(pos), 0, n - 1);
+    i = clamp(i, 0, n - 1);
+    eraTween = null;
+    if (still() || i === from) { jump = null; setPos(i); settle(); return; }
+    jump = { a: from, b: i, w: 0, t0: performance.now(), dur: dur || 1600 };
     request();
   }
 
@@ -1470,6 +1484,7 @@
     if (!n) return;
     i = clamp(i, 0, n - 1);
     eraTween = null;
+    jump = null;
     var dist = Math.abs(i - pos);
     if (still() || dist < 1e-3) { setPos(i); settle(); return; }
     eraTween = { from: pos, to: i, t0: performance.now(), dur: dur || Math.min(2200, 1100 + 450 * (dist - 1)) };
@@ -1638,6 +1653,7 @@
     document.title = st.name + " · Giza at Block Scale";
     canvas.setAttribute("aria-label", "Panorama from " + st.name + ". Drag, or use the arrow keys, to look around. Plus and minus zoom.");
     eraTween = null;
+    jump = null;
     turnTween = null;
     view.yaw = st.view.yaw;
     view.pitch = clamp(st.view.pitch, -PITCH_MAX, PITCH_MAX);
@@ -1893,9 +1909,8 @@
     if (station && station.id === s.station) {
       var k0 = station.stops.indexOf(s.eras[0]);
       if (Math.abs(pos - k0) > 1.001) {
-        // a far era: through dark, as a stop's own far cuts are
-        curtain.classList.add("on");
-        later(340, function () { setPos(k0); settle(); request(); later(60, function () { curtain.classList.remove("on"); }); });
+        // a far era: a dissolve straight to it, as a stop's own far changes are
+        dissolveTo(k0);
       } else if (Math.abs(pos - k0) > 1e-3) {
         glideTo(k0, TOUR_GLIDE);
       }
@@ -1938,7 +1953,7 @@
       tourWant = urlAt(to);
       need(tourWant);
       var shown = settledEntry(entry(urlAt(here))), next = settledEntry(entry(tourWant));
-      var calm = !eraTween && !(turnTween && !turnTween.linear) && !switching && !document.hidden && !curtain.classList.contains("on");
+      var calm = !eraTween && !jump && !(turnTween && !turnTween.linear) && !switching && !document.hidden && !curtain.classList.contains("on");
       if (!(shown && next && calm)) { readySince = 0; later(150, tick); return; }
       var now = performance.now();
       if (!readySince) readySince = now;
@@ -1946,8 +1961,7 @@
       if (Math.abs(to - here) <= 1 && !s.cut) {
         glideTo(to, TOUR_GLIDE);
       } else {
-        curtain.classList.add("on");
-        later(340, function () { setPos(to); settle(); request(); later(60, function () { curtain.classList.remove("on"); }); });
+        dissolveTo(to);
       }
       k++;
       readySince = 0;
@@ -2043,6 +2057,12 @@
       var te = clamp((now - eraTween.t0) / eraTween.dur, 0, 1);
       setPos(eraTween.from + (eraTween.to - eraTween.from) * ease(te));
       if (te >= 1) { eraTween = null; settle(); } else busy = true;
+    }
+    if (jump) {
+      var tj = clamp((now - jump.t0) / jump.dur, 0, 1);
+      jump.w = ease(tj);
+      refresh();
+      if (tj >= 1) { var to = jump.b; jump = null; setPos(to); settle(); } else busy = true;
     }
     view.yaw = wrapAngle(view.yaw);
     view.pitch = clamp(view.pitch, -PITCH_MAX, PITCH_MAX);
