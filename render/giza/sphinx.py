@@ -40,7 +40,8 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
-CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.9}
+# The First Time lion's own texture carries the bedrock's beds (it is drawn from sphinx-built's): only a little.
+CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.3}
 # Stand-ins that stand in a wet green world: dark growth in their hollows and the runs of rain below
 # them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
 # fresh limestone in a humid forest greys and greens in its first years).
@@ -48,8 +49,7 @@ DAMP = {"sphinx-lion-pristine": 1.0, "sphinx-lion-first": 0.4}
 # Generated textures with brush-stroke striations baked in that read as wood grain: their colour is
 # taken most of the way to plain fresh limestone, the carving left to the geometry and the normal map
 # (how far, and the stone's colour, are look choices).
-FLATTENED = {"sphinx-lion-first": (0.5, (0.86, 0.72, 0.52, 1.0)),
-             "sphinx-lion-rain": (0.35, (0.72, 0.62, 0.5, 1.0))}      # its lichen read as black paint
+FLATTENED = {"sphinx-lion-rain": (0.35, (0.72, 0.62, 0.5, 1.0))}      # its lichen read as black paint
 # Generated textures whose colour runs to orange clay (critic round 15): their saturation (a look choice).
 DESATURATED = {"sphinx-lion-pristine": 0.7}
 # Painted stand-ins whose generated colours come out saturated like plastic: their saturation (a look choice).

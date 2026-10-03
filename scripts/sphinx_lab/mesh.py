@@ -24,6 +24,8 @@ def main():
     ap.add_argument("--texture-prompt")
     ap.add_argument("--no-texture", action="store_true")
     ap.add_argument("--standard", action="store_true", help="the standard geometry pass instead of the 2k Ultra pass")
+    ap.add_argument("--resume", nargs="?", const="latest", help="fetch a task already created (its id, or the newest "
+                    "multi-image task) instead of paying for a new one, when the waiter died")
     a = ap.parse_args()
     uris = []
     for path in a.images:
@@ -40,7 +42,12 @@ def main():
         body["image_urls"] = uris
     else:
         body["image_url"] = uris[0]
-    task_id = meshy.call("POST", endpoint, body)["result"]
+    if a.resume == "latest":
+        task_id = meshy.call("GET", f"{endpoint}?page_size=1&sort_by=-created_at")[0]["id"]
+    elif a.resume:
+        task_id = a.resume
+    else:
+        task_id = meshy.call("POST", endpoint, body)["result"]
     print(f"task {task_id} on {endpoint}", flush=True)
     task = meshy.wait(endpoint, task_id)
     spec = {"endpoint": endpoint, "options": options}

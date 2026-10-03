@@ -1,0 +1,47 @@
+{
+  "about": "2026-10-02 evening: the First Time lion redrawn from the as-built Sphinx's body (slab forelegs, squared paws, tail on the right), and the long rains' lion weathered from it, both Meshy 7.1.",
+  "renders": [
+    {
+      "state": "first-time",
+      "station": "sphinx-face",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-face-first-time.png"
+    },
+    {
+      "state": "first-time",
+      "station": "sphinx-flank",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-flank-first-time.png"
+    },
+    {
+      "state": "first-time",
+      "station": "sphinx",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-first-time.png"
+    },
+    {
+      "state": "lion",
+      "station": "sphinx-flank",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-flank-lion.png"
+    },
+    {
+      "state": "lion",
+      "station": "sphinx-face",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-face-lion.png"
+    },
+    {
+      "state": "lion",
+      "station": "sphinx",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-lion.png"
+    }
+  ]
+}
