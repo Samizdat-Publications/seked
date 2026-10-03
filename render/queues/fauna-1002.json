@@ -1,0 +1,26 @@
+{
+  "about": "2026-10-02 night: herons, ibis and crocodiles at the flood's edge (Meshy text to 3D), with the re-carved lions.",
+  "renders": [
+    {
+      "state": "first-time",
+      "station": "sphinx",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-first-time.png"
+    },
+    {
+      "state": "lion",
+      "station": "sphinx",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/sphinx-lion.png"
+    },
+    {
+      "state": "built",
+      "station": "harbour",
+      "size": "4096x2048",
+      "samples": 96,
+      "out": "build/render/pano/harbour-built.png"
+    }
+  ]
+}

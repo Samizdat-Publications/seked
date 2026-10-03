@@ -40,8 +40,9 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # Stand-ins whose generated surface reads as cast resin, smooth and one colour: they are given the
 # enclosure's own bedrock, its horizontal members and its grain, so statue and ditch read as one rock
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
-# The First Time lion's own texture carries the bedrock's beds (it is drawn from sphinx-built's): only a little.
-CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.3}
+# The lions' own textures carry beds, but at the tour's resolution they still read as smooth clay (critic
+# rounds 17 and 18, both lions): they take the enclosure's members and grain as the carved Sphinx does.
+CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.6, "sphinx-lion-rain": 0.6}
 # Stand-ins that stand in a wet green world: dark growth in their hollows and the runs of rain below
 # them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
 # fresh limestone in a humid forest greys and greens in its first years).

@@ -23,7 +23,7 @@ finally:
     if _stub:
         del sys.modules["bpy"]
 
-SAVANNA = {"giraffe", "elephant", "gazelle", "oryx", "addax", "hartebeest", "ostrich", "buffalo", "hippo"}
+SAVANNA = {"giraffe", "elephant", "gazelle", "oryx", "addax", "hartebeest", "ostrich", "buffalo", "hippo", "heron", "ibis", "crocodile"}
 ANTELOPE = {"gazelle", "oryx", "addax", "hartebeest"}
 
 
@@ -54,7 +54,7 @@ class FaunaTests(unittest.TestCase):
 
     def test_every_model_has_a_size_and_a_facing(self):
         for mid, look in F.MODELS.items():
-            self.assertTrue(0.8 <= look["height"] <= 5.5, mid)
+            self.assertTrue(0.4 <= look["height"] <= 5.5, mid)    # a wading ibis or a crocodile lying flat is under a metre
             turn = look["turn"]
             self.assertTrue(isinstance(turn, (int, float)) or turn in ("axis+x", "axis-x", "axis+y", "axis-y"), mid)
 
@@ -75,7 +75,7 @@ class FaunaTests(unittest.TestCase):
             for need in ("giraffe", "elephant", "ostrich"):
                 self.assertIn(need, kinds[era], era)
             self.assertTrue(kinds[era] & ANTELOPE, era)
-        self.assertEqual(kinds["built"], {"cattle", "donkey", "goat"})
+        self.assertEqual(kinds["built"], {"cattle", "donkey", "goat", "heron", "ibis"})
         self.assertTrue(kinds["today"] <= {"camel", "horse", "cart"} and {"camel", "horse", "cart"} <= kinds["today"])
 
     def test_animals_stay_out_of_the_stand_ins(self):

@@ -143,6 +143,9 @@ MODELS = {
                            graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
                                       forward=(0.0, -1.0, 0.0))),
     "animal-hippo": dict(value=0.37, height=1.55, turn=180.0),                                      # shoulder ~1.5 m, albedo ~0.14
+    "animal-heron": dict(value=0.8, height=0.95, turn=180.0),                                       # standing, neck drawn up ~0.9-1.0 m
+    "animal-ibis": dict(value=0.85, height=0.7, turn=180.0),                                        # standing ~0.65-0.75 m
+    "animal-crocodile": dict(value=0.6, height=0.5, turn=180.0),                                    # a 4 m adult lying flat, ~0.45 m high
     # As built.
     "animal-cattle-ankole": dict(value=0.54, height=2.05, ref=("Animation", 0.0), turn=180.0, faces=14000,    # withers ~1.3 m, albedo ~0.13
                                  graze=dict(neck=("Neck1_3", "Neck2_2", "Neck3_1", "Head_0"), weights=(0.5, 0.2, 0.1, 0.2),
@@ -198,6 +201,9 @@ VARIANTS = {
     # Head down to the grass: the neck bent by _graze.
     "buffalo-graze": dict(model="animal-buffalo", pose=("@graze", 80.0)),
     "hippo": dict(model="animal-hippo"),
+    "heron": dict(model="animal-heron"),
+    "ibis": dict(model="animal-ibis"),
+    "crocodile": dict(model="animal-crocodile"),
     "cattle-ankole": dict(model="animal-cattle-ankole", pose=("Animation", 0.0)),
     "cattle-ankole-graze": dict(model="animal-cattle-ankole", pose=("@graze", 80.0)),     # head down, as buffalo-graze
     "cattle-piebald": dict(model="animal-cattle-piebald"),
@@ -240,6 +246,11 @@ KINDS = {
     "ostrich": dict(variants=("ostrich",), spacing=2.4, slope=20.0, young=(0.1, (0.6, 0.75))),
     "buffalo": dict(variants=("buffalo", "buffalo-graze"), weights=(1, 2), spacing=3.2, slope=14.0, young=(0.12, (0.6, 0.75))),
     "hippo": dict(variants=("hippo",), spacing=4.0, slope=10.0, young=(0.2, (0.5, 0.7)), water=(0.75, 1.25)),
+    # The water's birds and its crocodiles: herons wading in the shallows, ibis feeding on the wet ground
+    # above the water line, crocodiles basking on the bank (Egypt kept all three into the nineteenth century).
+    "heron": dict(variants=("heron",), spacing=6.0, slope=12.0, young=None, water=(0.3, 0.45)),
+    "ibis": dict(variants=("ibis",), spacing=1.6, slope=10.0, young=None),
+    "crocodile": dict(variants=("crocodile",), spacing=5.0, slope=10.0, young=(0.3, (0.5, 0.75))),
     "cattle": dict(variants=("cattle-ankole", "cattle-ankole-graze", "cattle-piebald"), weights=(2, 3, 2), spacing=3.0, slope=14.0,
                    young=(0.15, (0.55, 0.7))),
     "donkey": dict(variants=("donkey-pack", "donkey-pack-2", "donkey"), weights=(2, 2, 1), spacing=2.2, slope=18.0, young=None),
@@ -255,12 +266,12 @@ KINDS = {
 # Which variants each era's library holds, in Collection Info's order.
 SAVANNA = ("giraffe-stand", "giraffe-browse", "giraffe-walk", "giraffe-look", "elephant-cow", "elephant-bull",
            "elephant-calf", "gazelle", "gazelle-graze", "oryx", "oryx-graze", "addax", "addax-graze", "hartebeest",
-           "hartebeest-graze", "ostrich", "buffalo", "buffalo-graze", "hippo")
+           "hartebeest-graze", "ostrich", "buffalo", "buffalo-graze", "hippo", "heron", "ibis", "crocodile")
 ERAS = {
     "first-time": SAVANNA,
     "lion": SAVANNA,
     "built": ("cattle-ankole", "cattle-ankole-graze", "cattle-piebald", "donkey-pack", "donkey-pack-2", "donkey", "goat-white",
-              "goat-white-graze", "goat-brown", "goat-brown-graze"),
+              "goat-white-graze", "goat-brown", "goat-brown-graze", "heron", "ibis"),
     "stripped": ("camel", "camel-kneeling", "donkey-pack", "donkey", "goat-white", "goat-white-graze", "goat-brown",
                  "goat-brown-graze"),
     "today": ("camel-saddled", "camel-blanket", "camel-blanket-graze", "camel-blanket-walk", "camel-blanket-kneeling", "camel",
@@ -297,6 +308,9 @@ HERDS = {
         Herd(-1045.0, -1905.0, 22.0, 16.0, 7, ("addax", "gazelle")),  # south-west of the panorama rise
         Herd(-1150.0, -850.0, 60.0, 40.0, 12, ("gazelle",)),         # the western plateau, for the wide views
         Herd(-760.0, -260.0, 40.0, 30.0, 4, ("giraffe",)),           # west of Khafre, for the wide views
+        Herd(630.0, -370.0, 30.0, 30.0, 6, ("heron",)),              # in the shallows east of the Sphinx, where the flood is knee-deep
+        Herd(500.0, -585.0, 25.0, 25.0, 14, ("ibis",)),              # on the low bank at the flood's edge south of the temples
+        Herd(470.0, -715.0, 25.0, 25.0, 3, ("crocodile",)),          # basking on the bank south of the temples
     ],
     "lion": [
         Herd(465.0, -655.0, 28.0, 45.0, 5, ("elephant",)),
@@ -313,6 +327,9 @@ HERDS = {
         Herd(-870.0, -1860.0, 22.0, 16.0, 6, ("ostrich",)),
         Herd(-1045.0, -1905.0, 25.0, 18.0, 9, ("addax", "gazelle")),
         Herd(-1150.0, -850.0, 60.0, 40.0, 14, ("gazelle", "oryx")),
+        Herd(630.0, -365.0, 30.0, 30.0, 5, ("heron",)),
+        Herd(500.0, -585.0, 25.0, 25.0, 12, ("ibis",)),
+        Herd(470.0, -715.0, 25.0, 25.0, 3, ("crocodile",)),
     ],
     "built": [
         Herd(650.0, -300.0, 55.0, 40.0, 14, ("cattle",)),            # the valley fields east of the temples
@@ -325,6 +342,8 @@ HERDS = {
         Herd(545.0, -865.0, 12.0, 10.0, 3, ("donkey",)),             # in the builders' town south of the wall
         Herd(325.0, -800.0, 25.0, 18.0, 10, ("goat",)),              # by the west end of the Wall of the Crow
         Herd(650.0, 250.0, 50.0, 35.0, 10, ("cattle", "goat")),      # the fields north-east, for the wide views
+        Herd(590.0, -570.0, 30.0, 30.0, 5, ("heron",)),              # in the harbour's shallows south of the moorings
+        Herd(640.0, -330.0, 45.0, 30.0, 14, ("ibis",)),              # feeding in the fields with the cattle
     ],
     "stripped": [
         Herd(520.0, -330.0, 30.0, 20.0, 5, ("camel-plain", "donkey")),  # at the village's edge below the Sphinx
