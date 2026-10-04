@@ -165,7 +165,27 @@
       "today": 10.0
      }
     }
-   ]
+   ],
+   "patches": {
+    "built": [
+     {
+      "src": "pano/patch/south-built-earth.jpg",
+      "yaw": -17.9,
+      "pitch": 14,
+      "fov": 80.64,
+      "aspect": 2.0
+     }
+    ],
+    "today": [
+     {
+      "src": "pano/patch/south-today-earth.jpg",
+      "yaw": -17.9,
+      "pitch": 14,
+      "fov": 80.64,
+      "aspect": 2.0
+     }
+    ]
+   }
   },
   {
    "id": "sphinx",
@@ -329,6 +349,35 @@
      439.0,
      -445.0,
      -29.5
+    ]
+   },
+   "patches": {
+    "first-time": [
+     {
+      "src": "pano/patch/sphinx-first-time-lost.jpg",
+      "yaw": 166.71,
+      "pitch": 0,
+      "fov": 78.4,
+      "aspect": 2.0
+     }
+    ],
+    "built": [
+     {
+      "src": "pano/patch/sphinx-built-akhet.jpg",
+      "yaw": 278.29,
+      "pitch": 4,
+      "fov": 56.0,
+      "aspect": 2.0
+     }
+    ],
+    "today": [
+     {
+      "src": "pano/patch/sphinx-today-akhet.jpg",
+      "yaw": 278.29,
+      "pitch": 4,
+      "fov": 56.0,
+      "aspect": 2.0
+     }
     ]
    }
   },
@@ -764,7 +813,45 @@
       "today": 10.0
      }
     }
-   ]
+   ],
+   "patches": {
+    "first-time": [
+     {
+      "src": "pano/patch/panorama-first-time-intro.jpg",
+      "yaw": 18.6,
+      "pitch": 1,
+      "fov": 26.88,
+      "aspect": 2.0
+     }
+    ],
+    "lion": [
+     {
+      "src": "pano/patch/panorama-lion-intro.jpg",
+      "yaw": 18.6,
+      "pitch": 1,
+      "fov": 26.88,
+      "aspect": 2.0
+     }
+    ],
+    "built": [
+     {
+      "src": "pano/patch/panorama-built-intro.jpg",
+      "yaw": 18.6,
+      "pitch": 1,
+      "fov": 26.88,
+      "aspect": 2.0
+     }
+    ],
+    "today": [
+     {
+      "src": "pano/patch/panorama-today-intro.jpg",
+      "yaw": 18.6,
+      "pitch": 1,
+      "fov": 26.88,
+      "aspect": 2.0
+     }
+    ]
+   }
   },
   {
    "id": "temple",
@@ -1204,6 +1291,26 @@
      "where": "On the floor of the ditch at the tips of the paws, looking up at the face",
      "moment": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim"
     }
+   },
+   "patches": {
+    "first-time": [
+     {
+      "src": "pano/patch/sphinx-face-first-time-leo.jpg",
+      "yaw": 254.71,
+      "pitch": 28,
+      "fov": 78.4,
+      "aspect": 2.0
+     }
+    ],
+    "built": [
+     {
+      "src": "pano/patch/sphinx-face-built-leo.jpg",
+      "yaw": 254.71,
+      "pitch": 28,
+      "fov": 78.4,
+      "aspect": 2.0
+     }
+    ]
    }
   },
   {
