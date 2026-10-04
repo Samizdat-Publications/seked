@@ -145,8 +145,10 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
         if mode.startswith("megalithic"):
             # The claim's temples: megalithic limestone walls standing whole, roofed with slabs of the same stone.
             target = fresh_blocks if mode == "megalithic" else core_blocks
+            # The Sphinx temple's core blocks run from about one metre high to three, and their lengths as much;
+            # laid all alike they read as tiles (critic rounds 16 to 19), so the courses and blocks vary.
             laid = lay_ring(ring, base, HEIGHT_BUILT, rng, target, course=1.6, length=3.4, depth=2.4, miss=0.0 if mode == "megalithic" else 0.03,
-                            openings=doors)
+                            openings=doors, course_spread=0.38, length_spread=0.6, seed=7.0)
             lean = HEIGHT_BUILT / math.tan(math.radians(82.0))
             _slab(inset_ring(ring, 2.4 + lean + 0.2), base - 0.3, base + HEIGHT_BUILT - 0.05, coll, t["id"] + " core", mats["core behind"])
             _slab(inset_ring(ring, lean + 0.1), base + HEIGHT_BUILT - 0.05, base + HEIGHT_BUILT + 0.6, coll, t["id"] + " roof",

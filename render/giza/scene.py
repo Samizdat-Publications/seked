@@ -51,7 +51,7 @@ class Plateau:
         rng = random.Random(7)
         self.mats = {
             "core": materials.stone("core", "core"),
-            "core fresh": materials.stone("core fresh", "core", rough=0.8, tex_amt=0.45, sand_tops=0.0, bump=0.25),
+            "core fresh": materials.stone("core fresh", "core", rough=0.8, tex_amt=0.72, sand_tops=0.0, bump=0.45),   # fresh, but the stone's own grain and beds (2026-10-04: 0.45 read as soap)
             "core behind": materials.stone("core behind", "core", instanced=False),
             "casing": materials.stone("casing", "casing_today", rough=0.8, tex_role="casing", tex_amt=0.5, sand_tops=0.5, bump=0.35),
             "granite": materials.stone("granite", "granite", rough=0.7, tex_role="granite", tex_amt=0.6, sand_tops=0.3),
@@ -102,7 +102,10 @@ class Plateau:
             # renewed whiter and a few honeyed, grime in the joints, the face's weathering at a readable scale.
             "restored blocks": materials.dressed_blocks("restored blocks", [(0.0, "e0d8c6"), (0.05, "d8cfbb"), (0.5, "d3c8b0"),
                                                                             (0.93, "cdbfa4"), (1.0, "bfa988")],
-                                                        rough=0.46, speckle=False, broad=0.18, arris=0.006),
+                                                        rough=0.46, speckle=False, broad=0.18, arris=0.006,
+                                                        # a hairline of grime in the joints: at 1.5 m and 0.8 every stone was
+                                                        # ringed dark and the face read as rows of pebbles (2026-10-04)
+                                                        reach=0.25, grime=0.3),
             # the long rains' casing laid as blocks: worn round, streaked, grimed in the joints
             "weathered blocks": materials.weathered_casing("weathered blocks", instanced=True),
             "pristine blocks": materials.polished_casing("pristine blocks", instanced=True),

@@ -1,0 +1,173 @@
+{
+ "about": "2026-10-04: the megalithic temples' courses and blocks varied, the fresh limestone given its grain; every First Time and long-rains station that sees them, and their detail patches.",
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/east-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/menkaure-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/north-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/panorama-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/south-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-first-time-intro.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "patch": {
+    "yaw": 254.71,
+    "pitch": 28,
+    "fov": 78.4,
+    "aspect": 2.0,
+    "stop": "leo"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-face-first-time-leo.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "patch": {
+    "yaw": 166.71,
+    "pitch": 0,
+    "fov": 78.4,
+    "aspect": 2.0,
+    "stop": "lost"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-first-time-lost.png"
+  },
+  {
+   "state": "lion",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/east-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/menkaure-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/north-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/panorama-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/south-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-lion-intro.png"
+  }
+ ]
+}
