@@ -22,9 +22,28 @@ def make(scene):
 
 def frame(cam, location, target, lens):
     cam.data.type = "PERSP"
+    cam.data.sensor_fit = "AUTO"
+    cam.data.sensor_width = 36
     cam.data.lens = lens
     cam.location = location
     cam.rotation_euler = (Vector(target) - Vector(location)).to_track_quat("-Z", "Y").to_euler()
+
+
+def aim(cam, location, yaw, pitch, fov, aspect):
+    """
+    A detail patch: a rectilinear view from a station, `yaw` a compass bearing and `pitch` up from
+    level (degrees), `fov` its vertical field. apps/walk lays it over the panorama where a tour stop
+    looks closer than the panorama's own pixels hold.
+    """
+    cam.data.type = "PERSP"
+    cam.data.sensor_fit = "VERTICAL"
+    cam.data.sensor_height = 24.0
+    cam.data.sensor_width = 24.0 * aspect
+    cam.data.lens = 12.0 / math.tan(math.radians(fov) / 2)
+    cam.location = location
+    y, p = math.radians(yaw), math.radians(pitch)
+    look = Vector((math.cos(p) * math.sin(y), math.cos(p) * math.cos(y), math.sin(p)))
+    cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
 
 
 def station(cam, location):

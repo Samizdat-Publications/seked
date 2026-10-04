@@ -6,7 +6,8 @@ Build the plateau in Blender and render views of it.
     blender -b --factory-startup -P render/build.py -- --queue render/queues/spike.json
     blender -b --factory-startup -P render/build.py -- --film approach-built      # render/films.json
 
-A queue is {"renders": [{"state", "station" | "shot", "moment"?, "size"?, "samples"?, "out"?}, ...]};
+A queue is {"renders": [{"state", "station" | "shot", "moment"?, "size"?, "samples"?, "out"?, "patch"?}, ...]};
+a "patch" ({yaw, pitch, fov, aspect}) renders a station through a lens instead of whole (render/patches.py);
 each state is built once and every view in it rendered from the same scene.
 Outputs default to build/render/<view>-<state>.png.
 """
@@ -18,7 +19,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from giza import data  # noqa: E402
+from giza import cameras, data  # noqa: E402
 from giza.scene import Plateau  # noqa: E402
 
 DEFAULTS = {"station": {"size": "4096x2048", "samples": 96}, "shot": {"size": "1920x1080", "samples": 128}}
@@ -171,6 +172,10 @@ def main():
             # A view may stand somewhere else in one era (on a boat where the ground is under water).
             v = dict(v, **v.get("by_state", {}).get(state, {}))
             plateau.view(v, kind)
+            if "patch" in r:
+                # the station's own scene seen through a lens, for apps/walk to lay over the panorama
+                p = r["patch"]
+                cameras.aim(plateau.camera, tuple(plateau.camera.location), p["yaw"], p["pitch"], p["fov"], p["aspect"])
             m = r.get("moment", v.get("moment"))
             if m is not None:
                 plateau.moment(moments[m] if isinstance(m, str) else m)
@@ -178,6 +183,13 @@ def main():
             samples = int(r.get("samples", DEFAULTS[kind]["samples"]))
             out = r.get("out") or os.path.join(data.REPO, "build", "render", f"{r[kind]}-{state}.png")
             plateau.render(os.path.abspath(out), w, h, samples, view_id=r[kind], kind=kind, moment=m)
+            if "patch" in r:
+                side = os.path.splitext(os.path.abspath(out))[0] + ".json"
+                with open(side, encoding="utf-8") as f:
+                    meta = json.load(f)
+                meta["patch"] = r["patch"]
+                with open(side, "w", encoding="utf-8") as f:
+                    json.dump(meta, f, indent=1)
 
 
 main()

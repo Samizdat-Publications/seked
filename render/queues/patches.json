@@ -1,0 +1,159 @@
+{
+ "about": "Detail patches for the tour's close views (render/patches.py).",
+ "renders": [
+  {
+   "state": "today",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-today-intro.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "patch": {
+    "yaw": 278.29,
+    "pitch": 4,
+    "fov": 56.0,
+    "aspect": 2.0,
+    "stop": "akhet"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-today-akhet.png"
+  },
+  {
+   "state": "today",
+   "station": "south",
+   "patch": {
+    "yaw": -17.9,
+    "pitch": 14,
+    "fov": 80.64,
+    "aspect": 2.0,
+    "stop": "earth"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/south-today-earth.png"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-built-intro.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "patch": {
+    "yaw": 254.71,
+    "pitch": 28,
+    "fov": 78.4,
+    "aspect": 2.0,
+    "stop": "leo"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-face-built-leo.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "patch": {
+    "yaw": 278.29,
+    "pitch": 4,
+    "fov": 56.0,
+    "aspect": 2.0,
+    "stop": "akhet"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-built-akhet.png"
+  },
+  {
+   "state": "built",
+   "station": "south",
+   "patch": {
+    "yaw": -17.9,
+    "pitch": 14,
+    "fov": 80.64,
+    "aspect": 2.0,
+    "stop": "earth"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/south-built-earth.png"
+  },
+  {
+   "state": "lion",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-lion-intro.png"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-first-time-intro.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "patch": {
+    "yaw": 254.71,
+    "pitch": 28,
+    "fov": 78.4,
+    "aspect": 2.0,
+    "stop": "leo"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-face-first-time-leo.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "patch": {
+    "yaw": 166.71,
+    "pitch": 0,
+    "fov": 78.4,
+    "aspect": 2.0,
+    "stop": "lost"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-first-time-lost.png"
+  }
+ ]
+}

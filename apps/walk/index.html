@@ -507,7 +507,7 @@
   // so u = 0.5 + az / 2pi and v = 0.5 - el / pi.
   var DEG = Math.PI / 180;
   var MIN_FOV = 20 * DEG, MAX_FOV = 100 * DEG, MIN_HFOV = 55 * DEG, PITCH_MAX = 80 * DEG;
-  var MAX_TEXTURES = 4;   // 4096 x 2048 with mipmaps is about 45 MB of GPU memory each
+  var MAX_TEXTURES = 6;   // 4096 x 2048 with mipmaps is about 45 MB of GPU memory each; a detail patch about 35 MB
   var MAX_BLOBS = 12;     // compressed files kept for a quick return, about 1.3 MB each
   var FADE_MS = 320;
   var HONESTY = {
@@ -571,7 +571,8 @@
         stops: states.filter(function (x) { return typeof pan[x.id] === "string" && pan[x.id]; }).map(function (x) { return x.id; }),
         neighbours: Array.isArray(s.neighbours) ? s.neighbours.map(String) : [],
         landmarks: (Array.isArray(s.landmarks) ? s.landmarks : []).filter(function (L) { return L && L.name; }),
-        sky: s.sky && typeof s.sky === "object" ? s.sky : null
+        sky: s.sky && typeof s.sky === "object" ? s.sky : null,
+        patches: patchTable(s.patches)
       };
       byId[st.id] = st;
       return st;
@@ -580,6 +581,19 @@
       st.neighbours = st.neighbours.filter(function (id, k, all) { return byId[id] && id !== st.id && all.indexOf(id) === k; });
     });
     return { states: states, order: order, stateById: stateById, stations: stations, byId: byId };
+  }
+
+  // Each era's detail patches (render/patches.py): a sharper picture of a tour stop's close
+  // view, rendered from the same place in the same light, laid over the panorama.
+  function patchTable(t) {
+    if (!t || typeof t !== "object") return {};
+    var out = {};
+    Object.keys(t).forEach(function (k) {
+      out[k] = (Array.isArray(t[k]) ? t[k] : []).filter(function (p) { return p && typeof p.src === "string"; }).map(function (p) {
+        return { src: p.src, yaw: num(p.yaw, 0) * DEG, pitch: num(p.pitch, 0) * DEG, fov: num(p.fov, 50) * DEG, aspect: num(p.aspect, 2) };
+      });
+    });
+    return out;
   }
 
   // Where the camera stood in each era, when that differs (on a boat where the ground is flooded).
@@ -662,7 +676,25 @@
     for (var i = Math.max(0, s.a - 1); i <= Math.min(stopCount() - 1, s.b + 1); i++) out.push(urlAt(i));
     return out;
   }
-  function wanted(url) { return !!station && (wantedUrls().indexOf(url) >= 0 || url === tourWant); }
+  // The detail patch for an era (render/patches.py): the one whose middle is nearest the view.
+  function patchFor(id) {
+    var list = station && id ? station.patches[id] : null;
+    if (!list || !list.length) return null;
+    var best = null, d = 1e9;
+    list.forEach(function (p) {
+      var dd = Math.abs(wrapAngle(p.yaw - view.yaw)) + Math.abs(p.pitch - view.pitch);
+      if (dd < d) { d = dd; best = p; }
+    });
+    return best;
+  }
+  // A patch is only worth its download when the view is closer than the panorama's pixels hold.
+  function patchUrls() {
+    var s = segment(), out = [];
+    if (!s || mode !== "gl" || !canvas.height || (4096 / (2 * Math.PI)) * fov() / canvas.height > 0.8) return out;
+    [s.a, s.b].forEach(function (i) { var p = patchFor(station.stops[i]); if (p && out.indexOf(p.src) < 0) out.push(p.src); });
+    return out;
+  }
+  function wanted(url) { return !!station && (wantedUrls().indexOf(url) >= 0 || url === tourWant || patchUrls().indexOf(url) >= 0); }
 
   function fitFov(vfov) {
     var need = 2 * Math.atan(Math.tan(MIN_HFOV / 2) / (W / Math.max(H, 1)));
@@ -678,9 +710,11 @@
   var FS = [
     "#version 300 es",
     "precision highp float;",
-    "uniform sampler2D ta, tb;",
+    "uniform sampler2D ta, tb, pa, pb;",
     "uniform vec3 wts;",        // weights of panorama a, panorama b and the blank
     "uniform vec2 lods;",
+    "uniform vec4 qa, qb;",     // each era's detail patch: yaw, pitch, tan(half its vertical field), aspect
+    "uniform vec2 pon, plods;", // how far each patch is faded in, and its mip level
     "uniform float yaw, pitch, tanh, aspect;",
     "in vec2 v; out vec4 o;",
     "const float PI = 3.141592653589793;",
@@ -689,6 +723,19 @@
     "  vec3 sky = mix(vec3(0.085, 0.09, 0.105), vec3(0.035, 0.04, 0.055), clamp(el * 1.6, 0.0, 1.0));",
     "  vec3 ground = mix(vec3(0.095, 0.083, 0.068), vec3(0.05, 0.045, 0.04), clamp(-el * 1.6, 0.0, 1.0));",
     "  return (el >= 0.0 ? sky : ground) + vec3(0.075, 0.066, 0.052) * exp(-abs(el) * 90.0);",
+    "}",
+    // The panorama's colour c, or the patch's where the patch covers the direction w, its edges feathered.
+    "vec3 patched(sampler2D t, vec4 q, float lod, float on, vec3 w, vec3 c) {",
+    "  if (on <= 0.0) return c;",
+    "  float cy = cos(q.x), sy = sin(q.x), cp = cos(q.y), sp = sin(q.y);",
+    "  vec3 a = vec3(w.x * cy - w.y * sy, w.z, w.x * sy + w.y * cy);",
+    "  vec3 r = vec3(a.x, cp * a.y - sp * a.z, sp * a.y + cp * a.z);",
+    "  if (r.z <= 0.0) return c;",
+    "  vec2 p = vec2(r.x / (r.z * q.z * q.w), r.y / (r.z * q.z));",
+    "  vec2 e = 1.0 - smoothstep(0.86, 1.0, abs(p));",
+    "  float m = on * e.x * e.y;",
+    "  if (m <= 0.0) return c;",
+    "  return mix(c, textureLod(t, vec2(0.5 + 0.5 * p.x, 0.5 - 0.5 * p.y), lod).rgb, m);",
     "}",
     "void main() {",
     "  vec3 r = normalize(vec3(v.x * tanh * aspect, v.y * tanh, 1.0));",
@@ -700,8 +747,8 @@
     "  float el = asin(clamp(w.z, -1.0, 1.0));",
     "  vec2 uv = vec2(0.5 + az / (2.0 * PI), 0.5 - el / PI);",
     "  vec3 c = vec3(0.0);",
-    "  if (wts.x > 0.0) c += wts.x * textureLod(ta, uv, lods.x).rgb;",
-    "  if (wts.y > 0.0) c += wts.y * textureLod(tb, uv, lods.y).rgb;",
+    "  if (wts.x > 0.0) c += wts.x * patched(pa, qa, plods.x, pon.x, w, textureLod(ta, uv, lods.x).rgb);",
+    "  if (wts.y > 0.0) c += wts.y * patched(pb, qb, plods.y, pon.y, w, textureLod(tb, uv, lods.y).rgb);",
     "  if (wts.z > 0.0) c += wts.z * blank(el);",
     "  o = vec4(c, 1.0);",
     "}"
@@ -739,9 +786,11 @@
     var loc = gl.getAttribLocation(prog, "p");
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    ["ta", "tb", "wts", "lods", "yaw", "pitch", "tanh", "aspect"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+    ["ta", "tb", "pa", "pb", "wts", "lods", "qa", "qb", "pon", "plods", "yaw", "pitch", "tanh", "aspect"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
     gl.uniform1i(U.ta, 0);
     gl.uniform1i(U.tb, 1);
+    gl.uniform1i(U.pa, 3);
+    gl.uniform1i(U.pb, 4);
     // a 1 x 1 texture for a unit with no panorama, so the samplers are always complete
     dummy = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, dummy);
@@ -868,6 +917,7 @@
     if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
     e.tex = t;
     e.width = img.width || 4096;
+    e.height = img.height || 2048;
     e.status = "ready";
     e.readyAt = performance.now();
     closeImg(img);
@@ -880,7 +930,7 @@
     cache.forEach(function (e) { if (e.tex) ready.push(e); });
     var extra = ready.length - MAX_TEXTURES;
     if (extra <= 0) return;
-    var pinned = coreUrls();
+    var pinned = coreUrls().concat(patchUrls());
     if (tourWant) pinned.push(tourWant);   // the far era the tour is about to cut to
     ready.sort(function (a, b) { return a.used - b.used; });
     for (var i = 0; i < ready.length && extra > 0; i++) {
@@ -933,6 +983,7 @@
     var core = coreUrls();
     core.forEach(need);
     if (!core.every(function (u) { return settledEntry(cache.get(u)); })) return;
+    patchUrls().forEach(need);
     var more = wantedUrls();
     more.forEach(need);
     if (more.every(function (u) { return settledEntry(cache.get(u)); })) prefetch();
@@ -956,9 +1007,16 @@
       if (!e || (!e.blob && !e.tex && !e.fetching && !failed(e))) next = queue[i];
     }
     if (!next) return;
+    // Stop once the kept files are full: a file fetched past that would be the least used, dropped
+    // at once by trimBlobs and fetched again, round and round.
+    var held = 0;
+    cache.forEach(function (x) { if (x.blob || x.fetching) held++; });
+    if (held >= MAX_BLOBS) return;
     prefetching = true;
     var go = function () {
-      getBlob(entry(next)).then(function () { prefetching = false; prefetch(); });
+      var e = entry(next);
+      e.used = ++clock;
+      getBlob(e).then(function () { prefetching = false; prefetch(); });
     };
     if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 200);
   }
@@ -1039,6 +1097,10 @@
     out.wts = [wA, wB, wP];
     out.ea = ea;
     out.eb = eb;
+    out.qa = patchFor(idA);
+    out.qb = single ? null : patchFor(idB);
+    out.pa = out.qa ? cache.get(out.qa.src) || null : null;
+    out.pb = out.qb ? cache.get(out.qb.src) || null : null;
     out.fading = (pA > 0 && pA < 1) || (pB > 0 && pB < 1);
     out.claim = (isClaim(idA) ? sA : 0) + (!single && isClaim(idB) ? sB : 0);
     return out;
@@ -1061,6 +1123,20 @@
     gl.bindTexture(gl.TEXTURE_2D, mx.eb && mx.eb.tex ? mx.eb.tex : dummy);
     gl.uniform3f(U.wts, mx.wts[0], mx.wts[1], mx.wts[2]);
     gl.uniform2f(U.lods, lodFor(mx.ea, f), lodFor(mx.eb, f));
+    var now = performance.now(), on = [0, 0], pl = [0, 0];
+    [[mx.pa, mx.qa, gl.TEXTURE3, U.qa], [mx.pb, mx.qb, gl.TEXTURE4, U.qb]].forEach(function (x, k) {
+      var e = x[0], q = x[1];
+      gl.activeTexture(x[2]);
+      gl.bindTexture(gl.TEXTURE_2D, e && e.tex ? e.tex : dummy);
+      if (!e || !e.tex || !q || patchUrls().indexOf(q.src) < 0) { gl.uniform4f(x[3], 0, 0, 1, 1); return; }
+      var tq = Math.tan(q.fov / 2);
+      gl.uniform4f(x[3], q.yaw, q.pitch, tq, q.aspect);
+      on[k] = presence(e, now);
+      pl[k] = Math.max(0, Math.log2(Math.max((e.height || 1800) * Math.tan(f / 2) / (tq * canvas.height), 1e-3)));
+    });
+    gl.uniform2f(U.pon, on[0], on[1]);
+    if ((on[0] > 0 && on[0] < 1) || (on[1] > 0 && on[1] < 1)) request();   // a patch fading in
+    gl.uniform2f(U.plods, pl[0], pl[1]);
     gl.uniform1f(U.yaw, view.yaw);
     gl.uniform1f(U.pitch, view.pitch);
     gl.uniform1f(U.tanh, Math.tan(f / 2));

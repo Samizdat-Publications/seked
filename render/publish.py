@@ -9,6 +9,7 @@ the PNGs to web JPEGs, and writes the manifest apps/walk/index.html reads: the e
 order, and for each station its name, camera, default view, neighbours, the panoramas
 it has and its landmarks with a height per era. Plain Python; no Blender.
 """
+import glob
 import io
 import json
 import os
@@ -20,6 +21,7 @@ sys.path.insert(0, HERE)
 from giza import data, states  # noqa: E402
 
 PANO_IN = os.path.join(data.REPO, "build", "render", "pano")
+PATCH_IN = os.path.join(data.REPO, "build", "render", "patch")
 WALK = os.path.join(data.REPO, "apps", "walk")
 PANO_OUT = os.path.join(WALK, "pano")
 
@@ -284,6 +286,36 @@ def in_shadow(png):
     return ratio, under[:, :, 2].mean() / max(1.0, under[:, :, 0].mean())
 
 
+def detail_patches(station_id, panos):
+    """
+    The station's detail patches (render/patches.py), era by era: a sharper picture of a tour
+    stop's close view for apps/walk to lay over the panorama. A patch older than its panorama
+    was rendered from another scene and would not match it, so it is left out.
+    """
+    from PIL import Image
+    out = {}
+    os.makedirs(os.path.join(PANO_OUT, "patch"), exist_ok=True)
+    for st in panos:
+        pano_png = os.path.join(PANO_IN, f"{station_id}-{st}.png")
+        for png in sorted(glob.glob(os.path.join(PATCH_IN, f"{station_id}-{st}-*.png"))):
+            side = os.path.splitext(png)[0] + ".json"
+            name = os.path.basename(png)
+            if not os.path.exists(side):
+                continue
+            if os.path.getmtime(png) < os.path.getmtime(pano_png):
+                print(f"  WARNING: {name} is older than its panorama; left out until it is rendered again")
+                continue
+            with io.open(side, encoding="utf-8") as f:
+                p = json.load(f)["patch"]
+            jpg = os.path.join(PANO_OUT, "patch", os.path.splitext(name)[0] + ".jpg")
+            if not os.path.exists(jpg) or os.path.getmtime(jpg) < os.path.getmtime(png):
+                Image.open(png).convert("RGB").save(jpg, quality=84, optimize=True, progressive=True)
+                print(f"  patch/{os.path.basename(jpg)}: {os.path.getsize(jpg) / 1e6:.2f} MB")
+            out.setdefault(st, []).append({"src": "pano/patch/" + os.path.basename(jpg), "yaw": p["yaw"], "pitch": p["pitch"],
+                                           "fov": p["fov"], "aspect": p["aspect"]})
+    return out
+
+
 def main():
     from PIL import Image
     stations_src = data.load_json(HERE, "stations.json")
@@ -339,6 +371,9 @@ def main():
             entry["cameras"] = cameras
         if titles:
             entry["titles"] = titles
+        patches = detail_patches(s["id"], panos)
+        if patches:
+            entry["patches"] = patches
         if s.get("inside") or s.get("hall"):
             entry["inside"] = True
         sky = {st: v for st, v in night_sky(s, moments).items() if st in panos}
