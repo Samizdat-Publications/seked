@@ -1,0 +1,8 @@
+{
+  "about": "2026-10-04: the King's Chamber's granite finer-grained, polished and worn at hand height; the doorway cut through with the passage behind it.",
+  "renders": [
+    {"state": "today", "station": "kings-chamber", "size": "4096x2048", "samples": 96, "out": "build/render/pano/kings-chamber-today.png"},
+    {"state": "built", "station": "kings-chamber", "size": "4096x2048", "samples": 96, "out": "build/render/pano/kings-chamber-built.png"},
+    {"state": "stripped", "station": "kings-chamber", "size": "4096x2048", "samples": 96, "out": "build/render/pano/kings-chamber-stripped.png"}
+  ]
+}

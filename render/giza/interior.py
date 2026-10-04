@@ -90,13 +90,27 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
     tone = t.node("ShaderNodeRGBToBW")
     t.link(br.outputs["Color"], tone.inputs[0])
     col = t.ramp(t.noise(geo.outputs["Position"], 1.8, 5.0), [(0.3, hexlin(colours[0])), (0.7, hexlin(colours[1]))])
-    col = t.mix(1.0, col, t.grey(t.math("ADD", t.math("MULTIPLY", tone.outputs[0], 0.14), 0.93)), "MULTIPLY")
+    # each block its own shade; the granite blocks differ more than the limestone (Aswan's quarries ran
+    # from rose to near-grey)
+    spread = 0.34 if speckle else 0.14
+    col = t.mix(1.0, col, t.grey(t.math("ADD", t.math("MULTIPLY", tone.outputs[0], spread), 1.0 - spread / 2)), "MULTIPLY")
+    bump_h = None
     if speckle:        # granite: a mosaic of crystals a centimetre or two across, feldspar, quartz and mica
         # Aswan's crystals are large, a centimetre to three, and read across the chamber: big
         # feldspars over a finer ground of quartz and mica (critic round 13: "plaster").
+        # crystals' outlines broken by a fine noise, so they read as grains and not as a camouflage print
+        # (2026-10-04: the round-13 mosaic read as orange camo at the shafts stop)
+        wob = t.node("ShaderNodeTexNoise")
+        wob.inputs["Scale"].default_value = 90.0
+        wob.inputs["Detail"].default_value = 2.0
+        t.link(geo.outputs["Position"], wob.inputs["Vector"])
+        jitter = t.node("ShaderNodeVectorMath", operation="MULTIPLY_ADD")
+        t.link(wob.outputs["Color"], jitter.inputs[0])
+        jitter.inputs[1].default_value = (0.012, 0.012, 0.012)
+        t.link(geo.outputs["Position"], jitter.inputs[2])
         vor = t.node("ShaderNodeTexVoronoi")
-        vor.inputs["Scale"].default_value = 45.0
-        t.link(geo.outputs["Position"], vor.inputs["Vector"])
+        vor.inputs["Scale"].default_value = 60.0
+        t.link(jitter.outputs[0], vor.inputs["Vector"])
         cell = t.node("ShaderNodeSeparateColor")
         t.link(vor.outputs["Color"], cell.inputs[0])
         crystal = t.ramp(cell.outputs[0], [(0.0, hexlin(colours[1])), (0.45, hexlin(colours[0])), (0.7, hexlin(quartz)),
@@ -107,15 +121,33 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
         fcell = t.node("ShaderNodeSeparateColor")
         t.link(fine.outputs["Color"], fcell.inputs[0])
         mica = t.math("GREATER_THAN", fcell.outputs[0], 0.86)
-        col = t.mix(0.5, col, crystal)
-        col = t.mix(t.math("MULTIPLY", mica, 0.6), col, hexlin(speckle))
+        col = t.mix(0.36, col, crystal)
+        col = t.mix(t.math("MULTIPLY", mica, 0.5), col, hexlin(speckle))
+        # The faces were dressed smooth and have been polished by hands and air for millennia: a sheen
+        # that catches the lamps, the grains a hair proud where the polish has worn.
+        bump_h = t.math("MULTIPLY", t.math("ADD", cell.outputs[0], t.math("MULTIPLY", mica, -0.5)), 0.5)
     if soot:
         grime = t.math("MULTIPLY", t.band(up, 0.0, height), soot)
         grime = t.math("MULTIPLY", grime, t.band(t.noise(geo.outputs["Position"], 0.7, 3.0), 0.25, 0.75))
         col = t.mix(grime, col, hexlin("2e2620"))
+        if speckle:
+            # where visitors have leant and touched for two centuries: a darker, glossier band at hand
+            # height, patchy, and a scuffed foot along the floor
+            hands = t.math("MULTIPLY", t.band(up, 0.55, 1.0), t.math("SUBTRACT", 1.0, t.band(up, 1.55, 2.05)))
+            hands = t.math("MULTIPLY", hands, t.band(t.noise(geo.outputs["Position"], 1.6, 4.0), 0.35, 0.7))
+            foot = t.math("MULTIPLY", t.math("SUBTRACT", 1.0, t.band(up, 0.02, 0.35)), t.band(t.noise(geo.outputs["Position"], 3.0, 3.0), 0.3, 0.65))
+            wear = t.math("ADD", t.math("MULTIPLY", hands, 0.6 * soot), t.math("MULTIPLY", foot, 0.45 * soot), clamp=True)
+            col = t.mix(wear, col, hexlin("241c18"))
     col = t.mix(t.math("MULTIPLY", br.outputs["Fac"], joint), col, hexlin("3a322a"))
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = rough
+    if bump_h is not None:
+        bsdf.inputs["Roughness"].default_value = rough * 0.75
+        bump = t.node("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = 0.06
+        bump.inputs["Distance"].default_value = 0.0005
+        t.link(bump_h, bump.inputs["Height"])
+        t.link(bump.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
@@ -285,12 +317,28 @@ def kings_chamber(state, coll, mats, log=print):
     x0, x1 = r["kc.wall.west.east"], r["kc.wall.east.east"]
     y0, y1 = r["kc.wall.south.north"], r["kc.wall.north.north"]
     z0, z1 = r["kc.floor.elevation"], r["kc.ceiling.up"]
+    door_x = r["gg.floor.virtual_south_end.east"]
+    dw = r["passage.ascending.width"] / 2
     bm = bmesh.new()
     v = [bm.verts.new(p) for p in ((x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
                                     (x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1))]
-    for f in ((0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)):
+    for f in ((0, 1, 2, 3), (7, 6, 5, 4), (0, 4, 5, 1), (1, 5, 6, 2), (3, 7, 4, 0)):
         bm.faces.new([v[i] for i in f])
+    # The north wall with the doorway cut through it, and the passage running on north from it:
+    # an opening with depth, where a flat dark panel read as a grey card (2026-10-04).
+    dl, dr, dt = door_x - dw, door_x + dw, z0 + PASSAGE_HEIGHT
+    for a, b, lo, hi in ((x0, dl, z0, z1), (dr, x1, z0, z1), (dl, dr, dt, z1)):
+        bm.faces.new([bm.verts.new(p) for p in ((a, y1, lo), (a, y1, hi), (b, y1, hi), (b, y1, lo))])
+    deep = y1 + 2.4
+    for quad in (((dl, y1, z0), (dr, y1, z0), (dr, deep, z0), (dl, deep, z0)),          # floor
+                 ((dl, y1, dt), (dl, deep, dt), (dr, deep, dt), (dr, y1, dt)),          # roof
+                 ((dl, y1, z0), (dl, deep, z0), (dl, deep, dt), (dl, y1, dt)),          # west side
+                 ((dr, y1, z0), (dr, y1, dt), (dr, deep, dt), (dr, deep, z0))):         # east side
+        bm.faces.new([bm.verts.new(p) for p in quad])
     _emit("king's chamber", bm, mats["chamber granite"], coll)
+    bm = bmesh.new()
+    bm.faces.new([bm.verts.new(p) for p in ((dl, deep, z0), (dl, deep, dt), (dr, deep, dt), (dr, deep, z0))])
+    _emit("passage beyond", bm, mats["dark"], coll)
     # Nine beams across the roof, north to south, a hand's breadth proud of it.
     bm = bmesh.new()
     beam = (x1 - x0) / 9
@@ -311,12 +359,8 @@ def kings_chamber(state, coll, mats, log=print):
     _box(bm, cx + W / 2 - sides, cx + W / 2, cy - L / 2 + ends, cy + L / 2 - ends, z0 + base, z0 + H)  # east side
     _box(bm, cx - W / 2, cx - W / 2 + sides, cy - L / 2 + ends, cy + L / 2 - ends, z0 + base, z0 + H - 0.043)  # west, cut down
     _emit("coffer", bm, mats["coffer granite"], coll)
-    # The doorway at the east end of the north wall, and the two shafts' mouths.
+    # The two shafts' mouths
     bm = bmesh.new()
-    door_x = r["gg.floor.virtual_south_end.east"]
-    dw = r["passage.ascending.width"] / 2
-    bm.faces.new([bm.verts.new(p) for p in ((door_x - dw, y1 - 0.01, z0), (door_x + dw, y1 - 0.01, z0),
-                                            (door_x + dw, y1 - 0.01, z0 + PASSAGE_HEIGHT), (door_x - dw, y1 - 0.01, z0 + PASSAGE_HEIGHT))])
     # The shafts' mouths at their outlets' offsets east, the shafts taken as straight in plan (the north one jogs).
     for yy, shaft_x, dy in ((y1, r["kc.shaft.north.outlet.east"], -0.01), (y0, r["kc.shaft.south.outlet.east"], 0.01)):
         bm.faces.new([bm.verts.new(p) for p in ((shaft_x - 0.1, yy + dy, z0 + 0.9), (shaft_x + 0.1, yy + dy, z0 + 0.9),
@@ -724,7 +768,7 @@ def build(state, coll, mats, log=print):
     # Aswan's red granite: pink feldspar, grey quartz and black mica, muted enough that lamplight
     # does not turn it to orange plaster; the coffer's stone is darker, as it is.
     if state in MODERN:
-        lime, granite, soot, rough, quartz = ("b2a38c", "c4b59d"), ("5a3830", "7a4a3e"), 0.75, 0.4, "6e6964"
+        lime, granite, soot, rough, quartz = ("b2a38c", "c4b59d"), ("57403a", "73564c"), 0.75, 0.4, "6e6964"
     elif state == "stripped":
         lime, granite, soot, rough, quartz = ("a89985", "baab95"), ("45322d", "5a413a"), 0.9, 0.55, "66615c"
     else:
