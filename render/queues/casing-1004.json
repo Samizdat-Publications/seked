@@ -1,0 +1,145 @@
+{
+ "about": "2026-10-04: the built casing's joint grime cut to a hairline (it read as rows of pebbles through the detail patches); every outdoor built station and its patches.",
+ "renders": [
+  {
+   "state": "built",
+   "station": "cemetery",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/cemetery-built.png"
+  },
+  {
+   "state": "built",
+   "station": "east",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/east-built.png"
+  },
+  {
+   "state": "built",
+   "station": "harbour",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/harbour-built.png"
+  },
+  {
+   "state": "built",
+   "station": "menkaure",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/menkaure-built.png"
+  },
+  {
+   "state": "built",
+   "station": "north",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/north-built.png"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/panorama-built.png"
+  },
+  {
+   "state": "built",
+   "station": "south",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/south-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-face-built.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-flank",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/sphinx-flank-built.png"
+  },
+  {
+   "state": "built",
+   "station": "temple",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/temple-built.png"
+  },
+  {
+   "state": "built",
+   "station": "town",
+   "size": "4096x2048",
+   "samples": 96,
+   "out": "build/render/pano/town-built.png"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "patch": {
+    "yaw": 18.6,
+    "pitch": 1,
+    "fov": 26.88,
+    "aspect": 2.0,
+    "stop": "intro"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/panorama-built-intro.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-face",
+   "patch": {
+    "yaw": 254.71,
+    "pitch": 28,
+    "fov": 78.4,
+    "aspect": 2.0,
+    "stop": "leo"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-face-built-leo.png"
+  },
+  {
+   "state": "built",
+   "station": "sphinx",
+   "patch": {
+    "yaw": 278.29,
+    "pitch": 4,
+    "fov": 56.0,
+    "aspect": 2.0,
+    "stop": "akhet"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/sphinx-built-akhet.png"
+  },
+  {
+   "state": "built",
+   "station": "south",
+   "patch": {
+    "yaw": -17.9,
+    "pitch": 14,
+    "fov": 80.64,
+    "aspect": 2.0,
+    "stop": "earth"
+   },
+   "size": "3600x1800",
+   "samples": 96,
+   "out": "build/render/patch/south-built-earth.png"
+  }
+ ]
+}
