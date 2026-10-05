@@ -204,12 +204,19 @@ def overlays():
     # The disc is drawn a few degrees up the bearing, where the plateau's edge meets the gap as seen
     # from the Sphinx: a diagram of where it goes down, not the sun's altitude at that moment.
     sun = [sx + 2600 * math.sin(a), sy + 2600 * math.cos(a), sz + 2600 * math.tan(math.radians(5.0))]
+    # Where the disc starts, 6 degrees up its own setting path: at Giza's latitude the sun goes down
+    # at 90 - latitude to the horizon, moving north as it sinks at midsummer, so the visitor watches it
+    # set into its place rather than a disc that sits still for the whole stop (critic rounds 17 and 18).
+    lat = next(s["origin"]["latitude"] for s in data.load_json(data.DATA, "sites.json") if s["id"] == "giza")
+    rise = 6.0
+    a0 = a - math.radians(rise / math.tan(math.radians(90.0 - lat)))
+    sun0 = [sx + 2600 * math.sin(a0), sy + 2600 * math.cos(a0), sz + 2600 * math.tan(math.radians(5.0 + rise))]
     out["akhet"] = {
         "lines": [
             {"from": r([sx, sy, sz]), "to": r(sun), "style": "dash"},
             {"from": r([sx, sy, sz]), "to": r(gap), "style": "faint"},
         ],
-        "suns": [{"at": r(sun), "radius": 16}],
+        "suns": [{"at": r(sun), "from": r(sun0), "radius": 16, "seconds": 10}],
         "labels": [
             {"at": r(sun), "text": "The midsummer sun sets here, seen from the Sphinx", "sub": f"2500 BCE: bearing {v['akhet']['sunsetAzimuth']:.1f}°, the gap's middle {v['akhet']['gapAzimuth']:.1f}°", "place": "above", "dy": -66},
         ],

@@ -1374,6 +1374,24 @@
     (o.suns || []).forEach(function (S) {
       var p = at(S.at);
       if (!p || glow <= 0) return;
+      // A sun with a `from` sets: it slides down its own path into its place, a faint trail behind it.
+      var q = S.from ? at(S.from) : null;
+      if (q) {
+        var k = still() ? 1 : clamp((since - 1200) / ((S.seconds || 10) * 1000), 0, 1);
+        if (k < 1) overlayBusy = true;
+        var e = 1 - (1 - k) * (1 - k);
+        var cx = q[0] + (p[0] - q[0]) * e, cy = q[1] + (p[1] - q[1]) * e;
+        ctx.globalAlpha = glow * 0.5;
+        ctx.setLineDash([2, 5]);
+        ctx.strokeStyle = "rgba(255, 200, 96, 0.8)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(q[0], q[1]);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        p = [cx, cy];
+      }
       ctx.globalAlpha = glow;
       var g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], S.radius * 3);
       g.addColorStop(0, "rgba(255, 214, 120, 0.55)");
