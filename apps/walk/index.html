@@ -333,6 +333,8 @@
     opacity: 0; pointer-events: none; transition: opacity 1.6s ease-in-out;
   }
   .feature.on { opacity: 1; }
+  /* a night-sky figure: the daylight round it is taken down to dusk, so the stars do not sit on a noon sky */
+  .feature.dark { background: radial-gradient(ellipse at 62% 50%, rgba(6, 7, 12, 0.92), rgba(6, 7, 12, 0.78) 75%); }
   .feature a, .feature figcaption { transform: translateY(22px) scale(0.97); transition: transform 1.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
   .feature.on a, .feature.on figcaption { transform: none; }
   .feature a { display: block; max-width: 100%; max-height: 100%; min-height: 0; pointer-events: auto; }
@@ -1862,7 +1864,7 @@
         more: (Array.isArray(s.more) ? s.more : []).filter(function (m) { return m && m.href; }),
         who: s.who ? String(s.who) : "",
         summary: s.summary ? String(s.summary) : "",
-        figure: s.figure && s.figure.src ? { src: String(s.figure.src), alt: String(s.figure.alt || ""), caption: String(s.figure.caption || "") } : null,
+        figure: s.figure && s.figure.src ? { src: String(s.figure.src), alt: String(s.figure.alt || ""), caption: String(s.figure.caption || ""), dark: !!s.figure.dark } : null,
         overlay: s.overlay ? String(s.overlay) : "",
         detail: (Array.isArray(s.detail) ? s.detail : s.detail ? [s.detail] : []).map(String),
         hold: num(s.hold, 0),
@@ -2082,6 +2084,7 @@
       featureImg.src = pendingFigure.src;
       featureImg.alt = pendingFigure.alt;
       featureCap.textContent = pendingFigure.caption;
+      featureEl.classList.toggle("dark", !!pendingFigure.dark);
     }
     if (on) {
       featureEl.hidden = false;
