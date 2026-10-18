@@ -1,5 +1,7 @@
 # Seked
 
+![Status: v1.0](https://img.shields.io/badge/status-v1.0-2ea043)
+
 **Version 1.0 · live at https://seked.pages.dev**
 
 [Take the tour](https://seked.pages.dev/walk/#tour/1) · [Walk the plateau](https://seked.pages.dev/walk/) · [Films](https://seked.pages.dev/films/) · [Sky alignments](https://seked.pages.dev/alignments/) · [Claims dossier](https://seked.pages.dev/docs/dossier.html) · [Realtime viewer](https://seked.pages.dev/viewer/)

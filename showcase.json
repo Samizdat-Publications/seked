@@ -1,0 +1,53 @@
+{
+  "name": "Seked",
+  "repo": "seked",
+  "pitch": "The Giza plateau rebuilt from the survey in five eras, with every encoded-mathematics claim computed from the same measurements.",
+  "status": "v1",
+  "version": "1.0.0",
+  "kind": "reconstruction",
+  "started": "2026-09-13",
+  "updated": "2026-10-02",
+  "tech": [
+    "TypeScript",
+    "React Three Fiber",
+    "Blender Cycles",
+    "glTF"
+  ],
+  "links": {
+    "landing": "https://seked.pages.dev",
+    "play": "https://seked.pages.dev/walk/",
+    "devlog": ""
+  },
+  "hero": {
+    "gif": "",
+    "poster": "apps/home/img/overview-first-time.jpg",
+    "clip": "docs/progress/0016-blender-rollback-hero.mp4"
+  },
+  "credits": [
+    {
+      "what": "HYG 4.2 star catalogue",
+      "who": "David Nash",
+      "licence": "CC BY-SA 4.0"
+    },
+    {
+      "what": "Monument footprints",
+      "who": "OpenStreetMap contributors",
+      "licence": "ODbL"
+    },
+    {
+      "what": "City footprints and heights",
+      "who": "Google Open Buildings v3 and 2.5D Temporal",
+      "licence": "CC BY 4.0"
+    },
+    {
+      "what": "Terrain",
+      "who": "Copernicus GLO-30",
+      "licence": "Copernicus data licence"
+    },
+    {
+      "what": "Skies and textures",
+      "who": "Poly Haven",
+      "licence": "CC0"
+    }
+  ]
+}
