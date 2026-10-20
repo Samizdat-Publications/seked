@@ -603,5 +603,473 @@
     "citation": "Amza, A. (2025). EXCLUSIVE: Is there a secret city under the Giza Pyramids? Unpacking the controversy. TRT World (undated on the page; March or April 2025).",
     "url": "https://www.trtworld.com/article/1bd4fb6965ee",
     "note": "ESA's statement that SAR penetration 'can go up to 10 meters', and Biondi's own, that direct penetration is 'absolutely less than 10 meters'. Read by the khafre-sar research job, not yet here."
+  },
+  {
+    "id": "aera-khafre-monuments",
+    "kind": "critique",
+    "citation": "Ancient Egypt Research Associates. Khafre's Monuments. aeraweb.org, undated (site copyright 2025).",
+    "url": "https://aeraweb.org/khafres-monuments",
+    "note": "Checked 2026-10-20: the Valley Temple's north enclosure wall respects its granite casing; the Sphinx Temple was built after the Valley Temple; Ricke's study concluded one quarry and construction process. Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aera-radiocarbon",
+    "kind": "reference",
+    "citation": "Ancient Egypt Research Associates. How Old Are the Pyramids? (web page summarising the 1984 and 1995 radiocarbon projects).",
+    "url": "https://aeraweb.org/how-old-are-the-pyramids/",
+    "note": "Not peer reviewed; the project team's own summary. Checked: 1984 dates averaged 374 years older than expected; 1995 dates 100–200 years older; Khufu's dates scatter over about 400 years; old-wood explanation. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aera-sequence",
+    "kind": "critique",
+    "citation": "Ancient Egypt Research Associates. Why sequence is important. aeraweb.org, undated, read 2026-10-20.",
+    "url": "https://aeraweb.org/why-sequence-is-important/",
+    "note": "Checked: Valley Temple, then its enclosure wall, then the Sphinx Temple reusing that wall; Sphinx Temple core blocks matched to lower Member II of the Sphinx quarry; Sphinx and temple late in Khafre's programme 'with a high degree of probability'. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aera-sphinx-geology",
+    "kind": "reference",
+    "year": 2025,
+    "citation": "Ancient Egypt Research Associates. Geology of the Sphinx. Web page, (c) 2025.",
+    "url": "https://aeraweb.org/geology-of-the-sphinx/",
+    "note": "Checked, fetched 2026-10-20: Member I at the base, Member II the body, Member III the neck and head, 'softer at the neck and harder at the head'. Not peer reviewed. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "allan-2026",
+    "kind": "paper",
+    "year": 2026,
+    "citation": "Allan, E. (2026). A comprehensive statistical evaluation of the Orion–Giza correlation. Journal of Astronomical History and Heritage 29(2), 367–378.",
+    "url": "https://files.sciengine.com/pdfs/1440-2807/CD353FC8159543A09181EBB6B95CD63B.pdf",
+    "note": "Checked (full PDF read). Peer reviewed. Shape p = 0.0025 (rank 1,717/695,520); orientation, Menkaure offset, brightness, shaft convergence and Nile extension all fail; best-fit orientation epoch c. 11,625 BCE; uses Vondrák 2011 for the shaft table. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aubourg-1995",
+    "kind": "paper",
+    "year": 1995,
+    "citation": "Aubourg, É. (1995). La date de conception du zodiaque du temple d'Hathor à Dendera. Bulletin de l'Institut français d'archéologie orientale 95, 1-10.",
+    "url": "https://www.ifao.egnet.net/bifao/95/1/",
+    "note": "Bibliographic data checked through the IFAO listing in search results; text not read. Dates the Dendera zodiac to c. 50 BC. Peer reviewed. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "badawy-1964",
+    "kind": "paper",
+    "year": 1964,
+    "citation": "Badawy, A. (1964). The stellar destiny of Pharaoh and the so-called air-shafts of Cheops' pyramid. Mitteilungen des Instituts für Orientforschung 10, 189–206.",
+    "url": "https://gizamedia.rc.fas.harvard.edu/documents/badawy_mio_10_1964.pdf",
+    "note": "Citation checked against the Harvard Giza bibliography and Allan 2026; text not read. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "bauval-1989",
+    "kind": "proponent",
+    "year": 1989,
+    "citation": "Bauval, R. (1989). A master-plan for the three pyramids of Giza based on the configuration of the three stars of the belt of Orion. Discussions in Egyptology 13, 7–18.",
+    "url": "https://gizamedia.rc.fas.harvard.edu/documents/bauval_de_13_1989.pdf",
+    "note": "Unchecked: the PDF fetch failed; title and pages from memory and the Harvard file name. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "bonani-2001",
+    "kind": "paper",
+    "year": 2001,
+    "citation": "Bonani, G., Haas, H., Hawass, Z., Lehner, M., Nakhla, S., Nolan, J., Wenke, R. & Wölfli, W. (2001). Radiocarbon dates of Old and Middle Kingdom monuments in Egypt. Radiocarbon 43(3), 1297–1320. doi:10.1017/S0033822200038558",
+    "url": "https://www.cambridge.org/core/journals/radiocarbon/article/radiocarbon-dates-of-old-and-middle-kingdom-monuments-in-egypt/A967302ADD527BFEB9226457682C0B4A",
+    "note": "Peer reviewed (proceedings of the 17th International 14C Conference). Checked pp. 1297–1300: over 450 samples 1984–1995; the 1984 project funded by the Edgar Cayce Foundation to test Cayce's 10,500 BC hypothesis (p. 1297); Figure 1 p. 1300 compares calibrated ranges with Clayton's chronology. Appendices not read. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "boury-2023",
+    "kind": "paper",
+    "year": 2023,
+    "citation": "Boury, S., Weady, S. & Ristroph, L. (2023). Sculpting the Sphinx. Physical Review Fluids 8, 110503. doi:10.1103/PhysRevFluids.8.110503",
+    "url": "https://doi.org/10.1103/PhysRevFluids.8.110503",
+    "license": "CC BY 4.0",
+    "note": "Checked against the PDF: a Gallery of Fluid Motion paper; clay mounds with hard inclusions eroded by water flow become Sphinx-like. On shape, not age. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "breasted-1906",
+    "kind": "reference",
+    "year": 1906,
+    "citation": "Breasted, J. H. (1906). Ancient Records of Egypt, vol. I. Chicago: University of Chicago Press. §§177–180, pp. 83–85 (the Inventory Stela).",
+    "url": "https://jasoncolavito.com/inventory-stela.html",
+    "note": "Checked against Colavito's transcription, not a scan of the book. The quotation 'house of Isis… beside the house of the Sphinx' and the late-date verdict in §177 were confirmed there. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "bronk-ramsey-2010",
+    "kind": "paper",
+    "year": 2010,
+    "citation": "Bronk Ramsey, C. et al. (2010). Radiocarbon-based chronology for dynastic Egypt. Science 328, 1554–1557.",
+    "url": "https://doi.org/10.1126/science.1189395",
+    "note": "Checked against the PDF. Table 1, p. 1556, 95% hpd: Djoser 2691–2625, Khufu 2629–2558, Khafre 2604–2528, Unas 2450–2363 BCE (Khufu, Khafre and Unas have no direct dates). 211 dates, Nile offset 19 ± 5 14C years. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "clare-2020",
+    "kind": "survey",
+    "year": 2020,
+    "citation": "Clare, L. (2020). Göbekli Tepe, Turkey. A brief summary of research at a new World Heritage Site (2015–2019). e-Forschungsberichte des DAI 2020-2, 81–88, §1–13.",
+    "url": "https://doi.org/10.34780/efb.v0i2.1012",
+    "note": "DAI report, not peer-reviewed. Checked against the PDF: hunter-gatherer builders §2; domestic buildings §5–8; cistern and channel §9; mortar dates §10; slope slides §11, Fig. 7. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "dash-2017",
+    "kind": "paper",
+    "year": 2017,
+    "citation": "Dash, G. (2017). Occam's Egyptian razor: the equinox and the alignment of the pyramids. Journal of Ancient Egyptian Architecture 2, 1-8.",
+    "url": "https://web.ujaen.es/investiga/egiptologia/journalarchitecture/downloads/JAEA2/JAEA2_Dash.pdf",
+    "note": "Checked pp. 1, 6, 7 on 2026-10-20: gnomon test -7.3' against -5.9' expected (p. 6); mean of Khufu, Khafre, Red Pyramid -6.2' (p. 6); Table 3 casing alignments of six Fourth-Dynasty pyramids (p. 7). CC BY-NC 2.0. Distinct from dash-2015, the AERAgram survey. From docs/research/ch6.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "dee-2013",
+    "kind": "paper",
+    "year": 2013,
+    "citation": "Dee, M., Wengrow, D., Shortland, A., Stevenson, A., Brock, F., Girdland Flink, L. & Bronk Ramsey, C. (2013). An absolute chronology for early Egypt using radiocarbon dating and Bayesian statistical modelling. Proceedings of the Royal Society A 469, 20130395.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3780825/",
+    "note": "Checked: Aha's accession 3111–3045 BCE (68%), 3218–3035 (95%), median 3085 (§4, Table 1, Fig. 2). Naqada duration 477–825 years (95%). From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "dolphin-1978",
+    "kind": "survey",
+    "year": 1999,
+    "citation": "Dolphin, L. (1999). Geophysical Studies around the Sphinx (1978): project leader's notes on the 1978 seismic, resistivity and drilling survey, written 21 July 1999.",
+    "url": "https://www.ldolphin.org/egypt/sphinx.html",
+    "note": "Not peer reviewed; no formal report was filed. Checked: five 4-inch air-drilled holes into the largest anomalies (three in the temple area, two on the platform), borehole TV found 'only minor natural cracks'; sponsored by private investors with an add-on for the A.R.E. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "firestone-2007",
+    "kind": "paper",
+    "year": 2007,
+    "citation": "Firestone, R. B. et al. (2007). Evidence for an extraterrestrial impact 12,900 years ago that contributed to the megafaunal extinctions and the Younger Dryas cooling. PNAS 104(41), 16016–16021.",
+    "url": "https://doi.org/10.1073/pnas.0706977104",
+    "note": "Peer-reviewed; the founding YDIH paper. Unchecked: abstract and pages via search summary only. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "gardiner-1959",
+    "kind": "reference",
+    "year": 1959,
+    "citation": "Gardiner, A. H. (1959). The Royal Canon of Turin. Oxford: Griffith Institute.",
+    "note": "Unchecked. Column II lines 8–9 are the 'spirits, Followers of Horus, 13,420 + x years' and '23,200 + x years' lines; transliteration checked only at pharaoh.se (Turin col. 3), which follows Helck's restorations. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "gauri-1995",
+    "kind": "critique",
+    "year": 1995,
+    "citation": "Gauri, K. L., Sinai, J. J. & Bandyopadhyay, J. K. (1995). Geologic weathering and its implications on the age of the Sphinx. Geoarchaeology 10(2), 119-133. doi:10.1002/gea.3340100203",
+    "url": "https://doi.org/10.1002/gea.3340100203",
+    "note": "Checked against the Crossref record and abstract: arid weathering can make the rounded profile; the ditch-wall channels are 'pre-Pliocene karst features' exposed by excavation. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "graham-2022",
+    "kind": "paper",
+    "year": 2022,
+    "citation": "Graham, L. D. (2022). The sp tp.y (First Occasion) and the Dreamtime: Egyptian ḏ.t as a parallel to Aboriginal tjukurrpa? Birmingham Egyptology Journal 9, 52–84.",
+    "url": "https://more.bham.ac.uk/birminghamegyptology/wp-content/uploads/sites/54/2022/11/The-sp-tp.y-First-Occasion-and-the-Dreamtime.pdf",
+    "note": "Checked: abstract, p. 52. Student-run journal with light review. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hancock-2015",
+    "kind": "proponent",
+    "year": 2015,
+    "citation": "Hancock, G. (2015). Magicians of the Gods. London: Coronet.",
+    "note": "Unchecked: the use of Schoch's Sphinx geology beside Göbekli Tepe is from memory; chapter and page not found. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hancock-2023-saa",
+    "kind": "proponent",
+    "year": 2023,
+    "citation": "Hancock, G. (2023, 30 January). Response by Graham Hancock to the open letter to Netflix dated 30th November 2022 from the Society for American Archaeology concerning Ancient Apocalypse. grahamhancock.com.",
+    "url": "https://grahamhancock.com/hancockg22-saa/",
+    "note": "Checked (first 100k characters): absence of evidence; YDIH literature; denies racism charge. Göbekli Tepe not discussed. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hancock-fridman-2024",
+    "kind": "proponent",
+    "citation": "Hancock, G. Interview, Lex Fridman Podcast #449. Transcript at lexfridman.com.",
+    "url": "https://lexfridman.com/graham-hancock-transcript/",
+    "note": "Checked against the transcript, around 01:02:52: the Valley Temple 'attributed to Khafre on no good grounds whatsoever', limestone blocks 'up to 100 tons each', core blocks 'already eroded when the granite blocks were put there', granite 'deliberately cut to fit into the erosion marks'. The transcript page shows no air date; the year (2024) is unchecked. Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "harrell-1994",
+    "kind": "critique",
+    "year": 1994,
+    "citation": "Harrell, J. A. (1994). The Sphinx Controversy: Another Look at the Geological Evidence. KMT 5(2), 70-74.",
+    "url": "https://www.hallofmaat.com/?p=3243",
+    "note": "Checked against the Hall of Maat reprint: wet sand cover, capillary flood water, clay swelling and salts; seismic low-velocity layers may be depositional and S3's boundary picked too high. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "herz-fischler-2000",
+    "kind": "critique",
+    "year": 2000,
+    "citation": "Herz-Fischler, R. (2000). The Shape of the Great Pyramid. Waterloo, Ontario: Wilfrid Laurier University Press. xii + 293 pp. ISBN 0-88920-324-5.",
+    "url": "https://muse.jhu.edu/book/14297",
+    "note": "Checked: bibliographic details and table of contents (Project MUSE, catalogue records) on 2026-10-20. History of eleven theories of the shape, including pi, golden ratio, seked and the Herodotus reading. The author's own verdict among them is unchecked; academic press, not a journal. From docs/research/ch6.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "holliday-2023",
+    "kind": "critique",
+    "year": 2023,
+    "citation": "Holliday, V. T., Daulton, T. L., Bartlein, P. J., Boslough, M. B., Breslawski, R. P., Fisher, A. E., Jorgeson, I. A., Scott, A. C., Koeberl, C., Marlon, J. R., Severinghaus, J., Petaev, M. I. & Claeys, P. (2023). Comprehensive refutation of the Younger Dryas Impact Hypothesis (YDIH). Earth-Science Reviews 247, 104502.",
+    "url": "https://doi.org/10.1016/j.earscirev.2023.104502",
+    "note": "Peer-reviewed review. Checked against the abstract (University of Arizona record). From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hornung-krauss-warburton-2006",
+    "kind": "reference",
+    "year": 2006,
+    "citation": "Hornung, E., Krauss, R. & Warburton, D. A. (eds.) (2006). Ancient Egyptian Chronology. Handbook of Oriental Studies, Section 1, vol. 83. Leiden: Brill. Chronological table p. 490.",
+    "url": "https://www.degruyterbrill.com/document/isbn/9789047404002/html",
+    "note": "Bibliography and table page checked through the contents; Khufu's accession at 2509 BCE and Unas's at 2321 checked as quoted in Bronk Ramsey et al. 2010, Table 1. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "iau-boundaries",
+    "kind": "reference",
+    "year": 1989,
+    "citation": "Davenhall, A. C. & Leggett, S. K. (1989). Constellation Boundary Data (after Delporte 1930). CDS catalogue VI/49.",
+    "note": "Not consulted for this brief; proposed for import into data/stars/ so that the epochs at which the vernal point crosses Leo's boundaries can be computed. Citation from memory, unchecked. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "khafre-enthroned-cg14",
+    "kind": "reference",
+    "citation": "Statue of Khafre enthroned, Egyptian Museum Cairo CG 14 / JE 10062, found by A. Mariette in 1860 in a pit in the vestibule of Khafre's Valley Temple. Harvard Digital Giza object record.",
+    "url": "https://giza.fas.harvard.edu/objects/55103/full/",
+    "note": "Findspot ('in well in vestibule'), numbers and the companion statues CG 9-17 checked only through search summaries of the Digital Giza, Egyptian Museum and Wikipedia pages; the object URL is one of the Digital Giza records returned and its match to CG 14 is unconfirmed. Mariette's own report not identified. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "kuper-kropelin-2006",
+    "kind": "paper",
+    "year": 2006,
+    "citation": "Kuper, R. & Kröpelin, S. (2006). Climate-Controlled Holocene Occupation in the Sahara: Motor of Africa's Evolution. Science 313, 803-807. doi:10.1126/science.1130989",
+    "url": "https://doi.org/10.1126/science.1130989",
+    "note": "Abstract's content seen in search results (humid onset c. 8500 BCE; desiccation from 5300 BCE); paper not read. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "lacovara-2026",
+    "kind": "critique",
+    "year": 2026,
+    "citation": "Lacovara, P. (2026). Review of C. D. Reader, Rewriting the History of the Great Sphinx. American Journal of Archaeology 131(1), January 2027 (published open access online 6 October 2026), https://doi.org/10.1086/744239.",
+    "url": "https://www.journals.uchicago.edu/doi/reader/10.1086/744239",
+    "note": "Checked: full text read 2026-10-20. States the Khafre case (quarry blocks in the Sphinx Temple, citing Lehner diss. pp. 8-9; the temple unfinished; no pre-4th Dynasty material; paws and tail in masonry; rock-cut sculpture beginning under Khafre) and cites Lehner & Hawass 2017, pp. 229-31. Peer-reviewed journal; book review. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "legon-1995",
+    "kind": "critique",
+    "year": 1995,
+    "citation": "Legon, J. A. R. (1995). The Orion correlation and air-shaft theories. Discussions in Egyptology 33, 45–56.",
+    "url": "https://www.hallofmaat.com/?p=648",
+    "note": "Checked via the authorised Hall of Maat reproduction (2002): inversion, brightness, distances to Abu Roash and Zawiyet el-Aryan, shaft angles as geometry. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "lehner-1994-kmt",
+    "kind": "critique",
+    "year": 1994,
+    "citation": "Lehner, M. (1994). Notes and Photographs on the West-Schoch Sphinx Hypothesis. KMT 5(3), 40-48.",
+    "url": "https://www.hallofmaat.com/sphinx/notes-and-photographs-on-the-west-schoch-sphinx-hypothesis",
+    "note": "Checked against the Hall of Maat reprint: different strata in the tomb comparison; west-wall cracks are joints; Menkaure temple shows limestone dressed to fit granite; Member I 3.70 m at the rump, 0.65-1.09 m at the paws. Does not address the seismic. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "lehner-2017-aeragram",
+    "kind": "critique",
+    "year": 2017,
+    "citation": "Lehner, M. (2017). Who Built the Sphinx? The Sphinx Temple Has the Answer. AERAgram 18(1), 2-7.",
+    "url": "https://aeraweb.org/who-built-the-sphinx/",
+    "note": "Checked against the web version: core blocks up to a hundred tons; block types A to G with Aigner; Type A and C from Member II of the Sphinx quarry, Type G from head level into the Valley Temple; Sphinx Temple left without its exterior granite casing. Page range from Wikipedia's citation, unchecked. Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "liritzis-vafiadou-2015",
+    "kind": "paper",
+    "year": 2015,
+    "citation": "Liritzis, I. & Vafiadou, A. (2015). Surface luminescence dating of some Egyptian monuments. Journal of Cultural Heritage 16, 134-150. doi:10.1016/j.culher.2014.05.007",
+    "url": "https://liritzis.eu/wp-content/uploads/2019/01/EGYPTIAN-MONUMENTS-DATED-BY-SURFACE-LUMINESCENCE-DATING.pdf",
+    "note": "Checked against the PDF, Table 1 p. 137: Sphinx Temple limestone ST2 2220 ± 220 BCE; granites ST3 1190 ± 340, ST4 2740 ± 640, ST5 3100 ± 540 BCE; Valley Temple granite VT1 3060 ± 470, limestone VT9a 1050 ± 540 BCE. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "moore-2020",
+    "kind": "paper",
+    "year": 2020,
+    "citation": "Moore, A. M. T., Kennett, J. P., Napier, W. M., Bunch, T. E., Weaver, J. C., LeCompte, M., et al. & West, A. (2020). Evidence of Cosmic Impact at Abu Hureyra, Syria at the Younger Dryas Onset (~12.8 ka): High-temperature melting at >2200 °C. Scientific Reports 10, 4185.",
+    "url": "https://doi.org/10.1038/s41598-020-60867-w",
+    "note": "Peer-reviewed. Checked against PMC7060197: meltglass Fig. 7, YDB 12,825 ± 55 cal BP. Corrected 2025 (moore-2025-correction); not retracted. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "moore-2025-correction",
+    "kind": "paper",
+    "year": 2025,
+    "citation": "Moore, A. M. T. et al. (2025). Correction: Evidence of Cosmic Impact at Abu Hureyra, Syria at the Younger Dryas Onset (~12.8 ka). Scientific Reports 15, 40645.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12630835",
+    "note": "Checked: Supplementary Table S1 inconsistent with its original data sources; table revised and geochronological discussion added. Effect on conclusions not stated. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "notroff-2017",
+    "kind": "critique",
+    "year": 2017,
+    "citation": "Notroff, J., Dietrich, O., Clare, L., Dietrich, L., Schlindwein, J., Kinzel, M., Lelek-Tvetmarken, C. & Sönmez, D. (2017). More than a vulture: A response to Sweatman and Tsikritsis. Mediterranean Archaeology and Archaeometry 17(2), 57–63.",
+    "url": "https://www.dainst.blog/the-tepe-telegrams/2017/07/03/more-than-a-vulture-a-response-to-sweatman-and-tsikritsis/",
+    "note": "Checked against the authors' DAI blog version; Zenodo doi 10.5281/zenodo.581724. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "pharaoh-se-turin",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "pharaoh.se. Turin King List: column 3 (transliteration, translation and readings, Gardiner II.1–25).",
+    "url": "https://pharaoh.se/ancient-egypt/kinglist/turin/column-3/",
+    "note": "Checked 2026-10-20. Secondary, not peer-reviewed; flags which numerals are restored. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "piankoff-1968",
+    "kind": "reference",
+    "year": 1968,
+    "citation": "Piankoff, A. (1968). The Pyramid of Unas. Bollingen Series XL.5. Princeton: Princeton University Press.",
+    "note": "Unchecked; named by Pyramid Texts Online as its base translation. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "pyramid-texts-online",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Pyramid Texts Online: the Pyramid of Unas, translation (a modernised version of Piankoff 1968), with Sethe's utterance and § numbers and wall locations.",
+    "url": "https://pyramidtextsonline.com/translation.html",
+    "note": "Checked 2026-10-20 for PT 214, 215, 216, 219, 245, 248, 262, 263, 268, 273–274, 302 and 320. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "reader-2001",
+    "kind": "paper",
+    "year": 2001,
+    "citation": "Reader, C. D. (2001). A Geomorphological Study of the Giza Necropolis, with Implications for the Development of the Site. Archaeometry 43(1), 149-165. doi:10.1111/1475-4754.00009",
+    "url": "https://doi.org/10.1111/1475-4754.00009",
+    "note": "Checked against the Crossref record and abstract: run-off erosion, rainfall known at Giza to the late Fifth Dynasty, Sphinx probably predates Khufu. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "reader-2026",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Reader, C. D. (2026). Rewriting the History of the Great Sphinx. Oxford: Archaeopress. ISBN 978-1-805-83209-6.",
+    "url": "https://the-past.com/review/books/rewriting-the-history-of-the-great-sphinx/",
+    "note": "Argues for a Second Dynasty Sphinx (a few centuries before Khufu, not pre-dynastic), head first Mafdet and recarved under Khufu. Checked only through the review in The Past, 16 April 2026; book not read. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "reader-giza-before-4th",
+    "kind": "proponent",
+    "citation": "Reader, C. Giza Before the Fourth Dynasty. 18 pp.",
+    "url": "https://www.academia.edu/21651229",
+    "note": "Checked on academia.edu: Fig. 5 caption gives S3 c. 1.2 m and S1, S2, S4 1.8-2.5 m (KMT), S4 approaching 4 m and S9 1.2-1.5 m (Dobecki & Schoch 1992), and the Sphinx Temple floor 3 m below the ditch floor. Venue and year not given on the page. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "retraction-watch-2026-ydih",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Retraction Watch (2026, 4 March). Controversial comet theory struck by two new retractions.",
+    "url": "https://retractionwatch.com/2026/03/04/controversial-comet-theory-struck-by-two-new-retractions",
+    "note": "Checked: PLOS ONE retractions of 11 Feb 2026 (doi 10.1371/journal.pone.0328347 and 10.1371/journal.pone.0319840); Tall el-Hammam Sci Rep 2021 retracted April 2025. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "ricke-1970",
+    "kind": "survey",
+    "year": 1970,
+    "citation": "Ricke, H. (1970). Der Harmachistempel des Chefren in Giseh. In H. Ricke & S. Schott, Beiträge zur ägyptischen Bauforschung und Altertumskunde 10. Wiesbaden: Franz Steiner.",
+    "url": "https://gizamedia.rc.fas.harvard.edu/documents/ricke_harmachistempel.pdf",
+    "note": "Bibliographic details checked against Harvard Digital Giza records; the PDF could not be fetched and the text was not read. Ricke's conclusion that the Sphinx, Sphinx Temple and Valley Temple were one quarry and construction process is checked only through AERA's Khafre's Monuments page; his remark on partially completed casing work only through Wikipedia. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "rogers-1998",
+    "kind": "paper",
+    "year": 1998,
+    "citation": "Rogers, J. H. (1998). Origins of the ancient constellations: I. The Mesopotamian traditions. Journal of the British Astronomical Association 108, 9-28.",
+    "url": "https://ui.adsabs.harvard.edu/abs/1998JBAA..108....9R/abstract",
+    "note": "Checked: ADS abstract. Mesopotamian constellations developed c. 3200-500 BC; the twelve zodiacal signs passed to the Greek sky map. Peer reviewed. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "rossi-imhausen-2009",
+    "kind": "paper",
+    "year": 2009,
+    "citation": "Rossi, C. & Imhausen, A. (2009). Architecture and mathematics in the time of Senusret I: Sections G, H and I of Papyrus Reisner I. In S. Ikram & A. Dodson (eds), Beyond the Horizon: Studies in Egyptian Art, Archaeology and History in Honour of Barry J. Kemp. Cairo, pp. 440 ff.",
+    "url": "https://re.public.polimi.it/retrieve/e0c31c09-da17-4599-e053-1705fe0aef77/Rossi%26Imhausen.pdf",
+    "note": "Checked pp. 440-441 against the PDF on 2026-10-20: the seked model against pi and phi theories (p. 440); six architectural problems RMP 56-60 and MMP 14, seked always in palms and fingers (p. 441). End page not found. From docs/research/ch6.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "ryholt-2004",
+    "kind": "paper",
+    "year": 2004,
+    "citation": "Ryholt, K. (2004). The Turin King-List. Ägypten und Levante 14, 135–155.",
+    "url": "https://www.academia.edu/5564190",
+    "note": "Peer-reviewed. Bibliography checked through search; content not read. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schmidt-2007",
+    "kind": "paper",
+    "year": 2007,
+    "citation": "Schmidt, K. (2007). Göbekli Tepe: Stone Age Sanctuaries in Upper Mesopotamia. Boletín de Arqueología PUCP 11.",
+    "url": "https://revistas.pucp.edu.pe/index.php/boletindearqueologia/article/view/1833",
+    "note": "Peer-reviewed journal. Unchecked: deliberate filling in the late 9th millennium BC per search summary; the page would not load; pages not found. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-1992-kmt",
+    "kind": "proponent",
+    "year": 1992,
+    "citation": "Schoch, R. M. (1992). Redating the Great Sphinx of Giza. KMT: A Modern Journal of Ancient Egypt 3(2), Summer 1992.",
+    "note": "Unchecked: volume and issue from a secondary page found in search; page range not found. Not peer reviewed. Source of the KMT seismic figures (S3 c. 1.2 m; S1, S2, S4 1.8-2.5 m) as reported by Reader. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-bauval-2017",
+    "kind": "proponent",
+    "year": 2017,
+    "citation": "Schoch, R. M. & Bauval, R. (2017). Origins of the Sphinx: Celestial Guardian of Pre-Pharaonic Civilization. Rochester, VT: Inner Traditions.",
+    "url": "https://www.simonandschuster.ca/books/Origins-of-the-Sphinx/Robert-M-Schoch/9781620555262",
+    "note": "Checked against the publisher's page: Sphinx first built c. 12,000 years ago, contemporary with Göbekli Tepe; 'reanalysis of seismic studies'; Zep Tepi c. 10,500-9700 BCE. Book itself not read. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-sphinx-web",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Schoch, R. M. Research Highlights: The Great Sphinx. robertschoch.com, read 2026-10-20.",
+    "url": "https://www.robertschoch.com/sphinx.html",
+    "note": "Checked 2026-10-20: minimum of at least 7,000 years for the core body from seismic data 'calibrated very conservatively'; about 12,000 years 'more realistic'; latest view 'the end of the last ice age, circa 10,000 BCE'; Göbekli Tepe as the answer to 'where is the civilization'. Undated web page. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schwaller-1982",
+    "kind": "proponent",
+    "year": 1982,
+    "citation": "Schwaller de Lubicz, R. A. (1982). Sacred Science: The King of Pharaonic Theocracy. Rochester, VT: Inner Traditions.",
+    "note": "Unchecked. Hancock and Bauval cite p. 86 for the Turin totals, 36,620 years. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "sweatman-tsikritsis-2017",
+    "kind": "proponent",
+    "year": 2017,
+    "citation": "Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.",
+    "url": "https://doi.org/10.5281/zenodo.400780",
+    "note": "Peer-reviewed. Unchecked: abstract (10950 BC ± 250 yrs) seen in search summary; the star identifications not confirmed. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "trimble-1964",
+    "kind": "paper",
+    "year": 1964,
+    "citation": "Trimble, V. (1964). Astronomical investigation concerning the so-called air-shafts of Cheops' pyramid. Mitteilungen des Instituts für Orientforschung 10, 183–187.",
+    "url": "https://giza.fas.harvard.edu/pubdocs/901/full/",
+    "note": "Citation checked against the Harvard Giza bibliography and Allan 2026; text not read. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "waddell-1940",
+    "kind": "reference",
+    "year": 1940,
+    "citation": "Waddell, W. G. (1940). Manetho. Loeb Classical Library 350. Cambridge, MA: Harvard University Press / London: Heinemann. Fr. 1 (Eusebius, Armenian), pp. 3–9; Fr. 2–3 (Syncellus), pp. 11–17.",
+    "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Manetho/History_of_Egypt/1*.html",
+    "note": "Checked against the LacusCurtius transcription: gods 13,900 years; demigods 1,255; spirits of the dead and demigods 5,813; '24,900 lunar years, which make 2206 solar years' (p. 7); Syncellus 11,985. The Old Chronicle's 36,525 at p. 227 is unchecked (from Hancock and Bauval's note). From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "walker-2009",
+    "kind": "reference",
+    "year": 2009,
+    "citation": "Walker, M. et al. (2009). Formal definition and dating of the GSSP for the base of the Holocene using the Greenland NGRIP ice core. Journal of Quaternary Science 24(1).",
+    "url": "https://doi.org/10.1002/jqs.1227",
+    "note": "Peer-reviewed; the 11,700 b2k end of the Younger Dryas. Unchecked: from memory, including the DOI; verify before use. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "west-1993-film",
+    "kind": "proponent",
+    "year": 1993,
+    "citation": "The Mystery of the Sphinx (1993). Documentary presented by Charlton Heston, with J. A. West and R. M. Schoch. NBC.",
+    "note": "Not seen. The statements on granite fitted to weathered limestone are checked only as quoted in Lehner (1994), KMT 5(3). Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "ysi-2009-sphinx",
+    "kind": "survey",
+    "year": 2009,
+    "citation": "YSI Inc. (2009). YSI Level Scouts Monitor Groundwater Levels to Help Protect the Great Sphinx. Application Note A579.",
+    "url": "https://www.xylem.com/siteassets/brand/ysi/resources/case-study/a579-ysi-level-scouts-monitor-groundwater-beneath-the-sphinx.pdf",
+    "note": "Vendor note, not peer reviewed. Checked pp. 1–2: early 2008, SCA with Cairo University's Engineering Center for Archaeology and Environment drilled four 4-inch boreholes 20 m into the bedrock around the Sphinx, with cameras; plan of PZ/S1–S4 with printed elevations 20.492, 20.480, 20.505, 20.193; water table 4.6 m below the surface; eight pump stations from June 2008. From docs/research/ch8.md, by its research job; not yet checked here."
   }
 ]
