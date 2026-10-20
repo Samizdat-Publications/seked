@@ -14,7 +14,8 @@
     "@seked/claims": "workspace:*",
     "@seked/data": "workspace:*",
     "@seked/geometry": "workspace:*",
-    "@seked/sky": "workspace:*"
+    "@seked/sky": "workspace:*",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "vite": "8.3.0"

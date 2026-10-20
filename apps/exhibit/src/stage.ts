@@ -15,7 +15,11 @@ import { type Layer, PanoramaViewer } from './viewer';
 const FADE_MS = 320;
 const ARROWS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
 
-export interface Shot { station: Station; era: string; yaw?: number; pitch?: number; fov?: number; overlay?: string | null }
+export interface Shot {
+  station: Station; era: string; yaw?: number; pitch?: number; fov?: number; overlay?: string | null;
+  /** Panoramas to try in order, relative to the walkthrough's folder; the first that loads is shown. Default: the station's own for the era. */
+  panoramas?: string[];
+}
 
 export class Stage {
   station: Station | null = null;
@@ -33,6 +37,7 @@ export class Stage {
   private H = 1;
   private fitted = 58 * DEG;
   private overlay: Overlay | null = null;
+  private candidates: string[] = [];
   private overlayT0 = 0;
   private frame = 0;
   private last = 0;
@@ -75,7 +80,10 @@ export class Stage {
   /** Put a station on the stage in an era, looking where the shot says (or where the station opens). */
   show(shot: Shot): void {
     const st = shot.station;
-    const changed = st !== this.station || shot.era !== this.era;
+    const own = st.panoramas[shot.era];
+    const candidates = shot.panoramas ?? (own ? [own] : []);
+    const changed = st !== this.station || shot.era !== this.era || candidates.join() !== this.candidates.join();
+    this.candidates = candidates;
     this.station = st;
     this.era = shot.era;
     this.view.yaw = wrapAngle(shot.yaw ?? st.view.yaw);
@@ -116,8 +124,17 @@ export class Stage {
     this.request();
   }
 
+  /** The first candidate panorama that has not failed (a missing one hands over to the next). */
+  private current(): string {
+    const urls = this.candidates.map((p) => this.url(p));
+    return urls.find((u) => { const st = this.cache?.status(u); return st !== 'missing' && st !== 'error'; }) ?? urls[urls.length - 1] ?? '';
+  }
+
+  /** Whether the panorama shown is a stand-in for the first one asked for. */
+  get standIn(): boolean { return this.candidates.length > 1 && this.current() !== this.url(this.candidates[0]!); }
+
   private layer(st: Station, era: string, now: number): { layer: Layer; url: string } {
-    const url = this.url(st.panoramas[era] ?? '');
+    const url = this.current();
     const pano = this.cache!.get(url);
     let patch: Layer['patch'] = null;
     if (pano && wantsPatch(this.fov(), this.canvas.height)) {
@@ -153,7 +170,7 @@ export class Stage {
       if (a.layer.patch && a.layer.patch.on < 1) busy = true;
       this.onStatus(this.cache.status(a.url) ?? 'loading');
     }
-    if (this.overlay && (!this.cache || this.cache.status(this.url(st.panoramas[era] ?? '')) === 'ready')) {
+    if (this.overlay && (!this.cache || this.cache.status(this.current()) === 'ready')) {
       const camera = cameraFor(st, era);
       const at = (p: OverlayPoint) => this.project(Array.isArray(p) ? p : fromCamera(camera, p.dir), camera, fov);
       if (drawOverlay(this.ctx, this.overlay, at, era, t - this.overlayT0, this.still, this.font)) busy = true;
@@ -284,7 +301,7 @@ export class Stage {
   /** Without WebGL: the panorama laid out flat, scrolled to the view. */
   private showFlat(): void {
     if (this.viewer || !this.station || !this.era) return;
-    const src = this.station.panoramas[this.era];
+    const src = this.candidates[this.candidates.length - 1];
     this.flat.replaceChildren();
     if (!src) return;
     const img = new Image();

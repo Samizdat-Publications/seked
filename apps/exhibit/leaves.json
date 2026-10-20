@@ -1,0 +1,423 @@
+{
+ "about": "The exhibit's leaves, in order: where the visitor stands (a station in render/stations.json), in which era and moment, looking which way (degrees), how the leaf arrives from the one before, and the words spoken, cut from docs/script.md with every word of a chapter kept in order. The player, the render queue (scripts/exhibit_queue.py) and the narration are all built from this file. Plan: docs/exhibit-2026-10.md.",
+ "leaves": [
+  {
+   "id": "ch0-dawn",
+   "chapter": 0,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 277,
+    "pitch": 4,
+    "fov": 62
+   },
+   "arrive": "cut",
+   "say": "This is Giza at dawn, from the rooftops of Nazlet el-Samman.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-sunrise",
+   "chapter": 0,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 277,
+    "pitch": 5,
+    "fov": 34
+   },
+   "arrive": "turn",
+   "say": "The Sphinx faces the sunrise, as it has for at least four and a half thousand years.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-behind",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 276,
+    "pitch": 16,
+    "fov": 60
+   },
+   "arrive": "flight",
+   "say": "Behind it stand the pyramids of Khufu and Khafre.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-textbooks",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "built",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 276,
+    "pitch": 16,
+    "fov": 60
+   },
+   "arrive": "wipe",
+   "say": "The textbooks say Khafre's workmen carved the Sphinx about 2500 BCE.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-claim",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 276,
+    "pitch": 16,
+    "fov": 60
+   },
+   "arrive": "wipe",
+   "say": "Graham Hancock and Robert Bauval say the Sphinx and the plan of this plateau go back to about 10,500 BCE.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-schoch",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": 28,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "Robert Schoch, a geologist, says the rock agrees with them.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-question",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": 28,
+    "fov": 70
+   },
+   "arrive": "wipe",
+   "say": "So how old is the Sphinx?",
+   "draw": [],
+   "hold": 2,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-promise",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": 28,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "This piece makes their case as strongly as it can be made, and gives the archaeologists their answer.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-ditch",
+   "chapter": 0,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 230,
+    "pitch": 8,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "It starts where Schoch did, with the walls of the ditch.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch1-carved",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 285,
+    "pitch": 10,
+    "fov": 70
+   },
+   "arrive": "flight",
+   "say": "The Sphinx was not built. It was carved, by cutting a ditch around a knoll of bedrock, so the walls of the ditch are as old as the statue.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-rain",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 235,
+    "pitch": 12,
+    "fov": 62
+   },
+   "arrive": "turn",
+   "say": "Robert Schoch, a geologist, looked at these walls in the early 1990s and saw rain.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-rolls",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "The profile rolls. Harder beds stand out and softer beds are cut back into deep coves.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-fissures",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 235,
+    "pitch": 18,
+    "fov": 56
+   },
+   "arrive": "turn",
+   "say": "Vertical fissures open widest at the top, where water off the plateau would run in.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-wind",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 250,
+    "pitch": 10,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "Wind and blown sand, he says, cut sharp level grooves instead, like those on the Old Kingdom tombs nearby.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-reader",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 285,
+    "pitch": 10,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "Even Colin Reader, a geologist who rejects Schoch's date, agrees that running water cut these walls.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-floor",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 285,
+    "pitch": -30,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "Then Schoch looked under the floor.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-seismic",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": -20,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "In a seismic survey published in 1992, he and a colleague sent sound through the rock.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-depth",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "By his account, the stone in front of the Sphinx and along its sides is weathered about two metres deep, and behind it only a little over one.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-exposure",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "lion",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "wipe",
+   "say": "Deeper weathering means longer exposure, he argues, so the front was cut long before the back.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-cautious",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "lion",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "On his most cautious reckoning, the core of the Sphinx is at least seven thousand years old.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-ice-age",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "wipe",
+   "say": "His own view now is the end of the last Ice Age, about 10,000 BCE.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch1"
+  },
+  {
+   "id": "ch1-head",
+   "chapter": 1,
+   "station": "sphinx-flank",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 24,
+    "pitch": 40,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "If the body is that old, look again at the head.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch1"
+  }
+ ]
+}

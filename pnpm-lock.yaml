@@ -71,6 +71,9 @@ importers:
       '@seked/sky':
         specifier: workspace:*
         version: link:../../packages/sky
+      zod:
+        specifier: ^4.0.0
+        version: 4.6.4
     devDependencies:
       vite:
         specifier: 8.3.0
