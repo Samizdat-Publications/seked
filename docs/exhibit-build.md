@@ -238,19 +238,29 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `heads.json` (frame, crop, roles, the stand-in caveat, and the enlargement: the renders' `HEAD_SCALE` and the
   least the solve found, read from `build/models/sphinx-master-headscale.json`, decision 33). GLBs in Git LFS
   (decision 34). 4 tests for the parts without Blender. Not run here: no Blender, no models in this worktree.
-- [ ] **E14b. The object view.** The rest of E14: a small three.js view (add `three` to `apps/exhibit`), imported
+- [x] **E14b. The object view.** The rest of E14: a small three.js view (add `three` to `apps/exhibit`), imported
   lazily on a leaf whose `interact` is `object:head`, reading `objects/heads.json` and its GLBs (served at
   `/objects/` in dev, copied by `scripts/site.ts` as the flights are): the king's head solid, the lion's head
   translucent round it, lit simply on a dark ground, turned by dragging, a reset, and H1's factor from
   `heads.json` beside it labelled a proposal ("on these stand-ins, the lion's head had to be enlarged N times").
   Until `heads.json` exists the leaf shows the panorama, as now. Test with the laptop's export, or with any small
   GLB in its place.
+  *Done 2026-10-20 22:40 UTC, `f338758`, `ab23fd0`.* `src/objectview.ts` (three 0.186.0, the viewer's version, from
+  the local store), imported only when `ch2-ghost` is reached and `objects/heads.json` is there; the lion's head is
+  drawn translucent after the solid king's head; drag turns it, Reset brings it home; the caption gives H1 from
+  `heads.json` (the least enlargement, labelled a proposal, and the renders' 1.17), or the look choice alone when the
+  solve was not run (2 tests). Served at `/objects/` in dev, copied by `scripts/site.ts`. Checked at both sizes
+  with a Meshy heron standing in for both heads (since deleted): it frames, turns, resets and hides on the next
+  leaf. The two real heads have not been seen together yet: that waits for the laptop's export.
 - [ ] **E15. Chapter 5, "The sky as a clock": its leaves and the slider.** Cut chapter 5 into leaves likewise. The
   live figure: at night over the pyramids (the `orion` station, `built`), the stars drawn by `@seked/sky` over the
   panorama, and a year slider from today to 10,500 BCE the visitor drags (play animates it): Orion's belt sinks
   toward its lowest and its angle turns against the three pyramids' diagonal, C4's receipt live beside it,
   computed from the bundle as `apps/story`'s sky widget did (reuse it). Then the King's Chamber's southern shaft
   (`kings-chamber`, the existing `kc-shaft` overlay) drawn on toward Alnitak c. 2450 BCE. Receipts C2, C3, C4, C7.
+  *Note from chunk 3:* the live sky and its year slider exist (`src/sky.ts`, `src/skyfigure.ts`, a leaf's `sky`);
+  the `orion` station's night moments carry no `date`/`solar`, so its sky needs the night's sidereal time (the sky
+  bake's, `render/giza/night.py`) rather than `sunAt`. The receipts now compute for sky claims.
 
 ## Decisions
 
