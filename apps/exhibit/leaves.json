@@ -1056,6 +1056,247 @@
    "reply": "ch3"
   },
   {
+   "id": "ch4-first-king",
+   "chapter": 4,
+   "station": "orion",
+   "era": "first-time",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 14,
+    "fov": 78
+   },
+   "arrive": "cut",
+   "say": "Egypt did not think it began with its first king.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C5",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-turin",
+   "chapter": 4,
+   "station": "orion",
+   "era": "first-time",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 14,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "A papyrus in Turin, copied about 1250 BCE, lists the kings back to Menes, and before him gods, then spirits, then the Followers of Horus.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C5",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-numbers",
+   "chapter": 4,
+   "station": "orion",
+   "era": "first-time",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 14,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "In the most probable reading of its damaged numbers, it gives the spirits and Followers 13,420 years and, in the next line, 23,200.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C5",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-manetho",
+   "chapter": 4,
+   "station": "orion",
+   "era": "first-time",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 14,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "Manetho, a thousand years later, tells the same story.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C5",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-sep-tepi",
+   "chapter": 4,
+   "station": "orion",
+   "era": "first-time",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 14,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "The Egyptians called the beginning sep tepi, the First Time. Hancock and Bauval read it as a memory, not a myth: a golden age, they write, that immediately followed creation.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C5",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-plateau",
+   "chapter": 4,
+   "station": "sphinx",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 44
+   },
+   "arrive": "cut",
+   "say": "Here is the plateau as they picture it. The lion and its two temples stand alone.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch4"
+  },
+  {
+   "id": "ch4-nothing",
+   "chapter": 4,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 30,
+    "pitch": -2,
+    "fov": 60
+   },
+   "arrive": "cut",
+   "say": "Where the pyramids will rise, nothing stands yet.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch4"
+  },
+  {
+   "id": "ch4-stela",
+   "chapter": 4,
+   "station": "sphinx-flank",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "cut",
+   "say": "A stela found beside the Great Pyramid says Khufu found a house of Isis \"beside the house of the Sphinx\". If that is true, they argue, the Sphinx was there before Khafre.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch4"
+  },
+  {
+   "id": "ch4-unas",
+   "chapter": 4,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "cut",
+   "say": "On the walls of King Unas's burial chambers at Saqqara, carved about 2400 BCE, the oldest copy of the Pyramid Texts sends the king into the sky. \"Unas appears as a star.\"",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-sothis",
+   "chapter": 4,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "\"Orion is encircled by the Duat,\" it says, and so are Sothis, the star we call Sirius, and Unas.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch4-sky",
+   "chapter": 4,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "None of these texts gives a date. Hancock and Bauval look for one in the sky.",
+   "draw": [],
+   "hold": 2,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch4",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
    "id": "ch5-belt",
    "chapter": 5,
    "station": "orion",

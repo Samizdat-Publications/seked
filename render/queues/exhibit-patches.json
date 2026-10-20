@@ -121,6 +121,23 @@
    "for": "ch3-statues"
   },
   {
+   "state": "first-time",
+   "station": "panorama",
+   "moment": "summer-evening",
+   "patch": {
+    "yaw": 30,
+    "pitch": -2,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch4-nothing",
+    "pano": "pano/panorama-first-time.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/panorama-first-time-summer-evening-ch4-nothing.png",
+   "for": "ch4-nothing"
+  },
+  {
    "state": "built",
    "station": "orion",
    "moment": "night-dark",
