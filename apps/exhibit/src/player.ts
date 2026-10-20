@@ -5,7 +5,7 @@
  * on the view pauses play and hands the visitor the view; play resumes from that leaf.
  */
 import { isFigure } from './figures';
-import { type Leaf, cueIndex, drawCue } from './leaves';
+import { type Leaf, drawCue, leafCues } from './leaves';
 import { type ChapterRecording, type Span, leafSpans, recordingUrl } from './narration';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
@@ -52,13 +52,15 @@ export class Player {
   readonly audio = new Audio();
   /** Each chapter's recording, loaded once: its audio's address and each leaf's span in it (null without one). */
   private recordings = new Map<number, Promise<{ url: string; spans: Map<string, Span> } | null>>();
-  /** The word index that starts the leaf's overlay, in play. */
+  /** The word indices that start the leaf's overlay and show its figure, in play. */
   private cueAt = -1;
+  private figureAt = -1;
   private timers: number[] = [];
   private shown = -1;
 
   private word(k: number): void {
-    if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); this.showPendingFigure(); }
+    if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); }
+    if (k >= this.figureAt && this.figureAt >= 0) { this.figureAt = -1; this.showPendingFigure(); }
     this.onWord(k);
   }
 
@@ -292,8 +294,7 @@ export class Player {
   /** Say the leaf's words; when they end, hold, then go on. */
   private speak(token: number): void {
     const L = this.leaf;
-    const cue = L.draw[0] ? drawCue(L.draw[0]) : null;
-    this.cueAt = cue?.word ? cueIndex(L.say, cue.word) : -1;
+    ({ line: this.cueAt, figure: this.figureAt } = leafCues(L, isFigure));
     let ended = false;
     const end = () => {
       if (ended || token !== this.token) return;

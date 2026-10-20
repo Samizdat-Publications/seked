@@ -141,3 +141,17 @@ export function cueIndex(say: string, word: string | null): number {
   const want = bare(word);
   return say.split(/\s+/).filter(Boolean).findIndex((w) => bare(w).startsWith(want));
 }
+
+/**
+ * The words that cue a leaf's line and its figure in play (-1: not cued, drawn from the start). The stage draws the
+ * first entry when it is an overlay; the figure is the first entry that is one, wherever it stands in `draw`, so a
+ * figure listed after the leaf's line still waits for its own word.
+ */
+export function leafCues(L: Pick<Leaf, 'draw' | 'say'>, isFigure: (id: string) => boolean): { line: number; figure: number } {
+  const first = L.draw[0] ? drawCue(L.draw[0]) : null;
+  const figure = L.draw.map(drawCue).find((c) => isFigure(c.overlay));
+  return {
+    line: first?.word && !isFigure(first.overlay) ? cueIndex(L.say, first.word) : -1,
+    figure: figure?.word ? cueIndex(L.say, figure.word) : -1,
+  };
+}
