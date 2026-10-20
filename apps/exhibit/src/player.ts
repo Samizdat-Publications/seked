@@ -35,6 +35,8 @@ export class Player {
   words: { word: string; at: number }[] = [];
   /** Called as each word of the leaf is reached, with its index. */
   onWord: (i: number) => void = () => {};
+  /** Called when a leaf is put on the stage. */
+  onLeaf: (leaf: Leaf) => void = () => {};
 
   private token = 0;
   /** The word index that starts the leaf's overlay, in play. */
@@ -89,6 +91,7 @@ export class Player {
     this.cancel();
     const token = this.token;
     this.label(L);
+    this.onLeaf(L);
     history.replaceState(null, '', searchWithLeaf(location.search, L.id));
     const samePlace = !!from && from.station === L.station && from.moment === L.moment;
     const begin = () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); };

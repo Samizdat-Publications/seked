@@ -10,6 +10,7 @@ import script from '../../../docs/script.md?raw';
 import { type Leaf, type RenderStations, leafPanorama, readLeaves } from './leaves';
 import { type Manifest, pickEra, readManifest, readOverlays } from './manifest';
 import { leafFromSearch, scriptChapters } from './play';
+import { Panel } from './panel';
 import { Player } from './player';
 import { DEG } from './projection';
 import { Stage } from './stage';
@@ -72,6 +73,9 @@ async function start(): Promise<void> {
     play: $<HTMLButtonElement>('play'), prev: $<HTMLButtonElement>('prev'), next: $<HTMLButtonElement>('next'),
     chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'), flight: $<HTMLVideoElement>('flight'),
   }, panoramasFor(manifest));
+  const panel = new Panel($('stage'), script);
+  player.onLeaf = (L) => panel.show(L);
+  panel.onOpen = () => { if (player.playing) player.pause(); };
   $('controls').hidden = false;
   player.go(leafFromSearch(location.search, LEAVES));
 }
