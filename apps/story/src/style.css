@@ -36,3 +36,5 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .stage { height: 30vh; z-index: 1; }
   .stage-num { font-size: 4rem; }
 }
+.quiet { color: var(--quiet); font-style: italic; }
+.live ul { padding-left: 1.2rem; }

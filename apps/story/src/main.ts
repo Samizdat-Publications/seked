@@ -2,10 +2,16 @@
  * The scroll documentary, first step (docs/plan.html, phase 2): the script's
  * ten chapters as text, each with its receipts and its reply collapsed under
  * it, quieter than the claim and never omitted. The stage is a sticky panel
- * that follows the chapter in view; the stills and the live receipts come next.
+ * that follows the chapter in view. Each chapter's receipts are computed live
+ * from the bundled database (seked.json, written by `pnpm bundle`) when it can
+ * be fetched; the stills come next.
  */
+import type { Claim } from '@seked/claims/browser';
+import type { Database } from '@seked/data/browser';
+import { setDefaultStars, type Star } from '@seked/sky/browser';
 import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
+import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
 import './style.css';
 
@@ -13,7 +19,8 @@ const chapters = parseScript(script);
 
 function chapterHtml(c: Chapter): string {
   const receipts = c.receipts && !/^- None\b/.test(c.receipts)
-    ? `<details class="receipts"><summary>Receipts${c.claims.length ? ` · ${c.claims.join(', ')}` : ''}</summary>${block(c.receipts)}</details>`
+    ? `<details class="receipts"><summary>Receipts${c.claims.length ? ` · ${c.claims.join(', ')}` : ''}</summary>` +
+      `<div class="live" data-claims="${c.claims.join(',')}"></div>${block(c.receipts)}</details>`
     : '';
   return `
     <section class="chapter" id="ch${c.n}" data-n="${c.n}">
@@ -54,3 +61,42 @@ const seen = new IntersectionObserver(
   { rootMargin: '-45% 0px -45% 0px' },
 );
 app.querySelectorAll('.chapter').forEach((el) => seen.observe(el));
+
+/**
+ * The bundle sits beside the page in development (Vite serves apps/web/public) and beside the viewer on the
+ * site (viewer/seked.json). Without it the receipts stay as the script writes them, and the page says so.
+ */
+async function liveReceipts() {
+  type Bundle = Database & { claims: Claim[]; stars: Star[] };
+  let bundle: Bundle | undefined;
+  for (const url of ['./seked.json', '../viewer/seked.json']) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) {
+        bundle = (await r.json()) as Bundle;
+        break;
+      }
+    } catch {
+      // try the next place
+    }
+  }
+  // the dated claims read the named stars, which the bundle carries, as the viewer registers them
+  if (bundle) setDefaultStars(bundle.stars);
+  for (const el of app.querySelectorAll<HTMLElement>('.live')) {
+    const ids = (el.dataset.claims ?? '').split(',').filter(Boolean);
+    if (!ids.length) continue;
+    if (!bundle) {
+      el.innerHTML = '<p class="quiet">Live receipts need the bundled database (pnpm bundle).</p>';
+      continue;
+    }
+    const { sources, sites, structures, measurements, presets, materials } = bundle;
+    const results = chapterReceipts({ sources, sites, structures, measurements, presets, materials }, bundle.claims, ids);
+    el.innerHTML = results
+      .map((r) => `<p><strong>${inline(r.id)}, ${inline(r.title)}</strong>: ` +
+        `${r.fits === undefined ? 'not computed yet' : r.fits ? 'holds' : 'does not hold'}, ` +
+        `${r.freeChoices} free choice${r.freeChoices === 1 ? '' : 's'}</p>` +
+        `<ul>${r.comparisons.map((c) => `<li>${inline(receiptLine(c))}</li>`).join('')}</ul>`)
+      .join('');
+  }
+}
+void liveReceipts();

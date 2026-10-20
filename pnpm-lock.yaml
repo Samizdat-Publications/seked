@@ -68,6 +68,9 @@ importers:
       '@seked/geometry':
         specifier: workspace:*
         version: link:../../packages/geometry
+      '@seked/sky':
+        specifier: workspace:*
+        version: link:../../packages/sky
     devDependencies:
       vite:
         specifier: 8.3.0
