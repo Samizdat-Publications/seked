@@ -100,3 +100,8 @@ export function wipeAt(t: number): number {
   const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
   return -1.12 + 2.24 * e;
 }
+
+/** The film of the flight into a leaf from the one before it, relative to the exhibit (render/films-exhibit.json, E6). */
+export function flightFile(from: Pick<Leaf, 'id'>, to: Pick<Leaf, 'id'>): string {
+  return `flights/${from.id}--${to.id}.mp4`;
+}

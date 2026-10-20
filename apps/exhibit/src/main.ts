@@ -70,7 +70,7 @@ async function start(): Promise<void> {
   const player = new Player(stage, manifest, LEAVES, scriptChapters(script), {
     caption: $('caption'), place: $('place'), when: $('when'), pill: $('pill'),
     play: $<HTMLButtonElement>('play'), prev: $<HTMLButtonElement>('prev'), next: $<HTMLButtonElement>('next'),
-    chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'),
+    chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'), flight: $<HTMLVideoElement>('flight'),
   }, panoramasFor(manifest));
   $('controls').hidden = false;
   player.go(leafFromSearch(location.search, LEAVES));

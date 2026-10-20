@@ -58,6 +58,8 @@ build/city/
 
 # The walkthrough's rendered panoramas and frames are build outputs
 apps/walk/pano/
+# the exhibit's flights, rendered on the laptop from render/films-exhibit.json
+apps/exhibit/flights/
 apps/walk/img/
 apps/walk/films/
 apps/films/films/

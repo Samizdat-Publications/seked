@@ -46,8 +46,12 @@ if (!existsSync(join(apps, 'walk', 'pano'))) skipped.push('walkthrough panoramas
 if (!existsSync(join(apps, 'films', 'films'))) skipped.push('films (render/film.py)');
 // The exhibit (pnpm --filter @seked/exhibit build) reads the walkthrough's panoramas at ../walk/, so it carries none.
 const exhibit = join(apps, 'exhibit', 'dist');
-if (existsSync(join(exhibit, 'index.html'))) cpSync(exhibit, join(site, 'exhibit'), { recursive: true });
-else skipped.push('the exhibit (pnpm --filter @seked/exhibit build)');
+if (existsSync(join(exhibit, 'index.html'))) {
+  cpSync(exhibit, join(site, 'exhibit'), { recursive: true });
+  // its flights are rendered on the laptop (render/films-exhibit.json); a leaf without one cuts
+  const flights = join(apps, 'exhibit', 'flights');
+  if (existsSync(flights)) cpSync(flights, join(site, 'exhibit', 'flights'), { recursive: true });
+} else skipped.push('the exhibit (pnpm --filter @seked/exhibit build)');
 
 
 /** The page shell every generated page shares: the landing page's dark look, kept small. */

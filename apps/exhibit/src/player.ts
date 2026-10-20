@@ -5,7 +5,7 @@
  */
 import type { Leaf } from './leaves';
 import type { Manifest } from './manifest';
-import { type Chapter, chapterStarts, searchWithLeaf, wordTimes } from './play';
+import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
 import { DEG } from './projection';
 import type { Other, Shot, Stage } from './stage';
 
@@ -23,6 +23,7 @@ export interface PlayerUi {
   chapterBtn: HTMLButtonElement;
   chapterList: HTMLElement;
   count: HTMLElement;
+  flight: HTMLVideoElement;
 }
 
 const HONESTY: Record<string, string> = { claim: 'Theorized', reconstruction: 'Reconstruction', survey: 'Survey' };
@@ -82,7 +83,8 @@ export class Player {
     // the way in follows from what is on screen, so a jump through the chapter list arrives as sensibly as play
     if (samePlace && from.era === L.era) this.stage.turn(this.shot(L), begin);
     else if (samePlace) this.stage.wipe(this.shot(L), this.otherFor(from), begin);
-    else { this.stage.show(this.shot(L)); begin(); }   // flights are E4's; a cut until then
+    else if (from && L.arrive === 'flight' && from === this.leaves[i - 1] && this.playing) this.fly(from, L, token, begin);
+    else { this.stage.show(this.shot(L)); begin(); }
     this.offerCompare();
     const next = this.leaves[i + 1];
     if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p);
@@ -130,8 +132,41 @@ export class Player {
     this.stage.compare(null);
   }
 
+  /**
+   * Play the flight into a leaf full screen, the panorama set to the leaf's view behind it, and hand over on its
+   * last frame. No film yet (or one that will not play) is a cut. Flights play only in narrated play: stepping
+   * by hand goes straight to the leaf.
+   */
+  private fly(from: Leaf, to: Leaf, token: number, then: () => void): void {
+    const v = this.ui.flight;
+    const land = () => {
+      v.onended = v.onerror = v.oncanplay = null;
+      v.hidden = true;
+      v.removeAttribute('src');
+      v.load();
+      if (token === this.token) then();
+    };
+    this.stage.show(this.shot(to));   // behind the film, so the last frame hands over to the same view
+    if (this.stage.still) { land(); return; }
+    v.onerror = land;
+    v.onended = land;
+    v.oncanplay = () => {
+      v.oncanplay = null;
+      if (token !== this.token) return land();
+      v.hidden = false;
+      v.play().catch(land);
+    };
+    v.src = new URL(flightFile(from, to), location.href).href;
+    this.landing = land;
+  }
+
+  private landing: (() => void) | null = null;
+
   private cancel(): void {
+    const land = this.landing;
+    this.landing = null;
     this.token++;
+    land?.();   // after the token moves on, so a flight cut short does not start the next words
     for (const t of this.timers) clearTimeout(t);
     this.timers = [];
     window.speechSynthesis?.cancel();

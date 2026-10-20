@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { readLeaves } from './leaves';
 import {
-  chapterStarts, leafFromSearch, wipeAt, scriptChapters, scriptPart, searchWithLeaf, speakingTime, turnAt, turnSeconds, wordTimes,
+  chapterStarts, flightFile, leafFromSearch, wipeAt, scriptChapters, scriptPart, searchWithLeaf, speakingTime, turnAt, turnSeconds, wordTimes,
 } from './play';
 import { DEG } from './projection';
 
@@ -85,5 +85,11 @@ describe('wipes', () => {
     expect(wipeAt(0.5)).toBeCloseTo(0);
     expect(wipeAt(0.1) - wipeAt(0)).toBeLessThan(wipeAt(0.5) - wipeAt(0.4));
     expect(wipeAt(-1)).toBe(wipeAt(0));
+  });
+});
+
+describe('flights', () => {
+  it('are named by the two leaves they join', () => {
+    expect(flightFile({ id: 'ch0-ditch' }, { id: 'ch1-carved' })).toBe('flights/ch0-ditch--ch1-carved.mp4');
   });
 });
