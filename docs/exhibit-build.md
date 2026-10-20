@@ -252,7 +252,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   solve was not run (2 tests). Served at `/objects/` in dev, copied by `scripts/site.ts`. Checked at both sizes
   with a Meshy heron standing in for both heads (since deleted): it frames, turns, resets and hides on the next
   leaf. The two real heads have not been seen together yet: that waits for the laptop's export.
-- [ ] **E15. Chapter 5, "The sky as a clock": its leaves and the slider.** Cut chapter 5 into leaves likewise. The
+- [x] **E15. Chapter 5, "The sky as a clock": its leaves and the slider.** Cut chapter 5 into leaves likewise. The
   live figure: at night over the pyramids (the `orion` station, `built`), the stars drawn by `@seked/sky` over the
   panorama, and a year slider from today to 10,500 BCE the visitor drags (play animates it): Orion's belt sinks
   toward its lowest and its angle turns against the three pyramids' diagonal, C4's receipt live beside it,
@@ -261,6 +261,29 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   *Note from chunk 3:* the live sky and its year slider exist (`src/sky.ts`, `src/skyfigure.ts`, a leaf's `sky`);
   the `orion` station's night moments carry no `date`/`solar`, so its sky needs the night's sidereal time (the sky
   bake's, `render/giza/night.py`) rather than `sunAt`. The receipts now compute for sky claims.
+  *Done 2026-10-20 22:48 UTC, `8c2009f`, `cf02def`, `fa80cd2`.* 14 leaves, every word of chapter 5 in order and
+  inside `assets/narration/ch5.json`. They stand at `orion` (a kilometre north, looking south) at night as built:
+  the belt and the pyramids under Orion in gold; Sah overhead; the 2026 study; "Drag the sky back" with the slider
+  in hand; on "The belt sinks" play winds 2450 to 10,450 BCE with C4 read out live beside it (checked muted: 2,734
+  BCE at 1 s, 8,533 BCE at 4 s, 10,450 BCE by 6 s, the readout 50°51′40″ against 37°51′07″ there, the dossier's);
+  a wipe to the First Time under the lowest belt; a cut into the King's Chamber drawing `kc-shaft` on "shaft";
+  back outside, C2's shafts dashed across the meridian at their surveyed angles with Alnitak just above the King's.
+  **A night's sky** (decision 35): a moment with `night` turns the drawn sky to the hour its star crosses the
+  meridian in the year shown, as the bake does, from `scripts/nights.ts` (the bake's table, moved out so the
+  exhibit's build can read it). **A starless night** (decision 36): a moment may say `"stars": false`;
+  `night-dark` is 2450 BCE's night without its stars or Milky Way, so the drawn sky can move without doubling.
+  **What a sky picks out** (decision 37): `figure`, `bearings`, `marks`, `readout` in a leaf's `sky`; chapter 2's
+  sky leaves now name Leo and C5. An inside station takes its own panorama at any moment (decision 38). Receipts C4
+  and C7 on the belt leaves, C2 and C3 on the shafts. Looked at at both sizes; chapter 2's sky leaves checked again.
+  The queue asks for `orion` built and First Time at `night-dark` and four patches. `pnpm test` 1183 passed;
+  typecheck clean; render tests the same 2 missing-build-output errors. Left for E15b.
+- [ ] **E15b. Chapter 5's plan and its phone.** (a) The beat's plan: from overhead, C4's `sky-projection` laying
+  Alnitak, Alnilam and Mintaka over G1 to G3, and the two offset ticks (0.185 against 0.148) for "set off the line";
+  no overhead station exists, so a figure (as `ditch-plan`) drawn from the bundle's ground and the sky at C4's
+  epoch, on `ch5-diagonal`. (b) "Allan 2026: rank 1,717 of 695,520, p = 0.0025" as a cited caption on `ch5-allan`
+  (the figure is cited, not computed: needs `allan-2026` in `data/sources.json` with the numbers in a note, never
+  typed into the page). (c) On a phone the labels of `ch5-alnitak` crowd the belt (the field is so wide the shafts'
+  lines are 60 px long); shorter labels or a tighter phone framing there.
 
 ## Decisions
 
@@ -381,6 +404,26 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 34. **The head GLBs go in Git LFS**, as the narration does, rather than being gitignored like the flights: they
     are small, made once, and the site needs them; a flight is re-rendered whenever a leaf moves.
 
+35. **A night's drawn sky keeps its star on the meridian whatever the year.** The bake's nights are each a star's
+    transit; the slider keeps that rule, so dragging the years shows the belt sinking on the meridian, which is
+    what the words say, and at the night's own epoch the drawn sky is the rendered one. The alternative (a fixed
+    clock time) would swing the belt off the meridian and out of frame within a few thousand years.
+36. **Chapter 5's night panoramas are rendered without stars** (`night-dark`, `"stars": false`) rather than with
+    the 2450 BCE stars the walkthrough's have, because the drawn sky moves through 8,000 years and the baked one
+    cannot; the script's beat asked for the sky "cut out". The dark, airglow and sun are 2450 BCE's (a sun 30
+    degrees down looks the same in any age). Reversible: point the leaves back at `night-2450`.
+37. **A leaf's sky names what it picks out** (`figure`, `bearings`, `marks`, `readout`) instead of the sky always
+    drawing Leo and C5's bearings, so chapter 5 can pick out Orion, C2's shafts and C4 without a code path per
+    chapter. C4's readout is the claim's own comparisons evaluated with the slider's year as its epoch, so at
+    the claim's epoch it is the dossier's number exactly (tested). The shaft altitudes and the pyramids'
+    diagonal read the monuments, so they wait for the bundle and are simply absent without it.
+38. **An inside station takes its own panorama at any moment.** The King's Chamber is lit by the era's lamps and
+    has no moment, and a leaf there must still name one; asking for a new render per moment would buy nothing.
+    Its patches are queued with no moment, as its panorama was rendered.
+39. **The sky leaves wind from 2450 BCE, not 2026.** The beat drove the epoch from 2026, but the picture is Giza
+    as built with C2's night; starting the clock at the year the picture shows keeps the drawn sky and the
+    rendered ground in one age until the words move them.
+
 ## For Stewart
 
 - **The prototype is ready to judge in the browser**, on the walkthrough's panoramas until tonight's renders land:
@@ -408,6 +451,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **Chapter 5's starless nights** (E15), in `render/queues/exhibit-panos.json`: `orion` built and First Time at the
+  new moment `night-dark` (the night of 2450 BCE with no star dome and no Milky Way, `render/giza/scene.py`), then
+  `python render/publish.py`, which writes `pano/orion-built-night-dark.jpg` and `pano/orion-first-time-night-dark.jpg`.
+  Look for a sky that is dark and starless with the airglow still on the horizon. Then the four `orion` patches in
+  `exhibit-patches.json`. Until they land the leaves show the walkthrough's night panoramas, whose own stars stay at
+  their year while the drawn ones move (visible as a second, unmarked Orion while the slider winds).
 
 - **Chapter 2's two stations** (E13), `render/queues/exhibit-panos.json`: `sphinx-side` (beside the body, south of
   the ditch) today, First Time, long rains and built, and `sphinx-back` (behind the rump, looking east) today and
