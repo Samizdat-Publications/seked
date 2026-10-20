@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { SEQUENCES, cover, frameAt, frameFile, frameSource, sequenceFiles } from './sequence';
+import { SEQUENCES, contain, cover, frameAt, frameFile, frameSource, sequenceFiles } from './sequence';
 import { STILLS } from './stills';
 
 const root = join(__dirname, '..', '..', '..');
@@ -27,7 +27,8 @@ describe('the stage’s sequences', () => {
       for (const b of beats) expect(b.widget).toBe('sequence');
     }
     for (const b of STILLS.filter((x) => x.widget === 'sequence')) expect(SEQUENCES[b.sequence ?? '']).toBeDefined();
-    expect(STILLS.find((b) => b.sequence === 'enclosure-d-orbit')!.tags).toContain('stand-in');
+    for (const id of ['enclosure-d-orbit', 'enclosure-d-fill']) expect(STILLS.find((b) => b.sequence === id)!.tags, id).toContain('stand-in');
+    expect(SEQUENCES['enclosure-d-fill']!.alt).toMatch(/since revised/i);
   });
 });
 
@@ -47,6 +48,19 @@ describe('frameAt', () => {
     const mid = frameAt(95.5 / 96, 96, true);
     expect([mid.a, mid.b]).toEqual([95, 0]);
     expect(mid.mix).toBeCloseTo(0.5);
+  });
+});
+
+describe('contain', () => {
+  it('shows a diagram whole and centred on a tall stage', () => {
+    const r = contain(960, 540, 800, 900);
+    expect(r.w).toBe(800);
+    expect(r.x).toBe(0);
+    expect(r.y).toBeCloseTo((900 - 450) / 2);
+  });
+
+  it('is shown whole wherever its still is', () => {
+    for (const b of STILLS.filter((x) => x.widget === 'sequence')) expect(!!SEQUENCES[b.sequence!]!.whole, b.sequence).toBe(!!b.whole);
   });
 });
 

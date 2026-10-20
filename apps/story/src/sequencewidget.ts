@@ -3,7 +3,7 @@
  * over its neighbour at the share between them. The frames load when `load` is called, a chapter ahead of the
  * beat; until every frame has loaded the beat's still stands in, so a half-loaded sequence never shows.
  */
-import { type Sequence, cover, frameAt, frameFile } from './sequence';
+import { type Sequence, contain, cover, frameAt, frameFile } from './sequence';
 
 export interface SequenceWidget {
   el: HTMLCanvasElement;
@@ -36,7 +36,10 @@ export function sequenceWidget(sequence: Sequence): SequenceWidget {
     }
     const { a, b, mix } = frameAt(p, sequence.frames, sequence.loop);
     const fa = frames[a]!;
-    const r = cover(fa.naturalWidth, fa.naturalHeight, cw, ch, sequence.focus);
+    const r = sequence.whole
+      ? contain(fa.naturalWidth, fa.naturalHeight, cw, ch)
+      : cover(fa.naturalWidth, fa.naturalHeight, cw, ch, sequence.focus);
+    ctx.clearRect(0, 0, cw, ch);
     ctx.globalAlpha = 1;
     ctx.drawImage(fa, r.x, r.y, r.w, r.h);
     if (mix > 0.01 && b !== a) {

@@ -17,6 +17,8 @@ export interface Sequence {
   loop: boolean;
   /** Where the picture's subject lies across the frame (0 left, 1 right), kept in view when a phone crops it. */
   focus: number;
+  /** A diagram is shown whole on the stage's dark ground, as its still is; a scene covers the stage. */
+  whole?: true;
   /** The caption while it plays; the beat's still keeps its own until the frames have loaded. */
   alt: string;
   /** What made it, for the reader: the render script and the view. */
@@ -28,6 +30,16 @@ export const SEQUENCES: Record<string, Sequence> = {
     id: 'enclosure-d-orbit', dir: 'assets/sequences/enclosure-d-orbit', frames: 96, loop: true, focus: 0.5,
     alt: 'Enclosure D at Göbekli Tepe, circled from its rim at eye height, a person for scale; its pillars placed from the excavators’ plan',
     made: 'render/enclosure_d.py --view orbit:T, T = i/96, at 960 by 540 and 16 samples',
+  },
+  'enclosure-d-fill': {
+    id: 'enclosure-d-fill', dir: 'assets/sequences/enclosure-d-fill', frames: 32, loop: false, focus: 0.5,
+    alt: 'Enclosure D filled level, as Schmidt read it, to a look-choice depth. Since revised: now read as slope slides',
+    made: 'render/enclosure_d.py --view air --fill level --level L, L = 2.6 i/31 m, at 960 by 540 and 16 samples',
+  },
+  'underground-descent': {
+    id: 'underground-descent', dir: 'assets/sequences/underground-descent', frames: 48, loop: false, focus: 0.55, whole: true,
+    alt: 'Down the claimed wells to the two cubes at their foot; diameter, spacing and spirals a look choice',
+    made: 'render/underground.py --shot descent:T, T = i/47, at 960 by 540 and 16 samples',
   },
 };
 
@@ -53,6 +65,12 @@ export function frameAt(p: number, frames: number, loop: boolean): { a: number; 
   const a = Math.min(Math.floor(t), frames - 1);
   const b = loop ? (a + 1) % frames : Math.min(a + 1, frames - 1);
   return { a, b, mix: t - a };
+}
+
+/** Where to draw a `w` by `h` frame whole inside a `cw` by `ch` canvas, centred. */
+export function contain(w: number, h: number, cw: number, ch: number): { x: number; y: number; w: number; h: number } {
+  const k = Math.min(cw / w, ch / h);
+  return { x: (cw - w * k) / 2, y: (ch - h * k) / 2, w: w * k, h: h * k };
 }
 
 /**
