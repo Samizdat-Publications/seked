@@ -290,7 +290,7 @@ They find numbers in it as well.
 
 **The reply**
 
-The shape is real. The same 2026 study calls the match "real but narrow". Almost everything built on it fails. At no epoch does the pyramids' axis match the belt's better than chance, and its best fit, about 11,625 BCE, has no archaeology behind it. The best way to assign the stars to the pyramids is the reverse of Bauval's, and no assignment keeps both the shape and the order of brightness. At 10,450 BCE, Seked's own engine puts the belt thirteen degrees off the pyramids' diagonal. The shafts were never sightlines: the King's Chamber shafts bend on their way out, and the Queen's Chamber shafts stop at small stone doors about sixty metres in. The epochs the shafts give cluster between about 2500 and 2330 BCE, close to Khufu's reign. The sky dates the building, where Egyptologists already had it, not an older plan.
+The shape is real. The same 2026 study calls the match "real but narrow". Almost everything built on it fails. At no epoch does the pyramids' axis match the belt's better than chance, and its best fit, about 11,625 BCE, has no archaeology behind it. The best way to assign the stars to the pyramids is the reverse of Bauval's, and no assignment keeps both the shape and the order of brightness. At 10,450 BCE, Seked's own engine puts the belt thirteen degrees off the pyramids' diagonal. Nor is 10,450 BCE the bottom of the swing: the engine puts Alnitak's lowest crossing near 10,700 BCE, and the star stays within half a degree of that low for some fourteen centuries, from about 11,450 to 10,000 BCE. As a clock, the belt cannot name a century. The shafts were never sightlines: the King's Chamber shafts bend on their way out, and the Queen's Chamber shafts stop at small stone doors about sixty metres in. The epochs the shafts give cluster between about 2500 and 2330 BCE, close to Khufu's reign. The sky dates the building, where Egyptologists already had it, not an older plan.
 
 **Spoken reply**: Astronomers answer that the shapes do match, but in 10,450 BCE the belt lies thirteen degrees off the pyramids' line, and the shafts point to Khufu's century, not the Ice Age.
 
@@ -377,7 +377,7 @@ Some of that evidence has never been gathered.
 **Beats**
 
 - "About 12,900 years ago" → a full-bleed timeline strip: an ice-core temperature curve (NGRIP δ¹⁸O on GICC05, to be imported with a source record, never drawn by hand) from 15,000 to 8,000 BP. The scroll moves a cursor along it.
-- "Geologists call it the Younger Dryas." → the dip is shaded, with markers at its onset (c. 10,950 BCE) and its end (c. 9,700 BCE). C4's 10,450 BCE and C5's 10,500 BCE drop onto the strip, inside the dip.
+- "Geologists call it the Younger Dryas." → the dip is shaded, with markers at its onset (c. 10,900 BCE) and its end (c. 9,700 BCE). C4's 10,450 BCE and C5's 10,500 BCE drop onto the strip, inside the dip.
 - "At Abu Hureyra" → a map inset with Abu Hureyra, Göbekli Tepe and Giza.
 - "a monument appears on a hilltop in south-east Turkey" → **sequence**, new: Enclosure D as a labelled stand-in, built from published plans (read two ways) and CC photographs. The scroll circles the camera round the ring at eye height, with a human figure for scale.
 - "no farms, no pottery and no metal" → the phrase appears as a caption on the stage.
@@ -391,7 +391,7 @@ Some of that evidence has never been gathered.
 
   | Event | Date |
   |---|---|
-  | Younger Dryas onset | c. 12,900 BP, about 10,950 BCE |
+  | Younger Dryas onset | 12,896 b2k, about 10,900 BCE (`walker-2009`; the page draws GICC05's 10,897 BCE) |
   | Younger Dryas end | 11,700 b2k, about 9,700 BCE (`walker-2009`) |
   | Göbekli Tepe begins | c. 9,500 cal BC (`clare-2020`) |
   | C4's epoch | −10449 (10,450 BCE) |
@@ -570,7 +570,7 @@ The ten spoken replies come to about 320 words, roughly two minutes, so autoplay
 6. **Chapter 4.**
    - The Turin numerals are partly restored, and whether 23,200 includes 13,420 is open. The narration says "in the next line" to avoid committing.
    - The Pyramid Texts quotations come from a modernised Piankoff. Allen's or Faulkner's wording may be the better choice for the plates, and the plates need licensed photographs.
-7. **Chapter 5.** Seked has not computed the belt's minimum itself. "About 10,500 BCE, the bottom of its swing" rests on Bauval's figures and the brief, and the C4b solver should run before the voice records. Allan 2026 carries an AI-use disclosure and fits only three points; a reader may ask about either.
+7. **Chapter 5.** The page computes the belt's minimum (`lowestTransit` in `apps/story/src/sky.ts`): Alnitak crosses lowest in 10,719 BCE at 9°08.6′, against 9°12.8′ at 10,450 BCE, and within half a degree of it from 11,443 to 9,995 BCE (refraction not modelled). "About 10,500 BCE, the bottom of its swing" holds to three centuries, and the reply now says how coarse the clock is (Stewart, 20 October). C4b as a claim file is still to write. Allan 2026 carries an AI-use disclosure and fits only three points; a reader may ask about either.
 8. **Chapter 6.**
    - Hancock's page for "600 times 72" was not found; the attribution rests on B1's proponent list.
    - The scribes' 256/81 is kept out until it has a checked source.
