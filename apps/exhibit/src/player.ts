@@ -3,6 +3,7 @@
  * exists, its word-boundary events the timing), shows them as the caption, holds, and moves on. Any drag or key
  * on the view pauses play and hands the visitor the view; play resumes from that leaf.
  */
+import { isFigure } from './figures';
 import { type Leaf, cueIndex, drawCue } from './leaves';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
@@ -37,6 +38,10 @@ export class Player {
   onWord: (i: number) => void = () => {};
   /** Called when a leaf is put on the stage. */
   onLeaf: (leaf: Leaf) => void = () => {};
+  /** Show one of the exhibit's own figures (src/figures.ts), or put it away with null. */
+  onFigure: (id: string | null) => void = () => {};
+  /** A figure waiting for its word. */
+  private pendingFigure: string | null = null;
 
   private token = 0;
   /** The word index that starts the leaf's overlay, in play. */
@@ -45,7 +50,7 @@ export class Player {
   private shown = -1;
 
   private word(k: number): void {
-    if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); }
+    if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); this.showPendingFigure(); }
     this.onWord(k);
   }
 
@@ -73,7 +78,8 @@ export class Player {
 
   shot(L: Leaf): Shot {
     const station = this.manifest.byId[L.station]!;
-    const cue = L.draw[0] ? drawCue(L.draw[0]) : null;
+    const drawn = L.draw[0] ? drawCue(L.draw[0]) : null;
+    const cue = drawn && !isFigure(drawn.overlay) ? drawn : null;   // a figure is the page's, not the stage's
     return {
       station, era: L.era, yaw: L.view.yaw * DEG, pitch: L.view.pitch * DEG, fov: L.view.fov * DEG, panoramas: this.panoramas(L),
       // in play a cued line waits for its word; stepping by hand, or paused, it draws at once
@@ -92,6 +98,7 @@ export class Player {
     const token = this.token;
     this.label(L);
     this.onLeaf(L);
+    this.setFigure(L);
     history.replaceState(null, '', searchWithLeaf(location.search, L.id));
     const samePlace = !!from && from.station === L.station && from.moment === L.moment;
     const begin = () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); };
@@ -110,6 +117,7 @@ export class Player {
     this.playing = true;
     this.stage.compare(null);
     if (this.leaf.draw[0] && drawCue(this.leaf.draw[0]).word) this.stage.cueOverlay();
+    this.setFigure(this.leaf);
     this.ui.play.setAttribute('aria-pressed', 'true');
     this.ui.play.setAttribute('aria-label', 'Pause');
     document.body.classList.add('playing');
@@ -126,7 +134,20 @@ export class Player {
     document.body.classList.remove('playing');
     this.cancel();
     this.stage.startOverlay();   // a line still waiting for its word is drawn now
+    this.showPendingFigure();
     this.offerCompare();
+  }
+
+  /** A leaf's figure: shown now, or, in play with a cue, put away until its word. */
+  private setFigure(L: Leaf): void {
+    const d = L.draw.map(drawCue).find((c) => isFigure(c.overlay));
+    this.pendingFigure = null;
+    if (!d) { this.onFigure(null); return; }
+    if (this.playing && d.word) { this.onFigure(null); this.pendingFigure = d.overlay; } else this.onFigure(d.overlay);
+  }
+
+  private showPendingFigure(): void {
+    if (this.pendingFigure) { this.onFigure(this.pendingFigure); this.pendingFigure = null; }
   }
 
   /** The era a leaf is in, as the other side of a wipe or a comparison. */

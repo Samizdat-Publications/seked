@@ -185,7 +185,9 @@
    },
    "arrive": "flight",
    "say": "The Sphinx was not built. It was carved, by cutting a ditch around a knoll of bedrock, so the walls of the ditch are as old as the statue.",
-   "draw": [],
+   "draw": [
+    "ditch-plan@ditch"
+   ],
    "hold": 1.5,
    "interact": "look",
    "receipts": [],

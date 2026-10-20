@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { isFigure } from './figures';
 import { type Leaf, type RenderStations, cueIndex, drawCue, joinProblems, leafPanorama, readLeaves, stationMoment } from './leaves';
 
 const repo = join(__dirname, '..', '..', '..');
@@ -54,11 +55,11 @@ describe('leaves.json', () => {
     }
   });
 
-  it('draws only overlays that exist and cites only claims that exist', () => {
+  it('draws only overlays and figures that exist and cites only claims that exist', () => {
     for (const L of leaves) {
       for (const d of L.draw) {
         const { overlay, word } = drawCue(d);
-        expect(Object.keys(overlays), L.id).toContain(overlay);
+        if (!isFigure(overlay)) expect(Object.keys(overlays), L.id).toContain(overlay);
         expect(cueIndex(L.say, word), `${L.id}: ${d}`).toBeGreaterThanOrEqual(0);
       }
       for (const r of L.receipts) expect(existsSync(join(repo, 'data', 'claims', `${r}.yaml`)), `${L.id}: ${r}`).toBe(true);

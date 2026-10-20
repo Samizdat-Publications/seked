@@ -10,6 +10,8 @@ import script from '../../../docs/script.md?raw';
 import { type Leaf, type RenderStations, leafPanorama, readLeaves } from './leaves';
 import { type Manifest, pickEra, readManifest, readOverlays } from './manifest';
 import { leafFromSearch, scriptChapters } from './play';
+import sphinxPlan from 'virtual:sphinx-plan';
+import { ditchPlanSvg } from './figures';
 import { Panel } from './panel';
 import { Player } from './player';
 import { DEG } from './projection';
@@ -75,6 +77,15 @@ async function start(): Promise<void> {
   }, panoramasFor(manifest));
   const panel = new Panel($('stage'), script);
   player.onLeaf = (L) => panel.show(L);
+  const figure = $('figure');
+  player.onFigure = (id) => {
+    if (id === 'ditch-plan') {
+      const flank = manifest.byId['sphinx-flank'];
+      const here: [number, number] = flank ? [flank.camera[0], flank.camera[1]] : [330, -449];
+      figure.innerHTML = `${ditchPlanSvg(sphinxPlan, here)}<figcaption>The ditch in plan. Both margins are scaled from ARCE's drawing d-gen-008 and not yet checked against it; only the two the drawing gives are drawn.</figcaption>`;
+    }
+    figure.hidden = !id;
+  };
   panel.onOpen = () => { if (player.playing) player.pause(); };
   $('controls').hidden = false;
   player.go(leafFromSearch(location.search, LEAVES));
