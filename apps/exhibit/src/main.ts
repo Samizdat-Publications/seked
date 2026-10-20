@@ -17,6 +17,7 @@ import { Panel } from './panel';
 import { Player } from './player';
 import type { Moment } from './sky';
 import { SkyFigure } from './skyfigure';
+import type { HeadsManifest, ObjectView } from './objectview';
 import { DEG } from './projection';
 import { Stage } from './stage';
 
@@ -26,6 +27,8 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 const WALK = new URL('../walk/', location.href);
 const LEAVES = readLeaves(leavesJson);
 const RENDER = renderStations as unknown as RenderStations;
+/** Each object a leaf can hold (`interact: object:<id>`) and the file render/export_heads.py writes for it. */
+const OBJECT_FILES: Record<string, string> = { head: 'heads.json' };
 
 async function json(name: string): Promise<unknown> {
   const r = await fetch(new URL(name, WALK), { cache: 'no-cache' });
@@ -86,7 +89,21 @@ async function start(): Promise<void> {
   const panel = new Panel($('stage'), script);
   const sky = new SkyFigure(stage, skyData, (RENDER as unknown as { moments: Record<string, Moment> }).moments, $('skybar'));
   sky.onHandsOn = () => { if (player.playing) player.pause(); };
-  player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); };
+  // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
+  let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
+  const objectFor = (L: Leaf) => {
+    const file = OBJECT_FILES[L.interact.replace(/^object:/, '')];
+    if (!L.interact.startsWith('object:') || !file) { void objects?.then((o) => o?.view.hide()); return; }
+    objects ??= (async () => {
+      const r = await fetch(new URL(`objects/${file}`, location.href)).catch(() => null);
+      if (!r?.ok || !(r.headers.get('content-type') ?? '').includes('json')) return null;
+      const heads = (await r.json()) as HeadsManifest;
+      const { ObjectView: View } = await import('./objectview');
+      return { view: new View($('stage'), new URL('objects/', location.href)), heads };
+    })();
+    void objects.then((o) => { if (o && player.leaf === L) void o.view.show(o.heads).catch((e) => { console.error(e); o.view.hide(); }); });
+  };
+  player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); objectFor(L); };
   const figure = $('figure');
   player.onFigure = (id) => {
     if (id === 'ditch-plan') {
