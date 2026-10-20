@@ -16,6 +16,8 @@ import script from '../../../docs/script.md?raw';
 import { clock, lineAt, replyAt, schedule, timeAt, type Schedule } from './autoplay';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
+import { depthRows, undrawn } from './depths';
+import { depthsWidget, type DepthsWidget } from './depthswidget';
 import { mapWidget, type MapWidget } from './mapwidget';
 import { PLAN_STILL, planFootprints } from './plan';
 import { parseScript, type Chapter } from './script';
@@ -100,6 +102,8 @@ const isProfile = (s: Still | null | undefined) => PROFILE_MODES.some((m) => m =
 /** Chapter 7's timeline, likewise. */
 let timeline: TimelineWidget | undefined;
 const isTimeline = (s: Still | null | undefined) => s?.widget === 'ice' || s?.widget === 'dryas';
+/** Chapter 8's depth scale, likewise. */
+let depths: DepthsWidget | undefined;
 /** Chapter 7's map inset, likewise. */
 let map: MapWidget | undefined;
 /** Chapter 7's plan over the First Time, likewise: drawn once, through the still's own camera. */
@@ -140,6 +144,7 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('profile-on', isProfile(still) && !!profile);
   stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
   stage.classList.toggle('map-on', still?.widget === 'map' && !!map);
+  stage.classList.toggle('depths-on', still?.widget === 'depths' && !!depths);
   stage.classList.toggle('plan-on', still?.widget === 'plan' && !!planEl);
   const seq = sequenceOf(still);
   for (const w of sequences.values()) w.el.classList.toggle('on', w === seq && w.ready());
@@ -202,6 +207,7 @@ function follow() {
   // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
   // nearer: chapter 6's later beats have no still of their own, so its next beat is chapter 7's
   if (isTimeline(still) && timeline) timeline.progress(still!.widget as TimelineMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
+  if (still?.widget === 'depths' && depths) depths.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (still?.widget === 'map' && map) map.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (isProfile(still) && profile) profile.progress(still!.widget as ProfileMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
 }
@@ -262,6 +268,12 @@ async function liveReceipts() {
       stage.append(planEl);
     } catch (err) {
       console.warn('chapter 7 keeps its still without the plan:', err);
+    }
+    try {
+      depths = depthsWidget(depthRows(env, structures), undrawn(structures));
+      stage.append(depths.el);
+    } catch (err) {
+      console.warn('chapter 8 keeps its still without the depth scale:', err); // a record missing from the bundle
     }
     try {
       profile = profileWidget(profileOf(env, bundle.claims));

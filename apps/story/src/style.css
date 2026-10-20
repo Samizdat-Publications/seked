@@ -236,3 +236,28 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .player .player-note { display: none; }
   .subtitle { font-size: 0.85rem; bottom: 6%; }
 }
+/* chapter 8's depth scale: tiers as the renders draw them, claimed orange and dashed, excavated stone, instrumented blue */
+.depths { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column; justify-content: center;
+  background: #0f1219; color: #e9e2d4; font-family: system-ui, sans-serif; }
+.stage.depths-on .depths { display: flex; }
+.depths svg { width: 100%; max-height: 92%; }
+.depths text { fill: rgba(233, 226, 212, 0.85); font-size: 2.3px; }
+.depths .head { font-size: 2.8px; fill: #e9e2d4; }
+.depths .site { font-size: 2.6px; fill: rgba(233, 226, 212, 0.6); }
+.depths .axis line { stroke: rgba(233, 226, 212, 0.4); stroke-width: 0.2; }
+.depths .axis text { font-size: 2px; fill: rgba(233, 226, 212, 0.55); }
+.depths .zoom { fill: none; stroke: rgba(233, 226, 212, 0.3); stroke-width: 0.15; stroke-dasharray: 0.6 0.6; }
+.depths .known { fill: #d9cdb8; }
+.depths .row { transition: opacity 0.3s; }
+.depths .lead { stroke: rgba(233, 226, 212, 0.3); stroke-width: 0.12; }
+.depths .excavated rect, .depths rect.excavated { fill: #d9cdb8; }
+.depths .instrumented rect, .depths rect.instrumented { fill: #7fb3e6; }
+.depths .claimed rect, .depths rect.claimed { fill: rgba(242, 163, 58, 0.35); stroke: #f2a33a; stroke-width: 0.25; stroke-dasharray: 0.8 0.5; }
+.depths .line line { stroke: #f2a33a; stroke-width: 0.3; stroke-dasharray: 1 0.6; }
+.depths .far-label { transition: opacity 0.3s; }
+.depths .key text { font-size: 2.1px; }
+.depths .undrawn { font-size: 1.9px; fill: rgba(233, 226, 212, 0.55); font-style: italic; }
+@media (max-width: 52rem) {
+  .depths text { font-size: 2.8px; }
+  .depths .axis text, .depths .undrawn, .depths .key text { font-size: 2.4px; }
+}

@@ -23,7 +23,7 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption' | 'sequence';
+  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption' | 'sequence' | 'depths';
   /** For a `sequence` beat, its id in SEQUENCES (src/sequence.ts). */
   sequence?: string;
   /** For a `caption` beat, the words the stage shows over the still, from the narration. */
@@ -131,6 +131,9 @@ export const STILLS: Still[] = [
     alt: 'The Labyrinth’s bed and Amenemhat III’s pyramid, at Hawara 80 km south, laid on Giza for scale', tags: [], whole: true },
   { chapter: 8, anchor: 'walls eight to twelve metres down', src: 'progress/0039-hawara-section.png',
     alt: 'The ground under the Labyrinth by tier, depths drawn four times their true size', tags: [], whole: true },
+
+  { chapter: 8, anchor: 'Nobody has dug for any of it.', src: 'progress/0037-underneath-khafre-reply.png',
+    alt: 'Every underground thing the chapter names, on one depth scale, by tier', tags: [], whole: true, widget: 'depths' },
 
   { chapter: 9, anchor: 'Much of this case can be tested.', src: SPHINX_TODAY,
     alt: 'The Sphinx in its ditch today', tags: ['stand-in'] },
