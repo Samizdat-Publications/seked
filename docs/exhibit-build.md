@@ -58,7 +58,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   list from `docs/script.md`'s headings. Checked in Chromium at 1440 by 900 and 390 by 844: play ran ch0-dawn to
   ch0-textbooks unattended, a drag paused it on that leaf, the chapter list jumped to ch1-carved. The bundle is
   205 kB (67 kB gzipped), most of it the script, imported whole so chapter titles and replies are never retyped.
-- [ ] **E4. The changes.** (a) The era wipe in the panorama shader: a hard, slightly soft-edged boundary sweeping
+- [x] **E4. The changes.** (a) The era wipe in the panorama shader: a hard, slightly soft-edged boundary sweeping
   across the view, the new era behind it; animated in play, draggable when paused. (b) Lines that draw on, each
   timed to the word that names it. (c) Flights: when a leaf arrives by `flight`, play
   `flights/<from>--<to>.mp4` full screen and hand over to the panorama on its last frame, the panorama already
@@ -67,7 +67,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   with a faint light on it, crossing in 1.8 s once both pictures are in; the player wipes whenever the next leaf
   is the same station and moment in another era. Paused on an `era` leaf, a grip waits at the right edge ("Drag
   for Today") and brings back the era the panorama was last in. Checked mid-sweep and dragged at both sizes.
-  (b) and (c) remain.
+  *(c) done 16:08 UTC, `4843eb1`:* in narrated play a leaf arriving by flight from its predecessor plays
+  `apps/exhibit/flights/<from-leaf>--<to-leaf>.mp4` (gitignored, served at `/flights/`, copied by `pnpm site`)
+  over the stage with the panorama already at the leaf's view beneath, and hands over on the last frame; no film
+  is a cut. Checked with a throwaway test film. *(b) done 16:10 UTC, `5cfa56d`:* `draw` entries are `name` or
+  `name@word`; a cued line waits for its word in play (voice boundaries or the estimate) and draws on; paused it
+  is simply there. Checked with a temporary cue on Khufu's overlay. No leaf draws yet (E2b).
 - [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
   weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
   the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
@@ -125,6 +130,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     the floor. It reads the same whichever way the visitor looks, and the paused comparison needs an edge a
     finger can hold. The plan's "sunlight's direction" or "the floor rising" can come later as a per-leaf
     option. Reversible in `viewer.ts`.
+
+12. **Flights play only in narrated play.** Stepping with Next, or jumping by chapter, goes straight to the leaf:
+    a visitor who is choosing does not want three seconds of film in the way. A flight's file is named by the
+    two leaves it joins, so E6's queue and the player agree without a table.
+13. **A cued line is drawn at once when play is paused**, and taken down to draw again with its word when play
+    resumes, so a paused visitor never looks at a leaf missing the line its words promise.
 
 
 ## For Stewart
