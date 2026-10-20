@@ -288,10 +288,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   among them, so no ticks were needed. Beside the sky panel on a wide screen, below it on a phone; drawn again
   when the bundle arrives. (c) On a narrow screen the shafts are named by chamber and Alnitak by its altitude.
   Both looked at at both sizes.
-- [ ] **E15c. The 2026 study, cited on screen.** "Allan 2026: rank 1,717 of 695,520, p = 0.0025" as a quiet cited
+- [x] **E15c. The 2026 study, cited on screen.** "Allan 2026: rank 1,717 of 695,520, p = 0.0025" as a quiet cited
   caption on `ch5-allan`. The figures are in `allan-2026`'s free-text note in `data/sources.json`, which a page
   should not parse; enter them first as records with that source (`verified: false` until checked against the
   paper's table), then caption them from the records. The spoken words carry the claim meanwhile.
+  *Done 2026-10-20 23:08 UTC, `3794eed`.* (Chunk 5 found the tree clean.) Two records in
+  `data/measurements/orion-correlation.json`, the shape rank and the triplets tested, `allan-2026`, unchecked, under
+  a new structure `giza.pyramids` (decision 42); p is their quotient, never stored (decision 43). The build cuts them
+  out (`virtual:allan-rank`) and `allan-rank` draws on "ranks": every triplet as one dashed line, the best 1,717 a
+  gold mark at its end, and the cited line with the journal and "Not yet checked against the paper's table". Kept on
+  `ch5-named`. Looked at at both sizes; in play it draws about 10 s into the leaf. 3 tests.
 - [x] **E16. Chapter 6, "Numbers in the stone": its leaves** (first step; added by chunk 4 in the plan's order,
   chapter 6 after the two showpieces, decision 41). *Done 2026-10-20 22:56 UTC, `9863899`.* 10 leaves, every word
   in order and inside `ch6.json`: at `south` as built (the walkthrough's own panorama) with `g1-proportions` drawn
@@ -459,6 +465,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 41. **Chapter 6 is cut next, before 3 and 4**, as the plan orders it (`docs/exhibit-2026-10.md`, "Order": chapter 6
     after the two showpieces), and in two steps: the leaves now, on panoramas that exist, and the figures and the
     pyramid in the hand after (E16b).
+42. **The study's records are filed under a new structure, `giza.pyramids`** (the three as a group, excavated), not
+    under `plateau` (the lesser monuments) or `g1`: Allan's figures are about the triangle of all three. It adds no
+    monument and promotes nothing. Reversible: move the two records' `structure`.
+43. **The p-value is the rank over the count, computed, not entered.** 1,717 over 695,520 is 0.00247, the paper's
+    0.0025 to two figures, so storing it would type the same number twice. If checking the paper shows its p is
+    defined otherwise, enter it as its own record then.
 
 
 ## For Stewart
