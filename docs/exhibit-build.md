@@ -223,13 +223,28 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   HYG is). The sky draws Leo's lines on after its stars, labelled "Leo, a modern figure". Leo stands 25 to 41
   degrees up at the picture's moment, so `ch2-leo` and `ch2-image` now look up to it (yaw 106, pitch 20, field 66)
   with the sun and the bearings still in frame. Looked at at both sizes. `pnpm test` 1175 passed.
-- [ ] **E14. An object in the hand.** A small realtime three.js view, lazy-loaded only on a leaf whose `interact`
+- [x] **E14. An object in the hand** (first step: the export). A small realtime three.js view, lazy-loaded only on a leaf whose `interact`
   is `object:<id>`: the object lit simply on a dark ground, turned by dragging, with a reset. The first object is
   the ghosted head: `sphinx-built`'s king's head solid, and the master lion's head (its First Time finish, with
   night item 36's enlargement, the factor in the era record) translucent round it, placed by the head fit. Write
   `render/export_heads.py` (bpy, run by the laptop) that exports the two heads as small GLBs into
   `apps/exhibit/objects/` with a JSON of their placement and the factor; do not run Blender. Until the GLBs
   exist, the leaf shows the panorama.
+  *First step done 2026-10-20 22:30 UTC, `e25101a`:* `render/export_heads.py` (bpy, for the laptop) takes the
+  as-built statue (`sphinx-built`) and the First Time's (the master's `first-time` finish, head enlarged) from
+  `render/giza/sphinx.py`'s own fit to the footprint, so the two heads register as in the panoramas; cuts each to a
+  box round the king's head footprint (look choices, written down), centres both on the head, decimates them to
+  about 60,000 faces and 1024 px textures, and writes `apps/exhibit/objects/head-king.glb`, `head-lion.glb` and
+  `heads.json` (frame, crop, roles, the stand-in caveat, and the enlargement: the renders' `HEAD_SCALE` and the
+  least the solve found, read from `build/models/sphinx-master-headscale.json`, decision 33). GLBs in Git LFS
+  (decision 34). 4 tests for the parts without Blender. Not run here: no Blender, no models in this worktree.
+- [ ] **E14b. The object view.** The rest of E14: a small three.js view (add `three` to `apps/exhibit`), imported
+  lazily on a leaf whose `interact` is `object:head`, reading `objects/heads.json` and its GLBs (served at
+  `/objects/` in dev, copied by `scripts/site.ts` as the flights are): the king's head solid, the lion's head
+  translucent round it, lit simply on a dark ground, turned by dragging, a reset, and H1's factor from
+  `heads.json` beside it labelled a proposal ("on these stand-ins, the lion's head had to be enlarged N times").
+  Until `heads.json` exists the leaf shows the panorama, as now. Test with the laptop's export, or with any small
+  GLB in its place.
 - [ ] **E15. Chapter 5, "The sky as a clock": its leaves and the slider.** Cut chapter 5 into leaves likewise. The
   live figure: at night over the pyramids (the `orion` station, `built`), the stars drawn by `@seked/sky` over the
   panorama, and a year slider from today to 10,500 BCE the visitor drags (play animates it): Orion's belt sinks
@@ -349,6 +364,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 32. **Reader's sentence wipes back to today** (not on to the lion), so the flight to `sphinx-back` arrives in
     today's era, the 2026 sky shows "the sun rises close to due east in every age", and "drift" then wipes to the
     First Time as the years wind back.
+33. **H1's factor travels in `heads.json`, read from the head solve's own output.** The solve writes a build
+    file on the laptop; carrying it into the exhibit's objects beside the heads it was found on keeps the number
+    and the pictures together, and nothing types 1.16. If the solve has not been run on the machine that exports,
+    `least` is null and the view says only the renders' enlargement, which is a look choice.
+34. **The head GLBs go in Git LFS**, as the narration does, rather than being gitignored like the flights: they
+    are small, made once, and the site needs them; a flight is re-rendered whenever a leaf moves.
 
 ## For Stewart
 
@@ -415,5 +436,9 @@ Renders the laptop session should run, with the queue or command, as items need 
   `apps/exhibit/flights/ID.mp4` with `render/film.py encode ... --fps 30` (the command is in
   `scripts/exhibit_queue.py`'s docstring). **`ch0-ditch--ch1-carved` climbs only about 10 m and passes close to
   the Sphinx's south shoulder: check its preview for a clip.** If it clips, say so and the builder steers it.
-- Commit `assets/narration/` (Git LFS) to this branch, or merge it in: the player reads it at `narration/`, and
+- **The ghosted head** (E14): `blender -b --factory-startup -P render/export_heads.py`, after
+  `render/giza/sphinx_eras.py --solve-head` if `build/models/sphinx-master-headscale.json` is not there yet. Commit
+  `apps/exhibit/objects/` (the GLBs go in LFS by `.gitattributes`). Look at the two GLBs together in any viewer:
+  the king's head should sit inside the lion's mane, as in `ch2-ghost`'s panorama.
+- (Done: the narration is on this branch since the merge `84fcedf`.) Commit `assets/narration/` (Git LFS) to this branch, or merge it in: the player reads it at `narration/`, and
   without it falls back to the browser's voice. (Tested here against the main checkout's copy.)
