@@ -13,9 +13,30 @@ body { margin: 0; }
   position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center;
   align-items: center; background: linear-gradient(#e8d9bf, #c9a46a); color: #fff8ec;
 }
+.stage { overflow: hidden; }
+.card { position: relative; z-index: 2; text-align: center; transition: opacity 0.6s; }
 .stage-num { font-size: 8rem; line-height: 1; }
 .stage-title { font-size: 1.4rem; letter-spacing: 0.04em; }
+.stage.has-still .card { opacity: 0; }
+.stage { transition: background 0.9s; }
+.stage.whole { background: #14100c; }
+.still img.whole { object-fit: contain; }
+.still { position: absolute; inset: 0; margin: 0; }
+.still img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.9s; }
+.still img.on { opacity: 1; }
+.still .tags, .still figcaption { position: absolute; z-index: 1; opacity: 0; transition: opacity 0.6s; }
+.stage.has-still .tags, .stage.has-still figcaption { opacity: 1; }
+.still .tags { top: 0.8rem; left: 0.8rem; display: flex; gap: 0.4rem; }
+.still .tags span {
+  font: 0.75rem system-ui, sans-serif; letter-spacing: 0.03em; padding: 0.15rem 0.5rem; border-radius: 0.2rem;
+  background: rgba(20, 16, 12, 0.6); color: #fff8ec;
+}
+.still figcaption {
+  left: 0; right: 0; bottom: 0; padding: 2.5rem 1rem 0.8rem; font: 0.85rem/1.4 system-ui, sans-serif;
+  color: #fff8ec; background: linear-gradient(transparent, rgba(20, 16, 12, 0.7));
+}
 main { padding: 4rem 1.5rem 40vh; }
+.masthead { min-height: 70vh; }
 .masthead h1 { font-size: 2.4rem; margin: 0 0 0.5rem; }
 .masthead p { color: var(--quiet); }
 .chapter { min-height: 90vh; padding-top: 4rem; }
@@ -35,6 +56,7 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   #app { grid-template-columns: 1fr; gap: 0; }
   .stage { height: 30vh; z-index: 1; }
   .stage-num { font-size: 4rem; }
+  .still figcaption { font-size: 0.75rem; padding: 1.5rem 0.6rem 0.4rem; }
 }
 .quiet { color: var(--quiet); font-style: italic; }
 .live ul { padding-left: 1.2rem; }

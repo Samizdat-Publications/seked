@@ -4,7 +4,9 @@
  * it, quieter than the claim and never omitted. The stage is a sticky panel
  * that follows the chapter in view. Each chapter's receipts are computed live
  * from the bundled database (seked.json, written by `pnpm bundle`) when it can
- * be fetched; the stills come next.
+ * be fetched. The stage shows the committed stills (./stills), each from the
+ * beat it illustrates, crossfaded, and the chapter's number and title where
+ * no still has begun.
  */
 import type { Claim } from '@seked/claims/browser';
 import type { Database } from '@seked/data/browser';
@@ -13,9 +15,18 @@ import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
+import { STILLS, markAnchors, markers, type Still } from './stills';
 import './style.css';
 
 const chapters = parseScript(script);
+const stillsOf = (c: Chapter) => STILLS.filter((s) => s.chapter === c.n);
+
+/** A narration paragraph with an empty marker span before each still's anchor. */
+function narrationHtml(c: Chapter, p: string): string {
+  const mine = stillsOf(c);
+  const { text } = markAnchors(p, mine.map((s) => s.anchor));
+  return markers(inline(text), (i) => `data-still="${STILLS.indexOf(mine[i]!)}"`);
+}
 
 function chapterHtml(c: Chapter): string {
   const receipts = c.receipts && !/^- None\b/.test(c.receipts)
@@ -26,7 +37,7 @@ function chapterHtml(c: Chapter): string {
     <section class="chapter" id="ch${c.n}" data-n="${c.n}">
       <header><span class="num">${c.n}</span><h2>${inline(c.title)}</h2></header>
       ${c.note ? `<p class="note">${inline(c.note)}</p>` : ''}
-      <div class="narration">${c.narration.map((p) => `<p>${inline(p)}</p>`).join('')}</div>
+      <div class="narration">${c.narration.map((p) => `<p>${narrationHtml(c, p)}</p>`).join('')}</div>
       ${receipts}
       <details class="reply"><summary>The reply</summary>
         ${c.reply.map((p) => `<p>${inline(p)}</p>`).join('')}
@@ -37,30 +48,89 @@ function chapterHtml(c: Chapter): string {
 
 const app = document.querySelector<HTMLElement>('#app')!;
 app.innerHTML = `
-  <aside class="stage" aria-hidden="true"><div class="stage-num"></div><div class="stage-title"></div></aside>
+  <aside class="stage">
+    <div class="card"><div class="stage-num"></div><div class="stage-title"></div></div>
+    <figure class="still"><img alt="" /><img alt="" /><div class="tags"></div><figcaption></figcaption></figure>
+  </aside>
   <main>
     <header class="masthead"><h1>How old is the Sphinx?</h1>
       <p>The strongest case for an older Giza, and the archaeologists' answer to it, in ten chapters.</p></header>
     ${chapters.map(chapterHtml).join('')}
   </main>`;
 
-const stageNum = app.querySelector<HTMLElement>('.stage-num')!;
-const stageTitle = app.querySelector<HTMLElement>('.stage-title')!;
-const show = (c: Chapter) => {
+const stage = app.querySelector<HTMLElement>('.stage')!;
+const stageNum = stage.querySelector<HTMLElement>('.stage-num')!;
+const stageTitle = stage.querySelector<HTMLElement>('.stage-title')!;
+const layers = [...stage.querySelectorAll<HTMLImageElement>('.still img')];
+const tags = stage.querySelector<HTMLElement>('.tags')!;
+const caption = stage.querySelector<HTMLElement>('figcaption')!;
+let front = 0;
+let shown: Still | null | undefined;
+
+/** The stills live beside the page on the site (story/ next to progress/ and alignments/). */
+const url = (s: Still) => `../${s.src}`;
+
+/** Show a still, crossfading from the last, or the chapter's card when `still` is null. */
+function show(c: Chapter, still: Still | null) {
   stageNum.textContent = String(c.n);
   stageTitle.textContent = c.title;
-};
-if (chapters[0]) show(chapters[0]);
-const seen = new IntersectionObserver(
-  (entries) => {
-    for (const e of entries) {
-      const c = chapters.find((ch) => ch.n === Number((e.target as HTMLElement).dataset.n));
-      if (e.isIntersecting && c) show(c);
+  if (still === shown) return;
+  shown = still;
+  stage.classList.toggle('has-still', !!still);
+  stage.classList.toggle('whole', !!still?.whole);
+  if (!still) {
+    layers.forEach((l) => l.classList.remove('on'));
+    return;
+  }
+  const back = layers[1 - front]!;
+  const reveal = () => {
+    if (shown !== still) return;
+    back.classList.add('on');
+    layers[front]!.classList.remove('on');
+    front = 1 - front;
+  };
+  back.alt = still.alt;
+  back.classList.toggle('whole', !!still.whole);
+  caption.textContent = still.alt;
+  tags.innerHTML = still.tags.map((t) => `<span>${t}</span>`).join('');
+  if (back.getAttribute('src') === url(still) && back.complete) reveal();
+  else {
+    back.onload = reveal;
+    back.src = url(still);
+  }
+}
+
+/**
+ * The stage follows the last marker above the middle of the window: a chapter's top shows its card, a
+ * beat's marker its still. Markers are read in document order, so a still holds until the next beat.
+ */
+const marks = [...app.querySelectorAll<HTMLElement>('.chapter, .beat')];
+function follow() {
+  const line = innerHeight * 0.55;
+  let chapter = chapters[0];
+  let still: Still | null = null;
+  for (const m of marks) {
+    if (m.getBoundingClientRect().top > line) break;
+    if (m.classList.contains('chapter')) {
+      chapter = chapters.find((ch) => ch.n === Number(m.dataset.n)) ?? chapter;
+      still = null;
+    } else {
+      still = STILLS[Number(m.dataset.still)] ?? null;
     }
-  },
-  { rootMargin: '-45% 0px -45% 0px' },
-);
-app.querySelectorAll('.chapter').forEach((el) => seen.observe(el));
+  }
+  if (chapter) show(chapter, still);
+}
+let queued = false;
+addEventListener('scroll', () => {
+  if (queued) return;
+  queued = true;
+  requestAnimationFrame(() => {
+    queued = false;
+    follow();
+  });
+}, { passive: true });
+addEventListener('resize', follow);
+follow();
 
 /**
  * The bundle sits beside the page in development (Vite serves apps/web/public) and beside the viewer on the
