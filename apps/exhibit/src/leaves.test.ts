@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isFigure } from './figures';
-import { type Leaf, type RenderStations, cueIndex, drawCue, joinProblems, leafPanorama, readLeaves, stationMoment } from './leaves';
+import { type Leaf, type RenderStations, cueIndex, drawCue, joinProblems, leafPanorama, readLeaves, stationMoment, withStandIns } from './leaves';
 
 const repo = join(__dirname, '..', '..', '..');
 const read = (p: string) => readFileSync(join(repo, p), 'utf8');
@@ -66,6 +66,17 @@ describe('leaves.json', () => {
     }
   });
 
+  it('stands in only at stations the walkthrough has, and only for a station it lacks', () => {
+    for (const L of leaves) {
+      if (!L.until) continue;
+      expect(walk.stations.some((s) => s.id === L.until!.station), L.id).toBe(true);
+      expect(L.until.station, L.id).not.toBe(L.station);
+    }
+    // with every stand-in in place the joins still hold, so tonight's player is as clean as tomorrow's
+    expect(joinProblems(withStandIns(leaves, (id) => walk.stations.some((s) => s.id === id)))
+      .filter((p) => !p.includes('a flight goes somewhere'))).toEqual([]);
+  });
+
   it('draws only overlays and figures that exist and cites only claims that exist', () => {
     for (const L of leaves) {
       for (const d of L.draw) {
@@ -76,6 +87,19 @@ describe('leaves.json', () => {
       for (const r of L.receipts) expect(existsSync(join(repo, 'data', 'claims', `${r}.yaml`)), `${L.id}: ${r}`).toBe(true);
       expect(read('docs/script.md'), L.id).toContain(`## ${L.reply.slice(2)}. `);
     }
+  });
+});
+
+describe('withStandIns', () => {
+  const L = { id: 'ch0-a', chapter: 0, station: 'roof', era: 'today', moment: 'equinox-dawn', view: { yaw: 284, pitch: 1, fov: 40 },
+    arrive: 'cut', say: 'Words.', draw: [], hold: 1, interact: 'look', receipts: [], reply: 'ch0',
+    until: { station: 'sphinx', view: { yaw: 277, pitch: -4, fov: 62 } } } as Leaf;
+  it('puts a leaf at its stand-in while its station is not published, keeping its words, era and moment', () => {
+    const [s] = withStandIns([L], () => false);
+    expect([s!.station, s!.view, s!.say, s!.era, s!.moment]).toEqual(['sphinx', L.until!.view, 'Words.', 'today', 'equinox-dawn']);
+  });
+  it('leaves it alone once the station is published', () => {
+    expect(withStandIns([L], (id) => id === 'roof')[0]).toBe(L);
   });
 });
 

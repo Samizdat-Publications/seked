@@ -16,14 +16,16 @@ export const ARRIVALS = ['cut', 'flight', 'wipe', 'turn'] as const;
 
 const Interact = z.union([z.enum(['look', 'era', 'sky']), z.string().regex(/^object:[\w-]+$/)]);
 
+/** Degrees: yaw clockwise from north, pitch up from the horizon, the vertical field of view. */
+const View = z.object({ yaw: z.number().min(0).max(360), pitch: z.number().min(-80).max(80), fov: z.number().min(20).max(100) });
+
 export const LeafSchema = z.object({
   id: z.string().regex(/^ch\d+-[\w-]+$/),
   chapter: z.number().int().min(0),
   station: z.string().min(1),
   era: z.string().min(1),
   moment: z.string().min(1),
-  /** Degrees: yaw clockwise from north, pitch up from the horizon, the vertical field of view. */
-  view: z.object({ yaw: z.number().min(0).max(360), pitch: z.number().min(-80).max(80), fov: z.number().min(20).max(100) }),
+  view: View,
   arrive: z.enum(ARRIVALS),
   say: z.string().min(1),
   /**
@@ -38,6 +40,11 @@ export const LeafSchema = z.object({
   receipts: z.array(z.string()),
   /** The script chapter whose reply sits behind this leaf. */
   reply: z.string().regex(/^ch\d+$/),
+  /**
+   * What stands in until the leaf's own station is rendered and published: a station the walkthrough has and a
+   * view from it. The player uses it only while the walkthrough's manifest lacks the leaf's station.
+   */
+  until: z.object({ station: z.string().min(1), view: View }).strict().optional(),
 }).strict();
 
 export type Leaf = z.infer<typeof LeafSchema>;
@@ -47,6 +54,14 @@ export const LeavesSchema = z.object({ about: z.string(), leaves: z.array(LeafSc
 /** Parse leaves.json; throws with zod's account of the first thing wrong. */
 export function readLeaves(raw: unknown): Leaf[] {
   return LeavesSchema.parse(raw).leaves;
+}
+
+/**
+ * The leaves as they can be shown now: a leaf whose station the walkthrough has not published yet stands at its
+ * `until` station and view, keeping its words, era and moment. `has(station)` says whether a station is published.
+ */
+export function withStandIns(leaves: readonly Leaf[], has: (station: string) => boolean): Leaf[] {
+  return leaves.map((L) => (has(L.station) || !L.until ? L : { ...L, station: L.until.station, view: L.until.view }));
 }
 
 /** The rules that keep the joins clean, as a list of what breaks them (empty when none do). */

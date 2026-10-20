@@ -14,7 +14,8 @@ Writes:
 - render/films-exhibit.json: a flight for each leaf that arrives by flight, from the last leaf's station camera
   and view to this one's, in the arriving leaf's era and moment, about 3 s at 30 fps, 1920 by 1080, 64 samples,
   along an eased path that rises over what lies between. Its id is <from-leaf>--<to-leaf>, the file the player
-  plays (apps/exhibit/flights/<id>.mp4).
+  plays (apps/exhibit/flights/<id>.mp4). A flight to or from a station the walkthrough has not published waits,
+  since its camera is what publish records: render that station's panorama, publish, and run this again.
 - render/queues/exhibit-patches.json: a detail patch for each leaf the panorama cannot hold sharp: the leaf's
   station in its era and moment, through a lens at the leaf's yaw and pitch with a vertical field PATCH_MARGIN
   times the leaf's, 2560 by 1440, 96 samples. A 4096-wide panorama has about 11 pixels a degree; a patch is
@@ -165,8 +166,22 @@ def flight(prev, leaf, cameras):
     }
 
 
+def flight_pairs(leaves):
+    return [(leaves[i - 1], L) for i, L in enumerate(leaves) if i > 0 and L["arrive"] == "flight"]
+
+
 def films(leaves, cameras):
-    return [flight(leaves[i - 1], L, cameras) for i, L in enumerate(leaves) if i > 0 and L["arrive"] == "flight"]
+    """
+    The flights whose two cameras are known. A station's camera is where publish recorded it, so a flight
+    from or to a station not rendered yet waits (waiting_flights) until it is published and this runs again.
+    """
+    return [flight(a, b, cameras) for a, b in flight_pairs(leaves) if cameras(a["station"], b["era"]) and cameras(b["station"], b["era"])]
+
+
+def waiting_flights(leaves, cameras):
+    """The ids of the flights films() leaves out for want of a published station."""
+    return [f"{a['id']}--{b['id']}" for a, b in flight_pairs(leaves)
+            if not (cameras(a["station"], b["era"]) and cameras(b["station"], b["era"]))]
 
 
 def walk_cameras(walk):
@@ -174,8 +189,8 @@ def walk_cameras(walk):
     by_id = {s["id"]: s for s in walk["stations"]}
 
     def camera(station, era):
-        s = by_id[station]
-        return list((s.get("cameras") or {}).get(era) or s["camera"])
+        s = by_id.get(station)
+        return list((s.get("cameras") or {}).get(era) or s["camera"]) if s else None
     return camera
 
 
@@ -204,6 +219,7 @@ def main():
                  "--film ID (try --preview 0,45,89 first), encode with render/film.py into `out`.",
         "films": films(leaves, walk_cameras(walk)),
     }
+    waiting = waiting_flights(leaves, walk_cameras(walk))
     for path, doc in (("render/queues/exhibit-panos.json", queue), ("render/queues/exhibit-patches.json", patch_doc),
                       ("render/films-exhibit.json", flights)):
         with io.open(os.path.join(REPO, path), "w", encoding="utf-8", newline="\n") as f:
@@ -219,6 +235,8 @@ def main():
     print(f"{len(flights['films'])} flights into render/films-exhibit.json")
     for f in flights["films"]:
         print(f"  {f['id']}")
+    for w in waiting:
+        print(f"  {w} waits: a station it joins is not published yet (render its panorama, publish, run this again)")
 
 
 if __name__ == "__main__":

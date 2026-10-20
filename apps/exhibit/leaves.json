@@ -4,13 +4,13 @@
   {
    "id": "ch0-dawn",
    "chapter": 0,
-   "station": "sphinx",
+   "station": "nazlet-roof",
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 277,
-    "pitch": -4,
-    "fov": 62
+    "yaw": 284,
+    "pitch": 1,
+    "fov": 40
    },
    "arrive": "cut",
    "say": "This is Giza at dawn, from the rooftops of Nazlet el-Samman.",
@@ -18,7 +18,15 @@
    "hold": 1.5,
    "interact": "look",
    "receipts": [],
-   "reply": "ch0"
+   "reply": "ch0",
+   "until": {
+    "station": "sphinx",
+    "view": {
+     "yaw": 277,
+     "pitch": -4,
+     "fov": 62
+    }
+   }
   },
   {
    "id": "ch0-sunrise",
@@ -31,7 +39,7 @@
     "pitch": 0,
     "fov": 34
    },
-   "arrive": "turn",
+   "arrive": "flight",
    "say": "The Sphinx faces the sunrise, as it has for at least four and a half thousand years.",
    "draw": [],
    "hold": 1,

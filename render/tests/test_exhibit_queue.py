@@ -115,8 +115,18 @@ class Flights(unittest.TestCase):
     def test_only_leaves_arriving_by_flight_get_one(self):
         leaves = q.load("apps/exhibit/leaves.json")["leaves"]
         walk = q.load("apps/walk/stations.json")
-        made = q.films(leaves, q.walk_cameras(walk))
-        self.assertEqual([f["id"].split("--")[1] for f in made], [L["id"] for L in leaves[1:] if L["arrive"] == "flight"])
+        cams = q.walk_cameras(walk)
+        made = q.films(leaves, cams)
+        every = [f"{a['id']}--{b['id']}" for a, b in q.flight_pairs(leaves)]
+        self.assertEqual([b["id"] for a, b in q.flight_pairs(leaves)], [L["id"] for L in leaves[1:] if L["arrive"] == "flight"])
+        self.assertEqual(sorted([f["id"] for f in made] + q.waiting_flights(leaves, cams)), sorted(every))
+
+    def test_a_flight_from_a_station_not_yet_published_waits(self):
+        prev = dict(LEAF, id="ch0-x", station="nowhere-yet", moment="equinox-dawn")
+        leaf = dict(LEAF, id="ch0-y", station="sphinx", moment="equinox-dawn", arrive="flight")
+        cams = q.walk_cameras({"stations": [{"id": "sphinx", "camera": [439.0, -445.0, -29.5]}]})
+        self.assertEqual(q.films([prev, leaf], cams), [])
+        self.assertEqual(q.waiting_flights([prev, leaf], cams), ["ch0-x--ch0-y"])
 
 
 if __name__ == "__main__":

@@ -49,15 +49,41 @@ def village(terrain, coll, lib, log=print):
     return field("village", lib["mud box"], pos, rot, scl, g.integers(0, 3, n), g.random(n), np.zeros(n), coll, log)
 
 
-def build(terrain, coll, lib, log=print):
-    x, y, w, d, yaw, h = data.city_boxes().T
+MIN_HEIGHT = 3.0     # a box is drawn at least this tall over the ground, whatever its record says
+
+
+def _kept(x, y):
+    """The boxes build() draws: not the plateau's unmeasured ones, nor any within 3.2 half-bases of a pyramid."""
     keep = ~_on_plateau_unmeasured(x, y)
     for P in (data.PYRAMIDS[k] for k in ("g1", "g2", "g3")):
         keep &= np.hypot(x - P["cx"], y - P["cy"]) > P["half"] * 3.2
+    return keep
+
+
+def roof_at(px, py):
+    """
+    The drawn building whose box holds the point, for a station on a roof (render/stations.json `roof`): its
+    record in data/footprints/city.bin, its roof's height over the ground as build() draws it, and whether the
+    2.5D raster measured that height. None when no drawn box holds the point.
+    """
+    x, y, w, d, yaw, h = data.city_boxes().T
+    measured = data.city_measured()
+    c, s = np.cos(np.radians(yaw)), np.sin(np.radians(yaw))
+    u, v = (px - x) * c + (py - y) * s, -(px - x) * s + (py - y) * c
+    hit = np.nonzero(_kept(x, y) & (np.abs(u) <= np.maximum(w, 2) / 2) & (np.abs(v) <= np.maximum(d, 2) / 2))[0]
+    if not len(hit):
+        return None
+    i = int(hit[np.argmax(h[hit])])
+    return {"record": i, "height": float(max(h[i], MIN_HEIGHT)), "measured": bool(measured[i])}
+
+
+def build(terrain, coll, lib, log=print):
+    x, y, w, d, yaw, h = data.city_boxes().T
+    keep = _kept(x, y)
     x, y, w, d, yaw, h = (a[keep] for a in (x, y, w, d, yaw, h))
     n = len(x)
     pos = np.stack([x, y, terrain.surface(x, y) - 0.5], 1)
     rot = np.stack([np.zeros(n), np.zeros(n), np.radians(yaw)], 1)
-    scl = np.stack([np.maximum(w, 2), np.maximum(d, 2), np.maximum(h, 3) + 0.5], 1)
+    scl = np.stack([np.maximum(w, 2), np.maximum(d, 2), np.maximum(h, MIN_HEIGHT) + 0.5], 1)
     tone = np.random.default_rng(3).random(n).astype(np.float32)
     return field("city", lib["box"], pos, rot, scl, np.zeros(n, np.int32), tone, np.zeros(n), coll, log)

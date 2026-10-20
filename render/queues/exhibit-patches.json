@@ -3,19 +3,19 @@
  "renders": [
   {
    "state": "today",
-   "station": "sphinx",
+   "station": "nazlet-roof",
    "moment": "equinox-dawn",
    "patch": {
-    "yaw": 277,
-    "pitch": -4,
-    "fov": 80.6,
+    "yaw": 284,
+    "pitch": 1,
+    "fov": 52.0,
     "aspect": 1.7777777777777777,
     "leaf": "ch0-dawn",
-    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+    "pano": "pano/nazlet-roof-today.jpg"
    },
    "size": "2560x1440",
    "samples": 96,
-   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-dawn.png",
+   "out": "build/render/patch-exhibit/nazlet-roof-today-equinox-dawn-ch0-dawn.png",
    "for": "ch0-dawn"
   },
   {

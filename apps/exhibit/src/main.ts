@@ -7,7 +7,7 @@ import './style.css';
 import leavesJson from '../leaves.json';
 import renderStations from '../../../render/stations.json';
 import script from '../../../docs/script.md?raw';
-import { type Leaf, type RenderStations, leafPanorama, readLeaves } from './leaves';
+import { type Leaf, type RenderStations, leafPanorama, readLeaves, withStandIns } from './leaves';
 import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
@@ -71,9 +71,11 @@ async function start(): Promise<void> {
     return;
   }
 
-  const missing = LEAVES.find((L) => !manifest.byId[L.station]);
+  const leaves = withStandIns(LEAVES, (id) => !!manifest.byId[id]);
+  leaves.forEach((L, i) => { if (L.station !== LEAVES[i]!.station) console.info(`${L.id}: ${LEAVES[i]!.station} is not rendered yet; ${L.station} stands in`); });
+  const missing = leaves.find((L) => !manifest.byId[L.station]);
   if (missing) return fail(`The leaf ${missing.id} stands at ${missing.station}, which the walkthrough does not have.`);
-  const player = new Player(stage, manifest, LEAVES, scriptChapters(script), {
+  const player = new Player(stage, manifest, leaves, scriptChapters(script), {
     caption: $('caption'), place: $('place'), when: $('when'), pill: $('pill'),
     play: $<HTMLButtonElement>('play'), prev: $<HTMLButtonElement>('prev'), next: $<HTMLButtonElement>('next'),
     chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'), flight: $<HTMLVideoElement>('flight'),
@@ -94,7 +96,7 @@ async function start(): Promise<void> {
   // for capture and test scripts, as the story page had
   (window as unknown as { seked: unknown }).seked = { player, stage };
   $('controls').hidden = false;
-  player.go(leafFromSearch(location.search, LEAVES));
+  player.go(leafFromSearch(location.search, leaves));
 }
 
 void start();
