@@ -165,9 +165,11 @@ def figure_parts(x, y, height, facing=0.0):
             (x, y, 0.17, 0.46 * h, 0.82 * h), (x, y, 0.055, 0.82 * h, 0.86 * h), (x, y, 0.1, 0.86 * h, h)]
 
 
-def orbit(t, rec=None, look=LOOK, eye=1.6, out=4.0):
+def orbit(t, rec=None, look=LOOK, eye=1.6, out=1.5, at=1.4):
     """The sequence's camera at `t` (0 to 1, once round, clockwise from the south): on the rim `out` metres outside the
-    wall, a person's eye height above its top, looking at the middle of the ring a little above the floor."""
+    wall, a person's eye height above its top, looking at the middle of the ring `at` metres above the floor. Close to the
+    wall, so the line of sight clears the near rim and reaches the floor's middle; at 4 m out the near mound filled the
+    lower half of the frame and only the far strip of floor showed."""
     w = wall(rec, look)
     n = len(w["outer"])
     mx = sum(x for x, _ in w["outer"]) / n
@@ -179,7 +181,7 @@ def orbit(t, rec=None, look=LOOK, eye=1.6, out=4.0):
                 if abs(math.atan2(x - mx, y - my) - math.atan2(ux, uy)) % (2 * math.pi) < 0.2
                 or abs(math.atan2(x - mx, y - my) - math.atan2(ux, uy)) % (2 * math.pi) > 2 * math.pi - 0.2)[0]
     r = reach + out
-    return dict(eye=(mx + ux * r, my + uy * r, w["height"] + eye), at=(mx, my, 1.8))
+    return dict(eye=(mx + ux * r, my + uy * r, w["height"] + eye), at=(mx, my, at))
 
 
 def fill_mesh(w, level, mode="level", look=LOOK):
