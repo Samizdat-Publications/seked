@@ -1,5 +1,5 @@
 {
-  "note": "Figures shown as plates in the documentary: what the claimants and the reply published, beside what we drew from it (night decisions 24 and 25). Only open-licensed or public-domain figures are kept here, in Git LFS, each with its source, licence and checksum. Everything else is linked under 'linked', not hosted, until its rights holder answers the request drafted in docs/permissions/. A plate is read two ways, like any drawing: a printed dimension is transcribed and cites the figure; a distance scaled against the figure's own scale bar is 'scaled from plate', with its sigma, and never verified. A tomogram with no axes is placed by its labels and never scaled.",
+  "note": "Figures shown as plates in the documentary: what the claimants and the reply published, beside what we drew from it (night decisions 24 and 25). Only open-licensed or public-domain figures are kept here, in Git LFS, each with its source, licence and checksum. Everything else is linked under 'linked', not hosted, until its rights holder answers the request drafted in docs/permissions/. A plate is read two ways, like any drawing: a printed dimension is transcribed and cites the figure; a distance scaled against the figure's own scale bar is 'scaled from plate', with its sigma, and never verified. A tomogram with no axes is placed by its labels and never scaled. CC BY-NC-ND figures are hosted too, since Seked is a personal, non-commercial project (Stewart, 20 October 2026): each is the publisher's own image, unaltered (no crop, no mark, nothing drawn on it); what we read from it or drew over it is shown beside it, never on it.",
   "plates": [
     {
       "id": "biondi-malanga-2022-fig22",
@@ -61,6 +61,25 @@
           50.0
         ]
       }
+    },
+    {
+      "id": "haklay-gopher-2020-fig1",
+      "file": "haklay-gopher-2020/fig1.jpg",
+      "sha256": "9eaed7c2276ae8e039f5fc8b382a4a71bd7b44d03ca73df60825f4a062d4f06e",
+      "size": [
+        485,
+        672
+      ],
+      "source": "haklay-gopher-2020",
+      "figure": "Figure 1 (p. 344)",
+      "caption": "The main excavation area: schematic plan. (Modified from O. Dietrich et al. 2014.)",
+      "kind": "an excavation plan, schematic",
+      "url": "https://doi.org/10.1017/S0959774319000660",
+      "extracted": "The JPEG stream embedded in the publisher's PDF (sha256 4c784437743d4fa8fd6dea20968c0b929fbc2d73db38de30b6084bbea56a78a5, page 2), written out byte for byte by pdfimages -j: not re-encoded, cropped or resized.",
+      "licence": "CC BY-NC-ND 4.0 (the article's own licence line, p. 343, and Crossref's licence record): non-commercial re-use with the work unaltered and properly cited.",
+      "attribution": "Haklay, G. & Gopher, A. (2020), Geometry and Architectural Planning at Göbekli Tepe, Turkey, Cambridge Archaeological Journal 30(2), 343–357, Figure 1, modified from O. Dietrich et al. 2014. CC BY-NC-ND 4.0. © McDonald Institute for Archaeological Research 2020.",
+      "registration": "Read two ways by scripts/enclosure_d_plan.py against the figure's own 5 m bar: the pillars' positions and bearings are the 'scaled from plate' records in data/measurements/gobekli.json (0.51 m sigma), never verified; the printed figures (p. 347) are transcribed there and cite the page. The image itself carries no mark of that reading.",
+      "about": "Chapter 7: Enclosure D as its excavators drew it, to stand beside the stand-in built from it (progress 0046 to 0049 and the orbit), so a viewer can see we drew what the plan says."
     }
   ],
   "linked": [
