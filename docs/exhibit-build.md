@@ -347,12 +347,24 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   First Time at `sphinx-face` on "long ages before their first king" (decision 46). No new panorama or flight; three
   patches queued. Looked at at both sizes as contact sheets (`build/exhibit-shots/e17/`); played through muted, 116 s,
   no errors, no fallback voice. Left for E17b.
-- [ ] **E17b. Chapter 3's figures.** (a) The joint peeled open on "On camera in 1993": one Valley Temple wall in
+- [x] **E17b. Chapter 3's figures.** (a) The joint peeled open on "On camera in 1993": one Valley Temple wall in
   section, the granite pulled forward, a rounded and fissured core behind it, the granite's back shaped to it,
   captioned "the claim as West and Schoch describe it, not a survey" (a drawing of a claim, so no record is needed,
   but say so). (b) The luminescence dates the script proposes as records (`liritzis-vafiadou-2015` Table 1: VT1,
   VT9a, ST2, `verified: false` until checked), then shown in the reply's terms on `ch3-statues` or the reply panel.
-  (c) The statue sockets drawn on the hall floor from `khafre_valley_temple.hall.socket.*`, if those records exist.
+  (c) moved to E17c.
+  *Done 2026-10-20 23:36 UTC, `a1db894`, `182b928`.* (b) The three dates are records in
+  `data/measurements/luminescence.json` (`liritzis-vafiadou-2015`, unchecked); a calendar year had no unit, so the
+  schema gains quantity `date` in unit `year`, astronomical numbering as the claims' epochs (decision 47).
+  `luminescence` draws them on "core" in `ch3-statues`: a bar per sample on one axis of years, named by temple, stone
+  and sample from the records and `structures.json`, the paper cited short. (a) `joint-claim` draws on "camera" in
+  `ch3-west`: the wall in section, schematic, the same worn profile on the core and the granite's back, captioned as
+  the claim and not a survey; it holds no measurement. Both looked at at both sizes and cued in play (5 to 11 s in).
+  3 tests; `pnpm test` 1200 passed.
+- [ ] **E17c. The statue sockets on the hall floor.** `khafre_valley_temple.hall.socket.pitch` and
+  `.socket.first.east` exist (scaled from Hölscher's Blatt XVII). Draw the row of sockets on `ch3-statues`'s floor
+  as registered lines in the scene: find how `apps/walk/overlays.json` is generated, add the row there from the
+  records (never typed into the overlay), and cue it on "statues".
 - [ ] **E18. Chapter 4, "The First Time": its leaves.** Cut chapter 4 likewise, on panoramas that exist, with
   `until` stand-ins where a station is new; receipts as the script assigns them; the queue run.
 
@@ -518,6 +530,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     asked: there is no night panorama of the hall, and "long ages before their first king" leads into "The First
     Time". From `sphinx` the First Time's temple wall fills the view, so the leaf stands at `sphinx-face`, the cold
     open's own shot.
+47. **A date is a record like any other: quantity `date`, unit `year`, astronomical numbering** (1 BCE is 0), the
+    convention the claims' epochs and `@seked/sky` already use, so a date can one day enter an expression without a
+    conversion. The page writes it back as BCE. Reversible: two enum entries in `packages/data/src/core.ts`.
 
 
 ## For Stewart
