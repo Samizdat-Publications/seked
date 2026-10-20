@@ -751,9 +751,9 @@
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 90,
-    "pitch": 6,
-    "fov": 60
+    "yaw": 106,
+    "pitch": 20,
+    "fov": 66
    },
    "arrive": "turn",
    "say": "In about 10,500 BCE, Hancock and Bauval calculate, the constellation of the Lion rose in the east just before the equinox sun.",
@@ -767,8 +767,8 @@
    "until": {
     "station": "sphinx-flank",
     "view": {
-     "yaw": 80,
-     "pitch": 8,
+     "yaw": 104,
+     "pitch": 20,
      "fov": 70
     }
    },
@@ -783,9 +783,9 @@
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 90,
-    "pitch": 6,
-    "fov": 60
+    "yaw": 106,
+    "pitch": 20,
+    "fov": 66
    },
    "arrive": "turn",
    "say": "The lion on the ground watched its own image come up.",
@@ -799,8 +799,8 @@
    "until": {
     "station": "sphinx-flank",
     "view": {
-     "yaw": 80,
-     "pitch": 8,
+     "yaw": 104,
+     "pitch": 20,
      "fov": 70
     }
    },

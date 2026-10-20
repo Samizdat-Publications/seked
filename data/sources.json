@@ -277,6 +277,15 @@
     "note": "HYG moved off github.com/astronexus/HYG-Database, which stops at v4.1 and points here. On Codeberg the file is stored with Git LFS, so the /media/ URL above returns the 13 MB gzip and the /raw/ one returns only the 133-byte pointer; sha256 of the gzip is 5ca9431ff364c8002a4a3efa91b2b9296746aea1543374db4cb6b4fab049d601 and the version is dated 2025-06-29 by its own gzip timestamp. HYG gives right ascension in hours and distance in parsecs; scripts/stars.ts converts both and cuts the catalogue to magnitude 6.5. Row 0 of the CSV is the Sun, at right ascension 0 and distance 0, and is dropped. A distance of 100000 pc or more is HYG marking a missing or negative Hipparcos parallax."
   },
   {
+    "id": "stellarium-modern",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Stellarium's team. The modern (Western) sky culture of Stellarium: the IAU constellations' figures, each a set of lines drawn between stars named by their Hipparcos numbers.",
+    "url": "https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/modern/index.json",
+    "license": "CC BY-SA 4.0 for the sky culture's text and data (its description.md, section License), https://creativecommons.org/licenses/by-sa/4.0/. Required attribution: Stellarium's team, Stellarium modern sky culture, licensed CC BY-SA 4.0. data/stars/figures.json is an adapted database under that licence and carries the credit in its header.",
+    "note": "Downloaded 2026-10-20 from the master branch (the file has no version of its own), sha256 1f2f5ffd6c9e25a7d0dcfdbf1f756e2db03dd3b8ed4ec016a2839b09f6b0fe1e; scripts/figures.ts refuses any other file. A figure is a drawing convention, not a measurement: the exhibit labels every one it draws 'a modern figure'. The illustrations in the same folder are under the Free Art License and are not used."
+  },
+  {
     "id": "nasa-svs-4851",
     "kind": "reference",
     "year": 2020,

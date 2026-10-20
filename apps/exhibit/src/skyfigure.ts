@@ -23,8 +23,9 @@ export class SkyFigure {
     bar.innerHTML = `<p class="sky-year"><span class="sky-k">The sky in</span> <span class="sky-v"></span></p>
       <input type="range" min="${EARLIEST}" max="${TODAY}" step="1" aria-label="The sky's year">
       <p class="sky-note">The ${data.stars.length} stars of the HYG catalogue to magnitude ${data.magnitudeLimit}, precessed
-      (Vondrák 2011) to the year shown and drawn where they stood at this picture's moment, Leo's in gold. By day
-      none would be seen. Ticks on the horizon: C5's bearings.</p>`;
+      (Vondrák 2011) to the year shown and drawn where they stood at this picture's moment, Leo's in gold with
+      ${Object.keys(data.figures).length ? "Stellarium's modern figure drawn through them" : 'no figure drawn'}. By day none would be seen. Ticks on
+      the horizon: C5's bearings. Stars: HYG 4.2, by astronexus; figure: Stellarium; both CC BY-SA 4.0.</p>`;
     this.year = bar.querySelector('.sky-v')!;
     this.input = bar.querySelector('input')!;
     this.input.addEventListener('input', () => {

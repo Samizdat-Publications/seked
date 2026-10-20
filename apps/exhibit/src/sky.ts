@@ -24,6 +24,8 @@ export interface SkyData {
   named: Star[];
   /** Each claim with an epoch or a sun-ribbon overlay: its epoch and its bearings as written. */
   claims: Record<string, { epoch: number | null; bearings: { label: string; azimuth: string }[] }>;
+  /** The figures drawn (data/stars/figures.json, Stellarium's modern sky culture): runs of catalogue ids. */
+  figures: Record<string, { name: string; lines: string[][] }>;
   attribution: string;
 }
 
@@ -70,6 +72,7 @@ export function sunAt(moment: Moment, epoch: number, latDeg: number): { lstDeg: 
 export interface SkyStar { id: string; name: string | null; leo: boolean; mag: number; altDeg: number; azDeg: number }
 export interface SkyView {
   epoch: number;
+  figures: SkyData['figures'];
   sun: { altDeg: number; azDeg: number };
   stars: SkyStar[];
   bearings: { label: string; azDeg: number }[];
@@ -92,7 +95,7 @@ export function skyAt(data: SkyData, epoch: number, moment: Moment, bearingsOf =
   });
   const env = { ...skyEnvironment({ epoch, latitudeDeg: lat, longitudeDeg: data.longitudeDeg, stars: data.named }), ...sunEnvironment({ epoch, latitudeDeg: lat }) };
   const bearings = (data.claims[bearingsOf]?.bearings ?? []).map((b) => ({ label: b.label, azDeg: evaluate(b.azimuth, env) }));
-  return { epoch, sun, stars, bearings };
+  return { epoch, figures: data.figures, sun, stars, bearings };
 }
 
 /** The year `t` seconds into a leaf whose sky winds from `from` to `to`, eased; `to` once the run is over. */
@@ -111,7 +114,7 @@ export const yearLabel = (epoch: number) => {
 /** Where a direction (altitude and azimuth, degrees) falls on screen, or null behind the viewer. */
 export type SkyAt = (altDeg: number, azDeg: number) => [number, number] | null;
 
-const STAR_IN_MS = 1400;
+const STAR_IN_MS = 1400, LINES_MS = 1000;
 
 /**
  * Draw a sky onto the stage's ink: the stars appear brightest first over STAR_IN_MS (drawn on, not faded in), Leo's
@@ -120,10 +123,30 @@ const STAR_IN_MS = 1400;
  */
 export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, since: number, still: boolean, font: string): boolean {
   const k = still ? 1 : Math.min(1, since / STAR_IN_MS);
+  // the figures draw on once the stars are in
+  const g = still ? 1 : Math.min(1, Math.max(0, (since - STAR_IN_MS) / LINES_MS));
+  const byId = new Map(sky.stars.map((s) => [s.id, s]));
   const order = [...sky.stars].sort((a, b) => a.mag - b.mag);
   const shown = order.slice(0, Math.ceil(order.length * k));
   ctx.save();
   ctx.lineCap = 'round';
+  if (g > 0) {
+    ctx.strokeStyle = 'rgba(255, 210, 130, 0.85)';
+    ctx.lineWidth = 1.7;
+    for (const f of Object.values(sky.figures)) {
+      for (const run of f.lines) {
+        for (let i = 1; i < run.length; i++) {
+          const a = byId.get(run[i - 1]!), b = byId.get(run[i]!);
+          const pa = a && at(a.altDeg, a.azDeg), pb = b && at(b.altDeg, b.azDeg);
+          if (!pa || !pb) continue;
+          ctx.beginPath();
+          ctx.moveTo(pa[0], pa[1]);
+          ctx.lineTo(pa[0] + (pb[0] - pa[0]) * g, pa[1] + (pb[1] - pa[1]) * g);
+          ctx.stroke();
+        }
+      }
+    }
+  }
   for (const s of shown) {
     const p = at(s.altDeg, s.azDeg);
     if (!p) continue;
@@ -156,7 +179,7 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     if (pts.length >= 3) {
       const top = pts.reduce((a, b) => (b[1] < a[1] ? b : a));
       const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length;
-      label('Leo', [cx, top[1]], 'rgba(255, 220, 160, 0.95)', -12, -22);
+      label(sky.figures.Leo ? 'Leo, a modern figure' : 'Leo', [cx, top[1]], 'rgba(255, 220, 160, 0.95)', -12, -22);
     }
     // the bearings, as ticks standing on the horizon
     sky.bearings.forEach((b, i) => {
@@ -181,6 +204,6 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     }
   }
   ctx.restore();
-  return k < 1;
+  return k < 1 || g < 1;
 }
 

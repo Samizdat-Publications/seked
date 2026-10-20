@@ -9,7 +9,7 @@ const repo = join(__dirname, '..', '..', '..');
 const read = (p: string) => readFileSync(join(repo, 'data', p), 'utf8');
 const yaml = createRequire(join(repo, 'packages', 'claims', 'package.json'))('yaml') as { parse: (s: string) => never };
 const claims = readdirSync(join(repo, 'data', 'claims')).filter((f) => f.endsWith('.yaml')).map((f) => yaml.parse(read(`claims/${f}`)));
-const data = buildSkyData(JSON.parse(read('sites.json')), JSON.parse(read('stars/hyg-bright.json')), JSON.parse(read('stars/named.json')), claims);
+const data = buildSkyData(JSON.parse(read('sites.json')), JSON.parse(read('stars/hyg-bright.json')), JSON.parse(read('stars/named.json')), claims, JSON.parse(read('stars/figures.json')));
 const EQUINOX_DAWN = { date: '03-20', solar: 7.25 };
 
 describe('the sky data', () => {
@@ -22,6 +22,14 @@ describe('the sky data', () => {
     expect(epochOf('C5', data)).toBe(-10499);
     expect(epochOf('today', data)).toBe(TODAY);
     expect(() => epochOf('nothing', data)).toThrow();
+  });
+  it("draws Leo's modern figure, every star of it in the catalogue as cut, and credits it", () => {
+    const ids = new Set(data.stars.map((s) => s[0]));
+    const leo = data.figures.Leo!;
+    expect(leo.lines.flat()).toContain('hip49669');   // Regulus
+    for (const id of leo.lines.flat()) expect(ids.has(id), id).toBe(true);
+    expect(Object.keys(data.figures)).toEqual(['Leo']);
+    expect(data.attribution).toContain('Stellarium');
   });
 });
 
