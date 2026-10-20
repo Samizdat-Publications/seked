@@ -3,6 +3,10 @@ The lion's head ghosted round the king's: the hero image chapter 2 opens on (doc
 one master").
 
     blender -b --factory-startup -P render/ghost.py -- [--out build/preview/ghost.png] [--size 1600x900] [--samples 64]
+    blender -b --factory-startup -P render/ghost.py -- --orbit 48 --dir build/sequences/ghost-head [--size 960x540]
+
+`--orbit N` loads the scene once and renders N frames, fNNN.png and its fNNN.json record, the camera swung
+round the head on the still's own circle (render/giza/ghost.py `arc`); `--at T` renders the one frame at T.
 
 Two of the master's eras, both from render/giza/sphinx_eras.py and so the same statue: as built (c. 2500
 BCE, the king's head carved inside the lion's) drawn as stone, and the long rains (c. 7000 BCE, the lion
@@ -14,12 +18,15 @@ import math
 import os
 import sys
 
+import json
+
 import bpy
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from giza import data  # noqa: E402
+from giza import ghost as G  # noqa: E402
 from giza.sphinx import BLENDER_DIR  # noqa: E402
 
 if BLENDER_DIR not in sys.path:
@@ -27,7 +34,8 @@ if BLENDER_DIR not in sys.path:
 import render_standins as rs  # noqa: E402
 
 MODELS = os.path.join(data.REPO, "build", "models")
-GHOST_FROM = 0.40      # of the statue's height: the lion's head and mane, drawn as the ghost (a look choice)
+NOTE = ("Both forms are stand-ins derived from one Meshy master (render/giza/sphinx_eras.py), not measurements; "
+        "the ghost's extent, the light and the camera are look choices.")
 
 
 def stone(name, colour):
@@ -83,7 +91,7 @@ def main(argv):
     co = np.array([v.co[:] for v in lion.data.vertices])
     zr = (co[:, 2] - co[:, 2].min()) / np.ptp(co[:, 2])
     head_at = co[np.argmax(co[:, 2])]
-    keep = (zr > GHOST_FROM) & (np.abs(co[:, 1] - head_at[1]) < 0.18 * np.ptp(co[:, 1]))
+    keep = (zr > G.LOOK["ghost_from"]) & (np.abs(co[:, 1] - head_at[1]) < 0.18 * np.ptp(co[:, 1]))
     import bmesh
     bm = bmesh.new()
     bm.from_mesh(lion.data)
@@ -107,25 +115,46 @@ def main(argv):
     so.rotation_euler = (math.radians(62), 0.0, math.radians(-35))
     # The camera three-quarters in front, a little below the head, looking up at it.
     cam = bpy.data.cameras.new("camera")
-    cam.lens = 70
+    cam.lens = G.LOOK["lens"]
     co_cam = bpy.data.objects.new("camera", cam)
     sc.collection.objects.link(co_cam)
     sc.camera = co_cam
     from mathutils import Vector
-    target = Vector((float(head_at[0]), float(head_at[1]) + 0.02, float(co[:, 2].min() + 0.74 * np.ptp(co[:, 2]))))
-    co_cam.location = target + Vector((1.05, -1.45, -0.02))
-    co_cam.rotation_euler = (target - co_cam.location).to_track_quat("-Z", "Y").to_euler()
+    target = (float(head_at[0]), float(head_at[1]) + 0.02, float(co[:, 2].min() + 0.74 * np.ptp(co[:, 2])))
     sc.render.engine = "CYCLES"
     sc.cycles.device = "CPU"
     sc.cycles.samples = int(args.get("--samples", 64))
     sc.cycles.use_denoising = True
     sc.cycles.transparent_max_bounces = 16
     sc.render.resolution_x, sc.render.resolution_y = w, h
-    sc.render.filepath = out
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    bpy.ops.render.render(write_still=True)
-    print(f"ghost: {out}")
+    era = os.path.join(MODELS, "sphinx-master-built", "era.json")
+    fit = json.load(open(era, encoding="utf-8")).get("fit") if os.path.exists(era) else None
 
+    def shoot(path, t):
+        if t is None:
+            eye = tuple(a + b for a, b in zip(target, G.LOOK["still_offset"]))
+        else:
+            eye = G.arc(t, target)["eye"]
+        co_cam.location = Vector(eye)
+        co_cam.rotation_euler = (Vector(target) - co_cam.location).to_track_quat("-Z", "Y").to_euler()
+        sc.render.filepath = path
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        bpy.ops.render.render(write_still=True)
+        meta = dict(render=os.path.relpath(path, data.REPO), t=t, size=[w, h], samples=sc.cycles.samples,
+                    camera=dict(location=list(co_cam.location), rotation_euler=list(co_cam.rotation_euler),
+                                lens=cam.lens, sensor_width=cam.sensor_width),
+                    target=list(target), look_choices=G.LOOK, head_fit=fit, note=NOTE)
+        with open(os.path.splitext(path)[0] + ".json", "w", encoding="utf-8") as f:
+            json.dump(meta, f, indent=2)
+        print(f"ghost: {path}")
+
+    if "--orbit" in args:
+        n = int(args["--orbit"])
+        d = args.get("--dir", os.path.join(data.REPO, "build", "sequences", "ghost-head"))
+        for i in range(n):
+            shoot(os.path.join(d, "f%03d.png" % i), round(i / (n - 1), 4))
+    else:
+        shoot(out, float(args["--at"]) if "--at" in args else None)
 
 if __name__ == "__main__":
     main(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
