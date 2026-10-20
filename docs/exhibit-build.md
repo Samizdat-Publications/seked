@@ -17,11 +17,20 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 
 ## Items
 
-- [ ] **E1. `apps/exhibit`, the player ported.** A Vite + TypeScript app (no React, as `apps/story`), served at
+- [x] **E1. `apps/exhibit`, the player ported.** A Vite + TypeScript app (no React, as `apps/story`), served at
   `/exhibit/` by `pnpm site` beside `/walk/`. Port `apps/walk/index.html`'s WebGL2 panorama viewer into modules:
   equirectangular panoramas centred on true north, drag and wheel to look, the detail patches, the registered
   overlays (`overlays.json`, 3D lines projected from the station camera). Panoramas load from the same files
   `/walk/` uses. Full screen, nothing but the picture and a quiet caption band. Tests for the projection maths.
+  *Done 2026-10-20 15:49 UTC, `f499c90`.* `apps/exhibit/src`: `projection.ts` (the maths the shader and overlay
+  share, 19 tests), `manifest.ts` (stations and overlays read tolerantly, 7 tests), `viewer.ts` (the WebGL2
+  shader, two layers a and b ready for E4's wipe), `textures.ts` (fetch, decode, upload, oldest-used evicted),
+  `overlay.ts` (lines draw on, labels one at a time, the walk's label plate), `stage.ts` (drag, pinch, wheel,
+  arrows, inertia, patches, flat fallback without WebGL), `main.ts` (the address picks the shot until E2). Looked
+  at at 1440 by 900 and 390 by 844: `sphinx-flank` today, and `south` built with `g1-proportions` registered on
+  Khufu's edges; drag, zoom and resize checked. `pnpm site` builds it into `site/exhibit/`; `pnpm typecheck`
+  covers it. `pnpm test` 1118 passed. `render/tests` has 2 errors that need gitignored build outputs this
+  worktree lacks (`build/sky-bake.json`, `build/textures/index.json`), not this change.
 - [ ] **E2. The leaves.** `apps/exhibit/leaves.json` with the schema in the plan ("The leaves file"), a loader that
   validates it (zod, as `@seked/data`) and tests. Cut chapters 0 and 1 of `docs/script.md` into leaves, one or
   two sentences each, every word of those chapters kept in order. Choose each leaf's station, era, moment and
@@ -55,6 +64,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   badly. Write what still needs a render or a decision under "For Stewart" and "For the laptop".
 
 ## Decisions
+
+1. **The exhibit reads `../walk/` for stations, overlays and panoramas** rather than copying them, so the 4096 by
+   2048 panoramas are published once; the dev server serves `apps/walk` at `/walk/` to keep the path the same.
+   Reversible by pointing `WALK` in `main.ts` elsewhere.
+2. **Until E2, the address picks the shot** (`?station=&era=&yaw=&pitch=&fov=&overlay=`) and the page opens on
+   `sphinx-flank` today, chapter 1's station. E3 replaces it with `?leaf=`.
+3. **A panorama eases in from the blank over 320 ms as it arrives** (the walk's fade-in on load, not a dissolve
+   between pictures). Stewart's no-dissolves rule is about changes between leaves and eras, which E4 makes wipes.
 
 ## For Stewart
 
