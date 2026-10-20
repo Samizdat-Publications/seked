@@ -42,6 +42,18 @@ class ChinToCrownTests(unittest.TestCase):
         chin, _ = P.chin_to_crown(fwd, across, z)
         self.assertAlmostEqual(chin, 4.0, delta=0.2)
 
+    def test_the_rim_of_the_beards_hole_is_not_the_chin(self):
+        fwd, across, z = head()
+        # the beard cut away under the chin: no points in the middle there, and the hole's rim, just outside the
+        # middle, standing at the chest's front
+        width = np.ptp(across)
+        hole = (np.abs(across) < 0.07 * width) & (z > 3.1) & (z < 3.9)
+        rim = (np.abs(across) >= 0.07 * width) & (np.abs(across) < 0.08 * width) & (z > 3.1) & (z < 3.9)
+        keep = ~hole
+        fwd = np.where(rim, 2.0, fwd)
+        chin, _ = P.chin_to_crown(fwd[keep], across[keep], z[keep])
+        self.assertAlmostEqual(chin, 4.0, delta=0.2)
+
 
 if __name__ == "__main__":
     unittest.main()
