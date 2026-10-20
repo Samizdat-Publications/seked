@@ -26,6 +26,11 @@ export interface Sequence {
 }
 
 export const SEQUENCES: Record<string, Sequence> = {
+  'ghost-head': {
+    id: 'ghost-head', dir: 'assets/sequences/ghost-head', frames: 48, loop: false, focus: 0.5, whole: true,
+    alt: 'The king’s head carved inside the weathered lion’s, turned from one profile to the other; both stand-ins from one master',
+    made: 'render/ghost.py --orbit 48, the camera swung 80° either side of the face, at 960 by 540 and 16 samples',
+  },
   'enclosure-d-orbit': {
     id: 'enclosure-d-orbit', dir: 'assets/sequences/enclosure-d-orbit', frames: 96, loop: true, focus: 0.5,
     alt: 'Enclosure D at Göbekli Tepe, circled from its rim at eye height, a person for scale; its pillars placed from the excavators’ plan',

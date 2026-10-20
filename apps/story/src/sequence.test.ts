@@ -27,7 +27,7 @@ describe('the stage’s sequences', () => {
       for (const b of beats) expect(b.widget).toBe('sequence');
     }
     for (const b of STILLS.filter((x) => x.widget === 'sequence')) expect(SEQUENCES[b.sequence ?? '']).toBeDefined();
-    for (const id of ['enclosure-d-orbit', 'enclosure-d-fill']) expect(STILLS.find((b) => b.sequence === id)!.tags, id).toContain('stand-in');
+    for (const id of ['enclosure-d-orbit', 'enclosure-d-fill', 'ghost-head']) expect(STILLS.find((b) => b.sequence === id)!.tags, id).toContain('stand-in');
     expect(SEQUENCES['enclosure-d-fill']!.alt).toMatch(/since revised/i);
   });
 });
