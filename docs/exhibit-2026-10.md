@@ -63,7 +63,16 @@ with Stewart's agreement (`docs/laptop-2026-10-20.md`, decision 8).
 
 ElevenLabs, as the Antikythera exhibit's narration was made (`tools/narration.py` there; the key is in the
 laptop's environment). Its timestamps give each word a time, so a line draws on as its word is spoken. Until the
-voice is chosen, the browser's own speech stands in.
+voice is recorded, the browser's own speech stands in.
+
+**The voice** (Stewart, 20 October: "closest to David Attenborough, or just a good documentary voice"): "David -
+Documentary", ElevenLabs voice `ppLqTilh7rH7fbUVlXsf`, in Stewart's account. A first reading of the cold open's
+first two paragraphs (`eleven_multilingual_v2`, stability 0.55, similarity 0.8, style 0.15) ran 34.6 s for 73 words,
+about 127 words a minute, so the whole script of about 2,265 words runs near 18 minutes.
+
+**Chapter 7 gains a sky leaf** (agreed with Stewart, 20 October): Pillar 43, the Vulture Stone, laid over the sky
+`@seked/sky` computes for Göbekli Tepe, as Sweatman and Tsikritsis and Collins read it (the vulture as Cygnus, the
+scorpion as Scorpius, c. 9600 BCE), with the claim, its free choices and the reply. See `docs/gobekli-reliefs.md`.
 
 ## Building on what exists
 
