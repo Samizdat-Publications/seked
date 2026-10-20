@@ -406,6 +406,23 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   (`chronology.aha.accession.median`), with 13,420 alone, the two Turin figures summed (Schwaller's sum, not on the
   papyrus) and a thin line at 10,500 BCE, as the script's beat for "13,420 years and, in the next line, 23,200" asks.
   *Waiting on Stewart:* the totals want `data/texts/kinglists.json`, a new kind of file (see For Stewart).
+- [x] **E19. Chapter 7, "Before the flood": its leaves** (the plan's order: 3, 4, 7, 8, 9; added by chunk 6).
+  *Done 2026-10-21 00:02 UTC, `8c76c9d`.* 10 leaves, every word in order and inside `ch7.json`. No station stands at
+  Göbekli Tepe, so the chapter stays at Giza in the First Time, the same millennium (decision 52): the Younger Dryas
+  over the empty plateau from the `panorama` stand (turning on from `ch6-held`), up to the sky for the comet, then a
+  turn to yaw 40, the bearing of Göbekli Tepe from Giza computed from `data/sites.json` (39.7 degrees, 1,080 km), for
+  Abu Hureyra and the monument paragraph. Schoch and "a plan laid out at Giza" above the Sphinx Temple in the First
+  Time, with C4's `belt-plan` drawn on "plan" (receipt C4); "Some of that evidence has never been gathered" on the
+  flank's floor today, where chapter 8 goes underneath. Two patches queued, no new panorama or flight. Looked at as a
+  contact sheet and at both sizes; played through muted, 102 s, no errors, the belt plan drawn 4 s into its leaf.
+- [ ] **E19b. Enclosure D in the hand, its fill rising** (the plan's chapter 7 object, on `ch7-monument` to
+  `ch7-filled`). `render/giza/enclosure_d.py` is bpy-free and builds the pillars, wall and fill from
+  `data/measurements/gobekli.json` and its `LOOK`, so a three.js object can be ported like `pyramidobject.ts` (with
+  a test that its look choices match the renderer's `LOOK`).
+  *Waiting on the reliefs:* Stewart ruled on 20 October (`docs/gobekli-reliefs.md`) that Enclosure D is not shown
+  again without its carvings, and they stand at one first height map for Pillar 43, gitignored on the laptop. Build
+  the object once the cleaned height maps are committed, carving them as normal or bump maps on the pillars they
+  belong to.
 
 ## Decisions
 
@@ -585,6 +602,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 51. **The radiocarbon bands are drawn on the claim's leaf, "Egypt did not think it began with its first king"**, not
     only in the reply panel: the sentence names the first king, and the bar is when he reigned, which the king lists
     (E18c) will count back from. The panel stays text, as every other chapter's. Reversible: move `radiocarbon@king`.
+52. **Chapter 7 stands at Giza, facing Göbekli Tepe**, not at Göbekli Tepe: no station or panorama exists there, the
+    Enclosure D renders are flat stills without the reliefs Stewart asked for, and the First Time at Giza is the same
+    millennium the chapter is about. The leaves for the monument look along its bearing from Giza, so the picture
+    points where the words are. Reversible: give the monument leaves an `until` once a Göbekli station exists.
 
 
 ## For Stewart
