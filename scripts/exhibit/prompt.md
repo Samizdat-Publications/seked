@@ -14,6 +14,8 @@ Then:
 2. Take the first item that is not ticked and do it fully: code, tests (`pnpm test`, `pnpm typecheck`,
    `python -m unittest discover -s render/tests`), and look at what you build (Playwright's Chromium is
    installed for Python: screenshot the page at 1440 by 900 and at 390 by 844 and read the screenshots).
+   **Always launch Chromium with `args=["--mute-audio"]`**: this runs on Stewart's laptop, and the browser's
+   speech plays through its speakers. Test speech by its events and timings, never by sound.
    Commit named paths only, never `git add -A`, with a message that says what and why and ends with the
    attribution line below. Push with `git push -u origin {{branch}}`, retrying on network errors after 2, 4,
    8 and 16 s. Never force, never push any other branch, never merge.
