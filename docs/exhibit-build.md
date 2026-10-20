@@ -389,6 +389,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   quantity `date`; `verified: false`), drawn as a timeline on "first king" or in the reply. The king-list totals
   need `data/texts/kinglists.json`, a new kind of file the script says needs a sentence in `CLAUDE.md`: ask Stewart
   before creating it (For Stewart).
+  *Note from chunk 5:* the bands date reigns, and every record must name a registered structure; a reign is not one.
+  The smallest honest home is a site-free structure `chronology` beside `units` and `constants` (one entry in
+  `SITE_FREE_STRUCTURES`, `packages/data/src/index.ts`), keys like `chronology.aha.accession.start`. Both sources'
+  notes in `data/sources.json` already carry the ranges (Table 1 of each). Decide that first, then enter, then draw.
 
 ## Decisions
 
