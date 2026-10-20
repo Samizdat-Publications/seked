@@ -103,13 +103,20 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `sphinx.enclosure.weathering.depth.s1` to `.s4` from `dobecki-schoch-1992` (`verified: false`), the seismic
   lines a reading of Reader's Fig. 5 with `scripts/plate.py`. Enter those records first (never typed into an
   overlay), then draw them, as figures where the statue would hide them in the scene.
-- [ ] **E7. The recorded voice in the player** (replaced by the laptop session, 20 October: the voice is chosen
+- [x] **E7. The recorded voice in the player** (replaced by the laptop session, 20 October: the voice is chosen
   and recorded). `assets/narration/chN.mp3` and `chN-reply.mp3` hold each chapter of `docs/script.md` in Stewart's
   chosen voice, and `chN.json` the exact text spoken with every character's start and end time
   (`scripts/narrate_script.py`). A leaf is a range of its chapter's text: find its words in that text, take their
   times, and play that span of the chapter's audio; a line draws on at its word's time. The browser's speech stays
   only as the fallback for a leaf whose words are not in the recording (say so in the console). The leaves must
   keep the script's words exactly, or the chapter is re-recorded. Do not call ElevenLabs.
+  *Done 2026-10-20 16:29 UTC, `71c917a`.* `src/narration.ts` finds each leaf's words in its chapter's recorded text
+  and gives the span and each word's time (3 tests; one checks every chapter 0 and 1 leaf against the recordings
+  when the checkout has them, which this worktree does not, so it skipped here; the same check run by hand
+  against the main checkout's files found all 22). The player fetches a chapter's mp3 whole and plays the leaf's
+  span from memory (a blob seeks whatever the server does with ranges), cueing lines and figures from the audio
+  clock; the browser's voice is the fallback, said in the console. Served at `/narration/` in dev, copied by
+  `pnpm site`. Checked muted against the recordings.
 - [ ] **E8. Look at it end to end** at both sizes, as a visitor with no background would, and fix what reads
   badly. Write what still needs a render or a decision under "For Stewart" and "For the laptop".
 
@@ -173,6 +180,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     play tests (from about 16:00 UTC) ran unmuted, so the browser's voice will have been audible on the laptop
     while they ran. Every test script launches with `--mute-audio` now.
 
+19. **A chapter's recording is fetched whole and played from a blob URL**, not streamed. The dev server and a
+    Playwright route ignore HTTP ranges, and an audio element that cannot seek plays every leaf from the top of
+    its chapter. A chapter is 0.8 to 1.5 MB and plays in full anyway.
+
 
 ## For Stewart
 
@@ -190,6 +201,8 @@ Renders the laptop session should run, with the queue or command, as items need 
   at that hour; if so, say, and the chapter 1 leaves can move to `morning-east` with the flight in becoming a cut.
   The queue is now written (E6): `blender -b --factory-startup -P render/build.py -- --queue
   render/queues/exhibit-panos.json`, then `python render/publish.py`.
+- Commit `assets/narration/` (Git LFS) to the branch, or merge it in: the player reads it at `narration/`, and
+  without it falls back to the browser's voice.
 - Two flights, `render/films-exhibit.json`. Preview each first (`--films render/films-exhibit.json --film ID
   --preview 0,45,89`), then render and encode into `apps/exhibit/flights/ID.mp4` with `render/film.py encode ...
   --fps 30` (the command is in `scripts/exhibit_queue.py`'s docstring). **`ch0-ditch--ch1-carved` climbs only
