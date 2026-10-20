@@ -8,3 +8,4 @@ Written by `scripts/night.py` after each chunk of the overnight builder and comm
 | 2 | 2026-10-20 18:46 | 135 | $6.15 | $14.15 | finished; 6 commits |
 | 3 | 2026-10-20 22:31 | 155 | $9.87 | $24.02 | finished; 11 commits |
 | 4 | 2026-10-20 23:01 | 169 | $9.07 | $33.09 | finished; 14 commits |
+| 5 | 2026-10-20 23:42 | 181 | $9.15 | $42.24 | finished; 15 commits |
