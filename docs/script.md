@@ -126,7 +126,7 @@ If the lion is that old, they argue, so are the temples at its feet.
   - Shown as: Leo did rise just before the sun, but it did not rise due east. Overall, the claim is not within tolerance.
 - **D4, Sphinx axis and the temples.** The Sphinx Temple's east wall is −1.2′ from the meridian (band ±15′), its north wall +22.0′ from due east (band ±30′), and the Valley Temple's mean axis +5.0′. All hold. Free choice (1): the temple's axis stands in for the Sphinx's own.
 - **C6, Solstice akhet** (shown in the reply). Seen from the Sphinx at epoch −2499, the summer-solstice sun sets in the gap between Khufu's and Khafre's pyramids: +2°38′15″ against a band of ±8°, with no free choices. **Holds.** This is Lehner's alignment, which the reply relies on.
-- **H1, "the head inside the lion"** (proposed; the master lion, `sphinx-master`, is being made in the cloud, and H1 waits on it and on a nemes head).
+- **H1, "the head inside the lion"** (computed 20 October by `render/giza/sphinx_eras.py`, not yet a claim file). The largest king's head that fits wholly inside the weathered lion's head is **0.39 of the lion head's height: 3.17 m of head and nemes against 8.08 m of lion head, its crown 0.67 m under the lion's**. It is read off two stand-ins, the master lion and the king's head, and the receipt says so.
   - **Inputs:** the master lion, a Meshy stand-in, scaled to `sphinx.length` 73.0 m, `sphinx.height` 20.2 m and `sphinx.width` 19.1 m (`arce-sphinx-1991`, unverified); the phase II weathering; a nemes head.
   - **Free choices:** the master mesh, how deep the long rains wore, and the nemes head's natural proportions (taken from which royal sphinx).
   - **Output:** how far the king's head had to shrink to fit, compared with today's head in `sphinx-meshy`. The stand-in caveat is shown on screen.
@@ -546,7 +546,7 @@ The nine spoken replies come to about 290 words, roughly two minutes, so autopla
     - `krupp-1997` should be vol. 93(2), p. 64.
     - The header of `docs/shafts.md` is out of date.
     - The dossier should be regenerated.
-20. **The head-fit number (H1)** waits on the new master lion (`sphinx-master`, being drawn and meshed in the cloud) and on a nemes head to carve inside it.
+20. **The head-fit number (H1)** is 0.39 (3.17 m of king's head inside 8.08 m of lion's head), from the master and the king's head, both stand-ins. To make it a claim file, it needs the real head's height (scaled off an ARCE elevation) as the target, with the two meshes named as its free choices.
 
 ## Edits to the first draft
 

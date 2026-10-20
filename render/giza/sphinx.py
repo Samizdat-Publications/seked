@@ -29,10 +29,12 @@ if BLENDER_DIR not in sys.path:
 
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
 # The claim's lions are one master (docs/rethink-2026-10.md), lengthened to the ARCE proportions and worn
-# era by era by render/giza/sphinx_eras.py, whose output is the master's finishes. As built and today keep
-# their own models until the king's head is carved inside the master's.
+# era by era by render/giza/sphinx_eras.py, whose output is the master's finishes: as built is the same
+# statue with the king's head carved inside the lion's. Today keeps the model made from photographs until
+# its losses are carved too.
+DERIVED = {"sphinx-master"}      # whose finishes are eras, not surfaces: a missing one is no statue, not the master
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion"),
-             "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-built", None),
+             "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-master", "built"),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
@@ -107,6 +109,9 @@ def statue(state, coll, log=print):
         finished = os.path.join(data.REPO, "build", "models", f"{model['id']}-{finish}", "model.glb")
         if os.path.exists(finished):
             path = finished
+        elif model_id in DERIVED:
+            log(f"sphinx: {model_id}-{finish} is not on disk (blender -b --factory-startup -P render/giza/sphinx_eras.py); no statue")
+            return None
         else:
             log(f"sphinx: finish {finish} not on disk; the plain surface")
             surface = {}
