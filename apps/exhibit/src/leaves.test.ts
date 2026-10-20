@@ -46,6 +46,17 @@ describe('leaves.json', () => {
     expect(joinProblems(leaves)).toEqual([]);
   });
 
+  it('wipes only between eras taken from the same camera, so the two pictures register', () => {
+    const cams = (station: string, era: string) => {
+      const s = walk.stations.find((x) => x.id === station) as unknown as { camera: number[]; cameras?: Record<string, number[]> };
+      return (s.cameras?.[era] ?? s.camera).join();
+    };
+    leaves.forEach((L, i) => {
+      const prev = leaves[i - 1];
+      if (L.arrive === 'wipe' && prev) expect(cams(L.station, L.era), `${L.id}: ${prev.era} to ${L.era}`).toBe(cams(prev.station, prev.era));
+    });
+  });
+
   it('stands only at stations, in eras and moments the renderer knows', () => {
     const eras = new Set(walk.states.map((s) => s.id));
     for (const L of leaves) {

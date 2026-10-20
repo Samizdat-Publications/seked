@@ -9,11 +9,18 @@
    "for": "ch0-dawn"
   },
   {
+   "state": "first-time",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "out": "build/render/pano/sphinx-first-time-equinox-dawn.png",
+   "for": "ch0-claim"
+  },
+  {
    "state": "today",
    "station": "sphinx-face",
    "moment": "equinox-dawn",
    "out": "build/render/pano/sphinx-face-today-equinox-dawn.png",
-   "for": "ch0-behind"
+   "for": "ch0-question"
   },
   {
    "state": "today",

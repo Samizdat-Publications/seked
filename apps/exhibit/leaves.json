@@ -42,15 +42,15 @@
   {
    "id": "ch0-behind",
    "chapter": 0,
-   "station": "sphinx-face",
+   "station": "sphinx",
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 276,
-    "pitch": 16,
-    "fov": 60
+    "yaw": 292,
+    "pitch": 7,
+    "fov": 64
    },
-   "arrive": "flight",
+   "arrive": "turn",
    "say": "Behind it stand the pyramids of Khufu and Khafre.",
    "draw": [],
    "hold": 1,
@@ -61,32 +61,32 @@
   {
    "id": "ch0-textbooks",
    "chapter": 0,
-   "station": "sphinx-face",
-   "era": "built",
+   "station": "sphinx",
+   "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 276,
-    "pitch": 16,
-    "fov": 60
+    "yaw": 280,
+    "pitch": 6,
+    "fov": 44
    },
-   "arrive": "wipe",
+   "arrive": "turn",
    "say": "The textbooks say Khafre's workmen carved the Sphinx about 2500 BCE.",
    "draw": [],
    "hold": 1,
-   "interact": "era",
+   "interact": "look",
    "receipts": [],
    "reply": "ch0"
   },
   {
    "id": "ch0-claim",
    "chapter": 0,
-   "station": "sphinx-face",
+   "station": "sphinx",
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 276,
-    "pitch": 16,
-    "fov": 60
+    "yaw": 280,
+    "pitch": 6,
+    "fov": 44
    },
    "arrive": "wipe",
    "say": "Graham Hancock and Robert Bauval say the Sphinx and the plan of this plateau go back to about 10,500 BCE.",
@@ -104,10 +104,10 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 272,
-    "pitch": 28,
-    "fov": 70
+    "pitch": 24,
+    "fov": 66
    },
-   "arrive": "turn",
+   "arrive": "flight",
    "say": "Robert Schoch, a geologist, says the rock agrees with them.",
    "draw": [],
    "hold": 1,
@@ -123,8 +123,8 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 272,
-    "pitch": 28,
-    "fov": 70
+    "pitch": 24,
+    "fov": 66
    },
    "arrive": "wipe",
    "say": "So how old is the Sphinx?",
@@ -142,8 +142,8 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 272,
-    "pitch": 28,
-    "fov": 70
+    "pitch": 24,
+    "fov": 66
    },
    "arrive": "turn",
    "say": "This piece makes their case as strongly as it can be made, and gives the archaeologists their answer.",
@@ -160,8 +160,8 @@
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 230,
-    "pitch": 8,
+    "yaw": 246,
+    "pitch": 10,
     "fov": 70
    },
    "arrive": "turn",
