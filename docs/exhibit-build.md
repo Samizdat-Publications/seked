@@ -174,6 +174,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   measured height, eye 1.7 m above the roof), with a clear line to the Sphinx's face and the pyramids behind;
   `today`, `equinox-dawn`. Say in `stations.json` which building and its height's source. Make `ch0-dawn` stand
   there and fly (E4c) to the temple view for the next leaves; queue its panorama, patch and flight.
+  *Done 2026-10-20 18:45 UTC, `3f282b3`.* `nazlet-roof` stands on Open Buildings record 48821 (a 422 m2 building
+  354 m east of the Sphinx, 15 m north of its axis, its height measured by the 2.5D raster), chosen as the roof
+  nearest the axis from which lines to the Sphinx's head and chin and to both apexes clear the scene's terrain
+  and every drawn building (a throwaway search, `build/exhibit-shots/e12/roofs.py`; the monuments between were
+  not checked). The height is typed nowhere: `"roof": true` makes the renderer stand the eye 1.7 m over the drawn
+  box there (`city.roof_at`, decision 25), and `render/tests/test_city_roof.py` keeps every roof station on a
+  drawn, measured building. `ch0-dawn` stands there (yaw 284, pitch 1, field 40: the Sphinx, Khafre and Khufu in
+  one frame, a framing worked out from bearings, to look at once rendered) and `ch0-sunrise` flies from it.
+  Until the roof is published, `until` puts `ch0-dawn` at the temple view as before (decision 24): looked at at
+  both sizes, and Next turns to `ch0-sunrise` in the same panorama. The queue asks for the roof's panorama and
+  patch; the flight `ch0-dawn--ch0-sunrise` waits for the publish (see For the laptop).
 
 ## Decisions
 
@@ -256,6 +267,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 23. **A patch belongs to a panorama file, not to a station and era.** The exhibit shows one station in one era at
     more than one moment, and a patch rendered in one light laid over a panorama in another would show as a
     lighter or darker rectangle. Patches are now looked up by the address of the panorama on stage.
+24. **A leaf may name a stand-in (`until`) for while its station is unpublished**, rather than the player failing
+    or the leaf waiting in a branch. The stand-in is data in the leaf, the console says when it is used, and it
+    stops being used the moment publish adds the station, so the prototype works tonight and needs no edit
+    tomorrow. Take `until` out once the roof is rendered and liked.
+25. **A roof station names no height.** It says `"roof": true` at a point on the building, and the renderer reads
+    the height from `city.bin` with the rule `city.build` draws by, so the eye cannot drift from the roof if the
+    city is re-imported. Its note names the record and the height's source. Decision 5 is superseded.
 
 
 ## For Stewart
@@ -263,10 +281,8 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - **The prototype is ready to judge in the browser**, on the walkthrough's panoramas until tonight's renders land:
   `pnpm --filter @seked/exhibit dev`, then open the address it prints. Play starts it; any drag pauses; the
   tab at the right edge is the reply.
-- The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`, above the Sphinx temple. A
-  rooftop station east of the temple (and the rise over the roofs the script's beat describes) would make it
-  true; until then, should the words change to fit the picture? (Decision 5; changing them means re-recording
-  chapter 0.)
+- ~~The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`.~~ Settled by the laptop
+  session (E12): the words stay and `ch0-dawn` stands on a roof there once its panorama is rendered.
 - The cold open no longer shows Giza as built: at `sphinx` the built panorama is taken from another camera, so it
   cannot be wiped to. The textbook date is spoken over today's view. If the built Sphinx matters there, the
   built era at `sphinx` would need a render from today's camera.
@@ -292,7 +308,14 @@ Renders the laptop session should run, with the queue or command, as items need 
   long rains and the First Time without pyramids), which the walkthrough's own claim-era panoramas still lack.
   Worth a look whether the flank's floor is too dark at that hour; if so, say, and chapter 1 can move to
   `morning-east` with its flight in becoming a cut.
-  *On disk by 18:34 UTC; the panorama queue is empty now.*
+  *On disk by 18:34 UTC.*
+- **The rooftop** (E12), first: `render/queues/exhibit-panos.json` now holds only `nazlet-roof` today at
+  equinox dawn. Render, `python render/publish.py`, and look: the Sphinx's face and the two pyramids should be
+  in view over the Sphinx temple, the valley temple and whatever stands in the village (the search checked the
+  terrain and the city's boxes, not the monuments or the modern stands). If something blocks it, say so and
+  the builder picks the next roof. Then `python scripts/exhibit_queue.py` again: it queues the flight
+  `ch0-dawn--ch0-sunrise`, which can only be written once publish has recorded the roof's camera. The roof's
+  patch is already in `exhibit-patches.json`; render it after the panorama.
 - **Nine detail patches** (E11), `render/queues/exhibit-patches.json`, after the panoramas they register with
   (a patch older than its panorama is left out by publish): `blender -b --factory-startup -P render/build.py --
   --queue render/queues/exhibit-patches.json`, then `python render/publish.py`, which writes
