@@ -23,7 +23,7 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption' | 'sequence' | 'depths';
+  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption' | 'sequence' | 'depths' | 'method';
   /** For a `sequence` beat, its id in SEQUENCES (src/sequence.ts). */
   sequence?: string;
   /** For a `caption` beat, the words the stage shows over the still, from the narration. */
@@ -122,6 +122,8 @@ export const STILLS: Still[] = [
 
   { chapter: 8, anchor: 'Everything so far stands on the surface.', src: 'progress/0037-underneath-khafre-cutaway.png',
     alt: 'Khafre’s pyramid and the plateau cut away, the claimed wells and chambers below', tags: ['look choices'], whole: true },
+  { chapter: 8, anchor: 'the way an ultrasound reads a body', src: 'progress/0037-underneath-khafre-cutaway.png',
+    alt: 'The method as its authors describe it: radar off the ground, vibrations read in the rock', tags: [], whole: true, widget: 'method' },
   { chapter: 8, anchor: 'eight hollow wells in two rows', src: 'progress/0037-underneath-khafre-cutaway.png',
     alt: 'Khafre’s pyramid and the plateau cut away, the claimed wells and chambers below', tags: ['look choices'], whole: true,
     widget: 'sequence', sequence: 'underground-descent' },

@@ -261,3 +261,24 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .depths text { font-size: 2.8px; }
   .depths .axis text, .depths .undrawn, .depths .key text { font-size: 2.4px; }
 }
+/* chapter 8's method schematic: the radar pale, the claim's rings orange and dashed, the claimant's reach a firm orange rule */
+.method { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column; justify-content: center;
+  background: #0f1219; color: #e9e2d4; font-family: system-ui, sans-serif; }
+.stage.method-on .method { display: flex; }
+.method svg { width: 100%; max-height: 90%; }
+.method text { fill: rgba(233, 226, 212, 0.85); font-size: 2.6px; }
+.method .title { font-size: 3.2px; text-anchor: middle; fill: #e9e2d4; }
+.method .note { font-size: 2.2px; text-anchor: middle; font-style: italic; fill: rgba(233, 226, 212, 0.5); }
+.method .rock { fill: rgba(120, 104, 84, 0.35); }
+.method .ground { stroke: rgba(233, 226, 212, 0.6); stroke-width: 0.3; }
+.method .pyramid { fill: #c9bba3; }
+.method .sat rect { fill: #e9e2d4; }
+.method .pulse { stroke: #9fc4ff; stroke-width: 0.35; stroke-dasharray: 1.2 0.8; }
+.method .ring { fill: none; stroke: #f2a33a; stroke-width: 0.35; stroke-dasharray: 1 0.7; }
+.method .reach { stroke: #f2a33a; stroke-width: 0.45; }
+.method .pulse, .method .ring, .method .label, .method .reach, .method .reach-label { transition: opacity 0.3s; }
+.method .label.rings { fill: #f2b544; }
+.method .reach-label { fill: #f2b544; }
+@media (max-width: 52rem) {
+  .method text { font-size: 3.2px; }
+}

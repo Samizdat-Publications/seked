@@ -19,6 +19,7 @@ import { chapterReceipts, receiptLine } from './receipts';
 import { depthRows, undrawn } from './depths';
 import { depthsWidget, type DepthsWidget } from './depthswidget';
 import { mapWidget, type MapWidget } from './mapwidget';
+import { methodWidget, type MethodWidget } from './methodwidget';
 import { PLAN_STILL, planFootprints } from './plan';
 import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
@@ -102,6 +103,8 @@ const isProfile = (s: Still | null | undefined) => PROFILE_MODES.some((m) => m =
 /** Chapter 7's timeline, likewise. */
 let timeline: TimelineWidget | undefined;
 const isTimeline = (s: Still | null | undefined) => s?.widget === 'ice' || s?.widget === 'dryas';
+/** Chapter 8's method schematic, likewise. */
+let method: MethodWidget | undefined;
 /** Chapter 8's depth scale, likewise. */
 let depths: DepthsWidget | undefined;
 /** Chapter 7's map inset, likewise. */
@@ -145,6 +148,7 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
   stage.classList.toggle('map-on', still?.widget === 'map' && !!map);
   stage.classList.toggle('depths-on', still?.widget === 'depths' && !!depths);
+  stage.classList.toggle('method-on', still?.widget === 'method' && !!method);
   stage.classList.toggle('plan-on', still?.widget === 'plan' && !!planEl);
   const seq = sequenceOf(still);
   for (const w of sequences.values()) w.el.classList.toggle('on', w === seq && w.ready());
@@ -207,6 +211,7 @@ function follow() {
   // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
   // nearer: chapter 6's later beats have no still of their own, so its next beat is chapter 7's
   if (isTimeline(still) && timeline) timeline.progress(still!.widget as TimelineMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
+  if (still?.widget === 'method' && method) method.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (still?.widget === 'depths' && depths) depths.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (still?.widget === 'map' && map) map.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (isProfile(still) && profile) profile.progress(still!.widget as ProfileMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
@@ -268,6 +273,10 @@ async function liveReceipts() {
       stage.append(planEl);
     } catch (err) {
       console.warn('chapter 7 keeps its still without the plan:', err);
+    }
+    if (env['g2.sar.radar.penetration.max'] !== undefined && env['g2.height.original'] !== undefined) {
+      method = methodWidget(env['g2.sar.radar.penetration.max'], env['g2.height.original']);
+      stage.append(method.el);
     }
     try {
       depths = depthsWidget(depthRows(env, structures), undrawn(structures));
