@@ -106,7 +106,15 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   background: radial-gradient(ellipse at 50% 60%, #1f1b15, #0c0b09 75%); color: #e9e2d4; font-family: system-ui, sans-serif; }
 .stage.profile-on .profile { display: flex; }
 .profile svg { width: 100%; max-height: 70%; display: none; }
-.profile[data-mode="pi"] svg.pi, .profile[data-mode="phi"] svg.phi { display: block; }
+.profile[data-mode="pi"] svg.pi, .profile[data-mode="phi"] svg.phi, .profile[data-mode="earth"] svg.earth,
+.profile[data-mode="north"] svg.north { display: block; }
+.profile .row { display: none; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; padding: 0 1.2rem 1rem; }
+.profile[data-mode="row"] .row { display: grid; }
+.profile .row figure { margin: 0; }
+.profile .row svg.mini { display: block; width: 100%; height: 7rem; max-height: none; }
+.profile .row figcaption { font-size: 0.75rem; line-height: 1.35; color: rgba(233, 226, 212, 0.8); }
+.profile .row .res, .profile .row .free { display: block; }
+.profile .row .res { color: #f2b544; }
 .profile text { fill: rgba(233, 226, 212, 0.75); font-size: 2.6px; }
 .profile text:not([text-anchor]) { text-anchor: middle; }
 .profile .label.claimed { fill: #f2b544; font-size: 3.4px; }
@@ -127,4 +135,7 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .profile svg { max-height: 60%; }
   .profile .readouts { font-size: 0.7rem; line-height: 1.3; padding: 0 0.6rem; min-height: 0; }
   .profile .small { display: none; }
+  .profile .row { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; padding: 0 0.6rem 0.4rem; }
+  .profile .row figcaption { font-size: 0.6rem; }
+  .profile .row svg.mini { height: 3.6rem; }
 }

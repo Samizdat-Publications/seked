@@ -17,7 +17,7 @@ import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
-import { profileWidget, type ProfileWidget } from './profilewidget';
+import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
 import { skyWidget, type SkyWidget } from './skywidget';
 import { STILLS, keyFrames, markAnchors, markers, stillFile, type Still } from './stills';
 import './style.css';
@@ -79,7 +79,8 @@ let shown: Still | null | undefined;
 let sky: SkyWidget | undefined;
 /** Chapter 6's draw-on profile, likewise. */
 let profile: ProfileWidget | undefined;
-const isProfile = (s: Still | null | undefined) => s?.widget === 'pi' || s?.widget === 'phi';
+const PROFILE_MODES: (Still['widget'] & ProfileMode)[] = ['pi', 'phi', 'earth', 'north', 'row'];
+const isProfile = (s: Still | null | undefined) => PROFILE_MODES.some((m) => m === s?.widget);
 
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
@@ -147,7 +148,7 @@ function follow() {
   if (still?.widget === 'sky' && sky) sky.progress(since / (0.8 * (since + until)));
   // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
   // nearer: chapter 6's later beats have no still of their own, so its next beat is chapter 7's
-  if (isProfile(still) && profile) profile.progress(still!.widget as 'pi' | 'phi', since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
+  if (isProfile(still) && profile) profile.progress(still!.widget as ProfileMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
 }
 let queued = false;
 addEventListener('scroll', () => {
@@ -187,11 +188,11 @@ async function liveReceipts() {
     const env = buildEnvironment(resolve({ sources, sites, structures, measurements, presets, materials }, 'canonical').values);
     sky = skyWidget(c4, env);
     stage.append(sky.el);
-    const a1 = bundle.claims.find((c) => c.id === 'A1');
-    const a2 = bundle.claims.find((c) => c.id === 'A2');
-    if (a1 && a2) {
-      profile = profileWidget(profileOf(env, a1, a2));
+    try {
+      profile = profileWidget(profileOf(env, bundle.claims));
       stage.append(profile.el);
+    } catch (err) {
+      console.warn('chapter 6 keeps its stills:', err); // a claim or a length missing from the bundle
     }
     shown = undefined;
     follow();

@@ -23,7 +23,7 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky' | 'strip' | 'pi' | 'phi';
+  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row';
 }
 
 const SPHINX_TODAY = 'progress/0040-sphinx-today.png';
@@ -82,6 +82,12 @@ export const STILLS: Still[] = [
     alt: 'The Great Pyramid as built, its casing restored', tags: ['reconstruction'], widget: 'pi' },
   { chapter: 6, anchor: 'Draw a line from the apex down the middle of one face.', src: 'progress/0011-blender-section-drawing.png',
     alt: 'The Great Pyramid in section from the east, from Petrie’s survey', tags: [], whole: true, widget: 'phi' },
+  { chapter: 6, anchor: 'Scale the pyramid up 43,200 times.', src: 'progress/0011-blender-section-drawing.png',
+    alt: 'The Great Pyramid in section from the east, from Petrie’s survey', tags: [], whole: true, widget: 'earth' },
+  { chapter: 6, anchor: 'The sides run within four minutes of arc of true north.', src: 'progress/0026-blender-dawn-as-built.png',
+    alt: 'The Great Pyramid as built, its casing restored', tags: ['reconstruction'], widget: 'north' },
+  { chapter: 6, anchor: 'written into one shape', src: 'progress/0011-blender-section-drawing.png',
+    alt: 'The Great Pyramid in section from the east, from Petrie’s survey', tags: [], whole: true, widget: 'row' },
 
   { chapter: 7, anchor: 'a plan laid out at Giza in the eleventh millennium BCE', src: FIRST_TIME_AIR,
     alt: 'Giza’s First Time from the air: the plateau green, no pyramids', tags: ['claim state'] },

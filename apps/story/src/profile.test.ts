@@ -5,8 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { alongSquare, profileOf } from './profile';
 
 const env = buildEnvironment(resolve(loadDatabase(), 'canonical').values);
-const claim = (id: string) => loadClaims().find((c) => c.id === id)!;
-const p = profileOf(env, claim('A1'), claim('A2'));
+const p = profileOf(env, loadClaims());
 
 describe("chapter 6's profile", () => {
   it("reads the dossier's A1 and A2", () => {
@@ -15,6 +14,15 @@ describe("chapter 6's profile", () => {
     expect(p.a1.value).toBeCloseTo(p.perimeter / p.height, 12);
     expect(p.a2[0]!.value).toBeCloseTo(1.6187, 4);
     expect(p.a2[0]!.value).toBeCloseTo(p.apothem / p.half, 12);
+  });
+
+  it("reads the dossier's B1 and C1, and the free choices the row counts", () => {
+    // chapter 6's receipts: B1 −0.38 % and −0.68 %, 2 free choices; C1 −3′54″ (Dash), none
+    expect(p.b1[0]!.residualPct).toBeCloseTo(-0.38, 2);
+    expect(p.b1[1]!.residualPct).toBeCloseTo(-0.68, 2);
+    expect(p.scale).toBe(43200);
+    expect(p.c1.value * 60).toBeCloseTo(-3.9, 1);
+    expect(Object.values(p.claims).map((c) => c.freeChoices)).toEqual([0, 0, 2, 0]);
   });
 
   it('draws a pyramid whose parts agree: a right triangle, and four sides round', () => {
