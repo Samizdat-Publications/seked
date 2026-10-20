@@ -411,6 +411,15 @@
     "note": "The scale drawings of the Sphinx that the ARCE Sphinx Project made between 1979 and 1983, 6,048 media records in all, published on Open Context under CC BY 4.0 and served as full TIFFs and as a IIIF service on archive.org. Drawing d-gen-008 carries a printed scale of 1:200 in its own metadata, a scale bar ticked every 5 m from 10 m above zero to 50 m below it, and the project's own 10 m survey grid as crosses over the ditch floor. Fetched on 2026-09-17 to build/plates/ (gitignored) through https://iiif.archive.org/iiif/opencontext-101-drawing-d-gen-008/full/6726,/0/default.jpg, the full width of the scan, 6726 by 6225 pixels; nothing from it is committed but the numbers. The plate draws no dimension, so everything taken from it is scaled and never verified."
   },
   {
+    "id": "arce-sphinx-south-elevation-oc",
+    "kind": "survey",
+    "year": 2017,
+    "citation": "Lehner, M. (2017). ARCE Sphinx Project 1979-1983 Archive. Open Context, project 141e814a-ba2d-4560-879f-80f1afb019e9, https://doi.org/10.6078/M7CZ356B. Drawing d-ss-047, the Sphinx's south elevation, a photogrammetric survey by Ulrich Kapp (1979), its masonry coloured by phase, © 1997 Mark Lehner; Open Context media record b632d80f-c848-48e7-9013-85c344c9de50.",
+    "url": "https://opencontext.org/media/b632d80f-c848-48e7-9013-85c344c9de50",
+    "license": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0. Attribution: Mark Lehner, ARCE Sphinx Project 1979-1983 Archive, Open Context.",
+    "note": "The same archive as arce-sphinx-mapping-oc, a second sheet. Its title block reads 'SPHINX - GIZA, SOUTH - ELEVATION, Photogrammetric Survey'; it carries a printed scale of 1:50, a corner note of a 74 per cent reduction, a horizontal axis in the project's grid and an elevation axis from 10.0 to 30.0 m with 1 m ticks, which is what it is scaled against. The scan is 13,560 by 5,264 pixels. Fetched on 2026-10-20 to build/plates/d-ss-047/ (gitignored) as the region 7400,400,5600,3700 of https://iiif.archive.org/iiif/opencontext-101-drawing-d-ss-047/ at full resolution; nothing from it is committed but the numbers. The plate draws no dimension, so everything taken from it is scaled and never verified."
+  },
+  {
     "id": "hoelscher-1912",
     "kind": "survey",
     "year": 1912,

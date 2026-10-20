@@ -274,6 +274,18 @@
     "method": "survey"
   },
   {
+    "key": "sphinx.head.height",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 5.731,
+    "unit": "m",
+    "sigma": 0.093,
+    "source": "arce-sphinx-south-elevation-oc",
+    "method": "scaled from plate",
+    "note": "The head from the underside of the chin to the top of the head, as the photogrammetric south elevation draws it, with no beard (the beard is lost). Scaled from ARCE drawing d-ss-047 with scripts/plate.py against its own elevation axis, 10.0 to 30.0 m with 1 m ticks, in a crop of the native scan from (7400, 400): the 30.0 tick at row 295.5 and the 10.0 tick at row 3443, 157.375 px a metre, so 0.0063542 m per pixel; the 30 to 25 m stretch reads 157.1 px a metre and the 25 to 10 m stretch 157.47, 0.24 per cent apart, which is the shrinkage term. The sheet's printed 1:50 is not used: its corner notes a 74 per cent reduction. The scan is turned 0.75 degrees (the axis runs 38 px left over 2,900 rows), so the height is taken along the drawn vertical, not the pixel rows: the crown's outline at (1100, 144) and the chin's underside at (1560, 1052), 908 px down the rows and 901.9 px along the axis. Sigma sums the pixel term 0.054 m (6 px at each end, about half the drawn line's width), the drafting tolerance 0.025 m (half a millimetre at 1:50) and the shrinkage 0.014 m.",
+    "verified": false
+  },
+  {
     "key": "sphinx.center.latitude",
     "structure": "sphinx",
     "quantity": "latitude",
