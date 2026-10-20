@@ -150,6 +150,31 @@ export function markAnchors(paragraph: string, anchors: string[]): { text: strin
   return { text, found: hits.map((h) => h.i) };
 }
 
+/**
+ * A paragraph cut where a still's anchor follows a live figure's within it, so the figure's room to scroll comes
+ * before the next beat's words rather than after them: chapter 9's strip shared its paragraph with the closing
+ * beat and held for two lines. Each piece but the last ends with a figure; the pieces keep every word in order.
+ */
+export function splitAtFigures(paragraph: string, stills: Still[]): string[] {
+  const folded = fold(paragraph);
+  const hits = stills
+    .map((s) => ({ at: folded.indexOf(fold(s.anchor)), widget: !!s.widget }))
+    .filter((h) => h.at > 0)
+    .sort((a, b) => a.at - b.at);
+  const cuts: number[] = [];
+  hits.forEach((h, k) => {
+    if (k > 0 && hits[k - 1]!.widget) cuts.push(h.at);
+  });
+  const pieces: string[] = [];
+  let from = 0;
+  for (const at of cuts) {
+    pieces.push(paragraph.slice(from, at).trimEnd());
+    from = at;
+  }
+  pieces.push(paragraph.slice(from));
+  return pieces;
+}
+
 /** Turn `markAnchors`' markers into empty spans the page watches as it scrolls. */
 export const markers = (html: string, attr: (i: number) => string) =>
   html.replace(new RegExp(`${OPEN}(\\d+)${CLOSE}`, 'g'), (_, i: string) => `<span class="beat" ${attr(Number(i))}></span>`);

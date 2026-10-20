@@ -19,7 +19,7 @@ import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
 import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
 import { skyWidget, type SkyWidget } from './skywidget';
-import { STILLS, keyFrames, markAnchors, markers, stillFile, type Still } from './stills';
+import { STILLS, keyFrames, markAnchors, markers, splitAtFigures, stillFile, type Still } from './stills';
 import './style.css';
 
 const chapters = parseScript(script);
@@ -44,7 +44,8 @@ function chapterHtml(c: Chapter): string {
     <section class="chapter" id="ch${c.n}" data-n="${c.n}">
       <header><span class="num">${c.n}</span><h2>${inline(c.title)}</h2></header>
       ${c.note ? `<p class="note">${inline(c.note)}</p>` : ''}
-      <div class="narration">${c.narration.map((p) => `<p${holds(c, p) ? ' class="hold"' : ''}>${narrationHtml(c, p)}</p>`).join('')}</div>
+      <div class="narration">${c.narration.flatMap((p) => splitAtFigures(p, stillsOf(c)))
+        .map((p) => `<p${holds(c, p) ? ' class="hold"' : ''}>${narrationHtml(c, p)}</p>`).join('')}</div>
       ${receipts}
       <details class="reply"><summary>The reply</summary>
         ${c.reply.map((p) => `<p>${inline(p)}</p>`).join('')}

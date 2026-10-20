@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { inline } from './markdown';
 import { parseScript } from './script';
-import { STILLS, keyFrames, markAnchors, markers, stillFile, stillSource } from './stills';
+import { splitAtFigures, STILLS, keyFrames, markAnchors, markers, stillFile, stillSource } from './stills';
 
 const root = join(__dirname, '..', '..', '..');
 const chapters = parseScript(readFileSync(join(root, 'docs', 'script.md'), 'utf8'));
@@ -63,5 +63,18 @@ describe('beat markers', () => {
     const html = markers(inline(text), (i) => `data-i="${i}"`);
     expect(html).toBe('<span class="beat" data-i="1"></span>Look at the <em>head</em>. ' +
       'The <span class="beat" data-i="0"></span>figure was a lion’s first.');
+  });
+
+  it('give a live figure its room before the next beat in its paragraph, keeping every word', () => {
+    for (const c of chapters) {
+      const mine = STILLS.filter((s) => s.chapter === c.n);
+      for (const p of c.narration) expect(splitAtFigures(p, mine).join(' ').replace(/\s+/g, ' ')).toBe(p.replace(/\s+/g, ' '));
+    }
+    // chapter 9's closing paragraph: the strip, then the last beat in a paragraph of its own
+    const nine = chapters.find((c) => c.n === 9)!;
+    const last = nine.narration[nine.narration.length - 1]!;
+    const pieces = splitAtFigures(last, STILLS.filter((s) => s.chapter === 9));
+    expect(pieces).toHaveLength(2);
+    expect(pieces[1]!.startsWith('Until it is')).toBe(true);
   });
 });
