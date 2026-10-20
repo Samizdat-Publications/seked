@@ -60,6 +60,7 @@ app.innerHTML = `
   <aside class="stage">
     <div class="card"><div class="stage-num"></div><div class="stage-title"></div></div>
     <figure class="still"><img alt="" /><img alt="" /><div class="tags"></div><figcaption></figcaption></figure>
+    <div class="caption-stage"></div>
     <div class="strip">${keyFrames().map((k) => `<figure><img src="./${stillFile(k.src)}" alt="${k.alt}" loading="lazy" />` +
       `<figcaption>${k.chapter}</figcaption></figure>`).join('')}</div>
   </aside>
@@ -100,6 +101,8 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('whole', !!still?.whole);
   stage.classList.toggle('sky-on', still?.widget === 'sky' && !!sky);
   stage.classList.toggle('strip-on', still?.widget === 'strip');
+  stage.classList.toggle('caption-on', still?.widget === 'caption');
+  if (still?.caption) stage.querySelector<HTMLElement>('.caption-stage')!.textContent = still.caption;
   stage.classList.toggle('profile-on', isProfile(still) && !!profile);
   stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
   if (!still) {

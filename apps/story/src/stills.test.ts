@@ -82,4 +82,12 @@ describe('beat markers', () => {
     expect(ice).toHaveLength(2);
     expect(ice[1]!.startsWith('Geologists call it the Younger Dryas.')).toBe(true);
   });
+
+  it('take a caption only from words the narration says', () => {
+    for (const s of STILLS.filter((x) => x.widget === 'caption')) {
+      const c = chapters.find((ch) => ch.n === s.chapter)!;
+      expect(s.caption, s.anchor).toBeTruthy();
+      expect(c.narration.join(' ').toLowerCase()).toContain(s.caption!.toLowerCase());
+    }
+  });
 });
