@@ -39,7 +39,7 @@ export class ObjectView {
   constructor(host: HTMLElement, private base: URL) {
     this.el = document.createElement('figure');
     this.el.className = 'object';
-    this.el.innerHTML = `<canvas aria-label="The king's head inside the lion's. Drag to turn it."></canvas>
+    this.el.innerHTML = `<div class="object-view"><canvas aria-label="The king's head inside the lion's. Drag to turn it."></canvas></div>
       <button type="button" class="object-reset">Reset</button><figcaption></figcaption>`;
     host.append(this.el);
     const canvas = this.el.querySelector('canvas')!;
