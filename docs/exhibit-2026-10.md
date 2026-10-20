@@ -121,3 +121,17 @@ between consecutive leaves), so adding a leaf never means writing a render by ha
    showpieces.
 3. Chapter 6 (the numbers, the pyramid in the hand), then 3, 4, 7, 8 and 9.
 4. Narration recorded, the trailer captured, the site deployed (Stewart's say-so).
+
+## Added 20 October, from Stewart's questions
+
+- **The world's pyramids, on a globe and a timeline** (a closing leaf of chapter 9, or a side room). Every known
+  pyramid and pyramid-like monument imported from a dataset with its date range and coordinates (never typed), on
+  a turnable globe and a timeline. The claim drawn as its proponents draw it: the best-fitting great circle through
+  the sites, with each site's distance from it. The reply drawn beside it from the same data: the same fit for
+  random sites in the same latitude band, so the visitor sees how close "a line" comes by chance, and the dates
+  spread over four thousand years.
+- **"How deep has anyone looked?"** On chapter 8's depth scale, beside each claimed depth (the Khafre wells to
+  648 m, the Hawara walls at 8 to 12 m, the paw cavity), a bar for how deep anyone has actually drilled, dug or
+  surveyed there and who did it, each from its source: the 2008 groundwater boreholes at the Sphinx, Petrie's pits
+  at Hawara, the radar's own stated reach. Stewart's point, that the official checks stop short of where the
+  claims begin, is then shown by the data rather than asserted, and where a check did go deep enough, that shows too.
