@@ -121,5 +121,21 @@
     },
     "consumed_credits": 9,
     "sha256": "814910ae2dacc35c039b2d8d5d94495c7869358ad4d72d8fed96eb20949dc0a6"
+  },
+  "front": {
+    "task": "01a1575a-9b3c-732d-a2ad-e7f4fe1f94ca",
+    "prompt": "Edit this image of a colossal limestone lion statue, changing only its tail. The tail must not rise from the ground or loop in the air: carve it in low relief, lying flat on the rock floor and curling forward along the outside of the haunch, as on the Great Sphinx of Giza. Leave everything else in the image exactly as it is, pixel for pixel.",
+    "refs": [
+      {
+        "view": "frontdressed",
+        "sha256": "814910ae2dacc35c039b2d8d5d94495c7869358ad4d72d8fed96eb20949dc0a6"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "ef202c714f92020040a5f9eab7c1ce942a495ab7e0e5e039fb43cc6f42c07c39"
   }
 }
