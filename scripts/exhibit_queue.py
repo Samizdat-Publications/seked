@@ -66,7 +66,10 @@ def station_moment(render, station, era):
 
 def leaf_panorama(leaf, render):
     """The panorama a leaf needs, relative to apps/walk/ (leaves.ts's leafPanorama)."""
-    if station_moment(render, leaf["station"], leaf["era"]) == leaf["moment"]:
+    own = station_moment(render, leaf["station"], leaf["era"])
+    # a station rendered at no moment (inside, by the era's lamps) looks the same at any hour
+    momentless = own is None and any(s["id"] == leaf["station"] for s in render["stations"])
+    if own == leaf["moment"] or momentless:
         return f"pano/{leaf['station']}-{leaf['era']}.jpg"
     return f"pano/{leaf['station']}-{leaf['era']}-{leaf['moment']}.jpg"
 
@@ -106,7 +109,9 @@ def patch_queue(leaves, render, have):
         name = f"{L['station']}-{L['era']}-{L['moment']}-{L['id']}"
         if have(f"pano/patch/{name}.jpg"):
             continue
-        out.append({"state": L["era"], "station": L["station"], "moment": L["moment"],
+        # inside, the renderer is given no moment, as for the panorama the patch lays into
+        lit = {} if station_moment(render, L["station"], L["era"]) is None else {"moment": L["moment"]}
+        out.append({"state": L["era"], "station": L["station"], **lit,
                     "patch": {"yaw": v["yaw"], "pitch": v["pitch"], "fov": round(v["fov"] * PATCH_MARGIN, 2),
                               "aspect": PATCH_W / PATCH_H, "leaf": L["id"], "pano": leaf_panorama(L, render)},
                     "size": f"{PATCH_W}x{PATCH_H}", "samples": PATCH_SAMPLES,

@@ -116,7 +116,9 @@ export function stationMoment(render: RenderStations, station: string, era: stri
  * queue (scripts/exhibit_queue.py) asks the laptop for.
  */
 export function leafPanorama(leaf: Pick<Leaf, 'station' | 'era' | 'moment'>, render: RenderStations): string {
-  return stationMoment(render, leaf.station, leaf.era) === leaf.moment
+  const own = stationMoment(render, leaf.station, leaf.era);
+  // a station rendered at no moment (inside, by the era's lamps) looks the same at any hour
+  return own === leaf.moment || (own === null && render.stations.some((s) => s.id === leaf.station))
     ? `pano/${leaf.station}-${leaf.era}.jpg`
     : `pano/${leaf.station}-${leaf.era}-${leaf.moment}.jpg`;
 }

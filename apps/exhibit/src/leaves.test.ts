@@ -159,6 +159,10 @@ describe('the panorama a leaf needs', () => {
     expect(leafPanorama({ station: 'sphinx-face', era: 'today', moment: 'equinox-dawn' }, render)).toBe('pano/sphinx-face-today-equinox-dawn.jpg');
     expect(stationMoment(render, 'nowhere', 'today')).toBeNull();
   });
+  it("is the walkthrough's own at any moment for a station rendered at none (inside, by lamps)", () => {
+    expect(stationMoment(render, 'kings-chamber', 'built')).toBeNull();
+    expect(leafPanorama({ station: 'kings-chamber', era: 'built', moment: 'night-dark' }, render)).toBe('pano/kings-chamber-built.jpg');
+  });
 });
 
 describe('draw cues', () => {

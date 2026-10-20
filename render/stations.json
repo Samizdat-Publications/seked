@@ -44,6 +44,11 @@
       "night": "c2-2450",
       "label": "night, 2450 BCE: Alnitak on the meridian"
     },
+    "night-dark": {
+      "night": "c2-2450",
+      "stars": false,
+      "label": "night with the renderer's stars and Milky Way left out, for the exhibit to draw the sky over live at whatever year it shows; the dark, the airglow and the sun below the horizon are 2450 BCE's"
+    },
     "temple-morning": {
       "date": "11-15",
       "solar": 10.0,

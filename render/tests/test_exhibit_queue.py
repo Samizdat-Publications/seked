@@ -43,6 +43,16 @@ class Panoramas(unittest.TestCase):
         self.assertEqual(out, [{"state": "lion", "station": "sphinx-flank", "moment": "equinox-dawn",
                                 "out": "build/render/pano/sphinx-flank-lion-equinox-dawn.png", "for": "ch1-c"}])
 
+    def test_a_station_rendered_at_no_moment_uses_its_own_panorama_at_any_hour(self):
+        # inside, by the era's lamps: a leaf's moment there changes nothing, so nothing is queued and no patch is lit
+        self.assertIsNone(q.station_moment(self.render, "kings-chamber", "built"))
+        inside = dict(LEAF, station="kings-chamber", era="built", moment="night-dark", view={"yaw": 180, "pitch": 30, "fov": 40})
+        self.assertEqual(q.leaf_panorama(inside, self.render), "pano/kings-chamber-built.jpg")
+        self.assertEqual(q.pano_queue([inside], self.render, lambda p: p == "pano/kings-chamber-built.jpg"), [])
+        patch = q.patch_queue([inside], self.render, lambda p: False)[0]
+        self.assertNotIn("moment", patch)
+        self.assertEqual(patch["patch"]["pano"], "pano/kings-chamber-built.jpg")
+
 
 class Patches(unittest.TestCase):
     render = q.load("render/stations.json")
