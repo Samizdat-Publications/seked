@@ -365,6 +365,15 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `.socket.first.east` exist (scaled from Hölscher's Blatt XVII). Draw the row of sockets on `ch3-statues`'s floor
   as registered lines in the scene: find how `apps/walk/overlays.json` is generated, add the row there from the
   records (never typed into the overlay), and cue it on "statues".
+  *Blocked 2026-10-20 23:40 UTC on a renderer change this worktree cannot check.* Overlays are written by
+  `render/publish.py` (`overlays()`), outside Blender. To register with the picture the sockets must be drawn where
+  the render puts its statues: `render/giza/valley_temple.py`'s `plan()` steps them from the two records along its own
+  north wall line `y_ln` (from the aisle records, not `hall.stem.north`), at `floor`. `plan()` is pure but lives in a
+  module that imports `bpy`, so publish cannot call it. The step: move `plan()` and `_r()` (and `temples.centroid`)
+  into a bpy-free module both import, with a render test that the plan is unchanged; then `overlays()` adds
+  `valley-sockets`. It also types the count: `range(7)` in `plan()`, where Hölscher's seven is only in the pitch
+  record's note; a `khafre_valley_temple.hall.socket.count` record (`hoelscher-1912`, unchecked) should replace it.
+  Best done by the laptop session, which can render the hall after the move and see that nothing shifted.
 - [ ] **E18. Chapter 4, "The First Time": its leaves.** Cut chapter 4 likewise, on panoramas that exist, with
   `until` stand-ins where a station is new; receipts as the script assigns them; the queue run.
 
