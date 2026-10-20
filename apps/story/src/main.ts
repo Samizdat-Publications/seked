@@ -16,6 +16,7 @@ import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { mapWidget, type MapWidget } from './mapwidget';
+import { PLAN_STILL, planFootprints } from './plan';
 import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
 import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
@@ -90,6 +91,8 @@ let timeline: TimelineWidget | undefined;
 const isTimeline = (s: Still | null | undefined) => s?.widget === 'ice' || s?.widget === 'dryas';
 /** Chapter 7's map inset, likewise. */
 let map: MapWidget | undefined;
+/** Chapter 7's plan over the First Time, likewise: drawn once, through the still's own camera. */
+let planEl: HTMLElement | undefined;
 
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
@@ -109,6 +112,7 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('profile-on', isProfile(still) && !!profile);
   stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
   stage.classList.toggle('map-on', still?.widget === 'map' && !!map);
+  stage.classList.toggle('plan-on', still?.widget === 'plan' && !!planEl);
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;
@@ -207,6 +211,22 @@ async function liveReceipts() {
     stage.append(timeline.el);
     map = mapWidget(env['earth.radius.mean']!);
     stage.append(map.el);
+    try {
+      const { width: W, height: H } = PLAN_STILL;
+      planEl = document.createElement('div');
+      planEl.className = 'plan';
+      planEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"
+        aria-label="The three pyramids' bases drawn where the claim says the plan lay">
+        ${planFootprints(env as Record<string, number>).map((f) => {
+          const pts = f.corners.map((c) => `${(c.x * W).toFixed(1)},${(c.y * H).toFixed(1)}`).join(' ');
+          const low = f.corners.reduce((a, c) => (c.y > a.y ? c : a));
+          return `<polygon points="${pts}" /><text x="${(low.x * W).toFixed(1)}" y="${(low.y * H + 22).toFixed(1)}">${f.name}</text>`;
+        }).join('')}
+        <text class="title" x="${W / 2}" y="${H * 0.36}">the plan, as the claim has it</text></svg>`;
+      stage.append(planEl);
+    } catch (err) {
+      console.warn('chapter 7 keeps its still without the plan:', err);
+    }
     try {
       profile = profileWidget(profileOf(env, bundle.claims));
       stage.append(profile.el);

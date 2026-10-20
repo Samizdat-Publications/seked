@@ -23,7 +23,7 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'caption';
+  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption';
   /** For a `caption` beat, the words the stage shows over the still, from the narration. */
   caption?: string;
 }
@@ -114,7 +114,8 @@ export const STILLS: Still[] = [
     alt: 'Enclosure D filled level, as Schmidt read it: a burial on purpose. Since revised: the excavators now read the fill as slope slides',
     tags: ['stand-in', 'look choices'] },
   { chapter: 7, anchor: 'a plan laid out at Giza in the eleventh millennium BCE', src: FIRST_TIME_AIR,
-    alt: 'Giza’s First Time from the air: the plateau green, no pyramids', tags: ['claim state'] },
+    alt: 'Giza’s First Time from the air: the plateau green, no pyramids, the plan drawn where the claim puts it', tags: ['claim state'],
+    whole: true, widget: 'plan' },
 
   { chapter: 8, anchor: 'Everything so far stands on the surface.', src: 'progress/0037-underneath-khafre-cutaway.png',
     alt: 'Khafre’s pyramid and the plateau cut away, the claimed wells and chambers below', tags: ['look choices'], whole: true },
