@@ -23,7 +23,9 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption';
+  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas' | 'map' | 'plan' | 'caption' | 'sequence';
+  /** For a `sequence` beat, its id in SEQUENCES (src/sequence.ts). */
+  sequence?: string;
   /** For a `caption` beat, the words the stage shows over the still, from the narration. */
   caption?: string;
 }
@@ -106,7 +108,8 @@ export const STILLS: Still[] = [
   { chapter: 7, anchor: 'At Abu Hureyra', src: LION_FIRST_TIME,
     alt: 'The lion in the First Time, c. 10,500 BCE, the plateau green and no pyramids', tags: ['claim state', 'stand-in'], widget: 'map' },
   { chapter: 7, anchor: 'a monument appears on a hilltop in south-east Turkey', src: 'progress/0047-enclosure-d-from-the-air.png',
-    alt: 'Enclosure D at Göbekli Tepe from the air, its pillars placed from the excavators’ plan', tags: ['stand-in', 'look choices'] },
+    alt: 'Enclosure D at Göbekli Tepe from the air, its pillars placed from the excavators’ plan', tags: ['stand-in', 'look choices'],
+    widget: 'sequence', sequence: 'enclosure-d-orbit' },
   { chapter: 7, anchor: 'no farms, no pottery and no metal', src: 'progress/0047-enclosure-d-from-the-air.png',
     alt: 'Enclosure D at Göbekli Tepe from the air, its pillars placed from the excavators’ plan', tags: ['stand-in', 'look choices'],
     widget: 'caption', caption: 'No farms, no pottery and no metal' },

@@ -13,6 +13,7 @@ import { resolve, type Database } from '@seked/data/browser';
 import { buildEnvironment } from '@seked/geometry';
 import { setDefaultStars, type Star } from '@seked/sky/browser';
 import script from '../../../docs/script.md?raw';
+import { clock, lineAt, replyAt, schedule, timeAt, type Schedule } from './autoplay';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { mapWidget, type MapWidget } from './mapwidget';
@@ -20,6 +21,8 @@ import { PLAN_STILL, planFootprints } from './plan';
 import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
 import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
+import { SEQUENCES } from './sequence';
+import { sequenceWidget, type SequenceWidget } from './sequencewidget';
 import { skyWidget, type SkyWidget } from './skywidget';
 import { timelineWidget, type TimelineMode, type TimelineWidget } from './timelinewidget';
 import { REPLY_STILLS, STILLS, keyFrames, markAnchors, markers, splitAtFigures, stillFile, type Still } from './stills';
@@ -102,6 +105,23 @@ let map: MapWidget | undefined;
 /** Chapter 7's plan over the First Time, likewise: drawn once, through the still's own camera. */
 let planEl: HTMLElement | undefined;
 
+/** The stage's sequences, one canvas each; a beat's still stands in until its frames have loaded. */
+const sequences = new Map<string, SequenceWidget>(Object.values(SEQUENCES).map((q) => [q.id, sequenceWidget(q)]));
+for (const w of sequences.values()) stage.append(w.el);
+const sequenceOf = (s: Still | null | undefined) => (s?.widget === 'sequence' && s.sequence ? sequences.get(s.sequence) : undefined);
+/** A sequence's frames start loading once the reader reaches the chapter before its own. */
+function loadAhead(n: number) {
+  for (const s of STILLS) {
+    const w = sequenceOf(s);
+    if (w && !w.ready() && s.chapter <= n + 1) {
+      w.load().then(() => {
+        shown = undefined;
+        follow();
+      }, (err) => console.warn('the still stands in for the sequence:', err));
+    }
+  }
+}
+
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
 
@@ -121,6 +141,8 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
   stage.classList.toggle('map-on', still?.widget === 'map' && !!map);
   stage.classList.toggle('plan-on', still?.widget === 'plan' && !!planEl);
+  const seq = sequenceOf(still);
+  for (const w of sequences.values()) w.el.classList.toggle('on', w === seq && w.ready());
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;
@@ -134,7 +156,7 @@ function show(c: Chapter, still: Still | null) {
   };
   back.alt = still.alt;
   back.classList.toggle('whole', !!still.whole);
-  caption.textContent = still.alt;
+  caption.textContent = seq?.ready() ? seq.sequence.alt : still.alt;
   tags.innerHTML = still.tags.map((t) => `<span>${t}</span>`).join('');
   if (back.getAttribute('src') === url(still) && back.complete) reveal();
   else {
@@ -168,7 +190,13 @@ function follow() {
       still = STILLS[Number(m.dataset.still)] ?? null;
     }
   }
-  if (chapter) show(chapter, still);
+  if (chapter) {
+    loadAhead(chapter.n);
+    show(chapter, still);
+  }
+  // a sequence runs once through over the same share of the way to the next beat as the figures below
+  const seq = sequenceOf(still);
+  if (seq) seq.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   // the live sky runs from today to the claim's epoch over the first 80 per cent of the way to the next beat
   if (still?.widget === 'sky' && sky) sky.progress(since / (0.8 * (since + until)));
   // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
@@ -262,3 +290,74 @@ async function liveReceipts() {
   }
 }
 void liveReceipts();
+
+/**
+ * Autoplay: the play button runs the page's clock, and the scroll follows the narration's schedule
+ * (src/autoplay.ts). Any hand on the page pauses it. Until the voice is recorded it is silent and timed at the
+ * script's rate, which the button's note says. `window.seked.seek(t)` sets the clock for a capture script.
+ */
+const reading = () => innerHeight * 0.55;
+const paragraphEls = [...app.querySelectorAll<HTMLElement>('.narration p')];
+const plan: Schedule = schedule(chapters.map((c) => ({
+  n: c.n,
+  paragraphs: paragraphEls.filter((p) => p.closest<HTMLElement>('.chapter')?.dataset.n === String(c.n)).map((p) => p.textContent ?? ''),
+  reply: c.spokenReply,
+})));
+const boxes = (): [number, number][] => paragraphEls.map((p) => {
+  const r = p.getBoundingClientRect();
+  return [r.top + scrollY, r.bottom + scrollY];
+});
+const player = document.createElement('div');
+player.className = 'player';
+player.innerHTML = '<button type="button" aria-label="Play">▶</button><span class="clock"></span>' +
+  '<span class="player-note">silent, timed at 150 words a minute until the voice is recorded</span>';
+document.body.append(player);
+const button = player.querySelector('button')!;
+const clockEl = player.querySelector<HTMLElement>('.clock')!;
+const subtitle = document.createElement('div');
+subtitle.className = 'subtitle';
+stage.append(subtitle);
+let now = 0;
+let playing = false;
+let lastFrame = 0;
+
+function seek(t: number) {
+  now = Math.min(Math.max(t, 0), plan.duration);
+  scrollTo(0, lineAt(now, plan, boxes()) - reading());
+  const reply = replyAt(now, plan);
+  subtitle.textContent = reply ? reply.text : '';
+  stage.classList.toggle('subtitle-on', !!reply);
+  clockEl.textContent = `${clock(now)} / ${clock(plan.duration)}`;
+  follow();
+}
+function tick(at: number) {
+  if (!playing) return;
+  seek(now + (at - lastFrame) / 1000);
+  lastFrame = at;
+  if (now >= plan.duration) pause();
+  else requestAnimationFrame(tick);
+}
+function play() {
+  if (playing) return;
+  playing = true;
+  button.textContent = '❚❚';
+  button.setAttribute('aria-label', 'Pause');
+  now = scrollY < 10 ? 0 : timeAt(scrollY + reading(), plan, boxes());
+  lastFrame = performance.now();
+  requestAnimationFrame(tick);
+}
+function pause() {
+  playing = false;
+  button.textContent = '▶';
+  button.setAttribute('aria-label', 'Play');
+  stage.classList.remove('subtitle-on');
+}
+button.addEventListener('click', () => (playing ? pause() : play()));
+for (const e of ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const) {
+  addEventListener(e, (ev) => {
+    // the button's own click and keys are the player's; a wheel or a touch anywhere is the reader's hand
+    if (playing && (e === 'wheel' || e === 'touchstart' || !player.contains(ev.target as Node))) pause();
+  }, { passive: true });
+}
+clockEl.textContent = `0:00 / ${clock(plan.duration)}`;
+(window as unknown as { seked: unknown }).seked = { duration: plan.duration, schedule: plan, seek, play, pause };
