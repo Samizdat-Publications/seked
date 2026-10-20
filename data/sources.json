@@ -1089,5 +1089,100 @@
     "url": "https://www.ncei.noaa.gov/pub/data/paleo/icecore/greenland/summit/ngrip/gicc05-20yr.txt",
     "license": "Distributed free by NOAA's World Data Service for Paleoclimatology; the file asks users to cite the contributors, which this record and data/icecore/ngrip-d18o.json do. The same series is on PANGAEA under CC BY 3.0 (doi:10.1594/PANGAEA.586838).",
     "note": "A data file, imported by scripts/icecore.ts into data/icecore/ngrip-d18o.json (NGRIP d18O and the maximum counting error by age; GRIP and the depths left out). Fetched 2026-10-20 to data/icecore/gicc05-20yr.txt (gitignored), 117058 bytes, sha256 0b1b042590b621da176d64f8b981cf5afedb0dabba0c12da3d19d1a1cd235be6. Ages are years b2k at the bottom of each 20-year interval; the file says its maximum counting error is to be read as 2 sigma."
+  },
+  {
+    "id": "dietrich-2019",
+    "kind": "paper",
+    "year": 2019,
+    "citation": "Dietrich, L., Meister, J., Dietrich, O., Notroff, J., Kiep, J., Heeb, J., Beuger, A. & Schütt, B. (2019). Cereal processing at Early Neolithic Göbekli Tepe, southeastern Turkey. PLOS ONE 14(5), e0215214.",
+    "url": "https://doi.org/10.1371/journal.pone.0215214",
+    "note": "Peer-reviewed. Unchecked: abstract summarised by search, not fetched. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "holliday-2024",
+    "kind": "critique",
+    "year": 2024,
+    "citation": "Holliday, V. T., Daulton, T. L., Bartlein, P. J., Boslough, M. B., Breslawski, R. P., Fisher, A. E., Jorgeson, I. A., Scott, A. C. et al. (2024). Rebuttal of Sweatman, Powell, and West's 'Rejection of Holliday et al.'s alleged refutation of the Younger Dryas Impact Hypothesis'. Earth-Science Reviews 258, 104961.",
+    "url": "https://doi.org/10.1016/j.earscirev.2024.104961",
+    "note": "Peer-reviewed. Unchecked: from repository listings via search. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "karul-2021",
+    "kind": "paper",
+    "year": 2021,
+    "citation": "Karul, N. (2021). Buried Buildings at Pre-Pottery Neolithic Karahantepe / Karahantepe Çanak-Çömleksiz Neolitik Dönem Gömü Yapıları. Türk Arkeoloji ve Etnografya Dergisi 86.",
+    "url": "https://en.wikipedia.org/wiki/Karahan_Tepe",
+    "note": "Unchecked: listings disagree on pages (19–31 vs 21–31); the article was not seen; the url is the encyclopedia entry that lists it. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "kenny-2022",
+    "kind": "paper",
+    "year": 2022,
+    "citation": "Kenny, G. G., Hyde, W. R., Storey, M., Garde, A. A., Whitehouse, M. J., Beck, P. et al. (2022). A Late Paleocene age for Greenland's Hiawatha impact structure. Science Advances 8(10), eabm2434.",
+    "url": "https://doi.org/10.1126/sciadv.abm2434",
+    "note": "Peer-reviewed. Unchecked: via Wikipedia (about 58 million years). Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "kinzel-clare-2020",
+    "kind": "critique",
+    "year": 2020,
+    "citation": "Kinzel, M. & Clare, L. (2020). Monumental – compared to what? A perspective from Göbekli Tepe. In Gebauer, A. B., Sørensen, L., Teather, A. & Valera, A. C. (eds.), Monumentalising Life in the Neolithic. Oxford: Oxbow, 29–48.",
+    "url": "https://doi.org/10.2307/j.ctv13pk66m.7",
+    "note": "Edited volume. Unchecked: the chapter was not read. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "pinter-2011",
+    "kind": "critique",
+    "year": 2011,
+    "citation": "Pinter, N., Scott, A. C., Daulton, T. L., Podoll, A., Koeberl, C., Anderson, R. S. & Ishman, S. E. (2011). The Younger Dryas impact hypothesis: A requiem. Earth-Science Reviews 106(3–4), 247–264.",
+    "url": "https://doi.org/10.1016/j.earscirev.2011.02.005",
+    "note": "Peer-reviewed. Unchecked: citation via Wikipedia; the DOI, given from memory in the brief, resolves. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "saa-2022",
+    "kind": "critique",
+    "year": 2022,
+    "citation": "Society for American Archaeology (D. Sandweiss, President) (2022, 30 November). Open letter to Netflix and ITN Productions concerning Ancient Apocalypse.",
+    "url": "https://documents.saa.org/container/docs/default-source/doc-governmentaffairs/saa-letter-ancient-apocalypse.pdf",
+    "note": "Not peer-reviewed. Unchecked: the PDF failed on TLS; date and addressees confirmed via hancock-2023-saa; wording via secondary sources. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schmidt-2010",
+    "kind": "paper",
+    "year": 2010,
+    "citation": "Schmidt, K. (2010). Göbekli Tepe – the Stone Age Sanctuaries. New results of ongoing excavations with a special focus on sculptures and high reliefs. Documenta Praehistorica 37, 239–256.",
+    "url": "https://doi.org/10.4312/dp.37.21",
+    "note": "Peer-reviewed. Unchecked: not read; the DOI, given from memory in the brief, resolves. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-2012",
+    "kind": "proponent",
+    "year": 2012,
+    "citation": "Schoch, R. M. (2012). Forgotten Civilization: The Role of Solar Outbursts in Our Past and Future. Rochester, VT: Inner Traditions.",
+    "note": "Not peer-reviewed. Unchecked: publisher blurbs for the expanded edition only. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "sweatman-2024",
+    "kind": "proponent",
+    "year": 2024,
+    "citation": "Sweatman, M. B. (2024). Representations of calendars and time at Göbekli Tepe and Karahan Tepe support an astronomical interpretation of their symbolism. Time and Mind 17(3–4), 191–247.",
+    "url": "https://doi.org/10.1080/1751696X.2024.2373876",
+    "note": "Peer-reviewed. Unchecked: publisher returned 403; content from press coverage. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "sweatman-2024-rebuttal",
+    "kind": "proponent",
+    "year": 2024,
+    "citation": "Sweatman, M. B., Powell, J. L. & West, A. (2024). Rebuttal of Holliday et al.'s comprehensive Gish gallop of the Younger Dryas impact hypothesis. Airbursts and Cratering Impacts 2(1).",
+    "url": "https://doi.org/10.14293/ACI.2024.0007",
+    "note": "In a journal associated with the proponents. Unchecked: the content. Crossref lists three authors (Sweatman, Powell, West); the brief's fourth (Young) is not in it. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "thy-2015",
+    "kind": "critique",
+    "year": 2015,
+    "citation": "Thy, P., Willcox, G., Barfod, G. H. & Fuller, D. Q. (2015). Anthropogenic origin of siliceous scoria droplets from Pleistocene and Holocene archaeological sites in northern Syria. Journal of Archaeological Science 54, 193–209.",
+    "url": "https://doi.org/10.1016/j.jas.2014.11.027",
+    "note": "Peer-reviewed. Unchecked: from search summary; the paper was not read. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
   }
 ]
