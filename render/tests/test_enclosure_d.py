@@ -60,5 +60,25 @@ class EnclosureDTests(unittest.TestCase):
         self.assertTrue(all(math.hypot(*vs[n + i][:2]) > math.hypot(*vs[i][:2]) for i in range(n)))
 
 
+    def test_the_orbit_keeps_outside_the_wall_at_eye_height_above_its_top(self):
+        w = E.wall(self.rec)
+        n = len(w["outer"])
+        mx, my = sum(x for x, _ in w["outer"]) / n, sum(y for _, y in w["outer"]) / n
+        far = max(math.hypot(x - mx, y - my) for x, y in w["outer"])
+        near = min(math.hypot(x - mx, y - my) for x, y in w["outer"])
+        for k in range(24):
+            o = E.orbit(k / 24, self.rec)
+            r = math.hypot(o["eye"][0] - mx, o["eye"][1] - my)
+            self.assertGreater(r, near + 1.0)
+            self.assertLess(r, far + 5.0)
+            self.assertAlmostEqual(o["eye"][2], w["height"] + 1.6)
+        self.assertLess(E.orbit(0.0, self.rec)["eye"][1], my)   # it starts in the south
+
+    def test_the_figure_is_as_tall_as_the_look_says_and_stands_on_the_floor(self):
+        parts = E.figure_parts(0.0, 0.0, E.LOOK["figure"])
+        self.assertAlmostEqual(max(p[4] for p in parts), E.LOOK["figure"])
+        self.assertEqual(min(p[3] for p in parts), 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()

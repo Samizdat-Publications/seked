@@ -148,6 +148,31 @@ def ground_mesh(w, look=LOOK):
     return vs, fs
 
 
+def figure_parts(x, y, height, facing=0.0):
+    """A plain standing person, `height` tall: two legs, a body and a head as (x, y, radius, z0, z1) cylinders."""
+    h, f = height, math.radians(facing)
+    sx, sy = math.cos(f) * 0.1, -math.sin(f) * 0.1      # the legs apart across the facing direction
+    return [(x - sx, y - sy, 0.075, 0.0, 0.47 * h), (x + sx, y + sy, 0.075, 0.0, 0.47 * h),
+            (x, y, 0.17, 0.46 * h, 0.82 * h), (x, y, 0.055, 0.82 * h, 0.86 * h), (x, y, 0.1, 0.86 * h, h)]
+
+
+def orbit(t, rec=None, look=LOOK, eye=1.6, out=4.0):
+    """The sequence's camera at `t` (0 to 1, once round, clockwise from the south): on the rim `out` metres outside the
+    wall, a person's eye height above its top, looking at the middle of the ring a little above the floor."""
+    w = wall(rec, look)
+    n = len(w["outer"])
+    mx = sum(x for x, _ in w["outer"]) / n
+    my = sum(y for _, y in w["outer"]) / n
+    a = math.pi + 2 * math.pi * t                       # bearing from north, starting due south
+    ux, uy = math.sin(a), math.cos(a)
+    # the outer face's reach along this bearing, from the nearest of its points in angle
+    reach = max(((x - mx) * ux + (y - my) * uy, (x, y)) for x, y in w["outer"]
+                if abs(math.atan2(x - mx, y - my) - math.atan2(ux, uy)) % (2 * math.pi) < 0.2
+                or abs(math.atan2(x - mx, y - my) - math.atan2(ux, uy)) % (2 * math.pi) > 2 * math.pi - 0.2)[0]
+    r = reach + out
+    return dict(eye=(mx + ux * r, my + uy * r, w["height"] + eye), at=(mx, my, 1.8))
+
+
 def inner_span(w, axis=0):
     """The inner face's extent along x (axis 0) or y (axis 1), metres."""
     vals = [p[axis] for p in w["inner"]]

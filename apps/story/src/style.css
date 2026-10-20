@@ -190,9 +190,9 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .map .span-label { font-size: 5px; }
 }
 
-/* a beat whose picture is its words (chapter 7's "no farms, no pottery and no metal"), on a plain ground: no picture of
-   Göbekli Tepe exists yet, and the still behind would be Giza's */
+/* a beat whose picture is its words (chapter 7's "no farms, no pottery and no metal"), over its still darkened so the
+   words carry: there, Enclosure D */
 .caption-stage { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center;
   padding: 2rem; text-align: center; font-size: clamp(1.4rem, 3.4vw, 2.8rem); line-height: 1.25; color: #f4ede0;
-  background: #0c0b09; opacity: 0; pointer-events: none; transition: opacity 0.6s; }
+  background: rgba(12, 11, 9, 0.62); text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6); opacity: 0; pointer-events: none; transition: opacity 0.6s; }
 .stage.caption-on .caption-stage { opacity: 1; }
