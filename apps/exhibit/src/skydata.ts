@@ -10,14 +10,16 @@ const COL = { id: 0, name: 1, bf: 2, ra: 3, dec: 4, pmRa: 5, pmDec: 6, mag: 8 } 
 
 /**
  * `virtual:sky`, cut at build time from data/: Giza's origin from data/sites.json, the bright catalogue to
- * `magnitudeLimit`, the named stars, each claim's epoch and sun-ribbon bearings (the claims parsed from their
- * YAML by the caller), and the `drawn` constellations' figures from data/stars/figures.json.
+ * `magnitudeLimit`, the named stars, each claim's epoch, sun-ribbon bearings and comparisons (the claims parsed from
+ * their YAML by the caller), the `drawn` constellations' figures from data/stars/figures.json, and the star each of
+ * the sky bake's `nights` puts on the meridian (scripts/sky-bake.ts NIGHTS, passed in by the caller).
  */
 export function buildSkyData(sites: { id: string; origin: { latitude: number; longitude: number } }[],
   bright: { attribution: string; stars: unknown[][] }, named: Star[],
-  claims: { id: string; epoch?: number | null; overlay?: { type?: string; params?: { bearings?: { label: string; azimuth: string | number }[] } } }[],
+  claims: { id: string; epoch?: number | null; overlay?: { type?: string; params?: { bearings?: { label: string; azimuth: string | number }[] } };
+    comparisons?: { label: string; formula: string | number; target: string | number; unit?: string }[] }[],
   figures: { attribution: string; figures: Record<string, { name: string; lines: string[][] }> } | null = null,
-  drawn: readonly string[] = ['Leo'], magnitudeLimit = 4.5): SkyData {
+  nights: Record<string, { meridian: string }> = {}, drawn: readonly string[] = ['Leo', 'Ori'], magnitudeLimit = 4.5): SkyData {
   const giza = sites.find((s) => s.id === 'giza');
   if (!giza) throw new Error('data/sites.json has no giza');
   const stars = bright.stars.filter((r) => (r[COL.mag] as number) <= magnitudeLimit).map((r) =>
@@ -25,9 +27,11 @@ export function buildSkyData(sites: { id: string; origin: { latitude: number; lo
   const out: SkyData['claims'] = {};
   for (const c of claims) {
     const bearings = c.overlay?.type === 'sun-ribbon' ? (c.overlay.params?.bearings ?? []).map((b) => ({ label: b.label, azimuth: String(b.azimuth) })) : [];
-    if (c.epoch !== undefined || bearings.length) out[c.id] = { epoch: c.epoch ?? null, bearings };
+    const comparisons = (c.comparisons ?? []).map((k) => ({ label: k.label, formula: String(k.formula), target: String(k.target), unit: k.unit ?? '' }));
+    if (c.epoch !== undefined || bearings.length) out[c.id] = { epoch: c.epoch ?? null, bearings, comparisons };
   }
   const chosen = Object.fromEntries(drawn.flatMap((k) => (figures?.figures[k] ? [[k, figures.figures[k]!]] : [])));
   const attribution = figures ? `${bright.attribution} ${figures.attribution}` : bright.attribution;
-  return { latitudeDeg: giza.origin.latitude, longitudeDeg: giza.origin.longitude, magnitudeLimit, stars, named, claims: out, figures: chosen, attribution };
+  const meridians = Object.fromEntries(Object.entries(nights).map(([id, n]) => [id, n.meridian]));
+  return { latitudeDeg: giza.origin.latitude, longitudeDeg: giza.origin.longitude, magnitudeLimit, stars, named, claims: out, figures: chosen, nights: meridians, attribution };
 }

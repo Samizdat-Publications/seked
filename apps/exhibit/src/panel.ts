@@ -29,7 +29,7 @@ export function chapterReply(script: string, chapter: number): { spoken: string;
 
 let bundle: Promise<Bundle | null> | null = null;
 /** The bundled database (`pnpm bundle`), beside the page or beside the viewer on the site; null without it. */
-function loadBundle(): Promise<Bundle | null> {
+export function loadBundle(): Promise<Bundle | null> {
   bundle ??= (async () => {
     for (const url of ['./seked.json', '../viewer/seked.json']) {
       try {

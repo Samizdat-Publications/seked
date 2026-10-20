@@ -47,9 +47,14 @@ export const LeafSchema = z.object({
   until: z.object({ station: z.string().min(1), view: View }).strict().optional(),
   /**
    * A live sky drawn over the panorama at the leaf's moment (src/sky.ts): `at` the year, `today` or a claim id whose
-   * epoch it takes; `from` a year it winds from in play.
+   * epoch it takes; `from` a year it winds from in play; `figure` the constellation picked out in gold (as
+   * data/stars/figures.json keys it); `bearings` a claim whose sun-ribbon bearings stand on the horizon; `marks` a
+   * claim whose shafts are drawn across the meridian; `readout` a claim whose comparisons are read out at the year.
    */
-  sky: z.object({ at: z.string().min(1), from: z.string().min(1).optional() }).strict().optional(),
+  sky: z.object({
+    at: z.string().min(1), from: z.string().min(1).optional(), figure: z.string().regex(/^[A-Z][a-z]{2}$/).optional(),
+    bearings: z.string().min(1).optional(), marks: z.string().min(1).optional(), readout: z.string().min(1).optional(),
+  }).strict().optional(),
 }).strict();
 
 export type Leaf = z.infer<typeof LeafSchema>;

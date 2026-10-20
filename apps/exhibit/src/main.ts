@@ -13,7 +13,8 @@ import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
 import { ditchPlanSvg } from './figures';
-import { Panel } from './panel';
+import { Panel, loadBundle } from './panel';
+import { groundEnvironment } from './receipts';
 import { Player } from './player';
 import type { Moment } from './sky';
 import { SkyFigure } from './skyfigure';
@@ -89,6 +90,8 @@ async function start(): Promise<void> {
   const panel = new Panel($('stage'), script);
   const sky = new SkyFigure(stage, skyData, (RENDER as unknown as { moments: Record<string, Moment> }).moments, $('skybar'));
   sky.onHandsOn = () => { if (player.playing) player.pause(); };
+  // a sky claim's lines and targets that read the monuments wait for the bundled database
+  void loadBundle().then((b) => { if (b) sky.setGround(groundEnvironment(b)); });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
   let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
   const objectFor = (L: Leaf) => {

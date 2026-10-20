@@ -710,7 +710,9 @@
     }
    },
    "sky": {
-    "at": "today"
+    "at": "today",
+    "figure": "Leo",
+    "bearings": "C5"
    }
   },
   {
@@ -741,7 +743,9 @@
    },
    "sky": {
     "at": "C5",
-    "from": "today"
+    "from": "today",
+    "figure": "Leo",
+    "bearings": "C5"
    }
   },
   {
@@ -773,7 +777,9 @@
     }
    },
    "sky": {
-    "at": "C5"
+    "at": "C5",
+    "figure": "Leo",
+    "bearings": "C5"
    }
   },
   {
@@ -805,7 +811,9 @@
     }
    },
    "sky": {
-    "at": "C5"
+    "at": "C5",
+    "figure": "Leo",
+    "bearings": "C5"
    }
   },
   {

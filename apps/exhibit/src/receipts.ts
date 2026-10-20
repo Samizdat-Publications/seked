@@ -18,6 +18,11 @@ export function leafReceipts(db: Database, claims: Claim[], ids: string[], prese
     .map((c) => evaluateClaim(c, env));
 }
 
+/** The environment the claims evaluate in under `presetId`: the monuments, from which a sky claim takes its ground. */
+export function groundEnvironment(db: Database, presetId = DEFAULT_PRESET): Record<string, number> {
+  return buildEnvironment(resolve(db, presetId).values) as Record<string, number>;
+}
+
 /**
  * One comparison as the receipt reads it: measured against claimed, the residual and whether it is inside the
  * band, in the dossier's own formats so the page and docs/dossier.md cannot read differently.
