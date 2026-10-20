@@ -91,11 +91,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `render/queues/exhibit-panos.json` and 2 flights into `render/films-exhibit.json`; `render/build.py --films PATH`;
   `render/publish.py` publishes `<station>-<era>-<moment>.png` for the exhibit outside the walkthrough's manifest.
   7 tests in `render/tests/test_exhibit_queue.py` (naming in step with `leaves.ts`, lens, path, flights).
-- [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
-  weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
-  the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
-  script's beats say), in `render/publish.py`'s manner or a small script beside it, and name them in the leaves'
-  `draw`. Numbers only from `data/`; anything scaled or guessed says so on screen.
+- [x] **E2b. The flank's lines, first step: the ditch in plan.** *Done 2026-10-20 16:24 UTC, `8c6243f`.* The
+  exhibit's own figures (`src/figures.ts`), named in `draw` and cued like overlays; `ditch-plan` draws the statue's
+  OSM outline and the ditch's north and west walls at ARCE's two scaled margins with their sigmas, "you are
+  here", and a caption that they are scaled and unchecked. The build cuts its data out of `data/`
+  (`virtual:sphinx-plan`). `ch1-carved` draws it on "ditch"; 5 tests; looked at in play at both sizes.
+- [ ] **E2c. The rest of the flank's lines.** The script's beats also draw the bedding profile (hard beds and
+  coves, each bed's hardness sourced or labelled a look choice), the fissures with run-off arrows, seismic lines
+  S1 to S4 and S9 on the floor (placed from Reader's Fig. 5, labelled so) and the weathered slab under the floor
+  ("by Schoch's account"). None has records yet: the slab needs the proposed
+  `sphinx.enclosure.weathering.depth.s1` to `.s4` from `dobecki-schoch-1992` (`verified: false`), the seismic
+  lines a reading of Reader's Fig. 5 with `scripts/plate.py`. Enter those records first (never typed into an
+  overlay), then draw them, as figures where the statue would hide them in the scene.
 - [ ] **E7. The narration script, not run.** `scripts/narrate.py`: for each leaf, ElevenLabs text to speech with
   timestamps (model and voice as arguments; the key from `ELEVENLABS_API_KEY`), writing
   `apps/exhibit/audio/<leaf>.mp3` and `<leaf>.words.json`, skipping a leaf whose text has not changed (hash). The
@@ -156,6 +163,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 16. **The reply panel shows the script's spoken reply first, then the full reply**, both for the leaf's chapter,
     so every leaf of a chapter carries the same answer. Per-leaf replies would need the script to write them;
     the chapter's is what exists.
+
+17. **The flank's ditch is a plan figure, not lines in the scene.** From `sphinx-flank` the north margin lies
+    behind the statue, and an overlay knows nothing of what stands in front of it, so lines in the scene would
+    draw the far wall over the body. The script's beat asked for a plan inset anyway.
+18. **Chromium muted from 16:22 UTC.** The laptop session's rule (`d778b09`) came mid-chunk; this chunk's earlier
+    play tests (from about 16:00 UTC) ran unmuted, so the browser's voice will have been audible on the laptop
+    while they ran. Every test script launches with `--mute-audio` now.
 
 
 ## For Stewart
