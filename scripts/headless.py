@@ -20,8 +20,8 @@ job that runs at all ran on the key. Not `--bare`, which would also forbid any l
 the built-in tools to Bash, Edit and Read, and research needs WebSearch, WebFetch, Grep and
 Glob. A job longer than about ten minutes goes through job.py, like any long job.
 
-The key is read from SEKED_ANTHROPIC_API_KEY, or a line `SEKED_ANTHROPIC_API_KEY=...` in
-~/.seked/keys.env, and is never printed. Standard library only.
+The key is read from SEKED_ANTHROPIC_API_KEY, or a line `SEKED_ANTHROPIC_API_KEY=...` (or, failing that,
+`ANTHROPIC_API_KEY=...`) in ~/.seked/keys.env, and is never printed. Standard library only.
 """
 import os
 import shutil
@@ -48,9 +48,13 @@ KEEP = (
 def key():
     value = os.environ.get(NAME)
     if not value and os.path.exists(KEYS):
-        for line in open(KEYS, encoding="utf-8"):
-            if line.strip().startswith(f"{NAME}="):
-                value = line.split("=", 1)[1].strip()
+        lines = [line.strip() for line in open(KEYS, encoding="utf-8")]
+        # the laptop's keys.env names the same key ANTHROPIC_API_KEY (Stewart, 20 October 2026); the file's
+        # line only, never the process's own ANTHROPIC_API_KEY, which may be another account's
+        for name in (NAME, "ANTHROPIC_API_KEY"):
+            value = next((l.split("=", 1)[1].strip() for l in lines if l.startswith(f"{name}=")), None)
+            if value:
+                break
     if not value:
         sys.exit(f"no API key: set {NAME} or put {NAME}=... in {KEYS}")
     return value
