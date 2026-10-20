@@ -384,7 +384,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   script's are "dates only", and its records are proposals: E18b). No new panorama or flight; one patch. Looked at at
   both sizes; played through muted, 111 s, no errors. Until `orion` First Time at `night-dark` is rendered, the
   walkthrough's stand-in shows the pyramids in the First Time (see For the laptop).
-- [ ] **E18b. Chapter 4's figures.** The radiocarbon bands the script proposes as records (Aha from `dee-2013`;
+- [x] **E18b. Chapter 4's figures.** The radiocarbon bands the script proposes as records (Aha from `dee-2013`;
   Djoser, Khufu, Khafre and Unas from `bronk-ramsey-2010` Table 1; 95 per cent ranges, so a start and an end each,
   quantity `date`; `verified: false`), drawn as a timeline on "first king" or in the reply. The king-list totals
   need `data/texts/kinglists.json`, a new kind of file the script says needs a sentence in `CLAUDE.md`: ask Stewart
@@ -393,6 +393,19 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   The smallest honest home is a site-free structure `chronology` beside `units` and `constants` (one entry in
   `SITE_FREE_STRUCTURES`, `packages/data/src/index.ts`), keys like `chronology.aha.accession.start`. Both sources'
   notes in `data/sources.json` already carry the ranges (Table 1 of each). Decide that first, then enter, then draw.
+  *Done 2026-10-20 23:51 UTC, `01e7835`, the radiocarbon half; the king lists are E18c.* `chronology` is a site-free
+  structure beside `units` and `constants` (decision 50). `data/measurements/chronology.json` holds eleven records,
+  all unchecked: Aha's accession from `dee-2013` (95 per cent earliest and latest, and the median 3085 BCE the script
+  anchors the king lists on) and Djoser, Khufu, Khafre and Unas from `bronk-ramsey-2010` Table 1, keys
+  `chronology.<king>.accession.<earliest|median|latest>`, in astronomical years (decision 47). The figure `radiocarbon`
+  draws each accession as a bar across its range on one axis, the first king at the top, cut from the records at build
+  time (`virtual:radiocarbon`); its caption says which reigns the model places from reign lengths. Cued on "king" in
+  `ch4-first-king` beside the sky (decision 51); in play it draws about 4 s in. `shortCite` now reads two-word surnames
+  and "et al." ("Bronk Ramsey and others (2010)"). 4 tests. Looked at at both sizes paused and in play.
+- [ ] **E18c. Chapter 4's king lists.** The Turin and Manetho totals as a timeline unrolled back from Aha's median
+  (`chronology.aha.accession.median`), with 13,420 alone, the two Turin figures summed (Schwaller's sum, not on the
+  papyrus) and a thin line at 10,500 BCE, as the script's beat for "13,420 years and, in the next line, 23,200" asks.
+  *Waiting on Stewart:* the totals want `data/texts/kinglists.json`, a new kind of file (see For Stewart).
 
 ## Decisions
 
@@ -565,6 +578,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 49. **The First Time's night shows Orion low, as it was**, not "high in the south" as the beat says: at C5's epoch the
     belt crosses the meridian about 9 degrees up, its lowest, which is chapter 5's point. The leaves look lower to
     keep it in frame.
+50. **Reigns are dated under a site-free structure, `chronology`**, as chunk 5's note proposed: every record names a
+    structure, and a reign is not a monument, so it joins `units` and `constants` (one entry in
+    `SITE_FREE_STRUCTURES`) rather than a new entry in `data/structures.json`, which would give a king an evidence
+    tier. Reversible: one set entry and one file.
+51. **The radiocarbon bands are drawn on the claim's leaf, "Egypt did not think it began with its first king"**, not
+    only in the reply panel: the sentence names the first king, and the bar is when he reigned, which the king lists
+    (E18c) will count back from. The panel stays text, as every other chapter's. Reversible: move `radiocarbon@king`.
 
 
 ## For Stewart
