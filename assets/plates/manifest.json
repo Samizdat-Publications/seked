@@ -5,7 +5,10 @@
       "id": "biondi-malanga-2022-fig22",
       "file": "biondi-malanga-2022/fig22.png",
       "sha256": "fb30ab36193d4907c5cfb6f6ea9bd0e176663cdef863e077ad51a08eb2ab8c16",
-      "size": [2408, 1949],
+      "size": [
+        2408,
+        1949
+      ],
       "source": "biondi-malanga-2022",
       "figure": "Figure 22",
       "caption": "Three-dimensional (3D) reconstruction of the pyramid of Khnum-Khufu downstream of the interpretation of tomograms estimated through radar ultrasound.",
@@ -21,7 +24,10 @@
       "id": "biondi-malanga-2022-fig24",
       "file": "biondi-malanga-2022/fig24.png",
       "sha256": "ff0f41d41c4ffc8aa86fee971e8098b9848d4ca9290a65d4d66a73bbe2b64510",
-      "size": [2865, 1242],
+      "size": [
+        2865,
+        1242
+      ],
       "source": "biondi-malanga-2022",
       "figure": "Figure 24",
       "caption": "(a): Tomographic map of Khnum-Khufu overlapped to its schematic representation. (b): Tomographic map of Khnum-Khufu.",
@@ -30,8 +36,31 @@
       "licence": "CC BY 4.0 (Crossref's licence record for 10.3390/rs14205231)",
       "attribution": "Biondi, F. & Malanga, C. (2022), Remote Sensing 14(20), 5231, Figure 24, CC BY 4.0. Retracted 10 August 2026.",
       "retraction": "Retracted on 10 August 2026 (Remote Sensing 18(16), 2679, doi:10.3390/rs18162679) for 'serious methodological flaws and statistical errors'; the authors disagree. Shown only with that stated beside it.",
-      "registration": "Panel (a) carries a 50 m scale bar and a north arrow, so it can be registered on Khufu's north-south section with scripts/plate.py (scale, then register) and placed on that plane; not yet done. Panel (b) has no units and is placed beside (a), never scaled.",
-      "about": "Khufu's pyramid, not Khafre's: the tomogram the method drew over the known chambers, which a viewer can set against Khufu's surveyed section."
+      "registration": "Panel (a) is registered on its own 50 m scale bar, read on a pixel grid (scripts/plate.py grid, then scale): the bar runs from (65, 980) to (351, 980), so 286 ± 1.4 px is 50 m, 0.1748 ± 0.0009 m per pixel, horizontal only. The frame's origin is pinned where the authors' dashed outline meets its base line on the axis: the axis at x = 717.5 ± 2 (from the two dashed faces) and the base line at y = 863 ± 1. North is +x (the figure's arrow). Read two ways, the drawing disagrees with the survey: its base-left corner is at x = 53, a half base of 116.2 ± 0.6 m (Lehner's 115.17), but its apex, half hidden by the panel's title, lies near y = 59, a height of about 140.5 m against 146.59, so the authors' outline is drawn at about 50.4° where the survey gives 51.8°, or the figure's vertical scale is some 4% short of its bar. Scaled from plate, never verified. Panel (b) has no units and is placed beside (a), never scaled. scripts/plate_overlay.py draws the survey over it.",
+      "about": "Khufu's pyramid, not Khafre's: the tomogram the method drew over the known chambers, which a viewer can set against Khufu's surveyed section.",
+      "registered": {
+        "panel": "a",
+        "origin_px": [
+          717.5,
+          863.0
+        ],
+        "m_per_px": 0.17483,
+        "m_per_px_sigma": 0.0009,
+        "north_px": 1,
+        "up_px": 1,
+        "method": "scaled from plate",
+        "bar": [
+          [
+            65,
+            980
+          ],
+          [
+            351,
+            980
+          ],
+          50.0
+        ]
+      }
     }
   ],
   "linked": [
