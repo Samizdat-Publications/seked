@@ -15,6 +15,7 @@ import { setDefaultStars, type Star } from '@seked/sky/browser';
 import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
+import { mapWidget, type MapWidget } from './mapwidget';
 import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
 import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
@@ -87,6 +88,8 @@ const isProfile = (s: Still | null | undefined) => PROFILE_MODES.some((m) => m =
 /** Chapter 7's timeline, likewise. */
 let timeline: TimelineWidget | undefined;
 const isTimeline = (s: Still | null | undefined) => s?.widget === 'ice' || s?.widget === 'dryas';
+/** Chapter 7's map inset, likewise. */
+let map: MapWidget | undefined;
 
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
@@ -105,6 +108,7 @@ function show(c: Chapter, still: Still | null) {
   if (still?.caption) stage.querySelector<HTMLElement>('.caption-stage')!.textContent = still.caption;
   stage.classList.toggle('profile-on', isProfile(still) && !!profile);
   stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
+  stage.classList.toggle('map-on', still?.widget === 'map' && !!map);
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;
@@ -158,6 +162,7 @@ function follow() {
   // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
   // nearer: chapter 6's later beats have no still of their own, so its next beat is chapter 7's
   if (isTimeline(still) && timeline) timeline.progress(still!.widget as TimelineMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
+  if (still?.widget === 'map' && map) map.progress(since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (isProfile(still) && profile) profile.progress(still!.widget as ProfileMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
 }
 let queued = false;
@@ -200,6 +205,8 @@ async function liveReceipts() {
     stage.append(sky.el);
     timeline = timelineWidget(bundle.claims);
     stage.append(timeline.el);
+    map = mapWidget(env['earth.radius.mean']!);
+    stage.append(map.el);
     try {
       profile = profileWidget(profileOf(env, bundle.claims));
       stage.append(profile.el);

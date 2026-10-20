@@ -1184,5 +1184,29 @@
     "citation": "Thy, P., Willcox, G., Barfod, G. H. & Fuller, D. Q. (2015). Anthropogenic origin of siliceous scoria droplets from Pleistocene and Holocene archaeological sites in northern Syria. Journal of Archaeological Science 54, 193–209.",
     "url": "https://doi.org/10.1016/j.jas.2014.11.027",
     "note": "Peer-reviewed. Unchecked: from search summary; the paper was not read. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "natural-earth-5.1.2",
+    "kind": "reference",
+    "year": 2022,
+    "citation": "Natural Earth (2022). 1:50m Physical Vectors: Coastline, and Rivers + lake centerlines, version 5.1.2. Public domain.",
+    "url": "https://github.com/nvkelso/natural-earth-vector/tree/v5.1.2/geojson",
+    "note": "Data files, imported by scripts/basemap.ts into data/places/basemap.json, cut to 27-42° E, 27-39° N for chapter 7's map inset; context, not evidence. Fetched 2026-10-20 from the v5.1.2 tag to build/basemap/ (not in the repo): ne_50m_coastline.geojson, 1640858 bytes, sha256 271f1c4c1908312bac6b29d158ea1356544beafc129f260005300913aa5ea283; ne_50m_rivers_lake_centerlines.geojson, 827318 bytes, sha256 f286e0ce978fde999ca2d7a78c764be08542e19b63cded52b05c12d5173ccc51. Natural Earth asks no attribution; the page credits it anyway."
+  },
+  {
+    "id": "unesco-whc-1572",
+    "kind": "reference",
+    "year": 2018,
+    "citation": "UNESCO World Heritage Centre. Göbekli Tepe (World Heritage List no. 1572, inscribed 2018).",
+    "url": "https://whc.unesco.org/en/list/1572",
+    "note": "The property's coordinates, N37 13 23.671 E38 55 20.51, read on the list page on 2026-10-20 by the night builder (chunk 6); the point is the property's, not Enclosure D's."
+  },
+  {
+    "id": "wikipedia-abu-hureyra",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Tell Abu Hureyra. Wikipedia, revision as of 3 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Tell_Abu_Hureyra",
+    "note": "The coordinates 35°51′58″N 38°24′00″E, read 2026-10-20 (chunk 6). An encyclopedia, cited only for where a map puts the site: Moore et al. 2020 give no coordinates, only that it lay on the Euphrates' south-west bank, now under Lake Assad. Replace with an excavation report's figure when one is found."
   }
 ]

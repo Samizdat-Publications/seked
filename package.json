@@ -22,6 +22,7 @@
     "sky-rollback": "tsx scripts/sky-rollback.ts",
     "stars": "tsx scripts/stars.ts",
     "icecore": "tsx scripts/icecore.ts",
+    "basemap": "tsx scripts/basemap.ts",
     "footprints": "tsx scripts/footprints.ts",
     "city": "tsx scripts/city.ts",
     "props": "python scripts/props.py && tsx scripts/web-assets.ts",

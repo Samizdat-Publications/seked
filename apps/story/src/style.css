@@ -167,6 +167,29 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .timeline .small { display: none; }
 }
 
+/* chapter 7's map inset: the coast pale, the rivers blue, the places amber as the scroll names them */
+.map { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column; justify-content: center;
+  background: radial-gradient(ellipse at 50% 40%, #16202a, #080b0f 75%); color: #e9e2d4; font-family: system-ui, sans-serif; }
+.stage.map-on .map { display: flex; }
+.map svg { width: 100%; max-height: 75%; }
+.map .coast { fill: none; stroke: rgba(233, 226, 212, 0.7); stroke-width: 0.35; stroke-linejoin: round; }
+.map .river { fill: none; stroke: #9fc4ff; stroke-width: 0.35; stroke-linejoin: round; opacity: 0.8; }
+.map .place circle { fill: #f2b544; }
+.map .place text { fill: #f2b544; font-size: 3.2px; }
+.map .place, .map .span, .map .span-label { transition: opacity 0.3s; }
+.map .span { stroke: #f2b544; stroke-width: 0.3; stroke-dasharray: 1.2 0.8; }
+.map .span-label { fill: rgba(233, 226, 212, 0.85); font-size: 2.8px; }
+.map .readouts { padding: 0 1.2rem; font-size: 0.9rem; line-height: 1.5; min-height: 4em; }
+.map .small { font-size: 0.75rem; color: rgba(233, 226, 212, 0.6); margin-top: 0.4rem; }
+@media (max-width: 52rem) {
+  .stage.map-on { height: 45vh; }
+  .map .readouts { font-size: 0.7rem; line-height: 1.3; padding: 0 0.6rem; min-height: 0; }
+  .map .small { display: none; }
+  .map .place text { font-size: 6px; }
+  .map .place circle { r: 2px; }
+  .map .span-label { font-size: 5px; }
+}
+
 /* a beat whose picture is its words (chapter 7's "no farms, no pottery and no metal"), on a plain ground: no picture of
    Göbekli Tepe exists yet, and the still behind would be Giza's */
 .caption-stage { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center;

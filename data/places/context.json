@@ -1,0 +1,23 @@
+{
+  "note": "Places the story's maps name that are not sites: no datum, no frame, no measurements, nothing modelled. Context, as the modern city is. Coordinates are entered as their sources print them, degrees, minutes and seconds north and east, and converted by code. Giza is not here: its point is its site's origin in data/sites.json. A place that becomes a site (Göbekli Tepe, when Enclosure D is modelled) moves there. verified stays false until read again on the cited page.",
+  "places": [
+    {
+      "id": "gobekli-tepe",
+      "name": "Göbekli Tepe",
+      "latitude": [37, 13, 23.671],
+      "longitude": [38, 55, 20.51],
+      "source": "unesco-whc-1572",
+      "verified": false,
+      "note": "The World Heritage property's point, not Enclosure D's. On a hilltop on the Germuş range, north-east of Şanlıurfa."
+    },
+    {
+      "id": "abu-hureyra",
+      "name": "Abu Hureyra",
+      "latitude": [35, 51, 58],
+      "longitude": [38, 24, 0],
+      "source": "wikipedia-abu-hureyra",
+      "verified": false,
+      "note": "The tell lay on the Euphrates' south-west bank and has been under Lake Assad since the Tabqa dam closed in the 1970s; a point good to the seconds the encyclopedia gives."
+    }
+  ]
+}
