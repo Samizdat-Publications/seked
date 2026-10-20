@@ -186,6 +186,28 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   both sizes, and Next turns to `ch0-sunrise` in the same panorama. The queue asks for the roof's panorama and
   patch; the flight `ch0-dawn--ch0-sunrise` waits for the publish (see For the laptop).
 
+- [ ] **E13. Chapter 2, "A lion, not a king": its leaves.** Cut chapter 2 of `docs/script.md` into leaves, every
+  word kept in order (the narration is recorded: `assets/narration/ch2.json`). Stand where the argument is seen:
+  the head against the body at `sphinx-face` today (the head too small), the master lion in the First Time, the
+  head in the hand (E14) on "Here the king's head sits inside the lion's", and due east from behind the lion at
+  the equinox dawn of 10,500 BCE with Leo on the horizon, the sky drawn live from `@seked/sky` over the panorama's
+  own sky (registered by the station camera; the sun's place from the same engine). Receipts C5, D4, C6 and H1
+  (H1 is a proposal in `docs/claims-proposed.md`: show its number as the reply does, labelled a proposal). Queue
+  what the laptop must render (panoramas, patches, flights) through `scripts/exhibit_queue.py`.
+- [ ] **E14. An object in the hand.** A small realtime three.js view, lazy-loaded only on a leaf whose `interact`
+  is `object:<id>`: the object lit simply on a dark ground, turned by dragging, with a reset. The first object is
+  the ghosted head: `sphinx-built`'s king's head solid, and the master lion's head (its First Time finish, with
+  night item 36's enlargement, the factor in the era record) translucent round it, placed by the head fit. Write
+  `render/export_heads.py` (bpy, run by the laptop) that exports the two heads as small GLBs into
+  `apps/exhibit/objects/` with a JSON of their placement and the factor; do not run Blender. Until the GLBs
+  exist, the leaf shows the panorama.
+- [ ] **E15. Chapter 5, "The sky as a clock": its leaves and the slider.** Cut chapter 5 into leaves likewise. The
+  live figure: at night over the pyramids (the `orion` station, `built`), the stars drawn by `@seked/sky` over the
+  panorama, and a year slider from today to 10,500 BCE the visitor drags (play animates it): Orion's belt sinks
+  toward its lowest and its angle turns against the three pyramids' diagonal, C4's receipt live beside it,
+  computed from the bundle as `apps/story`'s sky widget did (reuse it). Then the King's Chamber's southern shaft
+  (`kings-chamber`, the existing `kc-shaft` overlay) drawn on toward Alnitak c. 2450 BCE. Receipts C2, C3, C4, C7.
+
 ## Decisions
 
 1. **The exhibit reads `../walk/` for stations, overlays and panoramas** rather than copying them, so the 4096 by
