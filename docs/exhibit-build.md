@@ -103,11 +103,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `sphinx.enclosure.weathering.depth.s1` to `.s4` from `dobecki-schoch-1992` (`verified: false`), the seismic
   lines a reading of Reader's Fig. 5 with `scripts/plate.py`. Enter those records first (never typed into an
   overlay), then draw them, as figures where the statue would hide them in the scene.
-- [ ] **E7. The narration script, not run.** `scripts/narrate.py`: for each leaf, ElevenLabs text to speech with
-  timestamps (model and voice as arguments; the key from `ELEVENLABS_API_KEY`), writing
-  `apps/exhibit/audio/<leaf>.mp3` and `<leaf>.words.json`, skipping a leaf whose text has not changed (hash). The
-  player prefers the recording when it exists. Port what helps from Stewart's Antikythera project
-  (`C:\Users\stewa\Documents\Claude\Blender Tests\antikythera\tools\narration.py`; read only, never write there).
+- [ ] **E7. The recorded voice in the player** (replaced by the laptop session, 20 October: the voice is chosen
+  and recorded). `assets/narration/chN.mp3` and `chN-reply.mp3` hold each chapter of `docs/script.md` in Stewart's
+  chosen voice, and `chN.json` the exact text spoken with every character's start and end time
+  (`scripts/narrate_script.py`). A leaf is a range of its chapter's text: find its words in that text, take their
+  times, and play that span of the chapter's audio; a line draws on at its word's time. The browser's speech stays
+  only as the fallback for a leaf whose words are not in the recording (say so in the console). The leaves must
+  keep the script's words exactly, or the chapter is re-recorded. Do not call ElevenLabs.
 - [ ] **E8. Look at it end to end** at both sizes, as a visitor with no background would, and fix what reads
   badly. Write what still needs a render or a decision under "For Stewart" and "For the laptop".
 
