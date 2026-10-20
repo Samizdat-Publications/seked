@@ -165,7 +165,7 @@ def figure_parts(x, y, height, facing=0.0):
             (x, y, 0.17, 0.46 * h, 0.82 * h), (x, y, 0.055, 0.82 * h, 0.86 * h), (x, y, 0.1, 0.86 * h, h)]
 
 
-def orbit(t, rec=None, look=LOOK, eye=1.6, out=1.5, at=1.4):
+def orbit(t, rec=None, look=LOOK, eye=1.6, out=1.5, at=3.5):
     """The sequence's camera at `t` (0 to 1, once round, clockwise from the south): on the rim `out` metres outside the
     wall, a person's eye height above its top, looking at the middle of the ring `at` metres above the floor. Close to the
     wall, so the line of sight clears the near rim and reaches the floor's middle; at 4 m out the near mound filled the
