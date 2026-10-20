@@ -157,6 +157,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   the leaf's (2560 px wide, the leaf's era and moment, 96 samples), and the player lays it into the panorama so the
   leaf is sharp at rest and still draggable, the panorama taking over past the patch's edge. The patch must
   register exactly with its panorama (same camera position and sun). Write the queue; do not render.
+  *Done 2026-10-20 18:39 UTC, `2b6debe`.* `scripts/exhibit_queue.py` writes `render/queues/exhibit-patches.json`:
+  9 patches for the 22 leaves (one per shared view, and only where a patch holds at least 1.25 times the
+  panorama's pixels, decision 22), out to `build/render/patch-exhibit/`, each sidecar naming the panorama it
+  registers with. `render/publish.py` publishes them into `pano/patch/` and lists them in
+  `apps/walk/exhibit-patches.json`, leaving out a patch older than its panorama. The player files every patch
+  under the panorama it was rendered with (decision 23), which also stops the walkthrough's midsummer patch for
+  `sphinx` today being laid over the exhibit's dawn panorama, and fetches the next leaf's patch ahead. Checked in
+  Chromium with a tinted patch reprojected from `sphinx-today-equinox-dawn.jpg`: it registers with no doubled
+  edges, covers the leaf at rest, and the panorama takes over at its feathered edge when dragged; a phone's wide
+  field never wants a patch, so none is fetched there. 5 new Python tests, 2 TS. The six dawn panoramas had
+  landed meanwhile, so the E10 framing was looked at again on them, all 22 leaves at both sizes: it holds.
 - [ ] **E12. The rooftop of Nazlet el-Samman** (decided by the laptop session: the words stay, and the cold open
   stands where they say). Add a station `nazlet-roof` to `render/stations.json`: on the flat roof of a real
   building in Nazlet el-Samman east of the Sphinx, chosen from `data/footprints/city.*` (its footprint and
@@ -237,6 +248,15 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     leaf would double the authoring and the review. Reversible: `frameAim` returns the leaf's pitch when
     `FRAME_PIVOT` is 0.5. A flight's last frame (16:9) still matches only on a wide screen, as before.
 
+22. **A leaf gets a patch only where it is at least 1.25 times as sharp as the panorama.** At 2560 by 1440 and
+    1.3 times the leaf's field, a 70-degree leaf's patch holds 12.4 pixels a degree against the panorama's 11.4:
+    nine per cent, invisible, for a render each. The panorama already matches a 1440 by 900 screen at that field;
+    a retina screen would want patches twice the size (5120 by 2880), which is the laptop's time to spend or not
+    (see For Stewart). `PATCH_MIN_GAIN` in `scripts/exhibit_queue.py`.
+23. **A patch belongs to a panorama file, not to a station and era.** The exhibit shows one station in one era at
+    more than one moment, and a patch rendered in one light laid over a panorama in another would show as a
+    lighter or darker rectangle. Patches are now looked up by the address of the panorama on stage.
+
 
 ## For Stewart
 
@@ -256,6 +276,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - On a phone a flight's film is cropped to fill the tall screen while the panorama widens its field, so the
   handover is not seamless there. A phone cut of each flight (or a cut instead of a flight on phones) would
   fix it; say which.
+- Sharp on a retina screen: the patches (E11) make the tight leaves sharp on an ordinary screen. On a retina
+  laptop every leaf wants about twice the pixels; that means patches at 5120 by 2880 for all 22 leaves, or
+  panoramas at 8192 by 4096. Both are only laptop time (a patch costs about what a panorama does). Worth it?
 
 ## For the laptop
 
@@ -269,6 +292,12 @@ Renders the laptop session should run, with the queue or command, as items need 
   long rains and the First Time without pyramids), which the walkthrough's own claim-era panoramas still lack.
   Worth a look whether the flank's floor is too dark at that hour; if so, say, and chapter 1 can move to
   `morning-east` with its flight in becoming a cut.
+  *On disk by 18:34 UTC; the panorama queue is empty now.*
+- **Nine detail patches** (E11), `render/queues/exhibit-patches.json`, after the panoramas they register with
+  (a patch older than its panorama is left out by publish): `blender -b --factory-startup -P render/build.py --
+  --queue render/queues/exhibit-patches.json`, then `python render/publish.py`, which writes
+  `apps/walk/pano/patch/*.jpg` and `apps/walk/exhibit-patches.json` (commit that file with `stations.json`). If a
+  claim-era panorama at the flank is rendered again tonight, render its patch after it.
 - **Two flights**, `render/films-exhibit.json`: `ch0-claim--ch0-schoch` (the First Time, from above the temple
   down to the paws) and `ch0-ditch--ch1-carved` (today, the paws to the flank). Preview each first (`--films
   render/films-exhibit.json --film ID --preview 0,45,89`), then render and encode into
