@@ -25,8 +25,17 @@ lion's head (`fit` in `build/models/sphinx-master-built/era.json`). Two results,
 | *The monument* (`sphinx.head.height`) | | | *5.73 ± 0.09 m* | | |
 
 The lion head is 8.08 m. The searched fit holds a much larger head only by setting it 1.5 m back into
-the mane and 2 m lower, where the lion's head is broadest. The carving in the renders uses the centred
-fit (decision 54), because carved at 0.61 the bust is short and the head is not the monument's.
+the mane and 2 m lower, where the lion's head is broadest. Those are the fits on the lion **as drawn**.
+
+**The enlargement (night item 36, Stewart's answer 6, night decision 83).** Since then the renders carve the
+monument's own head: the king's head at `sphinx.head.height` chin to crown, its crown at `sphinx.height`, set
+fore or aft as the searched fit is, inside a lion head and mane scaled about the head's foot
+(`render/giza/profile.py` `enlarge_head`). `sphinx_eras.py --solve-head` finds the least scale that holds it:
+**1.162**, the head 1.71 m aft. Centred fore and aft it would need 1.82; left free to drop, 1.082, with the crown
+1.5 m under the monument's height. The renders use 1.17 (`HEAD_SCALE`, a look choice). In that lion (head 9.27 m)
+the carved head is 5.73 m chin to crown with its crown at 20.2 m, 1.17 m aft, 99.97 per cent of its head and
+nemes inside; the largest head it could hold is 6.37 m (searched) or 4.42 m (centred). **The factor is the receipt
+H1 should report**: how much larger than the drawn lion's head the claim's lion head has to be.
 
 **What it would compare.**
 
@@ -156,7 +165,8 @@ the claims package before the file is written; if either is not supported, that 
 - H1's way in: a script-written `data/derived/` file under a `model.` prefix, or keep the head fit as a
   receipt computed outside the engine and shown with the stand-in caveat.
 - H1's verdict: a ratio with no "holds", or a tolerance (and whose).
-- Which fit H1 reports: the centred (0.39 of the lion head, the head where the lion's stood) or the searched
+- H1 now reports the enlargement the fit needed (1.16), with the fits on the lion as drawn beside it (decision 83).
+  Superseded question: which fit H1 reports: the centred (0.39 of the lion head, the head where the lion's stood) or the searched
   (0.61, the largest anywhere along the head). The searched is the honest answer to "how large could it be".
 - What H1 says when the fit comes out *smaller* than the monument's head (5.27 m against 5.73 m): the master's
   lion head is then too small to have held the head the Sphinx has, so the test speaks to the stand-in, not to
