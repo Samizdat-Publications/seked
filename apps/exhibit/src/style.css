@@ -110,6 +110,11 @@ p { margin: 0; }
 .reply p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: rgba(214, 205, 190, 0.92); }
 .reply .spoken { font: 400 17px/1.4 var(--display); color: var(--ink); }
 .reply .quiet { color: var(--muted); font-style: italic; }
+.reply .listen {
+  margin: -2px 0 12px; height: 30px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+  font: 500 12px/1 var(--body); color: var(--ink); background: none; border: 1px solid var(--rule);
+}
+.reply .listen:hover, .reply .listen[aria-pressed="true"] { border-color: rgba(239, 232, 220, 0.62); }
 .reply ul { margin: 0 0 12px; padding-left: 18px; font: 400 12px/1.55 var(--mono); color: var(--ink); }
 .reply section + section { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(239, 232, 220, 0.14); }
 .reply code { font: 400 0.92em var(--mono); color: var(--muted); }

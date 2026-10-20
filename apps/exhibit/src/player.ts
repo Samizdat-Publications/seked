@@ -38,6 +38,8 @@ export class Player {
   words: { word: string; at: number }[] = [];
   /** Called as each word of the leaf is reached, with its index. */
   onWord: (i: number) => void = () => {};
+  /** Called when play starts, before the first word. */
+  onPlay: () => void = () => {};
   /** Called when a leaf is put on the stage. */
   onLeaf: (leaf: Leaf) => void = () => {};
   /** Show one of the exhibit's own figures (src/figures.ts), or put it away with null. */
@@ -123,6 +125,7 @@ export class Player {
   play(): void {
     if (this.playing) return;
     this.playing = true;
+    this.onPlay();
     this.stage.compare(null);
     if (this.leaf.draw[0] && drawCue(this.leaf.draw[0]).word) this.stage.cueOverlay();
     this.setFigure(this.leaf);

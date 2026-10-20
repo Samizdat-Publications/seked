@@ -7,6 +7,7 @@ import type { Claim } from '@seked/claims/browser';
 import type { Database } from '@seked/data/browser';
 import type { Leaf } from './leaves';
 import { scriptPart } from './play';
+import { recordingUrl } from './narration';
 import { leafReceipts, receiptLine } from './receipts';
 
 type Bundle = Database & { claims: Claim[] };
@@ -46,6 +47,8 @@ export class Panel {
   private tab: HTMLButtonElement;
   private aside: HTMLElement;
   private leaf: Leaf | null = null;
+  /** The chapter's recorded spoken reply (assets/narration/chN-reply.mp3), played from the panel. */
+  private voice = new Audio();
 
   constructor(root: HTMLElement, private script: string) {
     this.tab = document.createElement('button');
@@ -72,13 +75,17 @@ export class Panel {
     this.tab.hidden = !has && !receipts;
     this.tab.textContent = receipts ? (has ? 'Receipt and reply' : 'Receipt') : 'The reply';
     if (this.tab.hidden) this.toggle(false);
-    else if (!this.aside.hidden) this.fill();
+    else if (!this.aside.hidden && this.voice.dataset.chapter !== leaf.reply) this.fill();
   }
+
+  /** Stop the recorded reply, so it never talks over the narration. */
+  quiet(): void { this.voice.pause(); }
 
   toggle(open?: boolean): void {
     const show = open ?? this.aside.hidden === true;
     if (show === (this.aside.hidden !== true)) return;
     this.aside.hidden = !show;
+    if (!show) this.voice.pause();
     this.tab.setAttribute('aria-expanded', String(show));
     document.body.classList.toggle('reading', show);
     if (show) { this.fill(); this.onOpen(); }
@@ -93,9 +100,27 @@ export class Panel {
       <button type="button" class="reply-x" aria-label="Close">&times;</button>
       ${L.receipts.length ? '<section class="receipts"><h2>The receipt</h2><div class="live"><p class="quiet">Computing from the database</p></div></section>' : ''}
       ${reply.spoken || reply.full ? `<section class="answer"><h2>The archaeologists' reply</h2>
-        ${reply.spoken ? `<p class="spoken">${inline(reply.spoken)}</p>` : ''}${paras}</section>` : ''}`;
+        ${reply.spoken ? `<p class="spoken">${inline(reply.spoken)}</p><button type="button" class="listen" hidden>Listen</button>` : ''}${paras}</section>` : ''}`;
     this.aside.querySelector('.reply-x')!.addEventListener('click', () => this.toggle(false));
+    this.listen(L);
     if (L.receipts.length) void this.receipts(L);
+  }
+
+  /** The listen button, shown once the chapter's recorded reply is known to be there. */
+  private listen(L: Leaf): void {
+    const btn = this.aside.querySelector<HTMLButtonElement>('.listen');
+    const v = this.voice;
+    v.pause();
+    if (!btn) return;
+    const src = new URL(recordingUrl(Number(L.reply.slice(2)), `${L.reply}-reply.mp3`), location.href).href;
+    if (v.src !== src) { v.src = src; v.preload = 'metadata'; }
+    v.dataset.chapter = L.reply;
+    const label = () => { btn.textContent = v.paused ? 'Listen' : 'Stop'; btn.setAttribute('aria-pressed', String(!v.paused)); };
+    const ready = () => { btn.hidden = false; label(); };
+    if (v.readyState >= 1) ready(); else v.addEventListener('loadedmetadata', ready, { once: true });
+    v.onerror = () => { btn.hidden = true; };
+    v.onplay = v.onpause = v.onended = label;
+    btn.addEventListener('click', () => { if (v.paused) { v.currentTime = 0; void v.play(); } else v.pause(); });
   }
 
   private async receipts(L: Leaf): Promise<void> {
