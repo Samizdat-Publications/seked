@@ -839,6 +839,219 @@
    "reply": "ch2"
   },
   {
+   "id": "ch3-temples",
+   "chapter": 3,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 255,
+    "pitch": -8,
+    "fov": 64
+   },
+   "arrive": "wipe",
+   "say": "At the Sphinx's paws stand two temples.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [
+    "D4"
+   ],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-granite",
+   "chapter": 3,
+   "station": "valley-temple",
+   "era": "built",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 270,
+    "pitch": 4,
+    "fov": 80
+   },
+   "arrive": "cut",
+   "say": "One of them, the Valley Temple, is lined with red granite from Aswan.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-core",
+   "chapter": 3,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 235,
+    "pitch": -22,
+    "fov": 45
+   },
+   "arrive": "cut",
+   "say": "Behind the granite is a core of local limestone, in blocks that Flinders Petrie found ranging in weight to over a hundred tons each.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-ditch",
+   "chapter": 3,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 275,
+    "pitch": -4,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "Those blocks came out of the Sphinx's own ditch, layer by layer. On that, the archaeologists and their critics agree.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-stone",
+   "chapter": 3,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 250,
+    "pitch": -8,
+    "fov": 75
+   },
+   "arrive": "turn",
+   "say": "The temples are built of the lion's stone, cut as the lion was freed from the rock.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [
+    "D4"
+   ],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-west",
+   "chapter": 3,
+   "station": "valley-temple",
+   "era": "today",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 0,
+    "pitch": 5,
+    "fov": 70
+   },
+   "arrive": "cut",
+   "say": "Schoch and the writer John Anthony West went further. On camera in 1993, they said the limestone behind the granite is rounded and fissured like the ditch walls, and that the backs of the granite blocks were cut to fit that worn surface.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-rain",
+   "chapter": 3,
+   "station": "valley-temple",
+   "era": "today",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 180,
+    "pitch": 5,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "Schoch writes that the core blocks of both temples carry the weathering of heavy rain beneath their Old Kingdom granite. Nobody weathers a wall and then cases it.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-refit",
+   "chapter": 3,
+   "station": "valley-temple",
+   "era": "built",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 180,
+    "pitch": 5,
+    "fov": 70
+   },
+   "arrive": "wipe",
+   "say": "On this reading the granite is a refit, laid over a building that was already old.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-hancock",
+   "chapter": 3,
+   "station": "valley-temple",
+   "era": "built",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 270,
+    "pitch": 4,
+    "fov": 80
+   },
+   "arrive": "turn",
+   "say": "Hancock argues that the temple is credited to Khafre \"on no good grounds whatsoever\".",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-statues",
+   "chapter": 3,
+   "station": "valley-temple",
+   "era": "built",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 22,
+    "pitch": -15,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "Khafre's statues, found inside it, and its granite show that he used and refaced the building. They leave the age of its core open.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
+   "id": "ch3-records",
+   "chapter": 3,
+   "station": "sphinx-face",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": 18,
+    "fov": 66
+   },
+   "arrive": "cut",
+   "say": "And the Egyptians' own records put long ages before their first king.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch3"
+  },
+  {
    "id": "ch5-belt",
    "chapter": 5,
    "station": "orion",

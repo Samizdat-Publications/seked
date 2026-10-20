@@ -70,6 +70,57 @@
    "for": "ch2-drift"
   },
   {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 235,
+    "pitch": -22,
+    "fov": 58.5,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch3-core",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch3-core.png",
+   "for": "ch3-core"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 275,
+    "pitch": -4,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch3-ditch",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch3-ditch.png",
+   "for": "ch3-ditch"
+  },
+  {
+   "state": "built",
+   "station": "valley-temple",
+   "moment": "temple-morning",
+   "patch": {
+    "yaw": 22,
+    "pitch": -15,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch3-statues",
+    "pano": "pano/valley-temple-built.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/valley-temple-built-temple-morning-ch3-statues.png",
+   "for": "ch3-statues"
+  },
+  {
    "state": "built",
    "station": "orion",
    "moment": "night-dark",
