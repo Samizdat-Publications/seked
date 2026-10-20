@@ -222,5 +222,21 @@
     "evidence": "instrumented",
     "source": "sharafeldin-2019",
     "note": "Mapped by ERT, seismic refraction, GPR and boreholes, peer reviewed. Not a monument: it is here because chapter 8's reply draws it in the section, where any shaft hundreds of metres deep would stand far below it."
+  },
+  {
+    "id": "hawara.groundwater",
+    "site": "hawara",
+    "name": "Hawara's water table",
+    "evidence": "instrumented",
+    "source": "elshazly-2024",
+    "note": "Mapped by ERT and TEM, peer reviewed. Not a monument: the Hawara section draws it because whatever lies under the Labyrinth lies in it."
+  },
+  {
+    "id": "hawara.bedrock",
+    "site": "hawara",
+    "name": "Hawara's bedrock and its cover",
+    "evidence": "instrumented",
+    "source": "szynkiewicz-2015",
+    "note": "From GPR to 20 m and cores: Eocene limestone under Holocene gravel and sand. Not a monument; drawn in the Hawara section."
   }
 ]
