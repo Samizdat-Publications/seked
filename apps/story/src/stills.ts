@@ -110,6 +110,9 @@ export const STILLS: Still[] = [
   { chapter: 7, anchor: 'no farms, no pottery and no metal', src: 'progress/0047-enclosure-d-from-the-air.png',
     alt: 'Enclosure D at Göbekli Tepe from the air, its pillars placed from the excavators’ plan', tags: ['stand-in', 'look choices'],
     widget: 'caption', caption: 'No farms, no pottery and no metal' },
+  { chapter: 7, anchor: 'believed they later filled it in on purpose', src: 'progress/0048-enclosure-d-filled-schmidt.png',
+    alt: 'Enclosure D filled level, as Schmidt read it: a burial on purpose. Since revised: the excavators now read the fill as slope slides',
+    tags: ['stand-in', 'look choices'] },
   { chapter: 7, anchor: 'a plan laid out at Giza in the eleventh millennium BCE', src: FIRST_TIME_AIR,
     alt: 'Giza’s First Time from the air: the plateau green, no pyramids', tags: ['claim state'] },
 

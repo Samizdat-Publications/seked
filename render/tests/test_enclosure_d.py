@@ -79,6 +79,29 @@ class EnclosureDTests(unittest.TestCase):
         self.assertAlmostEqual(max(p[4] for p in parts), E.LOOK["figure"])
         self.assertEqual(min(p[3] for p in parts), 0.0)
 
+    def test_the_two_fills_stand_inside_the_wall_and_the_slide_falls_away_from_its_source(self):
+        w = E.wall(self.rec)
+        lv, lf = E.fill_mesh(w, 2.0, "level")
+        self.assertTrue(all(v[2] == 2.0 for v in lv))
+        sv, sf = E.fill_mesh(w, 2.0, "slide")
+        self.assertTrue(all(all(0 <= i < len(sv) for i in f) for f in sf))
+        self.assertTrue(all(0.0 <= v[2] <= w["height"] for v in sv))
+        self.assertAlmostEqual(sv[0][2], 2.0)
+        # higher on the side it slid in from than on the far side
+        b = math.radians(E.LOOK["slide_from"])
+        along = lambda v: v[0] * math.sin(b) + v[1] * math.cos(b)  # noqa: E731
+        rim = sv[-len(w["inner"]):]
+        self.assertGreater(max(rim, key=along)[2], min(rim, key=along)[2])
+
+    def test_neither_face_of_the_wall_folds_back(self):
+        w = E.wall(self.rec)
+        for face in ("inner", "outer", "line"):
+            pts = w[face]
+            mx, my = sum(x for x, _ in pts) / len(pts), sum(y for _, y in pts) / len(pts)
+            ang = [math.atan2(x - mx, y - my) for x, y in pts]
+            steps = [((ang[(i + 1) % len(ang)] - ang[i] + math.pi) % (2 * math.pi)) - math.pi for i in range(len(ang))]
+            self.assertTrue(all(st > 0 for st in steps), face)   # clockwise all the way round, never back
+
 
 if __name__ == "__main__":
     unittest.main()

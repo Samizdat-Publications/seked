@@ -27,6 +27,10 @@ LOOK = dict(
     wall_thickness=1.0,     # the plan draws 0.7 to 1.1 m on the east and south and a thin line on the west
     wall_out=0.45,          # the wall's centreline outside the pillars' centres, so they stand half proud
     figure=1.7,             # the human figure for scale
+    fill_level=2.6,         # how high the fill stands in the still, above the floor: no source checked prints a depth
+    slide_from=315.0,       # the bearing the slope slides come from: up the mound, since Clare (2020 §11) puts the special
+                            # buildings in its "low-lying southeastern part" and the debris from "higher-lying knolls"
+    slide_dip=18.0,         # the slid fill's surface, degrees, falling away from where it came in
     ground_out=30.0,        # the hill's surface outside, drawn level with the wall's top this far out: the enclosure is
                             # sunk into the mound, but the fill around it is not measured here
 )
@@ -108,6 +112,11 @@ def wall(rec=None, look=LOOK):
         d = math.hypot(p["x"] - cx, p["y"] - cy)
         pts.append((p["x"] + (p["x"] - cx) / d * look["wall_out"], p["y"] + (p["y"] - cy) / d * look["wall_out"]))
     line = _catmull(pts)
+    # a few passes of neighbour averaging, so the offset faces do not fold where the ring turns sharply (by wall
+    # pillar 10 the half-metre offset outran the curve's radius); the line moves a few centimetres, the pillars not at all
+    for _ in range(6):
+        line = [tuple(0.25 * line[i - 1][j] + 0.5 * line[i][j] + 0.25 * line[(i + 1) % len(line)][j] for j in (0, 1))
+                for i in range(len(line))]
     inner, outer = [], []
     n = len(line)
     for i, (x, y) in enumerate(line):
@@ -171,6 +180,35 @@ def orbit(t, rec=None, look=LOOK, eye=1.6, out=4.0):
                 or abs(math.atan2(x - mx, y - my) - math.atan2(ux, uy)) % (2 * math.pi) > 2 * math.pi - 0.2)[0]
     r = reach + out
     return dict(eye=(mx + ux * r, my + uy * r, w["height"] + eye), at=(mx, my, 1.8))
+
+
+def fill_mesh(w, level, mode="level", look=LOOK):
+    """
+    The fill inside the wall, in concentric rings out to the inner face: "level", Schmidt's deliberate backfill,
+    a flat surface at `level`; "slide", Clare's slope slides, a surface tilted down from `slide_from` by
+    `slide_dip` and standing at `level` in the middle, never below the floor nor above the wall's top.
+    """
+    n = len(w["inner"])
+    mx = sum(x for x, _ in w["inner"]) / n
+    my = sum(y for _, y in w["inner"]) / n
+    b = math.radians(look["slide_from"])
+    ux, uy = math.sin(b), math.cos(b)
+    grade = math.tan(math.radians(look["slide_dip"]))
+
+    def z(x, y):
+        if mode == "level":
+            return level
+        return min(w["height"], max(0.0, level + grade * ((x - mx) * ux + (y - my) * uy)))
+    rings = 8                                           # concentric rings, so a clamped slope bends smoothly
+    vs = [(mx, my, z(mx, my))]
+    for k in range(1, rings + 1):
+        f = k / rings
+        vs += [(mx + (x - mx) * f, my + (y - my) * f, z(mx + (x - mx) * f, my + (y - my) * f)) for x, y in w["inner"]]
+    fs = [(0, 1 + i, 1 + (i + 1) % n) for i in range(n)]
+    for k in range(1, rings):
+        a, b = 1 + (k - 1) * n, 1 + k * n
+        fs += [(a + i, b + i, b + (i + 1) % n, a + (i + 1) % n) for i in range(n)]
+    return vs, fs
 
 
 def inner_span(w, axis=0):

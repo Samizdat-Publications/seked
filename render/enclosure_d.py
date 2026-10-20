@@ -1,7 +1,7 @@
 """
 Chapter 7's Enclosure D, a labelled stand-in from its plan (render/giza/enclosure_d.py), at eye height.
 
-    blender -b --factory-startup -P render/enclosure_d.py -- --size 1600x900 --samples 32 [--view rim|south|air|orbit:T]
+    blender -b --factory-startup -P render/enclosure_d.py -- --size 1600x900 --samples 32 [--view rim|south|air|orbit:T] [--fill level|slide]
 
 `rim` stands outside the ring on the south, a person's eye height above the wall's preserved top, where a
 visitor sees it from; `south` stands on the floor inside the ring, south of the central pair, at eye height,
@@ -32,7 +32,7 @@ VIEWS = dict(
 )
 
 
-def build(coll):
+def build(coll, fill=None):
     rec = E.records()
     if os.path.exists(os.path.join(REPO, "build", "textures", "index.json")):
         # the Giza scene's own stone: CC0 photographed grain (python scripts/textures.py), toned by noise; the flat
@@ -52,12 +52,20 @@ def build(coll):
             hill=material("the mound's surface", (0.50, 0.43, 0.33), rough=1.0),
         )
     M["figure"] = material("figure for scale", (0.18, 0.24, 0.34), rough=0.7)
+    if "hill" in M and os.path.exists(os.path.join(REPO, "build", "textures", "index.json")):
+        M["fill"] = S.stone("fill: rubble and settlement debris", "mastaba_core", tex_role="sand", instanced=False,
+                            sand_tops=0.3, bump=0.1)
+    else:
+        M["fill"] = material("fill: rubble and settlement debris", (0.30, 0.25, 0.19), rough=1.0)
     mesh("floor", [(-30, -30, 0), (30, -30, 0), (30, 30, 0), (-30, 30, 0)], [(0, 1, 2, 3)], M["floor"], coll)
     w = E.wall(rec)
     vs, fs = E.wall_mesh(w)
     mesh("wall", vs, fs, M["wall"], coll)
     vs, fs = E.ground_mesh(w)
     mesh("the hill round it", vs, fs, M["hill"], coll)
+    if fill:
+        vs, fs = E.fill_mesh(w, E.LOOK["fill_level"], fill)
+        mesh("fill (%s)" % fill, vs, fs, M["fill"], coll)
     for p in E.pillars(rec):
         for k, (pv, pf) in enumerate(E.tpillar(p)):
             mesh("%s %d" % (p["name"], k), pv, pf, M["stone"], coll)
@@ -82,7 +90,8 @@ def main():
     scene = bpy.context.scene
     coll = bpy.data.collections.new("enclosure D")
     scene.collection.children.link(coll)
-    placed = build(coll)
+    fill = o.get("fill")             # level (Schmidt's backfill) or slide (Clare's slope slides)
+    placed = build(coll, fill)
     if view.startswith("orbit"):   # orbit:T, the sequence's camera a share T of the way round
         v = dict(E.orbit(float(view.split(":")[1])), lens=22)
         out = o.get("out", os.path.join(REPO, "build", "preview", "enclosure-d-orbit-%s.png" % view.split(":")[1]))
@@ -117,7 +126,7 @@ def main():
     os.makedirs(os.path.dirname(out), exist_ok=True)
     bpy.ops.render.render(write_still=True)
     with open(os.path.splitext(out)[0] + ".json", "w", encoding="utf-8") as fh:
-        json.dump(dict(render=os.path.relpath(out, REPO), view=view, camera=v, stand_in=True, look_choices=E.LOOK,
+        json.dump(dict(render=os.path.relpath(out, REPO), view=view, camera=v, stand_in=True, look_choices=E.LOOK, fill=fill,
                        figure=placed["figure"],
                        note="A stand-in for Enclosure D at Göbekli Tepe. Pillar positions, widths and the central pair's "
                             "axes are scaled from Haklay & Gopher 2020 Fig. 1; the central pillars' height, their pedestals "
