@@ -4,6 +4,11 @@ at Hawara, laid on the Giza plateau beside the Great Pyramid at the same scale (
 labelled by the page "at Hawara, 80 km south; laid here for scale".
 
     blender -b --factory-startup -P render/labyrinth.py -- --size 1600x900 --samples 32
+    blender -b --factory-startup -P render/labyrinth.py -- --at hawara      # the group where it stands, on flat ground
+
+With `--at hawara` the same group stands at Hawara in stone: the pyramid cased as Petrie derived it (a
+reconstruction: its brick core stands today), the chip bed as the excavated ground south of it. No surface
+model of Hawara is imported, so its ground is drawn flat, and the canal has no record yet, so it is not drawn.
 
 The ground is GLO-30 (data/terrain), with the three pyramids' sites flattened as the scene flattens them; the
 pyramids are plain solids from render/giza/data.py; the Hawara group comes from render/giza/hawara.py and is
@@ -106,11 +111,44 @@ def build(coll):
     return g
 
 
-def camera_and_light():
-    target = Vector((-60.0, -250.0, 0.0))
-    loc = Vector((640.0, -1120.0, 980.0))
+def build_at_hawara(coll):
+    if os.path.exists(os.path.join(REPO, "build", "textures", "index.json")):
+        # the Giza scene's own CC0 photographed stone (python scripts/textures.py), as Enclosure D's stand-in uses
+        from giza import materials as S
+        M = dict(
+            ground=S.stone("Fayum desert, drawn flat", "core", tex_role="sand", instanced=False, sand_tops=0.95, bump=0.1),
+            stone=S.stone("limestone casing, as Petrie derived it", "tura_dressed", tex_role="casing", instanced=False, sand_tops=0.15),
+            chips=S.stone("Labyrinth chip bed: limestone chips", "tura_dressed", tex_role="casing", instanced=False, sand_tops=0.5, bump=0.1),
+        )
+    else:
+        M = dict(
+            ground=material("Fayum desert, drawn flat", (0.72, 0.55, 0.36), rough=0.95),
+            stone=material("limestone casing, as Petrie derived it", (0.86, 0.80, 0.68), rough=0.75),
+            chips=material("Labyrinth chip bed", (0.90, 0.88, 0.82), rough=1.0),
+        )
+    mesh("ground (flat)", [(-30000, -30000, 0), (30000, -30000, 0), (30000, 30000, 0), (-30000, 30000, 0)], [(0, 1, 2, 3)], M["ground"], coll)
+    g = W.at_hawara()
+    p = g["pyramid"]
+    pyramid("Amenemhat III's pyramid, cased", p["cx"], p["cy"], p["half"], p["H"], 0.0, M["stone"], coll)
+    x0, x1, y0, y1 = g["bed"]
+    v = [(x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0), (x0, y0, 0.4), (x1, y0, 0.4), (x1, y1, 0.4), (x0, y1, 0.4)]
+    f = [(4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    mesh("Labyrinth chip bed", v, f, M["chips"], coll)
+    return g
+
+
+VIEWS = dict(
+    giza=dict(target=(-60.0, -250.0, 0.0), location=(640.0, -1120.0, 980.0), lens=38.0),
+    hawara=dict(target=(0.0, -90.0, 12.0), location=(330.0, -470.0, 120.0), lens=32.0),   # from the south-east, a look choice
+)
+
+
+def camera_and_light(at="giza"):
+    v = VIEWS[at]
+    target = Vector(v["target"])
+    loc = Vector(v["location"])
     cam_data = bpy.data.cameras.new("camera")
-    cam_data.lens = 38.0
+    cam_data.lens = v["lens"]
     cam_data.clip_end = 20000.0
     cam = bpy.data.objects.new("camera", cam_data)
     cam.location = loc
@@ -121,7 +159,8 @@ def camera_and_light():
     sun_data.energy = 2.2
     sun_data.angle = math.radians(1.0)
     sun = bpy.data.objects.new("sun", sun_data)
-    az, el = math.radians(125.0), math.radians(32.0)      # morning, from the south-east (a look choice)
+    # morning from the south-east at Giza; at Hawara late afternoon from the south-west, low, so the pyramid throws its shadow
+    az, el = (math.radians(235.0), math.radians(14.0)) if at == "hawara" else (math.radians(125.0), math.radians(32.0))
     d = Vector((math.sin(az) * math.cos(el), math.cos(az) * math.cos(el), math.sin(el)))
     sun.rotation_euler = (-d).to_track_quat("-Z", "Y").to_euler()
     bpy.context.scene.collection.objects.link(sun)
@@ -138,27 +177,30 @@ def main():
     o = parse(sys.argv)
     w, hgt = (int(x) for x in o.get("size", "1600x900").split("x"))
     samples = int(o.get("samples", 32))
-    out = o.get("out", os.path.join(REPO, "build", "preview", "labyrinth-at-giza.png"))
+    at = o.get("at", "giza")
+    out = o.get("out", os.path.join(REPO, "build", "preview", "labyrinth-at-%s.png" % at))
     clear()
     scene = bpy.context.scene
     coll = bpy.data.collections.new("labyrinth")
     scene.collection.children.link(coll)
-    g = build(coll)
-    cam = camera_and_light()
+    g = build_at_hawara(coll) if at == "hawara" else build(coll)
+    cam = camera_and_light(at)
     renderer.gpu(scene)
     renderer.configure(scene, exposure=0.0)
     scene.cycles.samples = samples
     scene.render.resolution_x, scene.render.resolution_y = w, hgt
     scene.render.resolution_percentage = 100
-    scene.view_settings.exposure = -0.5
+    scene.view_settings.exposure = 0.3 if at == "hawara" else -0.5
     scene.render.filepath = out
     os.makedirs(os.path.dirname(out), exist_ok=True)
     bpy.ops.render.render(write_still=True)
     meta = dict(render=os.path.relpath(out, REPO), size=[w, hgt], samples=samples,
                 camera=dict(location=list(cam.location), rotation_euler=list(cam.rotation_euler), lens=cam.data.lens,
                             sensor_width=cam.data.sensor_width),
-                figures=W.figures(), receipts=W.ratios(), layout=W.LAYOUT, laid=g,
-                label="at Hawara, 80 km south; laid here for scale")
+                figures=W.figures(), receipts=W.ratios(), layout=W.LAYOUT, laid=g, at=at,
+                label="at Hawara, 80 km south; laid here for scale" if at == "giza" else
+                "at Hawara: the pyramid cased as Petrie derived it (a reconstruction), the chip bed as excavated; "
+                "the ground drawn flat, no surface model imported; the canal not drawn, no record")
     with open(os.path.splitext(out)[0] + ".json", "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
     print("wrote", out)

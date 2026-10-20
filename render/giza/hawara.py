@@ -43,6 +43,16 @@ def laid_on_giza(f=None, layout=LAYOUT):
                 bed=(g1["cx"] - ex / 2, g1["cx"] + ex / 2, top - ny, top))
 
 
+def at_hawara(f=None, layout=LAYOUT):
+    """The group where it stands, in a frame of its own: the pyramid's centre at the origin, the chip bed south of it
+    in the same arrangement as `laid_on_giza`, so the two pictures agree."""
+    f = f or figures()
+    half = f["side"] / 2
+    ex, ny = (f["bed_length"], f["bed_width"]) if layout["long_side"] == "east-west" else (f["bed_width"], f["bed_length"])
+    top = -half - layout["bed_gap"]
+    return dict(pyramid=dict(cx=0.0, cy=0.0, half=half, H=f["height"]), bed=(-ex / 2, ex / 2, top - ny, top))
+
+
 def ratios(f=None):
     """The receipts: the chip bed against Khufu's base, and the pyramid against Khufu's and Menkaure's sides."""
     f = f or figures()

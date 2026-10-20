@@ -40,3 +40,13 @@ class LayoutTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AtHawara(unittest.TestCase):
+    def test_the_group_stands_as_it_is_laid_on_giza(self):
+        g, h = W.laid_on_giza(), W.at_hawara()
+        dx, dy = g["pyramid"]["cx"] - h["pyramid"]["cx"], g["pyramid"]["cy"] - h["pyramid"]["cy"]
+        for a, b, d in zip(g["bed"], h["bed"], (dx, dx, dy, dy)):
+            self.assertAlmostEqual(a - b, d)
+        self.assertEqual((h["pyramid"]["cx"], h["pyramid"]["cy"]), (0.0, 0.0))
+        self.assertLess(h["bed"][3], -h["pyramid"]["half"] + 1e-9)    # south of the pyramid
