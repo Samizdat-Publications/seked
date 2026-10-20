@@ -23,7 +23,7 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row';
+  widget?: 'sky' | 'strip' | 'pi' | 'phi' | 'earth' | 'north' | 'row' | 'ice' | 'dryas';
 }
 
 const SPHINX_TODAY = 'progress/0040-sphinx-today.png';
@@ -89,6 +89,10 @@ export const STILLS: Still[] = [
   { chapter: 6, anchor: 'written into one shape', src: 'progress/0011-blender-section-drawing.png',
     alt: 'The Great Pyramid in section from the east, from Petrie’s survey', tags: [], whole: true, widget: 'row' },
 
+  { chapter: 7, anchor: 'About 12,900 years ago', src: LION_FIRST_TIME,
+    alt: 'The lion in the First Time, c. 10,500 BCE, the plateau green and no pyramids', tags: ['claim state', 'stand-in'], widget: 'ice' },
+  { chapter: 7, anchor: 'Geologists call it the Younger Dryas.', src: LION_FIRST_TIME,
+    alt: 'The lion in the First Time, c. 10,500 BCE, the plateau green and no pyramids', tags: ['claim state', 'stand-in'], widget: 'dryas' },
   { chapter: 7, anchor: 'a plan laid out at Giza in the eleventh millennium BCE', src: FIRST_TIME_AIR,
     alt: 'Giza’s First Time from the air: the plateau green, no pyramids', tags: ['claim state'] },
 
@@ -159,11 +163,11 @@ export function splitAtFigures(paragraph: string, stills: Still[]): string[] {
   const folded = fold(paragraph);
   const hits = stills
     .map((s) => ({ at: folded.indexOf(fold(s.anchor)), widget: !!s.widget }))
-    .filter((h) => h.at > 0)
+    .filter((h) => h.at >= 0)
     .sort((a, b) => a.at - b.at);
   const cuts: number[] = [];
   hits.forEach((h, k) => {
-    if (k > 0 && hits[k - 1]!.widget) cuts.push(h.at);
+    if (k > 0 && hits[k - 1]!.widget && h.at > 0) cuts.push(h.at);
   });
   const pieces: string[] = [];
   let from = 0;

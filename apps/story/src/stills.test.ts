@@ -76,5 +76,10 @@ describe('beat markers', () => {
     const pieces = splitAtFigures(last, STILLS.filter((s) => s.chapter === 9));
     expect(pieces).toHaveLength(2);
     expect(pieces[1]!.startsWith('Until it is')).toBe(true);
+    // a figure whose words open the paragraph counts too: chapter 7's ice curve, then the Younger Dryas
+    const seven = chapters.find((c) => c.n === 7)!;
+    const ice = splitAtFigures(seven.narration[0]!, STILLS.filter((s) => s.chapter === 7));
+    expect(ice).toHaveLength(2);
+    expect(ice[1]!.startsWith('Geologists call it the Younger Dryas.')).toBe(true);
   });
 });

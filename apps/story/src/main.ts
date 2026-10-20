@@ -19,6 +19,7 @@ import { parseScript, type Chapter } from './script';
 import { profileOf } from './profile';
 import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
 import { skyWidget, type SkyWidget } from './skywidget';
+import { timelineWidget, type TimelineMode, type TimelineWidget } from './timelinewidget';
 import { STILLS, keyFrames, markAnchors, markers, splitAtFigures, stillFile, type Still } from './stills';
 import './style.css';
 
@@ -82,6 +83,9 @@ let sky: SkyWidget | undefined;
 let profile: ProfileWidget | undefined;
 const PROFILE_MODES: (Still['widget'] & ProfileMode)[] = ['pi', 'phi', 'earth', 'north', 'row'];
 const isProfile = (s: Still | null | undefined) => PROFILE_MODES.some((m) => m === s?.widget);
+/** Chapter 7's timeline, likewise. */
+let timeline: TimelineWidget | undefined;
+const isTimeline = (s: Still | null | undefined) => s?.widget === 'ice' || s?.widget === 'dryas';
 
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
@@ -97,6 +101,7 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('sky-on', still?.widget === 'sky' && !!sky);
   stage.classList.toggle('strip-on', still?.widget === 'strip');
   stage.classList.toggle('profile-on', isProfile(still) && !!profile);
+  stage.classList.toggle('timeline-on', isTimeline(still) && !!timeline);
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;
@@ -149,6 +154,7 @@ function follow() {
   if (still?.widget === 'sky' && sky) sky.progress(since / (0.8 * (since + until)));
   // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
   // nearer: chapter 6's later beats have no still of their own, so its next beat is chapter 7's
+  if (isTimeline(still) && timeline) timeline.progress(still!.widget as TimelineMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
   if (isProfile(still) && profile) profile.progress(still!.widget as ProfileMode, since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
 }
 let queued = false;
@@ -189,6 +195,8 @@ async function liveReceipts() {
     const env = buildEnvironment(resolve({ sources, sites, structures, measurements, presets, materials }, 'canonical').values);
     sky = skyWidget(c4, env);
     stage.append(sky.el);
+    timeline = timelineWidget(bundle.claims);
+    stage.append(timeline.el);
     try {
       profile = profileWidget(profileOf(env, bundle.claims));
       stage.append(profile.el);
