@@ -107,8 +107,8 @@ def main():
     go.add_argument("chapters", nargs="+")
     go.add_argument("--model", default="claude-opus-5-5")
     go.add_argument("--effort", default="high")
-    go.add_argument("--budget", type=float, default=3.0, help="the most one chapter may spend, in USD")
-    go.add_argument("--turns", type=int, default=80)
+    go.add_argument("--budget", type=float, default=4.0, help="the most one chapter may spend, in USD")
+    go.add_argument("--turns", type=int, default=120)   # the chapter 1 pilot took 72
     go.set_defaults(func=start)
     back = sub.add_parser("collect")
     back.add_argument("chapters", nargs="+")
