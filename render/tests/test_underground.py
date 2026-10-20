@@ -120,3 +120,24 @@ class ReplyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Descent(unittest.TestCase):
+    def setUp(self):
+        self.k, self.c = U.khafre(), U.claim()
+
+    def test_it_starts_at_the_base_and_ends_on_the_middle_of_the_cubes(self):
+        top = U.descent(0.0, self.k, self.c)["target"]
+        self.assertEqual(top, U.DESCENT["top"])
+        cs = U.cubes(self.c, self.k)
+        end = U.descent(1.0, self.k, self.c)["target"]
+        self.assertAlmostEqual(end[2], sum(q["z"] for q in cs) / len(cs) - self.k["base"])
+        self.assertLess(end[2], self.c["bottom"])           # below the wells' foot, inside the cubes
+
+    def test_it_only_goes_down_and_keeps_one_offset(self):
+        zs = [U.descent(i / 20, self.k, self.c)["target"][2] for i in range(21)]
+        self.assertTrue(all(b < a for a, b in zip(zs, zs[1:])))
+        for i in range(21):
+            s = U.descent(i / 20, self.k, self.c)
+            for a, b, d in zip(s["location"], s["target"], U.DESCENT["offset"]):
+                self.assertAlmostEqual(a - b, d)

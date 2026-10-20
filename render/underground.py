@@ -7,6 +7,7 @@ tier's look, and Khafre's height laid end to end down the depth for scale.
     blender -b --factory-startup -P render/underground.py -- --shot base
     blender -b --factory-startup -P render/underground.py -- --shot depth --reply 1     # the reply's three lines
     blender -b --factory-startup -P render/underground.py -- --shot depth --plate 1     # the linked tomogram's frame
+    blender -b --factory-startup -P render/underground.py -- --shot descent:0.5        # the descent's camera halfway down
 
 The west half is cut away and the camera looks east at the section, so the burial chamber (east of the
 axis) shows through the cut face. The rock and the cut faces are drawn half transparent, as an x-ray:
@@ -145,9 +146,9 @@ SHOTS = {
 }
 
 
-def camera_and_light(k, size, shot="depth"):
+def camera_and_light(k, size, shot="depth", c=None):
     cx, cy, b = k["cx"], k["cy"], k["base"]
-    s = SHOTS[shot]
+    s = U.descent(min(1.0, max(0.0, float(shot.split(":")[1]))), k, c) if shot.startswith("descent:") else SHOTS[shot]
     target = Vector((cx + s["target"][0], cy + s["target"][1], b + s["target"][2]))
     loc = Vector((cx + s["location"][0], cy + s["location"][1], b + s["location"][2]))
     cam_data = bpy.data.cameras.new("camera")
@@ -189,8 +190,8 @@ def main():
     scene.unit_settings.system = "METRIC"
     coll = bpy.data.collections.new("underground")
     scene.collection.children.link(coll)
-    k, c = build(coll, cut_only=SHOTS[shot].get("cut_only", False), reply="reply" in o, plate="plate" in o)
-    cam = camera_and_light(k, (w, hgt), shot)
+    k, c = build(coll, cut_only=SHOTS.get(shot, {}).get("cut_only", False), reply="reply" in o, plate="plate" in o)
+    cam = camera_and_light(k, (w, hgt), shot, c)
     renderer.gpu(scene)
     renderer.configure(scene, exposure=0.0)
     scene.cycles.samples = samples

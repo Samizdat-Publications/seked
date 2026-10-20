@@ -1,7 +1,7 @@
 """
 Chapter 7's Enclosure D, a labelled stand-in from its plan (render/giza/enclosure_d.py), at eye height.
 
-    blender -b --factory-startup -P render/enclosure_d.py -- --size 1600x900 --samples 32 [--view rim|south|air|orbit:T] [--fill level|slide]
+    blender -b --factory-startup -P render/enclosure_d.py -- --size 1600x900 --samples 32 [--view rim|south|air|orbit:T] [--fill level|slide] [--level M]
 
 `rim` stands outside the ring on the south, a person's eye height above the wall's preserved top, where a
 visitor sees it from; `south` stands on the floor inside the ring, south of the central pair, at eye height,
@@ -32,7 +32,7 @@ VIEWS = dict(
 )
 
 
-def build(coll, fill=None):
+def build(coll, fill=None, level=None):
     rec = E.records()
     if os.path.exists(os.path.join(REPO, "build", "textures", "index.json")):
         # the Giza scene's own stone: CC0 photographed grain (python scripts/textures.py), toned by noise; the flat
@@ -63,17 +63,19 @@ def build(coll, fill=None):
     mesh("wall", vs, fs, M["wall"], coll)
     vs, fs = E.ground_mesh(w)
     mesh("the hill round it", vs, fs, M["hill"], coll)
-    if fill:
-        vs, fs = E.fill_mesh(w, E.LOOK["fill_level"], fill)
+    level = E.LOOK["fill_level"] if level is None else level
+    if fill and level > 0:   # the fill sequence starts from the empty enclosure
+        vs, fs = E.fill_mesh(w, level, fill)
         mesh("fill (%s)" % fill, vs, fs, M["fill"], coll)
     for p in E.pillars(rec):
         for k, (pv, pf) in enumerate(E.tpillar(p)):
             mesh("%s %d" % (p["name"], k), pv, pf, M["stone"], coll)
-    # the figure, by the western central pillar, on the floor
+    # the figure, by the western central pillar, on the floor, or on a level fill's surface, so it is not buried as the fill rises
     west = E.pillars(rec)[0]
     fx, fy, h = west["x"] + 0.9, west["y"] - 1.6, E.LOOK["figure"]
+    dz = level if fill == "level" else 0.0
     for k, (x, y, r, z0, z1) in enumerate(E.figure_parts(fx, fy, h)):
-        cylinder("figure %d" % k, x, y, r, z0, z1, M["figure"], coll, n=16)
+        cylinder("figure %d" % k, x, y, r, z0 + dz, z1 + dz, M["figure"], coll, n=16)
     return dict(figure=(fx, fy, h))
 
 
@@ -91,7 +93,8 @@ def main():
     coll = bpy.data.collections.new("enclosure D")
     scene.collection.children.link(coll)
     fill = o.get("fill")             # level (Schmidt's backfill) or slide (Clare's slope slides)
-    placed = build(coll, fill)
+    level = float(o["level"]) if "level" in o else None   # metres above the floor, for the fill rising frame by frame
+    placed = build(coll, fill, level)
     if view.startswith("orbit"):   # orbit:T, the sequence's camera a share T of the way round
         v = dict(E.orbit(float(view.split(":")[1])), lens=22)
         out = o.get("out", os.path.join(REPO, "build", "preview", "enclosure-d-orbit-%s.png" % view.split(":")[1]))
@@ -127,6 +130,7 @@ def main():
     bpy.ops.render.render(write_still=True)
     with open(os.path.splitext(out)[0] + ".json", "w", encoding="utf-8") as fh:
         json.dump(dict(render=os.path.relpath(out, REPO), view=view, camera=v, stand_in=True, look_choices=E.LOOK, fill=fill,
+                       fill_level=E.LOOK["fill_level"] if level is None else level,
                        figure=placed["figure"],
                        note="A stand-in for Enclosure D at Göbekli Tepe. Pillar positions, widths and the central pair's "
                             "axes are scaled from Haklay & Gopher 2020 Fig. 1; the central pillars' height, their pedestals "

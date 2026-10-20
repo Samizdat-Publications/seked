@@ -170,3 +170,19 @@ def receipts(c=None, k=None):
     return dict(heights=-c["bottom"] / k["H"], times_deepest_room=c["bottom"] / deepest,
                 deep_heights=-c["deep"] / k["H"], water_below_base=k["base"] - lv["water"],
                 below_water=lv["water"] - lv["claim"], times_radar=-c["bottom"] / c["radar"])
+
+
+# The descent, for chapter 8's sequence: the camera holds one offset from what it looks at and goes straight down with it,
+# from Khafre's base to the middle of the claimed cubes under the wells, placed by the geometry from the claim's records.
+# The start and the offset are look choices, like the shots in render/underground.py.
+DESCENT = dict(top=(0.0, 40.0, 30.0), offset=(-650.0, -380.0, 120.0))
+
+
+def descent(t, k, c):
+    """The descent's shot at `t`, 0 at the base to 1 at the cubes, eased in and out so the scroll starts and stops gently."""
+    e = t * t * (3 - 2 * t)
+    cs = cubes(c, k)
+    bottom = (sum(q["x"] for q in cs) / len(cs) - k["cx"], sum(q["y"] for q in cs) / len(cs) - k["cy"],
+              sum(q["z"] for q in cs) / len(cs) - k["base"])
+    target = tuple(a + (b - a) * e for a, b in zip(DESCENT["top"], bottom))
+    return dict(target=target, location=tuple(a + b for a, b in zip(target, DESCENT["offset"])))
