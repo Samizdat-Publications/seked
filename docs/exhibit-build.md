@@ -307,7 +307,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   by C1's own overlay factor (carried into `virtual:sky` from the claim, never typed), the far end's stray 0.261 m
   in the caption. Figures' outlines now draw themselves on. Both looked at at both sizes.
 - [x] **E16c. Chapter 6's φ figure.** The apothem and the Kepler triangle on "golden ratio" (A2, with A3's "cannot
-  discriminate" in the caption). *Done 2026-10-20 23:02 UTC (see the commit after `fcd869b`).* `phi-triangle` on
+  discriminate" in the caption). *Done 2026-10-20 23:02 UTC, `50fce93`.* `phi-triangle` on
   "golden": half the base, the height and the apothem, the apothem drawn on and named with its ratio (1.6187,
   tested); the caption's numbers from the bundle, A3's point in words. Looked at at 1440 by 900.
 - [ ] **E16d. The 43,200 globe and the pyramid in the hand.** The profile grown into the hemisphere at 1 : 43,200 on
