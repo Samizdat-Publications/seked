@@ -1,0 +1,68 @@
+{
+  "note": "Figures shown as plates in the documentary: what the claimants and the reply published, beside what we drew from it (night decisions 24 and 25). Only open-licensed or public-domain figures are kept here, in Git LFS, each with its source, licence and checksum. Everything else is linked under 'linked', not hosted, until its rights holder answers the request drafted in docs/permissions/. A plate is read two ways, like any drawing: a printed dimension is transcribed and cites the figure; a distance scaled against the figure's own scale bar is 'scaled from plate', with its sigma, and never verified. A tomogram with no axes is placed by its labels and never scaled.",
+  "plates": [
+    {
+      "id": "biondi-malanga-2022-fig22",
+      "file": "biondi-malanga-2022/fig22.png",
+      "sha256": "fb30ab36193d4907c5cfb6f6ea9bd0e176663cdef863e077ad51a08eb2ab8c16",
+      "size": [2408, 1949],
+      "source": "biondi-malanga-2022",
+      "figure": "Figure 22",
+      "caption": "Three-dimensional (3D) reconstruction of the pyramid of Khnum-Khufu downstream of the interpretation of tomograms estimated through radar ultrasound.",
+      "kind": "the authors' rendering of their interpretation",
+      "url": "https://mdpi-res.com/remotesensing/remotesensing-14-05231/article_deploy/html/images/remotesensing-14-05231-g022.png",
+      "licence": "CC BY 4.0 (Crossref's licence record for 10.3390/rs14205231)",
+      "attribution": "Biondi, F. & Malanga, C. (2022), Remote Sensing 14(20), 5231, Figure 22, CC BY 4.0. Retracted 10 August 2026.",
+      "retraction": "Retracted on 10 August 2026 (Remote Sensing 18(16), 2679, doi:10.3390/rs18162679) for 'serious methodological flaws and statistical errors'; the authors disagree. Shown only with that stated beside it.",
+      "registration": "None: a perspective rendering, with no scale.",
+      "about": "Khufu's pyramid, not Khafre's. The method's only peer-reviewed showing, for chapter 8's reply."
+    },
+    {
+      "id": "biondi-malanga-2022-fig24",
+      "file": "biondi-malanga-2022/fig24.png",
+      "sha256": "ff0f41d41c4ffc8aa86fee971e8098b9848d4ca9290a65d4d66a73bbe2b64510",
+      "size": [2865, 1242],
+      "source": "biondi-malanga-2022",
+      "figure": "Figure 24",
+      "caption": "(a): Tomographic map of Khnum-Khufu overlapped to its schematic representation. (b): Tomographic map of Khnum-Khufu.",
+      "kind": "(a) processed data laid over the authors' section drawing; (b) processed data, axes labelled 'Height' and 'Azimuth' with no units",
+      "url": "https://mdpi-res.com/remotesensing/remotesensing-14-05231/article_deploy/html/images/remotesensing-14-05231-g024.png",
+      "licence": "CC BY 4.0 (Crossref's licence record for 10.3390/rs14205231)",
+      "attribution": "Biondi, F. & Malanga, C. (2022), Remote Sensing 14(20), 5231, Figure 24, CC BY 4.0. Retracted 10 August 2026.",
+      "retraction": "Retracted on 10 August 2026 (Remote Sensing 18(16), 2679, doi:10.3390/rs18162679) for 'serious methodological flaws and statistical errors'; the authors disagree. Shown only with that stated beside it.",
+      "registration": "Panel (a) carries a 50 m scale bar and a north arrow, so it can be registered on Khufu's north-south section with scripts/plate.py (scale, then register) and placed on that plane; not yet done. Panel (b) has no units and is placed beside (a), never scaled.",
+      "about": "Khufu's pyramid, not Khafre's: the tomogram the method drew over the known chambers, which a viewer can set against Khufu's surveyed section."
+    }
+  ],
+  "linked": [
+    {
+      "id": "khafre-project-2025-tomograms",
+      "what": "The Khafre Project's tomograms (abstract pp. 4-6) and its four 3D renderings of the eight wells (p. 5)",
+      "source": "khafre-project-2025",
+      "url": "https://drive.google.com/file/d/1Leaa2tf3OHK31OTmdey_CRa-0vC9-CTD/view",
+      "rights": "The authors' copyright. Requested in docs/permissions/khafre-project.md (not sent).",
+      "registration": "No axes and no scale bar: placed on the cutaway's section plane by its own labels (the base and 648 m), and captioned so. Until permission, a grey frame (render/underground.py --plate) and a link."
+    },
+    {
+      "id": "pilicy-2025-fig1",
+      "what": "The Khafre Project's 'latest tomography', Pilicy 2025, Fig. 1, 'Reproduced with permission of Khafre SAR Project'",
+      "source": "pilicy-2025",
+      "url": "https://grahamhancock.com/pilicyd1/",
+      "rights": "The Khafre Project's copyright, as above."
+    },
+    {
+      "id": "de-cordier-2025-merlin-burrows-scans",
+      "what": "The Merlin Burrows scans of Hawara, among them 'The 2 chambers below the Hawara Pyramid'",
+      "source": "de-cordier-2025-merlin-burrows",
+      "url": "https://labyrinthofegypt.substack.com/p/the-merlin-burrows-scans-ii",
+      "rights": "'Image © Cosco Foundation, 2025'. Requested in docs/permissions/de-cordier.md (not sent)."
+    },
+    {
+      "id": "nriag-2008-hawara-figures",
+      "what": "The 2008 NRIAG survey's figures (the Mataha Expedition), on De Cordier's Google Drive",
+      "source": "de-cordier-2025-mataha",
+      "url": "https://drive.google.com/file/d/1YqntaYOhvSWA7fd3jFYToPqx34odntjB/view",
+      "rights": "Not stated; photographs '© Louis De Cordier'. Requested in docs/permissions/de-cordier.md (not sent)."
+    }
+  ]
+}

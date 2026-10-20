@@ -6,6 +6,7 @@ tier's look, and Khafre's height laid end to end down the depth for scale.
     blender -b --factory-startup -P render/underground.py -- --shot depth --size 1600x900 --samples 32
     blender -b --factory-startup -P render/underground.py -- --shot base
     blender -b --factory-startup -P render/underground.py -- --shot depth --reply 1     # the reply's three lines
+    blender -b --factory-startup -P render/underground.py -- --shot depth --plate 1     # the linked tomogram's frame
 
 The west half is cut away and the camera looks east at the section, so the burial chamber (east of the
 axis) shows through the cut face. The rock and the cut faces are drawn half transparent, as an x-ray:
@@ -164,7 +165,7 @@ def cylinder(name, x, y, r, z0, z1, mat, coll, n=32):
     return mesh(name, v, f, mat, coll)
 
 
-def build(coll, cut_only=False, reply=False):
+def build(coll, cut_only=False, reply=False, plate=False):
     k, c = U.khafre(), U.claim()
     cx, cy, b, h, H = k["cx"], k["cy"], k["base"], k["side"] / 2, k["H"]
     M = dict(
@@ -182,6 +183,8 @@ def build(coll, cut_only=False, reply=False):
         radar=material("reply: radar's reach", (0.80, 0.92, 1.0), emit=2.5),
         water=material("reply: water table", (0.20, 0.50, 1.0), emit=2.5),
         claim=material("reply: the claim's depth", (1.0, 0.45, 0.08), emit=2.5),
+        plate=material("plate, linked", (0.55, 0.56, 0.58), alpha=0.55, rough=1.0),
+        frame=material("plate frame", (0.85, 0.86, 0.88), emit=1.5),
     )
     # The rock east of the cut, from Khafre's base down: its top is ground, its west face the section.
     x0, x1, y0, y1, z0, z1 = cx, cx + EAST, cy - HALF_SPAN, cy + HALF_SPAN, b - DEPTH_BELOW, b
@@ -240,6 +243,13 @@ def build(coll, cut_only=False, reply=False):
             hw = h * t
             pts = [(cx - 0.6, (ya + yb) / 2 - hw, zc), (cx - 0.6, (ya + yb) / 2 + hw, zc), (cx - 0.6, (ya + yb) / 2, apex)]
         polyline("Khafre height %d" % (i + 1), pts, 0.9, M["scale"], coll, closed=True)
+    if plate:
+        # The Khafre Project's tomogram, linked until permission (assets/plates/manifest.json): a grey frame on the
+        # section plane, placed by the figure's own labels (the base and 648 m) across the footprint, never scaled.
+        z0, z1, ya, yb = b + c["bottom"], b, cy - h, cy + h
+        mesh("plate: Khafre Project tomogram (linked)", [(cx - 0.4, ya, z0), (cx - 0.4, yb, z0), (cx - 0.4, yb, z1), (cx - 0.4, ya, z1)],
+             [(0, 1, 2, 3)], M["plate"], coll)
+        polyline("plate frame", [(cx - 0.8, ya, z0), (cx - 0.8, yb, z0), (cx - 0.8, yb, z1), (cx - 0.8, ya, z1)], 1.0, M["frame"], coll, closed=True)
     if reply:
         # The reply's three lines across the cut: radar's reach by the claimant's own figure, the water table, the claim.
         for name, z in U.reply_levels(c, k).items():
@@ -294,13 +304,13 @@ def main():
     w, hgt = (int(x) for x in o.get("size", "1600x900").split("x"))
     samples = int(o.get("samples", 32))
     shot = o.get("shot", "depth")
-    out = o.get("out", os.path.join(REPO, "build", "preview", "underground-khafre-%s%s.png" % (shot, "-reply" if "reply" in o else "")))
+    out = o.get("out", os.path.join(REPO, "build", "preview", "underground-khafre-%s%s%s.png" % (shot, "-reply" if "reply" in o else "", "-plate" if "plate" in o else "")))
     clear()
     scene = bpy.context.scene
     scene.unit_settings.system = "METRIC"
     coll = bpy.data.collections.new("underground")
     scene.collection.children.link(coll)
-    k, c = build(coll, cut_only=SHOTS[shot].get("cut_only", False), reply="reply" in o)
+    k, c = build(coll, cut_only=SHOTS[shot].get("cut_only", False), reply="reply" in o, plate="plate" in o)
     cam = camera_and_light(k, (w, hgt), shot)
     renderer.gpu(scene)
     renderer.configure(scene, exposure=0.0)
