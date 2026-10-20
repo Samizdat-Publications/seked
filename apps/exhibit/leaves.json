@@ -1236,9 +1236,10 @@
    "arrive": "turn",
    "say": "The answer is two times pi, to within three hundredths of one per cent.",
    "draw": [
-    "g1-proportions"
+    "g1-proportions",
+    "pi-circle@pi"
    ],
-   "hold": 2,
+   "hold": 3,
    "interact": "look",
    "receipts": [
     "A1"

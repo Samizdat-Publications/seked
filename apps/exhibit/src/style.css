@@ -87,6 +87,9 @@ p { margin: 0; }
 @media (max-width: 600px) { .figure.beside-sky { left: var(--left); right: auto; top: calc(max(var(--g), env(safe-area-inset-top)) + 84px); } }
 .figure .statue { fill: rgba(239, 232, 220, 0.28); stroke: rgba(239, 232, 220, 0.7); stroke-width: 1; }
 .figure .star { fill: rgba(255, 214, 140, 1); }
+.figure svg .draw-on { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw-on 1.6s ease-in-out forwards; }
+.figure svg .draw-on.late { animation-delay: 1.4s; }
+@keyframes draw-on { to { stroke-dashoffset: 0; } }
 .figure .wall { stroke: var(--claim); stroke-width: 2; stroke-linecap: round; }
 .figure .dim { stroke: rgba(248, 214, 140, 0.9); stroke-width: 1; stroke-dasharray: 3 3; }
 .figure .lab { font: 600 11px var(--mono); fill: rgba(248, 214, 140, 1); }

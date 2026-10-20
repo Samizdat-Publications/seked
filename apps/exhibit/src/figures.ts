@@ -9,9 +9,12 @@
  * `belt-plan`: the three pyramids' centres in plan (Petrie's offsets, from the bundle) and Orion's belt at C4's
  * epoch laid over them as C4 compares them: as seen looking south, Alnitak on Khufu, scaled so that Mintaka falls
  * as far from it as Menkaure, and not turned, so the angle between the two diagonals is the claim's residual.
+ *
+ * `pi-circle`: A1 drawn: the Great Pyramid's base square and, about the same centre, the circle whose radius is its
+ * original height, the two outlines nearly the same length. Both from the bundle's environment.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -140,5 +143,26 @@ export function beltPlanSvg(p: BeltPlan, width = 300): string {
   ${p.stars.map((s) => `<circle class="star" cx="${X(s.x)}" cy="${Y(s.y)}" r="3.2"/>`).join('')}
   <text class="lab" x="${(Number(X(m.x)) - 6).toFixed(1)}" y="${(Number(Y(m.y)) - 8).toFixed(1)}" text-anchor="end">Mintaka</text>
   <text class="north" x="10" y="14">N &#8593;</text>
+</svg>`;
+}
+
+/** A1's two lengths: the base's perimeter and the circumference of a circle of radius the original height, metres. */
+export function piCircle(ground: Record<string, number>): { side: number; height: number; perimeter: number; circle: number } | null {
+  const side = ground['g1.base.side.mean'], height = ground['g1.height.original'], perimeter = ground['g1.base.perimeter'];
+  if (side === undefined || height === undefined || perimeter === undefined) return null;
+  return { side, height, perimeter, circle: 2 * Math.PI * height };
+}
+
+/** The square and the circle as SVG, the square's outline drawn round first, then the circle's. */
+export function piCircleSvg(c: NonNullable<ReturnType<typeof piCircle>>, width = 300): string {
+  const r = c.height, half = c.side / 2;
+  const extent = Math.max(r, half) * 1.12;
+  const k = width / (2 * extent), mid = width / 2;
+  return `<svg viewBox="0 0 ${width} ${width}" width="${width}" height="${width}" role="img" aria-label="The Great Pyramid's base square and a circle of radius its height, their outlines nearly equal">
+  <rect class="wall draw-on" x="${(mid - half * k).toFixed(1)}" y="${(mid - half * k).toFixed(1)}" width="${(c.side * k).toFixed(1)}" height="${(c.side * k).toFixed(1)}" fill="none" pathLength="1"/>
+  <circle class="dim draw-on late" cx="${mid}" cy="${mid}" r="${(r * k).toFixed(1)}" fill="none" pathLength="1"/>
+  <line class="dim" x1="${mid}" y1="${mid}" x2="${(mid + r * k).toFixed(1)}" y2="${mid}"/>
+  <text class="lab" x="${(mid + (r * k) / 2).toFixed(1)}" y="${mid - 6}" text-anchor="middle">height</text>
+  <text class="here-lab" x="${mid}" y="${(mid + half * k - 8).toFixed(1)}" text-anchor="middle">base</text>
 </svg>`;
 }

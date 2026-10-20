@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, sphinxPlanData } from './figures';
+import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, piCircle, piCircleSvg, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 
@@ -60,5 +60,17 @@ describe('the belt over the pyramids', () => {
   });
   it('waits for the ground', () => {
     expect(beltPlan({}, { alnitak: at('alnitak'), alnilam: at('alnilam'), mintaka: at('mintaka') })).toBeNull();
+  });
+});
+
+describe('pi in the profile, drawn', () => {
+  const ground = groundEnvironment(loadDatabase());
+  it("takes A1's two lengths from the database: the perimeter, and the circle of radius the height", () => {
+    const c = piCircle(ground)!;
+    expect(c.perimeter).toBe(ground['g1.base.perimeter']);
+    expect(c.circle).toBeCloseTo(2 * Math.PI * ground['g1.height.original']!, 9);
+    expect(c.perimeter / c.height).toBeCloseTo(6.28501, 4);   // the script's A1 receipt
+    expect(piCircleSvg(c)).toContain('<circle');
+    expect(piCircle({})).toBeNull();
   });
 });

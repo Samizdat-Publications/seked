@@ -12,7 +12,7 @@ import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays }
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
-import { beltPlan, beltPlanSvg, ditchPlanSvg } from './figures';
+import { beltPlan, beltPlanSvg, ditchPlanSvg, piCircle, piCircleSvg } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment } from './receipts';
 import { Player } from './player';
@@ -59,6 +59,16 @@ function beltPlanFigure(ground: Record<string, number> | null): string {
     stands ${v(angle, 'value')} from the meridian, the pyramids' diagonal ${v(angle, 'target')}. Menkaure sits ${v(offset, 'value')} of
     the Khufu to Khafre line off it, Mintaka ${v(offset, 'target')}. C4's comparisons; the north and south of the sky are
     swapped to lay it down, a free choice the claim records.</figcaption>`;
+}
+
+/** A1 drawn, its numbers the bundle's; without the bundle, a note saying so. */
+function piCircleFigure(ground: Record<string, number> | null): string {
+  const c = ground && piCircle(ground);
+  if (!c) return '<figcaption>The pyramid is drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const m = (v: number) => formatValue(v, 'm');
+  return `${piCircleSvg(c)}<figcaption>The Great Pyramid's base, ${m(c.perimeter)} round, and a circle whose radius is its
+    original height, ${m(c.height)}: that circle is ${m(c.circle)} round. Perimeter over height is
+    ${formatValue(c.perimeter / c.height, 'ratio')}, against 2π, ${formatValue(2 * Math.PI, 'ratio')} (A1).</figcaption>`;
 }
 
 async function start(): Promise<void> {
@@ -116,6 +126,7 @@ async function start(): Promise<void> {
     sky.setGround(ground);
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+    if (shownFigure === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
   });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
   let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
@@ -140,6 +151,7 @@ async function start(): Promise<void> {
       figure.innerHTML = `${ditchPlanSvg(sphinxPlan, here)}<figcaption>The ditch in plan. Both margins are scaled from ARCE's drawing d-gen-008 and not yet checked against it; only the two the drawing gives are drawn.</figcaption>`;
     }
     if (id === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+    if (id === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;
