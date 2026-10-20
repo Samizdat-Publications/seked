@@ -28,8 +28,11 @@ if BLENDER_DIR not in sys.path:
     sys.path.insert(0, BLENDER_DIR)
 
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
-MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-lion-rain", None),
-             "lion-fresh": ("sphinx-lion-first", None), "carved": ("sphinx-built", None),
+# The claim's lions are one master (docs/rethink-2026-10.md): the First Time's is sphinx-master as drawn,
+# the long rains' the same mesh worn by render/giza/sphinx_eras.py (its `lion` finish). As built and today
+# keep their own models until the king's head is carved inside the master's.
+MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion"),
+             "lion-fresh": ("sphinx-master", None), "carved": ("sphinx-built", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
@@ -42,11 +45,12 @@ WARMED = {"sphinx-carved": (0.9, 0.78, 0.62, 1.0),
 # (a look choice; the Sphinx is carved from the plateau's layered limestone).
 # The lions' own textures carry beds, but at the tour's resolution they still read as smooth clay (critic
 # rounds 17 and 18, both lions): they take the enclosure's members and grain as the carved Sphinx does.
-CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.6, "sphinx-lion-rain": 0.6}
+CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first": 0.6, "sphinx-lion-rain": 0.6,
+          "sphinx-master": 0.6}
 # Stand-ins that stand in a wet green world: dark growth in their hollows and the runs of rain below
 # them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
 # fresh limestone in a humid forest greys and greens in its first years).
-DAMP = {"sphinx-lion-pristine": 1.0, "sphinx-lion-first": 0.4}
+DAMP = {"sphinx-lion-pristine": 1.0, "sphinx-lion-first": 0.4, "sphinx-master": 0.4}
 # Generated textures with brush-stroke striations baked in that read as wood grain: their colour is
 # taken most of the way to plain fresh limestone, the carving left to the geometry and the normal map
 # (how far, and the stone's colour, are look choices).
