@@ -1,0 +1,131 @@
+{
+ "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a flight into each leaf that arrives by flight, from the last leaf's station camera and view to this one's, in the arriving leaf's era and moment, so its last frame is the leaf's panorama at the leaf's view. Render with render/build.py --films render/films-exhibit.json --film ID (try --preview 0,45,89 first), encode with render/film.py into `out`.",
+ "films": [
+  {
+   "id": "ch0-sunrise--ch0-behind",
+   "name": "Flight into ch0-behind from ch0-sunrise",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    33.12,
+    17.54
+   ],
+   "centre": [
+    402.2,
+    -439.0
+   ],
+   "path": [
+    [
+     439.0,
+     -445.0,
+     -29.5
+    ],
+    [
+     430.18,
+     -443.56,
+     -19.26
+    ],
+    [
+     402.25,
+     -439.0,
+     -10.88
+    ],
+    [
+     372.85,
+     -434.2,
+     -21.89
+    ],
+    [
+     365.5,
+     -433.0,
+     -38.4
+    ]
+   ],
+   "look": [
+    [
+     379.67,
+     -437.72,
+     -24.27
+    ],
+    [
+     343.91,
+     -432.34,
+     -23.06
+    ],
+    [
+     308.14,
+     -426.97,
+     -21.86
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch0-sunrise--ch0-behind.mp4"
+  },
+  {
+   "id": "ch0-ditch--ch1-carved",
+   "name": "Flight into ch1-carved from ch0-ditch",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    14.46,
+    14.46
+   ],
+   "centre": [
+    347.8,
+    -441.0
+   ],
+   "path": [
+    [
+     365.5,
+     -433.0,
+     -38.4
+    ],
+    [
+     361.24,
+     -434.92,
+     -33.04
+    ],
+    [
+     347.75,
+     -441.0,
+     -28.66
+    ],
+    [
+     333.55,
+     -447.4,
+     -32.56
+    ],
+    [
+     330.0,
+     -449.0,
+     -38.41
+    ]
+   ],
+   "look": [
+    [
+     319.98,
+     -471.19,
+     -30.04
+    ],
+    [
+     296.45,
+     -452.45,
+     -29.02
+    ],
+    [
+     272.92,
+     -433.71,
+     -28.0
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch0-ditch--ch1-carved.mp4"
+  }
+ ]
+}

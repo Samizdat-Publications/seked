@@ -361,6 +361,15 @@ def main():
                 titles[st] = {"name": over.get("name", s["name"]), "where": over.get("where", s.get("where", ""))}
                 if "moment" in over:
                     titles[st]["moment"] = moments.get(over["moment"], {}).get("label", "")
+        # The exhibit's leaves lit at another moment (scripts/exhibit_queue.py): <station>-<era>-<moment>.png,
+        # published beside the walkthrough's own for apps/exhibit, and left out of the walkthrough's manifest.
+        for st in states.ORDER:
+            for m in moments:
+                png = os.path.join(PANO_IN, f"{s['id']}-{st}-{m}.png")
+                jpg = os.path.join(PANO_OUT, f"{s['id']}-{st}-{m}.jpg")
+                if os.path.exists(png) and (not os.path.exists(jpg) or os.path.getmtime(jpg) < os.path.getmtime(png)):
+                    Image.open(png).convert("RGB").save(jpg, quality=82, optimize=True, progressive=True)
+                    print(f"  {os.path.basename(jpg)}: {os.path.getsize(jpg) / 1e6:.2f} MB, for the exhibit")
         if not panos:
             print(f"{s['id']}: nothing rendered yet; left out")
             continue

@@ -5,6 +5,7 @@ Build the plateau in Blender and render views of it.
     blender -b --factory-startup -P render/build.py -- --state built --shot panorama --size 1920x1080 --samples 128
     blender -b --factory-startup -P render/build.py -- --queue render/queues/spike.json
     blender -b --factory-startup -P render/build.py -- --film approach-built      # render/films.json
+    blender -b --factory-startup -P render/build.py -- --films render/films-exhibit.json --film ch0-sunrise--ch0-behind
 
 A queue is {"renders": [{"state", "station" | "shot", "moment"?, "size"?, "samples"?, "out"?, "patch"?}, ...]};
 a "patch" ({yaw, pitch, fov, aspect}) renders a station through a lens instead of whole (render/patches.py);
@@ -47,6 +48,14 @@ def renders_from(opts):
     return [r]
 
 
+def _film_spec(film_id, opts):
+    """A film's spec from render/films.json, or from the films file --films names (render/films-exhibit.json)."""
+    import io
+    path = opts.get("films") or os.path.join(HERE, "films.json")
+    with io.open(path, encoding="utf-8") as f:
+        return next(x for x in json.load(f)["films"] if x["id"] == film_id)
+
+
 def _lens(lens, t):
     """A flight's focal length at t: one number, or one per control point, eased between them in log space."""
     if not isinstance(lens, list):
@@ -74,8 +83,7 @@ def film(film_id, opts):
     """Render a flight's frames from one built era (render/films.json); skips frames already on disk."""
     import io
     from giza import cameras
-    with io.open(os.path.join(HERE, "films.json"), encoding="utf-8") as f:
-        spec = next(x for x in json.load(f)["films"] if x["id"] == film_id)
+    spec = _film_spec(film_id, opts)
     stations, _ = data.views()
     plateau = Plateau(spec["state"], aerosol=float(opts.get("aerosol", 1.1)), haze=float(opts.get("haze", 1.0)))
     cx, cy = spec["centre"]
@@ -115,8 +123,7 @@ def night_film(film_id, opts):
     import io
     import math
     from giza import cameras, night
-    with io.open(os.path.join(HERE, "films.json"), encoding="utf-8") as f:
-        spec = next(x for x in json.load(f)["films"] if x["id"] == film_id)
+    spec = _film_spec(film_id, opts)
     render_sky = night._render_sky()
     rollback = render_sky.load_rollback(os.path.join(data.REPO, "build", "sky-rollback.json"))
     stations, _ = data.views()
