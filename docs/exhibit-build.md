@@ -73,9 +73,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   is a cut. Checked with a throwaway test film. *(b) done 16:10 UTC, `5cfa56d`:* `draw` entries are `name` or
   `name@word`; a cued line waits for its word in play (voice boundaries or the estimate) and draws on; paused it
   is simply there. Checked with a temporary cue on Khufu's overlay. No leaf draws yet (E2b).
-- [ ] **E5. The receipt and the reply.** A small tab at the edge of the screen on every leaf that has them: the
+- [x] **E5. The receipt and the reply.** A small tab at the edge of the screen on every leaf that has them: the
   claim's receipt computed live from the bundle (port `apps/story`'s receipts), and the archaeologists' reply
   from `docs/script.md`, in a quieter type. Closed by default.
+  *Done 2026-10-20 16:17 UTC, `a983cc1`.* `src/panel.ts` (the tab and panel, the reply read from the script by the
+  leaf's `reply`), `src/receipts.ts` ported from `apps/story` with its tests, 5 new tests. Opening pauses play;
+  the panel follows the leaf; Escape closes. Chapters 0 and 1 name no claim, so the prototype shows the reply
+  alone; receipts need the bundle (`pnpm bundle`), absent in this worktree, so their page rendering is untested
+  here (the computing is). Looked at open and closed at both sizes. The bundle is now 260 kB (86 kB gzipped).
 - [x] **E6. The render queue from the leaves.** `scripts/exhibit_queue.py` writes, from `leaves.json`:
   `render/queues/exhibit-panos.json` (each leaf's station in its era and moment that `apps/walk/pano/` lacks) and
   `render/films-exhibit.json` (a flight for each leaf that arrives by `flight`: from the last leaf's station
@@ -147,6 +152,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 15. **A flight rises to clear what lies between, knowing nothing of it**: up steeply, across at a quarter of the
     distance above the higher end (8 to 60 m), down steeply onto the leaf. The laptop previews before it renders
     (below). A leaf could later carry waypoints if a path needs steering.
+
+16. **The reply panel shows the script's spoken reply first, then the full reply**, both for the leaf's chapter,
+    so every leaf of a chapter carries the same answer. Per-leaf replies would need the script to write them;
+    the chapter's is what exists.
 
 
 ## For Stewart
