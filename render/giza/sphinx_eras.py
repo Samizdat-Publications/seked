@@ -17,8 +17,11 @@ so the eras are one statue at different ages:
   choices), and the profile is then rounded, the way rain rounds an arris.
 - **built** (c. 2500 BCE): further wear of the same kind, and the king's head (`sphinx-king-head`)
   carved inside the lion's. First the head-fit test: the largest king's head, standing where the lion's
-  stood, whose every point lies inside the weathered lion head. That is the steelman's account of why
+  stood or as far fore or aft of it as ALONG allows, whose every point lies inside the weathered lion head;
+  the centred fit is recorded beside it. That is the steelman's account of why
   the head is small, as a number (`fit` in era.json), read off two stand-ins and no more than that.
+  The carving uses the centred fit (CARVE_WITH): the searched one fits a larger head only by setting it
+  back and down, and carved at that size it is not the monument's head.
   Then the carving: the lion head's surface is drawn onto the king's head (Blender's Shrinkwrap), fully
   above the jaw and fading out down the neck and chest. The lion's faces there are then cut away, and
   the king's head, with its own texture, closes the hole exactly at the cut.
@@ -46,7 +49,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-from giza import data, weathering  # noqa: E402
+from giza import data, profile, weathering  # noqa: E402
 from giza.sphinx import BLENDER_DIR  # noqa: E402
 
 if BLENDER_DIR not in sys.path:
@@ -250,6 +253,19 @@ CARVE_FROM, CARVE_FULL = 0.36, 0.60
 KING_MARGIN = 0.15
 KING_TEST_FROM = 0.45      # of the king's bust's height: the fit is tested on the head and nemes above this
 RAMP = 0.35                # of the stretch from CARVE_FROM up to the king head's foot: the last part, ramped onto the bust
+# The fit is searched fore and aft as well as up and down: the king's head may stand this far, as a share of the
+# lion's upper head's length, towards the face or the back of it (a look choice: the search's reach and its steps).
+ALONG = np.linspace(-0.25, 0.25, 11)
+CARVE_WITH = "centred"     # or "searched": which fit the carving uses (both are in era.json); see decision 54
+# The plain chest: under the king's bust the front is laid to a straight slope from the bust's foot down to the
+# chest where the carving starts, in bins across the chest; a front point up to CHEST_FILL in metres behind that
+# slope is brought onto it (the hollows), and one in front of it is cut back (the collar the ramp leaves at the
+# bust's foot); between CHEST_FILL and twice it behind, a point is brought part of the way. The slope is one
+# surface across the chest (the bins' fronts run through a five-bin mean and interpolated), it fades out across
+# the outer fifth either side of the bust's width, and the points moved are then smoothed (look choices).
+CHEST_BINS = 24
+CHEST_FILL = 0.6
+CHEST_SMOOTH = 12
 PLAIN = 200                # smoothing passes that carve the lion's mane off the chest, fewest lowest: about a metre of diffusion on this mesh
 
 
@@ -289,11 +305,36 @@ def king_head(path, front):
     off = np.abs(across - (across.min() + across.max()) / 2) / width
     chest = (off > 0.10) & (off < 0.16) & (zr > 0.30) & (zr < 0.50)
     chest_front = np.percentile(fwd[chest], 98) if chest.any() else fwd.max()
-    beard = (off < 0.07) & (zr > 0.20) & (zr < 0.56) & (fwd > chest_front + 0.01 * np.ptp(co[:, 2]))
+    # The beard stops short of the bust's cut, so its hole and the open foot are two holes, not one: run into
+    # the foot, the beard's hole let the inside of the bust show as a grey plate at its foot.
+    beard = (off < 0.07) & (zr > 0.28) & (zr < 0.56) & (fwd > chest_front + 0.01 * np.ptp(co[:, 2]))
     drop = beard | (zr < 0.25)
     bmesh.ops.delete(bm, geom=[v for v, d in zip(bm.verts, drop) if d], context="VERTS")
-    # close the small hole the beard leaves under the chin (not the open foot of the bust)
-    bmesh.ops.holes_fill(bm, edges=bm.edges[:], sides=48)
+    # Close the hole the beard leaves under the chin, and only that: a cap on the bust's foot stood out as a
+    # shelf wherever the lion's chest falls short of the bust. The patch takes the material of the faces round it.
+    open_edges = [e for e in bm.edges if e.is_boundary]
+    loops, seen = [], set()
+    for e in open_edges:
+        if e in seen:
+            continue
+        loop, todo = [], [e]
+        while todo:
+            x = todo.pop()
+            if x in seen:
+                continue
+            seen.add(x)
+            loop.append(x)
+            todo += [y for v in x.verts for y in v.link_edges if y.is_boundary and y not in seen]
+        loops.append(loop)
+    foot_loop = min(loops, key=lambda lp: np.mean([v.co.z for x in lp for v in x.verts]))
+    rest = [x for lp in loops if lp is not foot_loop for x in lp]
+    filled = bmesh.ops.holes_fill(bm, edges=rest, sides=0)["faces"] if rest else []
+    for f in filled:
+        near = [lf.material_index for e in f.edges for lf in e.link_faces if lf is not f]
+        if near:
+            f.material_index = max(set(near), key=near.count)
+    bmesh.ops.triangulate(bm, faces=filled, quad_method="BEAUTY", ngon_method="BEAUTY")
+    print(f"king's head: {len(filled)} holes closed")
     print(f"king's head: {int(beard.sum())} points of beard cut away")
     return mesh, bm
 
@@ -324,48 +365,73 @@ def carve(bm, king_path, front, scale_m):
     k_h = np.ptp(kco0[test, 2])
     upper = h > 0.72                         # the lion's upper head, the brow to the crown
     lion_fore = (along[upper].min() + along[upper].max()) / 2
+    upper_len = np.ptp(along[upper])
     lion_across = np.median(co[upper, 1 - axis])
 
-    def placed(s, drop=0.0):
+    def placed(s, drop=0.0, fore=0.0):
         """The king's head scaled so its head and nemes are s of the lion head's height, its crown `margin`
-        plus `drop` under the lion's, centred fore and aft and side to side in the lion's upper head."""
+        plus `drop` under the lion's, centred side to side in the lion's upper head and fore and aft but for
+        `fore` (towards the face)."""
         k = kco0 * (s * lion_h / k_h)
         ka = k[:, axis] * sign
         face_part = test & (kz > 0.6)
         shift = np.zeros(3)
-        shift[axis] = sign * (lion_fore - (ka[face_part].min() + ka[face_part].max()) / 2)
+        shift[axis] = sign * (lion_fore + fore - (ka[face_part].min() + ka[face_part].max()) / 2)
         shift[2] = (top - margin - drop) - k[:, 2].max()
         shift[1 - axis] = lion_across - np.median(k[test, 1 - axis])
         return k + shift
 
-    def fits(s):
-        """The highest the king's head can stand at size s and lie wholly inside the lion's, as a drop below
-        the lion's crown, or None. The carvers would have kept the crown as high as the stone allowed."""
-        for drop in np.linspace(0.0, 0.5 * lion_h, 13):
-            pts = placed(s, drop)[test]
-            if inside(tree, pts[:: max(1, len(pts) // 3000)]).mean() > 0.995:
-                return drop
-        return None
+    def fits(s, fores):
+        """The highest the king's head can stand at size s and lie wholly inside the lion's, as (a drop below
+        the lion's crown, a shift fore or aft), or None. The carvers would have kept the crown as high as the
+        stone allowed; of equal drops, the shift nearest the centre wins."""
+        best = None
+        for fore in sorted(fores, key=abs):
+            for drop in np.linspace(0.0, 0.5 * lion_h, 13):
+                if best is not None and drop >= best[0]:
+                    break
+                pts = placed(s, drop, fore)[test]
+                if inside(tree, pts[:: max(1, len(pts) // 3000)]).mean() > 0.995:
+                    best = (drop, fore)
+                    break
+            if best is not None and best[0] == 0.0:
+                break
+        return best
 
-    lo, hi, best = 0.2, 1.5, None
-    for _ in range(14):
-        s = (lo + hi) / 2
-        drop = fits(s)
-        print(f"  king's head at {s:.3f} of the lion's: " + ("fits" if drop is not None else "does not fit")
-              + (f", crown {drop * scale_m:.2f} m under the lion's" if drop is not None else ""))
-        if drop is not None:
-            lo, best = s, drop
-        else:
-            hi = s
-    s = lo
-    if best is None:
-        raise SystemExit("the king's head fits at no size: the placement is wrong, not the claim")
-    kco = placed(s, best)
+    def largest(fores, label):
+        lo, hi, best = 0.2, 1.5, None
+        for _ in range(14):
+            s = (lo + hi) / 2
+            got = fits(s, fores)
+            print(f"  {label}: king's head at {s:.3f} of the lion's: " + ("fits" if got is not None else "does not fit")
+                  + (f", crown {got[0] * scale_m:.2f} m under the lion's, {got[1] * scale_m:+.2f} m fore" if got is not None else ""))
+            if got is not None:
+                lo, best = s, got
+            else:
+                hi = s
+        if best is None:
+            raise SystemExit("the king's head fits at no size: the placement is wrong, not the claim")
+        return lo, best
+
+    def record(s, best):
+        # chin to crown as well, the measure ARCE's south elevation gives the monument's head (sphinx.head.height)
+        k = placed(s, *best)
+        chin, crown = profile.chin_to_crown(k[:, axis] * sign, k[:, 1 - axis], k[:, 2])
+        return {"scale_of_lion_head": round(float(s), 3), "lion_head_m": round(float(lion_h * scale_m), 2),
+                "king_head_m": round(float(s * lion_h * scale_m), 2), "crown_drop_m": round(float(best[0] * scale_m), 2),
+                "fore_m": round(float(best[1] * scale_m), 2), "margin_m": KING_MARGIN,
+                "chin_to_crown_m": round(float((crown - chin) * scale_m), 2)}
+
+    # The search fore and aft, and the centred fit beside it, so the gain from searching is on the record.
+    s, best = largest(ALONG * upper_len, "searched")
+    s0, best0 = largest([0.0], "centred")
+    kco = placed(s, *best) if CARVE_WITH == "searched" else placed(s0, *best0)
     for v, c in zip(kbm.verts, kco):
         v.co = c
-    fit = {"scale_of_lion_head": round(float(s), 3), "lion_head_m": round(float(lion_h * scale_m), 2),
-           "king_head_m": round(float(s * lion_h * scale_m), 2), "crown_drop_m": round(float(best * scale_m), 2),
-           "margin_m": KING_MARGIN}
+    fit = record(s, best)
+    fit["carved_with"] = CARVE_WITH
+    fit["searched_fore_m"] = [round(float(ALONG[0] * upper_len * scale_m), 2), round(float(ALONG[-1] * upper_len * scale_m), 2)]
+    fit["centred"] = record(s0, best0)
 
     # Carve. Above the king head's foot, the lion's head is drawn onto the king's: each point moves to the king
     # head's nearest surface. Below the foot the lion's mane is carved off into a plain broad chest: its points
@@ -393,11 +459,67 @@ def carve(bm, king_path, front, scale_m):
     for step in range(PLAIN):
         verts = [v for v, t in smooth if t * PLAIN > step]
         bmesh.ops.smooth_vert(bm, verts=verts, factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
+    plain_chest(bm, kco, w, near_head, axis, sign, z_from, foot_z, scale_m)
     # Cut away the lion's faces that now lie on the king's surface, so the king's own (and its texture) show.
     core = [f for f in bm.faces if all(w[v.index] >= 1.0 for v in f.verts)]
     bmesh.ops.delete(bm, geom=core, context="FACES")
     bm.normal_update()
     return fit, (kmesh, kbm)
+
+
+def plain_chest(bm, kco, w, near_head, axis, sign, z_from, foot_z, scale_m):
+    """Lay the chest under the king's bust to a plain slope (CHEST_BINS, CHEST_FILL, CHEST_SMOOTH), in place."""
+    bm.normal_update()
+    co = np.array([v.co[:] for v in bm.verts])
+    nor = np.array([v.normal[:] for v in bm.verts])
+    fwd, across = co[:, axis] * sign, co[:, 1 - axis]
+    k_fwd, k_across = kco[:, axis] * sign, kco[:, 1 - axis]
+    foot = kco[:, 2] < foot_z + 0.08 * np.ptp(kco[:, 2])
+    lo, hi = k_across[foot].min(), k_across[foot].max()
+    mid, half = (lo + hi) / 2, (hi - lo) / 2
+    edges = np.linspace(lo, hi, CHEST_BINS + 1)
+    centres = (edges[:-1] + edges[1:]) / 2
+
+    def front(values, where):
+        """The front in each bin across the chest, gaps filled and run through a five-bin mean, so the slope
+        is one surface across the chest and not a row of slabs."""
+        out = np.full(CHEST_BINS, np.nan)
+        b = np.clip(np.searchsorted(edges, where, side="right") - 1, 0, CHEST_BINS - 1)
+        for i in range(CHEST_BINS):
+            if (b == i).any():
+                out[i] = values[b == i].max()
+        ok = ~np.isnan(out)
+        out = np.interp(centres, centres[ok], out[ok])
+        pad = np.pad(out, 2, mode="edge")
+        return np.convolve(pad, np.ones(5) / 5, mode="valid")
+    top = front(k_fwd[foot], k_across[foot])
+    base_band = near_head & (np.abs(co[:, 2] - z_from) < 0.01 * (foot_z - z_from)) & (nor[:, axis] * sign > 0.3)
+    bottom = front(fwd[base_band], across[base_band])
+    fill = CHEST_FILL / scale_m
+    moved = []
+    for i, v in enumerate(bm.verts):
+        z = co[i, 2]
+        # front-facing points, and the shelves facing up that the ramp leaves at the bust's foot
+        facing = nor[i, axis] * sign >= 0.2 or nor[i, 2] >= 0.7
+        if not near_head[i] or w[i] >= 1.0 or z <= z_from or z >= foot_z or not facing:
+            continue
+        if abs(across[i] - mid) >= half:
+            continue
+        t = (z - z_from) / (foot_z - z_from)
+        slope = np.interp(across[i], centres, bottom) + t * (np.interp(across[i], centres, top) - np.interp(across[i], centres, bottom))
+        gap = slope - fwd[i]                     # behind the slope if positive
+        reach = np.clip((2.0 * fill - gap) / fill, 0.0, 1.0)  # fully up to CHEST_FILL behind, none past twice it
+        side = np.clip((1.0 - abs(across[i] - mid) / half) / 0.2, 0.0, 1.0)
+        k = side * reach
+        if k <= 0.0:
+            continue
+        c = v.co.copy()
+        c[axis] = (fwd[i] + k * gap) * sign
+        v.co = c
+        moved.append(v)
+    for _ in range(CHEST_SMOOTH):
+        bmesh.ops.smooth_vert(bm, verts=moved, factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
+    print(f"plain chest: {len(moved)} points laid to the slope")
 
 
 def write(mesh, bm, path):
