@@ -47,14 +47,20 @@ describe('leaves.json', () => {
   });
 
   it('wipes only between eras taken from the same camera, so the two pictures register', () => {
+    // a published station's cameras as publish recorded them; one not rendered yet, where the renderer will put it
     const cams = (station: string, era: string) => {
-      const s = walk.stations.find((x) => x.id === station) as unknown as { camera: number[]; cameras?: Record<string, number[]> };
-      return (s.cameras?.[era] ?? s.camera).join();
+      const s = walk.stations.find((x) => x.id === station) as unknown as { camera: number[]; cameras?: Record<string, number[]> } | undefined;
+      if (s) return (s.cameras?.[era] ?? s.camera).join();
+      const r = render.stations.find((x) => x.id === station) as unknown as Record<string, unknown> & { by_state?: Record<string, Record<string, unknown>> };
+      const at = { ...r, ...r.by_state?.[era] };
+      return ['x', 'y', 'z', 'eye', 'roof'].map((k) => String(at[k])).join();
     };
-    leaves.forEach((L, i) => {
-      const prev = leaves[i - 1];
+    const check = (list: readonly Leaf[]) => list.forEach((L, i) => {
+      const prev = list[i - 1];
       if (L.arrive === 'wipe' && prev) expect(cams(L.station, L.era), `${L.id}: ${prev.era} to ${L.era}`).toBe(cams(prev.station, prev.era));
     });
+    check(leaves);
+    check(withStandIns(leaves, (id) => walk.stations.some((s) => s.id === id)));
   });
 
   it('stands only at stations, in eras and moments the renderer knows', () => {

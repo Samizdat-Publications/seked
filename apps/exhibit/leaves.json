@@ -428,6 +428,394 @@
    "interact": "look",
    "receipts": [],
    "reply": "ch1"
+  },
+  {
+   "id": "ch2-look",
+   "chapter": 2,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 18,
+    "pitch": 34,
+    "fov": 70
+   },
+   "arrive": "wipe",
+   "say": "Look at the head.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch2"
+  },
+  {
+   "id": "ch2-nemes",
+   "chapter": 2,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 10,
+    "pitch": 25,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "It wears the striped headcloth of a Fourth Dynasty king, and it is better kept than the body below it.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch2"
+  },
+  {
+   "id": "ch2-small",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "arrive": "flight",
+   "say": "Beside that long body it is too small. Nobody disputes either point.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 345,
+     "pitch": 14,
+     "fov": 80
+    }
+   }
+  },
+  {
+   "id": "ch2-story",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "arrive": "turn",
+   "say": "Hancock, Bauval and Schoch read the two facts as one story.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 345,
+     "pitch": 14,
+     "fov": 80
+    }
+   }
+  },
+  {
+   "id": "ch2-lion",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "arrive": "wipe",
+   "say": "The figure was a lion first.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 345,
+     "pitch": 14,
+     "fov": 80
+    }
+   }
+  },
+  {
+   "id": "ch2-rains",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "lion",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "arrive": "wipe",
+   "say": "It stood through the long rains, and its head wore away.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 345,
+     "pitch": 14,
+     "fov": 80
+    }
+   }
+  },
+  {
+   "id": "ch2-king",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "built",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "arrive": "wipe",
+   "say": "When a king of the pyramid age took it over, his sculptors cut a royal face into what was left.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 345,
+     "pitch": 14,
+     "fov": 80
+    }
+   }
+  },
+  {
+   "id": "ch2-inside",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "built",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 29,
+    "pitch": 15,
+    "fov": 34
+   },
+   "arrive": "turn",
+   "say": "You can only carve a smaller form inside a larger one, so the new head came out small.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 18,
+     "pitch": 30,
+     "fov": 50
+    }
+   }
+  },
+  {
+   "id": "ch2-ghost",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "built",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 29,
+    "pitch": 15,
+    "fov": 34
+   },
+   "arrive": "turn",
+   "say": "Here the king's head sits inside the lion's, and the ghost around it is the stone they cut away.",
+   "draw": [],
+   "hold": 2,
+   "interact": "object:head",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 18,
+     "pitch": 30,
+     "fov": 50
+    }
+   }
+  },
+  {
+   "id": "ch2-reader",
+   "chapter": 2,
+   "station": "sphinx-side",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 29,
+    "pitch": 15,
+    "fov": 34
+   },
+   "arrive": "wipe",
+   "say": "Even Colin Reader, who dates the Sphinx far later than they do, argued in 2026 that it began as a lion.",
+   "draw": [],
+   "hold": 1,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 18,
+     "pitch": 30,
+     "fov": 50
+    }
+   }
+  },
+  {
+   "id": "ch2-equinox",
+   "chapter": 2,
+   "station": "sphinx-back",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 60
+   },
+   "arrive": "flight",
+   "say": "At the spring equinox the sun rises close to due east in every age, so the Sphinx's eastward gaze alone dates nothing.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 80,
+     "pitch": 8,
+     "fov": 70
+    }
+   }
+  },
+  {
+   "id": "ch2-drift",
+   "chapter": 2,
+   "station": "sphinx-back",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 60
+   },
+   "arrive": "wipe",
+   "say": "But the stars behind the sunrise drift.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 80,
+     "pitch": 8,
+     "fov": 70
+    }
+   }
+  },
+  {
+   "id": "ch2-leo",
+   "chapter": 2,
+   "station": "sphinx-back",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "In about 10,500 BCE, Hancock and Bauval calculate, the constellation of the Lion rose in the east just before the equinox sun.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C5"
+   ],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 80,
+     "pitch": 8,
+     "fov": 70
+    }
+   }
+  },
+  {
+   "id": "ch2-image",
+   "chapter": 2,
+   "station": "sphinx-back",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "The lion on the ground watched its own image come up.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "sky",
+   "receipts": [
+    "C5"
+   ],
+   "reply": "ch2",
+   "until": {
+    "station": "sphinx-flank",
+    "view": {
+     "yaw": 80,
+     "pitch": 8,
+     "fov": 70
+    }
+   }
+  },
+  {
+   "id": "ch2-temples",
+   "chapter": 2,
+   "station": "sphinx",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 255,
+    "pitch": -8,
+    "fov": 64
+   },
+   "arrive": "flight",
+   "say": "If the lion is that old, they argue, so are the temples at its feet.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "D4",
+    "C6"
+   ],
+   "reply": "ch2"
   }
  ]
 }

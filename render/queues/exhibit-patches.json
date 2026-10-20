@@ -153,6 +153,74 @@
    "samples": 96,
    "out": "build/render/patch-exhibit/sphinx-flank-first-time-equinox-dawn-ch1-ice-age.png",
    "for": "ch1-ice-age"
+  },
+  {
+   "state": "built",
+   "station": "sphinx-side",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 29,
+    "pitch": 15,
+    "fov": 44.2,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-inside",
+    "pano": "pano/sphinx-side-built.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-side-built-equinox-dawn-ch2-inside.png",
+   "for": "ch2-inside"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-side",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 29,
+    "pitch": 15,
+    "fov": 44.2,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-reader",
+    "pano": "pano/sphinx-side-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-side-today-equinox-dawn-ch2-reader.png",
+   "for": "ch2-reader"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-back",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-equinox",
+    "pano": "pano/sphinx-back-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-back-today-equinox-dawn-ch2-equinox.png",
+   "for": "ch2-equinox"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-drift",
+    "pano": "pano/sphinx-back-first-time.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-back-first-time-equinox-dawn-ch2-drift.png",
+   "for": "ch2-drift"
   }
  ]
 }
