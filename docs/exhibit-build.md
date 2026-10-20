@@ -31,12 +31,26 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   Khufu's edges; drag, zoom and resize checked. `pnpm site` builds it into `site/exhibit/`; `pnpm typecheck`
   covers it. `pnpm test` 1118 passed. `render/tests` has 2 errors that need gitignored build outputs this
   worktree lacks (`build/sky-bake.json`, `build/textures/index.json`), not this change.
-- [ ] **E2. The leaves.** `apps/exhibit/leaves.json` with the schema in the plan ("The leaves file"), a loader that
+- [x] **E2. The leaves.** `apps/exhibit/leaves.json` with the schema in the plan ("The leaves file"), a loader that
   validates it (zod, as `@seked/data`) and tests. Cut chapters 0 and 1 of `docs/script.md` into leaves, one or
   two sentences each, every word of those chapters kept in order. Choose each leaf's station, era, moment and
   view from `render/stations.json` so the story is told by where we stand: the cold open from the east over
   Nazlet el-Samman to the Sphinx's face at dawn; chapter 1 at `sphinx-flank`, the ditch wall. Follow the plan's
   rule: two leaves joined by a flight share an era and a moment. Log each choice.
+  *Done 2026-10-20 15:56 UTC, `4977e37`.* 22 leaves (chapter 0: 9, chapter 1: 13) in `apps/exhibit/leaves.json`;
+  `src/leaves.ts` (zod schema, join rules, the panorama a leaf needs) with 12 tests, one of which compares the
+  leaves' words with `docs/script.md` word for word. Cold open: `sphinx` (above the Sphinx temple, looking west at
+  the Sphinx before Khafre) for the first two sentences, a flight to `sphinx-face` on "Behind it stand the
+  pyramids", wipes there to built on "2500 BCE", to the First Time on "10,500 BCE" and back to today on "So how
+  old is the Sphinx?". Chapter 1: a flight to `sphinx-flank`, turns between the south wall (fissures, yaw 235),
+  the body's beds (yaw 340), the floor (pitch -30) and east along it, wipes to the long rains on "so the front
+  was cut long before the back" and to the First Time on "about 10,000 BCE", then a turn up to the head. `?leaf=`
+  shows a leaf. Every leaf looked at at 720 by 450; two at 390 by 844. All leaves draw nothing yet (E2b).
+- [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
+  weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
+  the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
+  script's beats say), in `render/publish.py`'s manner or a small script beside it, and name them in the leaves'
+  `draw`. Numbers only from `data/`; anything scaled or guessed says so on screen.
 - [ ] **E3. Narrated play.** Play, pause, next, previous, a chapter list. Each leaf speaks its words (the
   browser's `speechSynthesis` until the recorded voice exists, with its word-boundary events as the timing),
   shows them as a caption, holds, then moves on. Any drag or key pauses play and hands the visitor the view;
@@ -72,9 +86,35 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    `sphinx-flank` today, chapter 1's station. E3 replaces it with `?leaf=`.
 3. **A panorama eases in from the blank over 320 ms as it arrives** (the walk's fade-in on load, not a dissolve
    between pictures). Stewart's no-dissolves rule is about changes between leaves and eras, which E4 makes wipes.
+4. **The whole prototype is lit at `equinox-dawn`** (spring equinox, the sun low on the Sphinx's axis and clear
+   of the ditch's rim). It is the cold open's "dawn" and "faces the sunrise" made literal, it is already the
+   moment `sphinx-face` is rendered at in the built and First Time eras, and the script's chapter 1 beat asks for
+   the wall "lit by a low morning sun". One moment for every leaf keeps both flights legal. It costs five new
+   panoramas (`sphinx` today, `sphinx-face` today, `sphinx-flank` today, long rains and First Time); until they
+   exist each leaf shows the walkthrough's own panorama of that station and era.
+5. **The cold open starts at `sphinx`, not on the rooftops of Nazlet el-Samman**, because `render/stations.json`
+   has no station in the village. The words still say "from the rooftops of Nazlet el-Samman" (see For Stewart).
+6. **A fourth way to arrive, `turn`**: the same panorama, the view swinging to the leaf's. The plan's schema has
+   cut, flight and wipe; most leaves within a station change only where we look, and naming that keeps the
+   join rules checkable. Reversible: a turn is a cut that stays in one panorama.
+7. **Chapter 1 ends in the First Time, not the long rains** the beat names for "look again at the head", because
+   the eras run back with the words ("seven thousand years" on the long rains, "10,000 BCE" on the First Time)
+   and wiping forward again on the last sentence would undo that.
+8. **A leaf's panorama for a moment the walkthrough lacks is `pano/<station>-<era>-<moment>.jpg`**, beside the
+   walkthrough's; `leafPanorama` names it and E6's queue asks the laptop for it.
+
 
 ## For Stewart
+
+- The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`, above the Sphinx temple. A
+  rooftop station east of the temple (and the rise over the roofs the script's beat describes) would make it
+  true; until then, should the words change to fit the picture? (Decision 5.)
 
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- Five panoramas at `equinox-dawn` for the prototype (decision 4): `sphinx` today, `sphinx-face` today,
+  `sphinx-flank` today, long rains and First Time, each to `apps/walk/pano/<station>-<era>-equinox-dawn.jpg`.
+  E6 writes the queue; until then this line is the request. Worth a look whether the flank's floor is too dark
+  at that hour; if so, say, and the chapter 1 leaves can move to `morning-east` with the flight in becoming a cut.
