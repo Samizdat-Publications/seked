@@ -100,3 +100,31 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
 .stage.strip-on .strip img { transform: scale(1); }
 .strip figcaption { position: absolute; left: 0.4rem; bottom: 0.2rem; color: #fff8ec; font: 1rem Georgia, serif;
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.8); }
+
+/* chapter 6's draw-on profile: the stone pale, the claim's figure amber */
+.profile { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column; justify-content: center;
+  background: radial-gradient(ellipse at 50% 60%, #1f1b15, #0c0b09 75%); color: #e9e2d4; font-family: system-ui, sans-serif; }
+.stage.profile-on .profile { display: flex; }
+.profile svg { width: 100%; max-height: 70%; display: none; }
+.profile[data-mode="pi"] svg.pi, .profile[data-mode="phi"] svg.phi { display: block; }
+.profile text { fill: rgba(233, 226, 212, 0.75); font-size: 2.6px; }
+.profile text:not([text-anchor]) { text-anchor: middle; }
+.profile .label.claimed { fill: #f2b544; font-size: 3.4px; }
+.profile .stone, .profile .walked, .profile .square, .profile .face { fill: none; stroke: #e9e2d4; stroke-width: 0.35; }
+.profile .stone { fill: rgba(233, 226, 212, 0.08); }
+.profile .walker { fill: #fff6e0; }
+.profile .walker.gone { display: none; }
+.profile .height { stroke: rgba(233, 226, 212, 0.6); stroke-width: 0.25; stroke-dasharray: 1 0.8; }
+.profile .claim { fill: none; stroke: #f2b544; stroke-width: 0.25; stroke-dasharray: 1 0.8; opacity: 0.7; }
+.profile .wrapped { fill: none; stroke: #f2b544; stroke-width: 0.7; }
+.profile .apothem { stroke: #f2b544; stroke-width: 0.6; }
+.profile .square, .profile .face { fill: rgba(242, 181, 68, 0.12); }
+.profile .readouts { padding: 0 1.2rem; font-size: 0.9rem; line-height: 1.5; min-height: 6.5em; }
+.profile .r3 { color: #f2b544; }
+.profile .small { font-size: 0.75rem; color: rgba(233, 226, 212, 0.6); margin-top: 0.4rem; }
+@media (max-width: 52rem) {
+  .stage.profile-on { height: 50vh; }
+  .profile svg { max-height: 60%; }
+  .profile .readouts { font-size: 0.7rem; line-height: 1.3; padding: 0 0.6rem; min-height: 0; }
+  .profile .small { display: none; }
+}

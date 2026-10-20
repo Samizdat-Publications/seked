@@ -16,6 +16,8 @@ import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
+import { profileOf } from './profile';
+import { profileWidget, type ProfileWidget } from './profilewidget';
 import { skyWidget, type SkyWidget } from './skywidget';
 import { STILLS, keyFrames, markAnchors, markers, stillFile, type Still } from './stills';
 import './style.css';
@@ -75,6 +77,9 @@ let front = 0;
 let shown: Still | null | undefined;
 /** Chapter 5's live sky, once the bundle has loaded; until then its still stands in. */
 let sky: SkyWidget | undefined;
+/** Chapter 6's draw-on profile, likewise. */
+let profile: ProfileWidget | undefined;
+const isProfile = (s: Still | null | undefined) => s?.widget === 'pi' || s?.widget === 'phi';
 
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
@@ -89,6 +94,7 @@ function show(c: Chapter, still: Still | null) {
   stage.classList.toggle('whole', !!still?.whole);
   stage.classList.toggle('sky-on', still?.widget === 'sky' && !!sky);
   stage.classList.toggle('strip-on', still?.widget === 'strip');
+  stage.classList.toggle('profile-on', isProfile(still) && !!profile);
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;
@@ -139,6 +145,9 @@ function follow() {
   if (chapter) show(chapter, still);
   // the live sky runs from today to the claim's epoch over the first 80 per cent of the way to the next beat
   if (still?.widget === 'sky' && sky) sky.progress(since / (0.8 * (since + until)));
+  // the profile is drawn on over the same share of the way to the next beat, or of most of a screen if that is
+  // nearer: chapter 6's later beats have no still of their own, so its next beat is chapter 7's
+  if (isProfile(still) && profile) profile.progress(still!.widget as 'pi' | 'phi', since / (0.8 * Math.min(since + until, 0.9 * innerHeight)));
 }
 let queued = false;
 addEventListener('scroll', () => {
@@ -175,8 +184,15 @@ async function liveReceipts() {
   const c4 = bundle?.claims.find((c) => c.id === 'C4');
   if (bundle && c4) {
     const { sources, sites, structures, measurements, presets, materials } = bundle;
-    sky = skyWidget(c4, buildEnvironment(resolve({ sources, sites, structures, measurements, presets, materials }, 'canonical').values));
+    const env = buildEnvironment(resolve({ sources, sites, structures, measurements, presets, materials }, 'canonical').values);
+    sky = skyWidget(c4, env);
     stage.append(sky.el);
+    const a1 = bundle.claims.find((c) => c.id === 'A1');
+    const a2 = bundle.claims.find((c) => c.id === 'A2');
+    if (a1 && a2) {
+      profile = profileWidget(profileOf(env, a1, a2));
+      stage.append(profile.el);
+    }
     shown = undefined;
     follow();
   }
