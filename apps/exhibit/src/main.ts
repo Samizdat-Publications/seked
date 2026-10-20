@@ -13,12 +13,12 @@ import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
-import { groundEnvironment } from './receipts';
+import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
 import { type Moment, comparisonsAt, epochOf, skyEnv, yearLabel } from './sky';
-import { formatValue } from '@seked/claims/browser';
+import { type Claim, formatResidual, formatValue } from '@seked/claims/browser';
 import { SkyFigure } from './skyfigure';
 import type { HeadsManifest, ObjectView } from './objectview';
 import { DEG } from './projection';
@@ -94,12 +94,29 @@ function phiTriangleFigure(ground: Record<string, number> | null): string {
     it, so the survey cannot tell them apart (A3).</figcaption>`;
 }
 
+/** B1 drawn: its scale factor and free choices the claim's, its two comparisons evaluated as the receipts are. */
+function earthScaleFigure(b: Bundle | null, ground: Record<string, number> | null): string {
+  const claim = b?.claims.find((c) => c.id === 'B1');
+  const e = ground && claim && earthScale(ground, Number(claim.overlay?.params?.scale));
+  const result = b && e ? leafReceipts(b, b.claims, ['B1'])[0] : undefined;
+  if (!claim || !e || !result) return '<figcaption>The Earth is drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const km = (m: number) => `${(m / 1000).toLocaleString('en-GB', { maximumFractionDigits: 0 })} km`;
+  const [height, perimeter] = result.comparisons;
+  const line = (c: typeof height, what: string, against: string) => c
+    ? `${what} ${km(c.value)} against ${against}, ${km(c.targetValue)}: off by ${formatResidual(c)}` : '';
+  return `${earthScaleSvg(e)}<figcaption>The Great Pyramid ${e.scale.toLocaleString('en-GB')} times larger, its apex at the pole.
+    ${line(height, 'Its height becomes', 'the polar radius')}; ${line(perimeter, 'its perimeter', 'the equator')}. B1's free
+    choices: ${claim.free_choices.join('; ')}.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
   const journal = /\)\. [^.]+\. ([^.]+)\./.exec(d.citation)?.[1] ?? d.citation;
   return `${allanRankSvg(d)}<figcaption>${rankLine(d)}. ${journal}.${d.verified ? '' : " Not yet checked against the paper's table."}</figcaption>`;
 }
+
+type Bundle = Parameters<typeof groundEnvironment>[0] & { claims: Claim[] };
 
 async function start(): Promise<void> {
   const status = $('status');
@@ -149,16 +166,19 @@ async function start(): Promise<void> {
   sky.onHandsOn = () => { if (player.playing) player.pause(); };
   // a sky claim's lines and targets that read the monuments wait for the bundled database
   let ground: Record<string, number> | null = null;
+  let bundle: Bundle | null = null;
   let shownFigure: string | null = null;
   void loadBundle().then((b) => {
     if (!b) return;
     ground = groundEnvironment(b);
+    bundle = b as Bundle;
     sky.setGround(ground);
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
     if (shownFigure === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
+    if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
   });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
   let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
@@ -186,6 +206,7 @@ async function start(): Promise<void> {
     if (id === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     if (id === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (id === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
+    if (id === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

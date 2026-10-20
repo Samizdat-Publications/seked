@@ -1289,7 +1289,8 @@
    "arrive": "turn",
    "say": "Scale the pyramid up 43,200 times. Its height becomes the distance from the Earth's centre to the pole, and its perimeter the equator, each within one per cent.",
    "draw": [
-    "g1-proportions"
+    "g1-proportions",
+    "earth-scale@scale"
    ],
    "hold": 2,
    "interact": "look",
@@ -1313,7 +1314,8 @@
    "arrive": "turn",
    "say": "Graham Hancock points out that 43,200 is 600 times 72, and that 72 years is about how long the stars take to drift one degree.",
    "draw": [
-    "g1-proportions"
+    "g1-proportions",
+    "earth-scale"
    ],
    "hold": 1,
    "interact": "look",

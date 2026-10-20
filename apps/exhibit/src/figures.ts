@@ -19,12 +19,15 @@
  * `phi-triangle`: A2 drawn: the right triangle inside the pyramid from its centre, half the base along the ground,
  * the height up and the apothem down the face, with the apothem's ratio to half the base, near φ.
  *
+ * `earth-scale`: B1 drawn: the pyramid's profile grown by the claim's own scale factor and stood on the equator under
+ * the northern half of the Earth, its apex at the pole. The factor is the claim's overlay's, never typed here.
+ *
  * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
  * first, and the share that beat the pyramids' triangle marked at its end. The rank and the count are records
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -221,6 +224,28 @@ export function phiTriangleSvg(t: NonNullable<ReturnType<typeof phiTriangle>>, w
   <text class="here-lab" x="${((O[0]! + B[0]!) / 2).toFixed(1)}" y="${(O[1]! + 18).toFixed(1)}" text-anchor="middle">half the base, 1</text>
   <text class="lab" x="${((A[0]! + B[0]!) / 2 + 8).toFixed(1)}" y="${((A[1]! + B[1]!) / 2 - 6).toFixed(1)}">apothem, ${(t.apothem / t.half).toFixed(4)}</text>
   <text class="here-lab" x="${(O[0]! + 6).toFixed(1)}" y="${((O[1]! + A[1]!) / 2).toFixed(1)}">height</text>
+</svg>`;
+}
+
+/** B1's profile at its scale: half the base and the height grown `scale` times, and the Earth's two radii, metres. */
+export function earthScale(ground: Record<string, number>, scale: number): { scale: number; half: number; height: number; polar: number; equatorial: number } | null {
+  const half = ground['g1.base.half'], height = ground['g1.height.original'];
+  const polar = ground['earth.radius.polar'], equatorial = ground['earth.radius.equatorial'];
+  if ([half, height, polar, equatorial].some((v) => v === undefined) || !(scale > 0)) return null;
+  return { scale, half: half! * scale, height: height! * scale, polar: polar!, equatorial: equatorial! };
+}
+
+/** The northern hemisphere in section, the grown profile drawn on inside it, its apex at the pole. */
+export function earthScaleSvg(e: NonNullable<ReturnType<typeof earthScale>>, width = 300): string {
+  const pad = 14, k = (width - 2 * pad) / (2 * e.equatorial), cx = width / 2, base = Math.round(e.polar * k + pad + 18);
+  const h = base + 22, x = (m: number) => (cx + m * k).toFixed(1), y = (m: number) => (base - m * k).toFixed(1);
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="The Great Pyramid's profile ${count(e.scale)} times larger inside the northern half of the Earth, its apex at the pole">
+  <path class="statue" d="M ${x(-e.equatorial)} ${base} A ${(e.equatorial * k).toFixed(1)} ${(e.polar * k).toFixed(1)} 0 0 1 ${x(e.equatorial)} ${base} Z"/>
+  <line class="dim" x1="${cx}" y1="${base}" x2="${cx}" y2="${y(e.polar)}"/>
+  <polygon class="wall draw-on" points="${x(-e.half)},${base} ${x(0)},${y(e.height)} ${x(e.half)},${base}" fill="none" pathLength="1"/>
+  <text class="lab" x="${cx}" y="${(Number(y(e.polar)) - 6).toFixed(1)}" text-anchor="middle">the pole</text>
+  <text class="here-lab" x="${(cx + 16).toFixed(1)}" y="${(Number(y(e.height)) + 16).toFixed(1)}">height &#215; ${count(e.scale)}</text>
+  <text class="here-lab" x="${cx}" y="${base + 16}" text-anchor="middle">the equator</text>
 </svg>`;
 }
 

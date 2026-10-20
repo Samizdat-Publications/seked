@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
+import { loadClaims } from '@seked/claims';
 
 const data = join(__dirname, '..', '..', '..', 'data');
 const read = (p: string) => JSON.parse(readFileSync(join(data, p), 'utf8'));
@@ -115,5 +116,22 @@ describe("the 2026 study's rank", () => {
     expect(allanRankSvg(d)).toMatch(/x1="288\.0"/);
     expect(isFigure('allan-rank')).toBe(true);
     expect(() => allanRankData([], read('sources.json'))).toThrow(/orion\.allan2026\.shape\.rank/);
+  });
+});
+
+describe('the Earth at 1 : 43,200', () => {
+  const ground = groundEnvironment(loadDatabase());
+  const claim = loadClaims().find((c) => c.id === 'B1')!;
+  it("grows the profile by B1's own factor, its height near the polar radius", () => {
+    const e = earthScale(ground, Number(claim.overlay?.params?.scale))!;
+    expect(e.scale).toBe(43200);
+    expect(e.height / e.polar - 1).toBeGreaterThan(-0.01);
+    expect(e.height / e.polar - 1).toBeLessThan(0.01);
+    expect(e.half).toBeCloseTo(ground['g1.base.half']! * 43200, 3);
+    expect(earthScaleSvg(e)).toContain('height &#215; 43,200');
+  });
+  it('draws nothing without the monuments or a factor', () => {
+    expect(earthScale({}, 43200)).toBeNull();
+    expect(earthScale(ground, NaN)).toBeNull();
   });
 });
