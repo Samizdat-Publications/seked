@@ -61,6 +61,12 @@ export const STILLS: Still[] = [
 
   { chapter: 3, anchor: 'At the Sphinx’s paws stand two temples.', src: 'progress/0025-blender-harbour-as-built.png',
     alt: 'The two temples at the Sphinx’s paws as built, from the air north-east', tags: ['reconstruction'] },
+  { chapter: 3, anchor: 'Behind the granite is a core of local limestone', src: 'progress/0042-temple-core-built.png',
+    alt: 'The Sphinx Temple’s wall as built, red granite over its limestone core', tags: ['reconstruction'] },
+  { chapter: 3, anchor: 'On this reading the granite is a refit', src: 'progress/0043-temple-core-long-rains.png',
+    alt: 'The same wall in the long rains, c. 7000 BCE: the limestone core worn round, no granite yet', tags: ['claim state'] },
+  { chapter: 3, anchor: 'Khafre’s statues, found inside it', src: 'progress/0044-valley-hall-built.png',
+    alt: 'Khafre’s granite hall in the Valley Temple, his statues on their sockets', tags: ['reconstruction', 'stand-in'] },
 
   { chapter: 4, anchor: 'Egypt did not think it began with its first king.', src: LION_FIRST_TIME,
     alt: 'The First Time: the lion, the green plateau, no pyramids', tags: ['claim state', 'stand-in'] },
