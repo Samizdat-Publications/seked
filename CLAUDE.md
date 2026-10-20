@@ -45,6 +45,8 @@ python scripts/models.py     # fetch the stand-in models in blender/models.json 
 python scripts/textures.py   # fetch the CC0 Poly Haven texture sets in blender/textures.json into build/textures/ (md5-checked)
 python scripts/plate.py render|grid|scale|measure|register   # read a drawing: native scan, pixel grid, scale bar, scaled figure with its sigma
 python scripts/meshy.py generate ID [--tag T]   # generate a stand-in in blender/models.json from CC0 photographs with Meshy (MESHY_API_KEY in ~/.seked/keys.env)
+python scripts/meshy.py images ID               # a restyle's images only, to look at before paying for the mesh (then from_images, then generate)
+python scripts/meshy.py share [ID ...]          # the pinned Meshy generations on this machine into assets/meshy/ (Git LFS): Meshy keeps no API task
 python scripts/job.py claim|start|status        # own the repo, run a long job detached from the session, see who owns what (see "One session at a time")
 python scripts/headless.py -p "<prompt>" [claude flags]   # a headless `claude -p` job on the API key only (SEKED_ANTHROPIC_API_KEY, or in ~/.seked/keys.env); bulk research and drafting
 python scripts/research.py start|collect N...   # research documentary chapter N as a detached headless job; collect writes docs/research/chN.md

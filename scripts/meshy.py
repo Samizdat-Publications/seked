@@ -2,6 +2,8 @@
 Generate a stand-in model with Meshy from freely licensed photographs.
 
     python scripts/meshy.py generate ID [--tag TAG] [--image FILE ...]   # spend credits: photographs -> build/models/ID[-TAG]/model.glb
+    python scripts/meshy.py images ID        # a restyle's images only, to look at before a mesh is paid for
+    python scripts/meshy.py share [ID ...]   # the pinned generations on this machine into assets/meshy/ (Git LFS), checked
     python scripts/meshy.py balance
 
 A stand-in in blender/models.json may carry a `meshy` block instead of a
@@ -24,8 +26,17 @@ URIs, waits for the task, and writes the GLB, the task record and Meshy's
 thumbnails into build/models/<ID>/. It also keeps a copy under
 ~/.seked/models/<ID>/, because Meshy's download links expire and build/ is
 gitignored, and prints the task id and the GLB's sha256 for the manifest's
-`meshy.task` and `meshy.sha256`. `scripts/models.py` then finds the model
-there. With --tag the result goes to build/models/<ID>-<TAG>/ only, to compare
+`meshy.task` and `meshy.sha256`. Meshy keeps no task the API made, so an
+untagged result is also copied to assets/meshy/<ID>.glb, which Git LFS carries
+to every other machine; `share` does the same for generations made before
+that, each checked against its pinned sha256. `scripts/models.py` then finds the model
+there. `images` runs only a restyle's first half: the photographs changed by
+the image model, saved as made-N.png in build/models/<ID>-images/ and
+~/.seked/models/<ID>-images/, for a few credits. Once they look right, the
+entry's `from_images` is set to "<ID>-images" and `generate` builds the mesh from
+exactly those, with no second pass through the image model (which `from_made`
+makes, to change one part of an image that is otherwise right). With --tag the
+result goes to build/models/<ID>-<TAG>/ only, to compare
 tries before one is chosen, and --image (repeated) tries other photographs
 than the manifest's; the manifest is never written by this script.
 
@@ -54,8 +65,9 @@ MANIFEST = os.path.join(ROOT, "blender", "models.json")
 OUT = os.path.join(ROOT, "build", "models")
 KEYS = os.path.join(os.path.expanduser("~"), ".seked", "keys.env")
 KEEP = os.path.join(os.path.expanduser("~"), ".seked", "models")
+SHARED = os.path.join(ROOT, "assets", "meshy")   # the chosen generations, in Git LFS
 API = "https://api.meshy.ai/openapi"
-AGENT = {"User-Agent": "seked/0.1 (Giza survey model; stand-in reference photographs)"}
+AGENT = {"User-Agent": "seked/0.1 (https://github.com/Samizdat-Publications/seked; Giza survey model; stand-in reference photographs)"}
 
 
 def key():
@@ -81,16 +93,28 @@ def call(method, path, body=None):
         sys.exit(f"Meshy {method} {path}: {error.code} {error.read().decode(errors='replace')[:500]}")
 
 
+def polite(url, timeout):
+    """GET from Wikimedia, waiting out a 429 as long as it asks (a shared address meets its rate limit often)."""
+    for attempt in range(6):
+        try:
+            return urllib.request.urlopen(urllib.request.Request(url, headers=AGENT), timeout=timeout).read()
+        except urllib.error.HTTPError as error:
+            if error.code != 429 or attempt == 5:
+                raise
+            pause = int(error.headers.get("Retry-After") or 0) or 10 * 2 ** attempt
+            print(f"  Wikimedia asks for a pause: {pause} s", flush=True)
+            time.sleep(pause)
+
+
 def commons(title, width):
     """A Commons file at `width` pixels, with its licence and page, as (bytes, record)."""
     title = title if title.startswith("File:") else f"File:{title}"
     query = urllib.parse.urlencode({"action": "query", "titles": title, "prop": "imageinfo", "format": "json",
                                     "iiprop": "url|extmetadata", "iiurlwidth": width,
                                     "iiextmetadatafilter": "LicenseShortName|Artist"})
-    pages = json.load(urllib.request.urlopen(urllib.request.Request(
-        f"https://commons.wikimedia.org/w/api.php?{query}", headers=AGENT), timeout=60))["query"]["pages"]
+    pages = json.loads(polite(f"https://commons.wikimedia.org/w/api.php?{query}", 60))["query"]["pages"]
     info = next(iter(pages.values()))["imageinfo"][0]
-    data = urllib.request.urlopen(urllib.request.Request(info["thumburl"], headers=AGENT), timeout=120).read()
+    data = polite(info["thumburl"], 120)
     meta = info["extmetadata"]
     return data, {"file": title, "page": info["descriptionurl"], "license": meta["LicenseShortName"]["value"]}
 
@@ -122,6 +146,17 @@ def generate(args):
     photos, uris = [], []
     if endpoint == "restyle" and args.image:
         sys.exit("restyle takes its photographs from the manifest")
+    if spec.get("from_images"):
+        # The images `images` made and someone looked at, built into the mesh as they are.
+        folder = os.path.join(KEEP, spec["from_images"])
+        for name in sorted(n for n in os.listdir(folder) if n.startswith("made-") and n.endswith(".png"))[:4]:
+            data = open(os.path.join(folder, name), "rb").read()
+            photos.append({"file": f"{spec['from_images']}/{name}", "page": None, "license": "generated"})
+            uris.append("data:image/png;base64," + base64.b64encode(data).decode())
+            print(f"made image {spec['from_images']}/{name}, {len(data) / 1e6:.1f} MB")
+        task_id = call("POST", "multi-image-to-3d", dict(spec.get("options", {}), image_urls=uris))["result"]
+        print(f"task {task_id} created on multi-image-to-3d")
+        return finish(args, spec, task_id, wait("multi-image-to-3d", task_id), photos)
     if spec.get("from_made"):
         # Start from images an earlier restyle made (kept under ~/.seked/models/<name>/made-*.png),
         # when one of those already has the pose and the carving right and only a part should change.
@@ -179,8 +214,8 @@ def from_text(spec):
     return refine, task
 
 
-def restyled(spec, uris):
-    """The photographs changed by the image model, then built into a mesh; the made images ride along on the task."""
+def made_images(spec, uris):
+    """The photographs changed by the image model: (image urls, credits, image task ids)."""
     options = dict(spec.get("image_options", {}))
     # One photograph at a time keeps each restored image on its own photograph's
     # camera and proportions; all of them at once lets the model invent a statuette.
@@ -194,6 +229,40 @@ def restyled(spec, uris):
         credits += images.get("consumed_credits") or 0
         image_tasks.append(image_task)
     print(f"image-to-image: {len(urls)} images, {credits} credits")
+    return urls, credits, image_tasks
+
+
+def images(args):
+    model = entry(args.id)
+    if not model or (model.get("meshy") or {}).get("endpoint") != "restyle":
+        sys.exit(f"{args.id}: no model with a restyle meshy block in {MANIFEST}")
+    spec = model["meshy"]
+    photos, uris = [], []
+    for title in spec["images"]:
+        data, record = commons(title, spec.get("width", 2048))
+        photos.append(record)
+        uris.append("data:image/jpeg;base64," + base64.b64encode(data).decode())
+        print(f"photograph {record['file']} ({record['license']}), {len(data) / 1e6:.1f} MB")
+    urls, credits, image_tasks = made_images(spec, uris)
+    name = f"{args.id}-images"
+    folder = os.path.join(OUT, name)
+    os.makedirs(folder, exist_ok=True)
+    for i, url in enumerate(urls):
+        with open(os.path.join(folder, f"made-{i}.png"), "wb") as f:
+            f.write(urllib.request.urlopen(url, timeout=120).read())
+    record = {"image_task": ", ".join(image_tasks), "image_prompt": spec["image_prompt"],
+              "image_options": spec.get("image_options"), "photographs": photos, "consumed_credits": credits}
+    with open(os.path.join(folder, "images.json"), "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=2, ensure_ascii=False)
+    keep = os.path.join(KEEP, name)
+    shutil.copytree(folder, keep, dirs_exist_ok=True)
+    print(f"{name}: {len(urls)} images in {folder}, {credits} credits; kept a copy in {keep}")
+    print(f'to build the mesh from exactly these: set "from_images": "{name}" in the entry, then generate {args.id}')
+
+
+def restyled(spec, uris):
+    """The photographs changed by the image model, then built into a mesh; the made images ride along on the task."""
+    urls, credits, image_tasks = made_images(spec, uris)
     images = {"consumed_credits": credits}
     image_task = ", ".join(image_tasks)
     mesh_body = dict(spec.get("options", {}), image_urls=urls[:4])
@@ -233,6 +302,37 @@ def finish(args, spec, task_id, task, photos):
     shutil.copytree(folder, keep, dirs_exist_ok=True)
     print(f"{name}: {os.path.getsize(path) / 1e6:.1f} MB, {task.get('consumed_credits')} credits, sha256 {record['sha256']}")
     print(f"kept a copy in {keep}")
+    if not args.tag:
+        os.makedirs(SHARED, exist_ok=True)
+        shutil.copyfile(path, os.path.join(SHARED, f"{name}.glb"))
+        print(f"and in assets/meshy/{name}.glb: pin the task and sha256 in the manifest, then commit it (Git LFS)")
+
+
+def share(args):
+    """Copy every pinned generation this machine holds into assets/meshy/, if it is the pinned one."""
+    manifest = json.load(open(MANIFEST, encoding="utf-8"))
+    pinned = [m for m in manifest["models"] + manifest.get("figures", []) + manifest.get("animals", [])
+              + manifest.get("props", []) if (m.get("meshy") or {}).get("sha256")]
+    if args.ids:
+        pinned = [m for m in pinned if m["id"] in args.ids]
+    os.makedirs(SHARED, exist_ok=True)
+    for model in pinned:
+        wanted = [(model["id"], model["meshy"]["sha256"])]
+        wanted += [(f"{model['id']}-{tag}", f.get("sha256")) for tag, f in (model.get("finishes") or {}).items() if f.get("sha256")]
+        for name, sha in wanted:
+            found = next((p for p in (os.path.join(OUT, name, "model.glb"), os.path.join(KEEP, name, "model.glb"))
+                          if os.path.exists(p)), None)
+            target = os.path.join(SHARED, f"{name}.glb")
+            if not found:
+                print(f"{name}: not on this machine")
+            elif sha256_of(found) != sha:
+                print(f"{name}: {found} is not the pinned generation; not shared")
+            elif os.path.exists(target) and sha256_of(target) == sha:
+                print(f"{name}: already in assets/meshy")
+            else:
+                shutil.copyfile(found, target)
+                print(f"{name}: assets/meshy/{name}.glb, {os.path.getsize(target) / 1e6:.1f} MB")
+    print("then: git add assets/meshy && git commit (Git LFS carries the files)")
 
 
 def retexture(args):
@@ -277,6 +377,12 @@ def main():
     p.add_argument("--tag")
     p.add_argument("--image", action="append")
     p.set_defaults(func=generate)
+    p = sub.add_parser("images")
+    p.add_argument("id")
+    p.set_defaults(func=images)
+    p = sub.add_parser("share")
+    p.add_argument("ids", nargs="*", metavar="ID", help="the models to share; every pinned one when none is named")
+    p.set_defaults(func=share)
     p = sub.add_parser("retexture")
     p.add_argument("id")
     p.add_argument("--tag")

@@ -77,13 +77,14 @@ def dumps(value, indent=0):
 
 
 def token():
-    value = os.environ.get("SKETCHFAB_TOKEN")
+    # SKETCHFAB_API_KEY is the name the cloud environment's secret goes by.
+    value = os.environ.get("SKETCHFAB_TOKEN") or os.environ.get("SKETCHFAB_API_KEY")
     if not value and os.path.exists(KEYS):
         for line in open(KEYS, encoding="utf-8"):
             if line.strip().startswith("SKETCHFAB_TOKEN="):
                 value = line.split("=", 1)[1].strip()
     if not value:
-        sys.exit(f"no Sketchfab token: set SKETCHFAB_TOKEN or put SKETCHFAB_TOKEN=... in {KEYS}")
+        sys.exit(f"no Sketchfab token: set SKETCHFAB_TOKEN (or SKETCHFAB_API_KEY) or put SKETCHFAB_TOKEN=... in {KEYS}")
     return value
 
 
