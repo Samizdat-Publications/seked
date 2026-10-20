@@ -36,7 +36,7 @@ def landmarks():
         p = data.PYRAMIDS[key]
         z, height = {}, {}
         for st in states.ORDER:
-            h = p["today"] if states.STATES[st]["pyramids"] in ("today", "stripped") else p["H"]
+            h = states.pyramid_height(p, st)
             z[st] = round(p["base"] + h, 2)
             height[st] = round(h, 1)
         out.append({"name": p["name"], "x": round(p["cx"], 2), "y": round(p["cy"], 2), "z": z, "height": height})
@@ -138,7 +138,7 @@ def night_sky(s, moments):
         apex = {}
         for key in ("g1", "g2", "g3"):
             p = data.PYRAMIDS[key]
-            h = p["today"] if states.STATES[st]["pyramids"] in ("today", "stripped") else p["H"]
+            h = states.pyramid_height(p, st)
             apex[key] = [round(p["cx"], 2), round(p["cy"], 2), round(p["base"] + h, 2)]
         links = [{"star": n, "at": at(by_name[n]), "to": apex[k], "pyramid": data.PYRAMIDS[k]["name"]} for n, k in BELT]
         out[st] = {"label": night.get("label", ""), "figures": figs, "stars": names, "links": links}

@@ -2,19 +2,23 @@
 The eras the walkthrough crosses, oldest first, and what stands in each.
 
 The first two are a claim: the lost-civilisation reading (Hancock, Bauval, Schoch,
-Temple) drawn as its strongest case, as the project agreed ("rebuild the plateau
-faithfully, then illustrate his claims", labelled a claim). In it the Sphinx and
-the two megalithic temples in front of it are older than Khafre, the pyramids stand
-cased with metal caps, and the Sahara is green: the African Humid Period, which is
-real climate science, ended about 5,500 years ago. The Sphinx there is a lion, carved
-to face its own constellation rising due east at the spring equinox of about 10,500
-BCE (Bauval and Hancock), worn by the long rains of the lion era (Schoch's water
-erosion), then recut by Khafre's people. Stewart's reading (2026-09-25): an unknown
-people raised the pyramids pristine, near seamless and gilded at the top; the Egyptians
-inherited and restored them, so as built their casing shows its age. Temple's Anubis
-stays a stand-in on disk (sphinx.MODEL_FOR), outside the sequence.
+Temple) drawn as its strongest case, as its proponents make it (docs/rethink-2026-10.md,
+agreed 2026-10-20, labelled a claim). In it the Sphinx and the two megalithic temples
+in front of it are older than Khafre, and the Sahara is green: the African Humid
+Period, which is real climate science, ended about 5,500 years ago. There are no
+pyramids yet: the plateau holds the Sphinx, its temples and the plan, and the pyramids
+are built c. 2500 BCE to that older plan. Their sites are flattened to their surveyed
+base levels as in every era, so the ground does not keep GLO-30's mounds, and the page
+draws the plan over them; nothing is built there. The Sphinx is a lion, carved to face
+its own constellation rising due east at the spring equinox of about 10,500 BCE (Bauval
+and Hancock), worn by the long rains of the lion era (Schoch's water erosion), then
+recut by Khafre's people. This replaces Stewart's reading of 2026-09-25 (an unknown
+people raised the pyramids pristine and gilded, and the Egyptians inherited them),
+which drew the claim in its weakest form. Temple's Anubis stays a stand-in on disk
+(sphinx.MODEL_FOR), outside the sequence.
 
-`gild` is the height in metres of each main pyramid's metal apex (the pyramidion and
+`pyramids` is None in an era before they were built. `gild` is the height in metres of
+each main pyramid's metal apex (the pyramidion and
 the sheathed courses under it), `clouds` the sky's cloud field (sky.CLOUDS), `air`
 the era's aerosol and haze against the defaults, `haze_colour` the hazes' colours low to high,
 `mist` a layer of it lying on the valley floor (bottom, top, density, colour), and `grade` the
@@ -33,7 +37,7 @@ MEGALITHIC = ("khafre.valley_temple", "sphinx.temple")
 STATES = {
     "first-time": dict(
         label="c. 10,500 BCE", title="The First Time", honesty="claim", year=-10499,
-        pyramids="pristine", caps="bright gold", gild=22.0, queens=None, mastabas=None, causeway=None,
+        pyramids=None, caps=None, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic", sphinx="lion-fresh",
         ground="savanna", valley="lush", water="flood", city=None, clouds="tropical", air=(1.5, 3.5),
         haze_colour=("e3ebef", "e9eff3"), mist=(-50.0, -30.0, 9e-4, "eef2ee"),
@@ -41,7 +45,7 @@ STATES = {
         rubble=False, people=False, stones=False),
     "lion": dict(
         label="c. 7000 BCE", title="The long rains", honesty="claim", year=-6999,
-        pyramids="weathered", caps="electrum", gild=16.0, queens=None, mastabas=None, causeway=None,
+        pyramids=None, caps=None, queens=None, mastabas=None, causeway=None,
         temples=MEGALITHIC, temple_mode="megalithic-weathered", sphinx="lion",
         ground="dry-savanna", valley="lush", water="flood", city=None, clouds="showers", air=(1.6, 6.0),
         haze_colour=("cfdbe8", "dae3ed"), mist=(-50.0, -34.0, 6e-4, "e7ebea"),
@@ -68,6 +72,15 @@ STATES = {
         rubble=True, people=True, stones=True),
 }
 ORDER = ["first-time", "lion", "built", "stripped", "today"]
+
+
+def pyramid_height(P, state):
+    """How much of pyramid P (a data.PYRAMIDS record) stands in the state: nothing before it was built,
+    its full height while it keeps its casing, what is left of it once the casing was stripped."""
+    mode = STATES[state]["pyramids"]
+    if mode is None:
+        return 0.0
+    return P["today"] if mode in ("today", "stripped") else P["H"]
 
 # The drift that buried the Sphinx to its chest and the temples before it, as a surface
 # the ground is raised to (look choice, after the nineteenth-century photographs): level

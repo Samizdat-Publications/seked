@@ -323,6 +323,10 @@ def build(state, rng, coll, mats, lib, log=print):
     S = states.spec(state)
     mode, queens_mode = S["pyramids"], S["queens"]
     main = [dict(data.PYRAMIDS[k], key=k) for k in ("g1", "g2", "g3")]
+    if mode is None:
+        # Not built yet: nothing stands, but the sites are still flattened, or GLO-30's mounds would stand there.
+        log("pyramids: none in this era, their sites flattened")
+        return [(P["cx"], P["cy"], P["half"], P["base"]) for P in main]
     queens = [dict(q, key="queen") for q in data.QUEENS] if queens_mode else []
     core, casing, gran = Field(), Field(), Field()
 
