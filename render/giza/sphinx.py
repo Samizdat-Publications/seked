@@ -28,11 +28,11 @@ if BLENDER_DIR not in sys.path:
     sys.path.insert(0, BLENDER_DIR)
 
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
-# The claim's lions are one master (docs/rethink-2026-10.md): the First Time's is sphinx-master as drawn,
-# the long rains' the same mesh worn by render/giza/sphinx_eras.py (its `lion` finish). As built and today
-# keep their own models until the king's head is carved inside the master's.
+# The claim's lions are one master (docs/rethink-2026-10.md), lengthened to the ARCE proportions and worn
+# era by era by render/giza/sphinx_eras.py, whose output is the master's finishes. As built and today keep
+# their own models until the king's head is carved inside the master's.
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion"),
-             "lion-fresh": ("sphinx-master", None), "carved": ("sphinx-built", None),
+             "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-built", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
