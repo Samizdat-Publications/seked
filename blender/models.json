@@ -641,7 +641,10 @@
           "target_formats": [
             "glb"
           ]
-        }
+        },
+        "task": "01a15769-5f53-74dd-86dc-5638f472d2f3",
+        "sha256": "49bdcc76d6ba386e1fbea4688906dbae875cb5e1acd29456563d1fef33492deb",
+        "credits": 35
       },
       "material": "texture+stone"
     },
