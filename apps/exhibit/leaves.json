@@ -1894,6 +1894,200 @@
    "interact": "era",
    "receipts": [],
    "reply": "ch6"
+  },
+  {
+   "id": "ch7-cold",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 30,
+    "pitch": -2,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "About 12,900 years ago, as the last Ice Age was ending, the warming stopped. For more than a thousand years the northern world fell back into cold.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-dryas",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 30,
+    "pitch": 22,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "Geologists call it the Younger Dryas. Hancock cites about a hundred peer-reviewed studies arguing that fragments of a comet set it off.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-hureyra",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 4,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "At Abu Hureyra, an early village in Syria, their authors report glass melted at more than 2,200 degrees.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-monument",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 0,
+    "fov": 50
+   },
+   "arrive": "turn",
+   "say": "Then, as the cold lifts, a monument appears on a hilltop in south-east Turkey. Göbekli Tepe is a set of great rings of T-shaped stone pillars, carved with animals.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-built",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 0,
+    "fov": 50
+   },
+   "arrive": "turn",
+   "say": "It was built around 9500 BCE, seven thousand years before the Great Pyramid.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-hunters",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 0,
+    "fov": 50
+   },
+   "arrive": "turn",
+   "say": "Its excavators say the people who built it were still hunters and foragers. They had no farms, no pottery and no metal.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-filled",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 0,
+    "fov": 50
+   },
+   "arrive": "turn",
+   "say": "Its first excavator, Klaus Schmidt, believed they later filled it in on purpose.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-schoch",
+   "chapter": 7,
+   "station": "sphinx",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 44
+   },
+   "arrive": "cut",
+   "say": "Schoch now points to Göbekli Tepe when he is asked where the older civilisation was. For this piece too, it is what makes the rest worth taking seriously.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-plan",
+   "chapter": 7,
+   "station": "sphinx",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 44
+   },
+   "arrive": "turn",
+   "say": "If people who did not farm could raise this, then a plan laid out at Giza in the eleventh millennium BCE is not absurd. It is a question of evidence.",
+   "draw": [
+    "belt-plan@plan"
+   ],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-ungathered",
+   "chapter": 7,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 285,
+    "pitch": -30,
+    "fov": 70
+   },
+   "arrive": "cut",
+   "say": "Some of that evidence has never been gathered.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
   }
  ]
 }
