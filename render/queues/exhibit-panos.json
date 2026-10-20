@@ -1,47 +1,4 @@
 {
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: each leaf's panorama that apps/walk/pano/ lacks, its station in its era and moment. Render with render/build.py --queue, then python render/publish.py.",
- "renders": [
-  {
-   "state": "today",
-   "station": "sphinx",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/sphinx-today-equinox-dawn.png",
-   "for": "ch0-dawn"
-  },
-  {
-   "state": "first-time",
-   "station": "sphinx",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/sphinx-first-time-equinox-dawn.png",
-   "for": "ch0-claim"
-  },
-  {
-   "state": "today",
-   "station": "sphinx-face",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/sphinx-face-today-equinox-dawn.png",
-   "for": "ch0-question"
-  },
-  {
-   "state": "today",
-   "station": "sphinx-flank",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/sphinx-flank-today-equinox-dawn.png",
-   "for": "ch1-carved"
-  },
-  {
-   "state": "lion",
-   "station": "sphinx-flank",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/sphinx-flank-lion-equinox-dawn.png",
-   "for": "ch1-exposure"
-  },
-  {
-   "state": "first-time",
-   "station": "sphinx-flank",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/sphinx-flank-first-time-equinox-dawn.png",
-   "for": "ch1-ice-age"
-  }
- ]
+ "renders": []
 }

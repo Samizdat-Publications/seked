@@ -8,7 +8,7 @@ import leavesJson from '../leaves.json';
 import renderStations from '../../../render/stations.json';
 import script from '../../../docs/script.md?raw';
 import { type Leaf, type RenderStations, leafPanorama, readLeaves } from './leaves';
-import { type Manifest, pickEra, readManifest, readOverlays } from './manifest';
+import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import { ditchPlanSvg } from './figures';
@@ -40,14 +40,17 @@ const panoramasFor = (manifest: Manifest) => (L: Leaf): string[] => {
 async function start(): Promise<void> {
   const status = $('status');
   const fail = (msg: string) => { status.textContent = msg; status.hidden = false; };
-  let manifest: Manifest, overlays;
+  let manifest: Manifest, overlays, leafPatches: unknown;
   try {
-    [manifest, overlays] = await Promise.all([json('stations.json').then(readManifest), json('overlays.json').then(readOverlays, () => ({}))]);
+    // the exhibit's own detail patches are published once the laptop renders them; until then there are none
+    [manifest, overlays, leafPatches] = await Promise.all([json('stations.json').then(readManifest), json('overlays.json').then(readOverlays, () => ({})),
+      json('exhibit-patches.json').catch(() => null)]);
   } catch (e) {
     console.error(e);
     return fail('The exhibit could not load its stations. Reload to try again.');
   }
   const stage = new Stage($('stage'), $<HTMLCanvasElement>('view'), $<HTMLCanvasElement>('ink'), $('flat'), manifest, overlays, WALK);
+  stage.setPatches(patchesByPanorama(manifest, leafPatches));
   stage.onStatus = (s) => {
     status.hidden = s === 'ready';
     status.textContent = s === 'loading' ? 'Loading the panorama' : s === 'missing' ? 'This view has not been rendered yet.' : s === 'error' ? 'The panorama did not load. Reload to try again.' : '';

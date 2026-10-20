@@ -50,9 +50,7 @@ export function readManifest(raw: unknown): Manifest {
     for (const [k, c] of Object.entries(obj(s.cameras))) { const x = vec3(c); if (x) cameras[k] = x; }
     const patches: Record<string, Patch[]> = {};
     for (const [k, list] of Object.entries(obj(s.patches))) {
-      patches[k] = arr(list).map(obj).filter((p) => typeof p.src === 'string').map((p) => ({
-        src: p.src as string, yaw: num(p.yaw, 0) * DEG, pitch: num(p.pitch, 0) * DEG, fov: num(p.fov, 50) * DEG, aspect: num(p.aspect, 2),
-      }));
+      patches[k] = arr(list).map(obj).filter((p) => typeof p.src === 'string').map(readPatch);
     }
     return {
       id: String(s.id), name: String(s.name ?? s.id), where: String(s.where ?? ''), moment: String(s.moment ?? ''),
@@ -64,6 +62,30 @@ export function readManifest(raw: unknown): Manifest {
     };
   });
   return { states, stateById, stations, byId: Object.fromEntries(stations.map((s) => [s.id, s])) };
+}
+
+const readPatch = (p: Record<string, unknown>): Patch => ({
+  src: p.src as string, yaw: num(p.yaw, 0) * DEG, pitch: num(p.pitch, 0) * DEG, fov: num(p.fov, 50) * DEG, aspect: num(p.aspect, 2),
+});
+
+/**
+ * Every detail patch by the panorama it registers with (its path relative to the manifest): the walkthrough's,
+ * era by era, belong to that era's panorama, and the exhibit's (`exhibit-patches.json`, render/publish.py) name
+ * theirs. A patch is the same camera in the same light as one picture, so it is never laid over another.
+ */
+export function patchesByPanorama(m: Manifest, exhibit?: unknown): Record<string, Patch[]> {
+  const out: Record<string, Patch[]> = {};
+  const add = (pano: string, p: Patch) => { (out[pano] ??= []).push(p); };
+  for (const st of m.stations) {
+    for (const [era, list] of Object.entries(st.patches)) {
+      const pano = st.panoramas[era];
+      if (pano) for (const p of list) add(pano, p);
+    }
+  }
+  for (const p of arr(obj(exhibit).patches).map(obj)) {
+    if (typeof p.src === 'string' && typeof p.pano === 'string' && p.pano) add(p.pano, readPatch(p));
+  }
+  return out;
 }
 
 /** The camera for a station in an era: its own for that era if it has one, else the station's. */

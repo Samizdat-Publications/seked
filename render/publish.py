@@ -22,6 +22,7 @@ from giza import data, states  # noqa: E402
 
 PANO_IN = os.path.join(data.REPO, "build", "render", "pano")
 PATCH_IN = os.path.join(data.REPO, "build", "render", "patch")
+EXHIBIT_PATCH_IN = os.path.join(data.REPO, "build", "render", "patch-exhibit")
 WALK = os.path.join(data.REPO, "apps", "walk")
 PANO_OUT = os.path.join(WALK, "pano")
 
@@ -323,6 +324,39 @@ def detail_patches(station_id, panos):
     return out
 
 
+def exhibit_patches(patch_in=EXHIBIT_PATCH_IN, pano_in=PANO_IN, pano_out=PANO_OUT):
+    """
+    The exhibit's detail patches (scripts/exhibit_queue.py), one per leaf the panorama cannot hold sharp,
+    published into pano/patch/ and listed with the panorama each registers with, which its sidecar names. A
+    patch older than that panorama's render, or whose panorama was never rendered here, is left out: it may
+    not match. The aspect is the picture's own.
+    """
+    from PIL import Image
+    out = []
+    os.makedirs(os.path.join(pano_out, "patch"), exist_ok=True)
+    for png in sorted(glob.glob(os.path.join(patch_in, "*.png"))):
+        side = os.path.splitext(png)[0] + ".json"
+        name = os.path.basename(png)
+        if not os.path.exists(side):
+            continue
+        with io.open(side, encoding="utf-8") as f:
+            p = json.load(f).get("patch") or {}
+        if not p.get("pano"):
+            continue
+        pano_png = os.path.join(pano_in, os.path.splitext(os.path.basename(p["pano"]))[0] + ".png")
+        if not os.path.exists(pano_png) or os.path.getmtime(png) < os.path.getmtime(pano_png):
+            print(f"  WARNING: {name} is older than {os.path.basename(pano_png)}, or it is not here; left out until both are rendered")
+            continue
+        jpg = os.path.join(pano_out, "patch", os.path.splitext(name)[0] + ".jpg")
+        im = Image.open(png)
+        if not os.path.exists(jpg) or os.path.getmtime(jpg) < os.path.getmtime(png):
+            im.convert("RGB").save(jpg, quality=84, optimize=True, progressive=True)
+            print(f"  patch/{os.path.basename(jpg)}: {os.path.getsize(jpg) / 1e6:.2f} MB, for the exhibit")
+        out.append({"src": "pano/patch/" + os.path.basename(jpg), "pano": p["pano"], "leaf": p.get("leaf", ""),
+                    "yaw": p["yaw"], "pitch": p["pitch"], "fov": p["fov"], "aspect": round(im.width / im.height, 6)})
+    return out
+
+
 def main():
     from PIL import Image
     stations_src = data.load_json(HERE, "stations.json")
@@ -406,6 +440,11 @@ def main():
     with io.open(os.path.join(WALK, "overlays.json"), "w", encoding="utf-8") as f:
         json.dump(figures, f, indent=1, ensure_ascii=False)
     print(f"wrote apps/walk/stations.json: {len(manifest['stations'])} stations")
+    leaf_patches = exhibit_patches()
+    with io.open(os.path.join(WALK, "exhibit-patches.json"), "w", encoding="utf-8") as f:
+        json.dump({"about": "Written by render/publish.py: the exhibit's detail patches (scripts/exhibit_queue.py), each with "
+                            "the panorama it registers with. Degrees; the field is vertical.", "patches": leaf_patches}, f, indent=1)
+    print(f"wrote apps/walk/exhibit-patches.json: {len(leaf_patches)} patches")
 
 
 if __name__ == "__main__":
