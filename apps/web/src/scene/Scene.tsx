@@ -124,7 +124,7 @@ export function Scene({ model, terrain, desert, layers, overlay, sky, epoch }: S
         <FadeScope>
           <Desert {...desert} clippingPlanes={groundPlanes} />
           <Plateau {...terrain} context={layers.terrain} ground={layers.ground} clippingPlanes={groundPlanes} />
-          {layers.pyramids && <Pyramids pyramids={model.pyramids} observer={observer} clippingPlanes={planes} />}
+          {layers.pyramids && <Pyramids pyramids={model.pyramids} clippingPlanes={planes} />}
           {layers.pyramids && <Structures massings={model.massings} plateau={model.plateau} clippingPlanes={planes} />}
           {layers.interior && <Interiors interiors={model.interiors} clippingPlanes={planes} />}
           <Standins />

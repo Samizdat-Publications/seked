@@ -311,6 +311,23 @@ export function isWholeState(state: StateId): boolean {
   return state === 'ancient' || state === 'built';
 }
 
+/**
+ * What stands in the First Time, as its proponents have it
+ * (docs/rethink-2026-10.md): the Sphinx and the two temples in front of it.
+ * The pyramids and everything of their builders' (queens, tombs, temples,
+ * walls, causeways, pits) come c. 2500 BCE, to the older plan. The same two
+ * temples render/giza/states.py calls MEGALITHIC.
+ */
+const FIRST_TIME_TEMPLES = new Set(['khafre.valley_temple', 'sphinx.temple']);
+
+/** Whether a footprint's structure stands in the state at all. */
+export function standsIn(f: Footprint, state: StateId): boolean {
+  return state !== 'ancient' || f.group === 'sphinx' || FIRST_TIME_TEMPLES.has(f.id);
+}
+
+/** Whether the three pyramids stand in the state: not in the First Time, which is older than they are. */
+export const pyramidsStandIn = (state: StateId): boolean => state !== 'ancient';
+
 /** How a material's id reads in a label: `granite.red` as "red granite". */
 const STONE_WORDS: Record<string, string> = {
   'limestone.giza': 'the yellow limestone of Giza',
@@ -419,7 +436,8 @@ export function structuresFor(
   let firstTomb: string | undefined;
   let causeway: StructureMesh | undefined;
 
-  for (const f of features) {
+  const standing = features.filter((f) => standsIn(f, state));
+  for (const f of standing) {
     if (f.group === 'mastabas') {
       const tomb = mastabaMesh(f, env, whole ? 'cased' : 'ruined');
       if (tomb === undefined) continue;
@@ -482,15 +500,16 @@ export function structuresFor(
     if (other !== undefined) fallback.push(other);
   }
 
-  const roof = whole ? causewayRoofMesh(env, features) : undefined;
-  const corridor = whole ? causewayWallsMesh(env, features) : undefined;
+  const causewayStands = standing.some((f) => f.group === 'causeways');
+  const roof = whole && causewayStands ? causewayRoofMesh(env, features) : undefined;
+  const corridor = whole && causewayStands ? causewayWallsMesh(env, features) : undefined;
   const causewayStone = stoneOf('khafre.causeway', 'the causeway of Khafre');
   // The quay stands on the water the valley temples' own floors set, so it is
   // built from the same `waterExtent` the scene draws the basin from and moves
   // with the footprints rather than with a number typed here.
   const quay = quayMesh(waterExtent(features, env, state), features);
   const enclosureWalls: StructureMesh[] = [];
-  if (whole) {
+  if (whole && pyramidsStandIn(state)) {
     for (const id of ENCLOSED) {
       const wall = enclosureWallMesh(env, id);
       if (wall !== undefined) {
