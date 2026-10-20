@@ -2,7 +2,7 @@
 Generate a stand-in model with Meshy from freely licensed photographs.
 
     python scripts/meshy.py generate ID [--tag TAG] [--image FILE ...]   # spend credits: photographs -> build/models/ID[-TAG]/model.glb
-    python scripts/meshy.py images ID        # a restyle's images only, to look at before a mesh is paid for
+    python scripts/meshy.py images ID [--view NAME ...]   # a restyle's images, or an entry's drawn views, before a mesh is paid for
     python scripts/meshy.py share [ID ...]   # the pinned generations on this machine into assets/meshy/ (Git LFS), checked
     python scripts/meshy.py balance
 
@@ -32,7 +32,14 @@ to every other machine; `share` does the same for generations made before
 that, each checked against its pinned sha256. `scripts/models.py` then finds the model
 there. `images` runs only a restyle's first half: the photographs changed by
 the image model, saved as made-N.png in build/models/<ID>-images/ and
-~/.seked/models/<ID>-images/, for a few credits. Once they look right, the
+~/.seked/models/<ID>-images/, for a few credits. An entry may instead carry
+`views`: named drawings, each a `prompt` and its `refs` (Commons photographs
+by file name, or "view:<name>" for a view drawn before it), drawn in order, so
+that one side view taken from one photograph sets the body and the others are
+drawn from it and agree with it. Each view is <name>.png in the same folders and
+in assets/meshy/refs/<ID>/, the record of what the mesh was built from;
+`--view` draws only the views named, to redraw one. `generate` then builds the
+mesh from the views its `mesh_from` lists, in that order. Once they look right, the
 entry's `from_images` is set to "<ID>-images" and `generate` builds the mesh from
 exactly those, with no second pass through the image model (which `from_made`
 makes, to change one part of an image that is otherwise right). With --tag the
@@ -93,28 +100,43 @@ def call(method, path, body=None):
         sys.exit(f"Meshy {method} {path}: {error.code} {error.read().decode(errors='replace')[:500]}")
 
 
-def polite(url, timeout):
-    """GET from Wikimedia, waiting out a 429 as long as it asks (a shared address meets its rate limit often)."""
+def polite(url, timeout, longest=120):
+    """GET from Wikimedia, waiting out a 429 (a shared address meets its rate limit often), but not one that
+    asks for more than `longest` seconds: that is the throttle on thumbnails of uncommon widths, and the
+    caller can ask for the original instead."""
     for attempt in range(6):
         try:
             return urllib.request.urlopen(urllib.request.Request(url, headers=AGENT), timeout=timeout).read()
         except urllib.error.HTTPError as error:
-            if error.code != 429 or attempt == 5:
-                raise
             pause = int(error.headers.get("Retry-After") or 0) or 10 * 2 ** attempt
+            if error.code != 429 or attempt == 5 or pause > longest:
+                raise
             print(f"  Wikimedia asks for a pause: {pause} s", flush=True)
             time.sleep(pause)
 
 
+# The widths Wikimedia renders thumbnails at; since January 2026 any other is throttled hard
+# (https://www.mediawiki.org/wiki/Common_thumbnail_sizes).
+THUMB_WIDTHS = (20, 40, 60, 120, 250, 330, 500, 960, 1280, 1920, 3840)
+
+
 def commons(title, width):
-    """A Commons file at `width` pixels, with its licence and page, as (bytes, record)."""
+    """A Commons file at `width` pixels, or the standard thumbnail width under it, with its licence and page,
+    as (bytes, record)."""
+    width = max([w for w in THUMB_WIDTHS if w <= width] or [THUMB_WIDTHS[0]])
     title = title if title.startswith("File:") else f"File:{title}"
     query = urllib.parse.urlencode({"action": "query", "titles": title, "prop": "imageinfo", "format": "json",
                                     "iiprop": "url|extmetadata", "iiurlwidth": width,
                                     "iiextmetadatafilter": "LicenseShortName|Artist"})
     pages = json.loads(polite(f"https://commons.wikimedia.org/w/api.php?{query}", 60))["query"]["pages"]
     info = next(iter(pages.values()))["imageinfo"][0]
-    data = polite(info["thumburl"], 120)
+    try:
+        data = polite(info["thumburl"], 120)
+    except urllib.error.HTTPError as error:
+        if error.code != 429:
+            raise
+        print(f"  the {width} px thumbnail is throttled; the original ({info.get('width')} px) instead", flush=True)
+        data = polite(info["url"], 300)
     meta = info["extmetadata"]
     return data, {"file": title, "page": info["descriptionurl"], "license": meta["LicenseShortName"]["value"]}
 
@@ -146,6 +168,19 @@ def generate(args):
     photos, uris = [], []
     if endpoint == "restyle" and args.image:
         sys.exit("restyle takes its photographs from the manifest")
+    if spec.get("views"):
+        # The drawn views `images` made, in the order mesh_from gives, built into the mesh as they are.
+        folder = os.path.join(OUT, f"{args.id}-images")
+        for name in spec["mesh_from"]:
+            path = os.path.join(folder, f"{name}.png")
+            if not os.path.exists(path):
+                sys.exit(f"view {name} is not drawn yet: python scripts/meshy.py images {args.id} --view {name}")
+            photos.append({"file": f"assets/meshy/refs/{args.id}/{name}.png", "page": None, "license": "generated",
+                           "sha256": sha256_of(path)})
+            uris.append("data:image/png;base64," + base64.b64encode(open(path, "rb").read()).decode())
+        task_id = call("POST", "multi-image-to-3d", dict(spec.get("options", {}), image_urls=uris))["result"]
+        print(f"task {task_id} created on multi-image-to-3d from {', '.join(spec['mesh_from'])}")
+        return finish(args, spec, task_id, wait("multi-image-to-3d", task_id), photos)
     if spec.get("from_images"):
         # The images `images` made and someone looked at, built into the mesh as they are.
         folder = os.path.join(KEEP, spec["from_images"])
@@ -232,11 +267,61 @@ def made_images(spec, uris):
     return urls, credits, image_tasks
 
 
+def drawn_views(args, spec):
+    """Draw an entry's `views` in order, each from its prompt and its references, and keep each as <name>.png."""
+    name = f"{args.id}-images"
+    folder = os.path.join(OUT, name)
+    record_dir = os.path.join(ROOT, "assets", "meshy", "refs", args.id)
+    os.makedirs(folder, exist_ok=True)
+    os.makedirs(record_dir, exist_ok=True)
+    wanted = set(args.view or [v["name"] for v in spec["views"]])
+    record_path = os.path.join(record_dir, "views.json")
+    record = json.load(open(record_path, encoding="utf-8")) if os.path.exists(record_path) else {}
+    for view in spec["views"]:
+        if view["name"] not in wanted:
+            continue
+        uris, refs = [], []
+        for ref in view["refs"]:
+            if ref.startswith("view:"):
+                path = os.path.join(folder, f"{ref[5:]}.png")
+                if not os.path.exists(path):
+                    sys.exit(f"view {view['name']} needs {ref}, which is not drawn yet")
+                uris.append("data:image/png;base64," + base64.b64encode(open(path, "rb").read()).decode())
+                refs.append({"view": ref[5:], "sha256": sha256_of(path)})
+            else:
+                cache = os.path.join(folder, "photo-" + hashlib.sha1(ref.encode()).hexdigest()[:10] + ".jpg")
+                if os.path.exists(cache):
+                    data, photo = open(cache, "rb").read(), json.load(open(cache + ".json", encoding="utf-8"))
+                else:
+                    data, photo = commons(ref, spec.get("width", 2048))
+                    open(cache, "wb").write(data)
+                    json.dump(photo, open(cache + ".json", "w", encoding="utf-8"))
+                uris.append("data:image/jpeg;base64," + base64.b64encode(data).decode())
+                refs.append(photo)
+        options = dict(spec.get("image_options", {}), **view.get("options", {}))
+        options.pop("per_image", None)
+        task = call("POST", "image-to-image", dict(options, prompt=view["prompt"], reference_image_urls=uris))["result"]
+        print(f"view {view['name']}: image-to-image task {task}", flush=True)
+        done = wait("image-to-image", task)
+        path = os.path.join(folder, f"{view['name']}.png")
+        for k, url in enumerate(done["image_urls"]):
+            with open(path if k == 0 else os.path.join(folder, f"{view['name']}-alt{k}.png"), "wb") as f:
+                f.write(urllib.request.urlopen(url, timeout=120).read())
+        shutil.copyfile(path, os.path.join(record_dir, f"{view['name']}.png"))
+        record[view["name"]] = {"task": task, "prompt": view["prompt"], "refs": refs, "options": options,
+                                "consumed_credits": done.get("consumed_credits"), "sha256": sha256_of(path)}
+        json.dump(record, open(record_path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+        print(f"view {view['name']}: {path}, {done.get('consumed_credits')} credits", flush=True)
+    shutil.copytree(folder, os.path.join(KEEP, name), dirs_exist_ok=True)
+
+
 def images(args):
     model = entry(args.id)
-    if not model or (model.get("meshy") or {}).get("endpoint") != "restyle":
-        sys.exit(f"{args.id}: no model with a restyle meshy block in {MANIFEST}")
-    spec = model["meshy"]
+    spec = (model or {}).get("meshy") or {}
+    if spec.get("views"):
+        return drawn_views(args, spec)
+    if spec.get("endpoint") != "restyle":
+        sys.exit(f"{args.id}: no model with a restyle meshy block or drawn views in {MANIFEST}")
     photos, uris = [], []
     for title in spec["images"]:
         data, record = commons(title, spec.get("width", 2048))
@@ -379,6 +464,7 @@ def main():
     p.set_defaults(func=generate)
     p = sub.add_parser("images")
     p.add_argument("id")
+    p.add_argument("--view", action="append", help="draw only this view (repeat for more); all of them when none is named")
     p.set_defaults(func=images)
     p = sub.add_parser("share")
     p.add_argument("ids", nargs="*", metavar="ID", help="the models to share; every pinned one when none is named")
