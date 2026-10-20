@@ -135,6 +135,24 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   *Done 2026-10-20 16:39 UTC, `cb71430`.* The Listen button shows once the recording is there, reads Stop while it
   plays, and falls silent when the panel closes or play starts. Checked muted with and without the recording.
 
+- [ ] **E10. Framing** (the laptop session's review, 20 October). Most leaves put the subject on the bottom edge
+  under two-thirds empty sky (`ch0-sunrise`, `ch0-behind`, `ch0-textbooks`, `ch0-claim`, `ch0-promise`). Frame each
+  leaf as a photographer would: the subject on the lower third or centred, the horizon about a third down, sky
+  only where it says something (dawn, a storm). Mostly pitch and yaw in `leaves.json`; check each at 1440 by 900
+  and 390 by 844 and look at the screenshots side by side before and after.
+- [ ] **E11. Sharp at rest: a patch per leaf.** A 4096 by 2048 panorama gives about 11 px a degree, and a desktop
+  view at 40° wants about 30, so tight leaves look soft. Use the walkthrough's detail patches: for every leaf,
+  `scripts/exhibit_queue.py` also queues a rectilinear patch at the leaf's own yaw, pitch and a field 1.3 times
+  the leaf's (2560 px wide, the leaf's era and moment, 96 samples), and the player lays it into the panorama so the
+  leaf is sharp at rest and still draggable, the panorama taking over past the patch's edge. The patch must
+  register exactly with its panorama (same camera position and sun). Write the queue; do not render.
+- [ ] **E12. The rooftop of Nazlet el-Samman** (decided by the laptop session: the words stay, and the cold open
+  stands where they say). Add a station `nazlet-roof` to `render/stations.json`: on the flat roof of a real
+  building in Nazlet el-Samman east of the Sphinx, chosen from `data/footprints/city.*` (its footprint and
+  measured height, eye 1.7 m above the roof), with a clear line to the Sphinx's face and the pyramids behind;
+  `today`, `equinox-dawn`. Say in `stations.json` which building and its height's source. Make `ch0-dawn` stand
+  there and fly (E4c) to the temple view for the next leaves; queue its panorama, patch and flight.
+
 ## Decisions
 
 1. **The exhibit reads `../walk/` for stations, overlays and panoramas** rather than copying them, so the 4096 by
