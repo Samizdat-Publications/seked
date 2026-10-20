@@ -1,0 +1,40 @@
+{
+  "kingfront": {
+    "task": "01a15764-8d06-73fd-920f-d691e5d742f4",
+    "prompt": "Edit this photograph of the Great Sphinx of Giza, changing only its head and shoulders: restore it as it was on the day it was carved, about 2500 BCE: the nose and the lips whole, the cobra (uraeus) rearing on the brow, the striped royal headcloth (nemes) crisp, its lappets falling to the shoulders, every surface freshly dressed in pale limestone with no weathering, no missing parts and no repairs. No beard: it was added centuries later. Keep the camera and the head's shape, size and proportions exactly as they are in the photograph. A plain clear sky behind; no pyramids, no people.",
+    "refs": [
+      {
+        "file": "File:Giza Plateau - Great Sphinx - front view.JPG",
+        "page": "https://commons.wikimedia.org/wiki/File:Giza_Plateau_-_Great_Sphinx_-_front_view.JPG",
+        "license": "CC BY-SA 4.0"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "722084aee6a3c4bc38829fe3c4fbd16a5ba6927aeb306e341ae624bf9d900e86"
+  },
+  "kingside": {
+    "task": "01a15765-35f1-768d-b894-39cf48c07a72",
+    "prompt": "Edit the first image, a photograph of the Great Sphinx's head in profile, changing only the head: make it the same restored head as in the second image, seen from the side. restore it as it was on the day it was carved, about 2500 BCE: the nose and the lips whole, the cobra (uraeus) rearing on the brow, the striped royal headcloth (nemes) crisp, its lappets falling to the shoulders, every surface freshly dressed in pale limestone with no weathering, no missing parts and no repairs. No beard: it was added centuries later. Keep the camera and the head's shape, size and proportions exactly as they are in the photograph. A plain clear sky behind; no pyramids, no people.",
+    "refs": [
+      {
+        "file": "File:Profile Sphinx.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Profile_Sphinx.jpg",
+        "license": "CC BY-SA 4.0"
+      },
+      {
+        "view": "kingfront",
+        "sha256": "722084aee6a3c4bc38829fe3c4fbd16a5ba6927aeb306e341ae624bf9d900e86"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "e91895b11386d0fecd8278307cf8544fb63ecbeca4e528103af110e58d3fcd2f"
+  }
+}
