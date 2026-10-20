@@ -213,10 +213,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   panoramas, four new patches and, once the stations are published, three flights. Looked at at both sizes,
   stand-ins and sky. `pnpm test` (exhibit) 82 passed; typecheck clean; render tests the same 2
   missing-build-output errors.
-- [ ] **E13b. Leo's figure.** The beat draws Leo's figure lines, captioned "a modern figure". Import one: a
+- [x] **E13b. Leo's figure.** The beat draws Leo's figure lines, captioned "a modern figure". Import one: a
   script that fetches a modern sky culture's figure (Stellarium's `modern` sky culture gives each figure as pairs
   of Hipparcos numbers) into `data/stars/` with its source, checksum and licence in `data/sources.json`, as
   `pnpm run stars` does for HYG, and draw Leo's lines in `drawSky` from it, never typed (decision 29).
+  *Done 2026-10-20 22:24 UTC, `83b993b`.* `scripts/figures.ts` (`pnpm run figures`) imports all 88 figures of
+  Stellarium's modern sky culture into `data/stars/figures.json`, each star as its HYG id, refusing a download whose
+  sha256 is not the one `data/sources.json` records (`stellarium-modern`, CC BY-SA 4.0, credited on the page as
+  HYG is). The sky draws Leo's lines on after its stars, labelled "Leo, a modern figure". Leo stands 25 to 41
+  degrees up at the picture's moment, so `ch2-leo` and `ch2-image` now look up to it (yaw 106, pitch 20, field 66)
+  with the sun and the bearings still in frame. Looked at at both sizes. `pnpm test` 1175 passed.
 - [ ] **E14. An object in the hand.** A small realtime three.js view, lazy-loaded only on a leaf whose `interact`
   is `object:<id>`: the object lit simply on a dark ground, turned by dragging, with a reset. The first object is
   the ghosted head: `sphinx-built`'s king's head solid, and the master lion's head (its First Time finish, with
