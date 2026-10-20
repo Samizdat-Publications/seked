@@ -87,6 +87,8 @@ async function start(): Promise<void> {
     figure.hidden = !id;
   };
   panel.onOpen = () => { if (player.playing) player.pause(); };
+  // for capture and test scripts, as the story page had
+  (window as unknown as { seked: unknown }).seked = { player, stage };
   $('controls').hidden = false;
   player.go(leafFromSearch(location.search, LEAVES));
 }

@@ -1,10 +1,12 @@
 /**
- * Narrated play: each leaf is put on the stage, speaks its words (the browser's own voice until the recorded one
- * exists, its word-boundary events the timing), shows them as the caption, holds, and moves on. Any drag or key
+ * Narrated play: each leaf is put on the stage, speaks its words (its span of the chapter's recording, with each
+ * word's recorded time; the browser's own voice only for words not in the recording), shows them as the caption,
+ * holds, and moves on. Any drag or key
  * on the view pauses play and hands the visitor the view; play resumes from that leaf.
  */
 import { isFigure } from './figures';
 import { type Leaf, cueIndex, drawCue } from './leaves';
+import { type ChapterRecording, type Span, leafSpans, recordingUrl } from './narration';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
 import { DEG } from './projection';
@@ -44,6 +46,10 @@ export class Player {
   private pendingFigure: string | null = null;
 
   private token = 0;
+  /** The recorded voice's element (public for capture and test scripts, through window.seked). */
+  readonly audio = new Audio();
+  /** Each chapter's recording, loaded once: its audio's address and each leaf's span in it (null without one). */
+  private recordings = new Map<number, Promise<{ url: string; spans: Map<string, Span> } | null>>();
   /** The word index that starts the leaf's overlay, in play. */
   private cueAt = -1;
   private timers: number[] = [];
@@ -108,7 +114,9 @@ export class Player {
     else if (from && L.arrive === 'flight' && from === this.leaves[i - 1] && this.playing) this.fly(from, L, token, begin);
     else { this.stage.show(this.shot(L)); begin(); }
     this.offerCompare();
+    void this.recording(L.chapter);
     const next = this.leaves[i + 1];
+    if (next) void this.recording(next.chapter);
     if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p);
   }
 
@@ -200,7 +208,62 @@ export class Player {
 
   private landing: (() => void) | null = null;
 
+  /** A chapter's recording (narration/chN.json and its mp3), with each of its leaves' spans; null without one. */
+  private recording(chapter: number): Promise<{ url: string; spans: Map<string, Span> } | null> {
+    let r = this.recordings.get(chapter);
+    if (!r) {
+      r = (async () => {
+        try {
+          const res = await fetch(new URL(recordingUrl(chapter), location.href));
+          if (!res.ok || !(res.headers.get('content-type') ?? '').includes('json')) return null;
+          const rec = ((await res.json()) as ChapterRecording).files.narration;
+          if (!rec) return null;
+          const mine = this.leaves.filter((L) => L.chapter === chapter);
+          const spans = new Map<string, Span>();
+          leafSpans(rec, mine.map((L) => L.say)).forEach((s, k) => { if (s) spans.set(mine[k]!.id, s); });
+          // the whole file, played from memory: a blob can always be sought, whatever the server does with ranges
+          const audio = await fetch(new URL(recordingUrl(chapter, rec.file), location.href));
+          if (!audio.ok) return null;
+          return { url: URL.createObjectURL(await audio.blob()), spans };
+        } catch {
+          return null;
+        }
+      })();
+      this.recordings.set(chapter, r);
+    }
+    return r;
+  }
+
+  /**
+   * Play a leaf's span of its chapter's recording, the words cued from the audio's own clock; `fallback` if the
+   * audio will not play. Stops at the span's end and calls `end`.
+   */
+  private playSpan(token: number, url: string, span: Span, end: () => void, fallback: () => void): void {
+    const a = this.audio;
+    this.words = span.words;
+    let k = 0, failed = false;
+    const fail = () => { if (failed || token !== this.token) return; failed = true; a.pause(); fallback(); };
+    const tick = () => {
+      if (token !== this.token || failed) return;
+      const t = a.currentTime - span.start;
+      while (k < span.words.length && span.words[k]!.at <= t) this.word(k++);
+      if (a.currentTime >= span.end || a.ended) { a.pause(); end(); return; }
+      requestAnimationFrame(tick);
+    };
+    const go = () => {
+      if (token !== this.token) return;
+      a.currentTime = span.start;
+      a.play().then(tick, fail);
+    };
+    a.onerror = fail;
+    if (a.src !== url) { a.src = url; a.preload = 'auto'; }
+    if (a.readyState >= 1) go(); else a.addEventListener('loadedmetadata', go, { once: true });
+    // audio that stalls still lets play go on
+    this.later((span.end - span.start + 6) * 1000, () => { if (token === this.token && !failed) { a.pause(); end(); } });
+  }
+
   private cancel(): void {
+    this.audio.pause();
     const land = this.landing;
     this.landing = null;
     this.token++;
@@ -237,6 +300,19 @@ export class Player {
         else this.pause();
       });
     };
+    void this.recording(L.chapter).then((r) => {
+      if (token !== this.token) return;
+      const span = r?.spans.get(L.id);
+      if (r && span) this.playSpan(token, r.url, span, end, () => { console.info(`${L.id}: the recording would not play, so the browser's voice says it`); this.speakAloud(token, L, end); });
+      else {
+        if (r) console.info(`${L.id}: its words are not in chapter ${L.chapter}'s recording, so the browser's voice says them`);
+        this.speakAloud(token, L, end);
+      }
+    });
+  }
+
+  /** The browser's own voice, its word boundaries the timing; an estimate when there is no voice or it stalls. */
+  private speakAloud(token: number, L: Leaf, end: () => void): void {
     // the estimate, used as it stands when there is no voice, and as a watchdog when the voice goes quiet
     const estimate = wordTimes(L.say);
     const last = estimate[estimate.length - 1];

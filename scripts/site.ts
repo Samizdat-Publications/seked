@@ -51,6 +51,10 @@ if (existsSync(join(exhibit, 'index.html'))) {
   // its flights are rendered on the laptop (render/films-exhibit.json); a leaf without one cuts
   const flights = join(apps, 'exhibit', 'flights');
   if (existsSync(flights)) cpSync(flights, join(site, 'exhibit', 'flights'), { recursive: true });
+  // the recorded narration (scripts/narrate_script.py); without it the browser's own voice reads the leaves
+  const narration = join(REPO_ROOT, 'assets', 'narration');
+  if (existsSync(narration)) cpSync(narration, join(site, 'exhibit', 'narration'), { recursive: true });
+  else skipped.push('the recorded narration (assets/narration)');
 } else skipped.push('the exhibit (pnpm --filter @seked/exhibit build)');
 
 
