@@ -129,9 +129,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   the First Time at `sphinx` and flies to the face on "the rock agrees with them"; `ch0-ditch` faces the flank.
   A test now keeps wipes between eras taken from one camera (the built era at `sphinx` is not). What still needs
   a render or a decision is below.
-- [ ] **E9. The spoken reply, heard.** `assets/narration/chN-reply.mp3` holds each chapter's spoken reply; the
+- [x] **E9. The spoken reply, heard.** `assets/narration/chN-reply.mp3` holds each chapter's spoken reply; the
   reply panel shows its words but cannot play it. A quiet listen button beside the spoken line, playing the file
   while play is paused.
+  *Done 2026-10-20 16:39 UTC, `cb71430`.* The Listen button shows once the recording is there, reads Stop while it
+  plays, and falls silent when the panel closes or play starts. Checked muted with and without the recording.
 
 ## Decisions
 
