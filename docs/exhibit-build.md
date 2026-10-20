@@ -135,11 +135,22 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   *Done 2026-10-20 16:39 UTC, `cb71430`.* The Listen button shows once the recording is there, reads Stop while it
   plays, and falls silent when the panel closes or play starts. Checked muted with and without the recording.
 
-- [ ] **E10. Framing** (the laptop session's review, 20 October). Most leaves put the subject on the bottom edge
+- [x] **E10. Framing** (the laptop session's review, 20 October). Most leaves put the subject on the bottom edge
   under two-thirds empty sky (`ch0-sunrise`, `ch0-behind`, `ch0-textbooks`, `ch0-claim`, `ch0-promise`). Frame each
   leaf as a photographer would: the subject on the lower third or centred, the horizon about a third down, sky
   only where it says something (dawn, a storm). Mostly pitch and yaw in `leaves.json`; check each at 1440 by 900
   and 390 by 844 and look at the screenshots side by side before and after.
+  *Done 2026-10-20 18:30 UTC, `6b6ebb5`.* Two causes, two fixes. On a wide screen the leaves were simply aimed too
+  high: the cold open now looks 4 to 8 degrees lower (the Sphinx and the pyramids in the middle, the horizon near
+  40 per cent), `ch0-behind` turns to 298 so Khufu is in frame, the face leaves drop to pitch 18, the ditch walls
+  lose 4 to 7 degrees of sky, `ch1-head` is centred on the head. On a phone the widened vertical field split
+  evenly above and below and sank every subject under the sky whatever the pitch, so `frameAim` (decision 21)
+  keeps the point a shot puts 40 per cent down at 40 per cent on any screen. All 22 leaves looked at before and
+  after at both sizes as contact sheets (`build/exhibit-shots/e10/`, `build/exhibit-shots/frame.py`). Left alone:
+  `ch0-ditch` (already a good picture; the walls are not in the walkthrough's render from the paws), the floor
+  and seismic leaves, and the claim-era leaves at the flank, which must keep `ch1-depth`'s view for the wipe and
+  whose panoramas are being re-rendered. `render/films-exhibit.json` regenerated (the flights end on the leaves'
+  views). `pnpm test` 1161 passed; render tests the same 2 missing-build-output errors as E1.
 - [ ] **E11. Sharp at rest: a patch per leaf.** A 4096 by 2048 panorama gives about 11 px a degree, and a desktop
   view at 40° wants about 30, so tight leaves look soft. Use the walkthrough's detail patches: for every leaf,
   `scripts/exhibit_queue.py` also queues a rectilinear patch at the leaf's own yaw, pitch and a field 1.3 times
@@ -219,6 +230,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 
 20. **E2c waits for its sources; E8 goes ahead.** Drawing the seismic lines or the slab now would mean typing
     figures the database does not hold.
+
+21. **A leaf is framed for a wide screen, and a phone keeps its subject where the wide frame put it**, 40 per cent
+    of the way down (`FRAME_PIVOT` in `projection.ts`), the extra field of a tall screen going mostly onto the
+    ground under the caption. One set of numbers per leaf rather than a phone override each: a phone framing per
+    leaf would double the authoring and the review. Reversible: `frameAim` returns the leaf's pitch when
+    `FRAME_PIVOT` is 0.5. A flight's last frame (16:9) still matches only on a wide screen, as before.
 
 
 ## For Stewart
