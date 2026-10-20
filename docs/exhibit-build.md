@@ -120,8 +120,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   span from memory (a blob seeks whatever the server does with ranges), cueing lines and figures from the audio
   clock; the browser's voice is the fallback, said in the console. Served at `/narration/` in dev, copied by
   `pnpm site`. Checked muted against the recordings.
-- [ ] **E8. Look at it end to end** at both sizes, as a visitor with no background would, and fix what reads
+- [x] **E8. Look at it end to end** at both sizes, as a visitor with no background would, and fix what reads
   badly. Write what still needs a render or a decision under "For Stewart" and "For the laptop".
+  *Done 2026-10-20 16:38 UTC, `17eecf1`.* Played all 22 leaves unattended at 1440 by 900 and 390 by 844, muted,
+  with the recordings: 3 min 12 s each, no errors, no fallback to the browser's voice, the ditch plan on its
+  word. Fixed: on a phone "Behind it stand the pyramids" showed none (Khafre hidden behind the head at
+  `sphinx-face`, Khufu out of frame), so the cold open now keeps the pyramids, the textbook date and the wipe to
+  the First Time at `sphinx` and flies to the face on "the rock agrees with them"; `ch0-ditch` faces the flank.
+  A test now keeps wipes between eras taken from one camera (the built era at `sphinx` is not). What still needs
+  a render or a decision is below.
+- [ ] **E9. The spoken reply, heard.** `assets/narration/chN-reply.mp3` holds each chapter's spoken reply; the
+  reply panel shows its words but cannot play it. A quiet listen button beside the spoken line, playing the file
+  while play is paused.
 
 ## Decisions
 
@@ -193,28 +203,40 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 
 ## For Stewart
 
+- **The prototype is ready to judge in the browser**, on the walkthrough's panoramas until tonight's renders land:
+  `pnpm --filter @seked/exhibit dev`, then open the address it prints. Play starts it; any drag pauses; the
+  tab at the right edge is the reply.
+- The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`, above the Sphinx temple. A
+  rooftop station east of the temple (and the rise over the roofs the script's beat describes) would make it
+  true; until then, should the words change to fit the picture? (Decision 5; changing them means re-recording
+  chapter 0.)
+- The cold open no longer shows Giza as built: at `sphinx` the built panorama is taken from another camera, so it
+  cannot be wiped to. The textbook date is spoken over today's view. If the built Sphinx matters there, the
+  built era at `sphinx` would need a render from today's camera.
 - E2c needs scans of the seismic figures in Dobecki and Schoch 1992 (*Geoarchaeology* 7) and of Reader's Fig. 5,
   to read with `scripts/plate.py` into `assets/plates/`. With them the builder enters the weathering depths and
   the lines' positions (`verified: false`) and draws chapter 1's floor.
-
-- The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`, above the Sphinx temple. A
-  rooftop station east of the temple (and the rise over the roofs the script's beat describes) would make it
-  true; until then, should the words change to fit the picture? (Decision 5.)
+- On a phone a flight's film is cropped to fill the tall screen while the panorama widens its field, so the
+  handover is not seamless there. A phone cut of each flight (or a cut instead of a flight on phones) would
+  fix it; say which.
 
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
 
-- Five panoramas at `equinox-dawn` for the prototype (decision 4): `sphinx` today, `sphinx-face` today,
-  `sphinx-flank` today, long rains and First Time, each to `apps/walk/pano/<station>-<era>-equinox-dawn.jpg`.
-  E6 writes the queue; until then this line is the request. Worth a look whether the flank's floor is too dark
-  at that hour; if so, say, and the chapter 1 leaves can move to `morning-east` with the flight in becoming a cut.
-  The queue is now written (E6): `blender -b --factory-startup -P render/build.py -- --queue
-  render/queues/exhibit-panos.json`, then `python render/publish.py`.
-- Commit `assets/narration/` (Git LFS) to the branch, or merge it in: the player reads it at `narration/`, and
-  without it falls back to the browser's voice.
-- Two flights, `render/films-exhibit.json`. Preview each first (`--films render/films-exhibit.json --film ID
-  --preview 0,45,89`), then render and encode into `apps/exhibit/flights/ID.mp4` with `render/film.py encode ...
-  --fps 30` (the command is in `scripts/exhibit_queue.py`'s docstring). **`ch0-ditch--ch1-carved` climbs only
-  about 10 m and passes close to the Sphinx's south shoulder: check the preview for a clip.** If it clips, say so
-  and the builder steers it.
+- **Six panoramas at `equinox-dawn`** (decision 4), queued in `render/queues/exhibit-panos.json` by
+  `scripts/exhibit_queue.py`: `sphinx` today and First Time, `sphinx-face` today, `sphinx-flank` today, long
+  rains and First Time. `blender -b --factory-startup -P render/build.py -- --queue
+  render/queues/exhibit-panos.json`, then `python render/publish.py`, which writes
+  `apps/walk/pano/<station>-<era>-equinox-dawn.jpg`. They should follow tonight's claim-era re-renders (the
+  long rains and the First Time without pyramids), which the walkthrough's own claim-era panoramas still lack.
+  Worth a look whether the flank's floor is too dark at that hour; if so, say, and chapter 1 can move to
+  `morning-east` with its flight in becoming a cut.
+- **Two flights**, `render/films-exhibit.json`: `ch0-claim--ch0-schoch` (the First Time, from above the temple
+  down to the paws) and `ch0-ditch--ch1-carved` (today, the paws to the flank). Preview each first (`--films
+  render/films-exhibit.json --film ID --preview 0,45,89`), then render and encode into
+  `apps/exhibit/flights/ID.mp4` with `render/film.py encode ... --fps 30` (the command is in
+  `scripts/exhibit_queue.py`'s docstring). **`ch0-ditch--ch1-carved` climbs only about 10 m and passes close to
+  the Sphinx's south shoulder: check its preview for a clip.** If it clips, say so and the builder steers it.
+- Commit `assets/narration/` (Git LFS) to this branch, or merge it in: the player reads it at `narration/`, and
+  without it falls back to the browser's voice. (Tested here against the main checkout's copy.)
