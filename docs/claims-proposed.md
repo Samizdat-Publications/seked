@@ -18,10 +18,11 @@ lion's could have held. The comparison is that number against the head the monum
 shape of the `sphinx-king-head` stand-in, whose head and nemes lie wholly inside the weathered master
 lion's head (`fit` in `build/models/sphinx-master-built/era.json`). Two results, both recorded:
 
-| Fit | Of the lion head's height | King's head | Crown under the lion's | Fore (+) or aft (−) |
-|---|---|---|---|---|
-| Centred, standing where the lion's head stood | 0.393 | 3.17 m | 0.67 m | 0 |
-| Searched fore and aft, ±0.25 of the upper head's length (±2.45 m) | 0.61 | 4.93 m | 2.02 m | −1.47 m |
+| Fit | Of the lion head's height | King's head (test part) | Chin to crown | Crown under the lion's | Fore (+) or aft (−) |
+|---|---|---|---|---|---|
+| Centred, standing where the lion's head stood | 0.393 | 3.17 m | 3.39 m | 0.67 m | 0 |
+| Searched fore and aft, ±0.25 of the upper head's length (±2.45 m) | 0.61 | 4.93 m | 5.27 m | 2.02 m | −1.47 m |
+| *The monument* (`sphinx.head.height`) | | | *5.73 ± 0.09 m* | | |
 
 The lion head is 8.08 m. The searched fit holds a much larger head only by setting it 1.5 m back into
 the mane and 2 m lower, where the lion's head is broadest. The carving in the renders uses the centred
@@ -39,13 +40,20 @@ fit (decision 54), because carved at 0.61 the bust is short and the head is not 
   proportions; and whether the head may move fore and aft (the two rows above).
 
 **What it has.** `sphinx.length`, `.height` and `.width` (`arce-sphinx-1991`, unverified) scale the
-master.
+master. The target is now in `data/` too: `sphinx.head.height`, **5.731 ± 0.093 m** from the chin's
+underside to the top of the head, scaled off ARCE drawing d-ss-047, Kapp's photogrammetric south
+elevation, against its own elevation axis (`arce-sphinx-south-elevation-oc`, scaled from plate, never
+verified).
 
 **What stops it.**
 
-1. *The target is not in `data/`.* `sphinx.head.height` has to be scaled off an ARCE elevation of the
-   statue (Open Context holds the ARCE Sphinx Project's drawings, as it holds d-gen-008), read two ways:
-   `method: "scaled from plate"`, the plate and its scale bar named, a sigma, never verified.
+1. ~~*The two heights are not yet the same measure.*~~ Done: the fit reports the placed head chin to crown
+   (`render/giza/profile.py`), the measure the plate gives. **The centred head is 0.59 of the monument's,
+   the searched 0.92**: even set back and down, the largest king's head the master's lion head can hold is
+   0.46 m short of the head the Sphinx has, five times the plate's sigma. Read plainly, on these two
+   stand-ins the monument's head is not too small to have been cut from the lion's; it is too large. That
+   is a statement about the master (Meshy drew its lion head "about half as large again" as the present
+   head, by our prompt), not about the claim, and the receipt has to say so.
 2. *The fit is not a measurement.* It is read off two stand-ins, and the stand-in rule says nothing about
    a stand-in's form is entered as a measurement. The recommended way in is the star catalogue's: a file
    written by a script and never typed, `data/derived/sphinx-fit.json`, written by `sphinx_eras.py`
@@ -148,6 +156,8 @@ the claims package before the file is written; if either is not supported, that 
 - H1's way in: a script-written `data/derived/` file under a `model.` prefix, or keep the head fit as a
   receipt computed outside the engine and shown with the stand-in caveat.
 - H1's verdict: a ratio with no "holds", or a tolerance (and whose).
-- Which fit H1 reports: the centred (0.39, the head where the lion's stood) or the searched (0.61, the
-  largest anywhere along the head). The searched is the honest answer to "how large could it be"; it
-  also weakens the steelman, since it leaves room for a head larger than the one carved.
+- Which fit H1 reports: the centred (0.39 of the lion head, the head where the lion's stood) or the searched
+  (0.61, the largest anywhere along the head). The searched is the honest answer to "how large could it be".
+- What H1 says when the fit comes out *smaller* than the monument's head (5.27 m against 5.73 m): the master's
+  lion head is then too small to have held the head the Sphinx has, so the test speaks to the stand-in, not to
+  the claim. A larger master lion head is a Meshy spend and a look choice; the claim gives no size for it.
