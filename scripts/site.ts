@@ -1,6 +1,6 @@
 /**
  * Assemble the static site: the landing page (apps/home) at the root, the
- * path-traced walkthrough, films and sky alignments beside it, the realtime
+ * path-traced walkthrough, the exhibit, films and sky alignments beside it, the realtime
  * viewer under /viewer/, the milestone snapshots under /progress/ with a
  * generated index, and the generated documents under /docs/, as Markdown and
  * as pages. Run after `pnpm build:web`.
@@ -44,6 +44,10 @@ for (const page of ['walk', 'films', 'alignments']) {
 }
 if (!existsSync(join(apps, 'walk', 'pano'))) skipped.push('walkthrough panoramas (python render/publish.py)');
 if (!existsSync(join(apps, 'films', 'films'))) skipped.push('films (render/film.py)');
+// The exhibit (pnpm --filter @seked/exhibit build) reads the walkthrough's panoramas at ../walk/, so it carries none.
+const exhibit = join(apps, 'exhibit', 'dist');
+if (existsSync(join(exhibit, 'index.html'))) cpSync(exhibit, join(site, 'exhibit'), { recursive: true });
+else skipped.push('the exhibit (pnpm --filter @seked/exhibit build)');
 
 
 /** The page shell every generated page shares: the landing page's dark look, kept small. */
@@ -140,5 +144,5 @@ for (const [f, title] of pages) {
 }
 
 writeFileSync(join(site, '.nojekyll'), '');
-console.log(`site assembled at ${site}: landing page, walkthrough, films, alignments, viewer, ${rows.length} progress snapshots, docs`);
+console.log(`site assembled at ${site}: landing page, walkthrough, exhibit, films, alignments, viewer, ${rows.length} progress snapshots, docs`);
 if (skipped.length) console.log(`left out, not built in this checkout: ${skipped.join('; ')}`);

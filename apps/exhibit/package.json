@@ -1,0 +1,22 @@
+{
+  "name": "@seked/exhibit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The narrated exhibit: path-traced panoramas of the plateau, leaf by leaf, with the case and the reply",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@seked/claims": "workspace:*",
+    "@seked/data": "workspace:*",
+    "@seked/geometry": "workspace:*",
+    "@seked/sky": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "8.3.0"
+  }
+}

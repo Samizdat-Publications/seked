@@ -57,6 +57,25 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(@types/node@26.5.1)(vite@8.3.0(@types/node@26.5.1)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.1))
 
+  apps/exhibit:
+    dependencies:
+      '@seked/claims':
+        specifier: workspace:*
+        version: link:../../packages/claims
+      '@seked/data':
+        specifier: workspace:*
+        version: link:../../packages/data
+      '@seked/geometry':
+        specifier: workspace:*
+        version: link:../../packages/geometry
+      '@seked/sky':
+        specifier: workspace:*
+        version: link:../../packages/sky
+    devDependencies:
+      vite:
+        specifier: 8.3.0
+        version: 8.3.0(@types/node@26.5.1)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.1)
+
   apps/story:
     dependencies:
       '@seked/claims':
