@@ -374,8 +374,21 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `valley-sockets`. It also types the count: `range(7)` in `plan()`, where Hölscher's seven is only in the pitch
   record's note; a `khafre_valley_temple.hall.socket.count` record (`hoelscher-1912`, unchecked) should replace it.
   Best done by the laptop session, which can render the hall after the move and see that nothing shifted.
-- [ ] **E18. Chapter 4, "The First Time": its leaves.** Cut chapter 4 likewise, on panoramas that exist, with
+- [x] **E18. Chapter 4, "The First Time": its leaves.** Cut chapter 4 likewise, on panoramas that exist, with
   `until` stand-ins where a station is new; receipts as the script assigns them; the queue run.
+  *Done 2026-10-20 23:41 UTC, `8495e43`.* 11 leaves, every word in order and inside `ch4.json`. The texts (Turin,
+  Manetho, sep tepi) under the night of 10,500 BCE at `orion` in the First Time, Orion live at C5's epoch and framed
+  low (pitch 14), where the belt stood that year (decision 49); "as they picture it" above the Sphinx Temple in the
+  First Time; "nothing stands yet" at the `panorama` stand, grass and palms; the stela beside the lion at the flank;
+  Unas's Pyramid Texts under the built night at C2's epoch (decision 48), turning into chapter 5. No receipts (the
+  script's are "dates only", and its records are proposals: E18b). No new panorama or flight; one patch. Looked at at
+  both sizes; played through muted, 111 s, no errors. Until `orion` First Time at `night-dark` is rendered, the
+  walkthrough's stand-in shows the pyramids in the First Time (see For the laptop).
+- [ ] **E18b. Chapter 4's figures.** The radiocarbon bands the script proposes as records (Aha from `dee-2013`;
+  Djoser, Khufu, Khafre and Unas from `bronk-ramsey-2010` Table 1; 95 per cent ranges, so a start and an end each,
+  quantity `date`; `verified: false`), drawn as a timeline on "first king" or in the reply. The king-list totals
+  need `data/texts/kinglists.json`, a new kind of file the script says needs a sentence in `CLAUDE.md`: ask Stewart
+  before creating it (For Stewart).
 
 ## Decisions
 
@@ -542,6 +555,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 47. **A date is a record like any other: quantity `date`, unit `year`, astronomical numbering** (1 BCE is 0), the
     convention the claims' epochs and `@seked/sky` already use, so a date can one day enter an expression without a
     conversion. The page writes it back as BCE. Reversible: two enum entries in `packages/data/src/core.ts`.
+48. **Unas's sky is Giza's at C2's epoch, 2450 BCE**, not Saqqara's at 2400 as the beat asks: a sky's year is named
+    by a claim (decision 28) and C2's is the nearest, and Saqqara is not in `data/sites.json`. Fifteen kilometres and
+    fifty years move Orion by a fraction of a degree. The panel names the year it draws.
+49. **The First Time's night shows Orion low, as it was**, not "high in the south" as the beat says: at C5's epoch the
+    belt crosses the meridian about 9 degrees up, its lowest, which is chapter 5's point. The leaves look lower to
+    keep it in frame.
 
 
 ## For Stewart
@@ -568,9 +587,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   laptop every leaf wants about twice the pixels; that means patches at 5120 by 2880 for all 22 leaves, or
   panoramas at 8192 by 4096. Both are only laptop time (a patch costs about what a panorama does). Worth it?
 
+- Chapter 4's king-list totals (Turin's 13,420 and 23,200, Manetho's) want a new data file, `data/texts/kinglists.json`,
+  as the script proposes, with a sentence in `CLAUDE.md` for the new unit (years in a text, not a measurement). The
+  builder has not created it: is that the shape you want?
+
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **`orion` First Time at `night-dark`** (already queued for E15) now also carries chapter 4's opening: until it is
+  rendered, the walkthrough's `orion-first-time.jpg` stands in, and it shows the three pyramids in the First Time
+  ("nothing stands yet" two leaves later). Worth rendering before Stewart sees chapter 4.
 
 - **Chapter 5's starless nights** (E15), in `render/queues/exhibit-panos.json`: `orion` built and First Time at the
   new moment `night-dark` (the night of 2450 BCE with no star dome and no Milky Way, `render/giza/scene.py`), then
