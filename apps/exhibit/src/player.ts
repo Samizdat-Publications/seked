@@ -119,7 +119,8 @@ export class Player {
     void this.recording(L.chapter);
     const next = this.leaves[i + 1];
     if (next) void this.recording(next.chapter);
-    if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p);
+    const ahead = next && { yaw: next.view.yaw * DEG, pitch: next.view.pitch * DEG, fov: next.view.fov * DEG };
+    if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p, ahead);
   }
 
   play(): void {

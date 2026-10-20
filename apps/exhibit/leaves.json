@@ -4,13 +4,13 @@
   {
    "id": "ch0-dawn",
    "chapter": 0,
-   "station": "sphinx",
+   "station": "nazlet-roof",
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 277,
-    "pitch": 4,
-    "fov": 62
+    "yaw": 284,
+    "pitch": 1,
+    "fov": 40
    },
    "arrive": "cut",
    "say": "This is Giza at dawn, from the rooftops of Nazlet el-Samman.",
@@ -18,7 +18,15 @@
    "hold": 1.5,
    "interact": "look",
    "receipts": [],
-   "reply": "ch0"
+   "reply": "ch0",
+   "until": {
+    "station": "sphinx",
+    "view": {
+     "yaw": 277,
+     "pitch": -4,
+     "fov": 62
+    }
+   }
   },
   {
    "id": "ch0-sunrise",
@@ -28,10 +36,10 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 277,
-    "pitch": 5,
+    "pitch": 0,
     "fov": 34
    },
-   "arrive": "turn",
+   "arrive": "flight",
    "say": "The Sphinx faces the sunrise, as it has for at least four and a half thousand years.",
    "draw": [],
    "hold": 1,
@@ -46,8 +54,8 @@
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 292,
-    "pitch": 7,
+    "yaw": 298,
+    "pitch": 0,
     "fov": 64
    },
    "arrive": "turn",
@@ -66,7 +74,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 280,
-    "pitch": 6,
+    "pitch": -2,
     "fov": 44
    },
    "arrive": "turn",
@@ -85,7 +93,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 280,
-    "pitch": 6,
+    "pitch": -2,
     "fov": 44
    },
    "arrive": "wipe",
@@ -104,7 +112,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 272,
-    "pitch": 24,
+    "pitch": 18,
     "fov": 66
    },
    "arrive": "flight",
@@ -123,7 +131,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 272,
-    "pitch": 24,
+    "pitch": 18,
     "fov": 66
    },
    "arrive": "wipe",
@@ -142,7 +150,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 272,
-    "pitch": 24,
+    "pitch": 18,
     "fov": 66
    },
    "arrive": "turn",
@@ -180,7 +188,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 285,
-    "pitch": 10,
+    "pitch": 6,
     "fov": 70
    },
    "arrive": "flight",
@@ -201,7 +209,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 235,
-    "pitch": 12,
+    "pitch": 7,
     "fov": 62
    },
    "arrive": "turn",
@@ -239,7 +247,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 235,
-    "pitch": 18,
+    "pitch": 11,
     "fov": 56
    },
    "arrive": "turn",
@@ -258,7 +266,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 250,
-    "pitch": 10,
+    "pitch": 7,
     "fov": 70
    },
    "arrive": "turn",
@@ -277,7 +285,7 @@
    "moment": "equinox-dawn",
    "view": {
     "yaw": 285,
-    "pitch": 10,
+    "pitch": 6,
     "fov": 70
    },
    "arrive": "turn",
@@ -409,8 +417,8 @@
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 24,
-    "pitch": 40,
+    "yaw": 18,
+    "pitch": 34,
     "fov": 70
    },
    "arrive": "turn",

@@ -44,6 +44,35 @@ class Panoramas(unittest.TestCase):
                                 "out": "build/render/pano/sphinx-flank-lion-equinox-dawn.png", "for": "ch1-c"}])
 
 
+class Patches(unittest.TestCase):
+    render = q.load("render/stations.json")
+
+    def test_a_patch_is_queued_only_where_it_is_markedly_sharper_than_the_panorama(self):
+        self.assertGreater(q.patch_gain(34), 2.5)
+        self.assertLess(q.patch_gain(70), q.PATCH_MIN_GAIN)
+        # the gain is the patch's pixels a degree at its middle over the panorama's
+        f = math.radians(44 * q.PATCH_MARGIN)
+        self.assertAlmostEqual(q.patch_gain(44) * q.PANO_PX_PER_DEG, (q.PATCH_H / 2) / math.tan(f / 2) * math.pi / 180)
+
+    def test_one_patch_per_view_through_the_leafs_lens_from_its_panoramas_camera(self):
+        tight = {"yaw": 277, "pitch": 0, "fov": 34}
+        leaves = [dict(LEAF, id="ch0-a", station="sphinx", moment="equinox-dawn", view=tight),
+                  dict(LEAF, id="ch0-b", station="sphinx", moment="equinox-dawn", view=dict(tight), arrive="turn"),
+                  dict(LEAF, id="ch0-c", station="sphinx", moment="equinox-dawn", view={"yaw": 300, "pitch": 0, "fov": 70}, arrive="turn"),
+                  dict(LEAF, id="ch0-d", station="sphinx", era="first-time", moment="equinox-dawn", view=dict(tight), arrive="wipe")]
+        out = q.patch_queue(leaves, self.render, lambda p: p == "pano/patch/sphinx-first-time-equinox-dawn-ch0-d.jpg")
+        self.assertEqual(len(out), 1)
+        r = out[0]
+        self.assertEqual((r["state"], r["station"], r["moment"], r["for"]), ("today", "sphinx", "equinox-dawn", "ch0-a"))
+        self.assertEqual(r["out"], "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-a.png")
+        p = r["patch"]
+        self.assertEqual((p["yaw"], p["pitch"], p["fov"]), (277, 0, round(34 * q.PATCH_MARGIN, 2)))
+        self.assertEqual(p["pano"], q.leaf_panorama(leaves[0], self.render))
+        w, h = (int(n) for n in r["size"].split("x"))
+        self.assertAlmostEqual(p["aspect"], w / h)
+        self.assertEqual(w, 2560)
+
+
 class Flights(unittest.TestCase):
     a, b = [439.0, -445.0, -29.5], [365.5, -433.0, -38.4]
 
@@ -86,8 +115,18 @@ class Flights(unittest.TestCase):
     def test_only_leaves_arriving_by_flight_get_one(self):
         leaves = q.load("apps/exhibit/leaves.json")["leaves"]
         walk = q.load("apps/walk/stations.json")
-        made = q.films(leaves, q.walk_cameras(walk))
-        self.assertEqual([f["id"].split("--")[1] for f in made], [L["id"] for L in leaves[1:] if L["arrive"] == "flight"])
+        cams = q.walk_cameras(walk)
+        made = q.films(leaves, cams)
+        every = [f"{a['id']}--{b['id']}" for a, b in q.flight_pairs(leaves)]
+        self.assertEqual([b["id"] for a, b in q.flight_pairs(leaves)], [L["id"] for L in leaves[1:] if L["arrive"] == "flight"])
+        self.assertEqual(sorted([f["id"] for f in made] + q.waiting_flights(leaves, cams)), sorted(every))
+
+    def test_a_flight_from_a_station_not_yet_published_waits(self):
+        prev = dict(LEAF, id="ch0-x", station="nowhere-yet", moment="equinox-dawn")
+        leaf = dict(LEAF, id="ch0-y", station="sphinx", moment="equinox-dawn", arrive="flight")
+        cams = q.walk_cameras({"stations": [{"id": "sphinx", "camera": [439.0, -445.0, -29.5]}]})
+        self.assertEqual(q.films([prev, leaf], cams), [])
+        self.assertEqual(q.waiting_flights([prev, leaf], cams), ["ch0-x--ch0-y"])
 
 
 if __name__ == "__main__":

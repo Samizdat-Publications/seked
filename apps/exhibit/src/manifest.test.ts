@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cameraFor, pickEra, readManifest, readOverlays } from './manifest';
+import { cameraFor, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
 import { DEG } from './projection';
 
 const walk = join(__dirname, '..', '..', 'walk');
@@ -67,5 +67,30 @@ describe('readOverlays', () => {
     const r = readOverlays({ x: { lines: [{ from: { dir: [90, 0, 10] }, to: [0, 0, 0], style: 'edge' }, { from: [0, 0], to: [0, 0, 0] }], labels: [{ at: [0, 0, 0] }] } });
     expect(r.x?.lines).toEqual([{ from: { dir: [90, 0, 10] }, to: [0, 0, 0], style: 'edge' }]);
     expect(r.x?.labels).toEqual([]);
+  });
+});
+
+describe('patchesByPanorama', () => {
+  const m = readManifest({
+    states: [{ id: 'today' }, { id: 'built' }],
+    stations: [{ id: 'sphinx', panoramas: { today: 'pano/sphinx-today.jpg', built: 'pano/sphinx-built.jpg' },
+      patches: { built: [{ src: 'pano/patch/sphinx-built-akhet.jpg', yaw: 280, pitch: 5, fov: 30, aspect: 2 }] } }],
+  });
+  const exhibit = { patches: [
+    { src: 'pano/patch/sphinx-today-equinox-dawn-ch0-sunrise.jpg', pano: 'pano/sphinx-today-equinox-dawn.jpg', yaw: 277, pitch: 0, fov: 44.2, aspect: 1.777778 },
+    { src: 'pano/patch/no-pano.jpg', yaw: 1, pitch: 2, fov: 3 },
+    'nonsense',
+  ] };
+
+  it("files the walkthrough's patches under their era's panorama and the exhibit's under the one they name", () => {
+    const by = patchesByPanorama(m, exhibit);
+    expect(Object.keys(by).sort()).toEqual(['pano/sphinx-built.jpg', 'pano/sphinx-today-equinox-dawn.jpg']);
+    expect(by['pano/sphinx-built.jpg']![0]!.src).toBe('pano/patch/sphinx-built-akhet.jpg');
+    const p = by['pano/sphinx-today-equinox-dawn.jpg']![0]!;
+    expect([p.yaw / DEG, p.pitch / DEG, p.fov / DEG, p.aspect]).toEqual([277, 0, expect.closeTo(44.2, 9), 1.777778]);
+  });
+  it('never lays a patch over another picture of the station: the dawn panorama gets none of the walkthrough patches', () => {
+    expect(patchesByPanorama(m)['pano/sphinx-today.jpg']).toBeUndefined();
+    expect(patchesByPanorama(m, null)).toEqual(patchesByPanorama(m));
   });
 });

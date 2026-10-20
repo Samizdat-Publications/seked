@@ -3,11 +3,11 @@
  * (drag and pinch to look and zoom, the wheel and + and - to zoom, the arrow keys to turn). It shows one
  * station in one era at a time; the player (E3) tells it which.
  */
-import { cameraFor, type Manifest, type Overlay, type OverlayPoint, type Station } from './manifest';
+import { cameraFor, type Manifest, type Overlay, type OverlayPoint, type Station, patchesByPanorama } from './manifest';
 import { drawOverlay } from './overlay';
 import { type Aim, WIPE_SECONDS, turnAt, turnSeconds, wipeAt } from './play';
 import {
-  DEG, MAX_FOV, MIN_FOV, PITCH_MAX, clamp, fitFov, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
+  DEG, MAX_FOV, MIN_FOV, PITCH_MAX, type Patch, clamp, fitFov, frameAim, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
   type Vec3,
 } from './projection';
 import { TextureCache } from './textures';
@@ -44,6 +44,8 @@ export class Stage {
   private fitted = 58 * DEG;
   private overlay: Overlay | null = null;
   private candidates: string[] = [];
+  /** Detail patches by the absolute address of the panorama each registers with. */
+  private patches: Record<string, Patch[]> = {};
   private tween: { from: Aim; to: Aim; t0: number; ms: number; done: () => void } | null = null;
   /** The other era on screen during a wipe or a comparison: to the right of the edge, the stage's era to the left. */
   private other: Other | null = null;
@@ -79,6 +81,7 @@ export class Stage {
       this.request();
     });
     this.font = getComputedStyle(document.body).getPropertyValue('--body') || 'sans-serif';
+    this.setPatches(patchesByPanorama(manifest));
     this.bindInput();
     window.addEventListener('resize', () => this.resize());
     this.resize();
@@ -90,6 +93,12 @@ export class Stage {
   setFov(f: number): void { this.view.zoom = clamp(f, MIN_FOV, MAX_FOV) / this.fitted; }
 
   url(path: string): string { return new URL(path, this.base).href; }
+
+  /** The detail patches, by the panorama each registers with (paths relative to the base). */
+  setPatches(byPanorama: Record<string, Patch[]>): void {
+    this.patches = Object.fromEntries(Object.entries(byPanorama).map(([p, list]) => [this.url(p), list]));
+    this.request();
+  }
 
   /** Put a station on the stage in an era, looking where the shot says (or where the station opens). */
   show(shot: Shot): void {
@@ -106,8 +115,9 @@ export class Stage {
     this.station = st;
     this.era = shot.era;
     this.view.yaw = wrapAngle(shot.yaw ?? st.view.yaw);
-    this.view.pitch = clamp(shot.pitch ?? st.view.pitch, -PITCH_MAX, PITCH_MAX);
-    this.fitted = fitFov(shot.fov ?? st.view.fov, this.W, this.H);
+    const framed = frameAim(shot.pitch ?? st.view.pitch, shot.fov ?? st.view.fov, this.W, this.H);
+    this.view.pitch = framed.pitch;
+    this.fitted = framed.fov;
     this.view.zoom = 1;
     this.view.vy = this.view.vp = 0;
     this.setOverlay(shot);
@@ -137,7 +147,7 @@ export class Stage {
   turn(shot: Shot, done: () => void = () => {}): number {
     if (!this.station) { this.show(shot); done(); return 0; }
     const st = shot.station;
-    const to: Aim = { yaw: wrapAngle(shot.yaw ?? st.view.yaw), pitch: clamp(shot.pitch ?? st.view.pitch, -PITCH_MAX, PITCH_MAX), fov: fitFov(shot.fov ?? st.view.fov, this.W, this.H) };
+    const to: Aim = { yaw: wrapAngle(shot.yaw ?? st.view.yaw), ...frameAim(shot.pitch ?? st.view.pitch, shot.fov ?? st.view.fov, this.W, this.H) };
     const from: Aim = { yaw: this.view.yaw, pitch: this.view.pitch, fov: this.fov() };
     this.setOverlay(shot);
     this.view.vy = this.view.vp = 0;
@@ -245,10 +255,19 @@ export class Stage {
     this.onHandsOn();
   }
 
-  /** Fetch a panorama ahead of time: the given path, else the station's own for the era. */
-  prefetch(st: Station, era: string, path?: string): void {
+  /**
+   * Fetch a panorama ahead of time: the given path, else the station's own for the era; and, given the view it
+   * will be seen at, the detail patch that view will want.
+   */
+  prefetch(st: Station, era: string, path?: string, view?: { yaw: number; pitch: number; fov: number }): void {
     const p = path ?? st.panoramas[era];
-    if (p && this.cache) this.cache.prefetch(this.url(p));
+    if (!p || !this.cache) return;
+    const url = this.url(p);
+    this.cache.prefetch(url);
+    if (!view) return;
+    const aim = frameAim(view.pitch, view.fov, this.W, this.H);
+    const q = wantsPatch(aim.fov, this.canvas.height) ? nearestPatch(this.patches[url], { yaw: view.yaw, pitch: aim.pitch }) : null;
+    if (q) this.cache.prefetch(this.url(q.src), false);
   }
 
   /** Whether the panorama on stage is on screen (always, for the flat picture, which reports its own status). */
@@ -289,7 +308,7 @@ export class Stage {
     const pano = this.cache!.get(url);
     let patch: Layer['patch'] = null;
     if (pano && wantsPatch(this.fov(), this.canvas.height)) {
-      const q = nearestPatch(st.patches[era], this.view);
+      const q = nearestPatch(this.patches[url], this.view);
       if (q) {
         const purl = this.url(q.src);
         const tex = this.cache!.get(purl, false);

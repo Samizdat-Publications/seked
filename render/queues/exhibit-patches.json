@@ -1,0 +1,158 @@
+{
+ "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a detail patch for each leaf the panorama cannot hold sharp, from the leaf's panorama's camera in its era and moment. Render with render/build.py --queue after exhibit-panos.json, then python render/publish.py.",
+ "renders": [
+  {
+   "state": "today",
+   "station": "nazlet-roof",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 284,
+    "pitch": 1,
+    "fov": 52.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch0-dawn",
+    "pano": "pano/nazlet-roof-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/nazlet-roof-today-equinox-dawn-ch0-dawn.png",
+   "for": "ch0-dawn"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 277,
+    "pitch": 0,
+    "fov": 44.2,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch0-sunrise",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-sunrise.png",
+   "for": "ch0-sunrise"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 57.2,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch0-textbooks",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-textbooks.png",
+   "for": "ch0-textbooks"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 57.2,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch0-claim",
+    "pano": "pano/sphinx-first-time-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-first-time-equinox-dawn-ch0-claim.png",
+   "for": "ch0-claim"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 235,
+    "pitch": 7,
+    "fov": 80.6,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch1-rain",
+    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-flank-today-equinox-dawn-ch1-rain.png",
+   "for": "ch1-rain"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch1-rolls",
+    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-flank-today-equinox-dawn-ch1-rolls.png",
+   "for": "ch1-rolls"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 235,
+    "pitch": 11,
+    "fov": 72.8,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch1-fissures",
+    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-flank-today-equinox-dawn-ch1-fissures.png",
+   "for": "ch1-fissures"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch1-exposure",
+    "pano": "pano/sphinx-flank-lion-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-flank-lion-equinox-dawn-ch1-exposure.png",
+   "for": "ch1-exposure"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch1-ice-age",
+    "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-flank-first-time-equinox-dawn-ch1-ice-age.png",
+   "for": "ch1-ice-age"
+  }
+ ]
+}

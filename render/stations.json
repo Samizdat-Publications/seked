@@ -122,6 +122,25 @@
       "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it. As built the eye stands 8 m higher and 41 m further east, over the Sphinx Temple's granite wall and clear of its roof, which at -29.5 filled two thirds of the view (critic round 16; a look choice)."
     },
     {
+      "id": "nazlet-roof",
+      "name": "A rooftop in Nazlet el-Samman",
+      "where": "On a flat roof in the village east of the Sphinx, looking west up its axis to the pyramids",
+      "x": 690.9,
+      "y": -418.3,
+      "eye": 1.7,
+      "roof": true,
+      "moment": "equinox-dawn",
+      "view": {
+        "yaw": 280,
+        "pitch": 3,
+        "fov": 40
+      },
+      "neighbours": [
+        "sphinx"
+      ],
+      "note": "For the exhibit's cold open ('from the rooftops of Nazlet el-Samman'). The building is Open Buildings record 48821 in data/footprints/city.bin (a 422 m2 box centred here, 354 m east of the Sphinx and 15 m north of its axis); the eye stands 1.7 m over its roof, whose height the renderer reads from that record (city.roof_at), so it is typed nowhere. That height is measured: the median of nine points of the Open Buildings 2.5D Temporal height raster (2023 imagery, stated mean absolute error 1.5 m). Chosen as the roof nearest the axis, among the 241 measured buildings of at least 120 m2 and 6 m tall between 470 and 1,100 m east and 250 and 650 m south of Khufu, from which a line to the Sphinx's head and chin and to Khufu's and Khafre's apexes clears the scene's terrain and every drawn building (the monuments between were not checked; the laptop's preview is the check). Only today has the city, so only today stands on the roof."
+    },
+    {
       "id": "east",
       "name": "East of Khufu",
       "where": "On the Great Pyramid's axis, beyond its mortuary temple and the queens",

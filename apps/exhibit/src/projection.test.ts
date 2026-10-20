@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DEG, MAX_FOV, MIN_FOV, MIN_HFOV, type Patch, type Vec3, directionToUv, fitFov, fromCamera, lodFor, nearestPatch,
+  DEG, FRAME_PIVOT, MAX_FOV, MIN_FOV, MIN_HFOV, type Patch, type Vec3, directionToUv, fitFov, frameAim, fromCamera, lodFor, nearestPatch,
   patchCoords, project, rayDirection, wantsPatch, wrapAngle,
 } from './projection';
 
@@ -85,6 +85,28 @@ describe('fitFov', () => {
     expect(h).toBeCloseTo(Math.min(MIN_HFOV, 2 * Math.atan(Math.tan(MAX_FOV / 2) * (390 / 844))));
     expect(v).toBeLessThanOrEqual(MAX_FOV);
     expect(v).toBeGreaterThanOrEqual(MIN_FOV);
+  });
+});
+
+describe('frameAim', () => {
+  const camera: Vec3 = [20, -330, -3.81];
+  it('leaves a wide screen as the shot frames it', () => {
+    const a = frameAim(10 * DEG, 62 * DEG, 1440, 900);
+    expect(a.pitch).toBeCloseTo(10 * DEG);
+    expect(a.fov).toBeCloseTo(62 * DEG);
+  });
+  it('keeps the subject FRAME_PIVOT of the way down on a phone, not sunk under the sky', () => {
+    const view = { yaw: 280 * DEG, pitch: -2 * DEG }, vfov = 44 * DEG;
+    // the point the wide frame puts FRAME_PIVOT of the way down
+    const wide = rayDirection(0, 1 - 2 * FRAME_PIVOT, view, vfov, 1440 / 900);
+    const subject: Vec3 = [camera[0] + 100 * wide[0], camera[1] + 100 * wide[1], camera[2] + 100 * wide[2]];
+    const a = frameAim(view.pitch, vfov, 390, 844);
+    expect(a.fov).toBeCloseTo(fitFov(vfov, 390, 844));
+    const s = project(subject, camera, { yaw: view.yaw, pitch: a.pitch }, a.fov, 390, 844) as [number, number];
+    expect(s[0]).toBeCloseTo(195, 6);
+    expect(s[1] / 844).toBeCloseTo(FRAME_PIVOT, 6);
+    // the extra field goes mostly below: the phone looks down from the shot's pitch
+    expect(a.pitch).toBeLessThan(view.pitch);
   });
 });
 

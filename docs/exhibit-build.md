@@ -135,6 +135,57 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   *Done 2026-10-20 16:39 UTC, `cb71430`.* The Listen button shows once the recording is there, reads Stop while it
   plays, and falls silent when the panel closes or play starts. Checked muted with and without the recording.
 
+- [x] **E10. Framing** (the laptop session's review, 20 October). Most leaves put the subject on the bottom edge
+  under two-thirds empty sky (`ch0-sunrise`, `ch0-behind`, `ch0-textbooks`, `ch0-claim`, `ch0-promise`). Frame each
+  leaf as a photographer would: the subject on the lower third or centred, the horizon about a third down, sky
+  only where it says something (dawn, a storm). Mostly pitch and yaw in `leaves.json`; check each at 1440 by 900
+  and 390 by 844 and look at the screenshots side by side before and after.
+  *Done 2026-10-20 18:30 UTC, `6b6ebb5`.* Two causes, two fixes. On a wide screen the leaves were simply aimed too
+  high: the cold open now looks 4 to 8 degrees lower (the Sphinx and the pyramids in the middle, the horizon near
+  40 per cent), `ch0-behind` turns to 298 so Khufu is in frame, the face leaves drop to pitch 18, the ditch walls
+  lose 4 to 7 degrees of sky, `ch1-head` is centred on the head. On a phone the widened vertical field split
+  evenly above and below and sank every subject under the sky whatever the pitch, so `frameAim` (decision 21)
+  keeps the point a shot puts 40 per cent down at 40 per cent on any screen. All 22 leaves looked at before and
+  after at both sizes as contact sheets (`build/exhibit-shots/e10/`, `build/exhibit-shots/frame.py`). Left alone:
+  `ch0-ditch` (already a good picture; the walls are not in the walkthrough's render from the paws), the floor
+  and seismic leaves, and the claim-era leaves at the flank, which must keep `ch1-depth`'s view for the wipe and
+  whose panoramas are being re-rendered. `render/films-exhibit.json` regenerated (the flights end on the leaves'
+  views). `pnpm test` 1161 passed; render tests the same 2 missing-build-output errors as E1.
+- [ ] **E11. Sharp at rest: a patch per leaf.** A 4096 by 2048 panorama gives about 11 px a degree, and a desktop
+  view at 40° wants about 30, so tight leaves look soft. Use the walkthrough's detail patches: for every leaf,
+  `scripts/exhibit_queue.py` also queues a rectilinear patch at the leaf's own yaw, pitch and a field 1.3 times
+  the leaf's (2560 px wide, the leaf's era and moment, 96 samples), and the player lays it into the panorama so the
+  leaf is sharp at rest and still draggable, the panorama taking over past the patch's edge. The patch must
+  register exactly with its panorama (same camera position and sun). Write the queue; do not render.
+  *Done 2026-10-20 18:39 UTC, `2b6debe`.* `scripts/exhibit_queue.py` writes `render/queues/exhibit-patches.json`:
+  9 patches for the 22 leaves (one per shared view, and only where a patch holds at least 1.25 times the
+  panorama's pixels, decision 22), out to `build/render/patch-exhibit/`, each sidecar naming the panorama it
+  registers with. `render/publish.py` publishes them into `pano/patch/` and lists them in
+  `apps/walk/exhibit-patches.json`, leaving out a patch older than its panorama. The player files every patch
+  under the panorama it was rendered with (decision 23), which also stops the walkthrough's midsummer patch for
+  `sphinx` today being laid over the exhibit's dawn panorama, and fetches the next leaf's patch ahead. Checked in
+  Chromium with a tinted patch reprojected from `sphinx-today-equinox-dawn.jpg`: it registers with no doubled
+  edges, covers the leaf at rest, and the panorama takes over at its feathered edge when dragged; a phone's wide
+  field never wants a patch, so none is fetched there. 5 new Python tests, 2 TS. The six dawn panoramas had
+  landed meanwhile, so the E10 framing was looked at again on them, all 22 leaves at both sizes: it holds.
+- [ ] **E12. The rooftop of Nazlet el-Samman** (decided by the laptop session: the words stay, and the cold open
+  stands where they say). Add a station `nazlet-roof` to `render/stations.json`: on the flat roof of a real
+  building in Nazlet el-Samman east of the Sphinx, chosen from `data/footprints/city.*` (its footprint and
+  measured height, eye 1.7 m above the roof), with a clear line to the Sphinx's face and the pyramids behind;
+  `today`, `equinox-dawn`. Say in `stations.json` which building and its height's source. Make `ch0-dawn` stand
+  there and fly (E4c) to the temple view for the next leaves; queue its panorama, patch and flight.
+  *Done 2026-10-20 18:45 UTC, `3f282b3`.* `nazlet-roof` stands on Open Buildings record 48821 (a 422 m2 building
+  354 m east of the Sphinx, 15 m north of its axis, its height measured by the 2.5D raster), chosen as the roof
+  nearest the axis from which lines to the Sphinx's head and chin and to both apexes clear the scene's terrain
+  and every drawn building (a throwaway search, `build/exhibit-shots/e12/roofs.py`; the monuments between were
+  not checked). The height is typed nowhere: `"roof": true` makes the renderer stand the eye 1.7 m over the drawn
+  box there (`city.roof_at`, decision 25), and `render/tests/test_city_roof.py` keeps every roof station on a
+  drawn, measured building. `ch0-dawn` stands there (yaw 284, pitch 1, field 40: the Sphinx, Khafre and Khufu in
+  one frame, a framing worked out from bearings, to look at once rendered) and `ch0-sunrise` flies from it.
+  Until the roof is published, `until` puts `ch0-dawn` at the temple view as before (decision 24): looked at at
+  both sizes, and Next turns to `ch0-sunrise` in the same panorama. The queue asks for the roof's panorama and
+  patch; the flight `ch0-dawn--ch0-sunrise` waits for the publish (see For the laptop).
+
 ## Decisions
 
 1. **The exhibit reads `../walk/` for stations, overlays and panoramas** rather than copying them, so the 4096 by
@@ -202,16 +253,36 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 20. **E2c waits for its sources; E8 goes ahead.** Drawing the seismic lines or the slab now would mean typing
     figures the database does not hold.
 
+21. **A leaf is framed for a wide screen, and a phone keeps its subject where the wide frame put it**, 40 per cent
+    of the way down (`FRAME_PIVOT` in `projection.ts`), the extra field of a tall screen going mostly onto the
+    ground under the caption. One set of numbers per leaf rather than a phone override each: a phone framing per
+    leaf would double the authoring and the review. Reversible: `frameAim` returns the leaf's pitch when
+    `FRAME_PIVOT` is 0.5. A flight's last frame (16:9) still matches only on a wide screen, as before.
+
+22. **A leaf gets a patch only where it is at least 1.25 times as sharp as the panorama.** At 2560 by 1440 and
+    1.3 times the leaf's field, a 70-degree leaf's patch holds 12.4 pixels a degree against the panorama's 11.4:
+    nine per cent, invisible, for a render each. The panorama already matches a 1440 by 900 screen at that field;
+    a retina screen would want patches twice the size (5120 by 2880), which is the laptop's time to spend or not
+    (see For Stewart). `PATCH_MIN_GAIN` in `scripts/exhibit_queue.py`.
+23. **A patch belongs to a panorama file, not to a station and era.** The exhibit shows one station in one era at
+    more than one moment, and a patch rendered in one light laid over a panorama in another would show as a
+    lighter or darker rectangle. Patches are now looked up by the address of the panorama on stage.
+24. **A leaf may name a stand-in (`until`) for while its station is unpublished**, rather than the player failing
+    or the leaf waiting in a branch. The stand-in is data in the leaf, the console says when it is used, and it
+    stops being used the moment publish adds the station, so the prototype works tonight and needs no edit
+    tomorrow. Take `until` out once the roof is rendered and liked.
+25. **A roof station names no height.** It says `"roof": true` at a point on the building, and the renderer reads
+    the height from `city.bin` with the rule `city.build` draws by, so the eye cannot drift from the roof if the
+    city is re-imported. Its note names the record and the height's source. Decision 5 is superseded.
+
 
 ## For Stewart
 
 - **The prototype is ready to judge in the browser**, on the walkthrough's panoramas until tonight's renders land:
   `pnpm --filter @seked/exhibit dev`, then open the address it prints. Play starts it; any drag pauses; the
   tab at the right edge is the reply.
-- The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`, above the Sphinx temple. A
-  rooftop station east of the temple (and the rise over the roofs the script's beat describes) would make it
-  true; until then, should the words change to fit the picture? (Decision 5; changing them means re-recording
-  chapter 0.)
+- ~~The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`.~~ Settled by the laptop
+  session (E12): the words stay and `ch0-dawn` stands on a roof there once its panorama is rendered.
 - The cold open no longer shows Giza as built: at `sphinx` the built panorama is taken from another camera, so it
   cannot be wiped to. The textbook date is spoken over today's view. If the built Sphinx matters there, the
   built era at `sphinx` would need a render from today's camera.
@@ -221,6 +292,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - On a phone a flight's film is cropped to fill the tall screen while the panorama widens its field, so the
   handover is not seamless there. A phone cut of each flight (or a cut instead of a flight on phones) would
   fix it; say which.
+- Sharp on a retina screen: the patches (E11) make the tight leaves sharp on an ordinary screen. On a retina
+  laptop every leaf wants about twice the pixels; that means patches at 5120 by 2880 for all 22 leaves, or
+  panoramas at 8192 by 4096. Both are only laptop time (a patch costs about what a panorama does). Worth it?
 
 ## For the laptop
 
@@ -234,6 +308,19 @@ Renders the laptop session should run, with the queue or command, as items need 
   long rains and the First Time without pyramids), which the walkthrough's own claim-era panoramas still lack.
   Worth a look whether the flank's floor is too dark at that hour; if so, say, and chapter 1 can move to
   `morning-east` with its flight in becoming a cut.
+  *On disk by 18:34 UTC.*
+- **The rooftop** (E12), first: `render/queues/exhibit-panos.json` now holds only `nazlet-roof` today at
+  equinox dawn. Render, `python render/publish.py`, and look: the Sphinx's face and the two pyramids should be
+  in view over the Sphinx temple, the valley temple and whatever stands in the village (the search checked the
+  terrain and the city's boxes, not the monuments or the modern stands). If something blocks it, say so and
+  the builder picks the next roof. Then `python scripts/exhibit_queue.py` again: it queues the flight
+  `ch0-dawn--ch0-sunrise`, which can only be written once publish has recorded the roof's camera. The roof's
+  patch is already in `exhibit-patches.json`; render it after the panorama.
+- **Nine detail patches** (E11), `render/queues/exhibit-patches.json`, after the panoramas they register with
+  (a patch older than its panorama is left out by publish): `blender -b --factory-startup -P render/build.py --
+  --queue render/queues/exhibit-patches.json`, then `python render/publish.py`, which writes
+  `apps/walk/pano/patch/*.jpg` and `apps/walk/exhibit-patches.json` (commit that file with `stations.json`). If a
+  claim-era panorama at the flank is rendered again tonight, render its patch after it.
 - **Two flights**, `render/films-exhibit.json`: `ch0-claim--ch0-schoch` (the First Time, from above the temple
   down to the paws) and `ch0-ditch--ch1-carved` (today, the paws to the flank). Preview each first (`--films
   render/films-exhibit.json --film ID --preview 0,45,89`), then render and encode into

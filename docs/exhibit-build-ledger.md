@@ -5,3 +5,4 @@ Written by `scripts/night.py` after each chunk of the overnight builder and comm
 | Chunk | Ended (UTC) | Turns | Cost | Tonight | How it ended |
 |---|---|---|---|---|---|
 | 1 | 2026-10-20 16:39 |  | $0.00 | $0.00 | failed (no answer); 34 commits |
+| 2 | 2026-10-20 18:46 | 135 | $6.15 | $14.15 | finished; 6 commits |
