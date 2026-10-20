@@ -73,20 +73,24 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   is a cut. Checked with a throwaway test film. *(b) done 16:10 UTC, `5cfa56d`:* `draw` entries are `name` or
   `name@word`; a cued line waits for its word in play (voice boundaries or the estimate) and draws on; paused it
   is simply there. Checked with a temporary cue on Khufu's overlay. No leaf draws yet (E2b).
-- [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
-  weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
-  the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
-  script's beats say), in `render/publish.py`'s manner or a small script beside it, and name them in the leaves'
-  `draw`. Numbers only from `data/`; anything scaled or guessed says so on screen.
 - [ ] **E5. The receipt and the reply.** A small tab at the edge of the screen on every leaf that has them: the
   claim's receipt computed live from the bundle (port `apps/story`'s receipts), and the archaeologists' reply
   from `docs/script.md`, in a quieter type. Closed by default.
-- [ ] **E6. The render queue from the leaves.** `scripts/exhibit_queue.py` writes, from `leaves.json`:
+- [x] **E6. The render queue from the leaves.** `scripts/exhibit_queue.py` writes, from `leaves.json`:
   `render/queues/exhibit-panos.json` (each leaf's station in its era and moment that `apps/walk/pano/` lacks) and
   `render/films-exhibit.json` (a flight for each leaf that arrives by `flight`: from the last leaf's station
   camera and view to this one's, the arriving leaf's era and moment, about 3 s at 30 fps, 1920 by 1080, 64
   samples, a smooth eased path that rises over obstacles). Teach `render/build.py --film` to read a films file
   other than `render/films.json` (`--films PATH`). Unit tests for the path maths; do not render.
+  *Done 2026-10-20 16:14 UTC, `cd13e18`.* `scripts/exhibit_queue.py` (stdlib) wrote 5 panoramas into
+  `render/queues/exhibit-panos.json` and 2 flights into `render/films-exhibit.json`; `render/build.py --films PATH`;
+  `render/publish.py` publishes `<station>-<era>-<moment>.png` for the exhibit outside the walkthrough's manifest.
+  7 tests in `render/tests/test_exhibit_queue.py` (naming in step with `leaves.ts`, lens, path, flights).
+- [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
+  weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
+  the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
+  script's beats say), in `render/publish.py`'s manner or a small script beside it, and name them in the leaves'
+  `draw`. Numbers only from `data/`; anything scaled or guessed says so on screen.
 - [ ] **E7. The narration script, not run.** `scripts/narrate.py`: for each leaf, ElevenLabs text to speech with
   timestamps (model and voice as arguments; the key from `ELEVENLABS_API_KEY`), writing
   `apps/exhibit/audio/<leaf>.mp3` and `<leaf>.words.json`, skipping a leaf whose text has not changed (hash). The
@@ -137,6 +141,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 13. **A cued line is drawn at once when play is paused**, and taken down to draw again with its word when play
     resumes, so a paused visitor never looks at a leaf missing the line its words promise.
 
+14. **E2b moved below E6.** The queue is what the laptop can render tonight; the flank's lines need records the
+    database lacks (the seismic lines, the weathering depths) and `render/giza/sphinx.py`'s ditch outside
+    Blender, a slower job.
+15. **A flight rises to clear what lies between, knowing nothing of it**: up steeply, across at a quarter of the
+    distance above the higher end (8 to 60 m), down steeply onto the leaf. The laptop previews before it renders
+    (below). A leaf could later carry waypoints if a path needs steering.
+
 
 ## For Stewart
 
@@ -152,3 +163,10 @@ Renders the laptop session should run, with the queue or command, as items need 
   `sphinx-flank` today, long rains and First Time, each to `apps/walk/pano/<station>-<era>-equinox-dawn.jpg`.
   E6 writes the queue; until then this line is the request. Worth a look whether the flank's floor is too dark
   at that hour; if so, say, and the chapter 1 leaves can move to `morning-east` with the flight in becoming a cut.
+  The queue is now written (E6): `blender -b --factory-startup -P render/build.py -- --queue
+  render/queues/exhibit-panos.json`, then `python render/publish.py`.
+- Two flights, `render/films-exhibit.json`. Preview each first (`--films render/films-exhibit.json --film ID
+  --preview 0,45,89`), then render and encode into `apps/exhibit/flights/ID.mp4` with `render/film.py encode ...
+  --fps 30` (the command is in `scripts/exhibit_queue.py`'s docstring). **`ch0-ditch--ch1-carved` climbs only
+  about 10 m and passes close to the Sphinx's south shoulder: check the preview for a clip.** If it clips, say so
+  and the builder steers it.
