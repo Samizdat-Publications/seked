@@ -837,6 +837,365 @@
     "C6"
    ],
    "reply": "ch2"
+  },
+  {
+   "id": "ch5-belt",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "cut",
+   "say": "In 1989 Robert Bauval argued that the three pyramids of Giza are laid out like the three stars of Orion's belt.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch5-diagonal",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 184,
+    "pitch": 18,
+    "fov": 56
+   },
+   "arrive": "turn",
+   "say": "Two are nearly equal and stand on a diagonal. The third is smaller and set off the line, as Mintaka, the faintest, is.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch5-sah",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 180,
+    "pitch": 44,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "To the Egyptians Orion was Sah, Osiris among the stars.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch5-allan",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 180,
+    "pitch": 44,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "A study published in 2026 tested the pyramids' triangle against almost seven hundred thousand triplets of bright stars. It ranks in the top quarter of one per cent.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4",
+    "C7"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch5-named",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 180,
+    "pitch": 44,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "Every closer match is a group nobody ever named; Orion's belt is the first that someone did.",
+   "draw": [],
+   "hold": 2,
+   "interact": "sky",
+   "receipts": [
+    "C4",
+    "C7"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
+  },
+  {
+   "id": "ch5-clock",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "Bauval and Hancock take the plan as a clock.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori",
+    "readout": "C4"
+   }
+  },
+  {
+   "id": "ch5-wobble",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "Over twenty-six thousand years the wobble of the Earth's axis raises and lowers the belt on the southern meridian.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori",
+    "readout": "C4"
+   }
+  },
+  {
+   "id": "ch5-drag",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "Drag the sky back.",
+   "draw": [],
+   "hold": 1,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori",
+    "readout": "C4"
+   }
+  },
+  {
+   "id": "ch5-sinks",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "The belt sinks until, about 10,500 BCE, it reaches the bottom of its swing.",
+   "draw": [],
+   "hold": 3,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C4",
+    "from": "C2",
+    "figure": "Ori",
+    "readout": "C4"
+   }
+  },
+  {
+   "id": "ch5-first-time",
+   "chapter": 5,
+   "station": "orion",
+   "era": "first-time",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "wipe",
+   "say": "That, they say, is the First Time, and the moment the plan records.",
+   "draw": [],
+   "hold": 2,
+   "interact": "sky",
+   "receipts": [
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C4",
+    "figure": "Ori",
+    "readout": "C4"
+   }
+  },
+  {
+   "id": "ch5-shaft",
+   "chapter": 5,
+   "station": "kings-chamber",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 185,
+    "pitch": -2,
+    "fov": 64
+   },
+   "arrive": "cut",
+   "say": "Inside the Great Pyramid, a shaft from the King's Chamber climbs south at 45 degrees.",
+   "draw": [
+    "kc-shaft@shaft"
+   ],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "C2",
+    "C3"
+   ],
+   "reply": "ch5"
+  },
+  {
+   "id": "ch5-alnitak",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 180,
+    "pitch": 40,
+    "fov": 50
+   },
+   "arrive": "cut",
+   "say": "In about 2450 BCE, Alnitak, the belt's easternmost star, crossed the meridian within a fifth of a degree of that line.",
+   "draw": [],
+   "hold": 2,
+   "interact": "sky",
+   "receipts": [
+    "C2",
+    "C3"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori",
+    "marks": "C2"
+   }
+  },
+  {
+   "id": "ch5-two-dates",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
+   },
+   "arrive": "turn",
+   "say": "On their reading the stone holds two dates: when it was built, and when its plan was drawn.",
+   "draw": [],
+   "hold": 2,
+   "interact": "sky",
+   "receipts": [
+    "C2",
+    "C4"
+   ],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori",
+    "marks": "C2"
+   }
+  },
+  {
+   "id": "ch5-numbers",
+   "chapter": 5,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 184,
+    "pitch": 8,
+    "fov": 50
+   },
+   "arrive": "turn",
+   "say": "They find numbers in it as well.",
+   "draw": [],
+   "hold": 2,
+   "interact": "sky",
+   "receipts": [],
+   "reply": "ch5",
+   "sky": {
+    "at": "C2",
+    "figure": "Ori"
+   }
   }
  ]
 }

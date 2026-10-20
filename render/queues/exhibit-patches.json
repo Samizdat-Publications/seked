@@ -68,6 +68,74 @@
    "samples": 96,
    "out": "build/render/patch-exhibit/sphinx-back-first-time-equinox-dawn-ch2-drift.png",
    "for": "ch2-drift"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "moment": "night-dark",
+   "patch": {
+    "yaw": 184,
+    "pitch": 18,
+    "fov": 72.8,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch5-diagonal",
+    "pano": "pano/orion-built-night-dark.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/orion-built-night-dark-ch5-diagonal.png",
+   "for": "ch5-diagonal"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "moment": "night-dark",
+   "patch": {
+    "yaw": 180,
+    "pitch": 44,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch5-sah",
+    "pano": "pano/orion-built-night-dark.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/orion-built-night-dark-ch5-sah.png",
+   "for": "ch5-sah"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "moment": "night-dark",
+   "patch": {
+    "yaw": 180,
+    "pitch": 40,
+    "fov": 65.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch5-alnitak",
+    "pano": "pano/orion-built-night-dark.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/orion-built-night-dark-ch5-alnitak.png",
+   "for": "ch5-alnitak"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "moment": "night-dark",
+   "patch": {
+    "yaw": 184,
+    "pitch": 8,
+    "fov": 65.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch5-numbers",
+    "pano": "pano/orion-built-night-dark.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/orion-built-night-dark-ch5-numbers.png",
+   "for": "ch5-numbers"
   }
  ]
 }

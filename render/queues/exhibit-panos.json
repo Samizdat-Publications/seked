@@ -42,6 +42,20 @@
    "moment": "equinox-dawn",
    "out": "build/render/pano/sphinx-back-first-time.png",
    "for": "ch2-drift"
+  },
+  {
+   "state": "built",
+   "station": "orion",
+   "moment": "night-dark",
+   "out": "build/render/pano/orion-built-night-dark.png",
+   "for": "ch5-belt"
+  },
+  {
+   "state": "first-time",
+   "station": "orion",
+   "moment": "night-dark",
+   "out": "build/render/pano/orion-first-time-night-dark.png",
+   "for": "ch5-first-time"
   }
  ]
 }

@@ -84,7 +84,10 @@ export interface SkyView {
   sun: { altDeg: number; azDeg: number } | null;
   stars: SkyStar[];
   bearings: { label: string; azDeg: number }[];
-  /** At a night, the meridian star: the southern meridian is drawn and the star named on it. */
+  /**
+   * At a night, the meridian star: the southern meridian is drawn and the star named on it, with its true altitude
+   * as the claims engine gives it (drawn where refraction lifts it, quoted as the receipts quote it).
+   */
   meridian: { name: string; altDeg: number } | null;
   /** Lines a claim sets on the meridian (C2's shafts): an altitude and the side of the sky. */
   marks: { label: string; altDeg: number; azDeg: number }[];
@@ -145,7 +148,7 @@ export function skyAt(data: SkyData, epoch: number, moment: Moment, pick: SkyPic
   });
   const env = { ...ground, ...skyEnv(data, epoch) };
   const bearings = pick.bearings ? (data.claims[pick.bearings]?.bearings ?? []).map((b) => ({ label: b.label, azDeg: evaluate(b.azimuth, env) })) : [];
-  const meridian = night ? { name: night.star, altDeg: refracted(env[`star.${night.id}.transit.altitude`] ?? NaN) } : null;
+  const meridian = night ? { name: night.star, altDeg: env[`star.${night.id}.transit.altitude`] ?? NaN } : null;
   const marks = pick.marks ? meridianMarks(data, pick.marks, env) : [];
   const fig = key ? data.figures[key] : undefined;
   const figure = key ? { key, name: fig?.name ?? key, lines: fig?.lines ?? null } : null;
@@ -264,14 +267,18 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     ctx.fill();
   }
   ctx.shadowBlur = 0;
-  ctx.font = `500 12px ${font}`;
+  const narrow = (ctx.canvas.clientWidth || Infinity) < 600;
+  ctx.font = `500 ${narrow ? 11 : 12}px ${font}`;
   ctx.textBaseline = 'middle';
   // a star's name gives way: one that would cover a label already set is left out
   const taken: [number, number, number, number][] = [];
-  const label = (text: string, p: [number, number], colour: string, dx = 9, dy = 0, yields = false) => {
+  const label = (text: string, p: [number, number], colour: string, dx = 9, dy = 0, yields = false, before = false) => {
     const w = ctx.measureText(text).width;
-    // a label that would run off the right edge stands on the other side of its point
-    const x = p[0] + dx + w + 8 > (ctx.canvas.clientWidth || Infinity) ? p[0] - Math.abs(dx) - w : p[0] + dx;
+    // a label that would run off its edge stands on the other side of its point; `before` sets it left of the point
+    const right = ctx.canvas.clientWidth || Infinity;
+    const after = p[0] + Math.abs(dx), ahead = p[0] - Math.abs(dx) - w;
+    const want = before ? (ahead < 4 ? after : ahead) : (after + w + 8 > right ? ahead : p[0] + dx);
+    const x = Math.max(4, Math.min(right - w - 8, want));
     const box: [number, number, number, number] = [x - 4, p[1] + dy - 9, w + 8, 18];
     if (yields && taken.some((b) => box[0] < b[0] + b[2] && b[0] < box[0] + box[2] && box[1] < b[1] + b[3] && b[1] < box[1] + box[3])) return;
     taken.push(box);
@@ -282,15 +289,18 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
   };
   if (k >= 1) {
     if (sky.meridian) {
-      const foot = at(0, 180);
-      if (foot) label('the meridian, due south', foot, 'rgba(210, 222, 255, 0.9)', 6, -14);
+      // named left of the line, at a height the belt passes in neither 2450 nor 10,450 BCE (a look choice)
+      const foot = at(30, 180);
+      if (foot) label('the meridian, due south', foot, 'rgba(210, 222, 255, 0.9)', 6, 0, false, true);
       const star = sky.stars.find((s) => s.name === sky.meridian!.name);
       const sp = star && at(star.altDeg, star.azDeg);
-      if (sp) label(`${star!.name} on the meridian, ${formatValue(sky.meridian.altDeg, 'deg')} up`, sp, GOLD, 12, 0);
+      // below the star, where a line across the meridian at its height does not run
+      if (sp) label(`${star!.name} on the meridian, ${formatValue(sky.meridian.altDeg, 'deg')} up`, sp, GOLD, 10, 18);
     }
+    // a claim's lines are named at their eastern (left) end, the meridian star to its right
     sky.marks.forEach((m) => {
-      const p = at(m.altDeg, m.azDeg + 6);
-      if (p) label(`${m.label}, ${formatValue(m.altDeg, 'deg')}`, p, 'rgba(255, 240, 215, 0.95)', 6, 0);
+      const p = at(m.altDeg, m.azDeg - 6);
+      if (p) label(`${m.label}, ${formatValue(m.altDeg, 'deg')}`, p, 'rgba(255, 240, 215, 0.95)', 6, 0, false, true);
     });
     for (const s of sky.stars) {
       if (!s.hi || !s.name || !named.has(s.name) || s.name === sky.meridian?.name) continue;

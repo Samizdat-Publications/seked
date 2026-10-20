@@ -90,7 +90,7 @@ describe('the sky at a night', () => {
       expect(Math.abs(((alnitak.azDeg - 180 + 540) % 360) - 180), String(epoch)).toBeLessThan(0.01);
       expect(alnitak.altDeg).toBeCloseTo(refracted(skyEnv(data, epoch)['star.alnitak.transit.altitude']!), 3);
       expect(sky.meridian?.name).toBe('Alnitak');
-      expect(sky.meridian?.altDeg).toBeCloseTo(alnitak.altDeg, 9);
+      expect(sky.meridian?.altDeg).toBe(skyEnv(data, epoch)['star.alnitak.transit.altitude']);
       expect(sky.sun).toBeNull();
       expect(alnitak.hi).toBe(true);
     }
