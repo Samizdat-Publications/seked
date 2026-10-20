@@ -19,7 +19,9 @@ DONE, when a chunk fails for want of credit, after two failed chunks in a row, a
 chunks in a row with no commit of the builder's own, or when build/night.stop exists. After
 each chunk it appends a row to the ledger beside the list (night-ledger-<date>.md) and commits
 and pushes that one file, so the spend is on the branch whatever happens to the container.
---start and --spent carry the count and the spend on after a restart.
+--start and --spent carry the count and the spend on after a restart. --minutes stops it
+starting chunks after that long, for a run as a session's background task: a cloud container
+is reclaimed when its session sits idle, which killed the first night's run at its first chunk.
 
 Standard library only.
 """
@@ -129,11 +131,16 @@ def main():
     parser.add_argument("--turns", type=int, default=400)
     parser.add_argument("--start", type=int, default=1)
     parser.add_argument("--spent", type=float, default=0.0)
+    parser.add_argument("--minutes", type=float, default=0.0, help="start no chunk after this long (0: no limit)")
     args = parser.parse_args()
     base = os.path.basename(args.list).replace("night-", "night-ledger-", 1)
     path = os.path.join(ROOT, os.path.dirname(args.list), base)
     spent, failed, idle, n = args.spent, 0, 0, args.start
+    began = time.time()
     while True:
+        if args.minutes and time.time() - began > args.minutes * 60:
+            print(f"{args.minutes:.0f} minutes up: no new chunk; carry on with --start {n} --spent {spent:.2f}")
+            break
         if os.path.exists(STOP):
             print(f"{STOP} exists: no new chunk")
             break
