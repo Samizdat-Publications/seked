@@ -82,7 +82,20 @@ The lion head ghosted around the king's head is a hero image in its own right.
   through `scripts/job.py`. Git is the hand-off; one session owns the repo at a time.
 - **Bulk research and drafting** run as headless `claude -p` jobs on the API key in
   `SEKED_ANTHROPIC_API_KEY` (the Max plan's monthly API credit, which interactive sessions
-  cannot spend). The first such run is a one-line test, checked in the Console's usage.
+  cannot spend). `python scripts/headless.py -p "..."` starts every such job the same way:
+  `claude --bare`, whose only Anthropic auth is that key (never OAuth or the keychain, so a
+  logged-in laptop cannot spend the plan by mistake), in an environment with the host
+  session's `CLAUDE_*` and `ANTHROPIC_*` stripped. A long one goes through `scripts/job.py`.
+- **The one-line test ran on 20 October, 01:54 to 01:57 UTC**, all on `claude-haiku-5-5`, under a
+  cent in all: a plain `claude -p` ($0.0022, most of it 17,273 tokens of Claude Code's own
+  prompt and tool list written to the cache), then the same call through `headless.py`
+  ($0.0003, and it reached for a tool), then with `--tools ""` ($0.00001, 83 tokens in,
+  "ready" out), then that once more detached through `job.py`. A bogus key in the same
+  setup is refused ("Invalid API key"), so the calls that succeeded went on this key and
+  nothing else. **For Stewart:** the Console's usage page should show these four Haiku
+  calls against the key; if it shows nothing, the credit is not where we think it is.
+  The lesson for bulk jobs: `--bare` cuts the fixed cost of a call from about 17,000
+  tokens to about 1,600 with tools and under 100 without them.
 - **Effort:** planning and the script at extra; building at high; max only for a named, narrow
   hard problem, and said so first.
 

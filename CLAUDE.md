@@ -41,6 +41,7 @@ python scripts/textures.py   # fetch the CC0 Poly Haven texture sets in blender/
 python scripts/plate.py render|grid|scale|measure|register   # read a drawing: native scan, pixel grid, scale bar, scaled figure with its sigma
 python scripts/meshy.py generate ID [--tag T]   # generate a stand-in in blender/models.json from CC0 photographs with Meshy (MESHY_API_KEY in ~/.seked/keys.env)
 python scripts/job.py claim|start|status        # own the repo, run a long job detached from the session, see who owns what (see "One session at a time")
+python scripts/headless.py -p "<prompt>" [claude flags]   # a headless `claude --bare` job on the API key only (SEKED_ANTHROPIC_API_KEY, or in ~/.seked/keys.env); bulk research and drafting
 ```
 
 ## Rules that keep the project honest
