@@ -63,6 +63,8 @@ export const STILLS: Still[] = [
     alt: 'The two temples at the Sphinx’s paws as built, from the air north-east', tags: ['reconstruction'] },
   { chapter: 3, anchor: 'Behind the granite is a core of local limestone', src: 'progress/0042-temple-core-built.png',
     alt: 'The Sphinx Temple’s wall as built, red granite over its limestone core', tags: ['reconstruction'] },
+  { chapter: 3, anchor: 'On camera in 1993', src: 'progress/0045-valley-hall-long-rains.png',
+    alt: 'The Valley Temple’s limestone core in the long rains, c. 7000 BCE, before any granite', tags: ['claim state'] },
   { chapter: 3, anchor: 'On this reading the granite is a refit', src: 'progress/0043-temple-core-long-rains.png',
     alt: 'The same wall in the long rains, c. 7000 BCE: the limestone core worn round, no granite yet', tags: ['claim state'] },
   { chapter: 3, anchor: 'Khafre’s statues, found inside it', src: 'progress/0044-valley-hall-built.png',
