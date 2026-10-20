@@ -928,7 +928,9 @@
    },
    "arrive": "turn",
    "say": "A study published in 2026 tested the pyramids' triangle against almost seven hundred thousand triplets of bright stars. It ranks in the top quarter of one per cent.",
-   "draw": [],
+   "draw": [
+    "allan-rank@ranks"
+   ],
    "hold": 1,
    "interact": "sky",
    "receipts": [
@@ -954,7 +956,9 @@
    },
    "arrive": "turn",
    "say": "Every closer match is a group nobody ever named; Orion's belt is the first that someone did.",
-   "draw": [],
+   "draw": [
+    "allan-rank"
+   ],
    "hold": 2,
    "interact": "sky",
    "receipts": [

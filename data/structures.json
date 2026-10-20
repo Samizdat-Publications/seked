@@ -144,6 +144,14 @@
     "note": "A place rather than a monument, and a modern town standing for the Pelusiac mouth at the Delta's eastern limit."
   },
   {
+    "id": "giza.pyramids",
+    "site": "giza",
+    "name": "The three pyramids as a group",
+    "evidence": "excavated",
+    "source": "petrie-1883",
+    "note": "G1, G2 and G3 taken together, for figures about their arrangement rather than any one pyramid: the statistics of the Orion correlation's triangle. Each pyramid keeps its own structure; this adds no monument."
+  },
+  {
     "id": "plateau",
     "site": "giza",
     "name": "The plateau's lesser monuments (Tier 3)",

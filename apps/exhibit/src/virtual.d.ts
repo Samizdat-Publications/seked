@@ -6,3 +6,7 @@ declare module 'virtual:sky' {
   const data: import('./sky').SkyData;
   export default data;
 }
+declare module 'virtual:allan-rank' {
+  const data: import('./figures').RankData;
+  export default data;
+}

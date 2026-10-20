@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 
@@ -95,5 +95,25 @@ describe('phi in the face, drawn', () => {
     expect(Math.hypot(t.half, t.height)).toBeCloseTo(t.apothem, 6);
     expect(phiTriangleSvg(t)).toContain('apothem, 1.6187');
     expect(phiTriangle({})).toBeNull();
+  });
+});
+
+describe("the 2026 study's rank", () => {
+  const d = allanRankData(read('measurements/orion-correlation.json'), read('sources.json'));
+  it('is read from its records and cited from its source, unchecked', () => {
+    expect(d).toMatchObject({ rank: 1717, of: 695520, source: 'allan-2026', verified: false });
+    expect(d.citation).toContain('Journal of Astronomical History and Heritage');
+  });
+  it("gives the paper's p as the rank over the count, and the short cited line", () => {
+    expect(rankP(d)).toBe(0.0025);
+    expect(rankLine(d)).toBe('Allan 2026: rank 1,717 of 695,520, p = 0.0025');
+    // the spoken words: "the top quarter of one per cent"
+    expect(d.rank / d.of).toBeLessThan(0.0025);
+  });
+  it('marks the best matches at the end of the line, never thinner than a mark can be seen', () => {
+    expect(allanRankSvg(d)).toContain('the best 1,717');
+    expect(allanRankSvg(d)).toMatch(/x1="288\.0"/);
+    expect(isFigure('allan-rank')).toBe(true);
+    expect(() => allanRankData([], read('sources.json'))).toThrow(/orion\.allan2026\.shape\.rank/);
   });
 });

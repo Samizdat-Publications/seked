@@ -12,7 +12,8 @@ import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays }
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
-import { beltPlan, beltPlanSvg, ditchPlanSvg, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg } from './figures';
+import allanRank from 'virtual:allan-rank';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment } from './receipts';
 import { Player } from './player';
@@ -91,6 +92,13 @@ function phiTriangleFigure(ground: Record<string, number> | null): string {
     ${formatValue(t.apothem / t.half, 'ratio')}, against φ, ${formatValue(phi, 'ratio')} (A2). The face rises at
     ${formatValue(t.angle, 'deg')}, and the slopes a seked of 5½, π and φ each give all lie within about a minute of arc of
     it, so the survey cannot tell them apart (A3).</figcaption>`;
+}
+
+/** The 2026 study's shape test, cited from its records, quietly. */
+function allanRankFigure(): string {
+  const d = allanRank;
+  const journal = /\)\. [^.]+\. ([^.]+)\./.exec(d.citation)?.[1] ?? d.citation;
+  return `${allanRankSvg(d)}<figcaption>${rankLine(d)}. ${journal}.${d.verified ? '' : " Not yet checked against the paper's table."}</figcaption>`;
 }
 
 async function start(): Promise<void> {
@@ -178,6 +186,7 @@ async function start(): Promise<void> {
     if (id === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     if (id === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (id === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
+    if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;

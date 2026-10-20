@@ -18,9 +18,13 @@
  *
  * `phi-triangle`: A2 drawn: the right triangle inside the pyramid from its centre, half the base along the ground,
  * the height up and the apothem down the face, with the apothem's ratio to half the base, near φ.
+ *
+ * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
+ * first, and the share that beat the pyramids' triangle marked at its end. The rank and the count are records
+ * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -217,5 +221,46 @@ export function phiTriangleSvg(t: NonNullable<ReturnType<typeof phiTriangle>>, w
   <text class="here-lab" x="${((O[0]! + B[0]!) / 2).toFixed(1)}" y="${(O[1]! + 18).toFixed(1)}" text-anchor="middle">half the base, 1</text>
   <text class="lab" x="${((A[0]! + B[0]!) / 2 + 8).toFixed(1)}" y="${((A[1]! + B[1]!) / 2 - 6).toFixed(1)}">apothem, ${(t.apothem / t.half).toFixed(4)}</text>
   <text class="here-lab" x="${(O[0]! + 6).toFixed(1)}" y="${((O[1]! + A[1]!) / 2).toFixed(1)}">height</text>
+</svg>`;
+}
+
+/** A count as the page writes it, with thousands commas whatever the browser's locale. */
+const count = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+/** A study's rank among the cases it tried, with the record's source; `verified` only if both records are. */
+export interface RankData { rank: number; of: number; source: string; citation: string; verified: boolean }
+
+/** The figures cut from data/measurements/orion-correlation.json and data/sources.json at build time. */
+export function allanRankData(records: { key: string; value: number; source: string; verified?: boolean }[],
+  sources: { id: string; citation: string }[]): RankData {
+  const get = (key: string) => {
+    const r = records.find((x) => x.key === key);
+    if (!r) throw new Error(`no ${key} in orion-correlation.json`);
+    return r;
+  };
+  const rank = get('orion.allan2026.shape.rank'), of = get('orion.allan2026.shape.triplets');
+  const citation = sources.find((s) => s.id === rank.source)?.citation;
+  if (!citation) throw new Error(`no source ${rank.source}`);
+  return { rank: rank.value, of: of.value, source: rank.source, citation, verified: !!rank.verified && !!of.verified };
+}
+
+/** The rank's p-value, the share of the triplets that matched at least as well, to two significant figures. */
+export const rankP = (d: RankData) => Number((d.rank / d.of).toPrecision(2));
+
+/** The short cited line: "Allan 2026: rank 1,717 of 695,520, p = 0.0025". */
+export function rankLine(d: RankData): string {
+  const author = d.citation.split(',')[0]!.trim(), year = /\((\d{4})\)/.exec(d.citation)?.[1] ?? '';
+  return `${author} ${year}: rank ${count(d.rank)} of ${count(d.of)}, p = ${rankP(d)}`;
+}
+
+/** Every triplet tried as one line, best on the right; the ones that matched the pyramids at least as well in gold. */
+export function allanRankSvg(d: RankData, width = 300): string {
+  const pad = 10, w = width - 2 * pad, y = 26, top = Math.max(2, (d.rank / d.of) * w);
+  return `<svg viewBox="0 0 ${width} 56" width="${width}" height="56" role="img" aria-label="${count(d.of)} triplets of stars, the pyramids' triangle at rank ${count(d.rank)}">
+  <line class="dim" x1="${pad}" y1="${y}" x2="${pad + w}" y2="${y}"/>
+  <line class="wall draw-on" x1="${(pad + w - top).toFixed(1)}" y1="${y}" x2="${pad + w}" y2="${y}" pathLength="1"/>
+  <line class="wall" x1="${(pad + w - top).toFixed(1)}" y1="${y - 7}" x2="${(pad + w - top).toFixed(1)}" y2="${y + 7}"/>
+  <text class="here-lab" x="${pad}" y="${y + 20}">${count(d.of)} triplets</text>
+  <text class="lab" x="${pad + w}" y="${y - 10}" text-anchor="end">the best ${count(d.rank)}</text>
 </svg>`;
 }
