@@ -122,6 +122,9 @@ export const STILLS: Still[] = [
 
   { chapter: 8, anchor: 'Everything so far stands on the surface.', src: 'progress/0037-underneath-khafre-cutaway.png',
     alt: 'Khafre’s pyramid and the plateau cut away, the claimed wells and chambers below', tags: ['look choices'], whole: true },
+  { chapter: 8, anchor: 'under Khafre’s pyramid', src: 'progress/0050-underneath-khafre-plate-frame.png',
+    alt: 'Where the Khafre Project’s 2025 tomogram goes: placed by its labels, not scaled; a grey frame and a link until permission is given',
+    tags: ['look choices'], whole: true },
   { chapter: 8, anchor: 'the way an ultrasound reads a body', src: 'progress/0037-underneath-khafre-cutaway.png',
     alt: 'The method as its authors describe it: radar off the ground, vibrations read in the rock', tags: [], whole: true, widget: 'method' },
   { chapter: 8, anchor: 'eight hollow wells in two rows', src: 'progress/0037-underneath-khafre-cutaway.png',
