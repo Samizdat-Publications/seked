@@ -8,6 +8,7 @@ Build the plateau in Blender and render views of it.
 
 A queue is {"renders": [{"state", "station" | "shot", "moment"?, "size"?, "samples"?, "out"?, "patch"?}, ...]};
 a "patch" ({yaw, pitch, fov, aspect}) renders a station through a lens instead of whole (render/patches.py);
+"transparent": true leaves the sky out (alpha, and the star dome hidden), for a page that draws its own sky;
 each state is built once and every view in it rendered from the same scene.
 Outputs default to build/render/<view>-<state>.png.
 """
@@ -182,12 +183,15 @@ def main():
             w, h = (int(n) for n in str(r.get("size", DEFAULTS[kind]["size"])).split("x"))
             samples = int(r.get("samples", DEFAULTS[kind]["samples"]))
             out = r.get("out") or os.path.join(data.REPO, "build", "render", f"{r[kind]}-{state}.png")
+            plateau.scene.render.film_transparent = bool(r.get("transparent", False))
+            if r.get("transparent") and plateau.night is not None and plateau.night.dome is not None:
+                plateau.night.dome.hide_render = True   # the stars are a dome of geometry, not the world
             plateau.render(os.path.abspath(out), w, h, samples, view_id=r[kind], kind=kind, moment=m)
-            if "patch" in r:
+            if "patch" in r or r.get("transparent"):
                 side = os.path.splitext(os.path.abspath(out))[0] + ".json"
                 with open(side, encoding="utf-8") as f:
                     meta = json.load(f)
-                meta["patch"] = r["patch"]
+                meta.update({k: r[k] for k in ("patch", "transparent") if k in r})
                 with open(side, "w", encoding="utf-8") as f:
                     json.dump(meta, f, indent=1)
 

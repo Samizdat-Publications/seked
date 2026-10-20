@@ -2,7 +2,7 @@ import { loadClaims } from '@seked/claims';
 import { loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
 import { describe, expect, it } from 'vitest';
-import { beltAt, lowestTransit, yearLabel } from './sky';
+import { beltAt, lowestTransit, project, yearLabel } from './sky';
 
 const env = buildEnvironment(resolve(loadDatabase(), 'canonical').values);
 const c4 = loadClaims().find((c) => c.id === 'C4')!;
@@ -35,5 +35,15 @@ describe('the sky slider', () => {
   it('names years as the page says them', () => {
     expect(yearLabel(-10449)).toBe('10,450 BCE');
     expect(yearLabel(2026)).toBe('2026 CE');
+  });
+
+  it('projects through a lens as the renderer aims one', () => {
+    const lens = { yaw: 180, pitch: 12, fov: 40, aspect: 1 };
+    const centre = project(lens, 12, 180)!;
+    expect(centre.x).toBeCloseTo(0.5, 9);
+    expect(centre.y).toBeCloseTo(0.5, 9);
+    expect(project(lens, 32, 180)!.y).toBeCloseTo(0, 9); // the top edge, half the vertical field up
+    expect(project(lens, 12, 170)!.x).toBeLessThan(0.5); // looking south, east is on the left
+    expect(project(lens, 12, 0)).toBeNull(); // due north, behind the camera
   });
 });

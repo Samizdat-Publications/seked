@@ -52,3 +52,31 @@ export const yearLabel = (epoch: number) => {
   const y = Math.round(epoch);
   return y <= 0 ? `${(1 - y).toLocaleString('en-GB')} BCE` : `${y} CE`;
 };
+
+/** A rectilinear view as render/giza/cameras.py `aim` sets one: yaw a compass bearing, pitch up, fov the vertical field. */
+export interface Lens {
+  yaw: number;
+  pitch: number;
+  fov: number;
+  aspect: number;
+}
+
+const RAD = Math.PI / 180;
+
+/**
+ * Where a direction (altitude, azimuth) falls on a picture rendered through `lens`, as fractions across from
+ * the left and down from the top, or null if it is behind the camera. Stars are at infinity, so only the
+ * direction counts; refraction is left out (six arcminutes at ten degrees up).
+ */
+export function project(lens: Lens, altDeg: number, azDeg: number): { x: number; y: number } | null {
+  const dir = (alt: number, az: number) => [Math.cos(alt * RAD) * Math.sin(az * RAD), Math.cos(alt * RAD) * Math.cos(az * RAD), Math.sin(alt * RAD)];
+  const dot = (a: number[], b: number[]) => a.reduce((s, v, i) => s + v * (b[i] ?? 0), 0);
+  const f = dir(lens.pitch, lens.yaw);
+  const r = [Math.cos(lens.yaw * RAD), -Math.sin(lens.yaw * RAD), 0]; // forward × up: the picture's right
+  const u = [r[1]! * f[2]! - r[2]! * f[1]!, r[2]! * f[0]! - r[0]! * f[2]!, r[0]! * f[1]! - r[1]! * f[0]!];
+  const d = dir(altDeg, azDeg);
+  const depth = dot(d, f);
+  if (depth <= 0) return null;
+  const t = Math.tan((lens.fov / 2) * RAD);
+  return { x: 0.5 + dot(d, r) / depth / (t * lens.aspect) / 2, y: 0.5 - dot(d, u) / depth / t / 2 };
+}
