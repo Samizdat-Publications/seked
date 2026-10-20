@@ -119,6 +119,57 @@
    "samples": 96,
    "out": "build/render/patch-exhibit/orion-built-night-dark-ch5-numbers.png",
    "for": "ch5-numbers"
+  },
+  {
+   "state": "built",
+   "station": "south",
+   "moment": "golden-south",
+   "patch": {
+    "yaw": 0,
+    "pitch": 10,
+    "fov": 75.4,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch6-measure",
+    "pano": "pano/south-built.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/south-built-golden-south-ch6-measure.png",
+   "for": "ch6-measure"
+  },
+  {
+   "state": "built",
+   "station": "panorama",
+   "moment": "summer-evening",
+   "patch": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 39.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch6-smyth",
+    "pano": "pano/panorama-built.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/panorama-built-summer-evening-ch6-smyth.png",
+   "for": "ch6-smyth"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama",
+   "moment": "summer-evening",
+   "patch": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 39.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch6-held",
+    "pano": "pano/panorama-first-time.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/panorama-first-time-summer-evening-ch6-held.png",
+   "for": "ch6-held"
   }
  ]
 }

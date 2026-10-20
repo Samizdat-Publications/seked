@@ -1198,6 +1198,234 @@
     "at": "C2",
     "figure": "Ori"
    }
+  },
+  {
+   "id": "ch6-measure",
+   "chapter": 6,
+   "station": "south",
+   "era": "built",
+   "moment": "golden-south",
+   "view": {
+    "yaw": 0,
+    "pitch": 10,
+    "fov": 58
+   },
+   "arrive": "cut",
+   "say": "Measure the Great Pyramid. Walk once round its base and divide the distance by its original height.",
+   "draw": [
+    "g1-proportions@measure"
+   ],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [
+    "A1"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-pi",
+   "chapter": 6,
+   "station": "south",
+   "era": "built",
+   "moment": "golden-south",
+   "view": {
+    "yaw": 0,
+    "pitch": 10,
+    "fov": 58
+   },
+   "arrive": "turn",
+   "say": "The answer is two times pi, to within three hundredths of one per cent.",
+   "draw": [
+    "g1-proportions"
+   ],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "A1"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-phi",
+   "chapter": 6,
+   "station": "south",
+   "era": "built",
+   "moment": "golden-south",
+   "view": {
+    "yaw": 0,
+    "pitch": 10,
+    "fov": 58
+   },
+   "arrive": "turn",
+   "say": "Draw a line from the apex down the middle of one face. Divide it by half the base and you get the golden ratio, within a twentieth of one per cent.",
+   "draw": [
+    "g1-proportions"
+   ],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "A2",
+    "A3"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-scale",
+   "chapter": 6,
+   "station": "south",
+   "era": "built",
+   "moment": "golden-south",
+   "view": {
+    "yaw": 0,
+    "pitch": 10,
+    "fov": 58
+   },
+   "arrive": "turn",
+   "say": "Scale the pyramid up 43,200 times. Its height becomes the distance from the Earth's centre to the pole, and its perimeter the equator, each within one per cent.",
+   "draw": [
+    "g1-proportions"
+   ],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "B1",
+    "B5"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-72",
+   "chapter": 6,
+   "station": "south",
+   "era": "built",
+   "moment": "golden-south",
+   "view": {
+    "yaw": 0,
+    "pitch": 10,
+    "fov": 58
+   },
+   "arrive": "turn",
+   "say": "Graham Hancock points out that 43,200 is 600 times 72, and that 72 years is about how long the stars take to drift one degree.",
+   "draw": [
+    "g1-proportions"
+   ],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [
+    "B1"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-north",
+   "chapter": 6,
+   "station": "north",
+   "era": "built",
+   "moment": "june-dawn",
+   "view": {
+    "yaw": 180,
+    "pitch": 12,
+    "fov": 66
+   },
+   "arrive": "cut",
+   "say": "The sides run within four minutes of arc of true north. On a side of 230 metres that is a quarter of a metre, with no compass.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "C1"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-smyth",
+   "chapter": 6,
+   "station": "panorama",
+   "era": "built",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 30
+   },
+   "arrive": "cut",
+   "say": "Writers since Charles Piazzi Smyth in the 1860s have read these numbers as a design brief: the circle, the golden section, the size of the Earth and the slow turn of the sky, written into one shape.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [
+    "A1",
+    "A2",
+    "B1",
+    "C1"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-hancock",
+   "chapter": 6,
+   "station": "panorama",
+   "era": "built",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 30
+   },
+   "arrive": "turn",
+   "say": "For Hancock, the knowledge was inherited from a civilisation older than Egypt. Each number alone has an ordinary explanation.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [
+    "A3",
+    "A7"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-together",
+   "chapter": 6,
+   "station": "panorama",
+   "era": "built",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 30
+   },
+   "arrive": "turn",
+   "say": "The proponents ask whether the explanations hold when the numbers come together.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [
+    "A4",
+    "A5",
+    "B2",
+    "B3",
+    "B4"
+   ],
+   "reply": "ch6"
+  },
+  {
+   "id": "ch6-held",
+   "chapter": 6,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 30
+   },
+   "arrive": "wipe",
+   "say": "Knowledge that old needs people to have held it.",
+   "draw": [],
+   "hold": 2,
+   "interact": "era",
+   "receipts": [],
+   "reply": "ch6"
   }
  ]
 }
