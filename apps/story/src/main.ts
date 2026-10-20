@@ -17,7 +17,7 @@ import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
 import { skyWidget, type SkyWidget } from './skywidget';
-import { STILLS, markAnchors, markers, stillFile, type Still } from './stills';
+import { STILLS, keyFrames, markAnchors, markers, stillFile, type Still } from './stills';
 import './style.css';
 
 const chapters = parseScript(script);
@@ -56,6 +56,8 @@ app.innerHTML = `
   <aside class="stage">
     <div class="card"><div class="stage-num"></div><div class="stage-title"></div></div>
     <figure class="still"><img alt="" /><img alt="" /><div class="tags"></div><figcaption></figcaption></figure>
+    <div class="strip">${keyFrames().map((k) => `<figure><img src="./${stillFile(k.src)}" alt="${k.alt}" loading="lazy" />` +
+      `<figcaption>${k.chapter}</figcaption></figure>`).join('')}</div>
   </aside>
   <main>
     <header class="masthead"><h1>How old is the Sphinx?</h1>
@@ -85,7 +87,8 @@ function show(c: Chapter, still: Still | null) {
   shown = still;
   stage.classList.toggle('has-still', !!still);
   stage.classList.toggle('whole', !!still?.whole);
-  stage.classList.toggle('sky-on', !!still?.widget && !!sky);
+  stage.classList.toggle('sky-on', still?.widget === 'sky' && !!sky);
+  stage.classList.toggle('strip-on', still?.widget === 'strip');
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;

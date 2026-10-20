@@ -23,7 +23,7 @@ export interface Still {
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
   /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
-  widget?: 'sky';
+  widget?: 'sky' | 'strip';
 }
 
 const SPHINX_TODAY = 'progress/0040-sphinx-today.png';
@@ -99,9 +99,18 @@ export const STILLS: Still[] = [
     alt: 'The claim against radar’s reach and the water table', tags: ['look choices'], whole: true },
   { chapter: 9, anchor: 'An answer looks like this', src: 'progress/0013-blender-big-void.png',
     alt: 'The Big Void over the Grand Gallery, drawn as its two hypotheses', tags: [], whole: true },
+  { chapter: 9, anchor: 'read the stone, the sky and the texts as one story', src: 'progress/0013-blender-big-void.png',
+    alt: 'The chapters’ key frames', tags: [], widget: 'strip' },
   { chapter: 9, anchor: 'Until it is, that is where to look.', src: SPHINX_TODAY,
     alt: 'The Sphinx today', tags: ['stand-in'] },
 ];
+
+/** Each chapter's key frame for chapter 9's strip: its first still, for every chapter before the last. */
+export const keyFrames = (): Still[] => {
+  const last = Math.max(...STILLS.map((s) => s.chapter));
+  return [...new Set(STILLS.map((s) => s.chapter))].filter((n) => n < last)
+    .map((n) => STILLS.find((s) => s.chapter === n)!);
+};
 
 /** The page's copy of a still: a JPEG under stills/, named for the file it is made from. */
 export const stillFile = (src: string) => `stills/${(src.split('/').pop() ?? src).replace(/\.\w+$/, '')}.jpg`;

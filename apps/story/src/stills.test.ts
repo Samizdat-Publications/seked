@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { inline } from './markdown';
 import { parseScript } from './script';
-import { STILLS, markAnchors, markers, stillFile, stillSource } from './stills';
+import { STILLS, keyFrames, markAnchors, markers, stillFile, stillSource } from './stills';
 
 const root = join(__dirname, '..', '..', '..');
 const chapters = parseScript(readFileSync(join(root, 'docs', 'script.md'), 'utf8'));
@@ -48,6 +48,12 @@ describe('the stage’s stills', () => {
       if (/lion|10,?[45]\d\d|First Time/.test(s.alt) && s.chapter !== 9) expect(s.tags, s.alt).toContain('claim state');
       if (/sphinx|lion/i.test(s.src)) expect(s.tags, s.src).toContain('stand-in');
     }
+  });
+});
+
+describe('chapter 9’s strip', () => {
+  it('holds a key frame for every chapter before the last, in order', () => {
+    expect(keyFrames().map((s) => s.chapter)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });
 

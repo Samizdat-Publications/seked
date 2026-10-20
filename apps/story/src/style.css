@@ -85,3 +85,11 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .sky .epoch { font-size: 1rem; }
   .sky .small { display: none; }
 }
+.strip { position: absolute; inset: 0; z-index: 3; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
+  align-content: center; padding: 1rem; background: #14100c; opacity: 0; pointer-events: none; transition: opacity 0.9s; }
+.stage.strip-on .strip { opacity: 1; }
+.strip figure { position: relative; margin: 0; aspect-ratio: 16 / 9; overflow: hidden; }
+.strip img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform 6s ease-out; }
+.stage.strip-on .strip img { transform: scale(1); }
+.strip figcaption { position: absolute; left: 0.4rem; bottom: 0.2rem; color: #fff8ec; font: 1rem Georgia, serif;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8); }
