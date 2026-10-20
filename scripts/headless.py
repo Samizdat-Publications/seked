@@ -71,7 +71,17 @@ def main():
     program = shutil.which("claude", path=env.get("PATH"))
     if not program:
         sys.exit("no `claude` on PATH")
-    sys.exit(subprocess.run([program, *sys.argv[1:]], env=env).returncode)
+    # The prompt goes in on stdin, never as an argument: on Windows `claude` is a .cmd shim, and cmd.exe ends the
+    # command line at the prompt's first newline, dropping it and every flag after it (20 October 2026: a chunk ran
+    # with no --max-budget-usd, no --model and no JSON output). `claude -p` with no prompt reads stdin.
+    args, prompt = list(sys.argv[1:]), None
+    for flag in ("-p", "--print"):
+        if flag in args:
+            i = args.index(flag)
+            if i + 1 < len(args) and not args[i + 1].startswith("-"):
+                prompt = args.pop(i + 1)
+            break
+    sys.exit(subprocess.run([program, *args], env=env, input=prompt, text=True, encoding="utf-8").returncode)
 
 
 if __name__ == "__main__":
