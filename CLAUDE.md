@@ -7,18 +7,23 @@ The full plan is `docs/plan.html`; the generated claims dossier is
 
 ## What this is for
 
-A test of how beautiful a fully Claude-driven scene of the Giza plateau can be:
-modelled, lit, textured and given atmosphere, the pyramids above all, inside
-and out, under a correctly mapped sky, and still able to test a claim. It is
-"as close to survey as we can get, with the holes filled in", not a survey for
-its own sake. The pyramids stay as near survey as the sources allow, because
-they are what the claims are about. Everything else (temples, tombs, the
-Sphinx, causeways) needs its placement right, which the OSM registration
-gives to about a metre, and may use a good free 3D model fitted to its
-footprint and labelled as a visual stand-in. Filled-in parts are fine and are
-said to be filled. Render quality is a deliverable, not polish. Later: a tour
-of the star alignments, and an LLM that runs claims such as Hancock's against
-the sim. The next round's plan is `docs/geometry-blockers.md`.
+Since the October rethink (`docs/rethink-2026-10.md`, agreed with Stewart on
+19 and 20 October 2026; the plan is `docs/plan.html`): **the strongest case
+for an older Giza, illustrated for an ordinary viewer.** It is a steelman of
+Hancock, Bauval and Schoch, told as a scroll documentary in nine chapters and
+beautiful enough to show someone. The archaeologists' reply is in every
+chapter, quieter than the claim and never omitted. The checking machinery
+stays behind it: every number still comes from `data/`, and the claims engine
+gives each chapter its receipts. The steelman is in the words and the
+pictures, never in the numbers.
+
+What still holds from before: the scene is "as close to survey as we can
+get, with the holes filled in". The pyramids stay as near survey as the
+sources allow. Everything else (temples, tombs, the Sphinx, causeways) needs
+its placement right, which the OSM registration gives to about a metre, and
+may use a good free 3D model fitted to its footprint and labelled as a visual
+stand-in. Filled-in parts are said to be filled. Render quality is a
+deliverable, not polish. The September plan is `docs/plan-2026-09.html`.
 
 ## Commands
 
@@ -42,6 +47,7 @@ python scripts/plate.py render|grid|scale|measure|register   # read a drawing: n
 python scripts/meshy.py generate ID [--tag T]   # generate a stand-in in blender/models.json from CC0 photographs with Meshy (MESHY_API_KEY in ~/.seked/keys.env)
 python scripts/job.py claim|start|status        # own the repo, run a long job detached from the session, see who owns what (see "One session at a time")
 python scripts/headless.py -p "<prompt>" [claude flags]   # a headless `claude -p` job on the API key only (SEKED_ANTHROPIC_API_KEY, or in ~/.seked/keys.env); bulk research and drafting
+python scripts/research.py start|collect N...   # research documentary chapter N as a detached headless job; collect writes docs/research/chN.md
 ```
 
 ## Rules that keep the project honest

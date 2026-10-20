@@ -158,7 +158,10 @@ ${cards}`));
 // Generated documents, as their Markdown and as pages.
 const outDocs = join(site, 'docs');
 mkdirSync(outDocs, { recursive: true });
-if (existsSync(join(REPO_ROOT, 'docs', 'plan.html'))) cpSync(join(REPO_ROOT, 'docs', 'plan.html'), join(outDocs, 'plan.html'));
+// The plan, and the September plan it superseded, which it links.
+for (const f of ['plan.html', 'plan-2026-09.html']) {
+  if (existsSync(join(REPO_ROOT, 'docs', f))) cpSync(join(REPO_ROOT, 'docs', f), join(outDocs, f));
+}
 for (const [f, title] of [['dossier', 'Seked claims dossier'], ['shafts', 'Seked shaft alignments']] as const) {
   const src = join(REPO_ROOT, 'docs', `${f}.md`);
   if (!existsSync(src)) continue;

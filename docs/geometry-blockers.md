@@ -206,7 +206,7 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
    orientation, a scale check against the outline) and recorded in a
    `models/manifest.json` with URL, licence, attribution and the footprint it
    is fitted to. Candidates: the CC-BY photogrammetry scans of the Sphinx and
-   the Great Pyramid already named in docs/plan.html (Sketchfab), and free
+   the Great Pyramid already named in docs/plan-2026-09.html (Sketchfab), and free
    temple and mastaba models. Sketchfab downloads need an account; if a model
    is wanted from there, Stewart downloads the file and it goes in the
    scratchpad.
@@ -223,7 +223,7 @@ stepped core, Aswan granite and basalt textures, and the mastabas.
    logged in `docs/progress/log/`, with milestone snapshots in
    `docs/progress/`.
 6. **The viewer**, fed the same textures through glTF with KTX2 compression
-   (gltf-transform), as docs/plan.html always intended, so the browser is not
+   (gltf-transform), as docs/plan-2026-09.html always intended, so the browser is not
    the poor relation of the renders.
 
 ## Part 3. The plateau as it was built (asked 2026-09-16)
