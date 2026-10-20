@@ -71,8 +71,15 @@ describe('sites and structures', () => {
     expect(d?.evidence).toBe('excavated');
     expect(d?.site).toBe('gobekli-tepe');
     const figures = db.measurements.filter((m) => m.structure === 'gobekli.enclosure-d');
-    expect(figures.length).toBeGreaterThan(4);
-    for (const m of figures) expect(m.method, m.key).toBe('as published');
+    expect(figures.filter((m) => m.method === 'as published').length).toBeGreaterThan(4);
+    // the plan read two ways: what is printed, and what is scaled off its bar, never verified
+    const scaled = figures.filter((m) => m.method === 'scaled from plate');
+    expect(scaled.filter((m) => m.key.endsWith('.east')).length).toBe(13); // two central pillars and the 11 in the wall
+    for (const m of figures) expect(['as published', 'scaled from plate'], m.key).toContain(m.method);
+    for (const m of scaled) {
+      expect(m.verified, m.key).toBe(false);
+      expect(m.sigma, m.key).toBeGreaterThan(0);
+    }
   });
   it('enters every claimed underground figure as claimed, unverified, from where it was said', () => {
     const sar = db.measurements.filter((m) => m.structure === 'g2.sar-shafts');
