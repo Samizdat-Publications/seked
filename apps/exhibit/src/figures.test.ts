@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, luminescenceData, luminescenceSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -133,5 +133,21 @@ describe('the Earth at 1 : 43,200', () => {
   it('draws nothing without the monuments or a factor', () => {
     expect(earthScale({}, 43200)).toBeNull();
     expect(earthScale(ground, NaN)).toBeNull();
+  });
+});
+
+describe("the temples' luminescence dates", () => {
+  const d = luminescenceData(read('measurements/luminescence.json'), read('structures.json'), read('sources.json'));
+  it('are the three records, oldest first, named by temple, stone and sample, and unchecked', () => {
+    expect(d.dates.map((x) => x.sample)).toEqual(['VT1', 'ST2', 'VT9a']);
+    expect(d.dates[1]).toMatchObject({ temple: 'Sphinx Temple', stone: 'limestone', sigma: 220, verified: false });
+    expect(yearText(d.dates[1]!.year)).toBe('2220 BCE');   // the reply's words
+  });
+  it('label the axis in round years and cite the paper short', () => {
+    const svg = luminescenceSvg(d);
+    expect(svg).toContain('4000 BCE');
+    expect(svg).toContain('3060 BCE &#177; 470');
+    expect(svg).not.toContain('4001 BCE');
+    expect(shortCite(d.citation)).toBe('Liritzis and Vafiadou (2015)');
   });
 });

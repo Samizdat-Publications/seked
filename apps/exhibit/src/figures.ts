@@ -22,12 +22,15 @@
  * `earth-scale`: B1 drawn: the pyramid's profile grown by the claim's own scale factor and stood on the equator under
  * the northern half of the Earth, its apex at the pole. The factor is the claim's overlay's, never typed here.
  *
+ * `luminescence`: the temples' surface luminescence dates (data/measurements/luminescence.json), each a bar of its
+ * date and sigma on one line of years, named by its temple, its stone and its sample.
+ *
  * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
  * first, and the share that beat the pyramids' triangle marked at its end. The rank and the count are records
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -288,4 +291,59 @@ export function allanRankSvg(d: RankData, width = 300): string {
   <text class="here-lab" x="${pad}" y="${y + 20}">${count(d.of)} triplets</text>
   <text class="lab" x="${pad + w}" y="${y - 10}" text-anchor="end">the best ${count(d.rank)}</text>
 </svg>`;
+}
+
+/** A dated sample: astronomical year and sigma, the temple, the stone and the sample's name. */
+export interface Dated { year: number; sigma: number; temple: string; stone: string; sample: string; verified: boolean }
+export interface LuminescenceData { dates: Dated[]; citation: string }
+
+/** The dates cut from data/measurements/luminescence.json, named from data/structures.json, oldest first. */
+export function luminescenceData(records: { key: string; structure: string; value: number; sigma?: number; source: string; verified?: boolean }[],
+  structures: { id: string; name: string }[], sources: { id: string; citation: string }[]): LuminescenceData {
+  const dates = records.map((r) => {
+    const parts = r.key.split('.');
+    return {
+      year: r.value, sigma: r.sigma ?? 0, verified: !!r.verified,
+      temple: structures.find((s) => s.id === r.structure)?.name ?? r.structure,
+      stone: parts.find((p) => p === 'granite' || p === 'limestone') ?? 'stone',
+      sample: parts[parts.length - 1]!.replace(/^[a-z]+/, (m) => m.toUpperCase()),   // vt9a is VT9a
+    };
+  }).sort((a, b) => a.year - b.year);
+  const citation = sources.find((s) => s.id === records[0]?.source)?.citation;
+  if (!dates.length || !citation) throw new Error('no luminescence dates, or no source for them');
+  return { dates, citation };
+}
+
+/** An astronomical year as the page writes it. */
+export const yearText = (y: number) => (y <= 0 ? `${1 - Math.round(y)} BCE` : `${Math.round(y)} CE`);
+
+/** Each date a bar of plus and minus its sigma on one axis of years, oldest at the top. */
+export function luminescenceSvg(d: LuminescenceData, width = 300): string {
+  const lo = Math.floor(Math.min(...d.dates.map((x) => x.year - x.sigma)) / 500) * 500;
+  const hi = Math.ceil(Math.max(...d.dates.map((x) => x.year + x.sigma)) / 500) * 500;
+  const pad = 28, row = 50, top = 4, h = top + d.dates.length * row + 26;
+  const X = (y: number) => (pad + ((y - lo) / (hi - lo)) * (width - 2 * pad)).toFixed(1);
+  const ticks = [];
+  // every thousand years as the page counts them (4000 BCE is -3999)
+  for (let k = Math.ceil((1 - hi) / 1000); 1 - k * 1000 >= lo; k++) if (k > 0) ticks.push(1 - k * 1000);
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="Surface luminescence dates from the two temples">
+  ${d.dates.map((x, i) => {
+    const y = top + i * row + 22;
+    // the date under its bar, kept inside the frame
+    const mid = Math.min(width - 40, Math.max(40, Number(X(x.year))));
+    return `<text class="here-lab" x="${pad - 18}" y="${y - 9}">${x.temple}, ${x.stone} (${x.sample})</text>
+  <line class="wall draw-on" x1="${X(x.year - x.sigma)}" y1="${y}" x2="${X(x.year + x.sigma)}" y2="${y}" pathLength="1"/>
+  <circle class="star" cx="${X(x.year)}" cy="${y}" r="3"/>
+  <text class="lab" x="${mid}" y="${y + 16}" text-anchor="middle">${yearText(x.year)} &#177; ${x.sigma}</text>`;
+  }).join('\n  ')}
+  <line class="dim" x1="${X(lo)}" y1="${h - 20}" x2="${X(hi)}" y2="${h - 20}"/>
+  ${ticks.map((t) => `<text class="north" x="${X(t)}" y="${h - 6}" text-anchor="middle">${yearText(t)}</text>`).join('')}
+</svg>`;
+}
+
+/** "Liritzis and Vafiadou (2015)" from "Liritzis, I. & Vafiadou, A. (2015). ...". */
+export function shortCite(citation: string): string {
+  const names = [...citation.split('(')[0]!.matchAll(/([A-Z][\p{L}'-]+), (?:[A-Z]\.\s?)+/gu)].map((m) => m[1]!);
+  const year = /\((\d{4})\)/.exec(citation)?.[1];
+  return `${names.length > 2 ? `${names[0]} and others` : names.join(' and ')}${year ? ` (${year})` : ''}`;
 }

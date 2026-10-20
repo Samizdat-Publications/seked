@@ -13,7 +13,8 @@ import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import luminescence from 'virtual:luminescence';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, luminescenceSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -116,6 +117,14 @@ function pyramidCaption(ground: Record<string, number>): string {
     its height: ${formatValue(c.circle, 'm')} round, against the base's ${formatValue(c.perimeter, 'm')} (A1). Cut through its south
     face, half the base, the height and the apothem, ${formatValue(t.apothem / t.half, 'ratio')} times half the base (A2). The grey line
     is true north.`;
+}
+
+/** The temples' luminescence dates, from their records. */
+function luminescenceFigure(): string {
+  const d = luminescence;
+  const unchecked = d.dates.some((x) => !x.verified);
+  return `${luminescenceSvg(d)}<figcaption>Surface luminescence dates: when each stone's face last saw daylight, by
+    the method of ${shortCite(d.citation)}.${unchecked ? " Not yet checked against the paper's table." : ''}</figcaption>`;
 }
 
 /** The 2026 study's shape test, cited from its records, quietly. */
@@ -226,6 +235,7 @@ async function start(): Promise<void> {
     if (id === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (id === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (id === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
+    if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

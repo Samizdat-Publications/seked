@@ -1026,7 +1026,9 @@
    },
    "arrive": "turn",
    "say": "Khafre's statues, found inside it, and its granite show that he used and refaced the building. They leave the age of its core open.",
-   "draw": [],
+   "draw": [
+    "luminescence@core"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],

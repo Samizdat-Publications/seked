@@ -20,9 +20,10 @@ export type Source = z.infer<typeof SourceSchema>;
 export const MeasurementSchema = z.object({
   key: z.string().regex(/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$/, 'keys are dotted lower-case identifiers'),
   structure: z.string(),
-  quantity: z.enum(['length', 'angle', 'latitude', 'longitude', 'elevation', 'count', 'ratio', 'speed', 'time']),
+  /** A `date` is a calendar year in astronomical numbering (1 BCE is 0, 2220 BCE is -2219), as the claims' epochs are. */
+  quantity: z.enum(['length', 'angle', 'latitude', 'longitude', 'elevation', 'count', 'ratio', 'speed', 'time', 'date']),
   value: z.number(),
-  unit: z.enum(['m', 'deg', 'count', 'ratio', 'm/s', 'day']),
+  unit: z.enum(['m', 'deg', 'count', 'ratio', 'm/s', 'day', 'year']),
   sigma: z.number().nonnegative().optional(),
   source: z.string(),
   method: z.string().optional(),
