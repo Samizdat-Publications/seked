@@ -295,12 +295,15 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
       const star = sky.stars.find((s) => s.name === sky.meridian!.name);
       const sp = star && at(star.altDeg, star.azDeg);
       // below the star, where a line across the meridian at its height does not run
-      if (sp) label(`${star!.name} on the meridian, ${formatValue(sky.meridian.altDeg, 'deg')} up`, sp, GOLD, 10, 18);
+      // a phone's field is wide and its labels short
+      const text = narrow ? `${star!.name}, ${formatValue(sky.meridian.altDeg, 'deg')}` : `${star!.name} on the meridian, ${formatValue(sky.meridian.altDeg, 'deg')} up`;
+      if (sp) label(text, sp, GOLD, 10, 18);
     }
     // a claim's lines are named at their eastern (left) end, the meridian star to its right
     sky.marks.forEach((m) => {
       const p = at(m.altDeg, m.azDeg - 6);
-      if (p) label(`${m.label}, ${formatValue(m.altDeg, 'deg')}`, p, 'rgba(255, 240, 215, 0.95)', 6, 0, false, true);
+      const name = narrow ? m.label.replace(/ (south|north) shaft$/, '') : m.label;
+      if (p) label(`${name}, ${formatValue(m.altDeg, 'deg')}`, p, 'rgba(255, 240, 215, 0.95)', 6, 0, false, true);
     });
     for (const s of sky.stars) {
       if (!s.hi || !s.name || !named.has(s.name) || s.name === sky.meridian?.name) continue;
