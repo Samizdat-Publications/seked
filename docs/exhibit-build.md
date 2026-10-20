@@ -46,20 +46,28 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   the body's beds (yaw 340), the floor (pitch -30) and east along it, wipes to the long rains on "so the front
   was cut long before the back" and to the First Time on "about 10,000 BCE", then a turn up to the head. `?leaf=`
   shows a leaf. Every leaf looked at at 720 by 450; two at 390 by 844. All leaves draw nothing yet (E2b).
-- [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
-  weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
-  the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
-  script's beats say), in `render/publish.py`'s manner or a small script beside it, and name them in the leaves'
-  `draw`. Numbers only from `data/`; anything scaled or guessed says so on screen.
-- [ ] **E3. Narrated play.** Play, pause, next, previous, a chapter list. Each leaf speaks its words (the
+- [x] **E3. Narrated play.** Play, pause, next, previous, a chapter list. Each leaf speaks its words (the
   browser's `speechSynthesis` until the recorded voice exists, with its word-boundary events as the timing),
   shows them as a caption, holds, then moves on. Any drag or key pauses play and hands the visitor the view;
   play resumes from that leaf. The state is in the address (`?leaf=ch1-flank`), as the Antikythera exhibit's is.
+  *Done 2026-10-20 16:02 UTC, `f5e4270`.* `src/player.ts` and `src/play.ts` (9 tests: the script's chapters and
+  replies, the voiceless timing, turns, the address). The browser's voice speaks each leaf; its word boundaries
+  are kept as `player.words` for E4, with an estimate of 2.5 words a second when there is no voice or it stalls.
+  A leaf in the same panorama arrives by an eased turn; wipes and flights cut until E4. Drag, wheel or key pauses
+  and keeps the leaf; Play turns back to the leaf's view and speaks it again. Space, PageUp and PageDown; a chapter
+  list from `docs/script.md`'s headings. Checked in Chromium at 1440 by 900 and 390 by 844: play ran ch0-dawn to
+  ch0-textbooks unattended, a drag paused it on that leaf, the chapter list jumped to ch1-carved. The bundle is
+  205 kB (67 kB gzipped), most of it the script, imported whole so chapter titles and replies are never retyped.
 - [ ] **E4. The changes.** (a) The era wipe in the panorama shader: a hard, slightly soft-edged boundary sweeping
   across the view, the new era behind it; animated in play, draggable when paused. (b) Lines that draw on, each
   timed to the word that names it. (c) Flights: when a leaf arrives by `flight`, play
   `flights/<from>--<to>.mp4` full screen and hand over to the panorama on its last frame, the panorama already
   set to the leaf's view; until a flight is rendered, a `cut`.
+- [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
+  weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
+  the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
+  script's beats say), in `render/publish.py`'s manner or a small script beside it, and name them in the leaves'
+  `draw`. Numbers only from `data/`; anything scaled or guessed says so on screen.
 - [ ] **E5. The receipt and the reply.** A small tab at the edge of the screen on every leaf that has them: the
   claim's receipt computed live from the bundle (port `apps/story`'s receipts), and the archaeologists' reply
   from `docs/script.md`, in a quieter type. Closed by default.
@@ -102,6 +110,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    and wiping forward again on the last sentence would undo that.
 8. **A leaf's panorama for a moment the walkthrough lacks is `pano/<station>-<era>-<moment>.jpg`**, beside the
    walkthrough's; `leafPanorama` names it and E6's queue asks the laptop for it.
+
+9. **E2b moved below E4.** The flank's lines are drawn on in time with their words, which is E4's (b); building
+   them first would mean timing them twice.
+10. **Play starts paused, on a Play button.** Browsers refuse speech until the visitor has touched the page, so the
+    exhibit opens on its first leaf, silent, with Play the one bright control.
 
 
 ## For Stewart
