@@ -9,6 +9,7 @@ Build the plateau in Blender and render views of it.
 A queue is {"renders": [{"state", "station" | "shot", "moment"?, "size"?, "samples"?, "out"?, "patch"?}, ...]};
 a "patch" ({yaw, pitch, fov, aspect}) renders a station through a lens instead of whole (render/patches.py);
 "transparent": true leaves the sky out (alpha, and the star dome hidden), for a page that draws its own sky;
+"exposure" sets the view's exposure for that render only (a roofed hall's 2.4 blows out the same hall unroofed);
 each state is built once and every view in it rendered from the same scene.
 Outputs default to build/render/<view>-<state>.png.
 """
@@ -172,6 +173,8 @@ def main():
             v = by_id[(kind, r[kind])]
             # A view may stand somewhere else in one era (on a boat where the ground is under water).
             v = dict(v, **v.get("by_state", {}).get(state, {}))
+            if "exposure" in r:
+                v = dict(v, exposure=float(r["exposure"]))
             plateau.view(v, kind)
             if "patch" in r:
                 # the station's own scene seen through a lens, for apps/walk to lay over the panorama
