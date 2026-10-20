@@ -12,7 +12,7 @@ import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays }
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
-import { beltPlan, beltPlanSvg, ditchPlanSvg, piCircle, piCircleSvg } from './figures';
+import { beltPlan, beltPlanSvg, ditchPlanSvg, northSquare, northSquareSvg, piCircle, piCircleSvg } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment } from './receipts';
 import { Player } from './player';
@@ -71,6 +71,16 @@ function piCircleFigure(ground: Record<string, number> | null): string {
     ${formatValue(c.perimeter / c.height, 'ratio')}, against 2π, ${formatValue(2 * Math.PI, 'ratio')} (A1).</figcaption>`;
 }
 
+/** C1 drawn, its orientation the bundle's and its exaggeration the claim's overlay's. */
+function northSquareFigure(ground: Record<string, number> | null): string {
+  const n = ground && northSquare(ground);
+  const x = skyData.claims.C1?.exaggeration;
+  if (!n || !x) return '<figcaption>The base is drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  return `${northSquareSvg(n, x)}<figcaption>The base's sides run ${formatValue(Math.abs(n.orientation), 'deg')} ${n.orientation < 0 ? 'west' : 'east'} of
+    true north (the grey square), here drawn ${x} times larger so it can be seen at all. On a side of ${formatValue(n.side, 'm')}, the far
+    end strays ${formatValue(n.stray, 'm')} (C1).</figcaption>`;
+}
+
 async function start(): Promise<void> {
   const status = $('status');
   const fail = (msg: string) => { status.textContent = msg; status.hidden = false; };
@@ -127,6 +137,7 @@ async function start(): Promise<void> {
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
     if (shownFigure === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
+    if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
   });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
   let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
@@ -152,6 +163,7 @@ async function start(): Promise<void> {
     }
     if (id === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
     if (id === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
+    if (id === 'north-square') figure.innerHTML = northSquareFigure(ground);
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;

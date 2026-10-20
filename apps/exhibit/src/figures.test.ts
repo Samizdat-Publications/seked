@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, piCircle, piCircleSvg, sphinxPlanData } from './figures';
+import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, northSquare, northSquareSvg, piCircle, piCircleSvg, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 
@@ -72,5 +72,17 @@ describe('pi in the profile, drawn', () => {
     expect(c.perimeter / c.height).toBeCloseTo(6.28501, 4);   // the script's A1 receipt
     expect(piCircleSvg(c)).toContain('<circle');
     expect(piCircle({})).toBeNull();
+  });
+});
+
+describe('true north, drawn', () => {
+  const ground = groundEnvironment(loadDatabase());
+  it("takes C1's orientation from the database and says how far a side's end strays", () => {
+    const n = northSquare(ground)!;
+    expect(n.orientation).toBe(ground['g1.orientation']);
+    expect(n.orientation * 60).toBeCloseTo(-3.9, 1);   // the script's 3 54 west of north
+    expect(n.stray).toBeCloseTo(0.26, 2);             // and its quarter of a metre
+    expect(northSquareSvg(n, 120)).toContain('120 times');
+    expect(northSquare({})).toBeNull();
   });
 });

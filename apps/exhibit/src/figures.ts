@@ -12,9 +12,12 @@
  *
  * `pi-circle`: A1 drawn: the Great Pyramid's base square and, about the same centre, the circle whose radius is its
  * original height, the two outlines nearly the same length. Both from the bundle's environment.
+ *
+ * `north-square`: C1 drawn: the base square turned by its measured orientation, exaggerated by the claim's own
+ * factor, over a square set to true north.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -164,5 +167,29 @@ export function piCircleSvg(c: NonNullable<ReturnType<typeof piCircle>>, width =
   <line class="dim" x1="${mid}" y1="${mid}" x2="${(mid + r * k).toFixed(1)}" y2="${mid}"/>
   <text class="lab" x="${(mid + (r * k) / 2).toFixed(1)}" y="${mid - 6}" text-anchor="middle">height</text>
   <text class="here-lab" x="${mid}" y="${(mid + half * k - 8).toFixed(1)}" text-anchor="middle">base</text>
+</svg>`;
+}
+
+/** C1's base: its side, its orientation (degrees, negative west of north) and how far a side's end strays, metres. */
+export function northSquare(ground: Record<string, number>): { side: number; orientation: number; stray: number } | null {
+  const side = ground['g1.base.side.mean'], orientation = ground['g1.orientation'];
+  if (side === undefined || orientation === undefined) return null;
+  return { side, orientation, stray: side * Math.tan((Math.abs(orientation) * Math.PI) / 180) };
+}
+
+/** The true square in grey, the measured one turned by `exaggeration` times its orientation, north up. */
+export function northSquareSvg(n: NonNullable<ReturnType<typeof northSquare>>, exaggeration: number, width = 300): string {
+  const mid = width / 2, half = width * 0.3;
+  // a turn west of north (negative) is anticlockwise in plan, which with the screen's y running down is a negative angle
+  const a = (n.orientation * exaggeration * Math.PI) / 180;
+  const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, y]) => {
+    const px = x! * half, py = y! * half;
+    return `${(mid + px * Math.cos(a) - py * Math.sin(a)).toFixed(1)},${(mid + px * Math.sin(a) + py * Math.cos(a)).toFixed(1)}`;
+  });
+  return `<svg viewBox="0 0 ${width} ${width}" width="${width}" height="${width}" role="img" aria-label="The Great Pyramid's base against true north, its turn drawn ${exaggeration} times larger">
+  <line class="dim" x1="${mid}" y1="10" x2="${mid}" y2="${width - 10}"/>
+  <rect class="statue" x="${mid - half}" y="${mid - half}" width="${2 * half}" height="${2 * half}" fill="none"/>
+  <polygon class="wall draw-on" points="${corners.join(' ')}" fill="none" pathLength="1"/>
+  <text class="north" x="${mid + 6}" y="20">true north &#8593;</text>
 </svg>`;
 }

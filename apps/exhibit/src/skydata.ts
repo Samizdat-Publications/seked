@@ -16,7 +16,7 @@ const COL = { id: 0, name: 1, bf: 2, ra: 3, dec: 4, pmRa: 5, pmDec: 6, mag: 8 } 
  */
 export function buildSkyData(sites: { id: string; origin: { latitude: number; longitude: number } }[],
   bright: { attribution: string; stars: unknown[][] }, named: Star[],
-  claims: { id: string; epoch?: number | null; overlay?: { type?: string; params?: { bearings?: { label: string; azimuth: string | number }[] } };
+  claims: { id: string; epoch?: number | null; overlay?: { type?: string; params?: { bearings?: { label: string; azimuth: string | number }[]; exaggeration?: number } };
     comparisons?: { label: string; formula: string | number; target: string | number; unit?: string }[] }[],
   figures: { attribution: string; figures: Record<string, { name: string; lines: string[][] }> } | null = null,
   nights: Record<string, { meridian: string }> = {}, drawn: readonly string[] = ['Leo', 'Ori'], magnitudeLimit = 4.5): SkyData {
@@ -28,7 +28,9 @@ export function buildSkyData(sites: { id: string; origin: { latitude: number; lo
   for (const c of claims) {
     const bearings = c.overlay?.type === 'sun-ribbon' ? (c.overlay.params?.bearings ?? []).map((b) => ({ label: b.label, azimuth: String(b.azimuth) })) : [];
     const comparisons = (c.comparisons ?? []).map((k) => ({ label: k.label, formula: String(k.formula), target: String(k.target), unit: k.unit ?? '' }));
-    if (c.epoch !== undefined || bearings.length) out[c.id] = { epoch: c.epoch ?? null, bearings, comparisons };
+    // a compass rose's exaggeration (C1) is the overlay's own, so a figure drawing it states the claim's factor
+    const exaggeration = c.overlay?.type === 'compass-rose' ? c.overlay.params?.exaggeration : undefined;
+    if (c.epoch !== undefined || bearings.length || exaggeration) out[c.id] = { epoch: c.epoch ?? null, bearings, comparisons, ...(exaggeration ? { exaggeration } : {}) };
   }
   const chosen = Object.fromEntries(drawn.flatMap((k) => (figures?.figures[k] ? [[k, figures.figures[k]!]] : [])));
   const attribution = figures ? `${bright.attribution} ${figures.attribution}` : bright.attribution;

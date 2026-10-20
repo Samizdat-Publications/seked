@@ -1330,7 +1330,9 @@
    },
    "arrive": "cut",
    "say": "The sides run within four minutes of arc of true north. On a side of 230 metres that is a quarter of a metre, with no compass.",
-   "draw": [],
+   "draw": [
+    "north-square@north"
+   ],
    "hold": 2,
    "interact": "look",
    "receipts": [
