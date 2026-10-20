@@ -12,7 +12,7 @@
  *   radius, with the section grown by B1's factor until its apex nears the pole.
  *   It is the same figure at a scale, which is the claim's own note.
  * - `north`: the base from above against true north, its turn (C1) drawn at
- *   true size and then exaggerated up to 120 times, the screen saying by how much.
+ *   true size and then exaggerated as far as C1's overlay says, the screen saying by how much.
  * - `row`: the four as small multiples, each with its residual and its count of
  *   free choices.
  *
@@ -31,8 +31,6 @@ const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 
 export type ProfileMode = 'pi' | 'phi' | 'earth' | 'north' | 'row';
 const FIGURES = ['pi', 'phi', 'earth', 'north'] as const;
-/** C1's overlay draws the turn 120 times larger than life (data/claims/C1.yaml, `exaggeration`). */
-const EXAGGERATION = 120;
 
 export interface ProfileWidget {
   el: HTMLElement;
@@ -164,7 +162,7 @@ export function profileWidget(g: Profile): ProfileWidget {
   }
 
   function north(p: number) {
-    const times = Math.pow(EXAGGERATION, clamp((p - 0.25) / 0.55));
+    const times = Math.pow(g.exaggeration, clamp((p - 0.25) / 0.55));
     const turn = g.c1.value * times;                    // degrees, west of north negative; SVG turns clockwise
     q('.north .turned').setAttribute('transform', `rotate(${turn.toFixed(4)} ${n.x} ${n.y})`);
     const len = n.h + 8;

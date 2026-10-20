@@ -29,6 +29,8 @@ export interface Profile {
   /** The polar radius, metres; the scale factor B1 names. */
   polarRadius: number;
   scale: number;
+  /** How many times larger than life C1's overlay draws the turn. */
+  exaggeration: number;
   /** Each claim's title and its count of free choices, for the row. */
   claims: Record<ProfileClaim, { title: string; freeChoices: number }>;
 }
@@ -57,6 +59,7 @@ export function profileOf(env: Record<string, number>, all: Claim[]): Profile {
     c1: evaluateClaim(claim('C1'), env).comparisons[0]!,
     polarRadius: get('earth.radius.polar'),
     scale: Number(claim('B1').overlay?.params?.['scale'] ?? NaN),
+    exaggeration: Number(claim('C1').overlay?.params?.['exaggeration'] ?? NaN),
     claims: Object.fromEntries(PROFILE_CLAIMS.map((id) => [id, { title: claim(id).title, freeChoices: claim(id).free_choices.length }])) as Profile['claims'],
   };
 }

@@ -21,6 +21,7 @@ describe("chapter 6's profile", () => {
     expect(p.b1[0]!.residualPct).toBeCloseTo(-0.38, 2);
     expect(p.b1[1]!.residualPct).toBeCloseTo(-0.68, 2);
     expect(p.scale).toBe(43200);
+    expect(p.exaggeration).toBe(120);
     expect(p.c1.value * 60).toBeCloseTo(-3.9, 1);
     expect(Object.values(p.claims).map((c) => c.freeChoices)).toEqual([0, 0, 2, 0]);
   });
