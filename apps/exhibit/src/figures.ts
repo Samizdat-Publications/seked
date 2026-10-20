@@ -15,9 +15,12 @@
  *
  * `north-square`: C1 drawn: the base square turned by its measured orientation, exaggerated by the claim's own
  * factor, over a square set to true north.
+ *
+ * `phi-triangle`: A2 drawn: the right triangle inside the pyramid from its centre, half the base along the ground,
+ * the height up and the apothem down the face, with the apothem's ratio to half the base, near φ.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -191,5 +194,28 @@ export function northSquareSvg(n: NonNullable<ReturnType<typeof northSquare>>, e
   <rect class="statue" x="${mid - half}" y="${mid - half}" width="${2 * half}" height="${2 * half}" fill="none"/>
   <polygon class="wall draw-on" points="${corners.join(' ')}" fill="none" pathLength="1"/>
   <text class="north" x="${mid + 6}" y="20">true north &#8593;</text>
+</svg>`;
+}
+
+/** A2's triangle: half the base, the original height and the apothem, metres, and the face's angle, degrees. */
+export function phiTriangle(ground: Record<string, number>): { half: number; height: number; apothem: number; angle: number } | null {
+  const half = ground['g1.base.half'], height = ground['g1.height.original'], apothem = ground['g1.apothem'], angle = ground['g1.face.angle'];
+  if ([half, height, apothem, angle].some((v) => v === undefined)) return null;
+  return { half: half!, height: height!, apothem: apothem!, angle: angle! };
+}
+
+/** The triangle as SVG: base, height and apothem drawn on in turn, each named. */
+export function phiTriangleSvg(t: NonNullable<ReturnType<typeof phiTriangle>>, width = 300): string {
+  const pad = 34, k = (width - 2 * pad) / t.half, h = Math.round(t.height * k + 2 * pad);
+  const O = [pad, h - pad], B = [pad + t.half * k, h - pad], A = [pad, h - pad - t.height * k];
+  const pt = (p: number[]) => `${p[0]!.toFixed(1)},${p[1]!.toFixed(1)}`;
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="The triangle inside the Great Pyramid: half the base, the height and the apothem">
+  <polygon class="statue" points="${pt(O)} ${pt(B)} ${pt(A)}"/>
+  <line class="wall draw-on" x1="${O[0]}" y1="${O[1]}" x2="${B[0]}" y2="${B[1]}" pathLength="1"/>
+  <line class="dim" x1="${O[0]}" y1="${O[1]}" x2="${A[0]}" y2="${A[1]}"/>
+  <line class="wall draw-on late" x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" pathLength="1"/>
+  <text class="here-lab" x="${((O[0]! + B[0]!) / 2).toFixed(1)}" y="${(O[1]! + 18).toFixed(1)}" text-anchor="middle">half the base, 1</text>
+  <text class="lab" x="${((A[0]! + B[0]!) / 2 + 8).toFixed(1)}" y="${((A[1]! + B[1]!) / 2 - 6).toFixed(1)}">apothem, ${(t.apothem / t.half).toFixed(4)}</text>
+  <text class="here-lab" x="${(O[0]! + 6).toFixed(1)}" y="${((O[1]! + A[1]!) / 2).toFixed(1)}">height</text>
 </svg>`;
 }

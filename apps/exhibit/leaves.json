@@ -1260,9 +1260,10 @@
    "arrive": "turn",
    "say": "Draw a line from the apex down the middle of one face. Divide it by half the base and you get the golden ratio, within a twentieth of one per cent.",
    "draw": [
-    "g1-proportions"
+    "g1-proportions",
+    "phi-triangle@golden"
    ],
-   "hold": 2,
+   "hold": 3,
    "interact": "look",
    "receipts": [
     "A2",

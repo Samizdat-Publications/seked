@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, northSquare, northSquareSvg, piCircle, piCircleSvg, sphinxPlanData } from './figures';
+import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 
@@ -84,5 +84,16 @@ describe('true north, drawn', () => {
     expect(n.stray).toBeCloseTo(0.26, 2);             // and its quarter of a metre
     expect(northSquareSvg(n, 120)).toContain('120 times');
     expect(northSquare({})).toBeNull();
+  });
+});
+
+describe('phi in the face, drawn', () => {
+  const ground = groundEnvironment(loadDatabase());
+  it("takes A2's triangle from the database", () => {
+    const t = phiTriangle(ground)!;
+    expect(t.apothem / t.half).toBeCloseTo(1.6187, 4);   // the script's A2 receipt
+    expect(Math.hypot(t.half, t.height)).toBeCloseTo(t.apothem, 6);
+    expect(phiTriangleSvg(t)).toContain('apothem, 1.6187');
+    expect(phiTriangle({})).toBeNull();
   });
 });
