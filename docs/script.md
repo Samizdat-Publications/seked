@@ -2,7 +2,7 @@
 
 # Seked: the script
 
-*First draft, 20 October 2026, edited the same day (the edits are listed at the end). It is built from `docs/research/ch1.md` to `ch8.md`, the claims in `data/claims/` and `docs/dossier.md` (generated 2 October; regenerate it before the receipts are wired). In the source lists, "(new)" marks an id that a brief proposed and checked, and "(new, unchecked)" marks one the brief did not check. Ids without a mark are already in `data/sources.json`.*
+*First draft, 20 October 2026, edited the same day (the edits are listed at the end). It is built from `docs/research/ch1.md` to `ch8.md` (chapter 8's brief is now chapter 9's), `khafre-sar.md` and `labyrinth.md` for the new chapter 8, the claims in `data/claims/` and `docs/dossier.md` (generated 2 October; regenerate it before the receipts are wired). In the source lists, "(new)" marks an id that a brief proposed and checked, and "(new, unchecked)" marks one the brief did not check. Ids without a mark are already in `data/sources.json`.*
 
 ---
 
@@ -415,9 +415,64 @@ No one doubts Göbekli Tepe's age, or that hunter-gatherers built it. What the e
 
 ---
 
-## 8. What would settle it
+## 8. Underneath
 
-**Narration** (217 words)
+*A draft, written by the night builder on 20 October from `docs/research/khafre-sar.md` and `docs/research/labyrinth.md` (night list, decisions 23 to 27). It has not yet been edited by the session or read by Stewart.*
+
+**Narration** (215 words)
+
+Everything so far stands on the surface. The proponents say the oldest part of Giza may lie beneath it.
+
+In March 2025 an Italian team that includes a radar engineer, Filippo Biondi, showed what they said satellites had found under Khafre's pyramid. Radar cannot see far into rock, and Biondi agrees. Their method reads instead the faint vibrations of the ground, the way an ultrasound reads a body. What they read is eight hollow wells in two rows, wound with spiral paths, falling 648 metres to two great chambers about 80 metres on a side. That is four and a half times the pyramid's height, straight down.
+
+The rooms anyone has walked into lie three metres under its base.
+
+Ninety kilometres south, at Hawara, stood the Labyrinth. Herodotus saw it and said it surpassed the pyramids: three thousand rooms, half of them underground, which nobody would show him. Petrie found only a bed of stone chips, larger than the Great Pyramid's base. In 2008 Egypt's own geophysics institute surveyed the ground there, and the expedition behind it reported walls eight to twelve metres down.
+
+Under the Sphinx's paws, Schoch's seismic survey found a hollow that has never been opened. Edgar Cayce said a Hall of Records waited there.
+
+Nobody has dug for any of it.
+
+**Beats**
+
+- "Everything so far stands on the surface." → **live over stills**, new: the cutaway. Khafre's pyramid and the plateau east of a north–south plane through its axis are cut away, and the rock is drawn as in an x-ray, in the `today` era from the south-east.
+- "under Khafre's pyramid" → the team's tomogram appears as a plate on the section plane, placed by its own labels (the base and 648 m), captioned "Khafre Project, 2025; placed by its labels, not scaled". Until permission is given, the plate is a link and a grey frame.
+- "the way an ultrasound reads a body" → a small diagram inset: the radar's return off the surface, and a ring of vibration spreading in the rock, labelled "the method as its authors describe it".
+- "eight hollow wells in two rows" → the claimed geometry draws itself downwards in the claimed tier's look (dashed, translucent, never stone): the five Zeds in the base, then the eight wells and their spirals. A small label: "diameter, spacing and spiral pitch not published; drawn as a look choice".
+- "two great chambers about 80 metres on a side" → the two cubes at −648 m.
+- "four and a half times the pyramid's height" → ghosts of Khafre's pyramid stack beside the wells, one, two, three, four and a half, with the receipt counting.
+- "three metres under its base" → the camera rises to the base. The excavated substructure (`g2-interior.json`) is drawn in stone, a hairline at this scale. A depth scale runs down the left edge: −3 m, the burial chamber's floor; about −30 m, the Osiris Shaft under the causeway; −648 m.
+- "Ninety kilometres south, at Hawara" → a still at Hawara: Amenemhat III's pyramid from Petrie's figures, the canal, and the chip bed to its south.
+- "larger than the Great Pyramid's base" → the chip bed and Hawara's pyramid laid on Giza beside the Great Pyramid at the same scale, labelled "at Hawara, 90 km south; laid here for scale".
+- "walls eight to twelve metres down" → a north–south section south of Hawara's pyramid: Petrie's chips, Elshazly's closures at 5 and 7.5 m as solid boxes, the Mataha walls dashed and labelled "reported, unpublished", the water table as a blue band from 1.5 to 10 m, limestone at 12 to 15 m, and Herodotus's lower storey as a ghost.
+- "Under the Sphinx's paws" → back at Giza: the paw cavity (`claimed`) as a dashed outline about 5 m down, and the Hall of Records (`legendary`) ghosted under it.
+- "Nobody has dug for any of it." → every underground object on one depth scale, coloured by tier. Hold, then on into chapter 9.
+
+**Receipts**
+
+- **Depths against heights.** 648 m against `g2.height.original` is four and a half pyramid heights. Against the burial chamber's floor (`g2.passage.horizontal.floor.begin.up`, −3.0 m, `maragioglio-rinaldi-1966`, verified), the claimed wells go about 216 times deeper than any known room of Khafre's. Both are new labels, computed, with no target and so no residual.
+- **The known against the claimed**, by tier from `data/structures.json`:
+  - `excavated`: Khafre's substructure, `osiris-shaft`, and at Hawara the pyramid and the chip bed (proposed).
+  - `instrumented`: the Hawara closures of Elshazly 2024 (proposed).
+  - `claimed`: `g2.sar-shafts`, `sphinx.paw-cavity`, and at Hawara the Mataha walls and the Merlin Burrows levels (proposed).
+  - `legendary`: `hall-of-records`, and Herodotus's lower storey (proposed).
+- **The Labyrinth's size.** Petrie's chip bed against Khufu's base (`g1.base.side.mean`) is about 1.4 times the area, computed by `@seked/geometry` once Petrie's figures are records.
+- **What the claim gives and does not.** The abstract gives a count, two rows, a depth and a cube size. It gives no diameter, no spacing and no scale bar, and the receipt lists those as the free choices our drawing needed.
+- **Proposed data:** every claimed figure in `data/measurements/g2-sar.json` with `method: "as claimed"`; Petrie's Hawara in `data/measurements/hawara.json`; Hawara in `data/sites.json`; the water table (`sharafeldin-2019`) and Khufu's base elevation above sea level, so the section can draw how far the wells stand below the groundwater.
+
+**The reply**
+
+The method's only peer-reviewed paper, Biondi and Malanga's 2022 study of Khufu's pyramid, was retracted on 10 August 2026 for "serious methodological flaws and statistical errors"; the authors disagree. Radar specialists say that a satellite measures only the surface it sees, and that vibrations from hundreds of metres down are far too small to detect from orbit. No data or code has been released, so nobody has been able to check the processing. Egypt's antiquities authority gave no permission for work at Khafre, and Zahi Hawass says the pyramid sits on bedrock carved about eight metres down. Wells that deep would stand hundreds of metres below the water table. At Hawara, Petrie found Amenemhat III's name on the Labyrinth's architraves: it was his temple, built in the nineteenth century BCE, seven centuries after Khufu. The 2008 survey's own leader has since published, with colleagues, anomalies only five to seven and a half metres down, and an independent radar survey found "nothing to support the idea that this was Herodotus's labyrinth". Herodotus says himself that he only heard of the lower rooms.
+
+**Spoken reply**: Archaeologists answer that the radar method's only peer-reviewed paper was retracted and its data never released, and that the Labyrinth was Amenemhat III's temple, where the published surveys find only shallow remains.
+
+**Sources**: `khafre-project-2025`, `maragioglio-rinaldi-1966`, `petrie-1883`, `hawass-2007`, `dobecki-schoch-1992`, `cayce`, `biondi-malanga-2022` (new), `remote-sensing-retraction-2026` (new), `retraction-watch-2026-giza` (new), `pilicy-2025` (new), `el-aref-2025` (new), `moss-2025-natgeo` (new), `alvarez-1970` (new), `sharafeldin-2019` (new), `herodotus-2-148` (new; checked only as quoted by Carlotto), `petrie-1889` (new), `petrie-1890` (new), `petrie-1912` (new), `elshazly-2024` (new), `szynkiewicz-2015` (new), `khalil-2010` (new; abstract only), `de-cordier-2025-mataha` (new), `de-cordier-2025-merlin-burrows` (new)
+
+---
+
+## 9. What would settle it
+
+**Narration** (219 words)
 
 Much of this case can be tested. Under the Sphinx, the test that matters most has not been made.
 
@@ -425,7 +480,7 @@ Look beneath the floor of the ditch. Schoch's seismic lines found the rock weath
 
 It can be done. In 2008 Egypt's antiquities authority and Cairo University drilled four boreholes twenty metres into the bedrock around the Sphinx, to watch the groundwater. We have found no published record of how weathered that rock was.
 
-Under the paws, the same seismic survey found an anomaly that might be a room or a fissure. It has never been opened.
+Underneath, the paw cavity could be opened, the radar team could release its data, and a dig at Hawara could go below the chips.
 
 An answer looks like this: inside the Great Pyramid, muon detectors found a hidden corridor, gave its size with error bars, and a camera confirmed it.
 
@@ -437,10 +492,11 @@ Hancock, Bauval and Schoch read the stone, the sky and the texts as one story. W
 - "Look beneath the floor of the ditch." → a long east–west section under the Sphinx. The weathered zone is a translucent band, about 2 m deep at the front thinning to about 1.2 m at the rump (W1's proposed inputs, labelled "by Schoch's account, unverified"). A blue line marks the water table at about 15 m elevation against a floor at about 20 m (`sharafeldin-2019`).
 - "Two cores, one at the paws and one behind the rump" → the scroll drops two dashed cores through the band to sound rock, labelled "not yet drilled".
 - "In 2008" → a plan view with four solid pins for boreholes PZ/S1 to S4, scaled from the YSI plan and registered on the Sphinx's outline, with their sigma. They are labelled "drilled 2008, logs not published", and in the section each runs down 20 m.
-- "Under the paws" → the evidence tiers drawn side by side:
-  - the paw cavity (`claimed`): a dashed outline with no error box;
+- "Underneath" → chapter 8's depth scale returns, each claim with its test drawn dashed beside it:
+  - the paw cavity (`claimed`): a dashed outline with no error box, and a dashed core into it;
   - the Hall of Records (`legendary`): ghosted;
-  - the SAR shafts under Khafre (`claimed`): dashed, small, off to the west;
+  - the SAR shafts under Khafre (`claimed`): dashed, small, off to the west, labelled "data not released";
+  - the Hawara section: a dashed trench below Petrie's chips, labelled "not yet dug";
   - the rump passage (`excavated`): solid.
 - "An answer looks like this" → a cut to chapter 5's section of the Great Pyramid. The north-face corridor (`instrumented`) is a solid box with its error bars. The Big Void (`instrumented`) is a hatched zone 40 to 50 m above the Queen's Chamber floor.
 - "read the stone, the sky and the texts as one story" → a strip of the nine chapters' key frames runs briefly across the stage.
@@ -474,11 +530,11 @@ Hancock, Bauval and Schoch read the stone, the sky and the texts as one story. W
 
 **The reply**
 
-Most of what could be dated has been. In 1984 the Edgar Cayce Foundation, interested in Cayce's claim that the pyramids dated to 10,500 BCE, paid for radiocarbon dates on organic material in their mortar. More than 450 samples from 1984 and 1995 place the Fourth Dynasty monuments between about 2900 and 2400 BCE. That is a few centuries older than the historical dates, which the team traces to old wood burned for the mortar. The luminescence team that the proponents cite found nothing that "corroborates a prehistoric age". In 1978, five holes drilled into the largest anomalies around the Sphinx found "only minor natural cracks". The 2025 radar claims of shafts under Khafre's pyramid have not appeared in a journal, and the paper they built on was retracted in August 2026. Egypt permits instrumented, peer-reviewed work: that is how the corridor was found.
+Most of what could be dated has been. In 1984 the Edgar Cayce Foundation, interested in Cayce's claim that the pyramids dated to 10,500 BCE, paid for radiocarbon dates on organic material in their mortar. More than 450 samples from 1984 and 1995 place the Fourth Dynasty monuments between about 2900 and 2400 BCE. That is a few centuries older than the historical dates, which the team traces to old wood burned for the mortar. The luminescence team that the proponents cite found nothing that "corroborates a prehistoric age". In 1978, five holes drilled into the largest anomalies around the Sphinx found "only minor natural cracks". Egypt permits instrumented, peer-reviewed work: that is how the corridor was found.
 
 **Spoken reply**: Archaeologists answer that none of the physical dates taken at Giza, the first of them paid for by Cayce's own foundation, comes anywhere near 10,500 BCE, and that the holes drilled into the Sphinx's anomalies in 1978 found only cracks.
 
-**Sources**: `dobecki-schoch-1992`, `morishima-2017`, `procureur-2023`, `khafre-project-2025`, `cayce`, `arce-sphinx-1991`, `bonani-2001` (new), `aera-radiocarbon` (new), `liritzis-vafiadou-2015` (new), `dolphin-1978` (new), `ysi-2009-sphinx` (new), `sharafeldin-2019` (new), `biondi-malanga-2022` (new; retraction checked through Retraction Watch, notice not fetched), `retraction-watch-2026-giza` (new), `moss-2025-natgeo` (new), `harrell-1994` (new), `schoch-1992-kmt` (new, unchecked)
+**Sources**: `dobecki-schoch-1992`, `morishima-2017`, `procureur-2023`, `cayce`, `arce-sphinx-1991`, `bonani-2001` (new), `aera-radiocarbon` (new), `liritzis-vafiadou-2015` (new), `dolphin-1978` (new), `ysi-2009-sphinx` (new), `sharafeldin-2019` (new), `harrell-1994` (new), `schoch-1992-kmt` (new, unchecked)
 
 ---
 
@@ -496,17 +552,18 @@ At 150 words a minute:
 | 5. The sky as a clock | 219 | 1:28 |
 | 6. Numbers in the stone | 219 | 1:28 |
 | 7. Before the flood | 210 | 1:24 |
-| 8. What would settle it | 217 | 1:27 |
-| **Total** | **1,853** | **12:21** |
+| 8. Underneath (draft) | 215 | 1:26 |
+| 9. What would settle it | 219 | 1:28 |
+| **Total** | **2,070** | **13:48** |
 
-The nine spoken replies come to about 290 words, roughly two minutes, so autoplay runs about 14 minutes. That is inside the plan's 12 to 15.
+The ten spoken replies come to about 320 words, roughly two minutes, so autoplay runs about 16 minutes, a minute over the plan's 12 to 15. Chapter 8 is where to trim if Stewart wants it back inside.
 
 ## Open questions for Stewart
 
 **Unchecked sources the script leans on**
 
-1. **The seismic depths (chapters 1 and 8).** Dobecki and Schoch's own figures have not been read: the depths, their sigmas, S4's "about 4 m", and the paw anomaly's size and its "about 5 m" depth in `structures.json`. The "two metres" and "a little over one" come from Reader and Harrell quoting Schoch's *KMT* article, so the narration says "by his account". W1 cannot go into `data/` until the paper is read, and it should be read before the voice records chapter 1.
-2. **A reported reversal.** One search snippet says a later Dobecki study found "no evidence" of wet-period weathering. If that is confirmed, chapters 1 and 8 change. It needs checking before anything is recorded.
+1. **The seismic depths (chapters 1, 8 and 9).** Dobecki and Schoch's own figures have not been read: the depths, their sigmas, S4's "about 4 m", and the paw anomaly's size and its "about 5 m" depth in `structures.json`. The "two metres" and "a little over one" come from Reader and Harrell quoting Schoch's *KMT* article, so the narration says "by his account". W1 cannot go into `data/` until the paper is read, and it should be read before the voice records chapter 1.
+2. **A reported reversal.** One search snippet says a later Dobecki study found "no evidence" of wet-period weathering. If that is confirmed, chapters 1 and 9 change. It needs checking before anything is recorded.
 3. **When Schoch first looked.** The 1991 GSA abstract is unchecked, so the narration says "the early 1990s" rather than a year.
 4. **Reader 2026** is known only through two reviews. Chapter 2's narration names it, through Lacovara, who read the book. Reader 2001's page range conflicts between sources (149–165 or 149–159).
 5. **Chapter 3.** The 1993 NBC film was not seen; West and Schoch are known only as Lehner quotes them in 1994. The findspot of Khafre's statues is checked only through summaries. The air date of Hancock's Fridman interview is unchecked.
@@ -524,16 +581,21 @@ The nine spoken replies come to about 290 words, roughly two minutes, so autopla
    - Pillar heights, the carved arms and belts, Pillar 43, and Karahan Tepe and the wider Taş Tepeler sites are all left out of the narration for want of checked sources. Each would strengthen the claim if it were checked.
    - "About 1,100 kilometres" is arithmetic on approximate coordinates.
 10. **Chapter 2's reply.** "The Egyptian zodiacs that show it … are late" rests on Aubourg's listing. The proponents' best answer to it, a native Egyptian "Lion" constellation in Neugebauer and Parker, is unchecked and not in the script.
-11. **Chapter 8.**
+11. **Chapter 9** (chapter 8 before the split).
     - The script says nothing about anyone asking to drill and being refused, because no primary source was found.
     - The 2008 borehole logs would be worth asking the SCA or Cairo University for.
     - The note on `g2.sar-shafts` says "the Egyptian antiquities authority rejected it". The brief found only Hawass, a former minister, calling it baseless, so the note needs correcting.
+11a. **Chapter 8, the new draft** (night of 20 October).
+    - It is a draft in the script's voice, not yet edited. It names Biondi only, as the radar engineer whose method it is; the abstract is signed by Biondi, Mei and Malanga.
+    - "Hawass says the pyramid sits on bedrock carved about eight metres down" is his word in Al-Ahram Weekly (8 April 2025), as the brief read it; the narration does not repeat his "fake news".
+    - The Mataha walls (8 to 12 m) are told as "the expedition behind it reported", because no report has been published. The Merlin Burrows levels are in the beats and receipts only, not the narration, for want of words; they could replace the Hall of Records line.
+    - The pyramids' heights: "four and a half times" is 648 m over `g2.height.original`; the label is computed, not typed.
 
 **Choices of emphasis (yours)**
 
 12. **Left out entirely:** the Domingo face comparison (every detail is unchecked), the Osireion, the Edfu building texts, Temple's Anubis and Sweatman's Pillar 43. Each could come back as a line once it is checked.
 13. **Chapter 7 says, in the narrator's voice:** "For this piece too, it is what makes the rest worth taking seriously." The brief records this as your view and the piece's (19 and 20 October), so it stays; it is listed only because it is said in the main voice.
-14. **Chapter 8's close says plainly:** "Where it has been measured, the measurements have mostly gone against it." That is a verdict in the main voice, not the reply's. It is the honest close the brief asked for, but its strength is your call.
+14. **Chapter 9's close says plainly:** "Where it has been measured, the measurements have mostly gone against it." That is a verdict in the main voice, not the reply's. It is the honest close the brief asked for, but its strength is your call.
 15. **Chapter 2 says the Lion "rose in the east"**, not "due east". The beat draws the 10° gap and the receipt states the miss.
 16. **Chapter 5 gives only the King's Chamber shaft.** Sirius is left out for word count, and the Thuban miss appears only in the receipt.
 17. **Reader appears on both sides:** as support for running water in chapter 1's narration, and against the date in the reply panels. Check that this is the balance you want.
@@ -559,4 +621,11 @@ Made by the cloud session on 20 October, against the briefs:
 - H1 and open question 20: the master lion is now made in the cloud, not waited for from the laptop.
 - Open question 13: Göbekli Tepe's place in the piece is the brief's agreed view, so it is no longer
   put as a question.
+
+Made by the night builder on 20 October (`docs/night-2026-10-20.md`, item 2):
+
+- Chapter 8 split in two (decision 23): a new chapter 8, *Underneath*, drafted from the two new briefs,
+  and the old chapter 8 renumbered 9. Chapter 9's "Under the paws" line now names a test for each claim
+  underneath (open the cavity, release the radar data, dig at Hawara), and its reply leaves the radar
+  claims to chapter 8's.
 
