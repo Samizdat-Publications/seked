@@ -50,6 +50,13 @@ details { margin: 1.2rem 0; border-top: 1px solid #d8c9ae; padding-top: 0.6rem; 
 summary { cursor: pointer; color: var(--quiet); font-family: system-ui, sans-serif; font-size: 0.9rem; }
 details.reply p, details.receipts { font-size: 0.95rem; line-height: 1.5; color: var(--quiet); }
 .sources { font-size: 0.8rem; }
+.reply-still { margin: 0.8rem 0 1.2rem; }
+.reply-still img { display: block; width: 100%; height: auto; background: #14100c; }
+.reply-still figcaption { margin-top: 0.4rem; font: 0.8rem/1.4 system-ui, sans-serif; color: var(--quiet); }
+.reply-still .tags span {
+  display: inline-block; margin-left: 0.3rem; padding: 0 0.4rem; border-radius: 0.2rem; font-size: 0.7rem;
+  border: 1px solid #d8c9ae;
+}
 code { font-family: ui-monospace, monospace; font-size: 0.85em; }
 table { border-collapse: collapse; font-size: 0.85rem; }
 td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: left; }

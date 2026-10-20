@@ -138,6 +138,29 @@ export const STILLS: Still[] = [
     alt: 'The Sphinx today', tags: ['stand-in'] },
 ];
 
+/**
+ * Pictures for the replies: shown inside a chapter's collapsed reply, after the paragraph holding `anchor`
+ * (words from the reply, as a still's anchor is words from the narration). The reply is quieter than the
+ * claim, so its pictures stay in its panel rather than taking the stage.
+ */
+export interface ReplyStill {
+  chapter: number;
+  anchor: string;
+  src: string;
+  alt: string;
+  tags: Tag[];
+}
+
+export const REPLY_STILLS: ReplyStill[] = [
+  { chapter: 7, anchor: 'now looks like slope slides', src: 'progress/0049-enclosure-d-slope-slides.png',
+    alt: 'Enclosure D filled by slope slides from the higher ground, as the excavators now read it', tags: ['stand-in', 'look choices'] },
+  { chapter: 8, anchor: 'hundreds of metres below the water table', src: 'progress/0037-underneath-khafre-reply.png',
+    alt: 'The claimed wells against radar’s reach (10 m at most), the water table and the claim’s 648 m', tags: ['look choices'] },
+];
+
+/** Every committed file the page shows a copy of: the stage's stills and the replies' pictures. */
+export const pageSources = (): string[] => [...new Set([...STILLS, ...REPLY_STILLS].map((s) => s.src))];
+
 /** Each chapter's key frame for chapter 9's strip: its first still, for every chapter before the last. */
 export const keyFrames = (): Still[] => {
   const last = Math.max(...STILLS.map((s) => s.chapter));

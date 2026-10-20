@@ -22,7 +22,7 @@ import { profileOf } from './profile';
 import { profileWidget, type ProfileMode, type ProfileWidget } from './profilewidget';
 import { skyWidget, type SkyWidget } from './skywidget';
 import { timelineWidget, type TimelineMode, type TimelineWidget } from './timelinewidget';
-import { STILLS, keyFrames, markAnchors, markers, splitAtFigures, stillFile, type Still } from './stills';
+import { REPLY_STILLS, STILLS, keyFrames, markAnchors, markers, splitAtFigures, stillFile, type Still } from './stills';
 import './style.css';
 
 const chapters = parseScript(script);
@@ -38,6 +38,14 @@ function narrationHtml(c: Chapter, p: string): string {
 /** A paragraph holding a live figure's beat is followed by room to scroll it through. */
 const holds = (c: Chapter, p: string) => markAnchors(p, stillsOf(c).filter((s) => s.widget).map((s) => s.anchor)).found.length > 0;
 
+/** The reply's pictures that follow this paragraph, captioned and tagged as the stage's are. */
+function replyStillsAfter(c: Chapter, p: string): string {
+  return REPLY_STILLS.filter((r) => r.chapter === c.n && markAnchors(p, [r.anchor]).found.length)
+    .map((r) => `<figure class="reply-still"><img src="./${stillFile(r.src)}" alt="${r.alt}" loading="lazy" />` +
+      `<figcaption>${r.alt}${r.tags.length ? ` <span class="tags">${r.tags.map((t) => `<span>${t}</span>`).join('')}</span>` : ''}` +
+      `</figcaption></figure>`).join('');
+}
+
 function chapterHtml(c: Chapter): string {
   const receipts = c.receipts && !/^- None\b/.test(c.receipts)
     ? `<details class="receipts"><summary>Receipts${c.claims.length ? ` · ${c.claims.join(', ')}` : ''}</summary>` +
@@ -51,7 +59,7 @@ function chapterHtml(c: Chapter): string {
         .map((p) => `<p${holds(c, p) ? ' class="hold"' : ''}>${narrationHtml(c, p)}</p>`).join('')}</div>
       ${receipts}
       <details class="reply"><summary>The reply</summary>
-        ${c.reply.map((p) => `<p>${inline(p)}</p>`).join('')}
+        ${c.reply.map((p) => `<p>${inline(p)}</p>${replyStillsAfter(c, p)}`).join('')}
         ${c.sources.length ? `<p class="sources">Sources: ${c.sources.map((s) => `<code>${inline(s)}</code>`).join(', ')}</p>` : ''}
       </details>
     </section>`;

@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { inline } from './markdown';
 import { parseScript } from './script';
-import { splitAtFigures, STILLS, keyFrames, markAnchors, markers, stillFile, stillSource } from './stills';
+import { REPLY_STILLS, pageSources, splitAtFigures, STILLS, keyFrames, markAnchors, markers, stillFile, stillSource } from './stills';
 
 const root = join(__dirname, '..', '..', '..');
 const chapters = parseScript(readFileSync(join(root, 'docs', 'script.md'), 'utf8'));
@@ -47,6 +47,34 @@ describe('the stage’s stills', () => {
     for (const s of STILLS) {
       if (/lion|10,?[45]\d\d|First Time/.test(s.alt) && s.chapter !== 9) expect(s.tags, s.alt).toContain('claim state');
       if (/sphinx|lion/i.test(s.src)) expect(s.tags, s.src).toContain('stand-in');
+    }
+  });
+});
+
+describe('the replies’ pictures', () => {
+  it('are committed files the site publishes, each with a page copy of its own', () => {
+    const files = new Map<string, string>();
+    for (const src of pageSources()) {
+      expect(/^(progress|alignments\/img)\//.test(src), src).toBe(true);
+      expect(existsSync(stillSource(root, src)), src).toBe(true);
+      expect(files.get(stillFile(src)) ?? src, src).toBe(src);
+      files.set(stillFile(src), src);
+    }
+    for (const r of REPLY_STILLS) expect(pageSources()).toContain(r.src);
+  });
+
+  it('each follow exactly one paragraph of their chapter’s reply', () => {
+    for (const r of REPLY_STILLS) {
+      const c = chapters.find((ch) => ch.n === r.chapter);
+      expect(c, `chapter ${r.chapter}`).toBeDefined();
+      expect(c!.reply.filter((p) => markAnchors(p, [r.anchor]).found.length).length, r.anchor).toBe(1);
+    }
+  });
+
+  it('are labelled stand-ins and look choices as the stage’s are', () => {
+    for (const r of REPLY_STILLS) {
+      if (/enclosure-d|sphinx|lion/i.test(r.src)) expect(r.tags, r.src).toContain('stand-in');
+      if (/underneath|enclosure-d/.test(r.src)) expect(r.tags, r.src).toContain('look choices');
     }
   });
 });
