@@ -22,7 +22,11 @@ so the eras are one statue at different ages:
   Then the carving: the lion head's surface is drawn onto the king's head (Blender's Shrinkwrap), fully
   above the jaw and fading out down the neck and chest. The lion's faces there are then cut away, and
   the king's head, with its own texture, closes the hole exactly at the cut.
-- **today**: the same, further again; the restorations and the losses are still to come.
+- **today**: the as-built statue, king's head and all, worn on by what the rains and the wind took since
+  (weathering.further), so the head fit stays the 2500 BCE number it is; then the losses and the repairs:
+  the nose, chiselled off flat to the cheeks; the beard's socket, a scar on the chest under the chin; and
+  the masonry that cases the lower body and the paws, a different stone that wears no further. Their sizes
+  are look choices (LOSSES below, written into era.json).
 
 Each era is written to build/models/<master>-<era>/model.glb in the master's own frame, as a "finish" of
 the master: sphinx.statue fits it to the footprint exactly as it fits the master, so every era stands in
@@ -126,6 +130,9 @@ def derive(bm, era, front="-y"):
     h = (co[:, 2] - co[:, 2].min()) / np.ptp(co[:, 2])
     scale = height / np.ptp(co[:, 2])                # metres per model unit
     length = np.ptp(along) * scale
+    # the frame later wear is measured in, fixed before any wear moves the statue's extremes
+    frame = {"axis": axis, "sign": sign, "a0": along.min(), "aspan": np.ptp(along), "z0": co[:, 2].min(),
+             "zspan": np.ptp(co[:, 2]), "scale": scale, "height": height, "length": length}
     d = weathering.recession(u, h, nor[:, 2], era, height, length) / scale
     if d.any():
         d, nor = held(bm, co, nor, d)
@@ -135,7 +142,74 @@ def derive(bm, era, front="-y"):
     for _ in range(ROUNDING[era]):
         bmesh.ops.smooth_vert(bm, verts=bm.verts[:], factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
     bm.normal_update()
-    return float(d.max() * scale), float(np.median(d) * scale)
+    return float(d.max() * scale), float(np.median(d) * scale), frame
+
+
+def wear_on(bm, frame, since, era):
+    """Wear the statue in `bm`, as it stood in era `since`, on to `era`, in place; the masonry casing wears no
+    further. Returns the further recession's deepest and median in metres, and which points are cased."""
+    f = frame
+    bm.verts.index_update()
+    bm.normal_update()
+    co = np.array([v.co[:] for v in bm.verts])
+    nor = np.array([v.normal[:] for v in bm.verts])
+    u = (co[:, f["axis"]] * f["sign"] - f["a0"]) / f["aspan"]
+    h = (co[:, 2] - f["z0"]) / f["zspan"]
+    cased = weathering.masonry(u, h, f["height"])
+    d = weathering.further(u, h, nor[:, 2], since, era, f["height"], f["length"]) / f["scale"]
+    d[cased] = 0.0
+    d, nor = held(bm, co, nor, d)
+    d[cased] = 0.0                                   # the casing stands proud of the stone worn back above it
+    for v, c in zip(bm.verts, co - nor * d[:, None]):
+        v.co = c
+    # the rounding the longer wear adds, on the body only: the head is sound stone and the casing is cut
+    body = [v for v, hh, c in zip(bm.verts, h, cased) if hh < CARVE_FROM and not c]
+    for _ in range(ROUNDING[era] - ROUNDING[since]):
+        bmesh.ops.smooth_vert(bm, verts=body, factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
+    bm.normal_update()
+    worn = d[d > 0]
+    return float(d.max() * f["scale"]), float((np.median(worn) if len(worn) else 0.0) * f["scale"]), cased
+
+
+# Today's losses, as fractions of the king's bust (its height from the cut foot to the crown, and its width
+# across) and in metres (look choices, read off the king's head's own front profile): the nose, from the
+# upper lip to the bridge, chiselled flat to the cheeks either side of it; the beard's socket, a scar on the
+# chest under the chin where the beard was set, which the king's head stand-in has no beard to leave.
+LOSSES = {"nose": {"from": 0.50, "to": 0.68, "half_width": 0.07, "cheeks": (0.10, 0.16)},
+          "beard_socket": {"from": 0.12, "to": 0.38, "half_width": 0.06, "depth_m": 0.35}}
+
+
+def losses(bm, frame, king):
+    """Take today's losses off the king's head and chest in `bm`; `king` marks the king head's vertices."""
+    f = frame
+    bm.verts.index_update()
+    co = np.array([v.co[:] for v in bm.verts])
+    fwd = co[:, f["axis"]] * f["sign"]
+    kco = co[king]
+    kz0, kspan = kco[:, 2].min(), np.ptp(kco[:, 2])
+    kz = (co[:, 2] - kz0) / kspan
+    mid = np.median(kco[:, 1 - f["axis"]])
+    off = np.abs(co[:, 1 - f["axis"]] - mid) / np.ptp(kco[:, 1 - f["axis"]])
+    nor = np.array([v.normal[:] for v in bm.verts])
+    facing = nor[:, f["axis"]] * f["sign"] > 0.4
+    n = LOSSES["nose"]
+    band = king & (kz > n["from"]) & (kz < n["to"])
+    cheeks = band & facing & (off > n["cheeks"][0]) & (off < n["cheeks"][1])      # the cheeks' faces, not the nemes behind them
+    plane = np.percentile(fwd[cheeks], 95)          # their front: the nemes folds behind face forward too
+    nose = band & (off < n["half_width"]) & (fwd > plane)
+    b = LOSSES["beard_socket"]
+    box = (kz > b["from"]) & (kz < b["to"]) & (off < b["half_width"]) & facing & (fwd > plane - 0.25 * kspan)
+    t = np.clip(1.0 - off / b["half_width"], 0, 1) * np.sin(np.pi * np.clip((kz - b["from"]) / (b["to"] - b["from"]), 0, 1))
+    sink = np.where(box, b["depth_m"] / f["scale"] * np.sqrt(t), 0.0)
+    for i, v in enumerate(bm.verts):
+        if nose[i] or sink[i] > 0:
+            c = v.co.copy()
+            a = plane if nose[i] else fwd[i] - sink[i]
+            c[f["axis"]] = a * f["sign"]
+            v.co = c
+    bm.normal_update()
+    return {"nose_points": int(nose.sum()), "nose_m": round(float((fwd[nose].max() - plane) * f["scale"]), 2) if nose.any() else 0.0,
+            "beard_socket_points": int(box.sum()), **LOSSES}
 
 
 # A point may recede by at most this share of the stone behind it, so a nose, a lappet's edge or a toe wears
@@ -349,8 +423,8 @@ def main(argv):
     for era in eras:
         bpy.ops.wm.read_factory_settings(use_empty=True)
         mesh, bm = welded(source, f"{master} {era}")
-        deepest, median = derive(bm, era, model.get("front", "-y"))
-        fit = None
+        deepest, median, frame = derive(bm, "built" if era == "today" else era, model.get("front", "-y"))
+        fit = extra = None
         if era in ("built", "today"):
             king = os.path.join(MODELS, "sphinx-king-head", "model.glb")
             if not os.path.exists(king):
@@ -370,11 +444,37 @@ def main(argv):
             bpy.data.meshes.remove(tmp)
             kbm.free()
             print(f"head fit: {fit}")
+        if era == "today":
+            # today is the as-built statue worn on, so the head fit above is the as-built one
+            bm.verts.index_update()
+            king = np.zeros(len(bm.verts), dtype=bool)
+            for face in bm.faces:
+                if face.material_index >= offset:
+                    for v in face.verts:
+                        king[v.index] = True
+            further, further_median, cased = wear_on(bm, frame, "built", "today")
+            lost = losses(bm, frame, king)
+            # the casing is another stone: its faces take a material of their own, which the render dresses
+            masonry = mesh.materials[0].copy()
+            masonry.name = "masonry"
+            mesh.materials.append(masonry)
+            mi = len(mesh.materials) - 1
+            n_cased = 0
+            for face in bm.faces:
+                if face.material_index < offset and all(cased[v.index] for v in face.verts):
+                    face.material_index = mi
+                    n_cased += 1
+            extra = {"derived_from": "built", "since_built": {"deepest_m": round(further, 3), "median_m": round(further_median, 3)},
+                     "masonry": {"faces": n_cased, "over_member_i_m": weathering.MASONRY_OVER_MEMBER_I}, "losses": lost}
+            print(f"today: {extra}")
         out = os.path.join(MODELS, f"{master}-{era}", "model.glb")
         write(mesh, bm, out)
         bm.free()
         record = {"master": master, "era": era, "deepest_m": round(deepest, 3), "median_m": round(median, 3),
-                  "vertices": len(mesh.vertices), "fit": fit, "made_by": "render/giza/sphinx_eras.py"}
+                  "vertices": len(mesh.vertices), "fit": fit, "scale_m_per_unit": round(float(frame["scale"]), 4),
+                  "made_by": "render/giza/sphinx_eras.py"}
+        if extra:
+            record.update(extra)
         with open(os.path.join(os.path.dirname(out), "era.json"), "w", encoding="utf-8") as f:
             json.dump(record, f, indent=2)
         print(f"{master}-{era}: {out}, {len(mesh.vertices)} vertices, deepest {deepest:.2f} m, median {median:.2f} m")

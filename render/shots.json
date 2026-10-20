@@ -155,6 +155,20 @@
       "moment": "june-dawn"
     },
     {
+      "id": "sphinx-face",
+      "name": "The Sphinx's head and chest from the south-east, 85 mm",
+      "x": 372.0,
+      "y": -458.0,
+      "z": -20.0,
+      "target": [
+        341.0,
+        -433.0,
+        -23.0
+      ],
+      "lens": 85,
+      "moment": "sphinx-morning"
+    },
+    {
       "id": "sphinx-temple-core",
       "name": "The Sphinx Temple's limestone core, from the ditch at the Sphinx's paws, 28 mm",
       "x": 365.5,

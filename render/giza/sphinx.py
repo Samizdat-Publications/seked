@@ -30,12 +30,12 @@ if BLENDER_DIR not in sys.path:
 # Which stand-in, and which retexture of it, each Sphinx of the sequence is (blender/models.json).
 # The claim's lions are one master (docs/rethink-2026-10.md), lengthened to the ARCE proportions and worn
 # era by era by render/giza/sphinx_eras.py, whose output is the master's finishes: as built is the same
-# statue with the king's head carved inside the lion's. Today keeps the model made from photographs until
-# its losses are carved too.
+# statue with the king's head carved inside the lion's, and today is that statue worn on, with its losses
+# and its masonry casing. The stripped state (1800 CE, before the casing) keeps the model made from photographs.
 DERIVED = {"sphinx-master"}      # whose finishes are eras, not surfaces: a missing one is no statue, not the master
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion"),
              "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-master", "built"),
-             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
+             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-master", "today")}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
 # taken down to the bedrock's warm limestone (a look choice; traces of red ochre survive on it).
@@ -57,6 +57,10 @@ DAMP = {"sphinx-lion-pristine": 1.0, "sphinx-lion-first": 0.4, "sphinx-master": 
 # taken most of the way to plain fresh limestone, the carving left to the geometry and the normal map
 # (how far, and the stone's colour, are look choices).
 FLATTENED = {"sphinx-lion-rain": (0.35, (0.72, 0.62, 0.5, 1.0))}      # its lichen read as black paint
+# Today's masonry casing (render/giza/sphinx_eras.py names its material "masonry"): the scene's coursed limestone
+# of the repairs, in smaller blocks than a pyramid's, warmed from the casing's ivory towards the local stone it
+# was cut from, paler than the weathered body but not white (look choices: the courses, the blocks, the tint).
+MASONRY = {"course": 0.5, "width": 1.0, "rough": 0.6, "tint": (0.93, 0.83, 0.68, 1.0)}
 # Generated textures whose colour runs to orange clay (critic round 15): their saturation (a look choice).
 DESATURATED = {"sphinx-lion-pristine": 0.7}
 # Painted stand-ins whose generated colours come out saturated like plastic: their saturation (a look choice).
@@ -136,7 +140,23 @@ def statue(state, coll, log=print):
     for c in list(obj.users_collection):
         c.objects.unlink(obj)
     coll.objects.link(obj)
+    for i, mat in enumerate(obj.data.materials):
+        if mat and mat.name.startswith("masonry"):
+            from .materials import restored_casing
+            casing = restored_casing("sphinx masonry", rough=MASONRY["rough"], course=MASONRY["course"],
+                                     width=MASONRY["width"], foot=False, contact=True)
+            bsdf = next(nd for nd in casing.node_tree.nodes if nd.type == "BSDF_PRINCIPLED")
+            base = bsdf.inputs["Base Color"]
+            if base.is_linked:
+                warm = casing.node_tree.nodes.new("ShaderNodeMixRGB")
+                warm.blend_type, warm.inputs["Fac"].default_value = "MULTIPLY", 1.0
+                warm.inputs["Color2"].default_value = MASONRY["tint"]
+                casing.node_tree.links.new(base.links[0].from_socket, warm.inputs["Color1"])
+                casing.node_tree.links.new(warm.outputs["Color"], base)
+            obj.data.materials[i] = casing
     for mat in obj.data.materials:
+        if mat and mat.name == "sphinx masonry":
+            continue
         if mat and mat.node_tree:
             tree = mat.node_tree
             for nd in list(tree.nodes):

@@ -90,3 +90,23 @@ def recession(u, h, nz, era, height, length, seed=31):
     groove = JOINT_DEPTH * depth * np.sqrt(np.clip(h / MEMBER_III_BASE, 0.0, 1.0)) * np.clip(1.0 - near / half, 0.0, 1.0)
     # The joints run through the body, not the head: Member III is sound stone.
     return d + np.where(h < MEMBER_III_BASE, groove, 0.0)
+
+
+def further(u, h, nz, since, era, height, length, seed=31):
+    """How much further, in metres, each point recedes from era `since` to `era`: today is the as-built
+    statue worn on, not the lion worn again, so the head carved in 2500 BCE keeps its 2500 BCE fit."""
+    return np.maximum(recession(u, h, nz, era, height, length, seed) - recession(u, h, nz, since, height, length, seed), 0.0)
+
+
+# The masonry of the repairs, ancient to the 1980s and 1990s, that cases the lower body and the paws today
+# (the paws and tail completed in masonry: Lacovara 2026; the casing of the lower body: Lehner, unchecked).
+# How high it runs over Member I is a look choice; under it the stone wears no further, the casing having
+# rebuilt the profile.
+MASONRY_OVER_MEMBER_I = 1.5     # m
+
+
+def masonry(u, h, height):
+    """Which points lie under today's masonry casing: Member I and the first metre and a half over it."""
+    u, h = np.asarray(u, float), np.asarray(h, float)
+    top_i = MEMBER_I_TOP[0] + (MEMBER_I_TOP[1] - MEMBER_I_TOP[0]) * np.clip(u, 0.0, 1.0)
+    return h * height < top_i + MASONRY_OVER_MEMBER_I

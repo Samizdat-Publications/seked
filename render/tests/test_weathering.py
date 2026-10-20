@@ -39,6 +39,18 @@ class RecessionTests(unittest.TestCase):
         depths = [W.recession(u, h, nz, era, H, L)[0] for era in ("lion", "built", "today")]
         self.assertTrue(depths[0] < depths[1] < depths[2])
 
+    def test_today_wears_on_from_as_built_by_the_difference_and_never_back(self):
+        u, h, nz = np.random.rand(200), np.random.rand(200), np.random.uniform(-1, 1, 200)
+        more = W.further(u, h, nz, "built", "today", H, L)
+        built, today = (W.recession(u, h, nz, era, H, L) for era in ("built", "today"))
+        self.assertTrue((more >= 0).all())
+        np.testing.assert_allclose(built + more, today)
+
+    def test_the_masonry_cases_the_foot_and_not_the_head(self):
+        u = np.array([0.0, 0.0, 1.0, 1.0, 0.9])
+        z = np.array([W.MEMBER_I_TOP[0] + 1.0, W.MEMBER_I_TOP[0] + 2.0, 1.0, 3.0, 18.0])
+        self.assertEqual(W.masonry(u, z / H, H).tolist(), [True, False, True, False, False])
+
     def test_a_soft_bed_recedes_further_than_a_hard_one(self):
         z = np.linspace(W.MEMBER_I_TOP[1] + 0.01, W.MEMBER_III_BASE * H - 0.01, 400)
         u = np.full(z.shape, 0.5)
