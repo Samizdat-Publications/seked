@@ -9,7 +9,9 @@ Research the documentary's chapters as headless jobs on the API key.
 `start` builds each chapter's prompt from scripts/research/brief.md and the chapter's scope in
 scripts/research/chapters.json, and runs it through job.py (detached) and headless.py (the API
 key only), with web search and read-only access to the repository. `collect` takes a finished
-job's answer out of its log into docs/research/chN.md, headed with what it cost. A brief is a
+job's answer out of its log into docs/research/chN.md, headed with what it cost. A key that is
+not a number is a topic the plan adds beside a chapter (`"for"` names the chapter): its job is
+research-<key> and its brief docs/research/<key>.md. A brief is a
 draft: its [unchecked] citations are still to be checked, and nothing in it is data until it
 is entered in data/ like any other figure.
 
@@ -41,10 +43,24 @@ def chapters():
         return json.load(f)
 
 
+def is_chapter(key):
+    return key.isdigit()
+
+
+def job_name(key):
+    """research-chN for a chapter, research-<topic> for a topic the plan adds beside them."""
+    return f"research-ch{key}" if is_chapter(key) else f"research-{key}"
+
+
+def brief_path(key):
+    return os.path.join(OUT, f"ch{key}.md" if is_chapter(key) else f"{key}.md")
+
+
 def prompt(number, chapter):
     with open(BRIEF, encoding="utf-8") as f:
         template = f.read()
-    return template.replace("{{chapter}}", f"Chapter {number}: {chapter['title']}.\n\nScope: {chapter['scope']}")
+    heading = f"Chapter {number}" if is_chapter(number) else f"A topic for chapter {chapter['for']}"
+    return template.replace("{{chapter}}", f"{heading}: {chapter['title']}.\n\nScope: {chapter['scope']}")
 
 
 def job(name, prompt_text, args, then):
@@ -62,8 +78,9 @@ def job(name, prompt_text, args, then):
 
 
 def draft(args):
-    briefs = [n for n in sorted(chapters(), key=int) if os.path.exists(os.path.join(OUT, f"ch{n}.md"))]
-    missing = [n for n in chapters() if n not in briefs]
+    numbered = [n for n in chapters() if is_chapter(n)]
+    briefs = [n for n in sorted(numbered, key=int) if os.path.exists(brief_path(n))]
+    missing = [n for n in numbered if n not in briefs]
     if missing:
         sys.exit(f"no brief yet for chapter {', '.join(missing)}: collect them first")
     with open(SCRIPT, encoding="utf-8") as f:
@@ -76,8 +93,8 @@ def start(args):
         if number not in known:
             sys.exit(f"no chapter {number} in {os.path.relpath(CHAPTERS, ROOT)}")
     for number in args.chapters:
-        job(f"research-ch{number}", prompt(number, known[number]), args,
-            f"python scripts/research.py collect {number}, then read docs/research/ch{number}.md")
+        job(job_name(number), prompt(number, known[number]), args,
+            f"python scripts/research.py collect {number}, then read {os.path.relpath(brief_path(number), ROOT)}")
 
 
 def result(name):
@@ -97,7 +114,7 @@ def collect(args):
     known = chapters()
     os.makedirs(OUT, exist_ok=True)
     for number in args.chapters:
-        name = "research-script" if number == "script" else f"research-ch{number}"
+        name = "research-script" if number == "script" else job_name(number)
         record = json.load(open(os.path.join(JOBS, f"{name}.json"), encoding="utf-8"))
         answer = result(name)
         cost = answer.get("total_cost_usd", 0)
@@ -116,13 +133,14 @@ def collect(args):
                       " here on; its sources are the briefs in docs/research/. -->\n\n")
             path = os.path.join(ROOT, "docs", "script.md")
         else:
+            heading = f"Chapter {number}" if is_chapter(number) else f"Research for chapter {known[number]['for']}"
             header = (
-                f"# Chapter {number} research: {known[number]['title']}\n\n"
+                f"# {heading}: {known[number]['title']}\n\n"
                 f"A headless draft from `python scripts/research.py start {number}`: {how}"
                 " Citations marked [unchecked] are still to be checked against the work itself,"
                 " and nothing here is data until it is entered in `data/`.\n\n---\n\n"
             )
-            path = os.path.join(OUT, f"ch{number}.md")
+            path = brief_path(number)
         with open(path, "w", encoding="utf-8") as f:
             f.write(header + answer["result"].strip() + "\n")
         print(f"chapter {number}: {os.path.relpath(path, ROOT)}, {answer.get('num_turns')} turns, ${cost:.2f}")
@@ -145,7 +163,7 @@ def main():
     write.add_argument("--turns", type=int, default=80)
     write.set_defaults(func=draft)
     back = sub.add_parser("collect")
-    back.add_argument("chapters", nargs="+", help="chapter numbers, or `script`")
+    back.add_argument("chapters", nargs="+", help="chapter numbers or topics, or `script`")
     back.set_defaults(func=collect)
     args = parser.parse_args()
     args.func(args)

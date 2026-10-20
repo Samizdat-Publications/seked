@@ -120,12 +120,16 @@ for (const f of ['plan.html', 'plan-2026-09.html']) {
   if (existsSync(join(REPO_ROOT, 'docs', f))) cpSync(join(REPO_ROOT, 'docs', f), join(outDocs, f));
 }
 const research = join(REPO_ROOT, 'docs', 'research');
-const briefs = existsSync(research) ? readdirSync(research).filter((f) => /^ch\d+\.md$/.test(f)).map((f) => f.slice(0, -3)) : [];
+// A chapter's brief is chN.md; a topic the plan adds beside a chapter is titled by its own heading.
+const briefs = existsSync(research) ? readdirSync(research).filter((f) => f.endsWith('.md')).map((f) => f.slice(0, -3)).sort() : [];
+const briefTitle = (b: string): string => /^ch\d+$/.test(b)
+  ? `Seked research, chapter ${b.slice(2)}`
+  : `Seked research: ${(/^# (.+)$/m.exec(readFileSync(join(research, `${b}.md`), 'utf8'))?.[1] ?? b)}`;
 const pages: [string, string][] = [
   ['dossier', 'Seked claims dossier'],
   ['shafts', 'Seked shaft alignments'],
   ['script', 'Seked: the script'],
-  ...briefs.map((b): [string, string] => [`research/${b}`, `Seked research, chapter ${b.slice(2)}`]),
+  ...briefs.map((b): [string, string] => [`research/${b}`, briefTitle(b)]),
 ];
 for (const [f, title] of pages) {
   const src = join(REPO_ROOT, 'docs', `${f}.md`);
