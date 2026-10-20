@@ -20,6 +20,8 @@ export interface Shot {
   station: Station; era: string; yaw?: number; pitch?: number; fov?: number; overlay?: string | null;
   /** Panoramas to try in order, relative to the walkthrough's folder; the first that loads is shown. Default: the station's own for the era. */
   panoramas?: string[];
+  /** The overlay waits for startOverlay() (its word) rather than drawing at once. */
+  overlayCued?: boolean;
 }
 
 /** The era a wipe comes from, or a comparison shows beside the one on stage. */
@@ -108,8 +110,7 @@ export class Stage {
     this.fitted = fitFov(shot.fov ?? st.view.fov, this.W, this.H);
     this.view.zoom = 1;
     this.view.vy = this.view.vp = 0;
-    const o = shot.overlay ? this.overlays[shot.overlay] ?? null : null;
-    if (o !== this.overlay) { this.overlay = o; this.overlayT0 = performance.now(); }
+    this.setOverlay(shot);
     if (changed) this.showFlat();
     this.request();
   }
@@ -118,13 +119,27 @@ export class Stage {
    * Swing the view to a shot's aim in the same panorama, eased; `done` runs when it arrives, or at once if the
    * visitor takes the view first (the turn is dropped) or prefers reduced motion. Returns the seconds it takes.
    */
+  /** Start drawing the overlay on stage now (it waits when the shot's `overlayCued` is set). */
+  startOverlay(): void {
+    if (this.overlay && !Number.isFinite(this.overlayT0)) { this.overlayT0 = performance.now(); this.request(); }
+  }
+
+  /** Take the overlay down until startOverlay() again, so it can draw on with its word once more. */
+  cueOverlay(): void {
+    if (this.overlay) { this.overlayT0 = Infinity; this.request(); }
+  }
+
+  private setOverlay(shot: Shot): void {
+    const o = shot.overlay ? this.overlays[shot.overlay] ?? null : null;
+    if (o !== this.overlay) { this.overlay = o; this.overlayT0 = shot.overlayCued ? Infinity : performance.now(); }
+  }
+
   turn(shot: Shot, done: () => void = () => {}): number {
     if (!this.station) { this.show(shot); done(); return 0; }
     const st = shot.station;
     const to: Aim = { yaw: wrapAngle(shot.yaw ?? st.view.yaw), pitch: clamp(shot.pitch ?? st.view.pitch, -PITCH_MAX, PITCH_MAX), fov: fitFov(shot.fov ?? st.view.fov, this.W, this.H) };
     const from: Aim = { yaw: this.view.yaw, pitch: this.view.pitch, fov: this.fov() };
-    const o = shot.overlay ? this.overlays[shot.overlay] ?? null : null;
-    if (o !== this.overlay) { this.overlay = o; this.overlayT0 = performance.now(); }
+    this.setOverlay(shot);
     this.view.vy = this.view.vp = 0;
     this.tween?.done();
     const secs = this.still ? 0 : turnSeconds(from, to);
@@ -321,7 +336,7 @@ export class Stage {
       if (a.layer.patch && a.layer.patch.on < 1) busy = true;
       this.onStatus(this.cache.status(a.url) ?? 'loading');
     }
-    if (this.overlay && (!this.cache || this.cache.status(this.current()) === 'ready')) {
+    if (this.overlay && Number.isFinite(this.overlayT0) && (!this.cache || this.cache.status(this.current()) === 'ready')) {
       const camera = cameraFor(st, era);
       const at = (p: OverlayPoint) => this.project(Array.isArray(p) ? p : fromCamera(camera, p.dir), camera, fov);
       if (drawOverlay(this.ctx, this.overlay, at, era, t - this.overlayT0, this.still, this.font)) busy = true;

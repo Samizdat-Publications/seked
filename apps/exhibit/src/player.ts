@@ -3,7 +3,7 @@
  * exists, its word-boundary events the timing), shows them as the caption, holds, and moves on. Any drag or key
  * on the view pauses play and hands the visitor the view; play resumes from that leaf.
  */
-import type { Leaf } from './leaves';
+import { type Leaf, cueIndex, drawCue } from './leaves';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
 import { DEG } from './projection';
@@ -37,8 +37,15 @@ export class Player {
   onWord: (i: number) => void = () => {};
 
   private token = 0;
+  /** The word index that starts the leaf's overlay, in play. */
+  private cueAt = -1;
   private timers: number[] = [];
   private shown = -1;
+
+  private word(k: number): void {
+    if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); }
+    this.onWord(k);
+  }
 
   constructor(private stage: Stage, private manifest: Manifest, private leaves: readonly Leaf[], private chapters: readonly Chapter[],
     private ui: PlayerUi, private panoramas: (leaf: Leaf) => string[]) {
@@ -64,7 +71,12 @@ export class Player {
 
   shot(L: Leaf): Shot {
     const station = this.manifest.byId[L.station]!;
-    return { station, era: L.era, yaw: L.view.yaw * DEG, pitch: L.view.pitch * DEG, fov: L.view.fov * DEG, overlay: L.draw[0] ?? null, panoramas: this.panoramas(L) };
+    const cue = L.draw[0] ? drawCue(L.draw[0]) : null;
+    return {
+      station, era: L.era, yaw: L.view.yaw * DEG, pitch: L.view.pitch * DEG, fov: L.view.fov * DEG, panoramas: this.panoramas(L),
+      // in play a cued line waits for its word; stepping by hand, or paused, it draws at once
+      overlay: cue?.overlay ?? null, overlayCued: !!cue?.word && this.playing,
+    };
   }
 
   /** Show a leaf; if playing, speak it and go on. The arrival is a turn when the leaf stays in the panorama on screen. */
@@ -94,6 +106,7 @@ export class Player {
     if (this.playing) return;
     this.playing = true;
     this.stage.compare(null);
+    if (this.leaf.draw[0] && drawCue(this.leaf.draw[0]).word) this.stage.cueOverlay();
     this.ui.play.setAttribute('aria-pressed', 'true');
     this.ui.play.setAttribute('aria-label', 'Pause');
     document.body.classList.add('playing');
@@ -109,6 +122,7 @@ export class Player {
     this.ui.play.setAttribute('aria-label', 'Play');
     document.body.classList.remove('playing');
     this.cancel();
+    this.stage.startOverlay();   // a line still waiting for its word is drawn now
     this.offerCompare();
   }
 
@@ -187,6 +201,8 @@ export class Player {
   /** Say the leaf's words; when they end, hold, then go on. */
   private speak(token: number): void {
     const L = this.leaf;
+    const cue = L.draw[0] ? drawCue(L.draw[0]) : null;
+    this.cueAt = cue?.word ? cueIndex(L.say, cue.word) : -1;
     let ended = false;
     const end = () => {
       if (ended || token !== this.token) return;
@@ -203,7 +219,7 @@ export class Player {
     const estimated = (last ? last.at : 0) + 0.6;
     const timed = () => {
       this.words = estimate;
-      estimate.forEach((w, k) => this.later(w.at * 1000, () => { if (token === this.token) this.onWord(k); }));
+      estimate.forEach((w, k) => this.later(w.at * 1000, () => { if (token === this.token) this.word(k); }));
       this.later(estimated * 1000, end);
     };
     const synth = window.speechSynthesis;
@@ -222,7 +238,7 @@ export class Player {
       if (k < 0) return;
       heard[k] = { word: estimate[k]!.word, at: (performance.now() - t0) / 1000 };
       this.words = estimate.map((w, j) => heard[j] ?? w);
-      this.onWord(k);
+      this.word(k);
     };
     u.onend = end;
     u.onerror = () => { if (!started) timed(); else end(); };

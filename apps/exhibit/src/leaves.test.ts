@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { type Leaf, type RenderStations, joinProblems, leafPanorama, readLeaves, stationMoment } from './leaves';
+import { type Leaf, type RenderStations, cueIndex, drawCue, joinProblems, leafPanorama, readLeaves, stationMoment } from './leaves';
 
 const repo = join(__dirname, '..', '..', '..');
 const read = (p: string) => readFileSync(join(repo, p), 'utf8');
@@ -56,7 +56,11 @@ describe('leaves.json', () => {
 
   it('draws only overlays that exist and cites only claims that exist', () => {
     for (const L of leaves) {
-      for (const d of L.draw) expect(Object.keys(overlays), L.id).toContain(d);
+      for (const d of L.draw) {
+        const { overlay, word } = drawCue(d);
+        expect(Object.keys(overlays), L.id).toContain(overlay);
+        expect(cueIndex(L.say, word), `${L.id}: ${d}`).toBeGreaterThanOrEqual(0);
+      }
       for (const r of L.receipts) expect(existsSync(join(repo, 'data', 'claims', `${r}.yaml`)), `${L.id}: ${r}`).toBe(true);
       expect(read('docs/script.md'), L.id).toContain(`## ${L.reply.slice(2)}. `);
     }
@@ -102,5 +106,25 @@ describe('the panorama a leaf needs', () => {
   it('names a new render when it is not', () => {
     expect(leafPanorama({ station: 'sphinx-face', era: 'today', moment: 'equinox-dawn' }, render)).toBe('pano/sphinx-face-today-equinox-dawn.jpg');
     expect(stationMoment(render, 'nowhere', 'today')).toBeNull();
+  });
+});
+
+describe('draw cues', () => {
+  it('reads an overlay with or without the word that cues it', () => {
+    expect(drawCue('flank-profile')).toEqual({ overlay: 'flank-profile', word: null });
+    expect(drawCue('flank-profile@rolls')).toEqual({ overlay: 'flank-profile', word: 'rolls' });
+  });
+  it('finds the cued word whatever its case and punctuation', () => {
+    const say = 'The profile rolls. Harder beds stand out and softer beds are cut back into deep coves.';
+    expect(cueIndex(say, null)).toBe(0);
+    expect(cueIndex(say, 'rolls')).toBe(2);
+    expect(cueIndex(say, 'coves')).toBe(15);
+    expect(cueIndex(say, 'harder')).toBe(3);
+    expect(cueIndex(say, 'fissure')).toBe(-1);
+  });
+  it('refuses a malformed draw entry', () => {
+    const raw = JSON.parse(read('apps/exhibit/leaves.json'));
+    raw.leaves[0].draw = ['two words'];
+    expect(() => readLeaves(raw)).toThrow();
   });
 });

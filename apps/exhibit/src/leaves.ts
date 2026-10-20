@@ -26,8 +26,11 @@ export const LeafSchema = z.object({
   view: z.object({ yaw: z.number().min(0).max(360), pitch: z.number().min(-80).max(80), fov: z.number().min(20).max(100) }),
   arrive: z.enum(ARRIVALS),
   say: z.string().min(1),
-  /** Overlays (overlays.json) drawn on during the leaf. */
-  draw: z.array(z.string()),
+  /**
+   * Overlays (overlays.json) drawn on during the leaf: `name` from the leaf's start, or `name@word` from when
+   * the first word starting with `word` is spoken, so a line draws itself as its word is said.
+   */
+  draw: z.array(z.string().regex(/^[\w-]+(@[\w'-]+)?$/)),
   /** Seconds held after the words end. */
   hold: z.number().min(0),
   interact: Interact,
@@ -96,4 +99,18 @@ export function leafPanorama(leaf: Pick<Leaf, 'station' | 'era' | 'moment'>, ren
   return stationMoment(render, leaf.station, leaf.era) === leaf.moment
     ? `pano/${leaf.station}-${leaf.era}.jpg`
     : `pano/${leaf.station}-${leaf.era}-${leaf.moment}.jpg`;
+}
+
+/** A draw entry's overlay and the word that cues it (null: from the leaf's start). */
+export function drawCue(entry: string): { overlay: string; word: string | null } {
+  const [overlay, word] = entry.split('@');
+  return { overlay: overlay as string, word: word ?? null };
+}
+
+/** The index of the word in `say` that a cue names: the first word that starts with it, ignoring case and punctuation. */
+export function cueIndex(say: string, word: string | null): number {
+  if (!word) return 0;
+  const bare = (w: string) => w.toLowerCase().replace(/[^\p{L}\p{N}'-]/gu, '');
+  const want = bare(word);
+  return say.split(/\s+/).filter(Boolean).findIndex((w) => bare(w).startsWith(want));
 }
