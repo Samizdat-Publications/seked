@@ -332,7 +332,7 @@ const player = document.createElement('div');
 player.className = 'player';
 player.innerHTML = '<button type="button" aria-label="Play">▶</button><span class="clock"></span>' +
   '<span class="player-note">silent, timed at 150 words a minute until the voice is recorded</span>';
-document.body.append(player);
+stage.append(player);   // on the stage's top right, over the picture, so it never covers the text
 const button = player.querySelector('button')!;
 const clockEl = player.querySelector<HTMLElement>('.clock')!;
 const subtitle = document.createElement('div');
