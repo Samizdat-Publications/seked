@@ -93,9 +93,42 @@ export function buildEnvironment(measured: Record<string, number>): Environment 
   }
 
   deriveCentreOffsets(env);
+  deriveHawara(env);
 
   return env;
 }
+
+/**
+ * Hawara, as Petrie derived it (petrie-1890, p. 13): the finished base is the
+ * brick base plus the casing on both sides, and the height follows from it and
+ * the casing angle. He measured only the brick base; the casing and the angle
+ * are his readings, so the base and height are computed here, never stored.
+ * The Labyrinth's chip bed gets its area and its ratio to Khufu's base.
+ */
+function deriveHawara(env: Environment): void {
+  const brick = env['hawara.pyramid.base.side.brick'];
+  const casing = env['hawara.pyramid.casing.thickness'];
+  const angle = env['hawara.pyramid.casing.angle'];
+  if (brick !== undefined && casing !== undefined) {
+    const side = brick + 2 * casing;
+    env['hawara.pyramid.base.side.cased'] = side;
+    if (angle !== undefined) env['hawara.pyramid.height.original'] = (side / 2) * Math.tan((angle * Math.PI) / 180);
+  }
+  const length = env['hawara.labyrinth.chipbed.length'];
+  const width = env['hawara.labyrinth.chipbed.width'];
+  if (length !== undefined && width !== undefined) {
+    env['hawara.labyrinth.chipbed.area'] = length * width;
+    const g1 = env['g1.base.area'];
+    if (g1 !== undefined) env['hawara.labyrinth.chipbed.ratio.g1'] = (length * width) / g1;
+  }
+}
+
+const HAWARA_INPUTS: Record<string, readonly string[]> = {
+  'hawara.pyramid.base.side.cased': ['hawara.pyramid.base.side.brick', 'hawara.pyramid.casing.thickness'],
+  'hawara.pyramid.height.original': ['hawara.pyramid.base.side.brick', 'hawara.pyramid.casing.thickness', 'hawara.pyramid.casing.angle'],
+  'hawara.labyrinth.chipbed.area': ['hawara.labyrinth.chipbed.length', 'hawara.labyrinth.chipbed.width'],
+  'hawara.labyrinth.chipbed.ratio.g1': ['hawara.labyrinth.chipbed.length', 'hawara.labyrinth.chipbed.width', 'g1.base.side.mean'],
+};
 
 /** What each derived quantity of a structure is computed from, by the suffix after its id. */
 const PROFILE_INPUTS: Record<string, readonly string[]> = {
@@ -129,6 +162,7 @@ export function recordsBehind(key: string, measured: Record<string, number>): st
     const inputs = PROFILE_INPUTS[suffix];
     if (inputs) return inputs.map((s) => `${structure}.${s}`);
   }
+  if (key in HAWARA_INPUTS) return [...(HAWARA_INPUTS[key] as readonly string[])];
   if (key === 'g1.base.socket.mean') return ['north', 'east', 'south', 'west'].map((d) => `g1.base.socket.${d}`);
   if (key === 'g1.base.socket.perimeter') {
     return 'g1.base.socket.mean' in measured ? ['g1.base.socket.mean'] : recordsBehind('g1.base.socket.mean', measured);

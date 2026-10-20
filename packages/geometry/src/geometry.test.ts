@@ -145,3 +145,26 @@ describe('placing a structure that the database gives a coordinate for', () => {
     expect(Math.hypot(env['sphinx.centre.offset.east'] as number, env['sphinx.centre.offset.north'] as number)).toBeCloseTo(555, 0);
   });
 });
+
+describe('Hawara, as Petrie derived it', () => {
+  const inch = 0.0254;
+  const env = buildEnvironment({
+    'g1.base.side.mean': 230.33, 'g1.height.original': 146.59,
+    'hawara.pyramid.base.side.brick': 3692 * inch, 'hawara.pyramid.casing.thickness': 157 * inch, 'hawara.pyramid.casing.angle': 48.75,
+    'hawara.labyrinth.chipbed.length': 304.8, 'hawara.labyrinth.chipbed.width': 243.84,
+  });
+  it("reproduces Petrie's finished base of 4006 in and his height of 2284 in", () => {
+    expect((env['hawara.pyramid.base.side.cased'] as number) / inch).toBeCloseTo(4006, 6);
+    expect(Math.abs((env['hawara.pyramid.height.original'] as number) / inch - 2284)).toBeLessThan(1);
+  });
+  it('makes the chip bed about 1.4 times the Great Pyramid\'s base', () => {
+    expect(env['hawara.labyrinth.chipbed.ratio.g1']).toBeCloseTo((304.8 * 243.84) / (230.33 * 230.33), 9);
+    expect(env['hawara.labyrinth.chipbed.ratio.g1']).toBeGreaterThan(1.35);
+    expect(env['hawara.labyrinth.chipbed.ratio.g1']).toBeLessThan(1.45);
+  });
+  it('names the records behind each derived Hawara key', () => {
+    expect(recordsBehind('hawara.pyramid.height.original', {})).toEqual([
+      'hawara.pyramid.base.side.brick', 'hawara.pyramid.casing.thickness', 'hawara.pyramid.casing.angle',
+    ]);
+  });
+});
