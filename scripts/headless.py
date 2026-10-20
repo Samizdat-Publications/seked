@@ -7,16 +7,18 @@ Run a headless `claude -p` job on the project's API key, never on a subscription
 The one-line test that first proved the key (2026-10-20; see docs/rethink-2026-10.md):
 
     python scripts/headless.py -p "Seked API-key test: reply with the one word ready." \\
-        --model claude-haiku-5-5 --max-turns 1 --output-format json
+        --tools "" --model claude-haiku-5-5 --max-turns 1 --output-format json
 
 Why this exists. Bulk research and drafting for the rethink run on the Max plan's monthly
 API credit, which only an API key spends; an interactive session spends the plan itself. So
-this starts `claude --bare`, whose Anthropic auth is strictly ANTHROPIC_API_KEY (no OAuth, no
-keychain, no hooks, no CLAUDE.md discovery: a job's prompt names what it should read), with
-an environment cut down to the path, the proxy and the CA settings. Nothing a host-managed
-session sets (CLAUDE_*, ANTHROPIC_*) reaches the child. Its config and transcripts go to
-build/headless/config (gitignored), so a job can be read back after it ends. A job longer
-than about ten minutes goes through job.py, like any long job.
+this starts `claude -p` with ANTHROPIC_API_KEY set, which outranks a subscription login in
+print mode, in an environment cut down to the path, the proxy and the CA settings: nothing a
+host-managed session sets (CLAUDE_*, ANTHROPIC_*) reaches the child. Its config directory is
+build/headless/config (gitignored), which holds no login of any kind, and where its
+transcripts can be read back after it ends. The same setup with a bogus key is refused, so a
+job that runs at all ran on the key. Not `--bare`, which would also forbid any login: it cuts
+the built-in tools to Bash, Edit and Read, and research needs WebSearch, WebFetch, Grep and
+Glob. A job longer than about ten minutes goes through job.py, like any long job.
 
 The key is read from SEKED_ANTHROPIC_API_KEY, or a line `SEKED_ANTHROPIC_API_KEY=...` in
 ~/.seked/keys.env, and is never printed. Standard library only.
@@ -65,7 +67,7 @@ def main():
     program = shutil.which("claude", path=env.get("PATH"))
     if not program:
         sys.exit("no `claude` on PATH")
-    sys.exit(subprocess.run([program, "--bare", *sys.argv[1:]], env=env).returncode)
+    sys.exit(subprocess.run([program, *sys.argv[1:]], env=env).returncode)
 
 
 if __name__ == "__main__":

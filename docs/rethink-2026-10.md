@@ -83,9 +83,11 @@ The lion head ghosted around the king's head is a hero image in its own right.
 - **Bulk research and drafting** run as headless `claude -p` jobs on the API key in
   `SEKED_ANTHROPIC_API_KEY` (the Max plan's monthly API credit, which interactive sessions
   cannot spend). `python scripts/headless.py -p "..."` starts every such job the same way:
-  `claude --bare`, whose only Anthropic auth is that key (never OAuth or the keychain, so a
-  logged-in laptop cannot spend the plan by mistake), in an environment with the host
-  session's `CLAUDE_*` and `ANTHROPIC_*` stripped. A long one goes through `scripts/job.py`.
+  `claude -p` with `ANTHROPIC_API_KEY` set to that key, which outranks a subscription login
+  in print mode, in an environment with the host session's `CLAUDE_*` and `ANTHROPIC_*`
+  stripped and a config directory of its own (`build/headless/config`) that holds no login.
+  A long one goes through `scripts/job.py`; chapter research goes through
+  `scripts/research.py`, which writes `docs/research/chN.md`.
 - **The one-line test ran on 20 October, 01:54 to 01:57 UTC**, all on `claude-haiku-5-5`, under a
   cent in all: a plain `claude -p` ($0.0022, most of it 17,273 tokens of Claude Code's own
   prompt and tool list written to the cache), then the same call through `headless.py`
@@ -94,8 +96,12 @@ The lion head ghosted around the king's head is a hero image in its own right.
   setup is refused ("Invalid API key"), so the calls that succeeded went on this key and
   nothing else. **For Stewart:** the Console's usage page should show these four Haiku
   calls against the key; if it shows nothing, the credit is not where we think it is.
-  The lesson for bulk jobs: `--bare` cuts the fixed cost of a call from about 17,000
-  tokens to about 1,600 with tools and under 100 without them.
+- **Not `--bare`.** The first version ran `claude --bare`, which forbids any login, but it
+  also cuts the built-in tools to Bash, Edit and Read whatever `--tools` asks for. The first
+  chapter-1 pilot therefore had no web search, wrote 27 citations from memory and none
+  checked, and cost $1.23 for a draft that had to be thrown away. Without `--bare`, the job
+  has WebSearch, WebFetch, Read, Grep and Glob, a bogus key is still refused, and one search
+  cost $0.02 on Haiku.
 - **Effort:** planning and the script at extra; building at high; max only for a named, narrow
   hard problem, and said so first.
 
