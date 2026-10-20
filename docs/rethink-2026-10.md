@@ -77,7 +77,7 @@ The lion head ghosted around the king's head is a hero image in its own right.
 ## How the work is split
 
 - **This cloud environment thinks:** plan, script, code, data, Blender geometry and low-sample
-  Cycles previews (Blender 5.1.2 runs headless here on CPU; EEVEE does not, there is no GPU).
+  Cycles previews (Blender 5.1.2 runs headless here on CPU, with no GPU; Workbench and EEVEE run too once Mesa's software EGL is installed: `apt-get install -y libegl1 libegl-mesa0 libgl1-mesa-dri`, about 5 s a Workbench frame and 30 to 45 s an EEVEE one at 900 by 500).
 - **Stewart's laptop renders:** a local session pulls the branch and runs final renders
   through `scripts/job.py`. Git is the hand-off; one session owns the repo at a time.
 - **Bulk research and drafting** run as headless `claude -p` jobs on the API key in
