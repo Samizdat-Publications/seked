@@ -44,6 +44,7 @@ main { padding: 4rem 1.5rem 40vh; }
 .chapter .num { color: var(--sand); font-size: 1.6rem; }
 .chapter h2 { margin: 0; font-size: 1.8rem; }
 .narration p { font-size: 1.2rem; line-height: 1.6; }
+.narration p.hold { padding-bottom: 60vh; }
 .note { color: var(--quiet); font-style: italic; font-size: 0.9rem; }
 details { margin: 1.2rem 0; border-top: 1px solid #d8c9ae; padding-top: 0.6rem; }
 summary { cursor: pointer; color: var(--quiet); font-family: system-ui, sans-serif; font-size: 0.9rem; }
@@ -60,3 +61,27 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
 }
 .quiet { color: var(--quiet); font-style: italic; }
 .live ul { padding-left: 1.2rem; }
+.sky { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column; justify-content: center;
+  background: radial-gradient(ellipse at 50% 100%, #1d2333, #07080d 70%); color: #e9e2d4; font-family: system-ui, sans-serif; }
+.stage.sky-on .sky { display: flex; }
+.sky svg { width: 100%; max-height: 70%; }
+.sky .meridian { stroke: rgba(233, 226, 212, 0.35); stroke-width: 0.25; stroke-dasharray: 1 1; }
+.sky .tick line { stroke: rgba(233, 226, 212, 0.35); stroke-width: 0.25; }
+.sky text { fill: rgba(233, 226, 212, 0.75); font-size: 2.6px; }
+.sky .south { text-anchor: middle; }
+.sky .ground { fill: #15120e; }
+.sky .stars circle { fill: #fff6e0; }
+.sky .belt { stroke: #f2b544; stroke-width: 0.35; }
+.sky .ghost { stroke: #9fc4ff; stroke-width: 0.35; stroke-dasharray: 1.2 0.8; }
+.sky .ghost-label { fill: #9fc4ff; }
+.sky .readouts { padding: 0 1.2rem; font-size: 0.9rem; line-height: 1.5; }
+.sky .epoch { font-size: 1.6rem; }
+.sky input { width: 100%; margin: 0.6rem 0; }
+.sky .small { font-size: 0.75rem; color: rgba(233, 226, 212, 0.6); }
+@media (max-width: 52rem) {
+  .stage.sky-on { height: 60vh; }
+  .sky svg { max-height: 55%; }
+  .sky .readouts { font-size: 0.7rem; line-height: 1.3; padding: 0 0.6rem; }
+  .sky .epoch { font-size: 1rem; }
+  .sky .small { display: none; }
+}

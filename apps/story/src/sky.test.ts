@@ -1,0 +1,39 @@
+import { loadClaims } from '@seked/claims';
+import { loadDatabase, resolve } from '@seked/data';
+import { buildEnvironment } from '@seked/geometry';
+import { describe, expect, it } from 'vitest';
+import { beltAt, lowestTransit, yearLabel } from './sky';
+
+const env = buildEnvironment(resolve(loadDatabase(), 'canonical').values);
+const c4 = loadClaims().find((c) => c.id === 'C4')!;
+
+describe('the sky slider', () => {
+  it("reads the dossier's C4 at C4's own epoch", () => {
+    const r = beltAt(c4, env, c4.epoch!);
+    // docs/dossier.md: 50°51′40″ against 37°51′07″
+    expect(r.angleDeg).toBeCloseTo(50 + 51 / 60 + 40 / 3600, 3);
+    expect(r.diagonalDeg).toBeCloseTo(37 + 51 / 60 + 7 / 3600, 3);
+  });
+
+  it('puts Alnitak on the meridian, due south, and the belt beside it', () => {
+    const r = beltAt(c4, env, c4.epoch!);
+    const alnitak = r.stars.find((s) => s.id === 'alnitak')!;
+    expect(alnitak.azDeg).toBeCloseTo(180, 6);
+    expect(alnitak.altDeg).toBeCloseTo(r.transitDeg, 6);
+    for (const s of r.stars) expect(Math.abs(s.azDeg - 180)).toBeLessThan(5);
+  });
+
+  it('sinks the belt going back: lower at 10,450 BCE than today', () => {
+    expect(beltAt(c4, env, c4.epoch!).transitDeg).toBeLessThan(beltAt(c4, env, 2026).transitDeg - 30);
+  });
+
+  it("finds the bottom of the swing within a few centuries of C4's epoch", () => {
+    // the claim picks its epoch for the angle's match, not the lowest transit; how far apart they are is a reading
+    expect(Math.abs(lowestTransit(env, -13000, 0, 50) - c4.epoch!)).toBeLessThan(600);
+  });
+
+  it('names years as the page says them', () => {
+    expect(yearLabel(-10449)).toBe('10,450 BCE');
+    expect(yearLabel(2026)).toBe('2026 CE');
+  });
+});

@@ -22,6 +22,8 @@ export interface Still {
   tags: Tag[];
   /** Diagrams and annotated frames are shown whole on a dark ground; scenes fill the stage. */
   whole?: true;
+  /** A live figure that takes the stage from this beat when the bundle is loaded, the still standing in until then. */
+  widget?: 'sky';
 }
 
 const SPHINX_TODAY = 'progress/0040-sphinx-today.png';
@@ -65,7 +67,7 @@ export const STILLS: Still[] = [
   { chapter: 5, anchor: 'laid out like the three stars of Orion’s belt', src: 'alignments/img/c4-orion-plan.jpg',
     alt: 'The three pyramids from above with Orion’s belt fitted over them', tags: [], whole: true },
   { chapter: 5, anchor: 'Drag the sky back.', src: 'alignments/img/c4-orion-night.jpg',
-    alt: 'The night of 10,450 BCE looking south: Orion over the three pyramids', tags: ['claim state'], whole: true },
+    alt: 'The night of 10,450 BCE looking south: Orion over the three pyramids', tags: ['claim state'], whole: true, widget: 'sky' },
   { chapter: 5, anchor: 'Inside the Great Pyramid', src: 'alignments/img/c2-shafts-2450.jpg',
     alt: 'The Great Pyramid’s shafts carried out as rays into the sky of 2450 BCE', tags: [], whole: true },
   { chapter: 5, anchor: 'the stone holds two dates', src: 'alignments/img/c2-shafts-10450.jpg',

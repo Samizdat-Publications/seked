@@ -9,12 +9,14 @@
  * no still has begun.
  */
 import type { Claim } from '@seked/claims/browser';
-import type { Database } from '@seked/data/browser';
+import { resolve, type Database } from '@seked/data/browser';
+import { buildEnvironment } from '@seked/geometry';
 import { setDefaultStars, type Star } from '@seked/sky/browser';
 import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
+import { skyWidget, type SkyWidget } from './skywidget';
 import { STILLS, markAnchors, markers, stillFile, type Still } from './stills';
 import './style.css';
 
@@ -28,6 +30,9 @@ function narrationHtml(c: Chapter, p: string): string {
   return markers(inline(text), (i) => `data-still="${STILLS.indexOf(mine[i]!)}"`);
 }
 
+/** A paragraph holding a live figure's beat is followed by room to scroll it through. */
+const holds = (c: Chapter, p: string) => markAnchors(p, stillsOf(c).filter((s) => s.widget).map((s) => s.anchor)).found.length > 0;
+
 function chapterHtml(c: Chapter): string {
   const receipts = c.receipts && !/^- None\b/.test(c.receipts)
     ? `<details class="receipts"><summary>Receipts${c.claims.length ? ` · ${c.claims.join(', ')}` : ''}</summary>` +
@@ -37,7 +42,7 @@ function chapterHtml(c: Chapter): string {
     <section class="chapter" id="ch${c.n}" data-n="${c.n}">
       <header><span class="num">${c.n}</span><h2>${inline(c.title)}</h2></header>
       ${c.note ? `<p class="note">${inline(c.note)}</p>` : ''}
-      <div class="narration">${c.narration.map((p) => `<p>${narrationHtml(c, p)}</p>`).join('')}</div>
+      <div class="narration">${c.narration.map((p) => `<p${holds(c, p) ? ' class="hold"' : ''}>${narrationHtml(c, p)}</p>`).join('')}</div>
       ${receipts}
       <details class="reply"><summary>The reply</summary>
         ${c.reply.map((p) => `<p>${inline(p)}</p>`).join('')}
@@ -66,6 +71,8 @@ const tags = stage.querySelector<HTMLElement>('.tags')!;
 const caption = stage.querySelector<HTMLElement>('figcaption')!;
 let front = 0;
 let shown: Still | null | undefined;
+/** Chapter 5's live sky, once the bundle has loaded; until then its still stands in. */
+let sky: SkyWidget | undefined;
 
 /** The page's own lighter copy of each still (vite.config.ts). */
 const url = (s: Still) => `./${stillFile(s.src)}`;
@@ -78,6 +85,7 @@ function show(c: Chapter, still: Still | null) {
   shown = still;
   stage.classList.toggle('has-still', !!still);
   stage.classList.toggle('whole', !!still?.whole);
+  stage.classList.toggle('sky-on', !!still?.widget && !!sky);
   if (!still) {
     layers.forEach((l) => l.classList.remove('on'));
     return;
@@ -109,8 +117,15 @@ function follow() {
   const line = innerHeight * 0.55;
   let chapter = chapters[0];
   let still: Still | null = null;
+  let since = 0;
+  let until = Infinity;
   for (const m of marks) {
-    if (m.getBoundingClientRect().top > line) break;
+    const top = m.getBoundingClientRect().top;
+    if (top > line) {
+      until = top - line;
+      break;
+    }
+    since = line - top;
     if (m.classList.contains('chapter')) {
       chapter = chapters.find((ch) => ch.n === Number(m.dataset.n)) ?? chapter;
       still = null;
@@ -119,6 +134,8 @@ function follow() {
     }
   }
   if (chapter) show(chapter, still);
+  // the live sky runs from today to the claim's epoch over the first 80 per cent of the way to the next beat
+  if (still?.widget === 'sky' && sky) sky.progress(since / (0.8 * (since + until)));
 }
 let queued = false;
 addEventListener('scroll', () => {
@@ -152,6 +169,14 @@ async function liveReceipts() {
   }
   // the dated claims read the named stars, which the bundle carries, as the viewer registers them
   if (bundle) setDefaultStars(bundle.stars);
+  const c4 = bundle?.claims.find((c) => c.id === 'C4');
+  if (bundle && c4) {
+    const { sources, sites, structures, measurements, presets, materials } = bundle;
+    sky = skyWidget(c4, buildEnvironment(resolve({ sources, sites, structures, measurements, presets, materials }, 'canonical').values));
+    stage.append(sky.el);
+    shown = undefined;
+    follow();
+  }
   for (const el of app.querySelectorAll<HTMLElement>('.live')) {
     const ids = (el.dataset.claims ?? '').split(',').filter(Boolean);
     if (!ids.length) continue;
