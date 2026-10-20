@@ -72,6 +72,18 @@
       "cwd": "apps/story"
     },
     {
+      "name": "exhibit",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5196",
+        "--strictPort"
+      ],
+      "port": 5196,
+      "cwd": "apps/exhibit"
+    },
+    {
       "name": "site",
       "runtimeExecutable": "python",
       "runtimeArgs": [
