@@ -15,7 +15,7 @@ import script from '../../../docs/script.md?raw';
 import { block, inline } from './markdown';
 import { chapterReceipts, receiptLine } from './receipts';
 import { parseScript, type Chapter } from './script';
-import { STILLS, markAnchors, markers, type Still } from './stills';
+import { STILLS, markAnchors, markers, stillFile, type Still } from './stills';
 import './style.css';
 
 const chapters = parseScript(script);
@@ -67,8 +67,8 @@ const caption = stage.querySelector<HTMLElement>('figcaption')!;
 let front = 0;
 let shown: Still | null | undefined;
 
-/** The stills live beside the page on the site (story/ next to progress/ and alignments/). */
-const url = (s: Still) => `../${s.src}`;
+/** The page's own lighter copy of each still (vite.config.ts). */
+const url = (s: Still) => `./${stillFile(s.src)}`;
 
 /** Show a still, crossfading from the last, or the chapter's card when `still` is null. */
 function show(c: Chapter, still: Still | null) {

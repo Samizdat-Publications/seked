@@ -3,20 +3,26 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { inline } from './markdown';
 import { parseScript } from './script';
-import { STILLS, markAnchors, markers } from './stills';
+import { STILLS, markAnchors, markers, stillFile, stillSource } from './stills';
 
 const root = join(__dirname, '..', '..', '..');
 const chapters = parseScript(readFileSync(join(root, 'docs', 'script.md'), 'utf8'));
 const fold = (s: string) => s.replace(/[’‘]/g, "'");
-/** Where `pnpm site` puts each directory the stills come from. */
-const onDisk = (src: string) =>
-  src.startsWith('progress/') ? join(root, 'docs', src) : join(root, 'apps', src);
 
 describe('the stage’s stills', () => {
   it('are committed files in the directories the site publishes', () => {
     for (const s of STILLS) {
       expect(/^(progress|alignments\/img)\//.test(s.src), s.src).toBe(true);
-      expect(existsSync(onDisk(s.src)), s.src).toBe(true);
+      expect(existsSync(stillSource(root, s.src)), s.src).toBe(true);
+    }
+  });
+
+  it('have one page copy per file, and no two files share one', () => {
+    const files = new Map<string, string>();
+    for (const s of STILLS) {
+      expect(stillFile(s.src)).toMatch(/^stills\/[\w.-]+\.jpg$/);
+      expect(files.get(stillFile(s.src)) ?? s.src, s.src).toBe(s.src);
+      files.set(stillFile(s.src), s.src);
     }
   });
 

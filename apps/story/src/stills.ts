@@ -6,9 +6,9 @@
  * scenes and the alignments' frames. The viewer's screenshots carry its
  * interface and the September stand-ins are superseded, so neither is here.
  *
- * `src` is a path under the site's root (`progress/` is docs/progress,
- * `alignments/` is apps/alignments), which the page reaches as `../src`
- * beside it on the site and the dev server serves the same way.
+ * `src` names the committed file as the site publishes it (`progress/` is
+ * docs/progress, `alignments/` is apps/alignments). The page shows a lighter
+ * copy of each, `stillFile`, which its build writes and its dev server makes.
  */
 
 export type Tag = 'claim state' | 'stand-in' | 'reconstruction' | 'look choices';
@@ -97,6 +97,13 @@ export const STILLS: Still[] = [
   { chapter: 9, anchor: 'Until it is, that is where to look.', src: SPHINX_TODAY,
     alt: 'The Sphinx today', tags: ['stand-in'] },
 ];
+
+/** The page's copy of a still: a JPEG under stills/, named for the file it is made from. */
+export const stillFile = (src: string) => `stills/${(src.split('/').pop() ?? src).replace(/\.\w+$/, '')}.jpg`;
+
+/** The committed file a still's `src` names, from the repo's root. */
+export const stillSource = (root: string, src: string) =>
+  [root, src.startsWith('progress/') ? 'docs' : 'apps', src].join('/');
 
 /** Curly and straight apostrophes compare alike, as the script mixes them; both are one character. */
 const fold = (s: string) => s.replace(/[’‘]/g, "'");
