@@ -200,3 +200,17 @@ p { margin: 0; }
   .ctl.chapter { max-width: 40vw; }
   .chapter-list { left: auto; right: 0; transform: none; min-width: 0; width: max-content; max-width: calc(100vw - 32px); }
 }
+
+/* the live sky's year and slider (src/skyfigure.ts), top left where a figure would stand */
+.skybar {
+  position: absolute; left: var(--left); top: max(var(--g), env(safe-area-inset-top)); z-index: 3;
+  width: min(300px, calc(100% - 2 * var(--g) - 44px)); padding: 10px 14px 8px;
+  background: rgba(17, 15, 12, 0.72); border: 1px solid var(--rule); border-radius: 10px;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.skybar[hidden] { display: none; }
+.skybar .sky-year { margin: 0; font: 400 22px/1.2 var(--display); color: var(--ink); }
+.skybar .sky-k { font: 500 10px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.skybar input { width: 100%; margin: 6px 0 4px; accent-color: var(--claim); }
+.skybar .sky-note { margin: 0; font: 400 11px/1.4 var(--body); color: var(--muted); }
+@media (max-width: 600px) { .skybar .sky-note { display: none; } }

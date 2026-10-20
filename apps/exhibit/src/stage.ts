@@ -16,6 +16,9 @@ import { type Layer, PanoramaViewer } from './viewer';
 const FADE_MS = 320;
 const ARROWS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
 
+/** Draws a sky onto the ink, given where a direction falls on screen; true while it is still moving. */
+export type SkyDrawer = (ctx: CanvasRenderingContext2D, at: (altDeg: number, azDeg: number) => [number, number] | null, since: number, still: boolean, font: string) => boolean;
+
 export interface Shot {
   station: Station; era: string; yaw?: number; pitch?: number; fov?: number; overlay?: string | null;
   /** Panoramas to try in order, relative to the walkthrough's folder; the first that loads is shown. Default: the station's own for the era. */
@@ -54,6 +57,9 @@ export class Stage {
   private comparing = false;
   private handle: HTMLElement;
   private overlayT0 = 0;
+  /** A sky drawn over the panorama (src/skyfigure.ts), and when it was put up. */
+  private sky: SkyDrawer | null = null;
+  private skyT0 = 0;
   private frame = 0;
   private last = 0;
   private keys = new Set<string>();
@@ -137,6 +143,13 @@ export class Stage {
   /** Take the overlay down until startOverlay() again, so it can draw on with its word once more. */
   cueOverlay(): void {
     if (this.overlay) { this.overlayT0 = Infinity; this.request(); }
+  }
+
+  /** Draw a sky over the panorama from now (directions only, so it registers from any station), or none. */
+  setSky(draw: SkyDrawer | null): void {
+    this.sky = draw;
+    this.skyT0 = performance.now();
+    this.request();
   }
 
   private setOverlay(shot: Shot): void {
@@ -359,6 +372,11 @@ export class Stage {
       const camera = cameraFor(st, era);
       const at = (p: OverlayPoint) => this.project(Array.isArray(p) ? p : fromCamera(camera, p.dir), camera, fov);
       if (drawOverlay(this.ctx, this.overlay, at, era, t - this.overlayT0, this.still, this.font)) busy = true;
+    }
+    if (this.sky && (!this.cache || this.cache.status(this.current()) === 'ready')) {
+      const camera = cameraFor(st, era);
+      const at = (altDeg: number, azDeg: number) => this.project(fromCamera(camera, [azDeg, altDeg, 1e5]), camera, fov);
+      if (this.sky(this.ctx, at, t - this.skyT0, this.still, this.font)) busy = true;
     }
     if (busy) this.request();
   }

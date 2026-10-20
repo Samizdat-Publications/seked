@@ -94,6 +94,16 @@ describe('leaves.json', () => {
       expect(read('docs/script.md'), L.id).toContain(`## ${L.reply.slice(2)}. `);
     }
   });
+
+  it("draws a sky only on leaves the visitor may turn the sky on, in years that are today's or a claim's epoch", () => {
+    const epochOk = (ref: string) => ref === 'today' || /^epoch:\s*-?\d+/m.test(read(`data/claims/${ref}.yaml`));
+    for (const L of leaves) {
+      if (!L.sky) continue;
+      expect(L.interact, L.id).toBe('sky');
+      expect(epochOk(L.sky.at), `${L.id}: ${L.sky.at}`).toBe(true);
+      if (L.sky.from) expect(epochOk(L.sky.from), `${L.id}: ${L.sky.from}`).toBe(true);
+    }
+  });
 });
 
 describe('withStandIns', () => {

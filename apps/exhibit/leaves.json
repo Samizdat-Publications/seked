@@ -708,6 +708,9 @@
      "pitch": 8,
      "fov": 70
     }
+   },
+   "sky": {
+    "at": "today"
    }
   },
   {
@@ -724,7 +727,7 @@
    "arrive": "wipe",
    "say": "But the stars behind the sunrise drift.",
    "draw": [],
-   "hold": 1,
+   "hold": 3,
    "interact": "sky",
    "receipts": [],
    "reply": "ch2",
@@ -735,6 +738,10 @@
      "pitch": 8,
      "fov": 70
     }
+   },
+   "sky": {
+    "at": "C5",
+    "from": "today"
    }
   },
   {
@@ -764,6 +771,9 @@
      "pitch": 8,
      "fov": 70
     }
+   },
+   "sky": {
+    "at": "C5"
    }
   },
   {
@@ -793,6 +803,9 @@
      "pitch": 8,
      "fov": 70
     }
+   },
+   "sky": {
+    "at": "C5"
    }
   },
   {

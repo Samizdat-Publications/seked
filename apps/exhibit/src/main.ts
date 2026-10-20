@@ -11,9 +11,12 @@ import { type Leaf, type RenderStations, leafPanorama, readLeaves, withStandIns 
 import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
+import skyData from 'virtual:sky';
 import { ditchPlanSvg } from './figures';
 import { Panel } from './panel';
 import { Player } from './player';
+import type { Moment } from './sky';
+import { SkyFigure } from './skyfigure';
 import { DEG } from './projection';
 import { Stage } from './stage';
 
@@ -81,7 +84,9 @@ async function start(): Promise<void> {
     chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'), flight: $<HTMLVideoElement>('flight'),
   }, panoramasFor(manifest));
   const panel = new Panel($('stage'), script);
-  player.onLeaf = (L) => panel.show(L);
+  const sky = new SkyFigure(stage, skyData, (RENDER as unknown as { moments: Record<string, Moment> }).moments, $('skybar'));
+  sky.onHandsOn = () => { if (player.playing) player.pause(); };
+  player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); };
   const figure = $('figure');
   player.onFigure = (id) => {
     if (id === 'ditch-plan') {
@@ -92,9 +97,9 @@ async function start(): Promise<void> {
     figure.hidden = !id;
   };
   panel.onOpen = () => { if (player.playing) player.pause(); };
-  player.onPlay = () => panel.quiet();
+  player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); };
   // for capture and test scripts, as the story page had
-  (window as unknown as { seked: unknown }).seked = { player, stage };
+  (window as unknown as { seked: unknown }).seked = { player, stage, sky };
   $('controls').hidden = false;
   player.go(leafFromSearch(location.search, leaves));
 }

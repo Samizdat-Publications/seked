@@ -45,6 +45,11 @@ export const LeafSchema = z.object({
    * view from it. The player uses it only while the walkthrough's manifest lacks the leaf's station.
    */
   until: z.object({ station: z.string().min(1), view: View }).strict().optional(),
+  /**
+   * A live sky drawn over the panorama at the leaf's moment (src/sky.ts): `at` the year, `today` or a claim id whose
+   * epoch it takes; `from` a year it winds from in play.
+   */
+  sky: z.object({ at: z.string().min(1), from: z.string().min(1).optional() }).strict().optional(),
 }).strict();
 
 export type Leaf = z.infer<typeof LeafSchema>;
