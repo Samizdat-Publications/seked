@@ -7,7 +7,7 @@ import { cameraFor, type Manifest, type Overlay, type OverlayPoint, type Station
 import { drawOverlay } from './overlay';
 import { type Aim, WIPE_SECONDS, turnAt, turnSeconds, wipeAt } from './play';
 import {
-  DEG, MAX_FOV, MIN_FOV, PITCH_MAX, clamp, fitFov, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
+  DEG, MAX_FOV, MIN_FOV, PITCH_MAX, clamp, fitFov, frameAim, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
   type Vec3,
 } from './projection';
 import { TextureCache } from './textures';
@@ -106,8 +106,9 @@ export class Stage {
     this.station = st;
     this.era = shot.era;
     this.view.yaw = wrapAngle(shot.yaw ?? st.view.yaw);
-    this.view.pitch = clamp(shot.pitch ?? st.view.pitch, -PITCH_MAX, PITCH_MAX);
-    this.fitted = fitFov(shot.fov ?? st.view.fov, this.W, this.H);
+    const framed = frameAim(shot.pitch ?? st.view.pitch, shot.fov ?? st.view.fov, this.W, this.H);
+    this.view.pitch = framed.pitch;
+    this.fitted = framed.fov;
     this.view.zoom = 1;
     this.view.vy = this.view.vp = 0;
     this.setOverlay(shot);
@@ -137,7 +138,7 @@ export class Stage {
   turn(shot: Shot, done: () => void = () => {}): number {
     if (!this.station) { this.show(shot); done(); return 0; }
     const st = shot.station;
-    const to: Aim = { yaw: wrapAngle(shot.yaw ?? st.view.yaw), pitch: clamp(shot.pitch ?? st.view.pitch, -PITCH_MAX, PITCH_MAX), fov: fitFov(shot.fov ?? st.view.fov, this.W, this.H) };
+    const to: Aim = { yaw: wrapAngle(shot.yaw ?? st.view.yaw), ...frameAim(shot.pitch ?? st.view.pitch, shot.fov ?? st.view.fov, this.W, this.H) };
     const from: Aim = { yaw: this.view.yaw, pitch: this.view.pitch, fov: this.fov() };
     this.setOverlay(shot);
     this.view.vy = this.view.vp = 0;

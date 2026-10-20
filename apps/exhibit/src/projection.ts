@@ -78,6 +78,24 @@ export function fitFov(vfov: number, width: number, height: number): number {
   return clamp(Math.max(vfov, need), MIN_FOV, MAX_FOV);
 }
 
+/**
+ * Where a shot's subject sits on screen, as a fraction of the height from the top: above the middle, clear of the
+ * caption band along the bottom, as a photographer frames over a caption.
+ */
+export const FRAME_PIVOT = 0.4;
+
+/**
+ * How a shot framed for a wide screen is framed on this one: the vertical field fitted to it (a narrow screen
+ * widens it, fitFov), and the pitch moved so what the shot put FRAME_PIVOT of the way down stays there. Without
+ * it the extra field of a phone splits evenly and the subject sinks under a tall empty sky.
+ */
+export function frameAim(pitch: number, vfov: number, width: number, height: number): { pitch: number; fov: number } {
+  const fov = fitFov(vfov, width, height);
+  const up = 1 - 2 * FRAME_PIVOT;
+  const subject = pitch + Math.atan(up * Math.tan(clamp(vfov, MIN_FOV, MAX_FOV) / 2));
+  return { pitch: clamp(subject - Math.atan(up * Math.tan(fov / 2)), -PITCH_MAX, PITCH_MAX), fov };
+}
+
 /** The mip level that puts about one texel under each pixel at the centre of the view. */
 export function lodFor(textureWidth: number, canvasHeight: number, fov: number): number {
   const texelsPerPixel = (textureWidth / (2 * Math.PI)) / (canvasHeight / fov);
