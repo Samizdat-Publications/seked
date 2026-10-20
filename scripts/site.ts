@@ -10,8 +10,9 @@
  * what it left out.
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { REPO_ROOT } from '@seked/data';
+import { escape, markdown } from './markdown';
 
 const apps = join(REPO_ROOT, 'apps');
 const dist = join(apps, 'web', 'dist');
@@ -44,7 +45,6 @@ for (const page of ['walk', 'films', 'alignments']) {
 if (!existsSync(join(apps, 'walk', 'pano'))) skipped.push('walkthrough panoramas (python render/publish.py)');
 if (!existsSync(join(apps, 'films', 'films'))) skipped.push('films (render/film.py)');
 
-const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** The page shell every generated page shares: the landing page's dark look, kept small. */
 const shell = (title: string, body: string, home = '../') => `<!doctype html>
@@ -90,49 +90,6 @@ ${body}
 </html>
 `;
 
-/**
- * The Markdown the generators write: headings, pipe tables with alignment,
- * bullet lists, paragraphs, **bold**, *italic*, `code` and [links](url).
- * Enough for the dossier and the shaft table; not a general renderer.
- */
-function markdown(md: string): string {
-  const inline = (s: string) => escape(s)
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>')
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
-  const cells = (row: string) => row.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
-  const out: string[] = [];
-  const lines = md.split(/\r?\n/);
-  for (let i = 0; i < lines.length; ) {
-    const line = lines[i] as string;
-    const h = /^(#{1,6})\s+(.*)$/.exec(line);
-    if (h) { out.push(`<h${h[1]!.length}>${inline(h[2]!)}</h${h[1]!.length}>`); i++; continue; }
-    if (line.startsWith('|') && /^\|[\s:|-]+\|$/.test((lines[i + 1] ?? '').trim())) {
-      const head = cells(line);
-      const align = cells(lines[i + 1]!).map((a) => (a.endsWith(':') ? (a.startsWith(':') ? 'c' : 'r') : ''));
-      const cls = (j: number) => (align[j] ? ` class="${align[j]}"` : '');
-      const rows: string[] = [];
-      for (i += 2; i < lines.length && (lines[i] as string).startsWith('|'); i++) {
-        rows.push(`<tr>${cells(lines[i]!).map((c, j) => `<td${cls(j)}>${inline(c)}</td>`).join('')}</tr>`);
-      }
-      out.push(`<div class="scroll"><table><thead><tr>${head.map((c, j) => `<th${cls(j)}>${inline(c)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`);
-      continue;
-    }
-    if (/^[-*]\s+/.test(line)) {
-      const items: string[] = [];
-      for (; i < lines.length && /^[-*]\s+/.test(lines[i]!); i++) items.push(`<li>${inline(lines[i]!.replace(/^[-*]\s+/, ''))}</li>`);
-      out.push(`<ul>${items.join('')}</ul>`);
-      continue;
-    }
-    if (!line.trim()) { i++; continue; }
-    const para: string[] = [];
-    for (; i < lines.length && lines[i]!.trim() && !/^(#|\||[-*]\s)/.test(lines[i]!); i++) para.push(lines[i]!);
-    out.push(`<p>${inline(para.join(' '))}</p>`);
-  }
-  return out.join('\n');
-}
-
 // Progress snapshots: copy the images and turn the README's table into a page.
 const progressDir = join(REPO_ROOT, 'docs', 'progress');
 const outProgress = join(site, 'progress');
@@ -162,11 +119,20 @@ mkdirSync(outDocs, { recursive: true });
 for (const f of ['plan.html', 'plan-2026-09.html']) {
   if (existsSync(join(REPO_ROOT, 'docs', f))) cpSync(join(REPO_ROOT, 'docs', f), join(outDocs, f));
 }
-for (const [f, title] of [['dossier', 'Seked claims dossier'], ['shafts', 'Seked shaft alignments']] as const) {
+const research = join(REPO_ROOT, 'docs', 'research');
+const briefs = existsSync(research) ? readdirSync(research).filter((f) => /^ch\d+\.md$/.test(f)).map((f) => f.slice(0, -3)) : [];
+const pages: [string, string][] = [
+  ['dossier', 'Seked claims dossier'],
+  ['shafts', 'Seked shaft alignments'],
+  ['script', 'Seked: the script'],
+  ...briefs.map((b): [string, string] => [`research/${b}`, `Seked research, chapter ${b.slice(2)}`]),
+];
+for (const [f, title] of pages) {
   const src = join(REPO_ROOT, 'docs', `${f}.md`);
   if (!existsSync(src)) continue;
+  mkdirSync(dirname(join(outDocs, f)), { recursive: true });
   cpSync(src, join(outDocs, `${f}.md`));
-  writeFileSync(join(outDocs, `${f}.html`), shell(title, markdown(readFileSync(src, 'utf8'))));
+  writeFileSync(join(outDocs, `${f}.html`), shell(title, markdown(readFileSync(src, 'utf8')), f.includes('/') ? '../../' : '../'));
 }
 
 writeFileSync(join(site, '.nojekyll'), '');

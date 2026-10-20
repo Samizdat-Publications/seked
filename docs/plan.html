@@ -353,7 +353,7 @@
           <li><span class="q">4</span><div><p><strong>Where the page lives.</strong></p><p class="rec"><b>Recommendation:</b> it becomes the home page at <code>seked.pages.dev/</code>, with the viewer and the walkthrough kept under their own paths.</p></div></li>
           <li><span class="q">5</span><div><p><strong>The narrator.</strong> Three ElevenLabs voices read the cold open.</p><p class="rec"><b>Recommendation:</b> a measured, warm voice, not a trailer voice. It is Stewart's ear.</p></div></li>
           <li><span class="q">6</span><div><p><strong>When the tour retires.</strong></p><p class="rec"><b>Recommendation:</b> when phase 2 ships, so the site always has one working way through.</p></div></li>
-          <li><span class="q">7</span><div><p><strong>Spend on the API key.</strong> Chapter research costs about a dollar or two a chapter (see below).</p><p class="rec"><b>Recommendation:</b> run all eight once the Console shows the test calls against the credit.</p></div></li>
+          <li><span class="q">7</span><div><p><strong>Spend on the API key.</strong> The research for all eight chapters ran on 20 October for $16.22, plus $1.23 for the first pilot, which had no web access and was discarded. The script's draft runs at extra effort under an $8 cap.</p><p class="rec"><b>Recommendation:</b> check in the Console that these calls drew on the plan's API credit and not on a card. If they did, keep bulk research and drafting on the key.</p></div></li>
         </ol>
       </section>
 
@@ -361,7 +361,21 @@
         <p class="label">Sources</p>
         <h2>Research and sources</h2>
         <p>Each chapter's research is a headless job whose brief lands in <code>docs/research/chN.md</code>. It gives the claim at full strength, the proponents' evidence, the receipts, the reply, the state of the question, the pictures, the open questions, and the new sources in <code>data/sources.json</code>'s shape. Its citations are marked checked or unchecked. The briefs are drafts, and nothing in them is data until it is entered in <code>data/</code>.</p>
-        <div class="pending" id="research-status">Research status: filled in as each chapter's brief comes back.</div>
+        <p>All eight briefs came back on 20 October, about 4,300 to 5,900 words each, for $16.22 on the API key: a dollar and a half to two and a half a chapter, 48 to 72 turns each. The tallies below count the marks in each brief and say nothing yet about which citations matter most.</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>#</th><th>Brief</th><th>Cost</th><th>Checked / unchecked</th><th>New sources</th><th>Where it stands, in a line</th></tr></thead>
+          <tbody>
+            <tr><td class="id">1</td><td><a href="research/ch1.html">ch1</a></td><td class="fit">$2.12</td><td class="fit">27 / 15</td><td class="fit">26</td><td>Both sides now accept that water shaped the ditch; the dispute is when. The only quantitative support for an old date (the 1992 seismic) has never been calibrated by drilling. The newest dissent (Reader 2026) argues for centuries, not millennia.</td></tr>
+            <tr><td class="id">2</td><td><a href="research/ch2.html">ch2</a></td><td class="fit">$1.96</td><td class="fit">21 / 14</td><td class="fit">23</td><td>The small, better-kept head is real and undisputed. Leo did rise before the equinox sun c. 10,500 BCE, but well south of the gaze (C5), and Egypt shows no lion constellation before the Ptolemies.</td></tr>
+            <tr><td class="id">3</td><td><a href="research/ch3.html">ch3</a></td><td class="fit">$2.36</td><td class="fit">23 / 15</td><td class="fit">20</td><td>Everyone agrees the cores came out of the ditch. The "granite over weathered limestone" observation was made on camera in 1993 and never published as a measured section, which is the decisive test.</td></tr>
+            <tr><td class="id">4</td><td><a href="research/ch4.html">ch4</a></td><td class="fit">$2.01</td><td class="fit">15 / 13</td><td class="fit">33</td><td>Egypt's own lists do put long ages of gods and spirits before Menes, and the Pyramid Texts do make the king a star with Orion. None of the texts carries a date, and the only bridge to 10,500 BCE is precession.</td></tr>
+            <tr><td class="id">5</td><td><a href="research/ch5.html">ch5</a></td><td class="fit">$2.16</td><td class="fit">20 / 13</td><td class="fit">20</td><td>The shape match is statistically significant (Allan 2026, p = 0.0025), but every extension that would make the plan a clock fails, the epoch included: Seked's C4 has the belt 13° off the ground at 10,450 BCE.</td></tr>
+            <tr><td class="id">6</td><td><a href="research/ch6.html">ch6</a></td><td class="fit">$2.02</td><td class="fit">12 / 25</td><td class="fit">18</td><td>The numbers are real and the database reproduces them. The seked of 5½ yields π and φ together, and the strongest remaining point is the cluster itself.</td></tr>
+            <tr><td class="id">7</td><td><a href="research/ch7.html">ch7</a></td><td class="fit">$1.54</td><td class="fit">13 / 22</td><td class="fit">24</td><td>Göbekli Tepe's age (c. 9500 BCE, built by foragers) is settled. The post-2019 work makes its builders more settled and its burial more like landslip. The impact hypothesis is a minority view under heavy criticism, and nothing material links Göbekli to Giza.</td></tr>
+            <tr><td class="id">8</td><td><a href="research/ch8.html">ch8</a></td><td class="fit">$2.05</td><td class="fit">25 / 21</td><td class="fit">22</td><td>Every physical date taken at Giza has come out in the third millennium BCE. The one untested measurement is a core through the enclosure floor, front and back, and the 2008 boreholes show it can be done.</td></tr>
+          </tbody>
+        </table></div>
+        <p>Checked by hand so far: Allan 2026 (<em>Journal of Astronomical History and Heritage</em> 29(2), 367–378) exists and is fairly summarised. Chapter 2's "Reeder" was the misspelt header of Lacovara's review, and the book is Colin D. Reader's. The new sources, about 180 across the briefs with overlaps, go into <code>data/sources.json</code> only as the script uses them, each <code>verified: false</code> until it has been read against its page.</p>
       </section>
     </main>
   </div>
