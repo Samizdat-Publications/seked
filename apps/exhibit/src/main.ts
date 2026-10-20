@@ -1,13 +1,16 @@
 /**
- * The exhibit's page: the stage full screen and a quiet caption band. `?leaf=ch1-carved` shows a leaf (the
- * first when none is named); until play exists (E3) the address can also pick a shot by hand:
+ * The exhibit's page: the stage full screen, a quiet caption band and the play controls. `?leaf=ch1-carved`
+ * opens on a leaf (the first when none is named). A shot can still be picked by hand, outside the leaves:
  * `?station=sphinx-flank&era=today&yaw=285&pitch=10&fov=70&overlay=g1-proportions`.
  */
 import './style.css';
 import leavesJson from '../leaves.json';
 import renderStations from '../../../render/stations.json';
-import { type RenderStations, leafPanorama, readLeaves } from './leaves';
-import { pickEra, readManifest, readOverlays } from './manifest';
+import script from '../../../docs/script.md?raw';
+import { type Leaf, type RenderStations, leafPanorama, readLeaves } from './leaves';
+import { type Manifest, pickEra, readManifest, readOverlays } from './manifest';
+import { leafFromSearch, scriptChapters } from './play';
+import { Player } from './player';
 import { DEG } from './projection';
 import { Stage } from './stage';
 
@@ -24,56 +27,53 @@ async function json(name: string): Promise<unknown> {
   return r.json();
 }
 
-function honestyWord(h: string): string {
-  return h === 'claim' ? 'Theorized' : h === 'reconstruction' ? 'Reconstruction' : h === 'survey' ? 'Survey' : '';
-}
+/** A leaf's panorama, then the walkthrough's for its station and era until the laptop renders the leaf's own. */
+const panoramasFor = (manifest: Manifest) => (L: Leaf): string[] => {
+  const want = leafPanorama(L, RENDER);
+  const own = manifest.byId[L.station]?.panoramas[L.era];
+  return own && own !== want ? [want, own] : [want];
+};
 
 async function start(): Promise<void> {
   const status = $('status');
-  let manifest, overlays;
+  const fail = (msg: string) => { status.textContent = msg; status.hidden = false; };
+  let manifest: Manifest, overlays;
   try {
     [manifest, overlays] = await Promise.all([json('stations.json').then(readManifest), json('overlays.json').then(readOverlays, () => ({}))]);
   } catch (e) {
-    status.textContent = 'The exhibit could not load its stations. Reload to try again.';
-    status.hidden = false;
     console.error(e);
-    return;
+    return fail('The exhibit could not load its stations. Reload to try again.');
   }
   const stage = new Stage($('stage'), $<HTMLCanvasElement>('view'), $<HTMLCanvasElement>('ink'), $('flat'), manifest, overlays, WALK);
-
-  const q = new URLSearchParams(location.search);
-  const deg = (k: string) => { const v = q.get(k); return v !== null && v !== '' && Number.isFinite(Number(v)) ? Number(v) * DEG : undefined; };
-  const leaf = q.has('station') ? null : LEAVES.find((L) => L.id === q.get('leaf')) ?? LEAVES[0]!;
-  const st = leaf ? manifest.byId[leaf.station] : manifest.byId[q.get('station') ?? ''];
-  if (!st) { status.textContent = 'There is no such station.'; status.hidden = false; return; }
-  const era = leaf ? leaf.era : pickEra(manifest, st, q.get('era'));
-  if (!era) { status.textContent = `${st.name} has no panoramas yet.`; status.hidden = false; return; }
-
-  const state = manifest.stateById[era];
-  const pill = $('pill');
-  pill.textContent = honestyWord(state?.honesty ?? '');
-  pill.className = `pill ${state?.honesty ?? ''}`;
-  pill.hidden = !pill.textContent;
-  $('place').textContent = st.name;
-  $('when').textContent = state ? `${state.title}, ${state.label}` : era;
-  $('caption').textContent = leaf ? leaf.say : st.where;
-  document.title = `${st.name}: Seked`;
-
   stage.onStatus = (s) => {
     status.hidden = s === 'ready';
     status.textContent = s === 'loading' ? 'Loading the panorama' : s === 'missing' ? 'This view has not been rendered yet.' : s === 'error' ? 'The panorama did not load. Reload to try again.' : '';
   };
-  if (leaf) {
-    // the leaf's own panorama, else the walkthrough's for the era until the laptop renders it (E6 queues it)
-    const own = st.panoramas[era];
-    const want = leafPanorama(leaf, RENDER);
-    stage.show({
-      station: st, era, yaw: leaf.view.yaw * DEG, pitch: leaf.view.pitch * DEG, fov: leaf.view.fov * DEG, overlay: leaf.draw[0] ?? null,
-      panoramas: own && own !== want ? [want, own] : [want],
-    });
-  } else {
+
+  const q = new URLSearchParams(location.search);
+  if (q.has('station')) {
+    const st = manifest.byId[q.get('station')!];
+    if (!st) return fail('There is no such station.');
+    const era = pickEra(manifest, st, q.get('era'));
+    if (!era) return fail(`${st.name} has no panoramas yet.`);
+    const deg = (k: string) => { const v = q.get(k); return v !== null && v !== '' && Number.isFinite(Number(v)) ? Number(v) * DEG : undefined; };
+    const state = manifest.stateById[era];
+    $('place').textContent = st.name;
+    $('when').textContent = state ? `${state.title}, ${state.label}` : era;
+    $('caption').textContent = st.where;
     stage.show({ station: st, era, yaw: deg('yaw'), pitch: deg('pitch'), fov: deg('fov'), overlay: q.get('overlay') });
+    return;
   }
+
+  const missing = LEAVES.find((L) => !manifest.byId[L.station]);
+  if (missing) return fail(`The leaf ${missing.id} stands at ${missing.station}, which the walkthrough does not have.`);
+  const player = new Player(stage, manifest, LEAVES, scriptChapters(script), {
+    caption: $('caption'), place: $('place'), when: $('when'), pill: $('pill'),
+    play: $<HTMLButtonElement>('play'), prev: $<HTMLButtonElement>('prev'), next: $<HTMLButtonElement>('next'),
+    chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'),
+  }, panoramasFor(manifest));
+  $('controls').hidden = false;
+  player.go(leafFromSearch(location.search, LEAVES));
 }
 
 void start();

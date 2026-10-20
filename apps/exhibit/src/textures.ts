@@ -45,6 +45,8 @@ export class TextureCache {
     try {
       const r = await fetch(e.url);
       if (!r.ok) { e.status = r.status === 404 ? 'missing' : 'error'; this.onChange(); return; }
+      // a server that answers a missing file with its index page (a single-page fallback) has not got the picture
+      if (!(r.headers.get('content-type') ?? 'image/').startsWith('image/')) { e.status = 'missing'; this.onChange(); return; }
       const blob = await r.blob();
       const img = await decode(blob, this.viewer.maxTexture);
       if (this.entries.get(e.url) !== e) { img.close(); return; }

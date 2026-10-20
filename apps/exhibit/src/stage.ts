@@ -5,6 +5,7 @@
  */
 import { cameraFor, type Manifest, type Overlay, type OverlayPoint, type Station } from './manifest';
 import { drawOverlay } from './overlay';
+import { type Aim, turnAt, turnSeconds } from './play';
 import {
   DEG, MAX_FOV, MIN_FOV, PITCH_MAX, clamp, fitFov, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
   type Vec3,
@@ -38,6 +39,7 @@ export class Stage {
   private fitted = 58 * DEG;
   private overlay: Overlay | null = null;
   private candidates: string[] = [];
+  private tween: { from: Aim; to: Aim; t0: number; ms: number; done: () => void } | null = null;
   private overlayT0 = 0;
   private frame = 0;
   private last = 0;
@@ -84,6 +86,7 @@ export class Stage {
     const candidates = shot.panoramas ?? (own ? [own] : []);
     const changed = st !== this.station || shot.era !== this.era || candidates.join() !== this.candidates.join();
     this.candidates = candidates;
+    this.tween = null;
     this.station = st;
     this.era = shot.era;
     this.view.yaw = wrapAngle(shot.yaw ?? st.view.yaw);
@@ -97,11 +100,52 @@ export class Stage {
     this.request();
   }
 
-  /** Fetch a station's panorama in an era ahead of time. */
-  prefetch(st: Station, era: string): void {
-    const p = st.panoramas[era];
+  /**
+   * Swing the view to a shot's aim in the same panorama, eased; `done` runs when it arrives, or at once if the
+   * visitor takes the view first (the turn is dropped) or prefers reduced motion. Returns the seconds it takes.
+   */
+  turn(shot: Shot, done: () => void = () => {}): number {
+    if (!this.station) { this.show(shot); done(); return 0; }
+    const st = shot.station;
+    const to: Aim = { yaw: wrapAngle(shot.yaw ?? st.view.yaw), pitch: clamp(shot.pitch ?? st.view.pitch, -PITCH_MAX, PITCH_MAX), fov: fitFov(shot.fov ?? st.view.fov, this.W, this.H) };
+    const from: Aim = { yaw: this.view.yaw, pitch: this.view.pitch, fov: this.fov() };
+    const o = shot.overlay ? this.overlays[shot.overlay] ?? null : null;
+    if (o !== this.overlay) { this.overlay = o; this.overlayT0 = performance.now(); }
+    this.view.vy = this.view.vp = 0;
+    this.tween?.done();
+    const secs = this.still ? 0 : turnSeconds(from, to);
+    if (secs <= 0) { this.tween = null; this.aim(to); done(); this.request(); return 0; }
+    this.tween = { from, to, t0: performance.now(), ms: secs * 1000, done };
+    this.request();
+    return secs;
+  }
+
+  /** Where the view is pointed now. */
+  aimNow(): Aim { return { yaw: this.view.yaw, pitch: this.view.pitch, fov: this.fov() }; }
+
+  private aim(a: Aim): void {
+    this.view.yaw = a.yaw;
+    this.view.pitch = a.pitch;
+    this.fitted = clamp(a.fov, MIN_FOV, MAX_FOV);
+    this.view.zoom = 1;
+  }
+
+  /** The visitor has taken the view: a turn under way stops where it is. */
+  private handsOn(): void {
+    const t = this.tween;
+    this.tween = null;
+    t?.done();
+    this.onHandsOn();
+  }
+
+  /** Fetch a panorama ahead of time: the given path, else the station's own for the era. */
+  prefetch(st: Station, era: string, path?: string): void {
+    const p = path ?? st.panoramas[era];
     if (p && this.cache) this.cache.prefetch(this.url(p));
   }
+
+  /** Whether the panorama on stage is on screen (always, for the flat picture, which reports its own status). */
+  get ready(): boolean { return !this.cache || this.cache.status(this.current()) === 'ready'; }
 
   request(): void {
     if (!this.frame) this.frame = requestAnimationFrame((t) => this.tick(t));
@@ -184,6 +228,12 @@ export class Stage {
   private move(dt: number): boolean {
     const v = this.view;
     let moving = false;
+    if (this.tween) {
+      const tw = this.tween, k = (performance.now() - tw.t0) / tw.ms;
+      this.aim(turnAt(tw.from, tw.to, k));
+      if (k >= 1) { this.tween = null; tw.done(); }
+      return true;
+    }
     if (this.keys.size) {
       const rate = 1.1 * this.fov();
       if (this.keys.has('ArrowLeft')) v.yaw -= rate * dt;
@@ -223,7 +273,7 @@ export class Stage {
       else if (this.pointers.size === 1) this.drag = { x: e.clientX, y: e.clientY, t: e.timeStamp };
       v.vy = v.vp = 0;
       c.classList.add('grabbing');
-      this.onHandsOn();
+      this.handsOn();
       this.request();
     });
     c.addEventListener('pointermove', (e) => {
@@ -273,7 +323,7 @@ export class Stage {
       e.preventDefault();
       const d = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? this.H : 1);
       this.setFov(this.fov() * Math.exp(d * 0.0012));
-      this.onHandsOn();
+      this.handsOn();
       this.request();
     }, { passive: false });
     document.addEventListener('keydown', (e) => {
@@ -285,7 +335,7 @@ export class Stage {
       else if (e.key === '-' || e.key === '_') this.setFov(this.fov() / 0.88);
       else return;
       e.preventDefault();
-      this.onHandsOn();
+      this.handsOn();
       this.request();
     });
     document.addEventListener('keyup', (e) => { if (this.keys.delete(e.key)) this.request(); });

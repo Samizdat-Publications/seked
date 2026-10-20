@@ -1,0 +1,232 @@
+/**
+ * Narrated play: each leaf is put on the stage, speaks its words (the browser's own voice until the recorded one
+ * exists, its word-boundary events the timing), shows them as the caption, holds, and moves on. Any drag or key
+ * on the view pauses play and hands the visitor the view; play resumes from that leaf.
+ */
+import type { Leaf } from './leaves';
+import type { Manifest } from './manifest';
+import { type Chapter, chapterStarts, searchWithLeaf, wordTimes } from './play';
+import { DEG } from './projection';
+import type { Shot, Stage } from './stage';
+
+/** How long play waits for a leaf's panorama before speaking over the blank anyway. */
+const READY_WAIT_MS = 8000;
+
+export interface PlayerUi {
+  caption: HTMLElement;
+  place: HTMLElement;
+  when: HTMLElement;
+  pill: HTMLElement;
+  play: HTMLButtonElement;
+  prev: HTMLButtonElement;
+  next: HTMLButtonElement;
+  chapterBtn: HTMLButtonElement;
+  chapterList: HTMLElement;
+  count: HTMLElement;
+}
+
+const HONESTY: Record<string, string> = { claim: 'Theorized', reconstruction: 'Reconstruction', survey: 'Survey' };
+
+export class Player {
+  index = 0;
+  playing = false;
+  /** Each word's start in seconds as last spoken: the voice's own times, or the estimate. E4 draws lines on by it. */
+  words: { word: string; at: number }[] = [];
+  /** Called as each word of the leaf is reached, with its index. */
+  onWord: (i: number) => void = () => {};
+
+  private token = 0;
+  private timers: number[] = [];
+  private shown = -1;
+
+  constructor(private stage: Stage, private manifest: Manifest, private leaves: readonly Leaf[], private chapters: readonly Chapter[],
+    private ui: PlayerUi, private panoramas: (leaf: Leaf) => string[]) {
+    stage.onHandsOn = () => { if (this.playing) this.pause(); };
+    ui.play.addEventListener('click', () => (this.playing ? this.pause() : this.play()));
+    ui.prev.addEventListener('click', () => this.go(this.index - 1));
+    ui.next.addEventListener('click', () => this.go(this.index + 1));
+    ui.chapterBtn.addEventListener('click', () => this.toggleChapters());
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && t !== document.body && t.tagName !== 'CANVAS' && t !== document.documentElement) return;
+      if (e.key === ' ') { e.preventDefault(); this.playing ? this.pause() : this.play(); }
+      else if (e.key === 'PageDown') { e.preventDefault(); this.go(this.index + 1); }
+      else if (e.key === 'PageUp') { e.preventDefault(); this.go(this.index - 1); }
+      else if (e.key === 'Escape') this.toggleChapters(false);
+    });
+    this.buildChapters();
+    window.speechSynthesis?.getVoices();   // Chrome loads its voices on first asking
+  }
+
+  get leaf(): Leaf { return this.leaves[this.index]!; }
+
+  shot(L: Leaf): Shot {
+    const station = this.manifest.byId[L.station]!;
+    return { station, era: L.era, yaw: L.view.yaw * DEG, pitch: L.view.pitch * DEG, fov: L.view.fov * DEG, overlay: L.draw[0] ?? null, panoramas: this.panoramas(L) };
+  }
+
+  /** Show a leaf; if playing, speak it and go on. The arrival is a turn when the leaf stays in the panorama on screen. */
+  go(i: number): void {
+    if (i < 0 || i >= this.leaves.length) return;
+    const from = this.shown >= 0 ? this.leaves[this.shown] : undefined;
+    this.index = i;
+    this.shown = i;
+    const L = this.leaf;
+    this.cancel();
+    const token = this.token;
+    this.label(L);
+    history.replaceState(null, '', searchWithLeaf(location.search, L.id));
+    const samePano = !!from && from.station === L.station && from.era === L.era && from.moment === L.moment;
+    const begin = () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); };
+    if (samePano) this.stage.turn(this.shot(L), begin);
+    else { this.stage.show(this.shot(L)); begin(); }   // wipes and flights are E4's; a cut until then
+    const next = this.leaves[i + 1];
+    if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p);
+  }
+
+  play(): void {
+    if (this.playing) return;
+    this.playing = true;
+    this.ui.play.setAttribute('aria-pressed', 'true');
+    this.ui.play.setAttribute('aria-label', 'Pause');
+    document.body.classList.add('playing');
+    this.cancel();
+    const token = this.token;
+    // back to the leaf's own view if the visitor looked away, then its words from the start
+    this.stage.turn(this.shot(this.leaf), () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); });
+  }
+
+  pause(): void {
+    this.playing = false;
+    this.ui.play.setAttribute('aria-pressed', 'false');
+    this.ui.play.setAttribute('aria-label', 'Play');
+    document.body.classList.remove('playing');
+    this.cancel();
+  }
+
+  private cancel(): void {
+    this.token++;
+    for (const t of this.timers) clearTimeout(t);
+    this.timers = [];
+    window.speechSynthesis?.cancel();
+  }
+
+  private later(ms: number, f: () => void): void { this.timers.push(window.setTimeout(f, ms)); }
+
+  private whenReady(token: number, f: () => void): void {
+    const t0 = performance.now();
+    const check = () => {
+      if (token !== this.token) return;
+      if (this.stage.ready || performance.now() - t0 > READY_WAIT_MS) f();
+      else this.later(120, check);
+    };
+    check();
+  }
+
+  /** Say the leaf's words; when they end, hold, then go on. */
+  private speak(token: number): void {
+    const L = this.leaf;
+    let ended = false;
+    const end = () => {
+      if (ended || token !== this.token) return;
+      ended = true;
+      this.later(L.hold * 1000, () => {
+        if (token !== this.token || !this.playing) return;
+        if (this.index + 1 < this.leaves.length) this.go(this.index + 1);
+        else this.pause();
+      });
+    };
+    // the estimate, used as it stands when there is no voice, and as a watchdog when the voice goes quiet
+    const estimate = wordTimes(L.say);
+    const last = estimate[estimate.length - 1];
+    const estimated = (last ? last.at : 0) + 0.6;
+    const timed = () => {
+      this.words = estimate;
+      estimate.forEach((w, k) => this.later(w.at * 1000, () => { if (token === this.token) this.onWord(k); }));
+      this.later(estimated * 1000, end);
+    };
+    const synth = window.speechSynthesis;
+    if (!synth || typeof SpeechSynthesisUtterance === 'undefined') { timed(); return; }
+    const u = new SpeechSynthesisUtterance(L.say);
+    const voice = pickVoice(synth.getVoices());
+    if (voice) u.voice = voice;
+    u.rate = 0.95;
+    const starts = wordStarts(L.say);
+    const heard: { word: string; at: number }[] = [];
+    let t0 = 0, started = false;
+    u.onstart = () => { started = true; t0 = performance.now(); };
+    u.onboundary = (e) => {
+      if (token !== this.token || e.name !== 'word') return;
+      const k = starts.findIndex((s) => s >= e.charIndex);
+      if (k < 0) return;
+      heard[k] = { word: estimate[k]!.word, at: (performance.now() - t0) / 1000 };
+      this.words = estimate.map((w, j) => heard[j] ?? w);
+      this.onWord(k);
+    };
+    u.onend = end;
+    u.onerror = () => { if (!started) timed(); else end(); };
+    synth.speak(u);
+    // no voice at all (some browsers, a machine without voices): the caption still runs on the estimate
+    this.later(1500, () => { if (!started && token === this.token) { synth.cancel(); timed(); } });
+    // a voice that stalls mid-leaf (Chrome drops long utterances) still lets play go on
+    this.later((estimated / 0.95 + 4) * 1000, end);
+  }
+
+  private label(L: Leaf): void {
+    const st = this.manifest.byId[L.station];
+    const state = this.manifest.stateById[L.era];
+    this.ui.caption.textContent = L.say;
+    this.ui.place.textContent = st?.name ?? L.station;
+    this.ui.when.textContent = state ? `${state.title}, ${state.label}` : L.era;
+    const h = state?.honesty ?? '';
+    this.ui.pill.textContent = HONESTY[h] ?? '';
+    this.ui.pill.className = `pill ${h}`;
+    this.ui.pill.hidden = !this.ui.pill.textContent;
+    this.ui.prev.disabled = this.index === 0;
+    this.ui.next.disabled = this.index === this.leaves.length - 1;
+    const ch = this.chapters.find((c) => c.n === L.chapter);
+    this.ui.chapterBtn.textContent = ch ? `${ch.n}. ${ch.title}` : `Chapter ${L.chapter}`;
+    this.ui.count.textContent = `${this.index + 1} / ${this.leaves.length}`;
+    for (const b of this.ui.chapterList.querySelectorAll('button')) {
+      if (Number(b.dataset.chapter) === L.chapter) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    }
+    document.title = ch ? `${ch.title}: Seked` : 'Seked';
+  }
+
+  private buildChapters(): void {
+    const list = this.ui.chapterList;
+    list.replaceChildren();
+    for (const { chapter, index } of chapterStarts(this.leaves, this.chapters)) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.chapter = String(chapter.n);
+      b.innerHTML = `<span class="n"></span><span class="t"></span>`;
+      b.querySelector('.n')!.textContent = String(chapter.n);
+      b.querySelector('.t')!.textContent = chapter.title;
+      b.addEventListener('click', () => { this.toggleChapters(false); this.go(index); });
+      list.append(b);
+    }
+  }
+
+  private toggleChapters(open?: boolean): void {
+    const list = this.ui.chapterList;
+    const show = open ?? list.hidden;
+    list.hidden = !show;
+    this.ui.chapterBtn.setAttribute('aria-expanded', String(show));
+  }
+}
+
+/** Where each word of a text begins, as a character index, to match the voice's boundary events. */
+export function wordStarts(text: string): number[] {
+  return [...text.matchAll(/\S+/g)].map((m) => m.index ?? 0);
+}
+
+/** An English voice, a natural-sounding one where the browser has it. */
+function pickVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  const en = voices.filter((v) => /^en(-|_|$)/i.test(v.lang));
+  return en.find((v) => /natural|neural|premium|enhanced/i.test(v.name) && /GB|UK/i.test(v.lang + v.name))
+    ?? en.find((v) => /natural|neural|premium|enhanced/i.test(v.name))
+    ?? en.find((v) => /GB/i.test(v.lang))
+    ?? en[0] ?? null;
+}
