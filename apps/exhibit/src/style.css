@@ -52,6 +52,24 @@ p { margin: 0; }
   pointer-events: none;
 }
 
+/* the wipe's edge, when the visitor may drag it: a grip at mid height and the two eras' names either side */
+.edge { position: absolute; left: 0; top: 0; bottom: 0; z-index: 3; width: 0; pointer-events: none; }
+.edge-grip {
+  position: absolute; top: 42%; left: -22px; width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center; padding: 0; cursor: ew-resize; pointer-events: auto; touch-action: none;
+  color: #1f1604; background: var(--claim); border: 0; box-shadow: 0 0 0 4px rgba(15, 14, 12, 0.35), 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+.edge-now, .edge-then {
+  position: absolute; top: calc(42% + 54px); white-space: nowrap;
+  font: 500 11px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+.edge-now { right: 10px; }
+.edge-then { left: 10px; }
+.edge.at-rest .edge-then { display: none; }
+.edge.at-rest .edge-grip { left: -40px; }
+.edge.at-rest .edge-now { right: 22px; }
+
 /* the caption band: quiet, low, the picture's servant */
 .band {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;

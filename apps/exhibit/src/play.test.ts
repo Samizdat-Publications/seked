@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { readLeaves } from './leaves';
 import {
-  chapterStarts, leafFromSearch, scriptChapters, scriptPart, searchWithLeaf, speakingTime, turnAt, turnSeconds, wordTimes,
+  chapterStarts, leafFromSearch, wipeAt, scriptChapters, scriptPart, searchWithLeaf, speakingTime, turnAt, turnSeconds, wordTimes,
 } from './play';
 import { DEG } from './projection';
 
@@ -75,5 +75,15 @@ describe('the address', () => {
   it('keeps what else it carries', () => {
     expect(searchWithLeaf('?voice=x&leaf=a', 'ch1-floor')).toBe('?voice=x&leaf=ch1-floor');
     expect(searchWithLeaf('', 'ch0-dawn')).toBe('?leaf=ch0-dawn');
+  });
+});
+
+describe('wipes', () => {
+  it('sweep from just off the left edge to just off the right, eased', () => {
+    expect(wipeAt(0)).toBeLessThan(-1.08);
+    expect(wipeAt(1)).toBeGreaterThan(1.08);
+    expect(wipeAt(0.5)).toBeCloseTo(0);
+    expect(wipeAt(0.1) - wipeAt(0)).toBeLessThan(wipeAt(0.5) - wipeAt(0.4));
+    expect(wipeAt(-1)).toBe(wipeAt(0));
   });
 });

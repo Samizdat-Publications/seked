@@ -12,6 +12,7 @@ const FS = `#version 300 es
 precision highp float;
 uniform sampler2D ta, tb, pa, pb;
 uniform vec3 has;          // panorama a is loaded, panorama b is loaded, how much of b shows
+uniform vec3 wipe;         // a wipe is on, where its edge stands across the screen (-1 to 1), how soft the edge is
 uniform vec2 lods;
 uniform vec4 qa, qb;       // each layer's detail patch: yaw, pitch, tan(half its vertical field), aspect
 uniform vec2 pon, plods;   // how far each patch is faded in, and its mip level
@@ -48,7 +49,13 @@ void main() {
   vec3 bl = blank(el);
   vec3 a = has.x > 0.0 ? patched(pa, qa, plods.x, pon.x, w, textureLod(ta, uv, lods.x).rgb) : bl;
   vec3 c = a;
-  if (has.z > 0.0) {
+  if (wipe.x > 0.0) {
+    // a hard edge across the view: layer a behind it (to the left), layer b ahead of it, a faint light on the edge
+    vec3 b = has.y > 0.0 ? patched(pb, qb, plods.y, pon.y, w, textureLod(tb, uv, lods.y).rgb) : bl;
+    float x = v.x + 0.08 * v.y;
+    c = mix(a, b, smoothstep(wipe.y - wipe.z, wipe.y + wipe.z, x));
+    c += vec3(1.0, 0.86, 0.6) * 0.22 * exp(-abs(x - wipe.y) / max(wipe.z, 1e-4));
+  } else if (has.z > 0.0) {
     vec3 b = has.y > 0.0 ? patched(pb, qb, plods.y, pon.y, w, textureLod(tb, uv, lods.y).rgb) : bl;
     c = mix(a, b, has.z);
   }
@@ -95,7 +102,7 @@ export class PanoramaViewer {
     const loc = gl.getAttribLocation(this.prog, 'p');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    for (const n of ['ta', 'tb', 'pa', 'pb', 'has', 'lods', 'qa', 'qb', 'pon', 'plods', 'yaw', 'pitch', 'tanh', 'aspect']) this.u[n] = gl.getUniformLocation(this.prog, n);
+    for (const n of ['ta', 'tb', 'pa', 'pb', 'has', 'wipe', 'lods', 'qa', 'qb', 'pon', 'plods', 'yaw', 'pitch', 'tanh', 'aspect']) this.u[n] = gl.getUniformLocation(this.prog, n);
     gl.uniform1i(this.u.ta!, 0);
     gl.uniform1i(this.u.tb!, 1);
     gl.uniform1i(this.u.pa!, 2);
@@ -127,8 +134,11 @@ export class PanoramaViewer {
 
   release(t: Texture): void { this.gl.deleteTexture(t.tex); }
 
-  /** Draw the view: layer a, and layer b over it by `mix` (0 shows a alone). */
-  draw(view: View, fov: number, a: Layer, b: Layer | null, mix: number): void {
+  /**
+   * Draw the view: layer a, and layer b over it by `mix` (0 shows a alone); or, given `wipe` (the edge's place
+   * across the screen, -1 at the left to 1 at the right), a to the left of the edge and b to the right.
+   */
+  draw(view: View, fov: number, a: Layer, b: Layer | null, mix: number, wipe: number | null = null): void {
     const gl = this.gl, c = this.canvas, u = this.u;
     gl.viewport(0, 0, c.width, c.height);
     gl.useProgram(this.prog);
@@ -149,6 +159,7 @@ export class PanoramaViewer {
       plods[k] = Math.max(0, Math.log2(Math.max(p.tex.height * Math.tan(fov / 2) / (tq * c.height), 1e-3)));
     });
     gl.uniform3f(u.has!, a.pano ? 1 : 0, b?.pano ? 1 : 0, b ? mix : 0);
+    gl.uniform3f(u.wipe!, wipe === null || !b ? 0 : 1, wipe ?? 0, 2.5 / Math.max(1, c.width) + 0.004);
     gl.uniform2f(u.lods!, lods[0]!, lods[1]!);
     gl.uniform2f(u.pon!, pon[0]!, pon[1]!);
     gl.uniform2f(u.plods!, plods[0]!, plods[1]!);

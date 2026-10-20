@@ -7,7 +7,7 @@ import type { Leaf } from './leaves';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, searchWithLeaf, wordTimes } from './play';
 import { DEG } from './projection';
-import type { Shot, Stage } from './stage';
+import type { Other, Shot, Stage } from './stage';
 
 /** How long play waits for a leaf's panorama before speaking over the blank anyway. */
 const READY_WAIT_MS = 8000;
@@ -77,10 +77,13 @@ export class Player {
     const token = this.token;
     this.label(L);
     history.replaceState(null, '', searchWithLeaf(location.search, L.id));
-    const samePano = !!from && from.station === L.station && from.era === L.era && from.moment === L.moment;
+    const samePlace = !!from && from.station === L.station && from.moment === L.moment;
     const begin = () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); };
-    if (samePano) this.stage.turn(this.shot(L), begin);
-    else { this.stage.show(this.shot(L)); begin(); }   // wipes and flights are E4's; a cut until then
+    // the way in follows from what is on screen, so a jump through the chapter list arrives as sensibly as play
+    if (samePlace && from.era === L.era) this.stage.turn(this.shot(L), begin);
+    else if (samePlace) this.stage.wipe(this.shot(L), this.otherFor(from), begin);
+    else { this.stage.show(this.shot(L)); begin(); }   // flights are E4's; a cut until then
+    this.offerCompare();
     const next = this.leaves[i + 1];
     if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p);
   }
@@ -88,6 +91,7 @@ export class Player {
   play(): void {
     if (this.playing) return;
     this.playing = true;
+    this.stage.compare(null);
     this.ui.play.setAttribute('aria-pressed', 'true');
     this.ui.play.setAttribute('aria-label', 'Pause');
     document.body.classList.add('playing');
@@ -103,6 +107,27 @@ export class Player {
     this.ui.play.setAttribute('aria-label', 'Play');
     document.body.classList.remove('playing');
     this.cancel();
+    this.offerCompare();
+  }
+
+  /** The era a leaf is in, as the other side of a wipe or a comparison. */
+  private otherFor(L: Leaf): Other {
+    return { era: L.era, title: this.manifest.stateById[L.era]?.title ?? L.era, panoramas: this.panoramas(L) };
+  }
+
+  /**
+   * Paused on a leaf the visitor may compare eras on, the edge comes out at the side: dragging it shows the era
+   * this panorama was last in, the nearest leaf before at the same station and moment in another era.
+   */
+  private offerCompare(): void {
+    const L = this.leaf;
+    if (this.playing || L.interact !== 'era') { this.stage.compare(null); return; }
+    for (let i = this.index - 1; i >= 0; i--) {
+      const P = this.leaves[i]!;
+      if (P.station !== L.station || P.moment !== L.moment) break;
+      if (P.era !== L.era) { this.stage.compare(this.otherFor(P)); return; }
+    }
+    this.stage.compare(null);
   }
 
   private cancel(): void {

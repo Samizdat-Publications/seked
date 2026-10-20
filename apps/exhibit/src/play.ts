@@ -87,3 +87,16 @@ export function searchWithLeaf(search: string, id: string): string {
   q.set('leaf', id);
   return `?${q.toString()}`;
 }
+
+/** How long a wipe takes to cross the screen. */
+export const WIPE_SECONDS = 1.8;
+
+/**
+ * Where a wipe's edge stands at t (0 to 1), across the screen from -1 at the left to 1 at the right, eased; it
+ * starts and ends just off screen so the slant of the edge clears the corners.
+ */
+export function wipeAt(t: number): number {
+  const k = Math.min(1, Math.max(0, t));
+  const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+  return -1.12 + 2.24 * e;
+}

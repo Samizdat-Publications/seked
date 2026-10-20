@@ -5,7 +5,7 @@
  */
 import { cameraFor, type Manifest, type Overlay, type OverlayPoint, type Station } from './manifest';
 import { drawOverlay } from './overlay';
-import { type Aim, turnAt, turnSeconds } from './play';
+import { type Aim, WIPE_SECONDS, turnAt, turnSeconds, wipeAt } from './play';
 import {
   DEG, MAX_FOV, MIN_FOV, PITCH_MAX, clamp, fitFov, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
   type Vec3,
@@ -21,6 +21,9 @@ export interface Shot {
   /** Panoramas to try in order, relative to the walkthrough's folder; the first that loads is shown. Default: the station's own for the era. */
   panoramas?: string[];
 }
+
+/** The era a wipe comes from, or a comparison shows beside the one on stage. */
+export interface Other { era: string; title: string; panoramas: string[] }
 
 export class Stage {
   station: Station | null = null;
@@ -40,6 +43,12 @@ export class Stage {
   private overlay: Overlay | null = null;
   private candidates: string[] = [];
   private tween: { from: Aim; to: Aim; t0: number; ms: number; done: () => void } | null = null;
+  /** The other era on screen during a wipe or a comparison: to the right of the edge, the stage's era to the left. */
+  private other: Other | null = null;
+  private edge = 1.12;
+  private wipeRun: { t0: number; done: () => void } | null = null;
+  private comparing = false;
+  private handle: HTMLElement;
   private overlayT0 = 0;
   private frame = 0;
   private last = 0;
@@ -50,6 +59,7 @@ export class Stage {
   constructor(private root: HTMLElement, private canvas: HTMLCanvasElement, private ink: HTMLCanvasElement,
     private flat: HTMLElement, private manifest: Manifest, private overlays: Record<string, Overlay>, private base: URL) {
     this.ctx = ink.getContext('2d')!;
+    this.handle = this.makeHandle();
     try {
       this.viewer = new PanoramaViewer(canvas);
       this.cache = new TextureCache(this.viewer, () => this.request());
@@ -87,6 +97,10 @@ export class Stage {
     const changed = st !== this.station || shot.era !== this.era || candidates.join() !== this.candidates.join();
     this.candidates = candidates;
     this.tween = null;
+    this.finishWipe();
+    this.other = null;
+    this.comparing = false;
+    this.placeHandle();
     this.station = st;
     this.era = shot.era;
     this.view.yaw = wrapAngle(shot.yaw ?? st.view.yaw);
@@ -120,6 +134,83 @@ export class Stage {
     return secs;
   }
 
+  /**
+   * Show a shot in another era of the panorama on stage by a wipe: a hard edge sweeps across the view from the
+   * left with the shot's era behind it. It waits for both pictures, then takes WIPE_SECONDS; `done` runs at the
+   * end, or at once if the visitor takes the view first or prefers reduced motion.
+   */
+  wipe(shot: Shot, from: Other, done: () => void = () => {}): void {
+    this.show(shot);
+    if (this.still || !this.viewer) { done(); return; }
+    this.other = from;
+    this.edge = -1.12;
+    this.wipeRun = { t0: 0, done };
+    this.request();
+  }
+
+  /** Keep another era beside the one on stage, behind an edge the visitor can drag; null puts it away. */
+  compare(other: Other | null): void {
+    if (!other) {
+      this.comparing = false;
+      if (!this.wipeRun) this.other = null;
+    } else {
+      this.comparing = true;
+      if (!this.other) { this.other = other; this.edge = 1.12; }
+    }
+    this.placeHandle();
+    this.request();
+  }
+
+  private finishWipe(): void {
+    const w = this.wipeRun;
+    if (!w) return;
+    this.wipeRun = null;
+    this.edge = 1.12;
+    if (!this.comparing) this.other = null;
+    this.placeHandle();
+    w.done();
+  }
+
+  private makeHandle(): HTMLElement {
+    const h = document.createElement('div');
+    h.className = 'edge';
+    h.hidden = true;
+    h.innerHTML = '<button type="button" class="edge-grip" aria-label="Drag to compare the eras"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4 2.5 9 7 14M11 4l4.5 5L11 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="edge-now"></span><span class="edge-then"></span>';
+    const grip = h.querySelector('button')!;
+    let dragging = false;
+    const at = (x: number) => { this.edge = clamp((x / this.W) * 2 - 1, -1, 1.12); this.placeHandle(); this.request(); };
+    grip.addEventListener('pointerdown', (e) => { dragging = true; grip.setPointerCapture(e.pointerId); e.stopPropagation(); });
+    grip.addEventListener('pointermove', (e) => { if (dragging) at(e.clientX - this.root.getBoundingClientRect().left); });
+    const stop = () => { dragging = false; };
+    grip.addEventListener('pointerup', stop);
+    grip.addEventListener('pointercancel', stop);
+    grip.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowLeft' ? -0.1 : e.key === 'ArrowRight' ? 0.1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.edge = clamp(this.edge + step, -1, 1.12);
+      this.placeHandle();
+      this.request();
+    });
+    this.root.append(h);
+    return h;
+  }
+
+  private placeHandle(): void {
+    const show = !!this.other && this.comparing && !this.wipeRun && !!this.viewer;
+    this.handle.hidden = !show;
+    if (!show) return;
+    // at rest the handle waits at the right edge, where the other era is all but hidden
+    const x = clamp((this.edge + 1) / 2, 0, 1) * this.W;
+    this.handle.style.transform = `translateX(${Math.min(x, this.W - 28).toFixed(1)}px)`;
+    const now = this.manifest.stateById[this.era ?? ''];
+    const rest = this.edge > 0.98;
+    this.handle.querySelector('.edge-now')!.textContent = rest ? `Drag for ${this.other!.title}` : now ? now.title : '';
+    this.handle.querySelector('.edge-then')!.textContent = this.other!.title;
+    this.handle.classList.toggle('at-rest', rest);
+  }
+
   /** Where the view is pointed now. */
   aimNow(): Aim { return { yaw: this.view.yaw, pitch: this.view.pitch, fov: this.fov() }; }
 
@@ -135,6 +226,7 @@ export class Stage {
     const t = this.tween;
     this.tween = null;
     t?.done();
+    this.finishWipe();
     this.onHandsOn();
   }
 
@@ -169,16 +261,16 @@ export class Stage {
   }
 
   /** The first candidate panorama that has not failed (a missing one hands over to the next). */
-  private current(): string {
-    const urls = this.candidates.map((p) => this.url(p));
+  private current(candidates = this.candidates): string {
+    const urls = candidates.map((p) => this.url(p));
     return urls.find((u) => { const st = this.cache?.status(u); return st !== 'missing' && st !== 'error'; }) ?? urls[urls.length - 1] ?? '';
   }
 
   /** Whether the panorama shown is a stand-in for the first one asked for. */
   get standIn(): boolean { return this.candidates.length > 1 && this.current() !== this.url(this.candidates[0]!); }
 
-  private layer(st: Station, era: string, now: number): { layer: Layer; url: string } {
-    const url = this.current();
+  private layer(st: Station, era: string, now: number, candidates = this.candidates): { layer: Layer; url: string } {
+    const url = this.current(candidates);
     const pano = this.cache!.get(url);
     let patch: Layer['patch'] = null;
     if (pano && wantsPatch(this.fov(), this.canvas.height)) {
@@ -205,7 +297,22 @@ export class Stage {
       const a = this.layer(st, era, t);
       // the panorama eases in from the blank as it arrives, rather than snapping
       const on = this.still ? 1 : this.cache.presence(a.url, t, FADE_MS);
-      if (a.layer.pano && on < 1) {
+      const o = this.other;
+      if (o) {
+        const b = this.layer(st, o.era, t, o.panoramas);
+        const w = this.wipeRun;
+        if (w) {
+          const settled = (u: string) => { const x = this.cache!.status(u); return x === 'ready' || x === 'missing' || x === 'error'; };
+          if (!w.t0 && settled(a.url) && settled(b.url)) w.t0 = t;
+          if (w.t0) {
+            const k = (t - w.t0) / (WIPE_SECONDS * 1000);
+            this.edge = wipeAt(k);
+            if (k >= 1) this.finishWipe();
+          }
+          busy = true;
+        }
+        this.viewer.draw(this.view, fov, a.layer, b.layer, 0, this.edge);
+      } else if (a.layer.pano && on < 1) {
         busy = true;
         this.viewer.draw(this.view, fov, { pano: null, patch: null }, a.layer, on);
       } else {
