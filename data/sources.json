@@ -315,8 +315,9 @@
     "id": "khafre-project-2025",
     "kind": "proponent",
     "year": 2025,
-    "citation": "Malanga, C., Biondi, F. & Mei, A. (2025). Khafre Project: SAR Doppler tomography of the Giza plateau. Press conference, March 2025; not peer reviewed at the time of entry.",
-    "note": "Enter the published preprint or paper reference when one exists, and the specific critiques (radar penetration depth; the antiquities authority's statement)."
+    "citation": "Biondi, F., Mei, A. & Malanga, C. (2025). Khafre Project. Abstract of the Conference on March 16, 2025 (\"Abstract conf. English Version\"), 7 pp., March 2025. SAR Doppler tomography of Capella Space and Umbra open data. Not peer reviewed.",
+    "note": "The team's own document, read on 20 October 2026 (24,956,568 bytes, sha256 9f886dfc…4d083f; authors' copyright, not kept here). It gives five 'Zed' structures in the pyramid above Belzoni's chamber, each of five levels with a sloping roof; eight wells in two north–south rows descending 648 m from ground zero (the pyramid's base) into two cubes about 80 m a side, hollow and wrapped in descending spirals; and structures about two kilometres down. It gives no diameter, spacing, offset or spiral pitch, and its tomograms (pp. 4–6) carry no axes or scale bar. The data are Capella and Umbra, not COSMO-SkyMed (the 2022 Khufu paper's). Corrected from the March 2025 press-conference entry, after docs/research/khafre-sar.md.",
+    "url": "https://drive.google.com/file/d/1Leaa2tf3OHK31OTmdey_CRa-0vC9-CTD/view"
   },
   {
     "id": "cayce",
@@ -435,5 +436,164 @@
     "url": "https://sites.research.google/gr/open-buildings/temporal/",
     "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) or ODbL 1.0, at the user's choice. Attribution: Open Buildings 2.5D Temporal, Google Research.",
     "note": "Building height carries a stated mean absolute error of 1.5 m and is capped at 100 m, and is only meaningful where the presence band agrees. The tile containing the Great Pyramid is v1/geotiffs/14584_2023_06_30/tile_ZEIX66sm0PA.tif in the public bucket open-buildings-temporal-data, 25,000 by 25,000 px at 0.5 m in UTM 36N with its origin at 319912, 3321468; Giza sits near its north-west corner, so the north of the plateau's box needs a neighbouring tile, found by extent from v1/manifests/15_EPSG_32636_2023_06_30.json. A height from this raster is a measurement with an error bar, not a look choice. The tiles are cached outside the repo and are not committed."
+  },
+  {
+    "id": "biondi-malanga-2022",
+    "kind": "proponent",
+    "year": 2022,
+    "citation": "Biondi, F. & Malanga, C. (2022). Synthetic Aperture Radar Doppler Tomography Reveals Details of Undiscovered High-Resolution Internal Structure of the Great Pyramid of Giza. Remote Sensing 14(20), 5231. doi:10.3390/rs14205231. Retracted 10 August 2026.",
+    "url": "https://www.mdpi.com/2072-4292/14/20/5231",
+    "license": "CC BY 4.0",
+    "note": "The only peer-reviewed paper for the method, on Khufu's pyramid, not Khafre's. Crossref: published 19 October 2022, CC BY 4.0, updated by the retraction remote-sensing-retraction-2026. arXiv preprint 2208.00811. Its figures may be shown, captioned as retracted."
+  },
+  {
+    "id": "remote-sensing-retraction-2026",
+    "kind": "critique",
+    "year": 2026,
+    "citation": "Remote Sensing Editorial Office (2026). RETRACTED: Biondi, F.; Malanga, C. Synthetic Aperture Radar Doppler Tomography Reveals Details of Undiscovered High-Resolution Internal Structure of the Great Pyramid of Giza. Remote Sensing 18(16), 2679. doi:10.3390/rs18162679.",
+    "url": "https://www.mdpi.com/2072-4292/18/16/2679",
+    "license": "CC BY 4.0",
+    "note": "Date (10 August 2026) and licence from Crossref. The stated reason, 'serious methodological flaws and statistical errors' raised by a reader, with the authors disagreeing, is read only as Retraction Watch quotes it: MDPI's page refuses this container."
+  },
+  {
+    "id": "retraction-watch-2026-giza",
+    "kind": "critique",
+    "year": 2026,
+    "citation": "Santoro, H. (2026). Journal retracts paper claiming network of corridors inside the Great Pyramid of Giza. Retraction Watch, 31 August 2026 (updated 1 September).",
+    "url": "https://retractionwatch.com/2026/08/31/retraction-corridors-inside-great-pyramid-giza/",
+    "note": "Quotes the retraction's reason, Conyers (a satellite measures only what it sees; the vibrations are far too small) and Parcak. Journalism. The id is docs/research/ch8.md's (night decision 31)."
+  },
+  {
+    "id": "pilicy-2025",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "Pilicy, D. (2025). Tomographic Evidence Beneath the Pyramid of Khafre: Methodological Appraisal and Critical Responses. grahamhancock.com, 27 June 2025.",
+    "url": "https://grahamhancock.com/pilicyd1/",
+    "note": "The best-argued sympathetic appraisal. Concedes no paper, an undisclosed processing method, and no reproduction. Its Fig. 1 is the project's tomogram, reproduced with permission."
+  },
+  {
+    "id": "el-aref-2025",
+    "kind": "critique",
+    "year": 2025,
+    "citation": "El-Aref, N. (2025). Controversy over Pyramid claims. Al-Ahram Weekly, 8 April 2025.",
+    "url": "https://english.ahram.org.eg/NewsContent/50/1207/544236/AlAhram-Weekly/Heritage/Controversy-over-Pyramid-claims.aspx",
+    "note": "Hawass: radar use inside the pyramid 'completely false'; no radar devices used; the base is bedrock carved to about 8 m; the researchers never worked in Egypt."
+  },
+  {
+    "id": "moss-2025-natgeo",
+    "kind": "critique",
+    "year": 2025,
+    "citation": "Moss, C. (2025). Is there really a secret city under Egypt's Giza pyramids? National Geographic, 16 April 2025.",
+    "url": "https://www.nationalgeographic.com/history/article/is-there-a-secret-city-under-the-pyramids-",
+    "note": "Dibble, Rossi, Conyers, Hawass and Parcak; the water table would flood deep structures. Gives the cubes as 90 m. The id is docs/research/ch8.md's (night decision 31)."
+  },
+  {
+    "id": "alvarez-1970",
+    "kind": "survey",
+    "year": 1970,
+    "citation": "Alvarez, L. W. et al. (1970). Search for Hidden Chambers in the Pyramids. Science 167(3919), 832–839, 6 February 1970.",
+    "url": "https://bpb-us-e1.wpmucdn.com/sites.mit.edu/dist/9/2055/files/2025/08/AlvarezPyramids.pdf",
+    "license": "AAAS copyright",
+    "note": "Muon detectors in Khafre's Belzoni Chamber; a 35-degree half-angle cone, 19 per cent of the pyramid's volume; no chamber the size of the known Fourth Dynasty chambers (p. 839). Muons come from the sky, so it says nothing below the detector."
+  },
+  {
+    "id": "sharafeldin-2019",
+    "kind": "paper",
+    "year": 2019,
+    "citation": "Sharafeldin, S. M., Essa, K. S., Youssef, M. A. S., Karsli, H., Diab, Z. E. & Sayil, N. (2019). Shallow geophysical techniques to investigate the groundwater table at the Great Pyramids of Giza, Egypt. Geoscientific Instrumentation, Methods and Data Systems 8, 29–43. doi:10.5194/gi-8-29-2019.",
+    "url": "https://gi.copernicus.org/articles/8/29/2019/",
+    "license": "CC BY 4.0",
+    "note": "Peer reviewed. The water table at about +14.5 to +17 m above sea level across the plateau."
+  },
+  {
+    "id": "tbs-2025-khafre",
+    "kind": "reference",
+    "year": 2025,
+    "citation": "The Business Standard (2025). Scientists discover 'vast city' underneath Egypt's Giza pyramid, reveal new details about mysterious structures. TBS Report, 23 March 2025, after the Daily Mail.",
+    "url": "https://www.tbsnews.net/node/1099826",
+    "note": "Press, not the team. The only place the wells' diameter is given: 'about 33 to 39 feet in diameter'. Also 'two massive rectangular enclosures, each measuring approximately 260 feet on each side'."
+  },
+  {
+    "id": "petrie-1889",
+    "kind": "survey",
+    "year": 1889,
+    "citation": "Petrie, W. M. F. (1889). Hawara, Biahmu, and Arsinoe. London: Field & Tuer.",
+    "url": "https://archive.org/details/hawarabiahmuarsi00petruoft",
+    "license": "Public domain",
+    "note": "§5 (p. 5): the Labyrinth's chip and beton beds 'about 1000 feet long, and 800 feet broad', south of the pyramid; the plan is Pl. XXV. §7: the double paving and the architraves of Amenemhat III and Sobekneferu."
+  },
+  {
+    "id": "petrie-1890",
+    "kind": "survey",
+    "year": 1890,
+    "citation": "Petrie, W. M. F. (1890). Kahun, Gurob, and Hawara. London: Kegan Paul, Trench, Trübner.",
+    "url": "https://archive.org/details/kahungurobhawara00petr",
+    "license": "Public domain",
+    "note": "Measured in British inches. Ch. I, p. 13, §§17–18: the brickwork base 3692 in (measured); the casing 157 in, 'adopted as presumptive truth' from the entrance passage's slope; the casing angle 48° 45′ ± 3′ from one fragment. The finished base (4006 in) and the height (2284 in) are Petrie's derivations, computed here, never stored."
+  },
+  {
+    "id": "petrie-1912",
+    "kind": "survey",
+    "year": 1912,
+    "citation": "Petrie, W. M. F., Wainwright, G. A. & Mackay, E. (1912). The Labyrinth, Gerzeh and Mazghuneh. London: School of Archaeology in Egypt / Bernard Quaritch. Ch. X, pp. 28–33.",
+    "url": "https://archive.org/details/ERA21",
+    "license": "Public domain",
+    "note": "§41 the chips 15–24 ft deep along the pyramid's south foot and 2–4 ft elsewhere, and Lepsius's chambers a Roman town; §42 the restored plan (courts about 50 ft wide, a 27-column hall) and the ruin soon after 193 BCE. Read through archive.org's OCR only."
+  },
+  {
+    "id": "herodotus-2-148",
+    "kind": "reference",
+    "citation": "Herodotus, Histories II.148 (5th century BCE).",
+    "url": "http://www.perseus.tufts.edu/hopper/text?doc=Hdt.+2.148",
+    "note": "Twelve roofed courts and 3,000 chambers, half of them underground, the lower ones known to him only by hearsay as the tombs of kings and sacred crocodiles. Read only as quoted in carlotto-2025, pp. 408–409, whose translation is not named."
+  },
+  {
+    "id": "carlotto-2025",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "Carlotto, M. J. (2025). Space-Based Ground Penetrating Radar Imaging of a Possible Underground Structure at Hawara. Journal of Scientific Exploration 39(4), 407–422. doi:10.31275/20253579.",
+    "url": "https://journalofscientificexploration.org/index.php/jse/article/view/3579",
+    "license": "CC BY-NC 4.0 (base imagery © Maxar / Google Earth, not covered)",
+    "note": "Sentinel-1 and ALOS PALSAR; two areas of uncorrelated return either side of the canal south of the pyramid, the eastern about 450,000 sq ft (p. 419); penetration 0.5 m at C-band and 2–5 m at L-band by his own figures (p. 415); concedes the Roman settlement reading (p. 420). Tier claimed (night decision 33)."
+  },
+  {
+    "id": "khalil-2010",
+    "kind": "paper",
+    "year": 2010,
+    "citation": "Khalil, M. A., Abbas, A. M., Monteiro Santos, F. A., Mesbah, H. S. A. & Massoud, U. (2010). VLF-EM study for archaeological investigation of the labyrinth mortuary temple complex at Hawara area, Egypt. Near Surface Geophysics 8(3), 203–212. doi:10.3997/1873-0604.2010004.",
+    "url": "https://www.earthdoc.org/content/journals/10.3997/1873-0604.2010004",
+    "note": "Peer reviewed; the 2008 NRIAG survey's published result. Read only in its abstract: a 2 m grid, 'elongated and square subsurface anomalies at shallow depths'. The depths and figures are behind a paywall."
+  },
+  {
+    "id": "elshazly-2024",
+    "kind": "paper",
+    "year": 2024,
+    "citation": "Elshazly, M. F., Massoud, U., Abdeldayem, A., El-Khodary, S. & Abbas, A. M. (2024). Archaeological prospection and ground water hazard assessment of the Hawara Pyramid, Fayoum, Egypt. Delta Journal of Science 49(2), 39–53.",
+    "url": "https://djs.journals.ekb.eg/article_396440.html",
+    "note": "Peer reviewed. 25 ERT profiles and 40 TEM stations; closures 6 m wide at about 7.5 m and 4 m wide at 5 m south of the pyramid (p. 44), to be verified 'through standard excavation' (p. 51); the water table 1.5 m to 10 m below ground (pp. 48, 51); the pyramid's base about 32 m above sea level (p. 40). Abbas led the 2008 survey. Licence not stated."
+  },
+  {
+    "id": "szynkiewicz-2015",
+    "kind": "critique",
+    "year": 2015,
+    "citation": "Szynkiewicz, A. (2015). GPR research around the Hawara pyramid (Fayum, Egypt). Archaeologia Polona 53, 383–386.",
+    "url": "https://www.rcin.org.pl/iae//Content/86930/PDF/WA308_92311_P357_GPR-research-around.pdf",
+    "note": "GPR to 20 m for Cairo University; Eocene limestone at 12–15 m under 3–5 m of gravel and sand; the tomb flooded; possible remains east and south, but 'nothing to support the idea that this was Herodotus's labyrinth' (p. 386)."
+  },
+  {
+    "id": "de-cordier-2025-mataha",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "De Cordier, L. (2025). The Mataha Expedition; Unveiling the Lost Labyrinth; The Mataha Team (24 March 2025); The Mataha-Expedition Part I (21 July 2025). Labyrinth of Egypt (Substack).",
+    "url": "https://labyrinthofegypt.substack.com/p/the-mataha-expedition-part-i",
+    "note": "Self-published by the 2008 expedition's organiser; not peer reviewed. Walls 8–12 m deep and several metres thick over hectares; a wall over 17 m deep beside the pyramid; the NRIAG report dated April 2008 and unpublished."
+  },
+  {
+    "id": "de-cordier-2025-merlin-burrows",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "De Cordier, L. (2025). The Merlin Burrows Scans II. Labyrinth of Egypt (Substack), 6 June 2025. Tim Akers / Merlin Burrows satellite scans of Hawara, made in 2015.",
+    "url": "https://labyrinthofegypt.substack.com/p/the-merlin-burrows-scans-ii",
+    "note": "Method undisclosed, data unreleased, nothing reviewed. Four or five layers 20–50 m apart, to about 100 m; an atrium 40 by at least 100 m; two chambers under the pyramid. Images © Cosco Foundation, 2025. Stewart's lead, 'the Labyrinth under a pyramid, by new technology'."
   }
 ]

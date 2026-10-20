@@ -35,8 +35,8 @@ describe('database', () => {
 });
 
 describe('sites and structures', () => {
-  it('registers Giza on Earth and the Cydonia placeholder on Mars', () => {
-    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars']);
+  it('registers Giza on Earth, the Cydonia placeholder on Mars, and Hawara on Earth', () => {
+    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars', 'hawara:earth']);
   });
   it('gives every structure an evidence tier and a known site', () => {
     const tiers = new Set(db.structures.map((s) => s.evidence));
@@ -48,8 +48,31 @@ describe('sites and structures', () => {
     expect(db.structures.find((s) => s.id === 'g2.sar-shafts')?.evidence).toBe('claimed');
     expect(db.structures.find((s) => s.id === 'hall-of-records')?.evidence).toBe('legendary');
   });
-  it('defaults every measurement to the Giza site', () => {
-    for (const m of db.measurements) expect(m.site).toBe('giza');
+  it('defaults a measurement to the Giza site, and files each at its structure\'s site', () => {
+    expect(MeasurementSchema.parse({ key: 'x', structure: 'g1', quantity: 'length', value: 1, unit: 'm', source: 'petrie-1883' }).site).toBe('giza');
+    const siteOf = new Map(db.structures.map((s) => [s.id, s.site]));
+    for (const m of db.measurements) {
+      const site = siteOf.get(m.structure) ?? siteOf.get(m.structure.split('.')[0] as string);
+      if (site !== undefined) expect(m.site, m.key).toBe(site);
+    }
+    expect(new Set(db.measurements.map((m) => m.site))).toEqual(new Set(['giza', 'hawara']));
+  });
+  it('tiers Hawara by the rule: dug, published, announced, told', () => {
+    const tier = (id: string) => db.structures.find((s) => s.id === id)?.evidence;
+    expect(tier('hawara.labyrinth')).toBe('excavated');
+    expect(tier('hawara.mataha-anomalies')).toBe('instrumented');
+    expect(tier('hawara.mataha-walls')).toBe('claimed');
+    expect(tier('hawara.merlin-burrows')).toBe('claimed');
+    expect(tier('hawara.labyrinth.lower-storey')).toBe('legendary');
+    for (const s of db.structures.filter((s) => s.id.startsWith('hawara.'))) expect(s.site, s.id).toBe('hawara');
+  });
+  it('enters every claimed underground figure as claimed, unverified, from where it was said', () => {
+    const sar = db.measurements.filter((m) => m.structure === 'g2.sar-shafts');
+    expect(sar.length).toBeGreaterThan(5);
+    for (const m of sar) {
+      expect(m.method, m.key).toBe('as claimed');
+      expect(m.verified, m.key).toBe(false);
+    }
   });
 });
 

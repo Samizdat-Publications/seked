@@ -427,7 +427,7 @@ In March 2025 an Italian team that includes a radar engineer, Filippo Biondi, sh
 
 The rooms anyone has walked into lie three metres under its base.
 
-Ninety kilometres south, at Hawara, stood the Labyrinth. Herodotus saw it and said it surpassed the pyramids: three thousand rooms, half of them underground, which nobody would show him. Petrie found only a bed of stone chips, larger than the Great Pyramid's base. In 2008 Egypt's own geophysics institute surveyed the ground there, and the expedition behind it reported walls eight to twelve metres down.
+Eighty kilometres south, at Hawara, stood the Labyrinth. Herodotus saw it and said it surpassed the pyramids: three thousand rooms, half of them underground, which nobody would show him. Petrie found only a bed of stone chips, larger than the Great Pyramid's base. In 2008 Egypt's own geophysics institute surveyed the ground there, and the expedition behind it reported walls eight to twelve metres down.
 
 Under the Sphinx's paws, Schoch's seismic survey found a hollow that has never been opened. Edgar Cayce said a Hall of Records waited there.
 
@@ -442,8 +442,8 @@ Nobody has dug for any of it.
 - "two great chambers about 80 metres on a side" → the two cubes at −648 m.
 - "four and a half times the pyramid's height" → ghosts of Khafre's pyramid stack beside the wells, one, two, three, four and a half, with the receipt counting.
 - "three metres under its base" → the camera rises to the base. The excavated substructure (`g2-interior.json`) is drawn in stone, a hairline at this scale. A depth scale runs down the left edge: −3 m, the burial chamber's floor; about −30 m, the Osiris Shaft under the causeway; −648 m.
-- "Ninety kilometres south, at Hawara" → a still at Hawara: Amenemhat III's pyramid from Petrie's figures, the canal, and the chip bed to its south.
-- "larger than the Great Pyramid's base" → the chip bed and Hawara's pyramid laid on Giza beside the Great Pyramid at the same scale, labelled "at Hawara, 90 km south; laid here for scale".
+- "Eighty kilometres south, at Hawara" → a still at Hawara: Amenemhat III's pyramid from Petrie's figures, the canal, and the chip bed to its south.
+- "larger than the Great Pyramid's base" → the chip bed and Hawara's pyramid laid on Giza beside the Great Pyramid at the same scale, labelled "at Hawara, 80 km south; laid here for scale".
 - "walls eight to twelve metres down" → a north–south section south of Hawara's pyramid: Petrie's chips, Elshazly's closures at 5 and 7.5 m as solid boxes, the Mataha walls dashed and labelled "reported, unpublished", the water table as a blue band from 1.5 to 10 m, limestone at 12 to 15 m, and Herodotus's lower storey as a ghost.
 - "Under the Sphinx's paws" → back at Giza: the paw cavity (`claimed`) as a dashed outline about 5 m down, and the Hall of Records (`legendary`) ghosted under it.
 - "Nobody has dug for any of it." → every underground object on one depth scale, coloured by tier. Hold, then on into chapter 9.

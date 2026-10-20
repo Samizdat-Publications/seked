@@ -16,5 +16,14 @@
     "origin": { "latitude": 40.75, "longitude": -9.46, "elevation": 0 },
     "frame": "East-north-up at the 'Face' mesa. Placeholder: coordinates from memory and unverified; no structures entered.",
     "note": "Registered only so the model never assumes Earth or Giza. Imagery: Viking 1 frame 035A72 (1976), MGS MOC (2001), HiRISE (2007 onward, with DTMs). A Martian sky needs its own precession model; packages/sky is Earth-only."
+  },
+  {
+    "id": "hawara",
+    "name": "Hawara",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 29.274, "longitude": 30.898, "elevation": 32 },
+    "frame": "East-north-up at the base centre of Amenemhat III's pyramid; +Z up. No source checked gives the pyramid's azimuth, so its sides are taken as cardinal.",
+    "note": "Placeholder origin: the latitude and longitude are read off Elshazly et al. 2024, Fig. 1 (scaled, unverified), and the elevation is their 'about 32 m' above sea level for the pyramid's base (p. 40). The Labyrinth's remains lie south of the pyramid. Chapter 8 lays them over Giza for scale (night decision 26), and the distance in that label is computed from the two origins, not typed."
   }
 ]
