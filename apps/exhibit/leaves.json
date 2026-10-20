@@ -871,12 +871,14 @@
    "moment": "night-dark",
    "view": {
     "yaw": 184,
-    "pitch": 18,
-    "fov": 56
+    "pitch": 22,
+    "fov": 66
    },
    "arrive": "turn",
    "say": "Two are nearly equal and stand on a diagonal. The third is smaller and set off the line, as Mintaka, the faintest, is.",
-   "draw": [],
+   "draw": [
+    "belt-plan@diagonal"
+   ],
    "hold": 1,
    "interact": "sky",
    "receipts": [

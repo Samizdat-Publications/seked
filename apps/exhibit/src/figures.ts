@@ -5,9 +5,13 @@
  * `ditch-plan`: the Sphinx ditch in plan, the statue's OSM outline and the two margins ARCE's drawing d-gen-008
  * gives (scaled from the plate, not yet checked), with where the visitor stands. Only what is measured is drawn:
  * the plate maps no floor strip on the south, and the east opens onto the temple.
+ *
+ * `belt-plan`: the three pyramids' centres in plan (Petrie's offsets, from the bundle) and Orion's belt at C4's
+ * epoch laid over them as C4 compares them: as seen looking south, Alnitak on Khufu, scaled so that Mintaka falls
+ * as far from it as Menkaure, and not turned, so the angle between the two diagonals is the claim's residual.
  */
 
-export const FIGURES = ['ditch-plan'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -76,4 +80,65 @@ export function sphinxPlanData(footprints: { features: { group?: string; ring: [
   const rings = footprints.features.filter((f) => f.group === 'sphinx').map((f) => f.ring);
   if (!rings.length) throw new Error('no Sphinx in the footprints');
   return { rings, north: margin('sphinx.enclosure.margin.north'), west: margin('sphinx.enclosure.margin.west') };
+}
+
+/** A star's place at an epoch, degrees. */
+export interface RaDec { ra: number; dec: number }
+export interface BeltPlan {
+  /** The pyramids' centres, metres east and north of Khufu's, and their mean base sides where the database has them. */
+  pyramids: { id: 'g1' | 'g2' | 'g3'; x: number; y: number; side: number | null }[];
+  /** The belt stars on the ground, Alnitak on Khufu, in the same metres. */
+  stars: { name: 'Alnitak' | 'Alnilam' | 'Mintaka'; x: number; y: number }[];
+}
+
+/**
+ * The belt laid on the plan as C4's first comparison reads it: on a tangent plane about Alnilam (east = Δra cos
+ * dec, the claim's own x), seen looking south so that a higher declination lies further from the viewer, which on
+ * the ground is south; Alnitak set on Khufu's centre and the whole scaled so Alnitak to Mintaka is Khufu to
+ * Menkaure. Nothing is turned: the claim's angle is each diagonal's against the meridian.
+ */
+export function beltPlan(ground: Record<string, number>, belt: { alnitak: RaDec; alnilam: RaDec; mintaka: RaDec }): BeltPlan | null {
+  const g = (k: string) => ground[k];
+  const w2 = g('g2.centre.offset.west'), s2 = g('g2.centre.offset.south'), w3 = g('g3.centre.offset.west'), s3 = g('g3.centre.offset.south');
+  if ([w2, s2, w3, s3].some((v) => v === undefined)) return null;
+  const pyramids: BeltPlan['pyramids'] = [
+    { id: 'g1', x: 0, y: 0, side: g('g1.base.side.mean') ?? null },
+    { id: 'g2', x: -w2!, y: -s2!, side: g('g2.base.side.mean') ?? null },
+    { id: 'g3', x: -w3!, y: -s3!, side: g('g3.base.side.mean') ?? null },
+  ];
+  const cos = Math.cos((belt.alnilam.dec * Math.PI) / 180);
+  const fold = (d: number) => ((d + 540) % 360) - 180;
+  const sky = (s: RaDec) => [fold(s.ra - belt.alnitak.ra) * cos, -(s.dec - belt.alnitak.dec)] as const;
+  const [mx, my] = sky(belt.mintaka);
+  const k = Math.hypot(w3!, s3!) / Math.hypot(mx, my);
+  const stars: BeltPlan['stars'] = (['Alnitak', 'Alnilam', 'Mintaka'] as const).map((name) => {
+    const [x, y] = sky(belt[name.toLowerCase() as 'alnitak' | 'alnilam' | 'mintaka']);
+    return { name, x: x * k, y: y * k };
+  });
+  return { pyramids, stars };
+}
+
+/** The plan as SVG, north up. */
+export function beltPlanSvg(p: BeltPlan, width = 300): string {
+  const xs = [...p.pyramids.map((q) => q.x), ...p.stars.map((s) => s.x)], ys = [...p.pyramids.map((q) => q.y), ...p.stars.map((s) => s.y)];
+  // room either side for the names, which stand beside their points
+  const padX = 300, padY = 130;
+  const x0 = Math.min(...xs) - padX, x1 = Math.max(...xs) + padX, y0 = Math.min(...ys) - padY, y1 = Math.max(...ys) + padY;
+  const k = width / (x1 - x0), height = Math.round((y1 - y0) * k);
+  const X = (x: number) => ((x - x0) * k).toFixed(1), Y = (y: number) => ((y1 - y) * k).toFixed(1);
+  const NAMES = { g1: 'Khufu', g2: 'Khafre', g3: 'Menkaure' };
+  const [a, , m] = p.stars as [BeltPlan['stars'][number], BeltPlan['stars'][number], BeltPlan['stars'][number]];
+  const g3 = p.pyramids[2]!;
+  return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="The three pyramids in plan with Orion's belt laid over them">
+  ${p.pyramids.map((q) => {
+    const h = q.side ? (q.side * k) / 2 : 4;
+    return `<rect class="statue" x="${(Number(X(q.x)) - h).toFixed(1)}" y="${(Number(Y(q.y)) - h).toFixed(1)}" width="${(2 * h).toFixed(1)}" height="${(2 * h).toFixed(1)}"/>
+  <text class="here-lab" x="${(Number(X(q.x)) + h + 4).toFixed(1)}" y="${(Number(Y(q.y)) + 4).toFixed(1)}">${NAMES[q.id]}</text>`;
+  }).join('')}
+  <line class="dim" x1="${X(0)}" y1="${Y(0)}" x2="${X(g3.x)}" y2="${Y(g3.y)}"/>
+  <line class="wall" x1="${X(a.x)}" y1="${Y(a.y)}" x2="${X(m.x)}" y2="${Y(m.y)}"/>
+  ${p.stars.map((s) => `<circle class="star" cx="${X(s.x)}" cy="${Y(s.y)}" r="3.2"/>`).join('')}
+  <text class="lab" x="${(Number(X(m.x)) - 6).toFixed(1)}" y="${(Number(Y(m.y)) - 8).toFixed(1)}" text-anchor="end">Mintaka</text>
+  <text class="north" x="10" y="14">N &#8593;</text>
+</svg>`;
 }

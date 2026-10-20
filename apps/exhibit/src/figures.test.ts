@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ditchPlan, ditchPlanSvg, isFigure, sphinxPlanData } from './figures';
+import { loadDatabase } from '@seked/data';
+import { beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, isFigure, sphinxPlanData } from './figures';
+import { groundEnvironment } from './receipts';
+import { skyEnvironment } from '@seked/sky';
 
 const data = join(__dirname, '..', '..', '..', 'data');
 const read = (p: string) => JSON.parse(readFileSync(join(data, p), 'utf8'));
@@ -33,5 +36,29 @@ describe('the ditch plan', () => {
   it('is a figure the leaves may name', () => {
     expect(isFigure('ditch-plan')).toBe(true);
     expect(isFigure('g1-proportions')).toBe(false);
+  });
+});
+
+describe('the belt over the pyramids', () => {
+  const ground = groundEnvironment(loadDatabase());
+  const sky = skyEnvironment({ epoch: -10449, latitudeDeg: ground['g1.center.latitude']!, longitudeDeg: 0 });
+  const at = (id: string) => ({ ra: sky[`star.${id}.ra`]!, dec: sky[`star.${id}.dec`]! });
+  const plan = beltPlan(ground, { alnitak: at('alnitak'), alnilam: at('alnilam'), mintaka: at('mintaka') })!;
+  const deg = (x: number, y: number) => (Math.atan(Math.abs(x) / Math.abs(y)) * 180) / Math.PI;
+  it('sets Alnitak on Khufu and Mintaka as far off as Menkaure, unturned, so the two diagonals keep C4 angles', () => {
+    const [a, , m] = plan.stars;
+    const g3 = plan.pyramids[2]!;
+    expect([a!.x, a!.y]).toEqual([0, -0]);
+    expect(Math.hypot(m!.x, m!.y)).toBeCloseTo(Math.hypot(g3.x, g3.y), 6);
+    expect(deg(g3.x, g3.y)).toBeCloseTo(37 + 51 / 60 + 7 / 3600, 3);   // the script's 37 51 07
+    expect(deg(m!.x, m!.y)).toBeCloseTo(50 + 51 / 60 + 40 / 3600, 2);  // and 50 51 40
+    // looking south, Mintaka lies south-west of Alnitak, as Menkaure does of Khufu
+    expect(m!.x).toBeLessThan(0);
+    expect(m!.y).toBeLessThan(0);
+    expect(isFigure('belt-plan')).toBe(true);
+    expect(beltPlanSvg(plan)).toContain('Menkaure');
+  });
+  it('waits for the ground', () => {
+    expect(beltPlan({}, { alnitak: at('alnitak'), alnilam: at('alnilam'), mintaka: at('mintaka') })).toBeNull();
   });
 });

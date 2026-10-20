@@ -12,11 +12,12 @@ import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays }
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
-import { ditchPlanSvg } from './figures';
+import { beltPlan, beltPlanSvg, ditchPlanSvg } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment } from './receipts';
 import { Player } from './player';
-import type { Moment } from './sky';
+import { type Moment, comparisonsAt, epochOf, skyEnv, yearLabel } from './sky';
+import { formatValue } from '@seked/claims/browser';
 import { SkyFigure } from './skyfigure';
 import type { HeadsManifest, ObjectView } from './objectview';
 import { DEG } from './projection';
@@ -43,6 +44,22 @@ const panoramasFor = (manifest: Manifest) => (L: Leaf): string[] => {
   const own = manifest.byId[L.station]?.panoramas[L.era];
   return own && own !== want ? [want, own] : [want];
 };
+
+/** The belt over the pyramids at C4's epoch, its caption's numbers C4's own; without the bundle, a note saying so. */
+function beltPlanFigure(ground: Record<string, number> | null): string {
+  const epoch = epochOf('C4', skyData);
+  const env = skyEnv(skyData, epoch);
+  const at = (id: string) => ({ ra: env[`star.${id}.ra`] ?? NaN, dec: env[`star.${id}.dec`] ?? NaN });
+  const plan = ground && beltPlan(ground, { alnitak: at('alnitak'), alnilam: at('alnilam'), mintaka: at('mintaka') });
+  if (!plan) return '<figcaption>The plan of the pyramids is drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const [angle, offset] = comparisonsAt(skyData, 'C4', epoch, ground ?? {});
+  const v = (c: typeof angle, k: 'value' | 'target') => (c && c[k] !== null ? formatValue(c[k]!, c.unit) : '?');
+  return `${beltPlanSvg(plan)}<figcaption>The pyramids' centres from Petrie's offsets, and Orion's belt in ${yearLabel(epoch)} laid over
+    them as seen looking south, Alnitak on Khufu, scaled so Mintaka falls as far off as Menkaure, and not turned. The belt
+    stands ${v(angle, 'value')} from the meridian, the pyramids' diagonal ${v(angle, 'target')}. Menkaure sits ${v(offset, 'value')} of
+    the Khufu to Khafre line off it, Mintaka ${v(offset, 'target')}. C4's comparisons; the north and south of the sky are
+    swapped to lay it down, a free choice the claim records.</figcaption>`;
+}
 
 async function start(): Promise<void> {
   const status = $('status');
@@ -91,7 +108,15 @@ async function start(): Promise<void> {
   const sky = new SkyFigure(stage, skyData, (RENDER as unknown as { moments: Record<string, Moment> }).moments, $('skybar'));
   sky.onHandsOn = () => { if (player.playing) player.pause(); };
   // a sky claim's lines and targets that read the monuments wait for the bundled database
-  void loadBundle().then((b) => { if (b) sky.setGround(groundEnvironment(b)); });
+  let ground: Record<string, number> | null = null;
+  let shownFigure: string | null = null;
+  void loadBundle().then((b) => {
+    if (!b) return;
+    ground = groundEnvironment(b);
+    sky.setGround(ground);
+    // a figure drawn from the monuments before they loaded is drawn again with them
+    if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+  });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
   let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
   const objectFor = (L: Leaf) => {
@@ -114,6 +139,9 @@ async function start(): Promise<void> {
       const here: [number, number] = flank ? [flank.camera[0], flank.camera[1]] : [330, -449];
       figure.innerHTML = `${ditchPlanSvg(sphinxPlan, here)}<figcaption>The ditch in plan. Both margins are scaled from ARCE's drawing d-gen-008 and not yet checked against it; only the two the drawing gives are drawn.</figcaption>`;
     }
+    if (id === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+    figure.classList.toggle('beside-sky', !!player.leaf.sky);
+    shownFigure = id;
     figure.hidden = !id;
   };
   panel.onOpen = () => { if (player.playing) player.pause(); };
