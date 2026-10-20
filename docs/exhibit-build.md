@@ -63,6 +63,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   timed to the word that names it. (c) Flights: when a leaf arrives by `flight`, play
   `flights/<from>--<to>.mp4` full screen and hand over to the panorama on its last frame, the panorama already
   set to the leaf's view; until a flight is rendered, a `cut`.
+  *(a) done 2026-10-20 16:06 UTC, `25de84b`:* the shader draws the new era left of a hard, slightly slanted edge
+  with a faint light on it, crossing in 1.8 s once both pictures are in; the player wipes whenever the next leaf
+  is the same station and moment in another era. Paused on an `era` leaf, a grip waits at the right edge ("Drag
+  for Today") and brings back the era the panorama was last in. Checked mid-sweep and dragged at both sizes.
+  (b) and (c) remain.
 - [ ] **E2b. The flank's lines.** Chapter 1 promises the profile, the fissures, the seismic lines and the
   weathered slab drawn on the scene, but `overlays.json` has none at `sphinx-flank`. Write them as overlays from
   the database (`sphinx.enclosure.margin.*`; the seismic lines placed from Reader's Fig. 5 and labelled so, as the
@@ -115,6 +120,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    them first would mean timing them twice.
 10. **Play starts paused, on a Play button.** Browsers refuse speech until the visitor has touched the page, so the
     exhibit opens on its first leaf, silent, with Play the one bright control.
+
+11. **The wipe's edge is a screen line with a slight slant, sweeping left to right**, not tied to the sun or
+    the floor. It reads the same whichever way the visitor looks, and the paused comparison needs an edge a
+    finger can hold. The plan's "sunlight's direction" or "the floor rising" can come later as a per-leaf
+    option. Reversible in `viewer.ts`.
 
 
 ## For Stewart
