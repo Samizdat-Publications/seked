@@ -103,6 +103,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `sphinx.enclosure.weathering.depth.s1` to `.s4` from `dobecki-schoch-1992` (`verified: false`), the seismic
   lines a reading of Reader's Fig. 5 with `scripts/plate.py`. Enter those records first (never typed into an
   overlay), then draw them, as figures where the statue would hide them in the scene.
+  *Blocked 2026-10-20 16:31 UTC on sources:* `assets/plates/` has neither Dobecki and Schoch's figures nor Reader's
+  Fig. 5, and the script keeps the *KMT* depths in the notes until the paper's own figures are read. See For
+  Stewart.
 - [x] **E7. The recorded voice in the player** (replaced by the laptop session, 20 October: the voice is chosen
   and recorded). `assets/narration/chN.mp3` and `chN-reply.mp3` hold each chapter of `docs/script.md` in Stewart's
   chosen voice, and `chN.json` the exact text spoken with every character's start and end time
@@ -184,8 +187,15 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     Playwright route ignore HTTP ranges, and an audio element that cannot seek plays every leaf from the top of
     its chapter. A chapter is 0.8 to 1.5 MB and plays in full anyway.
 
+20. **E2c waits for its sources; E8 goes ahead.** Drawing the seismic lines or the slab now would mean typing
+    figures the database does not hold.
+
 
 ## For Stewart
+
+- E2c needs scans of the seismic figures in Dobecki and Schoch 1992 (*Geoarchaeology* 7) and of Reader's Fig. 5,
+  to read with `scripts/plate.py` into `assets/plates/`. With them the builder enters the weathering depths and
+  the lines' positions (`verified: false`) and draws chapter 1's floor.
 
 - The cold open says "from the rooftops of Nazlet el-Samman" but stands at `sphinx`, above the Sphinx temple. A
   rooftop station east of the temple (and the rise over the roofs the script's beat describes) would make it
