@@ -384,6 +384,11 @@ def shapes(state, terrain=None):
     for sq in squares:
         P = next((P for P in data.PYRAMIDS.values() if abs(P["cx"] - sq[0]) < 1 and abs(P["cy"] - sq[1]) < 1), None)
         key = "queen" if sq[2] <= 40 else "precinct" if P is not None and sq[2] > P["half"] + 5 else "pyramid"
+        if key == "pyramid" and S["pyramids"] is None:
+            # Not built yet: the site is flattened only to take GLO-30's mound away, and it grows like the
+            # ground round it. A bare square in the forest would be a monument nobody claims; the page
+            # draws the plan instead (docs/plan.html, decision 2).
+            continue
         out.append(("square", (sq[0], sq[1], sq[2]), APRON[key]))
     for c in getattr(terrain, "cuts", None) or ():
         out.append(("rect", tuple(c[:4]), APRON["cut"]))

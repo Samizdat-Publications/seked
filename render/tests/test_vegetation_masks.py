@@ -43,15 +43,22 @@ class VegetationTests(unittest.TestCase):
                 z = grid.at(grid.Z, pos[:, 0], pos[:, 1])
                 self.assertFalse((z > -25.0).any(), f"{state}: {kind} on the plateau")
 
-    def test_nothing_stands_on_a_pyramid_or_its_apron(self):
+    def test_an_era_with_pyramids_keeps_their_squares_clear(self):
+        squares = [g for kind, g, _ in V.shapes("built") if kind == "square"]
+        for key, P in data.PYRAMIDS.items():
+            self.assertTrue(any(abs(g[0] - P["cx"]) < 1 and abs(g[1] - P["cy"]) < 1 for g in squares), key)
+
+    def test_a_pyramid_site_grows_like_the_ground_round_it_before_the_pyramid(self):
+        # The First Time has no pyramids (docs/rethink-2026-10.md): their sites are flattened, not cleared,
+        # because a bare square in the forest would be a monument nobody claims.
+        for key, P in data.PYRAMIDS.items():
+            self.assertFalse([g for kind, g, _ in V.shapes("first-time") if kind == "square"
+                              and abs(g[0] - P["cx"]) < 1 and abs(g[1] - P["cy"]) < 1], key)
         grid, plan = planted("first-time", (-560.0, -100.0, -600.0, -100.0))
         self.assertIn("tussock", plan)
-        for kind, (pos, *_) in plan.items():
-            for P in data.PYRAMIDS.values():
-                d = np.hypot(np.maximum(np.abs(pos[:, 0] - P["cx"]) - P["half"], 0.0),
-                             np.maximum(np.abs(pos[:, 1] - P["cy"]) - P["half"], 0.0))
-                # 2.5 m of slack: the masks live on the 4 m nodes and are interpolated between them
-                self.assertTrue((d > V.APRON["pyramid"] + V.KINDS[kind]["margin"] - 2.5).all(), f"{kind} at {d.min():.1f} m")
+        on_a_site = sum(int(((np.abs(pos[:, 0] - P["cx"]) < P["half"]) & (np.abs(pos[:, 1] - P["cy"]) < P["half"])).sum())
+                        for pos, *_ in plan.values() for P in data.PYRAMIDS.values())
+        self.assertGreater(on_a_site, 0)
 
     def test_the_lion_is_barer_than_the_first_time(self):
         box = (-1100.0, -500.0, -300.0, 300.0)

@@ -94,6 +94,9 @@ def statue(state, coll, log=print):
     index = index.get("models", index)
     model_id, finish = MODEL_FOR[states.spec(state)["sphinx"]]
     model = models[model_id]
+    if model["id"] not in index:
+        log(f"sphinx: {model['id']} is not in build/models/index.json (python scripts/models.py finds it); no statue")
+        return None
     path = os.path.join(data.REPO, "build", "models", index[model["id"]]["file"])
     surface = (model.get("finishes") or {}).get(finish, {}) if finish else {}
     if finish:
