@@ -1408,7 +1408,7 @@
    "say": "The proponents ask whether the explanations hold when the numbers come together.",
    "draw": [],
    "hold": 2,
-   "interact": "look",
+   "interact": "object:pyramid",
    "receipts": [
     "A4",
     "A5",

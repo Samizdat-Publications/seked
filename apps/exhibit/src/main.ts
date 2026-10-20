@@ -22,6 +22,7 @@ import { type Claim, formatResidual, formatValue } from '@seked/claims/browser';
 import { SkyFigure } from './skyfigure';
 import type { HeadsManifest, ObjectView } from './objectview';
 import { DEG } from './projection';
+import { pyramidObject } from './pyramidobject';
 import { Stage } from './stage';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -30,8 +31,6 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 const WALK = new URL('../walk/', location.href);
 const LEAVES = readLeaves(leavesJson);
 const RENDER = renderStations as unknown as RenderStations;
-/** Each object a leaf can hold (`interact: object:<id>`) and the file render/export_heads.py writes for it. */
-const OBJECT_FILES: Record<string, string> = { head: 'heads.json' };
 
 async function json(name: string): Promise<unknown> {
   const r = await fetch(new URL(name, WALK), { cache: 'no-cache' });
@@ -109,6 +108,16 @@ function earthScaleFigure(b: Bundle | null, ground: Record<string, number> | nul
     choices: ${claim.free_choices.join('; ')}.</figcaption>`;
 }
 
+/** What the pyramid in the hand shows, its numbers A1's and A2's from the bundle. */
+function pyramidCaption(ground: Record<string, number>): string {
+  const c = piCircle(ground), t = phiTriangle(ground);
+  if (!c || !t) return '';
+  return `The Great Pyramid from the survey's base and height, to turn in the hand. On the ground, a circle whose radius is
+    its height: ${formatValue(c.circle, 'm')} round, against the base's ${formatValue(c.perimeter, 'm')} (A1). Cut through its south
+    face, half the base, the height and the apothem, ${formatValue(t.apothem / t.half, 'ratio')} times half the base (A2). The grey line
+    is true north.`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -179,20 +188,30 @@ async function start(): Promise<void> {
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
+    if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
   });
-  // an object in the hand: three.js loads only when a leaf asks for one, and only once its export exists
-  let objects: Promise<{ view: ObjectView; heads: HeadsManifest } | null> | null = null;
+  // an object in the hand: three.js loads only when a leaf asks for one, and only once what it shows exists (the
+  // heads' export from the laptop, the pyramid's monuments from the bundle); until then the leaf is its panorama
+  let view: Promise<ObjectView> | null = null;
+  const objectView = () => (view ??= import('./objectview').then(({ ObjectView: View }) => new View($('stage'), new URL('objects/', location.href))));
+  const hideObject = () => { void view?.then((v) => v.hide()); };
+  let heads: Promise<HeadsManifest | null> | null = null;
+  const loadHeads = () => (heads ??= (async () => {
+    const r = await fetch(new URL('objects/heads.json', location.href)).catch(() => null);
+    return r?.ok && (r.headers.get('content-type') ?? '').includes('json') ? ((await r.json()) as HeadsManifest) : null;
+  })());
   const objectFor = (L: Leaf) => {
-    const file = OBJECT_FILES[L.interact.replace(/^object:/, '')];
-    if (!L.interact.startsWith('object:') || !file) { void objects?.then((o) => o?.view.hide()); return; }
-    objects ??= (async () => {
-      const r = await fetch(new URL(`objects/${file}`, location.href)).catch(() => null);
-      if (!r?.ok || !(r.headers.get('content-type') ?? '').includes('json')) return null;
-      const heads = (await r.json()) as HeadsManifest;
-      const { ObjectView: View } = await import('./objectview');
-      return { view: new View($('stage'), new URL('objects/', location.href)), heads };
-    })();
-    void objects.then((o) => { if (o && player.leaf === L) void o.view.show(o.heads).catch((e) => { console.error(e); o.view.hide(); }); });
+    const id = L.interact.startsWith('object:') ? L.interact.slice('object:'.length) : null;
+    if (id === 'head') {
+      void loadHeads().then(async (h) => {
+        if (!h) return hideObject();
+        const v = await objectView();
+        if (player.leaf === L) void v.show(h).catch((e) => { console.error(e); v.hide(); });
+      });
+    } else if (id === 'pyramid' && ground && pyramidObject(ground)) {
+      const g = ground;
+      void objectView().then((v) => { if (player.leaf === L) v.showPyramid(pyramidObject(g)!, pyramidCaption(g)); });
+    } else hideObject();
   };
   player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); objectFor(L); };
   const figure = $('figure');

@@ -3,10 +3,12 @@
  * simply on a dark ground and turned by dragging, on a leaf whose `interact` is `object:<id>`. Imported lazily, so
  * three.js loads only when such a leaf is reached. The first object is the ghosted head (`objects/heads.json`,
  * written by render/export_heads.py): the as-built king's head solid, the First Time lion's head translucent round
- * it, and H1's enlargement read from the same file.
+ * it, and H1's enlargement read from the same file. The second is the Great Pyramid with chapter 6's numbers drawn
+ * on it (src/pyramidobject.ts), built from the database with no file at all.
  */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { type PyramidObject, toThree } from './pyramidobject';
 
 export interface HeadsManifest {
   centre: number[];
@@ -24,6 +26,9 @@ export function factorLine(m: HeadsManifest): string {
 }
 
 const GHOST_OPACITY = 0.26;
+/** The lines drawn on the pyramid: the claim's gold, and a quiet grey for north. */
+const CLAIM_GOLD = 0xf2c46b;
+const NORTH_GREY = 0x9a9488;
 
 export class ObjectView {
   readonly el: HTMLElement;
@@ -69,6 +74,7 @@ export class ObjectView {
   async show(m: HeadsManifest): Promise<void> {
     this.el.hidden = false;
     this.el.querySelector('figcaption')!.textContent = `${factorLine(m)} ${m.standin}`;
+    this.el.querySelector('canvas')!.setAttribute('aria-label', "The king's head inside the lion's. Drag to turn it.");
     const key = m.objects.map((o) => o.file).join();
     if (this.loaded !== key) {
       this.loaded = key;
@@ -95,15 +101,59 @@ export class ObjectView {
       }));
       parts.forEach((p) => this.group.add(p));
       // both were exported centred on the head, so the view turns about it; frame the whole of the larger one
-      const sphere = new THREE.Box3().setFromObject(this.group).getBoundingSphere(new THREE.Sphere());
-      const d = sphere.radius / Math.sin((this.camera.fov / 2) * Math.PI / 180) * 1.05;
-      this.camera.position.set(0, 0, d);
-      this.camera.near = d / 50;
-      this.camera.far = d * 4;
-      this.camera.lookAt(0, 0, 0);
-      this.turn = { ...this.home };
+      this.frameGroup(new THREE.Vector3(), { yaw: 0.6, pitch: 0.15 });
     }
     this.draw();
+  }
+
+  /** Show the Great Pyramid with its lines; `caption` says what they are. */
+  showPyramid(p: PyramidObject, caption: string): void {
+    this.el.hidden = false;
+    this.el.querySelector('figcaption')!.textContent = caption;
+    this.el.querySelector('canvas')!.setAttribute('aria-label', 'The Great Pyramid with a circle of radius its height round it and its golden triangle inside. Drag to turn it.');
+    const key = `pyramid:${p.side}:${p.height}`;
+    if (this.loaded !== key) {
+      this.loaded = key;
+      this.group.clear();
+      const pos = new Float32Array(p.mesh.positions.length);
+      for (let i = 0; i < pos.length; i += 3) pos.set(toThree([p.mesh.positions[i]!, p.mesh.positions[i + 1]!, p.mesh.positions[i + 2]!]), i);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setIndex(new THREE.BufferAttribute(p.mesh.indices, 1));
+      geo.computeVertexNormals();
+      this.group.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xd8c7a2, roughness: 0.9, flatShading: true, side: THREE.DoubleSide })));
+      const ground = new THREE.Mesh(new THREE.CircleGeometry(p.height * 1.08, 96), new THREE.MeshStandardMaterial({ color: 0x2a251d, roughness: 1 }));
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.05;
+      this.group.add(ground);
+      // the lines are drawn over the stone, so the triangle shows through the solid it is cut from
+      const line = (pts: number[][], color: number) => {
+        const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts.map((q) => new THREE.Vector3(...toThree(q)))),
+          new THREE.LineBasicMaterial({ color, depthTest: false, transparent: true }));
+        l.renderOrder = 2;
+        this.group.add(l);
+      };
+      line(p.circle, CLAIM_GOLD);
+      line(p.triangle, CLAIM_GOLD);
+      line(p.north, NORTH_GREY);
+      // turned about the middle of its height, seen from a little above so the circle on the ground reads
+      // framed on the circle and the apex, the reach of what is drawn, not on the ground's box
+      this.frameGroup(new THREE.Vector3(0, p.height / 3, 0), { yaw: 0.55, pitch: 0.42 }, p.height * 1.25);
+    }
+    this.draw();
+  }
+
+  /** Centre the group's turning on `pivot`, frame all of it (or `reach` about the pivot), and set where Reset goes. */
+  private frameGroup(pivot: THREE.Vector3, home: { yaw: number; pitch: number }, reach?: number): void {
+    this.group.children.forEach((c) => c.position.sub(pivot));
+    const radius = reach ?? new THREE.Box3().setFromObject(this.group).getBoundingSphere(new THREE.Sphere()).radius;
+    const d = radius / Math.sin((this.camera.fov / 2) * Math.PI / 180) * 1.05;
+    this.camera.position.set(0, 0, d);
+    this.camera.near = d / 50;
+    this.camera.far = d * 4;
+    this.camera.lookAt(0, 0, 0);
+    this.home = { ...home };
+    this.turn = { ...home };
   }
 
   hide(): void { this.el.hidden = true; }
