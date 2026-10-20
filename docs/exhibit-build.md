@@ -333,11 +333,28 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   triangle through the south face drawn through the stone, and a grey line north; `ObjectView.showPyramid` shows it,
   three.js still loaded only when an object leaf is reached. Looked at at both sizes, turned and reset; the next
   leaf hides it. 7 new tests; `pnpm test` 1198 passed.
-- [ ] **E17. Chapter 3, "Temples of the same stone": its leaves** (the plan's order after chapter 6: 3, 4, 7, 8,
+- [x] **E17. Chapter 3, "Temples of the same stone": its leaves** (the plan's order after chapter 6: 3, 4, 7, 8,
   9). Cut chapter 3 of `docs/script.md` into leaves, every word in order and inside `assets/narration/ch3.json`;
   stand where the argument is seen (the Sphinx Temple and the Valley Temple, their core blocks against the ditch's
   beds) on panoramas that exist, `until` stand-ins where a station is new; receipts as the script assigns them;
   queue what the laptop must render with `scripts/exhibit_queue.py`. Figures in a later step.
+  *Done 2026-10-20 23:25 UTC, `e628ea6`.* 11 leaves, every word in order and inside `ch3.json`. At `sphinx` the First
+  Time wipes to today on "two temples" (D4); a cut into the granite hall as built (`valley-temple`) for the granite;
+  back above the temples, close on the Sphinx Temple's bare limestone blocks for the core (decision 45), turns to the
+  Sphinx in its ditch for "layer by layer" and to the lion and both temples for "the lion's stone" (D4). West and
+  Schoch in the hall today (a north wall, then the south), wiped to the hall as built on "refit"; Hancock down the
+  hall; Khafre's statue (the walkthrough's stand-in scan) for "Khafre's statues"; and a cut to the lion's face in the
+  First Time at `sphinx-face` on "long ages before their first king" (decision 46). No new panorama or flight; three
+  patches queued. Looked at at both sizes as contact sheets (`build/exhibit-shots/e17/`); played through muted, 116 s,
+  no errors, no fallback voice. Left for E17b.
+- [ ] **E17b. Chapter 3's figures.** (a) The joint peeled open on "On camera in 1993": one Valley Temple wall in
+  section, the granite pulled forward, a rounded and fissured core behind it, the granite's back shaped to it,
+  captioned "the claim as West and Schoch describe it, not a survey" (a drawing of a claim, so no record is needed,
+  but say so). (b) The luminescence dates the script proposes as records (`liritzis-vafiadou-2015` Table 1: VT1,
+  VT9a, ST2, `verified: false` until checked), then shown in the reply's terms on `ch3-statues` or the reply panel.
+  (c) The statue sockets drawn on the hall floor from `khafre_valley_temple.hall.socket.*`, if those records exist.
+- [ ] **E18. Chapter 4, "The First Time": its leaves.** Cut chapter 4 likewise, on panoramas that exist, with
+  `until` stand-ins where a station is new; receipts as the script assigns them; the queue run.
 
 ## Decisions
 
@@ -493,6 +510,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     together", because the object is the numbers together: the circle, the triangle and north on one solid. The
     leaves before it each draw one number as a figure, and an object over a figure would crowd the screen. Reversible:
     move `object:pyramid` to another chapter 6 leaf.
+45. **Chapter 3 shows the limestone core at the Sphinx Temple, from above**, not in the Valley Temple: the hall's
+    renders are granite on every wall in both eras, and the Sphinx Temple's outside never got its granite (the
+    reply's own point), so its bare core blocks are what "a core of local limestone" can honestly point at. The
+    beat's sequence lifting the granite away needs a render the laptop has not made.
+46. **Chapter 3 ends on the lion's face in the First Time**, not on a night look-around in the hall as the beat
+    asked: there is no night panorama of the hall, and "long ages before their first king" leads into "The First
+    Time". From `sphinx` the First Time's temple wall fills the view, so the leaf stands at `sphinx-face`, the cold
+    open's own shot.
 
 
 ## For Stewart
