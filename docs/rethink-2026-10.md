@@ -54,8 +54,15 @@ it; that state is to be rebuilt.
    piece's: this is what makes the rest worth taking seriously. The reply here must include
    the post-2019 excavation reports (domestic buildings and cisterns found; the backfill
    possibly slope slides as well as deliberate burial).
-8. **What would settle it.** Drilling the ditch floor, the cavities under the Sphinx, the
-   surveys not yet made.
+8. **Underneath.** The shafts claimed under Khafre's pyramid, the Labyrinth at Hawara, the
+   cavities under the Sphinx and the Hall of Records, each drawn by its evidence tier.
+9. **What would settle it.** Drilling the ditch floor, the SAR data released and reprocessed,
+   a dig at Hawara, the surveys not yet made.
+
+Chapter 8 was split in two on 20 October (`docs/night-2026-10-20.md`, decision 23): the
+underground claims are the most visual in the piece and need their own stage, and the close
+then answers every chapter. Ten chapters, 0 to 9. If nine reads better, the two become the
+halves of one chapter.
 
 Each chapter: the claim at full strength, its receipts (the residual from the claims engine,
 where it has one), and the archaeologists' reply, collapsed.

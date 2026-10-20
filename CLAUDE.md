@@ -10,7 +10,7 @@ The full plan is `docs/plan.html`; the generated claims dossier is
 Since the October rethink (`docs/rethink-2026-10.md`, agreed with Stewart on
 19 and 20 October 2026; the plan is `docs/plan.html`): **the strongest case
 for an older Giza, illustrated for an ordinary viewer.** It is a steelman of
-Hancock, Bauval and Schoch, told as a scroll documentary in nine chapters and
+Hancock, Bauval and Schoch, told as a scroll documentary in ten chapters and
 beautiful enough to show someone. The archaeologists' reply is in every
 chapter, quieter than the claim and never omitted. The checking machinery
 stays behind it: every number still comes from `data/`, and the claims engine

@@ -153,7 +153,7 @@
   <header class="masthead">
     <p class="eyebrow">Project plan · Draft 2 · 20 October 2026 · Supersedes <a href="plan-2026-09.html">the September plan</a></p>
     <h1>Seked</h1>
-    <p class="dek">The strongest case for an older Giza, illustrated for an ordinary viewer: a scroll documentary in nine chapters. Every figure is computed from the measurement database, and the archaeologists get a reply in every chapter.</p>
+    <p class="dek">The strongest case for an older Giza, illustrated for an ordinary viewer: a scroll documentary in ten chapters. Every figure is computed from the measurement database, and the archaeologists get a reply in every chapter.</p>
     <dl class="facts">
       <div><dt>Goal</dt><dd>A steelman of Hancock, Bauval and Schoch, beautiful enough to show someone. The question moves from "does the claim hold?" to "what exactly is the claim, shown as well as it can be shown?".</dd></div>
       <div><dt>Format</dt><dd>One long page. Each chapter pins a full-bleed render and the reader's scroll drives it. An autoplay mode narrates it and records the trailer.</dd></div>
@@ -167,9 +167,10 @@
       <ol>
         <li><a href="#change">What changes</a></li>
         <li><a href="#page">The page</a></li>
-        <li><a href="#chapters">Nine chapters</a></li>
+        <li><a href="#chapters">Ten chapters</a></li>
         <li><a href="#sphinx">The Sphinx, one master</a></li>
         <li><a href="#first-time">The First Time</a></li>
+        <li><a href="#underneath">Underneath</a></li>
         <li><a href="#assets">Assets by chapter</a></li>
         <li><a href="#voice">Narration and trailer</a></li>
         <li><a href="#split">Who does what</a></li>
@@ -228,8 +229,8 @@
 
       <section id="chapters">
         <p class="label">Script</p>
-        <h2>Nine chapters</h2>
-        <p>The order follows the argument as its proponents build it: the stone first (it is older than it should be), then what it was and what faced it, then the texts that remember a First Time, then the sky that dates it, the numbers in the stone, the world before the flood that makes it thinkable, and last, what would settle it. The narration itself is drafted in <code>docs/script.md</code> once the research below is in.</p>
+        <h2>Ten chapters</h2>
+        <p>The order follows the argument as its proponents build it: the stone first (it is older than it should be), then what it was and what faced it, then the texts that remember a First Time, then the sky that dates it, the numbers in the stone, the world before the flood that makes it thinkable, then what is said to lie underneath, and last, what would settle it. Chapter 8 was split in two on 20 October (decision 8): the underground claims are the most visual in the piece and need their own stage, and the closing chapter then answers every chapter, not just the cavities. The narration itself is drafted in <code>docs/script.md</code> once the research below is in.</p>
         <div class="tbl-wrap"><table>
           <thead><tr><th>#</th><th>Chapter</th><th>What the scroll does</th><th>Receipts</th><th>Stage</th></tr></thead>
           <tbody>
@@ -241,10 +242,11 @@
             <tr><td class="id">5</td><td><strong>The sky as a clock.</strong> Orion's belt on the ground and at its lowest; the shafts.</td><td>The live slider. Drag from today to 10,500 BCE and watch the belt sink to its lowest and turn against the three pyramids. Then the Great Pyramid in section, its shafts at Alnitak and Sirius c. 2450 BCE.</td><td>C2, C3, C4, C7</td><td>live</td></tr>
             <tr><td class="id">6</td><td><strong>Numbers in the stone.</strong> π and φ, 1 : 43,200, true north.</td><td>The perimeter unrolls into a circle with the height as its radius. φ follows, then the globe at 1 : 43,200, then the compass at −3.9′.</td><td>A1–A5, A7, B1–B5, C1, D1–D3</td><td>live over stills</td></tr>
             <tr><td class="id">7</td><td><strong>Before the flood.</strong> The Younger Dryas, Göbekli Tepe.</td><td>Enclosure D of Göbekli Tepe as it was dug, then as it was buried. The timeline runs out to the green Sahara of the First Time.</td><td>Radiocarbon dates</td><td>sequence (stand-in)</td></tr>
-            <tr><td class="id">8</td><td><strong>What would settle it.</strong> Drilling the ditch floor, the cavities, the surveys not made.</td><td>The enclosure in x-ray: the seismic lines under the floor, the paw cavity (claimed), the Hall of Records (legendary), and the ScanPyramids void (instrumented) as the model of an answer.</td><td>Evidence tiers from <code>data/structures.json</code></td><td>live over stills</td></tr>
+            <tr><td class="id">8</td><td><strong>Underneath.</strong> The shafts under Khafre's pyramid, the Labyrinth at Hawara, the Sphinx's cavities, the Hall of Records.</td><td>The plateau cut away on a section through Khafre's axis. The excavated rooms a few metres down, then the claimed wells falling 648 m, with Khafre's pyramid stacked beside them for scale. Then east to the Sphinx's paws, and south to Hawara, whose Labyrinth is laid over Giza at the same scale.</td><td>Depths against the pyramids' heights; the known against the claimed; the Big Void's sigma; evidence tiers</td><td>live over stills</td></tr>
+            <tr><td class="id">9</td><td><strong>What would settle it.</strong> Drilling the ditch floor, the SAR data released and reprocessed, a dig at Hawara.</td><td>The enclosure in x-ray: the seismic lines under the floor and two dashed cores not yet drilled. Then the ScanPyramids corridor (instrumented) as the model of an answer, and a strip of the nine chapters before it, each with its test.</td><td>The model answer from <code>g1-voids.json</code>; physical dates as records</td><td>live over stills</td></tr>
           </tbody>
         </table></div>
-        <div class="note"><p>Chapters 1, 4, 7 and 8 have no claim in <code>data/claims/</code> today. Chapter 1's weathering depth and chapter 2's head fit can become claims, as data, with their free choices named. Chapters 4 and 7 rest on texts and excavation reports, so their receipts are dates with error bars. Chapter 8's are the tiers.</p></div>
+        <div class="note"><p>Chapters 1, 4, 7, 8 and 9 have no claim in <code>data/claims/</code> today. Chapter 1's weathering depth and chapter 2's head fit can become claims, as data, with their free choices named. Chapters 4 and 7 rest on texts and excavation reports, so their receipts are dates with error bars. Chapter 8's are depths and tiers, and chapter 9's are the instrumented surveys and the dates.</p></div>
       </section>
 
       <section id="sphinx">
@@ -272,6 +274,49 @@
         </ul>
       </section>
 
+      <section id="underneath">
+        <p class="label">Chapter 8</p>
+        <h2>Underneath: the known, the measured, the claimed and the legend</h2>
+        <p>Chapter 8 shows what is said to lie under the plateau, and what is known to. Its stage is the plateau cut away on a north–south plane through Khafre's axis, the eastern half removed and the rock drawn as in an x-ray. The camera starts at the pyramid's base and goes down. The excavated rooms are a few metres under it. The claimed wells fall 648 m, and Khafre's pyramid is stacked beside them, four and a half times, for scale. Then the camera goes east to the Sphinx's paws, and south to Hawara, whose Labyrinth is then laid over Giza at the same scale. The research is in <a href="research/khafre-sar.html"><code>docs/research/khafre-sar.md</code></a> and <a href="research/labyrinth.html"><code>labyrinth.md</code></a>, both checked by hand where the model rests on them.</p>
+        <h3>Four layers, by tier</h3>
+        <p>Every object in the chapter belongs to one tier in <code>data/structures.json</code>, and the tier sets its look: stone for excavated, a solid box with error bars for instrumented, a dashed outline for claimed, a ghost for legendary. No object changes tier because the chapter needs it (decision 27 of the night of 20 October).</p>
+        <ol class="phases">
+          <li><span class="n">I<small>excavated</small></span><div><h3>What has been walked into</h3><p>Khafre's substructure from <code>data/measurements/g2-interior.json</code>: the passages, the burial chamber with its floor at −3.0 m (Maragioglio and Rinaldi), and the lower chamber, 10.46 × 3.13 m (Petrie), whose level no record yet gives. It needs a new key from Hölscher's sections or Lehner. The Osiris Shaft, three levels to about 30 m under the causeway with water at the bottom (<code>osiris-shaft</code>), is the deepest excavated room on the plateau. At Hawara: Amenemhat III's pyramid and the Labyrinth's chip bed, as Petrie dug them.</p></div></li>
+          <li><span class="n">II<small>instrumented</small></span><div><h3>What instruments found, with error bars</h3><p>The Great Pyramid's north-face corridor and Big Void from <code>g1-voids.json</code>, all verified: the corridor 9.06 ± 0.07 m long, the Void at least 30 m long with its centre 40 to 50 m above the Queen's Chamber floor. Alvarez's 1970 muon cone, drawn up from the Belzoni Chamber at its 35° half-angle, found no chamber in the 19 per cent of Khafre it saw. At Hawara: the shallow resistivity closures at 5 and 7.5 m that Elshazly and colleagues published in 2024, with the 2008 survey's leader among the authors. These are the model of what an answer looks like.</p></div></li>
+          <li><span class="n">III<small>claimed</small></span><div><h3>What has been announced</h3><p>The Khafre Project of March 2025 (<code>g2.sar-shafts</code>): five "Zeds" in the base, eight wells in two north–south rows wrapped in descending spirals, two cubes about 80 m on a side at −648 m, and structures to about 2 km. The cavity under the Sphinx's paws, about 5 m down (<code>sphinx.paw-cavity</code>). At Hawara: the Mataha walls at 8–12 m (2008, unpublished), and the Merlin Burrows levels to about 100 m (2015, published by De Cordier in 2025). None of it is in a journal.</p></div></li>
+          <li><span class="n">IV<small>legendary</small></span><div><h3>What is told</h3><p>The Hall of Records under the paw (<code>hall-of-records</code>, from Cayce), and Herodotus's lower storey at Hawara: 1,500 rooms he was not shown, which he reports from hearsay.</p></div></li>
+        </ol>
+        <h3>The claimants' own pictures</h3>
+        <p>The chapter shows what the claimants published beside what we drew from it, so a viewer can check that we drew what they said.</p>
+        <ul>
+          <li><strong>Tomograms and slices.</strong> The Khafre Project's tomograms (its abstract of 16 March 2025, pp. 4–6) have no axes and no scale bar. They are hung as plates on the section plane, fitted by their own labels (the base, 648 m), and captioned "placed by its labels, not scaled". Nothing is scaled from them.</li>
+          <li><strong>Figures with axes.</strong> Elshazly's ERT sections, Szynkiewicz's radargrams and Carlotto's Fig. 11 (with its 144 m bar) are registered with <code>scripts/plate.py</code> and read two ways: a printed dimension is transcribed, and a scaled distance is <code>scaled from plate</code>, with its sigma.</li>
+          <li><strong>Rights.</strong> The retracted 2022 Khufu paper is CC BY 4.0, so its figures are hosted with "retracted 10 August 2026" beside them. Petrie's and Lepsius's plates are in the public domain. Everything else is linked, not hosted, until permission is given. The requests are drafted in <code>docs/permissions/</code> for Stewart to send (decision 10).</li>
+        </ul>
+        <h3>The model of the claim</h3>
+        <p>The claimed underground is built procedurally from the claimants' numbers: a dependency-free geometry module in <code>render/giza/</code>, tested in <code>render/tests/</code>, and a Blender builder for the cutaway. It is never made by Meshy or an image model, which would add detail nobody has claimed. Every figure is a record in <code>data/measurements/g2-sar.json</code> with <code>method: "as claimed"</code>, citing the slide, paper or video it comes from, and <code>verified: false</code> until it has been checked there.</p>
+        <ul>
+          <li><strong>From their numbers:</strong> the count of wells, the two rows, the depth of 648 m, the cubes' 80 m, the five Zeds and the 2 km.</li>
+          <li><strong>Stated look choices:</strong> the wells' diameter (10–12 m, from the press, not the abstract), the rows' spacing and offset (taken from the authors' own 3D rendering, inside the footprint about its centre), the spirals' pitch and the Zeds' size. None of these is published. Each is labelled where it is drawn and lives in one table in the geometry module.</li>
+        </ul>
+        <h3>The Labyrinth at Hawara, and at Giza for scale</h3>
+        <p>Hawara is a site of its own in <code>data/sites.json</code>, with its own frame: origin at the pyramid's base centre, +X east, +Y north. Petrie's figures go in as records: the chip bed "about 1000 feet long, and 800 feet broad" (1889, p. 5), the pyramid's brick base of 3692 in, the presumptive casing of 157 in and the casing angle of 48° 45′ (1890, p. 13). The finished base and the height are computed, as Petrie computed them. Which way the chip bed's long side runs is read from his Pl. XXV, two ways, or is a stated choice.</p>
+        <ul>
+          <li><strong>The still:</strong> the chip bed and the pyramid laid beside the Great Pyramid at the same scale, labelled "at Hawara, 90 km south; laid here for scale". The chip bed is about 1.4 times Khufu's base, and the pyramid a little smaller than Menkaure's.</li>
+          <li><strong>The section:</strong> north–south, south of the pyramid. Petrie's chips (0.6 to 7.3 m), Elshazly's closures, the Mataha walls dashed and labelled "reported, unpublished", the water table from 1.5 to 10 m, limestone at 12 to 15 m, and Herodotus's lower storey as a ghost. Whatever is down there is drowning.</li>
+        </ul>
+        <h3>The receipts</h3>
+        <ul>
+          <li><strong>Depths against heights.</strong> 648 m against <code>g2.height.original</code> is four and a half Khafres. Against the burial chamber's floor at −3.0 m, the claimed wells go about 216 times deeper than any known room of Khafre's.</li>
+          <li><strong>The known against the claimed.</strong> One depth scale for every object in the chapter, coloured by tier.</li>
+          <li><strong>The Big Void's sigma.</strong> An instrumented answer gives a position with error bars. The claimed shafts and the paw cavity give none, and the receipt says so.</li>
+          <li><strong>The Labyrinth's area</strong> against Khufu's base, computed by <code>@seked/geometry</code> from Petrie's records.</li>
+          <li><strong>Three lines in the section:</strong> what radar is measured to image in dry sand (about 1.5 m; up to 10 m by ESA's figure), the water table (<code>sharafeldin-2019</code>, once Khufu's base elevation above sea level is a record), and the claim's 648 m.</li>
+        </ul>
+        <h3>The reply</h3>
+        <p>The only peer-reviewed paper behind the method, Biondi and Malanga's 2022 work on Khufu, was retracted on 10 August 2026 for "serious methodological flaws and statistical errors"; the authors disagree. Satellite radar sees the surface, and Biondi agrees that it reaches less than 10 m into rock, so the dispute is whether surface vibrations can be measured from orbit and inverted to 648 m. No data or code has been released, and nobody has reprocessed it. Egypt's antiquities authority permitted no work at Khafre, and Hawass says the base is bedrock carved to about 8 m. Deep shafts would sit hundreds of metres below the water table. At Hawara, Petrie's finds name Amenemhat III. The 2008 survey's own leader published only shallow closures in 2024, and an independent GPR survey found "nothing to support the idea that this was Herodotus's labyrinth". The reply's picture is the claim's own section with the three lines drawn in, and the empty column between 10 m and 648 m.</p>
+      </section>
+
       <section id="assets">
         <p class="label">Inventory</p>
         <h2>Assets by chapter</h2>
@@ -287,7 +332,8 @@
             <tr><td class="id">5</td><td><code>packages/sky</code>; <code>sky-bake</code> and <code>sky-rollback</code>; <code>docs/shafts.md</code>; the <code>orion</code> station; <code>apps/alignments/img/c4-*</code>, <code>c2-*</code>; the viewer's epoch slider</td><td>A night render with the sky cut out; the section through the Great Pyramid</td><td>A light slider widget for the page, outside the React viewer</td></tr>
             <tr><td class="id">6</td><td>A1–A7, B1–B5, C1, D1–D3; the <code>g1-proportions</code> overlay; the <code>earth</code> patches; the viewer's GhostProfile</td><td>A clean profile still of the Great Pyramid as built</td><td>The draw-on overlays, driven by scroll</td></tr>
             <tr><td class="id">7</td><td>The First Time forest (<code>render/giza/vegetation.py</code>)</td><td>Göbekli Tepe's Enclosure D as a labelled stand-in, from published plans and CC photographs</td><td>Göbekli Tepe sources (there are none in <code>data/sources.json</code> yet)</td></tr>
-            <tr><td class="id">8</td><td>The tiers in <code>data/structures.json</code> (<code>sphinx.paw-cavity</code>, <code>g2.sar-shafts</code>, <code>hall-of-records</code>, <code>g1.big-void</code>)</td><td>The enclosure in x-ray</td><td>Geometry for the claimed cavities and the seismic lines, drawn by tier</td></tr>
+            <tr><td class="id">8</td><td>The pyramid builder (<code>render/giza/pyramids.py</code>); <code>g2-interior.json</code>, <code>g1-voids.json</code>; the tiers in <code>data/structures.json</code> (<code>g2.sar-shafts</code>, <code>osiris-shaft</code>, <code>sphinx.paw-cavity</code>, <code>hall-of-records</code>)</td><td>The cutaway through Khafre, as stills and then a descent (sequence); the Labyrinth laid over Giza (still); the Hawara section (still)</td><td>The underground geometry module and its builder; <code>g2-sar.json</code> (as claimed) and <code>hawara.json</code> (Petrie); Hawara in <code>sites.json</code>; the Labyrinth's parts in <code>structures.json</code>; the plates in <code>assets/plates/</code> with a manifest; the permission requests</td></tr>
+            <tr><td class="id">9</td><td>The tiers; <code>g1-voids.json</code>; <code>sphinx-enclosure.json</code>; chapter 5's section of the Great Pyramid</td><td>The enclosure in x-ray, with two dashed cores</td><td>Geometry for the seismic lines and the cores, drawn by tier; the 2008 boreholes scaled from their plate; physical dates as records</td></tr>
           </tbody>
         </table></div>
       </section>
@@ -318,14 +364,15 @@
         <p class="label">Schedule</p>
         <h2>Order of work</h2>
         <ol class="phases">
-          <li><span class="n">1<small>Now</small></span><div><h3>Plan, research and script</h3><p>Research for chapters 1 to 8, checked; the script drafted and edited; new sources entered in <code>data/sources.json</code> as <code>verified: false</code> until checked against the page.</p><p class="done"><b>Done when</b> <code>docs/script.md</code> carries all nine chapters, with their beats, receipts, replies and sources.</p></div></li>
-          <li><span class="n">2</span><div><h3>The page with what exists</h3><p><code>apps/story</code> with the script as text, stills crossfaded from the renders that exist, live receipts and collapsed replies.</p><p class="done"><b>Done when</b> all nine chapters scroll end to end, on a phone and on a desktop, with today's renders.</p></div></li>
+          <li><span class="n">1<small>Now</small></span><div><h3>Plan, research and script</h3><p>Research for chapters 1 to 9, checked; the script drafted and edited; new sources entered in <code>data/sources.json</code> as <code>verified: false</code> until checked against the page.</p><p class="done"><b>Done when</b> <code>docs/script.md</code> carries all ten chapters, with their beats, receipts, replies and sources.</p></div></li>
+          <li><span class="n">2</span><div><h3>The page with what exists</h3><p><code>apps/story</code> with the script as text, stills crossfaded from the renders that exist, live receipts and collapsed replies.</p><p class="done"><b>Done when</b> all ten chapters scroll end to end, on a phone and on a desktop, with today's renders.</p></div></li>
           <li><span class="n">3</span><div><h3>The master Sphinx</h3><p>The four era operators, the head-fit test, and the comparison with the photo-made mesh.</p><p class="done"><b>Done when</b> one mesh yields every era's Sphinx, and the head-fit number and the distance to today are in the receipts.</p></div></li>
           <li><span class="n">4</span><div><h3>The First Time rebuilt</h3><p>No pyramids in either claim state; the bedrock knolls; the plan drawn by the page.</p><p class="done"><b>Done when</b> no render or state shows a pyramid before 2500 BCE.</p></div></li>
-          <li><span class="n">5</span><div><h3>Sequences</h3><p>Chapter by chapter, the stills are replaced by rendered sequences: previews framed in the cloud, finals on the laptop.</p><p class="done"><b>Done when</b> every stage marked "sequence" above scrubs smoothly.</p></div></li>
-          <li><span class="n">6</span><div><h3>The sky slider</h3><p>The chapter 5 widget over a night render with its sky cut out, sharing <code>@seked/sky</code> with the viewer.</p><p class="done"><b>Done when</b> dragging to 10,450 BCE brings the belt to its lowest, with C4's receipt alongside.</p></div></li>
-          <li><span class="n">7</span><div><h3>Göbekli Tepe</h3><p>The Enclosure D stand-in, its sources and its burial.</p><p class="done"><b>Done when</b> chapter 7 shows it, and its reply cites the post-2019 excavation reports.</p></div></li>
-          <li><span class="n">8</span><div><h3>Narration, autoplay, trailer</h3><p>The voice, the timings, the autoplay scroll and the recorded trailer.</p><p class="done"><b>Done when</b> pressing play runs the whole piece with no hand on the page, and the trailer file exists.</p></div></li>
+          <li><span class="n">5</span><div><h3>Underneath</h3><p>The claimed figures and Petrie's Hawara as records; the underground geometry and its cutaway; the plates registered or linked; the Labyrinth laid over Giza.</p><p class="done"><b>Done when</b> chapter 8's cutaway, Labyrinth still and Hawara section exist as previews, every claimed figure in <code>g2-sar.json</code> cites where it was said, and every plate is placed or linked with its rights stated.</p></div></li>
+          <li><span class="n">6</span><div><h3>Sequences</h3><p>Chapter by chapter, the stills are replaced by rendered sequences: previews framed in the cloud, finals on the laptop.</p><p class="done"><b>Done when</b> every stage marked "sequence" above scrubs smoothly.</p></div></li>
+          <li><span class="n">7</span><div><h3>The sky slider</h3><p>The chapter 5 widget over a night render with its sky cut out, sharing <code>@seked/sky</code> with the viewer.</p><p class="done"><b>Done when</b> dragging to 10,450 BCE brings the belt to its lowest, with C4's receipt alongside.</p></div></li>
+          <li><span class="n">8</span><div><h3>Göbekli Tepe</h3><p>The Enclosure D stand-in, its sources and its burial.</p><p class="done"><b>Done when</b> chapter 7 shows it, and its reply cites the post-2019 excavation reports.</p></div></li>
+          <li><span class="n">9</span><div><h3>Narration, autoplay, trailer</h3><p>The voice, the timings, the autoplay scroll and the recorded trailer.</p><p class="done"><b>Done when</b> pressing play runs the whole piece with no hand on the page, and the trailer file exists.</p></div></li>
         </ol>
       </section>
 
@@ -335,11 +382,14 @@
         <ul>
           <li><strong>Reading as advocacy, or as a debunk.</strong> Three of the headline claims miss their own tolerance. The narration tells each claim at its strongest, and the receipt states the miss plainly. Rule I is the guard. The reply panel is the release valve.</li>
           <li><strong>Sources from memory.</strong> The first headless pilot had no web access and wrote every citation from memory. Research jobs now mark each citation checked or unchecked, and nothing reaches <code>data/</code> until it has been checked against the page.</li>
-          <li><strong>Weight.</strong> Nine chapters of frame sequences could reach 100 MB. Each chapter loads one ahead, phones get 1200-pixel frames, and the budget is about 12 MB per chapter on a desktop.</li>
+          <li><strong>Weight.</strong> Ten chapters of frame sequences could reach 100 MB. Each chapter loads one ahead, phones get 1200-pixel frames, and the budget is about 12 MB per chapter on a desktop.</li>
           <li><strong>Render time.</strong> About 600–900 final frames at one to two minutes each on the laptop is 10–30 hours, spread over several nights through <code>job.py</code>.</li>
           <li><strong>The master Sphinx is a stand-in.</strong> The head-fit number is read off a Meshy mesh scaled to the ARCE dimensions, and its receipt says so. A better master changes the number.</li>
           <li><strong>Göbekli Tepe has no 3D source.</strong> A stand-in is built from published plans (read two ways, like any drawing) and CC photographs, and labelled. If that cannot be made honest, the chapter uses photographs instead.</li>
           <li><strong>Copyright.</strong> Quotations stay short. Plates of stelae and texts come from licensed photographs, with attribution.</li>
+          <li><strong>Lending weight by scale.</strong> A 648 m shaft drawn beautifully under a pyramid is more persuasive than the press conference it came from. The claimed tier's look (dashed, never stone), the label on every look choice and the reply's empty column are the guard. The claim is drawn as large as it is said, no larger.</li>
+          <li><strong>Rights to the underground pictures.</strong> The Khafre Project's tomograms, the Merlin Burrows images and the Mataha figures belong to their authors. Until they answer, the chapter links them and draws its own model, and the comparison that lets a viewer check our drawing waits.</li>
+          <li><strong>Hawara is not Giza.</strong> The Labyrinth is 90 km south and some 700 years after Khufu, and even its proponents do not say it dates Giza. It is in the chapter because the claims are made together and because "it would have been found by now" is the argument it tests. Its overlay on Giza is labelled as laid there for scale.</li>
         </ul>
       </section>
 
@@ -354,6 +404,10 @@
           <li><span class="q">5</span><div><p><strong>The narrator.</strong> Three ElevenLabs voices read the cold open.</p><p class="rec"><b>Recommendation:</b> a measured, warm voice, not a trailer voice. It is Stewart's ear.</p></div></li>
           <li><span class="q">6</span><div><p><strong>When the tour retires.</strong></p><p class="rec"><b>Recommendation:</b> when phase 2 ships, so the site always has one working way through.</p></div></li>
           <li><span class="q">7</span><div><p><strong>Spend on the API key.</strong> The research for all eight chapters ran on 20 October for $16.22, plus $1.23 for the first pilot, which had no web access and was discarded. The script's draft runs at extra effort under an $8 cap.</p><p class="rec"><b>Recommendation:</b> check in the Console that these calls drew on the plan's API credit and not on a card. If they did, keep bulk research and drafting on the key.</p></div></li>
+          <li><span class="q">8</span><div><p><strong>Ten chapters or nine.</strong> On 20 October chapter 8 was split into <em>Underneath</em> (8) and <em>What would settle it</em> (9).</p><p class="rec"><b>Recommendation:</b> ten. The underground claims are the most visual in the piece, and the close then answers every chapter. If nine reads better, the two become the halves of one chapter.</p></div></li>
+          <li><span class="q">9</span><div><p><strong>The Labyrinth over Giza.</strong> Laying a building from 90 km away on the plateau shows its size at a glance, and could be taken as a claim that it was there.</p><p class="rec"><b>Recommendation:</b> lay it there, labelled "at Hawara, 90 km south; laid here for scale", in the same translucent look as any overlay.</p></div></li>
+          <li><span class="q">10</span><div><p><strong>Sending the permission requests</strong> drafted in <code>docs/permissions/</code>: the Khafre Project's press office, and Louis De Cordier for the Mataha and Merlin Burrows images.</p><p class="rec"><b>Recommendation:</b> send both. Until they answer, only the open-licensed figures are hosted.</p></div></li>
+          <li><span class="q">11</span><div><p><strong>Carlotto's SAR areas at Hawara</strong> are in the <em>Journal of Scientific Exploration</em> (2025), which reviews its papers but is outside the field's journals.</p><p class="rec"><b>Recommendation:</b> <code>claimed</code>. His polygons are his outlines of unexplained returns, by his own figures no deeper than 5 m, not a located structure. Reversible in one line of <code>structures.json</code>.</p></div></li>
         </ol>
       </section>
 
@@ -372,10 +426,13 @@
             <tr><td class="id">5</td><td><a href="research/ch5.html">ch5</a></td><td class="fit">$2.16</td><td class="fit">20 / 13</td><td class="fit">20</td><td>The shape match is statistically significant (Allan 2026, p = 0.0025), but every extension that would make the plan a clock fails, the epoch included: Seked's C4 has the belt 13° off the ground at 10,450 BCE.</td></tr>
             <tr><td class="id">6</td><td><a href="research/ch6.html">ch6</a></td><td class="fit">$2.02</td><td class="fit">12 / 25</td><td class="fit">18</td><td>The numbers are real and the database reproduces them. The seked of 5½ yields π and φ together, and the strongest remaining point is the cluster itself.</td></tr>
             <tr><td class="id">7</td><td><a href="research/ch7.html">ch7</a></td><td class="fit">$1.54</td><td class="fit">13 / 22</td><td class="fit">24</td><td>Göbekli Tepe's age (c. 9500 BCE, built by foragers) is settled. The post-2019 work makes its builders more settled and its burial more like landslip. The impact hypothesis is a minority view under heavy criticism, and nothing material links Göbekli to Giza.</td></tr>
-            <tr><td class="id">8</td><td><a href="research/ch8.html">ch8</a></td><td class="fit">$2.05</td><td class="fit">25 / 21</td><td class="fit">22</td><td>Every physical date taken at Giza has come out in the third millennium BCE. The one untested measurement is a core through the enclosure floor, front and back, and the 2008 boreholes show it can be done.</td></tr>
+            <tr><td class="id">8</td><td><a href="research/ch8.html">ch8</a></td><td class="fit">$2.05</td><td class="fit">25 / 21</td><td class="fit">22</td><td>Every physical date taken at Giza has come out in the third millennium BCE. The one untested measurement is a core through the enclosure floor, front and back, and the 2008 boreholes show it can be done. Now chapter 9's brief.</td></tr>
+            <tr><td class="id">8</td><td><a href="research/khafre-sar.html">khafre-sar</a></td><td class="fit">$3.01</td><td class="fit">51 / 12</td><td class="fit">19</td><td>One unpublished application of a method whose only peer-reviewed paper was retracted on 10 August 2026. The team's own abstract gives the count, the rows, 648 m and the cubes, but no diameter, spacing or scale bar.</td></tr>
+            <tr><td class="id">8</td><td><a href="research/labyrinth.html">labyrinth</a></td><td class="fit">$3.12</td><td class="fit">42 / 14</td><td class="fit">22</td><td>The building is real: Amenemhat III's temple, quarried to a bed of chips. Peer-reviewed geophysics finds shallow anomalies at 5 to 7.5 m. Stewart's "Labyrinth under a pyramid" is the Merlin Burrows scans of 2015, published in 2025 and reviewed by nobody.</td></tr>
           </tbody>
         </table></div>
         <p>Checked by hand so far: Allan 2026 (<em>Journal of Astronomical History and Heritage</em> 29(2), 367–378) exists and is fairly summarised. Chapter 2's "Reeder" was the misspelt header of Lacovara's review, and the book is Colin D. Reader's. The new sources, about 180 across the briefs with overlaps, go into <code>data/sources.json</code> only as the script uses them, each <code>verified: false</code> until it has been read against its page.</p>
+        <p>Two more briefs, on topics beside the chapters, came back the same night for $6.13: the shafts under Khafre's pyramid and the Labyrinth at Hawara. Checked by hand in them: the retraction (Crossref, 10 August 2026), the 2022 paper's CC BY 4.0 licence, the Khafre Project's own abstract (which corrects the data to Capella and Umbra, and gives no diameter, spacing or scale bar), and Petrie's Hawara figures against the scans of 1889 and 1890.</p>
       </section>
     </main>
   </div>
