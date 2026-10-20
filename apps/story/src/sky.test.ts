@@ -2,7 +2,7 @@ import { loadClaims } from '@seked/claims';
 import { loadDatabase, resolve } from '@seked/data';
 import { buildEnvironment } from '@seked/geometry';
 import { describe, expect, it } from 'vitest';
-import { beltAt, lowestTransit, project, yearLabel } from './sky';
+import { beltAt, beltOnLens, lowestTransit, NIGHT_LENS, project, yearLabel } from './sky';
 
 const env = buildEnvironment(resolve(loadDatabase(), 'canonical').values);
 const c4 = loadClaims().find((c) => c.id === 'C4')!;
@@ -45,5 +45,22 @@ describe('the sky slider', () => {
     expect(project(lens, 32, 180)!.y).toBeCloseTo(0, 9); // the top edge, half the vertical field up
     expect(project(lens, 12, 170)!.x).toBeLessThan(0.5); // looking south, east is on the left
     expect(project(lens, 12, 0)).toBeNull(); // due north, behind the camera
+  });
+});
+
+describe('the slider over the night render', () => {
+  it("takes the night render's lens from its queue", () => {
+    expect(NIGHT_LENS).toEqual({ yaw: 180, pitch: 12, fov: 40, aspect: 1 });
+  });
+
+  it("holds the belt in the picture, above the horizon, at C4's epoch, and above the picture today", () => {
+    const then = beltOnLens(beltAt(c4, env, c4.epoch!));
+    for (const s of then.stars) {
+      expect(s.at!.x).toBeGreaterThan(0.3);
+      expect(s.at!.x).toBeLessThan(0.7);
+      expect(s.at!.y).toBeGreaterThan(0);
+      expect(s.at!.y).toBeLessThan(then.horizonY);
+    }
+    for (const s of beltOnLens(beltAt(c4, env, 2026)).stars) expect(s.at?.y ?? -1).toBeLessThan(0);
   });
 });

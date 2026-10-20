@@ -8,6 +8,7 @@
  */
 import { evaluateClaim, type Claim } from '@seked/claims/browser';
 import { altAz, skyEnvironment } from '@seked/sky/browser';
+import storySky from '../../../render/queues/story-sky.json';
 
 export const BELT = ['alnitak', 'alnilam', 'mintaka'] as const;
 
@@ -79,4 +80,21 @@ export function project(lens: Lens, altDeg: number, azDeg: number): { x: number;
   if (depth <= 0) return null;
   const t = Math.tan((lens.fov / 2) * RAD);
   return { x: 0.5 + dot(d, r) / depth / (t * lens.aspect) / 2, y: 0.5 - dot(d, u) / depth / t / 2 };
+}
+
+/**
+ * The lens of the night render behind the slider (`orion-sky.webp`, from render/queues/story-sky.json): the
+ * queue's own patch, read from the queue, so the picture and the stars drawn over it share one camera.
+ */
+export const NIGHT_LENS: Lens = storySky.renders[0]!.patch;
+
+/**
+ * The belt on the night render: each star's place as fractions of the picture (null behind the camera), and
+ * where due south's horizon falls. A star above the top edge has y below 0; the widget points up to it.
+ */
+export function beltOnLens(r: BeltReading, lens: Lens = NIGHT_LENS) {
+  return {
+    stars: r.stars.map((s) => ({ id: s.id, at: project(lens, s.altDeg, s.azDeg) })),
+    horizonY: project(lens, 0, lens.yaw)?.y ?? NaN,
+  };
 }

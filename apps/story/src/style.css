@@ -78,6 +78,13 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
 .sky .epoch { font-size: 1.6rem; }
 .sky input { width: 100%; margin: 0.6rem 0; }
 .sky .small { font-size: 0.75rem; color: rgba(233, 226, 212, 0.6); }
+/* over the night render once it has loaded; the schematic stays the fallback */
+.sky svg.night, .sky .true, .sky.night-on svg:not(.night), .sky.night-on .scale { display: none; }
+.sky.night-on svg.night { display: block; }
+.sky.night-on .true { display: inline; }
+.sky .night .above { display: none; }
+.sky .night.high .above { display: block; }
+.sky .night .above text { text-anchor: middle; }
 @media (max-width: 52rem) {
   .stage.sky-on { height: 60vh; }
   .sky svg { max-height: 55%; }
