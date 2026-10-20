@@ -78,6 +78,8 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
 .sky .epoch { font-size: 1.6rem; }
 .sky input { width: 100%; margin: 0.6rem 0; }
 .sky .small { font-size: 0.75rem; color: rgba(233, 226, 212, 0.6); }
+.sky .receipt { font-size: 0.72rem; line-height: 1.35; color: rgba(233, 226, 212, 0.75); margin-top: 0.4rem; }
+.sky .receipt b { font-weight: 600; color: #f2b544; }
 /* over the night render once it has loaded; the schematic stays the fallback */
 .sky svg.night, .sky .true, .sky.night-on svg:not(.night), .sky.night-on .scale { display: none; }
 .sky.night-on svg.night { display: block; }
@@ -91,6 +93,7 @@ td, th { border-bottom: 1px solid #d8c9ae; padding: 0.2rem 0.6rem; text-align: l
   .sky .readouts { font-size: 0.7rem; line-height: 1.3; padding: 0 0.6rem; }
   .sky .epoch { font-size: 1rem; }
   .sky .small { display: none; }
+  .sky .receipt { font-size: 0.6rem; line-height: 1.25; }
 }
 .strip { position: absolute; inset: 0; z-index: 3; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
   align-content: center; padding: 1rem; background: #14100c; opacity: 0; pointer-events: none; transition: opacity 0.9s; }

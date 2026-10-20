@@ -6,7 +6,7 @@
  * readout is the dossier's; the stars' places are the same Vondrák precession
  * at the latitude the environment carries for the Great Pyramid.
  */
-import { evaluateClaim, type Claim } from '@seked/claims/browser';
+import { evaluateClaim, type Claim, type ComparisonResult } from '@seked/claims/browser';
 import { altAz, skyEnvironment } from '@seked/sky/browser';
 import storySky from '../../../render/queues/story-sky.json';
 
@@ -17,6 +17,8 @@ export interface BeltReading {
   /** C4's first comparison at this epoch: the belt's angle from the meridian, and the G1 to G3 diagonal. */
   angleDeg: number;
   diagonalDeg: number;
+  /** C4's comparisons at this epoch, whole, for the receipt beside the slider. */
+  comparisons: ComparisonResult[];
   /** Alnitak's altitude as it crosses the meridian. */
   transitDeg: number;
   /** Each belt star's altitude and azimuth at the moment Alnitak transits. */
@@ -26,7 +28,8 @@ export interface BeltReading {
 export function beltAt(c4: Claim, env: Record<string, number>, epoch: number): BeltReading {
   const latitudeDeg = env['g1.center.latitude'];
   if (latitudeDeg === undefined) throw new Error('the environment carries no g1.center.latitude');
-  const [angle] = evaluateClaim({ ...c4, epoch }, env).comparisons;
+  const comparisons = evaluateClaim({ ...c4, epoch }, env).comparisons;
+  const [angle] = comparisons;
   const sky = skyEnvironment({ epoch, latitudeDeg, longitudeDeg: env['g1.center.longitude'] ?? 0 });
   const at = (id: string, k: string) => sky[`star.${id}.${k}`] ?? NaN;
   const lstDeg = at('alnitak', 'ra');
@@ -34,6 +37,7 @@ export function beltAt(c4: Claim, env: Record<string, number>, epoch: number): B
     epoch,
     angleDeg: angle?.value ?? NaN,
     diagonalDeg: angle?.targetValue ?? NaN,
+    comparisons,
     transitDeg: at('alnitak', 'transit.altitude'),
     stars: BELT.map((id) => ({ id, ...altAz({ raDeg: at(id, 'ra'), decDeg: at(id, 'dec'), latDeg: latitudeDeg, lstDeg }) })),
   };

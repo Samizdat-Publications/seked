@@ -13,6 +13,10 @@ describe('the sky slider', () => {
     // docs/dossier.md: 50°51′40″ against 37°51′07″
     expect(r.angleDeg).toBeCloseTo(50 + 51 / 60 + 40 / 3600, 3);
     expect(r.diagonalDeg).toBeCloseTo(37 + 51 / 60 + 7 / 3600, 3);
+    // and its receipt reads as the dossier's: neither comparison inside ±5 %
+    expect(r.comparisons.map((c) => c.within)).toEqual([false, false]);
+    expect(r.comparisons[0]!.residualPct).toBeCloseTo(34.368, 2);
+    expect(r.comparisons[1]!.residualPct).toBeCloseTo(24.97, 1);
   });
 
   it('puts Alnitak on the meridian, due south, and the belt beside it', () => {

@@ -5,6 +5,7 @@
  * readouts the script names. Scrolling sets the epoch; the reader can drag it.
  */
 import { formatValue, type Claim } from '@seked/claims/browser';
+import { receiptLine } from './receipts';
 import { beltAt, beltOnLens, lowestTransit, NIGHT_LENS, yearLabel, type BeltReading } from './sky';
 import nightUrl from './orion-sky.webp';
 
@@ -64,6 +65,7 @@ export function skyWidget(c4: Claim, env: Record<string, number>): SkyWidget {
       <div class="epoch"></div>
       <div class="transit"></div>
       <div class="angle"></div>
+      <div class="receipt"></div>
       <input type="range" min="${EARLIEST}" max="${LATEST}" step="1" aria-label="Epoch" />
       <div class="small"><span class="scale">The belt drawn ${BELT_SCALE} times its size about Alnitak, its angle kept.</span>
         <span class="true">The belt at its true size, through the render's own lens; the pyramids are a render of the
@@ -124,6 +126,8 @@ export function skyWidget(c4: Claim, env: Record<string, number>): SkyWidget {
     q('.epoch').textContent = yearLabel(r.epoch);
     q('.transit').textContent = `Alnitak crosses the meridian ${dms(r.transitDeg)} above the horizon`;
     q('.angle').textContent = `The belt leans ${dms(r.angleDeg)} from the meridian; the pyramids' diagonal, ${dms(r.diagonalDeg)}`;
+    // C4's receipt at the slider's epoch, both comparisons whole, in the dossier's words
+    q('.receipt').innerHTML = `<b>${c4.id} at ${yearLabel(r.epoch)}</b>` + r.comparisons.map((c) => `<div>${receiptLine(c)}</div>`).join('');
     input.value = String(Math.round(r.epoch));
   }
 
