@@ -1208,5 +1208,13 @@
     "citation": "Wikipedia contributors. Tell Abu Hureyra. Wikipedia, revision as of 3 October 2026.",
     "url": "https://en.wikipedia.org/wiki/Tell_Abu_Hureyra",
     "note": "The coordinates 35°51′58″N 38°24′00″E, read 2026-10-20 (chunk 6). An encyclopedia, cited only for where a map puts the site: Moore et al. 2020 give no coordinates, only that it lay on the Euphrates' south-west bank, now under Lake Assad. Replace with an excavation report's figure when one is found."
+  },
+  {
+    "id": "haklay-gopher-2020",
+    "kind": "paper",
+    "year": 2020,
+    "citation": "Haklay, G. & Gopher, A. (2020). Geometry and Architectural Planning at Göbekli Tepe, Turkey. Cambridge Archaeological Journal 30(2), 343–357.",
+    "url": "https://doi.org/10.1017/S0959774319000660",
+    "note": "Peer-reviewed. CC BY-NC-ND 4.0 (Crossref's licence record). Read on 2026-10-20 in the publisher's PDF (sha256 4c784437743d4fa8fd6dea20968c0b929fbc2d73db38de30b6084bbea56a78a5): Enclosure D's dimensions on p. 347; Fig. 1 (p. 344), the main excavation area's schematic plan modified from O. Dietrich et al. 2014, with a 5 m scale bar and a north arrow, embedded at 485 by 672 px. Their geometric reading (an equilateral triangle of about 19.25 m through the centres of B, C and D, p. 350) is an interpretation, not a measurement."
   }
 ]

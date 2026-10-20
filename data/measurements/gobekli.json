@@ -1,0 +1,86 @@
+[
+  {
+    "key": "gobekli.enclosure_d.diameter.inner.max",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "length",
+    "value": 14,
+    "unit": "m",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'The maximum inner diameter of this enclosure is about 14 m', p. 347. Rounded by the authors; the enclosure is oval. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  },
+  {
+    "key": "gobekli.enclosure_d.wall.height.preserved.min",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "length",
+    "value": 3,
+    "unit": "m",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'Its peripheral wall, preserved to an elevation of over 3 m', p. 347: a lower bound. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  },
+  {
+    "key": "gobekli.enclosure_d.pillars.peripheral.count",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "count",
+    "value": 11,
+    "unit": "count",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'connects (so far) 11 T-shaped pillars', p. 347: as excavated by 2019, not a count of the original ring. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  },
+  {
+    "key": "gobekli.enclosure_d.pillars.central.count",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "count",
+    "value": 2,
+    "unit": "count",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'Its central pillars ... the twin central pillars', p. 347. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  },
+  {
+    "key": "gobekli.enclosure_d.pillars.central.height",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "length",
+    "value": 5.5,
+    "unit": "m",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'Its central pillars with anthropomorphic depictions, rising to a height of 5.5 m, are the largest megalithic features on the site', p. 347; p. 344 says 'up to 5.5 m high'. One figure for the pair. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  },
+  {
+    "key": "gobekli.enclosure_d.pillars.central.pedestal.height.min",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "length",
+    "value": 0.2,
+    "unit": "m",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'shallow pedestals or platform-like bases (20–30 cm high) carved out of the bedrock forming the enclosure floor', p. 347. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  },
+  {
+    "key": "gobekli.enclosure_d.pillars.central.pedestal.height.max",
+    "structure": "gobekli.enclosure-d",
+    "quantity": "length",
+    "value": 0.3,
+    "unit": "m",
+    "source": "haklay-gopher-2020",
+    "method": "as published",
+    "note": "'shallow pedestals or platform-like bases (20–30 cm high)', p. 347. Checked against the publisher's PDF by the night builder, 20 October 2026.",
+    "verified": true,
+    "site": "gobekli-tepe"
+  }
+]

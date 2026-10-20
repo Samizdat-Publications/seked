@@ -238,5 +238,13 @@
     "evidence": "instrumented",
     "source": "szynkiewicz-2015",
     "note": "From GPR to 20 m and cores: Eocene limestone under Holocene gravel and sand. Not a monument; drawn in the Hawara section."
+  },
+  {
+    "id": "gobekli.enclosure-d",
+    "site": "gobekli-tepe",
+    "name": "Enclosure D, Göbekli Tepe",
+    "evidence": "excavated",
+    "source": "haklay-gopher-2020",
+    "note": "The largest and best preserved of the Layer III enclosures in the main excavation area: a ring of T-shaped pillars set in a stone wall round two larger central pillars, carved with arms, belts and a fox. Dug by the German Archaeological Institute from 1995. Excavated, c. 9500 BCE; its tier says nothing about Giza."
   }
 ]

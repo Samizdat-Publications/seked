@@ -35,8 +35,8 @@ describe('database', () => {
 });
 
 describe('sites and structures', () => {
-  it('registers Giza on Earth, the Cydonia placeholder on Mars, and Hawara on Earth', () => {
-    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars', 'hawara:earth']);
+  it('registers Giza on Earth, the Cydonia placeholder on Mars, Hawara and Göbekli Tepe on Earth', () => {
+    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars', 'hawara:earth', 'gobekli-tepe:earth']);
   });
   it('gives every structure an evidence tier and a known site', () => {
     const tiers = new Set(db.structures.map((s) => s.evidence));
@@ -55,7 +55,7 @@ describe('sites and structures', () => {
       const site = siteOf.get(m.structure) ?? siteOf.get(m.structure.split('.')[0] as string);
       if (site !== undefined) expect(m.site, m.key).toBe(site);
     }
-    expect(new Set(db.measurements.map((m) => m.site))).toEqual(new Set(['giza', 'hawara']));
+    expect(new Set(db.measurements.map((m) => m.site))).toEqual(new Set(['giza', 'hawara', 'gobekli-tepe']));
   });
   it('tiers Hawara by the rule: dug, published, announced, told', () => {
     const tier = (id: string) => db.structures.find((s) => s.id === id)?.evidence;
@@ -65,6 +65,14 @@ describe('sites and structures', () => {
     expect(tier('hawara.merlin-burrows')).toBe('claimed');
     expect(tier('hawara.labyrinth.lower-storey')).toBe('legendary');
     for (const s of db.structures.filter((s) => s.id.startsWith('hawara.'))) expect(s.site, s.id).toBe('hawara');
+  });
+  it('enters Enclosure D as excavated at Göbekli Tepe, its figures as its excavators published them', () => {
+    const d = db.structures.find((s) => s.id === 'gobekli.enclosure-d');
+    expect(d?.evidence).toBe('excavated');
+    expect(d?.site).toBe('gobekli-tepe');
+    const figures = db.measurements.filter((m) => m.structure === 'gobekli.enclosure-d');
+    expect(figures.length).toBeGreaterThan(4);
+    for (const m of figures) expect(m.method, m.key).toBe('as published');
   });
   it('enters every claimed underground figure as claimed, unverified, from where it was said', () => {
     const sar = db.measurements.filter((m) => m.structure === 'g2.sar-shafts');

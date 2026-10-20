@@ -1,15 +1,6 @@
 {
-  "note": "Places the story's maps name that are not sites: no datum, no frame, no measurements, nothing modelled. Context, as the modern city is. Coordinates are entered as their sources print them, degrees, minutes and seconds north and east, and converted by code. Giza is not here: its point is its site's origin in data/sites.json. A place that becomes a site (Göbekli Tepe, when Enclosure D is modelled) moves there. verified stays false until read again on the cited page.",
+  "note": "Places the story's maps name that are not sites: no datum, no frame, no measurements, nothing modelled. Context, as the modern city is. Coordinates are entered as their sources print them, degrees, minutes and seconds north and east, and converted by code. Giza and Göbekli Tepe are not here: their points are their sites' origins in data/sites.json. A place that becomes a site moves there, as Göbekli Tepe did when Enclosure D's records went in. verified stays false until read again on the cited page.",
   "places": [
-    {
-      "id": "gobekli-tepe",
-      "name": "Göbekli Tepe",
-      "latitude": [37, 13, 23.671],
-      "longitude": [38, 55, 20.51],
-      "source": "unesco-whc-1572",
-      "verified": false,
-      "note": "The World Heritage property's point, not Enclosure D's. On a hilltop on the Germuş range, north-east of Şanlıurfa."
-    },
     {
       "id": "abu-hureyra",
       "name": "Abu Hureyra",

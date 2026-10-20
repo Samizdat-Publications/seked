@@ -25,5 +25,14 @@
     "origin": { "latitude": 29.274, "longitude": 30.898, "elevation": 32 },
     "frame": "East-north-up at the base centre of Amenemhat III's pyramid; +Z up. No source checked gives the pyramid's azimuth, so its sides are taken as cardinal.",
     "note": "Placeholder origin: the latitude and longitude are read off Elshazly et al. 2024, Fig. 1 (scaled, unverified), and the elevation is their 'about 32 m' above sea level for the pyramid's base (p. 40). The Labyrinth's remains lie south of the pyramid. Chapter 8 lays them over Giza for scale (night decision 26), and the distance in that label is computed from the two origins, not typed."
+  },
+  {
+    "id": "gobekli-tepe",
+    "name": "Göbekli Tepe",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 37.223242, "longitude": 38.922364, "elevation": 776 },
+    "frame": "East-north-up at the World Heritage property's point; +Z up. Not Enclosure D's centre, which no source checked gives in coordinates; a model of the enclosure places itself by its own plan.",
+    "note": "Placeholder origin. The latitude and longitude are UNESCO's N37 13 23.671 E38 55 20.51 (source unesco-whc-1572), converted. The elevation is GLO-30 sampled at that point (776.3 m on EGM2008, tile Copernicus_DSM_COG_10_N37_00_E038_00_DEM, sha256 5d96ac1876559801667d43560a30c3cf9feac0f43e071b1c967725bbadf1fdef), a surface model on the mound's top: a ring 150 m round runs 735 to 779 m. Chapter 7 only; nothing here bears on Giza."
   }
 ]

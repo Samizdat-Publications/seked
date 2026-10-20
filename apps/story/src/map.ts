@@ -1,8 +1,8 @@
 /**
  * Chapter 7's map inset (docs/script.md, the beat "At Abu Hureyra"): Abu
- * Hureyra, Göbekli Tepe and Giza on today's coast and rivers. Giza is its site's
- * origin (data/sites.json); the other two are context places
- * (data/places/context.json), entered as their sources print them; the coast
+ * Hureyra, Göbekli Tepe and Giza on today's coast and rivers. Giza and Göbekli
+ * Tepe are their sites' origins (data/sites.json); Abu Hureyra is a context
+ * place (data/places/context.json), entered as its source prints it; the coast
  * and rivers are imported from Natural Earth (data/places/basemap.json, written
  * by scripts/basemap.ts). Nothing on it is drawn by hand.
  */
@@ -21,9 +21,13 @@ export interface Place {
 /** Degrees, minutes and seconds, as a page prints them, in degrees. */
 export const dms = ([d, m = 0, s = 0]: number[]) => d! + m / 60 + s / 3600;
 
-const giza = sites.find((s) => s.id === 'giza')!;
+const site = (id: string, name: string): Place => {
+  const s = sites.find((x) => x.id === id)!;
+  return { id, name, latitude: s.origin.latitude, longitude: s.origin.longitude, source: 'data/sites.json' };
+};
 export const PLACES: Place[] = [
-  { id: 'giza', name: 'Giza', latitude: giza.origin.latitude, longitude: giza.origin.longitude, source: 'data/sites.json' },
+  site('giza', 'Giza'),
+  site('gobekli-tepe', 'Göbekli Tepe'),
   ...context.places.map((p) => ({ id: p.id, name: p.name, latitude: dms(p.latitude), longitude: dms(p.longitude), source: p.source })),
 ];
 export const place = (id: string) => {
