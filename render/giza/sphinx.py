@@ -34,8 +34,11 @@ if BLENDER_DIR not in sys.path:
 # and its masonry casing. The stripped state (1800 CE, before the casing) keeps the model made from photographs.
 DERIVED = {"sphinx-master"}      # whose finishes are eras, not surfaces: a missing one is no statue, not the master
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion"),
-             "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-master", "built"),
-             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-master", "today")}
+             "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-built", None),
+             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
+# The real eras keep the Meshy models (sphinx-built, and sphinx-meshy from photographs); the master serves the
+# two claim eras only. Carving and wearing the master into the as-built and today states was dropped on
+# 20 October (docs/laptop-2026-10-20.md, decision 8): the carved chest and the worn body never read.
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
 # taken down to the bedrock's warm limestone (a look choice; traces of red ochre survive on it).

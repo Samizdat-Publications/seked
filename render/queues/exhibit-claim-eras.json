@@ -1,0 +1,69 @@
+{
+ "about": "2026-10-20, the exhibit's claim eras re-rendered on the laptop: the First Time and the long rains with no pyramids (the October rethink) and the master lion with item 36's enlarged head, at every station that has them. The September/October panoramas of these eras carried gold-capped pyramids and the older lions. Sphinx stations first, for the chapter 0 and 1 prototype.",
+ "renders": [
+  {
+   "state": "lion",
+   "station": "sphinx-flank"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx"
+  },
+  {
+   "state": "lion",
+   "station": "east"
+  },
+  {
+   "state": "first-time",
+   "station": "east"
+  },
+  {
+   "state": "lion",
+   "station": "south"
+  },
+  {
+   "state": "first-time",
+   "station": "south"
+  },
+  {
+   "state": "lion",
+   "station": "north"
+  },
+  {
+   "state": "first-time",
+   "station": "north"
+  },
+  {
+   "state": "lion",
+   "station": "panorama"
+  },
+  {
+   "state": "first-time",
+   "station": "panorama"
+  },
+  {
+   "state": "lion",
+   "station": "menkaure"
+  },
+  {
+   "state": "first-time",
+   "station": "menkaure"
+  }
+ ]
+}

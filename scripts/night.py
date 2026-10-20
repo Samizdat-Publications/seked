@@ -38,7 +38,8 @@ ROOT = os.path.dirname(HERE)
 PROMPT = os.path.join(HERE, "night", "prompt.md")
 STOP = os.path.join(ROOT, "build", "night.stop")
 OUT = os.path.join(ROOT, "build", "jobs", "night")
-BRANCH = "claude/funny-ramanujan-bopfxb"
+BRANCH = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, capture_output=True,
+                        text=True).stdout.strip() or "claude/funny-ramanujan-bopfxb"   # the checkout's own branch
 TOOLS = "Bash,Read,Edit,Write,Glob,Grep,WebSearch,WebFetch"
 ENDS = ("error_max_turns", "error_max_budget_usd")   # a chunk that ran out of turns or budget ended normally
 BROKE = ("credit balance", "billing", "insufficient credit", "payment required")
@@ -81,7 +82,7 @@ def parse(out):
 
 
 def chunk(n, budget, effort, spent, args):
-    with open(PROMPT, encoding="utf-8") as f:
+    with open(args.prompt or PROMPT, encoding="utf-8") as f:
         text = f.read()
     for name, value in {"chunk": str(n), "budget": f"{budget:.2f}", "spent": f"{spent:.2f}",
                         "cap": f"{args.cap:.2f}", "list": args.list}.items():
@@ -123,6 +124,7 @@ def ledger(path, n, answer, cost, spent, how):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--list", required=True, help="the running list, e.g. docs/night-2026-10-20.md")
+    parser.add_argument("--prompt", help="the chunk's prompt (default scripts/night/prompt.md)")
     parser.add_argument("--cap", type=float, required=True, help="the most the night's chunks may spend, in USD")
     parser.add_argument("--chunk", type=float, default=15.0, help="the most one chunk may spend, in USD")
     parser.add_argument("--model", default="claude-opus-5-5")
@@ -133,7 +135,9 @@ def main():
     parser.add_argument("--spent", type=float, default=0.0)
     parser.add_argument("--minutes", type=float, default=0.0, help="start no chunk after this long (0: no limit)")
     args = parser.parse_args()
-    base = os.path.basename(args.list).replace("night-", "night-ledger-", 1)
+    base = os.path.basename(args.list)
+    # night-DATE.md keeps its ledger in night-ledger-DATE.md; any other list in LIST-ledger.md
+    base = base.replace("night-", "night-ledger-", 1) if base.startswith("night-") else base[:-3] + "-ledger.md"
     path = os.path.join(ROOT, os.path.dirname(args.list), base)
     spent, failed, idle, n = args.spent, 0, 0, args.start
     began = time.time()
