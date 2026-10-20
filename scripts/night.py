@@ -85,7 +85,7 @@ def chunk(n, budget, effort, spent, args):
     with open(args.prompt or PROMPT, encoding="utf-8") as f:
         text = f.read()
     for name, value in {"chunk": str(n), "budget": f"{budget:.2f}", "spent": f"{spent:.2f}",
-                        "cap": f"{args.cap:.2f}", "list": args.list}.items():
+                        "cap": f"{args.cap:.2f}", "list": args.list, "branch": BRANCH}.items():
         text = text.replace("{{" + name + "}}", value)
     command = [
         sys.executable, os.path.join(HERE, "headless.py"), "-p", text,
