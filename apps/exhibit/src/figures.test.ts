@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, luminescenceData, luminescenceSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -149,5 +149,17 @@ describe("the temples' luminescence dates", () => {
     expect(svg).toContain('3060 BCE &#177; 470');
     expect(svg).not.toContain('4001 BCE');
     expect(shortCite(d.citation)).toBe('Liritzis and Vafiadou (2015)');
+  });
+});
+
+describe("West and Schoch's joint", () => {
+  it("draws the same worn profile on the core and on the granite's back, and is named a figure", () => {
+    const svg = jointClaimSvg();
+    const paths = [...svg.matchAll(/class="wall draw-on[^"]*" d="([^"]+)"/g)].map((m) => m[1]!);
+    expect(paths).toHaveLength(2);
+    const xs = (d: string) => [...d.matchAll(/[ML] ([\d.]+)/g)].map((m) => Number(m[1]));
+    const gaps = xs(paths[0]!).map((x, i) => x - xs(paths[1]!)[i]!);
+    expect(Math.max(...gaps) - Math.min(...gaps)).toBeLessThan(0.11);   // one profile, shifted: they fit
+    expect(isFigure('joint-claim')).toBe(true);
   });
 });

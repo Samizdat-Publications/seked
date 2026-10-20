@@ -950,7 +950,9 @@
    },
    "arrive": "cut",
    "say": "Schoch and the writer John Anthony West went further. On camera in 1993, they said the limestone behind the granite is rounded and fissured like the ditch walls, and that the backs of the granite blocks were cut to fit that worn surface.",
-   "draw": [],
+   "draw": [
+    "joint-claim@camera"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],

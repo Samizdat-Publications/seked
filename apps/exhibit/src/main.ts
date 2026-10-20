@@ -14,7 +14,7 @@ import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, luminescenceSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -235,6 +235,8 @@ async function start(): Promise<void> {
     if (id === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (id === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (id === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
+    if (id === 'joint-claim') figure.innerHTML = `${jointClaimSvg()}<figcaption>The claim as West and Schoch describe it, not a survey:
+      no measured section through an original joint has been published, by either side.</figcaption>`;
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);

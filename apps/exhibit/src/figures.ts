@@ -25,12 +25,14 @@
  * `luminescence`: the temples' surface luminescence dates (data/measurements/luminescence.json), each a bar of its
  * date and sigma on one line of years, named by its temple, its stone and its sample.
  *
+ * `joint-claim`: the joint West and Schoch describe, drawn as they describe it (no survey of one exists).
+ *
  * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
  * first, and the share that beat the pyramids' triangle marked at its end. The rank and the count are records
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -346,4 +348,32 @@ export function shortCite(citation: string): string {
   const names = [...citation.split('(')[0]!.matchAll(/([A-Z][\p{L}'-]+), (?:[A-Z]\.\s?)+/gu)].map((m) => m[1]!);
   const year = /\((\d{4})\)/.exec(citation)?.[1];
   return `${names.length > 2 ? `${names[0]} and others` : names.join(' and ')}${year ? ` (${year})` : ''}`;
+}
+
+/**
+ * The joint West and Schoch describe, in section, schematic: the granite casing pulled forward from a limestone core
+ * whose face is rounded and fissured, the granite's back cut to the same profile. It draws a claim, not a survey, and
+ * holds no measurement; the shape is a look choice, the same wave for both faces so they visibly fit.
+ */
+export function jointClaimSvg(width = 300): string {
+  const h = 180, top = 16, bottom = h - 34, coreX = 170, gap = 46, n = 24;
+  // one profile for the worn face: rounded swells, and two fissures opening toward the top of their course
+  const face = Array.from({ length: n + 1 }, (_, i) => {
+    const t = i / n, y = top + t * (bottom - top);
+    const fissure = [0.3, 0.7].reduce((a, f) => a + Math.max(0, 1 - Math.abs(t - f) / 0.05) * 9, 0);
+    return [coreX - 7 * Math.sin(t * Math.PI * 3) ** 2 + fissure, y] as const;
+  });
+  const path = (dx: number) => face.map(([x, y], i) => `${i ? 'L' : 'M'} ${(x + dx).toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const core = `${path(0)} L ${width - 8} ${bottom} L ${width - 8} ${top} Z`;
+  const granite = `${path(-gap)} L 30 ${bottom} L 30 ${top} Z`;
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="The claim in section: granite casing pulled away from a rounded, fissured limestone core, its back cut to fit">
+  <path class="granite" d="${granite}"/>
+  <path class="statue" d="${core}"/>
+  <path class="wall draw-on" d="${path(0)}" fill="none" pathLength="1"/>
+  <path class="wall draw-on late" d="${path(-gap)}" fill="none" pathLength="1"/>
+  <text class="here-lab" x="30" y="${top - 4}">granite, pulled forward</text>
+  <text class="here-lab" x="${width - 10}" y="${top - 4}" text-anchor="end">limestone core</text>
+  <text class="lab" x="${coreX + 6}" y="${(top + bottom) / 2 + 4}">rounded, fissured</text>
+  <text class="lab" x="30" y="${bottom + 20}">its back cut to fit the worn face</text>
+</svg>`;
 }
