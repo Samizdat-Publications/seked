@@ -61,3 +61,5 @@ apps/walk/pano/
 apps/walk/img/
 apps/walk/films/
 apps/films/films/
+# Downloaded by hand for `pnpm run icecore`; see data/sources.json, source gicc05-ngrip-20yr
+data/icecore/gicc05-20yr.txt

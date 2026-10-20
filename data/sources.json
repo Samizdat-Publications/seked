@@ -1064,7 +1064,7 @@
     "year": 2009,
     "citation": "Walker, M. et al. (2009). Formal definition and dating of the GSSP for the base of the Holocene using the Greenland NGRIP ice core. Journal of Quaternary Science 24(1).",
     "url": "https://doi.org/10.1002/jqs.1227",
-    "note": "Peer-reviewed; the 11,700 b2k end of the Younger Dryas. Unchecked: from memory, including the DOI; verify before use. From docs/research/ch7.md, by its research job; not yet checked here."
+    "note": "Peer-reviewed; the 11,700 b2k end of the Younger Dryas. The DOI, authors, title and volume were checked on 2026-10-20 against IntChron's page for it (https://intchron.org/doi/10.1002/jqs.1227), whose event table also gives GICC05's start of GS-1 and of the Holocene (data/icecore/events.json); the paper's own page was not read (Wiley refuses this container). From docs/research/ch7.md, by its research job."
   },
   {
     "id": "west-1993-film",
@@ -1080,5 +1080,14 @@
     "citation": "YSI Inc. (2009). YSI Level Scouts Monitor Groundwater Levels to Help Protect the Great Sphinx. Application Note A579.",
     "url": "https://www.xylem.com/siteassets/brand/ysi/resources/case-study/a579-ysi-level-scouts-monitor-groundwater-beneath-the-sphinx.pdf",
     "note": "Vendor note, not peer reviewed. Checked pp. 1–2: early 2008, SCA with Cairo University's Engineering Center for Archaeology and Environment drilled four 4-inch boreholes 20 m into the bedrock around the Sphinx, with cameras; plan of PZ/S1–S4 with printed elevations 20.492, 20.480, 20.505, 20.193; water table 4.6 m below the surface; eight pump stations from June 2008. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "gicc05-ngrip-20yr",
+    "kind": "reference",
+    "year": 2006,
+    "citation": "NGRIP dating group (2006). Greenland Ice Core Chronology 2005 (GICC05): NGRIP and GRIP oxygen isotope ratios in 20-year means on the GICC05 time scale, 0 to 41.76 ka b2k. IGBP PAGES/World Data Center for Paleoclimatology Data Contribution Series 2006-118, NOAA/NCDC Paleoclimatology Program. Dating: Vinther et al. (2006), JGR 111, D13102; Rasmussen et al. (2006), JGR 111, D06102; Andersen et al. and Svensson et al. (2006), QSR 25.",
+    "url": "https://www.ncei.noaa.gov/pub/data/paleo/icecore/greenland/summit/ngrip/gicc05-20yr.txt",
+    "license": "Distributed free by NOAA's World Data Service for Paleoclimatology; the file asks users to cite the contributors, which this record and data/icecore/ngrip-d18o.json do. The same series is on PANGAEA under CC BY 3.0 (doi:10.1594/PANGAEA.586838).",
+    "note": "A data file, imported by scripts/icecore.ts into data/icecore/ngrip-d18o.json (NGRIP d18O and the maximum counting error by age; GRIP and the depths left out). Fetched 2026-10-20 to data/icecore/gicc05-20yr.txt (gitignored), 117058 bytes, sha256 0b1b042590b621da176d64f8b981cf5afedb0dabba0c12da3d19d1a1cd235be6. Ages are years b2k at the bottom of each 20-year interval; the file says its maximum counting error is to be read as 2 sigma."
   }
 ]

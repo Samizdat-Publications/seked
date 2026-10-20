@@ -1,0 +1,21 @@
+{
+  "note": "Boundaries on the GICC05 time scale, entered by hand from a cited table; ages in years b2k (before 2000 CE). verified stays false until read on the paper's own page. scripts/icecore.ts does not write this file.",
+  "events": [
+    {
+      "key": "gs1.start",
+      "name": "Start of GS-1, the Younger Dryas",
+      "age_b2k": 12896,
+      "source": "walker-2009",
+      "verified": false,
+      "note": "IntChron's event table for Walker et al. 2009 gives t = -10896 (calendar year, so 12,896 b2k), t_sigma 2, source GICC05. The data file's maximum counting error there is about 138 years (2 sigma)."
+    },
+    {
+      "key": "holocene.start",
+      "name": "Start of the Holocene, the end of the Younger Dryas",
+      "age_b2k": 11703,
+      "source": "walker-2009",
+      "verified": false,
+      "note": "IntChron's event table for Walker et al. 2009 gives t = -9703 (calendar year, so 11,703 b2k), t_sigma 2, source GICC05: the GSSP for the base of the Holocene. The data file's maximum counting error there is about 99 years (2 sigma)."
+    }
+  ]
+}
