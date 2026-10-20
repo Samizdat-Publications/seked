@@ -108,5 +108,16 @@
     "method": "as claimed",
     "note": "'About 33 to 39 feet in diameter': 39 ft. The press is the only source; the abstract gives no diameter.",
     "verified": false
+  },
+  {
+    "key": "g2.sar.radar.penetration.max",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": 10.0,
+    "unit": "m",
+    "source": "amza-trt-2025",
+    "method": "as claimed",
+    "note": "Biondi's own figure for how far the radar itself reaches into the ground: 'absolutely less than 10 meters', as TRT World quotes him; ESA's statement in the same article, 'up to 10 meters', is the same number. The method claims to read surface vibrations instead, so the claim's 648 m is not a radar penetration depth; the reply draws the two depths together.",
+    "verified": false
   }
 ]

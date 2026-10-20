@@ -5,6 +5,7 @@ tier's look, and Khafre's height laid end to end down the depth for scale.
 
     blender -b --factory-startup -P render/underground.py -- --shot depth --size 1600x900 --samples 32
     blender -b --factory-startup -P render/underground.py -- --shot base
+    blender -b --factory-startup -P render/underground.py -- --shot depth --reply 1     # the reply's three lines
 
 The west half is cut away and the camera looks east at the section, so the burial chamber (east of the
 axis) shows through the cut face. The rock and the cut faces are drawn half transparent, as an x-ray:
@@ -163,7 +164,7 @@ def cylinder(name, x, y, r, z0, z1, mat, coll, n=32):
     return mesh(name, v, f, mat, coll)
 
 
-def build(coll, cut_only=False):
+def build(coll, cut_only=False, reply=False):
     k, c = U.khafre(), U.claim()
     cx, cy, b, h, H = k["cx"], k["cy"], k["base"], k["side"] / 2, k["H"]
     M = dict(
@@ -177,6 +178,10 @@ def build(coll, cut_only=False):
         path=material("claimed spiral", (1.0, 0.45, 0.08), emit=1.3),
         edge=material("claimed edges", (1.0, 0.52, 0.12), emit=1.8, dashes=8.0, alpha=1.0),
         scale=material("scale", (0.92, 0.95, 1.0), emit=2.5),
+        outline=material("excavated outline", (0.95, 0.90, 0.78), emit=1.2),
+        radar=material("reply: radar's reach", (0.80, 0.92, 1.0), emit=2.5),
+        water=material("reply: water table", (0.20, 0.50, 1.0), emit=2.5),
+        claim=material("reply: the claim's depth", (1.0, 0.45, 0.08), emit=2.5),
     )
     # The rock east of the cut, from Khafre's base down: its top is ground, its west face the section.
     x0, x1, y0, y1, z0, z1 = cx, cx + EAST, cy - HALF_SPAN, cy + HALF_SPAN, b - DEPTH_BELOW, b
@@ -189,13 +194,20 @@ def build(coll, cut_only=False):
     mesh("Khafre, cut", v, f, M["stone"], coll, face_mats=[0, 0, 0, 1, 0], mats=(M["pcut"],))
     # The known rooms, solid and dark: a hairline at this scale.
     rooms = U.known_rooms(k)
-    box("burial chamber", *rooms["chamber"], M["known"], coll)
-    box("horizontal passage", *rooms["horizontal"], M["known"], coll)
+    known = [box("burial chamber", *rooms["chamber"], M["known"], coll),
+             box("horizontal passage", *rooms["horizontal"], M["known"], coll)]
     d = rooms["descending"]
     s, e, w2, hh = Vector(d["start"]), Vector(d["end"]), d["width"] / 2, d["height"]
     v = [(s.x - w2, s.y, s.z), (s.x + w2, s.y, s.z), (e.x + w2, e.y, e.z), (e.x - w2, e.y, e.z)]
     v += [(p[0], p[1], p[2] + hh) for p in v]
-    mesh("descending passage", v, [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)], M["known"], coll)
+    known.append(mesh("descending passage", v, [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)], M["known"], coll))
+    for ob in known:
+        # a light edge round each excavated room, so the dark stone reads through the x-ray
+        wire = ob.modifiers.new("outline", "WIREFRAME")
+        wire.thickness = 0.15
+        wire.use_replace = False
+        ob.data.materials.append(M["outline"])
+        wire.material_offset = 1
     # The claim, in the claimed tier's look: dashed shells, bright spirals, dashed edges.
     for i, w in enumerate(U.wells(c, k)):
         if cut_only and w["x"] < cx:
@@ -228,6 +240,10 @@ def build(coll, cut_only=False):
             hw = h * t
             pts = [(cx - 0.6, (ya + yb) / 2 - hw, zc), (cx - 0.6, (ya + yb) / 2 + hw, zc), (cx - 0.6, (ya + yb) / 2, apex)]
         polyline("Khafre height %d" % (i + 1), pts, 0.9, M["scale"], coll, closed=True)
+    if reply:
+        # The reply's three lines across the cut: radar's reach by the claimant's own figure, the water table, the claim.
+        for name, z in U.reply_levels(c, k).items():
+            polyline("reply " + name, [(cx - 1.0, cy - HALF_SPAN, z), (cx - 1.0, cy + HALF_SPAN, z)], 1.6, M[name], coll)
     return k, c
 
 
@@ -278,13 +294,13 @@ def main():
     w, hgt = (int(x) for x in o.get("size", "1600x900").split("x"))
     samples = int(o.get("samples", 32))
     shot = o.get("shot", "depth")
-    out = o.get("out", os.path.join(REPO, "build", "preview", "underground-khafre-%s.png" % shot))
+    out = o.get("out", os.path.join(REPO, "build", "preview", "underground-khafre-%s%s.png" % (shot, "-reply" if "reply" in o else "")))
     clear()
     scene = bpy.context.scene
     scene.unit_settings.system = "METRIC"
     coll = bpy.data.collections.new("underground")
     scene.collection.children.link(coll)
-    k, c = build(coll, cut_only=SHOTS[shot].get("cut_only", False))
+    k, c = build(coll, cut_only=SHOTS[shot].get("cut_only", False), reply="reply" in o)
     cam = camera_and_light(k, (w, hgt), shot)
     renderer.gpu(scene)
     renderer.configure(scene, exposure=0.0)
@@ -299,7 +315,7 @@ def main():
         render=os.path.relpath(out, REPO), shot=shot, size=[w, hgt], samples=samples,
         camera=dict(location=list(cam.location), rotation_euler=list(cam.rotation_euler), lens=cam.data.lens,
                     sensor_width=cam.data.sensor_width),
-        receipts=U.receipts(c, k), look_choices=U.LOOK,
+        receipts=U.receipts(c, k), reply_levels=U.reply_levels(c, k) if "reply" in o else None, look_choices=U.LOOK,
         note="Claimed geometry from data/measurements/g2-sar.json; spacing, offset, pitch and the Zeds' size are look choices.",
     )
     with open(os.path.splitext(out)[0] + ".json", "w", encoding="utf-8") as f:

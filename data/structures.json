@@ -214,5 +214,13 @@
     "evidence": "legendary",
     "source": "herodotus-2-148",
     "note": "Herodotus's 1,500 underground rooms, the tombs of the builders and of sacred crocodiles, which he was not shown and reports from hearsay. Nobody since has seen them."
+  },
+  {
+    "id": "giza.groundwater",
+    "site": "giza",
+    "name": "The plateau's water table",
+    "evidence": "instrumented",
+    "source": "sharafeldin-2019",
+    "note": "Mapped by ERT, seismic refraction, GPR and boreholes, peer reviewed. Not a monument: it is here because chapter 8's reply draws it in the section, where any shaft hundreds of metres deep would stand far below it."
   }
 ]

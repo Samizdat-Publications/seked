@@ -101,5 +101,22 @@ class KnownRoomTests(unittest.TestCase):
         self.assertAlmostEqual(np.degrees(np.arctan(slope)), 26.633333, places=4)
 
 
+class ReplyTests(unittest.TestCase):
+    def test_the_three_lines_fall_in_order_radar_water_claim(self):
+        lv = U.reply_levels()
+        self.assertAlmostEqual(lv["radar"], K["base"] - 10.0)
+        self.assertGreater(lv["radar"], lv["water"])
+        self.assertGreater(lv["water"], lv["claim"])
+
+    def test_the_water_table_lies_some_fifty_to_sixty_metres_under_khafre(self):
+        # +15 m above sea level (sharafeldin-2019) under a base about 72 m up (GLO-30 round Khufu, plus 10 m)
+        r = U.receipts()
+        self.assertTrue(50.0 < r["water_below_base"] < 65.0, r["water_below_base"])
+        self.assertTrue(580.0 < r["below_water"] < 600.0, r["below_water"])
+
+    def test_the_claim_goes_65_times_deeper_than_the_claimant_says_radar_reaches(self):
+        self.assertAlmostEqual(U.receipts()["times_radar"], 64.8)
+
+
 if __name__ == "__main__":
     unittest.main()

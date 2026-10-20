@@ -52,6 +52,7 @@ def claim():
         bottom=v("g2.sar.wells.bottom.up"), cubes=int(v("g2.sar.cubes.count")), cube=v("g2.sar.cube.side"),
         zeds=int(v("g2.sar.zeds.count")), zed_levels=int(v("g2.sar.zed.levels")), deep=v("g2.sar.deep.up"),
         diameter=(v("g2.sar.well.diameter.min"), v("g2.sar.well.diameter.max")),
+        radar=v("g2.sar.radar.penetration.max"),
     )
 
 
@@ -146,10 +147,26 @@ def known_rooms(k=None):
     return dict(chamber=chamber, descending=descending, horizontal=horizontal)
 
 
+def khufu_base_msl():
+    """Khufu's base above sea level: GLO-30's ground round it (EGM2008), as the scene itself sets it, not typed.
+
+    The plateau slopes and GLO-30 is a surface model, so this is good to a metre or two."""
+    return data.ORIGIN_ELEVATION + data.ring_median(0.0, 0.0, 150.0)
+
+
+def reply_levels(c=None, k=None):
+    """The reply's three lines, as z in the frame: radar's reach by the claimant's own figure, the water table, the claim."""
+    c, k = c or claim(), k or khafre()
+    water = _value(data.records("groundwater.json"), "giza.watertable.elevation")
+    return dict(radar=k["base"] - c["radar"], water=water - khufu_base_msl(), claim=k["base"] + c["bottom"])
+
+
 def receipts(c=None, k=None):
     """The chapter's computed labels: the depth in Khafre's heights, and against the deepest known room."""
     c, k = c or claim(), k or khafre()
     rooms = known_rooms(k)
     deepest = min(rooms["chamber"][4], rooms["horizontal"][4]) - k["base"]
+    lv = reply_levels(c, k)
     return dict(heights=-c["bottom"] / k["H"], times_deepest_room=c["bottom"] / deepest,
-                deep_heights=-c["deep"] / k["H"])
+                deep_heights=-c["deep"] / k["H"], water_below_base=k["base"] - lv["water"],
+                below_water=lv["water"] - lv["claim"], times_radar=-c["bottom"] / c["radar"])
