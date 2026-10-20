@@ -60,3 +60,30 @@ def chin_to_crown(fwd, across, z, bins=BINS):
             chin = (zc[i] + zc[i - 1]) / 2
             break
     return float(chin), float(hi)
+
+
+def smooth(x):
+    """0 below 0, 1 above 1, and a smoothstep between."""
+    s = np.clip(x, 0.0, 1.0)
+    return s * s * (3.0 - 2.0 * s)
+
+
+def enlarge_head(co, frame, f, low, high, behind):
+    """The points `co` with the lion's head scaled by `f` about its foot: the pivot is the middle of the upper head
+    (above 0.72 of the frame's height) at `high` of the height. The scale fades in from `low` to `high` of the height,
+    and along the body from `behind` (a share of its length) behind the head's back, where the head is what stands
+    above `high`, so the head joins the neck and the back with no seam. `frame` is sphinx_eras.derive's: the axis
+    and its sign, z0, zspan and aspan. Returns (the moved points, the pivot)."""
+    axis, sign = frame["axis"], frame["sign"]
+    h = (co[:, 2] - frame["z0"]) / frame["zspan"]
+    along = co[:, axis] * sign
+    upper = h > 0.72
+    fore = (along[upper].min() + along[upper].max()) / 2
+    back = along[h > high].min()
+    pivot = np.zeros(3)
+    pivot[axis] = fore * sign
+    pivot[1 - axis] = np.median(co[upper, 1 - axis])
+    pivot[2] = frame["z0"] + high * frame["zspan"]
+    reach = behind * frame["aspan"]
+    k = 1.0 + (f - 1.0) * smooth((h - low) / (high - low)) * smooth((along - (back - reach)) / reach)
+    return pivot + (co - pivot) * k[:, None], pivot

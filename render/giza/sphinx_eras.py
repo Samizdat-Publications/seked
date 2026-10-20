@@ -62,6 +62,15 @@ ERAS = ("first-time", "lion", "built", "today")
 ROUNDING = {"first-time": 0, "lion": 3, "built": 4, "today": 6}
 # How the length the master lacks is shared between the flank and the forelegs (look choices).
 STRETCH_SHARE = {"flank": 0.8, "forelegs": 0.2}     # about 2.7 and 1.4 times, near the old lion's 2D stretch
+# The lion's head enlarged (night item 36, Stewart's answer 6 of 20 October). On the master as drawn, the largest king's
+# head its worn lion head holds is short of the monument's own (sphinx.head.height, chin to crown). So the king's head is
+# carved at the monument's size, its crown at the monument's top (sphinx.height) and set fore or aft as the searched fit
+# is, and the lion's head and mane are scaled about the
+# head's foot (profile.enlarge_head) by the least factor that holds it wholly inside: `--solve-head` finds it on the worn
+# built lion and writes the search to build/models/<master>-headscale.json. A look choice, and H1's receipt. The scale
+# fades in up the neck from CARVE_FROM to CARVE_FULL and along HEAD_BEHIND of the body behind the head (look choices).
+HEAD_SCALE = 1.17           # --solve-head: least 1.162, the head 1.71 m aft; a little over it, as the build wears after enlarging
+HEAD_BEHIND = 0.08
 
 
 def zones(u, h):
@@ -114,8 +123,15 @@ def welded(path, name):
     return mesh, bm
 
 
-def derive(bm, era, front="-y"):
-    """Lengthen the welded master `bm` to the ARCE proportions and wear it to `era`, in place."""
+def head_target():
+    """The monument's head, chin to crown, in metres (sphinx.head.height, scaled off ARCE's south elevation)."""
+    return {r["key"]: r["value"] for r in data.records("g2-g3-sphinx.json")}["sphinx.head.height"]
+
+
+def derive(bm, era, front="-y", head_scale=None):
+    """Lengthen the welded master `bm` to the ARCE proportions, enlarge its head by `head_scale` (HEAD_SCALE if None)
+    and wear it to `era`, in place. The frame, and so the metres, are the master's as drawn: the lion's top as drawn
+    is the monument's height, and an enlarged head stands above it."""
     height, length_arce = ground_truth()
     axis = {"x": 0, "y": 1}[front[-1]]
     sign = -1.0 if front.startswith("-") else 1.0
@@ -127,15 +143,24 @@ def derive(bm, era, front="-y"):
     bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=1, use_grid_fill=True)
     bm.normal_update()
     co = np.array([v.co[:] for v in bm.verts])
-    nor = np.array([v.normal[:] for v in bm.verts])
     along = co[:, axis] * sign                       # grows towards the face
-    u = (along - along.min()) / np.ptp(along)        # rump 0, forepaws 1
-    h = (co[:, 2] - co[:, 2].min()) / np.ptp(co[:, 2])
     scale = height / np.ptp(co[:, 2])                # metres per model unit
     length = np.ptp(along) * scale
     # the frame later wear is measured in, fixed before any wear moves the statue's extremes
     frame = {"axis": axis, "sign": sign, "a0": along.min(), "aspan": np.ptp(along), "z0": co[:, 2].min(),
              "zspan": np.ptp(co[:, 2]), "scale": scale, "height": height, "length": length}
+    f = HEAD_SCALE if head_scale is None else head_scale
+    frame["head_scale"] = f
+    if f != 1.0:
+        co, pivot = profile.enlarge_head(co, frame, f, CARVE_FROM, CARVE_FULL, HEAD_BEHIND)
+        for v, c in zip(bm.verts, co):
+            v.co = c
+        bm.normal_update()
+        print(f"head enlarged {f:.3f} times about {pivot.round(4).tolist()}")
+    nor = np.array([v.normal[:] for v in bm.verts])
+    along = co[:, axis] * sign
+    u = (along - frame["a0"]) / frame["aspan"]       # rump 0, forepaws 1
+    h = (co[:, 2] - frame["z0"]) / frame["zspan"]    # above 1 in an enlarged head
     d = weathering.recession(u, h, nor[:, 2], era, height, length) / scale
     if d.any():
         d, nor = held(bm, co, nor, d)
@@ -256,7 +281,7 @@ RAMP = 0.35                # of the stretch from CARVE_FROM up to the king head'
 # The fit is searched fore and aft as well as up and down: the king's head may stand this far, as a share of the
 # lion's upper head's length, towards the face or the back of it (a look choice: the search's reach and its steps).
 ALONG = np.linspace(-0.25, 0.25, 11)
-CARVE_WITH = "centred"     # or "searched": which fit the carving uses (both are in era.json); see decision 54
+CARVE_WITH = "monument"    # or "searched" or "centred": which head the carving uses (all three are in era.json); decisions 54 and 83
 # The plain chest: under the king's bust the front is laid to a straight slope from the bust's foot down to the
 # chest where the carving starts, in bins across the chest; a front point up to CHEST_FILL in metres behind that
 # slope is brought onto it (the hollows), and one in front of it is cut back (the collar the ramp leaves at the
@@ -339,15 +364,56 @@ def king_head(path, front):
     return mesh, bm
 
 
-def carve(bm, king_path, front, scale_m):
+def at_monument(co, frame, kco0, drop=0.0, fore=0.0):
+    """The king's head points `kco0` at the monument's size, chin to crown sphinx.head.height, its crown `drop` under
+    the lion's crown less KING_MARGIN, centred in the lion's upper head in `co` side to side and fore and aft but for
+    `fore` (towards the face), as `carve`'s `placed` sets a head."""
+    axis, sign = frame["axis"], frame["sign"]
+    h = (co[:, 2] - frame["z0"]) / frame["zspan"]
+    along = co[:, axis] * sign
+    upper = h > 0.72
+    chin, crown = profile.chin_to_crown(kco0[:, axis] * sign, kco0[:, 1 - axis], kco0[:, 2])
+    k = kco0 * (head_target() / frame["scale"] / (crown - chin))
+    ka = k[:, axis] * sign
+    kz = (kco0[:, 2] - kco0[:, 2].min()) / np.ptp(kco0[:, 2])
+    face_part = (kz >= KING_TEST_FROM) & (kz > 0.6)
+    shift = np.zeros(3)
+    shift[axis] = sign * ((along[upper].min() + along[upper].max()) / 2 + fore - (ka[face_part].min() + ka[face_part].max()) / 2)
+    shift[2] = (co[h > CARVE_FULL, 2].max() - KING_MARGIN / frame["scale"] - drop) - k[:, 2].max()
+    shift[1 - axis] = np.median(co[upper, 1 - axis]) - np.median(k[kz >= KING_TEST_FROM, 1 - axis])
+    return k + shift
+
+
+def monument_fit(co, frame, kco0, test, tree):
+    """Where the king's head at the monument's size lies inside the lion's head in `co` (its BVH `tree`) with its
+    crown at the monument's top (sphinx.height, the frame's), searched fore and aft over ALONG as `carve`'s `fits`
+    searches: (drop under the lion's crown less the margin, fore, share inside) or None. The shift nearest the
+    centre wins."""
+    axis, sign = frame["axis"], frame["sign"]
+    h = (co[:, 2] - frame["z0"]) / frame["zspan"]
+    along = co[:, axis] * sign
+    upper = h > 0.72
+    drop = co[h > CARVE_FULL, 2].max() - KING_MARGIN / frame["scale"] - (frame["z0"] + frame["zspan"])
+    if drop < 0.0:
+        return None                          # the lion's crown, less the margin, is under the monument's
+    for fore in sorted(ALONG * np.ptp(along[upper]), key=abs):
+        pts = at_monument(co, frame, kco0, drop, fore)[test]
+        got = float(inside(tree, pts[:: max(1, len(pts) // 3000)]).mean())
+        if got > 0.995:
+            return (drop, fore, got)
+    return None
+
+
+def carve(bm, king_path, front, frame):
     """Fit the king's head inside the worn lion head in `bm` and carve the lion's head down to it. Returns
     the head-fit record and the placed king's head (mesh, bmesh) to join."""
     from mathutils import Matrix, Vector
     from mathutils.bvhtree import BVHTree
     axis = {"x": 0, "y": 1}[front[-1]]
     sign = -1.0 if front.startswith("-") else 1.0
+    scale_m = frame["scale"]
     co = np.array([v.co[:] for v in bm.verts])
-    z0, zspan = co[:, 2].min(), np.ptp(co[:, 2])
+    z0, zspan = frame["z0"], frame["zspan"]
     h = (co[:, 2] - z0) / zspan
     along = co[:, axis] * sign
     head = h > CARVE_FULL
@@ -425,13 +491,25 @@ def carve(bm, king_path, front, scale_m):
     # The search fore and aft, and the centred fit beside it, so the gain from searching is on the record.
     s, best = largest(ALONG * upper_len, "searched")
     s0, best0 = largest([0.0], "centred")
-    kco = placed(s, *best) if CARVE_WITH == "searched" else placed(s0, *best0)
+    mfit = monument_fit(co, frame, kco0, test, tree)
+    if mfit is None and CARVE_WITH == "monument":
+        raise SystemExit(f"the monument's head fits nowhere in a lion head enlarged {frame.get('head_scale', 1.0)} times: solve again (--solve-head)")
+    mon = at_monument(co, frame, kco0, *(mfit[:2] if mfit else (0.0, 0.0)))
+    kco = {"searched": lambda: placed(s, *best), "centred": lambda: placed(s0, *best0), "monument": lambda: mon}[CARVE_WITH]()
     for v, c in zip(kbm.verts, kco):
         v.co = c
     fit = record(s, best)
     fit["carved_with"] = CARVE_WITH
     fit["searched_fore_m"] = [round(float(ALONG[0] * upper_len * scale_m), 2), round(float(ALONG[-1] * upper_len * scale_m), 2)]
     fit["centred"] = record(s0, best0)
+    m_chin, m_crown = profile.chin_to_crown(mon[:, axis] * sign, mon[:, 1 - axis], mon[:, 2])
+    fit["monument"] = {"chin_to_crown_m": round(float((m_crown - m_chin) * scale_m), 2), "target_m": head_target(),
+                       "crown_m": round(float((mon[:, 2].max() - z0) * scale_m), 2),
+                       "crown_drop_m": round(float(mfit[0] * scale_m), 2) if mfit else None,
+                       "fore_m": round(float(mfit[1] * scale_m), 2) if mfit else None,
+                       "inside_share": round(mfit[2], 4) if mfit else None,
+                       "head_scale": frame.get("head_scale", 1.0), "head_behind": HEAD_BEHIND,
+                       "head_scale_from_to": [CARVE_FROM, CARVE_FULL]}
 
     # Carve. Above the king head's foot, the lion's head is drawn onto the king's: each point moves to the king
     # head's nearest surface. Below the foot the lion's mane is carved off into a plain broad chest: its points
@@ -533,9 +611,48 @@ def write(mesh, bm, path):
     bpy.data.objects.remove(obj, do_unlink=True)
 
 
+def solve_head(source, master, front, lo=1.0, hi=1.5, steps=9):
+    """The least head scale at which the king's head at the monument (at_monument) lies wholly inside the worn
+    built lion's head: bisection on profile.enlarge_head over the worn mesh, written beside the eras."""
+    from mathutils.bvhtree import BVHTree
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    mesh, bm = welded(source, f"{master} solve")
+    _, _, frame = derive(bm, "built", front, head_scale=1.0)
+    co = np.array([v.co[:] for v in bm.verts])
+    polys = [[v.index for v in f.verts] for f in bm.faces]
+    _, kbm = king_head(os.path.join(MODELS, "sphinx-king-head", "model.glb"), front)
+    kco0 = np.array([v.co[:] for v in kbm.verts])
+    kz = (kco0[:, 2] - kco0[:, 2].min()) / np.ptp(kco0[:, 2])
+    test = kz >= KING_TEST_FROM
+
+    def placed_at(f):
+        cf, _ = profile.enlarge_head(co, frame, f, CARVE_FROM, CARVE_FULL, HEAD_BEHIND)
+        return monument_fit(cf, frame, kco0, test, BVHTree.FromPolygons(cf.tolist(), polys))
+    trace = []
+    for _ in range(steps):
+        f = (lo + hi) / 2
+        got = placed_at(f)
+        trace.append([round(f, 4)] + ([round(float(got[0] * frame["scale"]), 2), round(float(got[1] * frame["scale"]), 2)] if got else [None, None]))
+        print(f"head scale {f:.3f}: " + (f"fits, crown {trace[-1][1]} m down, {trace[-1][2]:+} m fore" if got else "does not fit"))
+        if got:
+            hi = f
+        else:
+            lo = f
+    out = {"master": master, "least_head_scale": round(hi, 4), "held_when": "more than 0.995 of the head and nemes inside",
+           "placed": "the crown at the monument's top (sphinx.height); searched fore and aft over ALONG, as the searched fit is",
+           "target_m": head_target(), "trace (scale, crown drop m, fore m)": trace,
+           "made_by": "render/giza/sphinx_eras.py --solve-head"}
+    with open(os.path.join(MODELS, f"{master}-headscale.json"), "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=2)
+    print(f"least head scale: {hi:.4f}")
+
+
 def main(argv):
     args = dict(zip(argv[::2], argv[1::2]))
     master = args.get("--master", "sphinx-master")
+    if "--solve-head" in argv:
+        models = {m["id"]: m for m in data.load_json(BLENDER_DIR, "models.json")["models"]}
+        return solve_head(os.path.join(MODELS, master, "model.glb"), master, models[master].get("front", "-y"))
     eras = args.get("--eras", ",".join(ERAS)).split(",")
     models = {m["id"]: m for m in data.load_json(BLENDER_DIR, "models.json")["models"]}
     model = models[master]
@@ -551,9 +668,7 @@ def main(argv):
             king = os.path.join(MODELS, "sphinx-king-head", "model.glb")
             if not os.path.exists(king):
                 sys.exit(f"{king} is not on disk: python scripts/models.py finds it")
-            height, _ = ground_truth()
-            zs = [v.co.z for v in bm.verts]
-            fit, (kmesh, kbm) = carve(bm, king, model.get("front", "-y"), height / (max(zs) - min(zs)))
+            fit, (kmesh, kbm) = carve(bm, king, model.get("front", "-y"), frame)
             # The king's head joins the statue with its own material.
             offset = len(mesh.materials)
             for mat in kmesh.materials:
@@ -594,6 +709,7 @@ def main(argv):
         bm.free()
         record = {"master": master, "era": era, "deepest_m": round(deepest, 3), "median_m": round(median, 3),
                   "vertices": len(mesh.vertices), "fit": fit, "scale_m_per_unit": round(float(frame["scale"]), 4),
+                  "head_scale": frame["head_scale"], "head_scale_note": "the lion's head enlarged about its foot: a look choice (HEAD_SCALE, night item 36)",
                   "made_by": "render/giza/sphinx_eras.py"}
         if extra:
             record.update(extra)

@@ -57,3 +57,34 @@ class ChinToCrownTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EnlargeHeadTests(unittest.TestCase):
+    def setUp(self):
+        rng = np.random.default_rng(5)
+        # a lion along -y (the face towards -y): a low body from y 0 to -8 at height 0 to 6, a head at y -7 to -9 up to 10
+        body = np.column_stack([rng.uniform(-1, 1, 4000), rng.uniform(-8, 0, 4000), rng.uniform(0, 6, 4000)])
+        head = np.column_stack([rng.uniform(-1, 1, 2000), rng.uniform(-9, -7, 2000), rng.uniform(6, 10, 2000)])
+        self.co = np.vstack([body, head])
+        self.frame = {"axis": 1, "sign": -1.0, "z0": 0.0, "zspan": 10.0, "aspan": 9.0}
+
+    def test_one_moves_nothing(self):
+        out, _ = P.enlarge_head(self.co, self.frame, 1.0, 0.36, 0.6, 0.08)
+        np.testing.assert_allclose(out, self.co)
+
+    def test_scales_the_head_about_its_foot_and_leaves_the_rump(self):
+        out, pivot = P.enlarge_head(self.co, self.frame, 1.3, 0.36, 0.6, 0.08)
+        self.assertAlmostEqual(pivot[2], 6.0)
+        top = self.co[:, 2] > 7.2
+        np.testing.assert_allclose(out[top] - pivot, 1.3 * (self.co[top] - pivot))
+        rump = self.co[:, 1] > -5.0
+        np.testing.assert_allclose(out[rump], self.co[rump])
+        self.assertAlmostEqual(out[:, 2].max() - 6.0, 1.3 * (self.co[:, 2].max() - 6.0))
+
+    def test_never_folds_up_the_neck(self):
+        # points stacked up the head's middle keep their order in height
+        z = np.linspace(0.0, 10.0, 201)
+        line = np.column_stack([np.zeros_like(z), np.full_like(z, -8.0), z])
+        co = np.vstack([self.co, line])
+        out, _ = P.enlarge_head(co, self.frame, 1.8, 0.36, 0.6, 0.08)
+        self.assertTrue(np.all(np.diff(out[-len(z):, 2]) > 0))
