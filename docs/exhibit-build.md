@@ -151,7 +151,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   and seismic leaves, and the claim-era leaves at the flank, which must keep `ch1-depth`'s view for the wipe and
   whose panoramas are being re-rendered. `render/films-exhibit.json` regenerated (the flights end on the leaves'
   views). `pnpm test` 1161 passed; render tests the same 2 missing-build-output errors as E1.
-- [ ] **E11. Sharp at rest: a patch per leaf.** A 4096 by 2048 panorama gives about 11 px a degree, and a desktop
+- [x] **E11. Sharp at rest: a patch per leaf.** A 4096 by 2048 panorama gives about 11 px a degree, and a desktop
   view at 40° wants about 30, so tight leaves look soft. Use the walkthrough's detail patches: for every leaf,
   `scripts/exhibit_queue.py` also queues a rectilinear patch at the leaf's own yaw, pitch and a field 1.3 times
   the leaf's (2560 px wide, the leaf's era and moment, 96 samples), and the player lays it into the panorama so the
@@ -168,7 +168,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   edges, covers the leaf at rest, and the panorama takes over at its feathered edge when dragged; a phone's wide
   field never wants a patch, so none is fetched there. 5 new Python tests, 2 TS. The six dawn panoramas had
   landed meanwhile, so the E10 framing was looked at again on them, all 22 leaves at both sizes: it holds.
-- [ ] **E12. The rooftop of Nazlet el-Samman** (decided by the laptop session: the words stay, and the cold open
+- [x] **E12. The rooftop of Nazlet el-Samman** (decided by the laptop session: the words stay, and the cold open
   stands where they say). Add a station `nazlet-roof` to `render/stations.json`: on the flat roof of a real
   building in Nazlet el-Samman east of the Sphinx, chosen from `data/footprints/city.*` (its footprint and
   measured height, eye 1.7 m above the roof), with a clear line to the Sphinx's face and the pyramids behind;
@@ -186,7 +186,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   both sizes, and Next turns to `ch0-sunrise` in the same panorama. The queue asks for the roof's panorama and
   patch; the flight `ch0-dawn--ch0-sunrise` waits for the publish (see For the laptop).
 
-- [ ] **E13. Chapter 2, "A lion, not a king": its leaves.** Cut chapter 2 of `docs/script.md` into leaves, every
+- [x] **E13. Chapter 2, "A lion, not a king": its leaves.** Cut chapter 2 of `docs/script.md` into leaves, every
   word kept in order (the narration is recorded: `assets/narration/ch2.json`). Stand where the argument is seen:
   the head against the body at `sphinx-face` today (the head too small), the master lion in the First Time, the
   head in the hand (E14) on "Here the king's head sits inside the lion's", and due east from behind the lion at
@@ -194,6 +194,29 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   own sky (registered by the station camera; the sun's place from the same engine). Receipts C5, D4, C6 and H1
   (H1 is a proposal in `docs/claims-proposed.md`: show its number as the reply does, labelled a proposal). Queue
   what the laptop must render (panoramas, patches, flights) through `scripts/exhibit_queue.py`.
+  *Done 2026-10-20 22:19 UTC, `a43efaf`, `65bbc4e`, `3576018`.* (Chunk 3 found E11 and E12 done but their boxes
+  unticked, and ticked them; the tree was clean.) 15 leaves, every word of chapter 2 in order and inside the
+  recording (the recordings test now covers every chapter the leaves reach). "Look at the head" wipes
+  `ch1-head`'s lion head back to today at the flank; the head and the worn body below; a flight to a new station
+  `sphinx-side` (decision 26) for "too small", wiped there through the First Time, the long rains and the built
+  king; a turn in to the head for "smaller form" and the ghost (`object:head`, E14); back to today on Reader; a
+  flight to a new station `sphinx-back` behind the rump looking east for the sky; a wipe to the First Time on
+  "drift"; a flight to `sphinx` for the temples (decision 31). Until the two stations are rendered each leaf stands
+  in at the flank (`until`). **The live sky** (`src/sky.ts`, `src/skyfigure.ts`, 7 tests): a leaf's `sky` names
+  its year (`today` or a claim's epoch, decision 28); the bright catalogue to magnitude 4.5 is precessed to it and
+  placed at the picture's own moment as `render/giza/sun.py` lights it, so the drawn sun lands on the rendered sun
+  (checked in today's panorama); Leo's stars gold, Regulus named, C5's own bearings on the horizon; a year readout
+  and slider, wound from 2026 to 10,500 BCE in play on "drift" (checked muted: 1323 CE at 1 s, 4,311 BCE at 3 s,
+  10,500 BCE by 6 s), and dragging it pauses play. **The receipts**: C5 on the Leo leaves, D4 and C6 on the
+  temples. They had never computed for a sky claim (the bundle's stars were not registered); fixed, and read
+  against a local `pnpm bundle`: they match the dossier. H1 waits for E14 (decision 30). The queue asks for six
+  panoramas, four new patches and, once the stations are published, three flights. Looked at at both sizes,
+  stand-ins and sky. `pnpm test` (exhibit) 82 passed; typecheck clean; render tests the same 2
+  missing-build-output errors.
+- [ ] **E13b. Leo's figure.** The beat draws Leo's figure lines, captioned "a modern figure". Import one: a
+  script that fetches a modern sky culture's figure (Stellarium's `modern` sky culture gives each figure as pairs
+  of Hipparcos numbers) into `data/stars/` with its source, checksum and licence in `data/sources.json`, as
+  `pnpm run stars` does for HYG, and draw Leo's lines in `drawSky` from it, never typed (decision 29).
 - [ ] **E14. An object in the hand.** A small realtime three.js view, lazy-loaded only on a leaf whose `interact`
   is `object:<id>`: the object lit simply on a dark ground, turned by dragging, with a reset. The first object is
   the ghosted head: `sphinx-built`'s king's head solid, and the master lion's head (its First Time finish, with
@@ -297,6 +320,29 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     the height from `city.bin` with the rule `city.build` draws by, so the eye cannot drift from the roof if the
     city is re-imported. Its note names the record and the height's source. Decision 5 is superseded.
 
+26. **Chapter 2 stands at two new stations, `sphinx-side` and `sphinx-back`, not `sphinx-face`.** From the face
+    the body's length is foreshortened to nothing and from the flank (6 m off) the head is overhead, so neither
+    shows "beside that long body it is too small"; the beat asks for a side elevation, and the sky leaves want the
+    lion's own eastward view. Both are placed from the footprints and the terrain with the scene's ditch cut (their
+    notes say how) and stand in at the flank until rendered. Reversible: point the leaves back at `sphinx-face`.
+27. **The sky leaves stay at `equinox-dawn`, the sky drawn at the picture's own moment.** The beat holds the sky
+    fifty minutes before sunrise, but a pre-dawn panorama needs a night bake, and a sky drawn for another moment
+    would put the drawn sun 16 degrees from the rendered one. So the drawn sky and the picture share one instant
+    (Leo already up, ahead of the sun; Regulus's rising bearing on the horizon), and the panel says that by day no
+    star would be seen. See For Stewart.
+28. **A sky's year is named, not typed**: `today` (the present calendar, as the renderer's moments) or a claim
+    id, whose epoch it takes; the bearings are C5's own `sun-ribbon` expressions, evaluated in the sky environment.
+29. **Leo is its stars until a figure is imported**: the HYG designations put a star in Leo, and its stars are
+    drawn gold with Regulus and the constellation named. Lines need a figure from a source (E13b).
+30. **H1's number waits for E14.** The factor is written by `sphinx_eras.py --solve-head` into a build output on
+    the laptop, not into `data/`; E14's `export_heads.py` is to carry it into `apps/exhibit/objects/`, and the
+    object leaf shows it, labelled a proposal. Until then the reply's own words ("enlarged by a sixth") carry it.
+31. **The temples leaf stands at `sphinx`, above the Sphinx Temple**, looking down at the temple and the Sphinx
+    behind it, in the First Time at equinox dawn (already rendered). At `sphinx-face` the temple's west wall
+    stands 3.5 m in front of the camera and fills the view.
+32. **Reader's sentence wipes back to today** (not on to the lion), so the flight to `sphinx-back` arrives in
+    today's era, the 2026 sky shows "the sun rises close to due east in every age", and "drift" then wipes to the
+    First Time as the years wind back.
 
 ## For Stewart
 
@@ -314,6 +360,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - On a phone a flight's film is cropped to fill the tall screen while the panorama widens its field, so the
   handover is not seamless there. A phone cut of each flight (or a cut instead of a flight on phones) would
   fix it; say which.
+- The sky leaves of chapter 2 draw the stars over a daylit dawn (decision 27). A real pre-dawn picture at
+  `sphinx-back`, the Lion low in the east before the equinox sun, would need a night bake for that moment (the
+  renderer draws stars only from `pnpm run sky-bake`'s nights) and a moment change in place, which the wipe does
+  not do yet. Worth it for the chapter's hero shot?
 - Sharp on a retina screen: the patches (E11) make the tight leaves sharp on an ordinary screen. On a retina
   laptop every leaf wants about twice the pixels; that means patches at 5120 by 2880 for all 22 leaves, or
   panoramas at 8192 by 4096. Both are only laptop time (a patch costs about what a panorama does). Worth it?
@@ -321,6 +371,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **Chapter 2's two stations** (E13), `render/queues/exhibit-panos.json`: `sphinx-side` (beside the body, south of
+  the ditch) today, First Time, long rains and built, and `sphinx-back` (behind the rump, looking east) today and
+  First Time, all at equinox dawn. Preview first: both were placed from numbers, not pictures. `sphinx-side`
+  should show the whole body side-on, rump to head, over the ditch's south rim; if the rim or the causeway hides
+  the body, say so and the builder moves it. Then `python render/publish.py`, the four new patches in
+  `exhibit-patches.json`, and `python scripts/exhibit_queue.py` again for the three flights
+  (`ch2-nemes--ch2-small`, `ch2-reader--ch2-equinox`, `ch2-image--ch2-temples`). The rooftop's panorama is
+  published, so the queue no longer lists it; the flight `ch0-dawn--ch0-sunrise` is written once `stations.json`
+  carries the roof's camera.
 
 - **Six panoramas at `equinox-dawn`** (decision 4), queued in `render/queues/exhibit-panos.json` by
   `scripts/exhibit_queue.py`: `sphinx` today and First Time, `sphinx-face` today, `sphinx-flank` today, long
