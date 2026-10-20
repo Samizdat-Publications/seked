@@ -29,6 +29,7 @@ export interface Still {
 const SPHINX_TODAY = 'progress/0040-sphinx-today.png';
 const LION_FIRST_TIME = 'progress/0035-master-lion-first-time.png';
 const LION_RAINS = 'progress/0035-master-lion-long-rains.png';
+const FIRST_TIME_AIR = 'progress/0041-first-time-overview.png';
 
 export const STILLS: Still[] = [
   { chapter: 0, anchor: 'This is Giza at dawn', src: 'progress/0018-blender-dawn-materials-air.png',
@@ -61,6 +62,8 @@ export const STILLS: Still[] = [
 
   { chapter: 4, anchor: 'Egypt did not think it began with its first king.', src: LION_FIRST_TIME,
     alt: 'The First Time: the lion, the green plateau, no pyramids', tags: ['claim state', 'stand-in'] },
+  { chapter: 4, anchor: 'Here is the plateau as they picture it.', src: FIRST_TIME_AIR,
+    alt: 'The First Time from the air: the plateau green, the flood at its foot, no pyramids', tags: ['claim state'] },
   { chapter: 4, anchor: 'Hancock and Bauval look for one in the sky.', src: 'progress/0020-blender-night-milky-way.png',
     alt: 'The night of 2449 BCE over the pyramids, with the Milky Way', tags: [] },
 
@@ -78,8 +81,8 @@ export const STILLS: Still[] = [
   { chapter: 6, anchor: 'Draw a line from the apex down the middle of one face.', src: 'progress/0011-blender-section-drawing.png',
     alt: 'The Great Pyramid in section from the east, from Petrie’s survey', tags: [], whole: true },
 
-  { chapter: 7, anchor: 'a plan laid out at Giza in the eleventh millennium BCE', src: LION_FIRST_TIME,
-    alt: 'Giza’s First Time: the green Sahara, the lion, no pyramids', tags: ['claim state', 'stand-in'] },
+  { chapter: 7, anchor: 'a plan laid out at Giza in the eleventh millennium BCE', src: FIRST_TIME_AIR,
+    alt: 'Giza’s First Time from the air: the plateau green, no pyramids', tags: ['claim state'] },
 
   { chapter: 8, anchor: 'Everything so far stands on the surface.', src: 'progress/0037-underneath-khafre-cutaway.png',
     alt: 'Khafre’s pyramid and the plateau cut away, the claimed wells and chambers below', tags: ['look choices'], whole: true },
