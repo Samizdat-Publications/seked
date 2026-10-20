@@ -109,5 +109,12 @@ The lion head ghosted around the king's head is a hero image in its own right.
 
 1. The new plan (`docs/plan.html` replaced or superseded), with the chapter script and its
    sources, the asset list per chapter and what each reuses.
-2. The master Sphinx and its subtracted eras.
-3. The First Time rebuilt without pyramids.
+   **20 October:** the plan is written and the September one kept as `docs/plan-2026-09.html`.
+   The research for chapters 1 to 8 is in `docs/research/`. The script's first draft is
+   `docs/script.md`, to be edited.
+2. The master Sphinx and its subtracted eras. **Blocked in the cloud** until the Meshy GLBs
+   reach it (the plan's decision 1).
+3. The First Time rebuilt without pyramids. **20 October:** done in code, in both the renders
+   (`render/giza/states.py`, `pyramids.py`) and the realtime viewer (`apps/web/src/model.ts`,
+   `Pyramids.tsx`). Its render is still to be looked at, on the laptop, because a cloud preview
+   lacks the Sketchfab props and the Meshy GLBs.
