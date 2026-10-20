@@ -2,6 +2,17 @@
 
 A headless draft from `python scripts/research.py start labyrinth`: claude-haiku-5-5, claude-opus-5-5 at high effort, 74 turns, $3.12 on the API key, ended 2026-10-20T04:34:15+00:00. Citations marked [unchecked] are still to be checked against the work itself, and nothing here is data until it is entered in `data/`.
 
+*Checked by hand, 2026-10-20, by the night builder (`docs/night-2026-10-20.md`, item 1):*
+
+- *Stewart's lead, "the Labyrinth under a pyramid, by new technology", plainly.* No published result shows the Labyrinth under a pyramid. The lead is best matched by **the Merlin Burrows satellite scans**. They were made in 2015 by Tim Akers's firm, shown in Harrogate on 21 July 2015 and kept under an NDA. Louis De Cordier published them on 6 June 2025 ("The Merlin Burrows scans II", read here). They claim "2 chambers below the Hawara Pyramid" (that caption is De Cordier's) and a complex south of it in four or five layers 20–50 m apart. The method is undisclosed, the data are unreleased and nothing is reviewed. Two other things are easily run together with it:
+  - the **Khafre Project**, which is under a pyramid and by satellite radar, but at Giza, and not about the Labyrinth;
+  - **Biondi's promised Hawara scan** (ARF, 2 May 2026: "after finishing Giza (projected by Summer 2026)"), which has produced no result found as of 20 October 2026.
+
+  Mataha (2008) and Carlotto (2025) are about the ground *south of* the pyramid, not under it.
+- *Petrie 1889, checked against the scan* (archive.org `hawarabiahmuarsi00petruoft`, p. 5): §5 reads "they cover an area about 1000 feet long, and 800 feet broad", traced as the limits of the chip and beton beds "on the south of the pyramid". The plan is Pl. XXV. The figure is in §5 alone, not §§5–6 as the tables below say. It is Petrie's own "about", and the long side's direction is not stated on that page.
+- *Petrie 1890, checked against the scan* (archive.org `kahungurobhawara00petr`, p. 13, §§17–18). Only one number here was measured: "the brickwork base was found to be 3692 inches". The 4006 in base is Petrie's derivation, "adding 2 × 157", where 157 in is the casing thickness he took from the entrance passage's slope and "adopted ... as presumptive truth". The 2284 in height is derived in turn from the 4006 in base and his casing angle of 48° 45′ ± 3′, read from one fragment (two others give 49° 51′ and 52° 25′, "so that the angle is not well fixed"). For the database, then, the brick base, the casing thickness and the angle are entered, and the finished base and the height are computed, never stored (nothing is typed twice).
+- *The retraction*, cited in reply item 6, is confirmed from Crossref: 10 August 2026, `10.3390/rs18162679` (see `docs/research/khafre-sar.md`).
+
 ---
 
 # Chapter 8 brief: the Labyrinth at Hawara

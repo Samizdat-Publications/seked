@@ -2,6 +2,21 @@
 
 A headless draft from `python scripts/research.py start khafre-sar`: claude-haiku-5-5, claude-opus-5-5 at high effort, 93 turns, $3.01 on the API key, ended 2026-10-20T04:32:49+00:00. Citations marked [unchecked] are still to be checked against the work itself, and nothing here is data until it is entered in `data/`.
 
+*Checked by hand, 2026-10-20, by the night builder (`docs/night-2026-10-20.md`, item 1):*
+
+- *The retraction.* Crossref's records, queried directly: the paper is `10.3390/rs14205231`, *Remote Sensing* 14(20), published 19 October 2022 under CC BY 4.0. It is updated by the retraction `10.3390/rs18162679` (*Remote Sensing* 18(16), 2679), dated **10 August 2026**, Retraction Watch database record 72251. The stated reason, "serious methodological flaws and statistical errors" raised by a reader, with the authors disagreeing, was read in Retraction Watch's article of 31 August 2026. MDPI's own pages refuse this container (403), so the notice's full text is still unread. Everything in reply item 1 stands.
+- *The primary document, read.* The "Project Abstract" the brief could not fetch is a seven-page Google Docs PDF titled "Abstract conf. English Version", headed "Khafre Project. Abstract of the Conference on March 16, 2025", signed Filippo Biondi, Armando Mei and Corrado Malanga, "Marzo 2025" (24,956,568 bytes, sha256 `9f886dfc…4d083f`; fetched with `https://drive.google.com/uc?export=download&id=1Leaa2tf3OHK31OTmdey_CRa-0vC9-CTD`; authors' copyright, so not kept in the repository). It confirms, in its own words:
+  - five structures "at the center of the pyramid, above Belzoni's chamber", like the "Zed" over Khufu's King's Chamber, each with "5 horizontal levels and a sloping roof";
+  - "eight of these structures, arranged in two parallel rows from north to south, descend to a depth of 648 meters, merging into two large cubic structures measuring approximately 80 meters per side", as "vertical wells, hollow inside, surrounded by descending spiral pathways";
+  - structures "approximately two kilometers beneath ground zero", extending under Khufu and Menkaure. Depths are measured from "the ground level (ground zero) of the main structure", which is the pyramid's base.
+- *Corrections to the brief.*
+  - **The data are Capella Space and Umbra open data**, as the abstract states, not COSMO-SkyMed. COSMO-SkyMed was the 2022 Khufu paper's source.
+  - **The conference date is 16 March 2025** in the team's own abstract. Geopop's 15 March may be the first of the two days; Bologna is still unconfirmed.
+  - **The abstract gives no diameter, no spacing, no offset and no spiral pitch.** The 10–12 m diameter rests only on press syndication (TBS / Daily Mail).
+  - **The deepest figure is "about two kilometres"** in the abstract. The 1.2 km in `g2.sar-shafts`'s note comes from secondary transcripts and should give way to it.
+- *What can be scaled.* The abstract's four 3D renderings (p. 5) show the eight cylinders inside Khafre's footprint, two rows of four about its centre, with numbered labels. Its tomograms (pp. 4–6) carry **no axes and no scale bar**. Nothing can be scaled from them as `scaled from plate`, so any spacing in our model is a stated look choice taken from how the authors drew it, and is labelled that way.
+- *Source ids.* `docs/research/ch8.md` already proposes `retraction-watch-2026-giza`, `moss-2025-natgeo`, `biondi-malanga-2022`, `pilicy-2025`, `helal-2025`, `alvarez-1970` and `sharafeldin-2019`. Its ids win where the two briefs overlap; this brief's `retraction-watch-2026` and `moss-2025` are the same works.
+
 ---
 
 # Chapter 8 research brief: the shafts under Khafre's pyramid
