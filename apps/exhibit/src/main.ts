@@ -14,7 +14,8 @@ import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import radiocarbon from 'virtual:radiocarbon';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -125,6 +126,16 @@ function luminescenceFigure(): string {
   const unchecked = d.dates.some((x) => !x.verified);
   return `${luminescenceSvg(d)}<figcaption>Surface luminescence dates: when each stone's face last saw daylight, by
     the method of ${shortCite(d.citation)}.${unchecked ? " Not yet checked against the paper's table." : ''}</figcaption>`;
+}
+
+/** The first king's accession and four later ones, from their records: the reply's dates, which need no text. */
+function radiocarbonFigure(): string {
+  const d = radiocarbon;
+  const unchecked = d.reigns.some((r) => !r.verified);
+  const cites = Object.values(d.citations).map(shortCite).join(' and ');
+  return `${radiocarbonSvg(d)}<figcaption>When five kings came to the throne, by radiocarbon: 95 per cent ranges from ${cites}.
+    The first is Aha, Egypt's first king; the dot is the median. Khufu's, Khafre's and Unas's are placed by the model from
+    reign lengths, not dated directly.${unchecked ? " Not yet checked against the papers' tables." : ''}</figcaption>`;
 }
 
 /** The 2026 study's shape test, cited from its records, quietly. */
@@ -238,6 +249,7 @@ async function start(): Promise<void> {
     if (id === 'joint-claim') figure.innerHTML = `${jointClaimSvg()}<figcaption>The claim as West and Schoch describe it, not a survey:
       no measured section through an original joint has been published, by either side.</figcaption>`;
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
+    if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

@@ -25,6 +25,9 @@
  * `luminescence`: the temples' surface luminescence dates (data/measurements/luminescence.json), each a bar of its
  * date and sigma on one line of years, named by its temple, its stone and its sample.
  *
+ * `radiocarbon`: the first king's accession and four later ones as radiocarbon models date them
+ * (data/measurements/chronology.json), each a bar of its 95 per cent range on one line of years.
+ *
  * `joint-claim`: the joint West and Schoch describe, drawn as they describe it (no survey of one exists).
  *
  * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
@@ -32,7 +35,7 @@
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -343,11 +346,69 @@ export function luminescenceSvg(d: LuminescenceData, width = 300): string {
 </svg>`;
 }
 
+/** A reign's accession as a radiocarbon model gives it: the 95 per cent range, its median where the paper gives one. */
+export interface Reign { king: string; earliest: number; latest: number; median?: number; source: string; verified: boolean }
+export interface RadiocarbonData { reigns: Reign[]; citations: Record<string, string> }
+
+/** The accessions cut from data/measurements/chronology.json (`chronology.<king>.accession.<earliest|median|latest>`), oldest first. */
+export function radiocarbonData(records: { key: string; value: number; source: string; verified?: boolean }[],
+  sources: { id: string; citation: string }[]): RadiocarbonData {
+  const byKing = new Map<string, Partial<Reign> & { checked: boolean[] }>();
+  for (const r of records) {
+    const m = /^chronology\.([a-z_]+)\.accession\.(earliest|median|latest)$/.exec(r.key);
+    if (!m) continue;
+    const name = m[1]!.replace(/^./, (c) => c.toUpperCase());
+    const k = byKing.get(name) ?? { king: name, source: r.source, checked: [] };
+    k[m[2] as 'earliest' | 'median' | 'latest'] = r.value;
+    k.checked.push(!!r.verified);
+    byKing.set(name, k);
+  }
+  const reigns = [...byKing.values()].map((k) => {
+    if (k.earliest === undefined || k.latest === undefined) throw new Error(`${k.king}'s accession lacks a start or an end`);
+    return { king: k.king!, earliest: k.earliest, latest: k.latest, median: k.median, source: k.source!, verified: k.checked.every(Boolean) };
+  }).sort((a, b) => a.earliest - b.earliest);
+  const citations: Record<string, string> = {};
+  for (const r of reigns) {
+    const c = sources.find((s) => s.id === r.source)?.citation;
+    if (!c) throw new Error(`no source ${r.source}`);
+    citations[r.source] = c;
+  }
+  if (!reigns.length) throw new Error('no radiocarbon accessions');
+  return { reigns, citations };
+}
+
+/** Each accession a bar across its 95 per cent range on one axis of years, the first king at the top. */
+export function radiocarbonSvg(d: RadiocarbonData, width = 300): string {
+  const lo = Math.floor(Math.min(...d.reigns.map((r) => r.earliest)) / 100) * 100;
+  const hi = Math.ceil(Math.max(...d.reigns.map((r) => r.latest)) / 100) * 100;
+  const pad = 28, row = 34, top = 4, h = top + d.reigns.length * row + 26;
+  const X = (y: number) => (pad + ((y - lo) / (hi - lo)) * (width - 2 * pad)).toFixed(1);
+  const ticks = [];
+  // every 500 years as the page counts them (3000 BCE is -2999)
+  for (let k = Math.ceil((1 - hi) / 500); 1 - k * 500 >= lo; k++) if (k > 0) ticks.push(1 - k * 500);
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="Radiocarbon dates for the accessions of ${d.reigns.map((r) => r.king).join(', ')}">
+  ${d.reigns.map((r, i) => {
+    const y = top + i * row + 24;
+    // the name and range over the bar, from its start, or back from its end where the frame would cut it
+    const late = Number(X(r.earliest)) > width - 150;
+    return `<text class="here-lab" x="${late ? X(r.latest) : X(r.earliest)}" y="${y - 8}" text-anchor="${late ? 'end' : 'start'}">${r.king} <tspan class="lab">${1 - r.earliest} to ${yearText(r.latest)}</tspan></text>
+  <line class="wall draw-on" x1="${X(r.earliest)}" y1="${y}" x2="${X(r.latest)}" y2="${y}" pathLength="1"/>
+  <line class="wall" x1="${X(r.earliest)}" y1="${y - 3}" x2="${X(r.earliest)}" y2="${y + 3}"/><line class="wall" x1="${X(r.latest)}" y1="${y - 3}" x2="${X(r.latest)}" y2="${y + 3}"/>${r.median !== undefined ? `
+  <circle class="star" cx="${X(r.median)}" cy="${y}" r="3"/>` : ''}`;
+  }).join('\n  ')}
+  <line class="dim" x1="${X(lo)}" y1="${h - 20}" x2="${X(hi)}" y2="${h - 20}"/>
+  ${ticks.map((t) => `<text class="north" x="${X(t)}" y="${h - 6}" text-anchor="middle">${yearText(t)}</text>`).join('')}
+</svg>`;
+}
+
 /** "Liritzis and Vafiadou (2015)" from "Liritzis, I. & Vafiadou, A. (2015). ...". */
 export function shortCite(citation: string): string {
-  const names = [...citation.split('(')[0]!.matchAll(/([A-Z][\p{L}'-]+), (?:[A-Z]\.\s?)+/gu)].map((m) => m[1]!);
+  // a surname may be two words (Bronk Ramsey, Girdland Flink); "et al." stands for the rest
+  const authors = citation.split('(')[0]!;
+  const names = [...authors.matchAll(/([A-Z][\p{L}'-]+(?: [A-Z][\p{L}'-]+)*), (?:[A-Z]\.\s?)+/gu)].map((m) => m[1]!);
   const year = /\((\d{4})\)/.exec(citation)?.[1];
-  return `${names.length > 2 ? `${names[0]} and others` : names.join(' and ')}${year ? ` (${year})` : ''}`;
+  const others = names.length > 2 || /et al\./.test(authors);
+  return `${others ? `${names[0]} and others` : names.join(' and ')}${year ? ` (${year})` : ''}`;
 }
 
 /**

@@ -14,3 +14,7 @@ declare module 'virtual:luminescence' {
   const data: import('./figures').LuminescenceData;
   export default data;
 }
+declare module 'virtual:radiocarbon' {
+  const data: import('./figures').RadiocarbonData;
+  export default data;
+}

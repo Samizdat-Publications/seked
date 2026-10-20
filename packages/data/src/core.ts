@@ -29,7 +29,7 @@ export const MeasurementSchema = z.object({
   method: z.string().optional(),
   note: z.string().optional(),
   verified: z.boolean().default(false),
-  /** Which site the record belongs to; `units` and `constants` records are site-free. */
+  /** Which site the record belongs to; `units`, `constants` and `chronology` records are site-free. */
   site: z.string().default('giza'),
 });
 export type Measurement = z.infer<typeof MeasurementSchema> & { file: string; order: number };

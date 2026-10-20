@@ -11,8 +11,11 @@ export const DATA_DIR = join(REPO_ROOT, 'data');
 // their own module, so `@seked/data/browser` can offer them without node:fs.
 export * from './core';
 
-/** Structure ids that are not physical structures and need no registry entry. */
-const SITE_FREE_STRUCTURES = new Set(['units', 'constants']);
+/**
+ * Structure ids that are not physical structures and need no registry entry. `chronology` holds dates of reigns
+ * (radiocarbon models of when a king came to the throne), which belong to Egypt rather than to any one monument.
+ */
+const SITE_FREE_STRUCTURES = new Set(['units', 'constants', 'chronology']);
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf8'));

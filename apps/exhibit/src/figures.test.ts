@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -149,6 +149,29 @@ describe("the temples' luminescence dates", () => {
     expect(svg).toContain('3060 BCE &#177; 470');
     expect(svg).not.toContain('4001 BCE');
     expect(shortCite(d.citation)).toBe('Liritzis and Vafiadou (2015)');
+  });
+});
+
+describe('the radiocarbon accessions', () => {
+  const d = radiocarbonData(read('measurements/chronology.json'), read('sources.json'));
+  it('are the five kings, first king first, each a 95 per cent range, unchecked', () => {
+    expect(d.reigns.map((r) => r.king)).toEqual(['Aha', 'Djoser', 'Khufu', 'Khafre', 'Unas']);
+    expect(yearText(d.reigns[0]!.median!)).toBe('3085 BCE');   // the script's anchor for the king lists
+    expect(d.reigns.every((r) => r.earliest < r.latest && !r.verified)).toBe(true);
+    expect(d.reigns[1]!.median).toBeUndefined();
+  });
+  it('labels each range as the page writes years and cites both papers short', () => {
+    const svg = radiocarbonSvg(d);
+    expect(svg).toContain('3218 to 3035 BCE');
+    expect(svg).toContain('2450 to 2363 BCE');
+    expect(svg).toContain('3000 BCE');
+    expect(svg).not.toContain('3001 BCE');
+    expect(Object.keys(d.citations).sort()).toEqual(['bronk-ramsey-2010', 'dee-2013']);
+    expect(shortCite(d.citations['dee-2013']!)).toBe('Dee and others (2013)');
+    expect(shortCite(d.citations['bronk-ramsey-2010']!)).toBe('Bronk Ramsey and others (2010)');
+  });
+  it('refuses an accession with only one end', () => {
+    expect(() => radiocarbonData([{ key: 'chronology.aha.accession.earliest', value: -3217, source: 'dee-2013' }], read('sources.json'))).toThrow(/start or an end/);
   });
 });
 

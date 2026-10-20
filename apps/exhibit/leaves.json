@@ -1068,7 +1068,7 @@
    },
    "arrive": "cut",
    "say": "Egypt did not think it began with its first king.",
-   "draw": [],
+   "draw": ["radiocarbon@king"],
    "hold": 1,
    "interact": "sky",
    "receipts": [],
