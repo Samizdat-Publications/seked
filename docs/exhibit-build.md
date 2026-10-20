@@ -277,13 +277,33 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   and C7 on the belt leaves, C2 and C3 on the shafts. Looked at at both sizes; chapter 2's sky leaves checked again.
   The queue asks for `orion` built and First Time at `night-dark` and four patches. `pnpm test` 1183 passed;
   typecheck clean; render tests the same 2 missing-build-output errors. Left for E15b.
-- [ ] **E15b. Chapter 5's plan and its phone.** (a) The beat's plan: from overhead, C4's `sky-projection` laying
+- [x] **E15b. Chapter 5's plan and its phone.** (a) The beat's plan: from overhead, C4's `sky-projection` laying
   Alnitak, Alnilam and Mintaka over G1 to G3, and the two offset ticks (0.185 against 0.148) for "set off the line";
   no overhead station exists, so a figure (as `ditch-plan`) drawn from the bundle's ground and the sky at C4's
-  epoch, on `ch5-diagonal`. (b) "Allan 2026: rank 1,717 of 695,520, p = 0.0025" as a cited caption on `ch5-allan`
-  (the figure is cited, not computed: needs `allan-2026` in `data/sources.json` with the numbers in a note, never
-  typed into the page). (c) On a phone the labels of `ch5-alnitak` crowd the belt (the field is so wide the shafts'
-  lines are 60 px long); shorter labels or a tighter phone framing there.
+  epoch, on `ch5-diagonal`. (c) On a phone the labels of `ch5-alnitak` crowd the belt (the field is so wide the
+  shafts' lines are 60 px long); shorter labels or a tighter phone framing there. ((b) moved to E15c.)
+  *Done 2026-10-20 22:54 UTC, `ac1a88c`, `d09d42d`.* (a) `belt-plan` (`src/figures.ts`, 2 tests) draws on
+  "diagonal": the pyramids' centres from the bundle, the belt at C4's epoch laid as seen looking south, Alnitak on
+  Khufu, scaled to Menkaure, unturned (decision 40); the caption's numbers are C4's two comparisons, the offsets
+  among them, so no ticks were needed. Beside the sky panel on a wide screen, below it on a phone; drawn again
+  when the bundle arrives. (c) On a narrow screen the shafts are named by chamber and Alnitak by its altitude.
+  Both looked at at both sizes.
+- [ ] **E15c. The 2026 study, cited on screen.** "Allan 2026: rank 1,717 of 695,520, p = 0.0025" as a quiet cited
+  caption on `ch5-allan`. The figures are in `allan-2026`'s free-text note in `data/sources.json`, which a page
+  should not parse; enter them first as records with that source (`verified: false` until checked against the
+  paper's table), then caption them from the records. The spoken words carry the claim meanwhile.
+- [x] **E16. Chapter 6, "Numbers in the stone": its leaves** (first step; added by chunk 4 in the plan's order,
+  chapter 6 after the two showpieces, decision 41). *Done 2026-10-20 22:56 UTC, `9863899`.* 10 leaves, every word
+  in order and inside `ch6.json`: at `south` as built (the walkthrough's own panorama) with `g1-proportions` drawn
+  on "Measure" and kept through the numbers; a cut to `north` for true north; a cut to `panorama` (the three in a
+  row, reframed tighter with the horizon near 40 per cent) for Smyth and Hancock; "Knowledge that old" wipes it to
+  the First Time. Receipts as the script assigns them. No new panorama; the queue adds three patches. Looked at at
+  both sizes.
+- [ ] **E16b. Chapter 6's figures and the pyramid in the hand.** The beats ask for the perimeter unrolling into a
+  circle of radius the height (A1's `ghost-profile`), the apothem and the Kepler triangle (A2), the profile grown
+  into the hemisphere at 1 : 43,200 (B1's `ghost-earth`) and the compass rose 3′54″ west of north drawn 120 times
+  larger (C1). As figures from the bundle (like `belt-plan`), each on its word; then the pyramid in the hand
+  (`object:pyramid`, the object view with a generated mesh from `@seked/geometry`, needing no Blender).
 
 ## Decisions
 
@@ -423,6 +443,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 39. **The sky leaves wind from 2450 BCE, not 2026.** The beat drove the epoch from 2026, but the picture is Giza
     as built with C2's night; starting the clock at the year the picture shows keeps the drawn sky and the
     rendered ground in one age until the words move them.
+40. **The belt is laid over the pyramids unturned.** Turning it to fit would hide the claim's residual; C4 compares
+    each diagonal's angle against the meridian, so the plan keeps both against north and lets the 13 degrees show.
+    It is scaled and placed (Alnitak on Khufu, Mintaka at Menkaure's distance) only so the two can be compared.
+41. **Chapter 6 is cut next, before 3 and 4**, as the plan orders it (`docs/exhibit-2026-10.md`, "Order": chapter 6
+    after the two showpieces), and in two steps: the leaves now, on panoramas that exist, and the figures and the
+    pyramid in the hand after (E16b).
+
 
 ## For Stewart
 
