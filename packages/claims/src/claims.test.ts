@@ -76,7 +76,16 @@ describe('the classic ratios, from data alone', () => {
     const [casing, socket] = r.comparisons;
     expect(casing!.within).toBe(false);
     expect(socket!.within).toBe(true);
-    expect(r.fits).toBe(false);
+    // It holds as Smyth made it, on the socket line, a choice B4 lists among its free choices (fit: any)
+    expect(r.fits).toBe(true);
+    expect(r.freeChoices).toBe(3);
+  });
+  it('B2: holds on the perihelion, the alternative it names, at the ordinary tolerance', () => {
+    const r = byId('B2');
+    const [mean, perihelion] = r.comparisons;
+    expect(mean!.within).toBe(false);
+    expect(perihelion!.within).toBe(true);
+    expect(r.fits).toBe(true);
   });
 });
 

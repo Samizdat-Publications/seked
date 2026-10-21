@@ -11,7 +11,7 @@ comparisons:
     formula: g1.height.original * 1e9
     target: earth.perihelion
     unit: m
-tolerance_pct: 2.5
+fit: any
 free_choices:
   - the factor 10⁹
   - the mean distance or the perihelion distance, whichever fits

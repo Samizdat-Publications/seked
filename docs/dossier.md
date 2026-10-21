@@ -9,13 +9,13 @@ Generated 2026-10-21 from `data/` with the **canonical** preset. Every number be
 | A1 | π in the profile | +0.03 % | +0.03 % | yes | 0 |
 | A2 | φ in the face | +0.04 % | −0.09 % | yes | 0 |
 | A3 | Seked 5½ explains both | 5.9″ (+0.003 %) | 1.0′ (+0.033 %) | yes | 0 |
-| A4 | King's Chamber 3-4-5 | −0.01 % | −0.17 % | yes | 1 |
-| A5 | The cubit itself | +1 µm (+0.000 %) | −7 µm (−0.001 %) | yes | 1 |
+| A4 | King's Chamber 3-4-5 | −0.04 % | −0.19 % | yes | 1 |
+| A5 | The cubit itself | +141 µm (+0.03 %) | +149 µm (+0.03 %) | yes | 3 |
 | A7 | Khafre's 3-4-5 | 2.2′ (+0.069 %) | 2.2′ (+0.069 %) | yes | 0 |
 | B1 | 1 : 43,200 | −24.1 km (−0.38 %) | −274.0 km (−0.68 %) | yes | 2 |
 | B2 | Height × 10⁹ = Earth–Sun distance | −505,000.0 km (−0.34 %) | −3,007,870.7 km (−2.01 %) | yes | 2 |
 | B3 | Latitude equals the speed of light | −0.3″ (−0.000 %) | −0.3″ (−0.000 %) | yes | 3 |
-| B4 | Pyramid inch and the year | −0.16 % | −0.79 % | no | 3 |
+| B4 | Pyramid inch and the year | −0.16 % | −0.79 % | yes | 3 |
 | B5 | Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.34 m (−0.68 %) | yes | 2 |
 | C1 | True north | −3.9′ | −3.9′ | yes | 0 |
 | C2 | Shafts point at stars | −12.2′ (−0.450 %) | 39.5′ (+2.060 %) | no | 2 |
@@ -26,7 +26,7 @@ Generated 2026-10-21 from `data/` with the **canonical** preset. Every number be
 | C7 | Cygnus alternative | −42.45 % | −22°33′24″ (−59.591 %) | no | 3 |
 | C8 | The Vulture Stone as a date | 4°10′16″ | 4°10′16″ | no | 5 |
 | D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
-| D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
+| D2 | Legon's rectangle | +0.08 % | −0.12 % | yes | 1 |
 | D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −6°31′41″ (−14.507 %) | no | 2 |
 | D4 | Sphinx axis and the temples | −1.2′ | 22.0′ | yes | 1 |
 
@@ -114,19 +114,19 @@ The King's Chamber measures 20 × 10 cubits with a height of 5√5 cubits, so th
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.9854 | 15 | −0.10 % | yes (±0.5 %) |
-| floor diagonal in cubits against √500 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2)` vs `sqrt(500)` | 22.3583 | 22.3607 | −0.01 % | yes (±0.5 %) |
-| space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9896 | 25 | −0.04 % | yes (±0.5 %) |
-| height in cubits against 5√5 | `kc.height / cubit.royal` vs `5 * sqrt(5)` | 11.1618 | 11.1803 | −0.17 % | yes (±0.5 %) |
+| end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.9812 | 15 | −0.13 % | yes (±0.5 %) |
+| floor diagonal in cubits against √500 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2)` vs `sqrt(500)` | 22.352 | 22.3607 | −0.04 % | yes (±0.5 %) |
+| space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9825 | 25 | −0.07 % | yes (±0.5 %) |
+| height in cubits against 5√5 | `kc.height / cubit.royal` vs `5 * sqrt(5)` | 11.1586 | 11.1803 | −0.19 % | yes (±0.5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| end-wall diagonal in cubits against 15 | −0.10 % | −0.13 % | −0.13 % | −0.10 % |
-| floor diagonal in cubits against √500 | −0.01 % | −0.04 % | −0.04 % | −0.01 % |
-| space diagonal in cubits against 25 | −0.04 % | −0.07 % | −0.07 % | −0.04 % |
-| height in cubits against 5√5 | −0.17 % | −0.19 % | −0.19 % | −0.17 % |
+| end-wall diagonal in cubits against 15 | −0.13 % | −0.13 % | −0.13 % | −0.13 % |
+| floor diagonal in cubits against √500 | −0.04 % | −0.04 % | −0.04 % | −0.04 % |
+| space diagonal in cubits against 25 | −0.07 % | −0.07 % | −0.07 % | −0.07 % |
+| height in cubits against 5√5 | −0.19 % | −0.19 % | −0.19 % | −0.19 % |
 
 **Free choices (1)**:
 - the cubit length used to convert the metric measurements
@@ -145,18 +145,20 @@ The royal cubit in metres equals π/6 and also φ²/5.
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| royal cubit against π/6 metres | `cubit.royal` vs `pi / 6` | 0.524 m | 0.524 m | +1 µm (+0.000 %) | yes (±0.1 %) |
-| royal cubit against φ²/5 metres | `cubit.royal` vs `phi^2 / 5` | 0.524 m | 0.524 m | −7 µm (−0.001 %) | yes (±0.1 %) |
+| royal cubit against π/6 metres | `cubit.royal` vs `pi / 6` | 0.524 m | 0.524 m | +149 µm (+0.03 %) | yes (±0.1 %) |
+| royal cubit against φ²/5 metres | `cubit.royal` vs `phi^2 / 5` | 0.524 m | 0.524 m | +141 µm (+0.03 %) | yes (±0.1 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| royal cubit against π/6 metres | +1 µm (+0.000 %) | +149 µm (+0.03 %) | +149 µm (+0.03 %) | +1 µm (+0.000 %) |
-| royal cubit against φ²/5 metres | −7 µm (−0.001 %) | +141 µm (+0.03 %) | +141 µm (+0.03 %) | −7 µm (−0.001 %) |
+| royal cubit against π/6 metres | +149 µm (+0.03 %) | +149 µm (+0.03 %) | +149 µm (+0.03 %) | +149 µm (+0.03 %) |
+| royal cubit against φ²/5 metres | +141 µm (+0.03 %) | +141 µm (+0.03 %) | +141 µm (+0.03 %) | +141 µm (+0.03 %) |
 
-**Free choices (1)**:
+**Free choices (3)**:
 - the metre, defined in 1793, as the unit of comparison
+- the divisor 6 under pi
+- the divisor 5 under phi, and squaring phi
 
 **Overlay:** `panel`
 
@@ -164,7 +166,7 @@ Residual by survey preset:
 
 **Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer.
 
-π/6 = 0.523599 and φ²/5 = 0.523607 agree with each other to 0.002 % with no help from Egypt, so any length near 0.5236 m "encodes" both. The cubit varied between 0.523 and 0.529 m across Egypt and across dynasties.
+π/6 = 0.523599 and φ²/5 = 0.523607 agree with each other to 0.002 % with no help from Egypt, so any length near 0.5236 m "encodes" both. The cubit varied between 0.523 and 0.529 m across Egypt and across dynasties. The cubit tested is Petrie's measured one (cubit.royal); the conventional 0.5236 m is pi/6 rounded, so testing it would be circular, and it is kept apart as cubit.royal.conventional.
 
 ### A7 · Khafre's 3-4-5
 
@@ -222,8 +224,8 @@ The original height multiplied by a thousand million is the distance from the Ea
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| height × 10⁹ against the astronomical unit | `g1.height.original * 1e9` vs `au` | 146,590,000 km | 149,597,870.7 km | −3,007,870.7 km (−2.01 %) | yes (±2.5 %) |
-| height × 10⁹ against the perihelion distance | `g1.height.original * 1e9` vs `earth.perihelion` | 146,590,000 km | 147,095,000 km | −505,000.0 km (−0.34 %) | yes (±2.5 %) |
+| height × 10⁹ against the astronomical unit | `g1.height.original * 1e9` vs `au` | 146,590,000 km | 149,597,870.7 km | −3,007,870.7 km (−2.01 %) | no (±0.5 %) |
+| height × 10⁹ against the perihelion distance | `g1.height.original * 1e9` vs `earth.perihelion` | 146,590,000 km | 147,095,000 km | −505,000.0 km (−0.34 %) | yes (±0.5 %) |
 
 Residual by survey preset:
 
@@ -603,15 +605,15 @@ The three pyramids sit inside a rectangle bounded by the east and north faces of
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| east-west extent in cubits against 1000 root 2 | `(g1.base.half + g3.centre.offset.west + g3.base.half) / cubit.royal` vs `1000 * sqrt(2)` | 1415.8 | 1414.21 | +0.11 % | yes (±0.5 %) |
-| north-south extent in cubits against 1000 root 3 | `(g1.base.half + g3.centre.offset.south + g3.base.half) / cubit.royal` vs `1000 * sqrt(3)` | 1730.43 | 1732.05 | −0.09 % | yes (±0.5 %) |
+| east-west extent in cubits against 1000 root 2 | `(g1.base.half + g3.centre.offset.west + g3.base.half) / cubit.royal` vs `1000 * sqrt(2)` | 1415.4 | 1414.21 | +0.08 % | yes (±0.5 %) |
+| north-south extent in cubits against 1000 root 3 | `(g1.base.half + g3.centre.offset.south + g3.base.half) / cubit.royal` vs `1000 * sqrt(3)` | 1729.94 | 1732.05 | −0.12 % | yes (±0.5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| east-west extent in cubits against 1000 root 2 | +0.11 % | +0.23 % | +0.23 % | +0.11 % |
-| north-south extent in cubits against 1000 root 3 | −0.09 % | −0.005 % | −0.004 % | −0.09 % |
+| east-west extent in cubits against 1000 root 2 | +0.08 % | +0.23 % | +0.23 % | +0.09 % |
+| north-south extent in cubits against 1000 root 3 | −0.12 % | −0.005 % | −0.004 % | −0.12 % |
 
 **Free choices (1)**:
 - the cubit length used to convert the metric extents
@@ -693,7 +695,7 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 |---|---:|---|---|---|:---:|
 | au | 149597870700 | m | iau-2012 | defined | yes |
 | c | 299792458 | m/s | si-2019 | defined | yes |
-| cubit.royal | 0.5236 | m | lehner-1997 | tabulated | no |
+| cubit.royal | 0.523748 | m | petrie-1883 | weighted-mean | yes |
 | delta.apex.center.longitude | 31.1333 | deg | coords-delta-cited | cited | no |
 | delta.east.center.latitude | 31.25 | deg | coords-delta-cited | cited | no |
 | delta.east.center.longitude | 32.3 | deg | coords-delta-cited | cited | no |

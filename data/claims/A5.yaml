@@ -14,6 +14,8 @@ comparisons:
 tolerance_pct: 0.1
 free_choices:
   - the metre, defined in 1793, as the unit of comparison
+  - the divisor 6 under pi
+  - the divisor 5 under phi, and squaring phi
 overlay:
   type: panel
 sources:
@@ -22,4 +24,7 @@ sources:
 notes: >-
   π/6 = 0.523599 and φ²/5 = 0.523607 agree with each other to 0.002 % with no
   help from Egypt, so any length near 0.5236 m "encodes" both. The cubit
-  varied between 0.523 and 0.529 m across Egypt and across dynasties.
+  varied between 0.523 and 0.529 m across Egypt and across dynasties. The cubit
+  tested is Petrie's measured one (cubit.royal); the conventional 0.5236 m is
+  pi/6 rounded, so testing it would be circular, and it is kept apart as
+  cubit.royal.conventional.

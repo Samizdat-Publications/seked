@@ -91,6 +91,6 @@ export function evaluateClaim(claim: Claim, env: Environment): ClaimResult {
     status: claim.status,
     freeChoices: claim.free_choices.length,
     comparisons,
-    fits: claim.status === 'computed' ? comparisons.every((c) => c.within) : undefined,
+    fits: claim.status === 'computed' ? (claim.fit === 'any' ? comparisons.some((c) => c.within) : comparisons.every((c) => c.within)) : undefined,
   };
 }
