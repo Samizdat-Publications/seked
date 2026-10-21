@@ -272,6 +272,125 @@
    "samples": 96,
    "out": "build/render/patch-exhibit/panorama-first-time-summer-evening-ch7-monument.png",
    "for": "ch7-monument"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 8,
+    "pitch": 10,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-surface",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-surface.png",
+   "for": "ch8-surface"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 8,
+    "pitch": 4,
+    "fov": 67.6,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-biondi",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-biondi.png",
+   "for": "ch8-biondi"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 8,
+    "pitch": -14,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-wells",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-wells.png",
+   "for": "ch8-wells"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 8,
+    "pitch": 8,
+    "fov": 67.6,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-height",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-height.png",
+   "for": "ch8-height"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 8,
+    "pitch": 0,
+    "fov": 52.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-rooms",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-rooms.png",
+   "for": "ch8-rooms"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 196,
+    "pitch": 2,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-hawara",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-hawara.png",
+   "for": "ch8-hawara"
+  },
+  {
+   "state": "today",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
+   "patch": {
+    "yaw": 196,
+    "pitch": -6,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch8-chips",
+    "pano": "pano/menkaure-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch8-chips.png",
+   "for": "ch8-chips"
   }
  ]
 }

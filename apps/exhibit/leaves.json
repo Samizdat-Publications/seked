@@ -2088,6 +2088,196 @@
    "interact": "look",
    "receipts": [],
    "reply": "ch7"
+  },
+  {
+   "id": "ch8-surface",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": 10,
+    "fov": 60
+   },
+   "arrive": "cut",
+   "say": "Everything so far stands on the surface. The proponents say the oldest part of Giza may lie beneath it.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-biondi",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": 4,
+    "fov": 52
+   },
+   "arrive": "turn",
+   "say": "In March 2025 an Italian team that includes a radar engineer, Filippo Biondi, showed what they said satellites had found under Khafre's pyramid.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-radar",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": 4,
+    "fov": 52
+   },
+   "arrive": "turn",
+   "say": "Radar cannot see far into rock, and Biondi agrees. Their method reads instead the faint vibrations of the ground, the way an ultrasound reads a body.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-wells",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": -14,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "What they read is eight hollow wells in two rows, wound with spiral paths, falling 648 metres to two great chambers about 80 metres on a side.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-height",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": 8,
+    "fov": 52
+   },
+   "arrive": "turn",
+   "say": "That is four and a half times the pyramid's height, straight down.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-rooms",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": 0,
+    "fov": 40
+   },
+   "arrive": "turn",
+   "say": "The rooms anyone has walked into lie three metres under its base.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-hawara",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 196,
+    "pitch": 2,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "Eighty kilometres south, at Hawara, stood the Labyrinth. Herodotus saw it and said it surpassed the pyramids: three thousand rooms, half of them underground, which nobody would show him.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-chips",
+   "chapter": 8,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 196,
+    "pitch": -6,
+    "fov": 60
+   },
+   "arrive": "turn",
+   "say": "Petrie found only a bed of stone chips, larger than the Great Pyramid's base. In 2008 Egypt's own geophysics institute surveyed the ground there, and the expedition behind it reported walls eight to twelve metres down.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-paws",
+   "chapter": 8,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": -6,
+    "fov": 70
+   },
+   "arrive": "cut",
+   "say": "Under the Sphinx's paws, Schoch's seismic survey found a hollow that has never been opened. Edgar Cayce said a Hall of Records waited there.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
+  },
+  {
+   "id": "ch8-dug",
+   "chapter": 8,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": 4,
+    "fov": 74
+   },
+   "arrive": "turn",
+   "say": "Nobody has dug for any of it.",
+   "draw": [],
+   "hold": 2,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch8"
   }
  ]
 }
