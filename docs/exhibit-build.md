@@ -758,6 +758,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    the plan's and the script's own words, not a claim file and not a caption typed in code: it is about the structure,
    the same in every place that shows it, and a test keeps it off anything dug. Stewart may want to read the three lines
    (`data/structures.json`).
+61. **`ch6-north` shows three figures, each on its own part of the sentence**: the base square on "sides", the drift on
+   "north", Spence's stars on "compass", with the hold raised from 5 to 8 s. With the stars added on "compass", the drift
+   on "quarter" showed for 1.5 s; spread out, each shows 2.5 to 9 s. Reversible in `apps/exhibit/leaves.json`.
+62. **Spence's two configurations are both drawn, and the radiocarbon beside them.** Which star hung above is the
+   reading's own free choice (it flips the sign of the stray), so each pyramid gets a year from each, and the figure does
+   not pick one per pyramid as the paper does. The reign dates come from the same records as chapter 4's `radiocarbon`,
+   so the gap between the stars' dates and the radiocarbon dates is computed, never typed. Reversible in
+   `src/polestars.ts`.
 
 ## For Stewart
 
