@@ -22,7 +22,7 @@ describe('the script', () => {
     const reply = scriptPart(script, 1, 'The reply');
     expect(reply.startsWith('The strongest answer is the order of building.')).toBe(true);
     expect(reply).not.toContain('**');
-    expect(scriptPart(script, 0, 'Spoken reply')).toBe("Archaeologists answer that the Sphinx was cut from Khafre's quarry about 2500 BCE, and each chapter sets their reasons beside the claim.");
+    expect(scriptPart(script, 0, 'Spoken reply')).toBe("Archaeologists answer that the Sphinx was cut from Khafre's quarry about 2500 BCE. Each chapter sets their reasons beside the claim.");
     expect(scriptPart(script, 42, 'The reply')).toBe('');
   });
 });
