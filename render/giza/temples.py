@@ -16,6 +16,7 @@ import numpy as np
 
 from . import data, materials, states
 from .instancing import Field
+from .rings import centroid
 from .walls import battered_variants, ccw, inset_ring, lay_masonry, lay_ring, simplify
 from .variants import N_DRESSED
 
@@ -94,17 +95,6 @@ def _battered_shell(ring, z0, height, coll, name, material, batter_deg=82.0):
 
 
 DOOR_HEAD = 5.0      # look choice: the height of a doorway's lintel
-
-
-def centroid(ring):
-    """A ring's area centroid, the point Hölscher's plate is registered to (the vertices' mean leans towards where they crowd)."""
-    a = cx = cy = 0.0
-    for (x0, y0), (x1, y1) in zip(ring, ring[1:] + ring[:1]):
-        c = x0 * y1 - x1 * y0
-        a += c
-        cx += (x0 + x1) * c
-        cy += (y0 + y1) * c
-    return cx / (3.0 * a), cy / (3.0 * a)
 
 
 def doorways(t):

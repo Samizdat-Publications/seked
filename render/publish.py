@@ -189,6 +189,22 @@ def overlays():
             ],
         },
     }
+    # `valley-sockets`: the statue sockets on the granite hall's floor, at the spots valley_temple.py stands
+    # the statues on (giza/valley_plan.py, from the Blatt XVII records), so the marks meet the statues'
+    # feet. Hölscher's north row was scaled; the south row mirrors it, as the render does (look choice).
+    from giza import valley_plan
+    hall = valley_plan.plan()
+    rows = valley_plan.statue_spots(hall)[:2 * len(hall["sockets"])]   # the long hall's, south and north in turn
+    z, tick = hall["floor"] + 0.02, 0.3    # look choice: half a mark's length across the row
+    socket = {x["key"]: x["value"] for x in data.records("khafre-valley-temple.json")}
+    out["valley-sockets"] = {
+        "lines": [{"from": r([x, y - tick, z]), "to": r([x, y + tick, z]), "style": "edge"} for x, y, _ in rows]
+                 + [{"from": r([rows[k][0], rows[k][1], z]), "to": r([rows[-2 + k][0], rows[-2 + k][1], z]), "style": "dash"} for k in (0, 1)],
+        "labels": [
+            {"at": r([rows[1][0], rows[1][1], z]), "text": f"{len(hall['sockets'])} statue sockets a wall",
+             "sub": f"{socket['khafre_valley_temple.hall.socket.pitch']:.1f} m apart, scaled from Hölscher's plan; the south row mirrored", "place": "above"},
+        ],
+    }
     # The rest needs the claims engine's own values: `pnpm tsx scripts/tour-values.ts` writes them.
     path = os.path.join(data.REPO, "build", "tour-values.json")
     if not os.path.exists(path):
