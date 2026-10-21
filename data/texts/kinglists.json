@@ -1,0 +1,51 @@
+{
+ "about": "Totals of years before the first king, as two texts give them. Figures are what the text says, cited to its line or fragment and page, never measurements; plus_x marks a damaged total read as a minimum. Unchecked against the editions themselves (Gardiner 1959, Ryholt 2004, Waddell 1940's pages) until someone reads them.",
+ "figures": [
+  {
+   "key": "turin.followers.years",
+   "text": "The Turin King List (Royal Canon of Turin)",
+   "locus": "column II, line 8 (Gardiner); row 3.8 at pharaoh.se",
+   "value": 13420,
+   "unit": "year",
+   "plus_x": true,
+   "reading": "... of the spirits and the followers of Horus, 13420 (+ x) years",
+   "source": "pharaoh-se-turin",
+   "note": "The site gives no uncertainty note for this numeral beyond the + x. The script's 'in the most probable reading of its damaged numbers' covers this line and the next.",
+   "verified": false
+  },
+  {
+   "key": "turin.followers.lifetime.years",
+   "text": "The Turin King List (Royal Canon of Turin)",
+   "locus": "column II, line 9 (Gardiner); row 3.9 at pharaoh.se",
+   "value": 23200,
+   "unit": "year",
+   "plus_x": true,
+   "reading": "their lifetime to the followers of Horus: 23200 (+ x) years",
+   "source": "pharaoh-se-turin",
+   "note": "The site: the year-sign traces are clear and the two ten-thousand signs very probable. Whether this total includes line 8's or runs before it is open (docs/script.md, open questions); adding the two is Schwaller de Lubicz's reading, not a figure on the papyrus.",
+   "verified": false
+  },
+  {
+   "key": "manetho.eusebius.before_kings.lunar_years",
+   "text": "Manetho, in Eusebius's Armenian version",
+   "locus": "Fr. 1, section 4, Loeb p. 7 (Waddell 1940)",
+   "value": 24900,
+   "unit": "lunar_year",
+   "reading": "is reckoned to have comprised in all 24,900 lunar years, which make 2206 solar years",
+   "source": "waddell-1940",
+   "note": "The gods, demigods and spirits before the first dynasty, all told. Read on LacusCurtius's transcription of Waddell, page marker p. 7.",
+   "verified": false
+  },
+  {
+   "key": "manetho.eusebius.before_kings.years",
+   "text": "Manetho, in Eusebius's Armenian version",
+   "locus": "Fr. 1, section 4, Loeb p. 7 (Waddell 1940)",
+   "value": 2206,
+   "unit": "year",
+   "reading": "24,900 lunar years, which make 2206 solar years",
+   "source": "waddell-1940",
+   "note": "Eusebius's own conversion, in the text, not ours. Waddell's note 8: Boeckh corrects 2206 to 2046.",
+   "verified": false
+  }
+ ]
+}

@@ -34,6 +34,31 @@ export const MeasurementSchema = z.object({
 });
 export type Measurement = z.infer<typeof MeasurementSchema> & { file: string; order: number };
 
+/**
+ * A figure an ancient text gives (data/texts/): what the text says, in the text's own unit, cited to the line or
+ * problem it stands in. It is never a measurement and never enters a claim's environment. `plus_x` marks a damaged
+ * total read as a minimum ("13,420 + x years"). What follows from a figure (a seked from a base and a height) is
+ * computed where it is shown, as derived quantities are, never stored beside it.
+ */
+export const TextFigureSchema = z.object({
+  key: z.string().regex(/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$/, 'keys are dotted lower-case identifiers'),
+  /** The text, named as a reader would know it. */
+  text: z.string(),
+  /** Where in the text: column and line, fragment and page, problem number. */
+  locus: z.string(),
+  value: z.number(),
+  unit: z.enum(['year', 'lunar_year', 'cubit', 'palm']),
+  plus_x: z.boolean().default(false),
+  /** The words around the figure, as the source transliterates or translates them. */
+  reading: z.string().optional(),
+  source: z.string(),
+  note: z.string().optional(),
+  verified: z.boolean().default(false),
+});
+export type TextFigure = z.infer<typeof TextFigureSchema> & { file: string };
+
+export const TextFileSchema = z.object({ about: z.string(), figures: z.array(TextFigureSchema) });
+
 export const SiteSchema = z.object({
   id: z.string(),
   name: z.string(),

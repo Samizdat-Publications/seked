@@ -3,7 +3,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
-import { MaterialSchema, MeasurementSchema, StructureSchema, DATA_DIR, casedIn, isContext, loadDatabase, loadFootprints, resolve } from './index';
+import { MaterialSchema, MeasurementSchema, StructureSchema, DATA_DIR, casedIn, isContext, loadDatabase, loadFootprints, loadTexts, resolve } from './index';
 
 const db = loadDatabase();
 
@@ -206,5 +206,32 @@ describe('what the buildings are made of', () => {
     expect(() => loadDatabase(copy)).toThrow(/cites unknown source "no-such-book"/);
 
     rmSync(copy, { recursive: true, force: true });
+  });
+});
+
+describe('texts', () => {
+  const texts = loadTexts();
+  it('loads every figure with its text, its place in it and a registered source', () => {
+    expect(texts.map((t) => t.key)).toEqual(expect.arrayContaining(['turin.followers.years', 'rhind.p56.base', 'rhind.p56.height']));
+    for (const t of texts) expect(t.locus.length).toBeGreaterThan(0);
+  });
+  it('keeps texts out of the measurements and stores no derived figure', () => {
+    const measured = new Set(db.measurements.map((m) => m.key));
+    for (const t of texts) expect(measured.has(t.key)).toBe(false);
+    // problem 56's answer follows from its base and height, so it is computed where shown
+    expect(texts.map((t) => t.key)).not.toContain('rhind.p56.seked');
+  });
+  it('rejects a figure whose source is not registered', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'seked-texts-'));
+    try {
+      cpSync(join(DATA_DIR, 'sources.json'), join(dir, 'sources.json'));
+      cpSync(join(DATA_DIR, 'texts'), join(dir, 'texts'), { recursive: true });
+      writeFileSync(join(dir, 'texts', 'bad.json'), JSON.stringify({ about: 'x', figures: [{ key: 'x.y', text: 'x', locus: 'l', value: 1, unit: 'year', source: 'nobody' }] }));
+      expect(() => loadTexts(dir)).toThrow(/unknown source nobody/);
+      writeFileSync(join(dir, 'texts', 'bad.json'), JSON.stringify({ about: 'x', figures: [{ key: 'rhind.p56.base', text: 'x', locus: 'l', value: 1, unit: 'cubit', source: 'greenberg-rhind' }] }));
+      expect(() => loadTexts(dir)).toThrow(/given twice/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
