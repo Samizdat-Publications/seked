@@ -478,6 +478,22 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   with "The Sphinx's claimed cavity has no comparable figures at all". The paper's length is the record `.width` (the
   project's keys take length east to west); a test pins that. Looked at at both sizes; in play it draws about 10 s in.
 
+- [ ] **E22. Chapter 6, "how they did the math"** (the plan's "Added 20 October" section, agreed with Stewart): Rhind
+  problem 56 in the scribe's steps beside our pyramid, the 5½-palm seked becoming 2π and φ with A3's receipt; north as
+  a method (Spence's two stars, the equinox shadow, the drift that dates the pyramids); the engine's sorting made
+  visible (no free choices, units chosen, fails); the gap said in words (no mathematical papyrus from the pyramid age).
+- [ ] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
+  every claim shown, and for a reported but unproven one, one line on what it would change if it held.
+- [ ] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
+  deep anyone has drilled, dug or surveyed there, and who, each from its source (records, `verified: false`).
+- [ ] **E25. The Vulture Stone over the sky** (chapter 7): Pillar 43's relief (the line drawing's height map,
+  `build/gobekli/p43-height-a.png`, or an outline from the excavators' drawing, labelled a reconstruction) laid over
+  the sky `@seked/sky` computes at Göbekli Tepe, with Sweatman and Tsikritsis's date as the claim's free choice and
+  the reply. See `docs/gobekli-reliefs.md`.
+- [ ] **E26. The world's pyramids on a globe and a timeline** (chapter 9's closing leaf, the plan's "Added 20
+  October"): imported sites with date ranges, the best-fit great circle as the claim, the same fit for random sites in
+  the same latitude band as the reply.
+
 ## Decisions
 
 1. **The exhibit reads `../walk/` for stations, overlays and panoramas** rather than copying them, so the 4096 by
