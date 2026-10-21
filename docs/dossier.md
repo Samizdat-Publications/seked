@@ -372,7 +372,7 @@ Residual by survey preset:
 | King's Chamber south shaft against Alnitak | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) |
 | King's Chamber north shaft against Thuban | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) |
 | Queen's Chamber south shaft against Sirius | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) |
-| Queen's Chamber north shaft against Kochab | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) |
+| Queen's Chamber north shaft against Kochab | −14.3′ (−0.606 %) | −1°53′18″ (−4.799 %) | −1°53′18″ (−4.799 %) | −1°53′18″ (−4.799 %) |
 
 **Free choices (2)**:
 - the epoch
