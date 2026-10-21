@@ -524,6 +524,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   plainly (decision 62). The leaf's figures are spread over its sentence and its hold raised to 8 s (decision 61).
   Looked at paused at both sizes and in play: the square at 1.8 s, the drift at 4.3 s, the stars at 9.4 s, held to
   18.1 s. Still waiting: (a) and (d) on Stewart, (b) on its records.
+  *(b) done 2026-10-21 01:18 UTC, `5a12ddc` (chunk 10):* Dash 2017's Table 3 (p. 7, the journal's free PDF, read on the
+  page image) gives every side of the Fourth Dynasty's six casings with its source. Meidum (−24.4′, Petrie 1892), the Bent
+  (−10.2′, Dorner 1986) and the Red Pyramid (−8.7′, its east side only, Dorner 1998) are records in
+  `data/measurements/sneferu.json`, each citing the survey Dash takes it from, with Dash's page in the note, all unchecked
+  (decision 65). `meidum` and `dahshur` are sites, three structures `excavated`. `north-drift` draws six needles in
+  building order at 70 times rather than C1's 120 (decision 64), its labels on two rows; `pole-stars` keeps Giza's three
+  (decision 66). 1 new test, the two site-listing tests extended. Looked at in play at both sizes: the drift shows from
+  4.4 to 9.5 s. Spence's own Table 1, which the research quotes for the same pyramids, was not read.
 - [x] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
   *Done 2026-10-21 00:48 UTC (chunk 8), the plain words; the "what it would change" lines are E23b.* (1) `f719eb7`: every
@@ -811,6 +819,20 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    turns round finds it. Turning the leaf west would show the rows, but drawn across the pillars that hide most of the
    statues (overlays have no depth), and would throw away the leaf's queued patch. A clean view wants a camera in the
    long hall's middle aisle (For the laptop). Reversible: the leaf's `view` in `apps/exhibit/leaves.json`.
+64. **The drift figure caps its own exaggeration**: C1's 120 while every needle stays within 30 degrees, otherwise the
+   largest multiple of ten that does (70 with Meidum), and the caption gives both numbers. At 120 Meidum's needle leans
+   49 degrees and crosses its neighbours; the claim's overlay is about Khufu alone and keeps its 120. Reversible in
+   `figures.ts` (`MAX_LEAN`, `driftExaggeration`).
+65. **Sneferu's orientations cite the survey each comes from, transcribed through Dash 2017**, the one source read: the
+   record's `source` is Petrie 1892 or Dorner 1986 or 1998 (Dash's notes 23 to 25), the note names Dash's table and page,
+   and all three stay `verified: false` until someone reads the surveys themselves. Dash, not Spence 2000, because his
+   paper is free to read and prints every side; Spence's Table 1 (the research's −18.1′/−20.6′ for Meidum are two of
+   Dash's sides) was not consulted. The two sites' origins are Wikidata's coordinates (CC0, cited for position only) and
+   GLO-30's median on a ring 250 m out, since the surface model at the point reads the pyramid's mound. Reversible:
+   `data/measurements/sneferu.json` and the two entries in `data/sites.json`.
+66. **`pole-stars` stays with Giza's three.** Read off Spence's line, Meidum's 24′ would push the plot's window out by
+   decades and crowd its six labels, and the caption's dating speaks of Khufu. The drift shows the earlier three; the
+   needles carry a `site` so the stars' figure can filter. Reversible in `main.ts` (`poleStarsFigure`).
 
 ## For Stewart
 
