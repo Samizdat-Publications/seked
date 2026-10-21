@@ -2,12 +2,174 @@
  "about": "Written by render/publish.py: the exhibit's detail patches (scripts/exhibit_queue.py), each with the panorama it registers with. Degrees; the field is vertical.",
  "patches": [
   {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-biondi.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-biondi",
+   "yaw": 8,
+   "pitch": 4,
+   "fov": 67.6,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-chips.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-chips",
+   "yaw": 196,
+   "pitch": -6,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-hawara.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-hawara",
+   "yaw": 196,
+   "pitch": 2,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-height.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-height",
+   "yaw": 8,
+   "pitch": 8,
+   "fov": 67.6,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-rooms.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-rooms",
+   "yaw": 8,
+   "pitch": 0,
+   "fov": 52.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-surface.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-surface",
+   "yaw": 8,
+   "pitch": 10,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-wells.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch8-wells",
+   "yaw": 8,
+   "pitch": -14,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
    "src": "pano/patch/nazlet-roof-today-equinox-dawn-ch0-dawn.jpg",
    "pano": "pano/nazlet-roof-today.jpg",
    "leaf": "ch0-dawn",
    "yaw": 284,
    "pitch": 1,
    "fov": 52.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/orion-built-night-dark-ch5-alnitak.jpg",
+   "pano": "pano/orion-built-night-dark.jpg",
+   "leaf": "ch5-alnitak",
+   "yaw": 180,
+   "pitch": 40,
+   "fov": 65.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/orion-built-night-dark-ch5-numbers.jpg",
+   "pano": "pano/orion-built-night-dark.jpg",
+   "leaf": "ch5-numbers",
+   "yaw": 184,
+   "pitch": 8,
+   "fov": 65.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/orion-built-night-dark-ch5-sah.jpg",
+   "pano": "pano/orion-built-night-dark.jpg",
+   "leaf": "ch5-sah",
+   "yaw": 180,
+   "pitch": 44,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/panorama-built-summer-evening-ch6-smyth.jpg",
+   "pano": "pano/panorama-built.jpg",
+   "leaf": "ch6-smyth",
+   "yaw": 24,
+   "pitch": -2,
+   "fov": 39.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/panorama-first-time-summer-evening-ch4-nothing.jpg",
+   "pano": "pano/panorama-first-time.jpg",
+   "leaf": "ch4-nothing",
+   "yaw": 30,
+   "pitch": -2,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/panorama-first-time-summer-evening-ch6-held.jpg",
+   "pano": "pano/panorama-first-time.jpg",
+   "leaf": "ch6-held",
+   "yaw": 24,
+   "pitch": -2,
+   "fov": 39.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/panorama-first-time-summer-evening-ch7-hureyra.jpg",
+   "pano": "pano/panorama-first-time.jpg",
+   "leaf": "ch7-hureyra",
+   "yaw": 40,
+   "pitch": 4,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/panorama-first-time-summer-evening-ch7-monument.jpg",
+   "pano": "pano/panorama-first-time.jpg",
+   "leaf": "ch7-monument",
+   "yaw": 40,
+   "pitch": 0,
+   "fov": 65.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/south-built-golden-south-ch6-measure.jpg",
+   "pano": "pano/south-built.jpg",
+   "leaf": "ch6-measure",
+   "yaw": 0,
+   "pitch": 10,
+   "fov": 75.4,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-back-first-time-equinox-dawn-ch2-drift.jpg",
+   "pano": "pano/sphinx-back-first-time.jpg",
+   "leaf": "ch2-drift",
+   "yaw": 90,
+   "pitch": 6,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-back-today-equinox-dawn-ch2-equinox.jpg",
+   "pano": "pano/sphinx-back-today.jpg",
+   "leaf": "ch2-equinox",
+   "yaw": 90,
+   "pitch": 6,
+   "fov": 78.0,
    "aspect": 1.777778
   },
   {
@@ -65,6 +227,24 @@
    "aspect": 1.777778
   },
   {
+   "src": "pano/patch/sphinx-side-built-equinox-dawn-ch2-inside.jpg",
+   "pano": "pano/sphinx-side-built.jpg",
+   "leaf": "ch2-inside",
+   "yaw": 29,
+   "pitch": 15,
+   "fov": 44.2,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-side-today-equinox-dawn-ch2-reader.jpg",
+   "pano": "pano/sphinx-side-today.jpg",
+   "leaf": "ch2-reader",
+   "yaw": 29,
+   "pitch": 15,
+   "fov": 44.2,
+   "aspect": 1.777778
+  },
+  {
    "src": "pano/patch/sphinx-today-equinox-dawn-ch0-sunrise.jpg",
    "pano": "pano/sphinx-today-equinox-dawn.jpg",
    "leaf": "ch0-sunrise",
@@ -80,6 +260,33 @@
    "yaw": 280,
    "pitch": -2,
    "fov": 57.2,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-today-equinox-dawn-ch3-core.jpg",
+   "pano": "pano/sphinx-today-equinox-dawn.jpg",
+   "leaf": "ch3-core",
+   "yaw": 235,
+   "pitch": -22,
+   "fov": 58.5,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-today-equinox-dawn-ch3-ditch.jpg",
+   "pano": "pano/sphinx-today-equinox-dawn.jpg",
+   "leaf": "ch3-ditch",
+   "yaw": 275,
+   "pitch": -4,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/valley-temple-built-temple-morning-ch3-statues.jpg",
+   "pano": "pano/valley-temple-built.jpg",
+   "leaf": "ch3-statues",
+   "yaw": 22,
+   "pitch": -15,
+   "fov": 78.0,
    "aspect": 1.777778
   }
  ]
