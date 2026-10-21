@@ -523,3 +523,18 @@ Already in `data/sources.json`: `lehner-1997`, `khafre-project-2025`. Proposed i
   }
 ]
 ```
+
+---
+
+## The Mataha Expedition's own report, read (21 October 2026)
+
+Stewart found the expedition's print version on De Cordier's Drive, linked from his Substack ("Unraveling the Mystery of Hawara", 24 March 2025): *labyrinthofegypt.com printversion, version VII, 08.2010*, 34 pages (sha256 starts 0e63ba204eb4a2ec). It is the organisers' account, not the NRIAG journal paper, and it is kept in `build/research/labyrinth/` only (© Mataha-expedition; not for the repo or the site without permission). What it adds, all as the expedition reports it, none peer reviewed here:
+
+- **When and who.** 18 February to 12 March 2008, conducted by NRIAG (Helwan) with Ghent University; Dr Abbas Mohamed Abbas among those thanked. Methods named in the depth diagram (p. 7): GPR, ERT, GEM-6 and VLF.
+- **Where (p. 6, "Scan zones").** Two grids south of the pyramid: **Site 1, 150 × 100 m**, east of the Bahr Wahbi canal, just south of the pyramid; **Site 2, 80 × 100 m**, west of the canal, rotated. Drawn on a satellite image with a north arrow and the grids' side lengths, which is enough to place them approximately (scaled from the figure; a stated sigma of tens of metres).
+- **What (p. 7).** Above the water table: chaotic mudbrick walls at 1.5–2.5 m, read as Ptolemaic and Roman. Water table at about 4–5 m. Below "the artificial stone surface" (Petrie's bed): "a grid structure of gigantic size" of very high resistivity at **8 to 12 m**, with walls "several meters" thick forming nearly closed rooms, **out of angle by 20° to 25° from the pyramid's orientation**, and similar parallel grids on both sides of the canal.
+- **An inconsistency to show, not smooth over.** The text says 8–12 m; the "Accumulated Results" diagram on the same page draws Petrie's slab at about 5 m and the "possible labyrinth structure" between about 5.5 and 8 m, and the one result image (p. 8) is labelled "Depth −8m, Zone A, VLF". VLF is the deepest-reaching and least resolved of the four methods.
+- **The result image (p. 8)** is a single VLF anomaly map of the 100 × 150 m zone at −8 m. It shows blobs and arcs; the "grid" is the expedition's interpretation of it, not a visible lattice.
+- **The publication record it claims:** a Cairo workshop (August 2008), "the scientific journal of the NRIAG" (autumn 2008), a public lecture at Ghent (October 2008); and that Hawass then asked them to stop communicating the results. The workshop PDF it cites: http://labyrinthofegypt.com/downloads/mataha-expedition_hawara-workshop.pdf (not fetched).
+
+For the leaf: the two grids and the 20–25° rotated lattice can be drawn at Hawara as the claim, tier `claimed`, with the depth given as the report gives it, both figures, and the reply's items (Abbas's own 2024 resistivity paper among them) beside it.
