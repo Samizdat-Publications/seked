@@ -2278,6 +2278,196 @@
    "interact": "look",
    "receipts": [],
    "reply": "ch8"
+  },
+  {
+   "id": "ch9-tested",
+   "chapter": 9,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 277,
+    "pitch": 0,
+    "fov": 34
+   },
+   "arrive": "cut",
+   "say": "Much of this case can be tested. Under the Sphinx, the test that matters most has not been made.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-floor",
+   "chapter": 9,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 285,
+    "pitch": -30,
+    "fov": 70
+   },
+   "arrive": "cut",
+   "say": "Look beneath the floor of the ditch. Schoch's seismic lines found the rock weathered more deeply in front of the lion than behind it.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-only",
+   "chapter": 9,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": -20,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "That difference is the only measured support for the early date, and no one has tested it by drilling.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-cores",
+   "chapter": 9,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 90,
+    "pitch": -12,
+    "fov": 76
+   },
+   "arrive": "turn",
+   "say": "Two cores, one at the paws and one behind the rump, would show whether it is weathering, as Schoch says, or a change in the rock itself.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-boreholes",
+   "chapter": 9,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 250,
+    "pitch": 2,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "It can be done. In 2008 Egypt's antiquities authority and Cairo University drilled four boreholes twenty metres into the bedrock around the Sphinx, to watch the groundwater.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-unpublished",
+   "chapter": 9,
+   "station": "sphinx-flank",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 250,
+    "pitch": 2,
+    "fov": 70
+   },
+   "arrive": "turn",
+   "say": "We have found no published record of how weathered that rock was.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-underneath",
+   "chapter": 9,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 272,
+    "pitch": -6,
+    "fov": 70
+   },
+   "arrive": "cut",
+   "say": "Underneath, the paw cavity could be opened, the radar team could release its data, and a dig at Hawara could go below the chips.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-answer",
+   "chapter": 9,
+   "station": "north",
+   "era": "today",
+   "moment": "june-dawn",
+   "view": {
+    "yaw": 180,
+    "pitch": 14,
+    "fov": 66
+   },
+   "arrive": "cut",
+   "say": "An answer looks like this: inside the Great Pyramid, muon detectors found a hidden corridor, gave its size with error bars, and a camera confirmed it.",
+   "draw": [],
+   "hold": 1.5,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-story",
+   "chapter": 9,
+   "station": "sphinx",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 44
+   },
+   "arrive": "cut",
+   "say": "Hancock, Bauval and Schoch read the stone, the sky and the texts as one story. Where it has been measured, the measurements have mostly gone against it.",
+   "draw": [],
+   "hold": 1,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
+  },
+  {
+   "id": "ch9-look",
+   "chapter": 9,
+   "station": "sphinx-face",
+   "era": "today",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 246,
+    "pitch": 10,
+    "fov": 70
+   },
+   "arrive": "cut",
+   "say": "The ditch floor has not. Until it is, that is where to look.",
+   "draw": [],
+   "hold": 3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch9"
   }
  ]
 }
