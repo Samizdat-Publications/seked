@@ -18,7 +18,7 @@ import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
 import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
-import { groundEnvironment, leafReceipts } from './receipts';
+import { TIER_WORDS, groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
 import { type Moment, comparisonsAt, epochOf, skyEnv, yearLabel } from './sky';
 import { type Claim, formatResidual, formatValue } from '@seked/claims/browser';
@@ -171,13 +171,20 @@ function khafreDepthsFigure(ground: Record<string, number> | null): string {
     under the paws, never dug, about ${d.paw} m; neither figure yet checked against its page.` : ''}</figcaption>`;
 }
 
+/** How a figure draws each tier, in the plain words of the tone rule, for the tiers it shows. */
+function tierKey(tiers: string[]): string {
+  const look: Record<string, string> = { excavated: 'stone', instrumented: 'blue', claimed: 'dashed', legendary: 'ghosted' };
+  return [...new Set(tiers)].filter((t): t is keyof typeof TIER_WORDS => t in TIER_WORDS)
+    .map((t) => `${look[t]}, ${TIER_WORDS[t]}`).join('; ');
+}
+
 /** Hawara's depths to one scale, each by its structure's tier, from the claims' environment. */
 function hawaraDepthsFigure(ground: Record<string, number> | null, structures: { id: string; evidence?: string }[] | undefined): string {
   const rows = ground && structures && hawaraDepths(ground, structures);
   if (!rows) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
   return `${hawaraDepthsSvg(rows)}<figcaption>Under Hawara, in metres below the ground: the bed of chips Petrie dug at the
     south foot, the two closures a resistivity survey found, and the walls the 2008 expedition reported, never dug. Drawn
-    by tier, from the records.</figcaption>`;
+    by tier, from the records: ${tierKey(rows.map((r) => r.tier))}.</figcaption>`;
 }
 
 /** How deep anyone has looked beside each claimed depth, from the records; with `tests`, chapter 9's test for each. */
@@ -186,7 +193,7 @@ function lookedFigure(ground: Record<string, number> | null, structures: { id: s
   if (!rows) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
   return `${lookedSvg(rows, tests)}<figcaption>How deep has anyone looked? Each claim, dashed, beside the deepest anyone has dug
     or drilled there, on a scale that grows tenfold at each mark. The 2008 boreholes stand beside the cavity, not in it, and their logs are unpublished; the 1978
-    holes into the Sphinx's anomalies left no depth on record. ${tests ? 'Below each, the test chapter 9 names. ' : ''}From the
+    holes into the Sphinx's anomalies left no depth on record. The claims, dashed: ${[...new Set(rows.map((r) => TIER_WORDS[r.tier as keyof typeof TIER_WORDS] ?? r.tier))].join('; ')}. ${tests ? 'Below each, the test chapter 9 names. ' : ''}From the
     records, none yet checked against its page.</figcaption>`;
 }
 
