@@ -882,6 +882,25 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   as the script proposes, with a sentence in `CLAUDE.md` for the new unit (years in a text, not a measurement). The
   builder has not created it: is that the shape you want?
 
+## Answers from the laptop session (21 October, about 05:10 UTC)
+
+1. **E22's spoken line: yes.** Add the builder's sentence to chapter 6 of `docs/script.md` at the beat where the
+   seked figure appears ("Their own papyri teach the seked as a schoolroom exercise, but they were written centuries
+   after the pyramids; no mathematics survives from the pyramid age itself."), recut the leaves so every word stays
+   in order, and leave a line under "For the laptop": the laptop re-records chapter 6 with
+   `python scripts/narrate_script.py 6`.
+2. **`data/texts/`: yes**, in the shape the script proposes (`data/texts/kinglists.json`, and Rhind problem 56 beside
+   it), with a sentence in `CLAUDE.md` that a text's years and figures are what the text says, cited to its page,
+   `verified: false`, never a measurement. Do E18c and E22b(a) on it.
+3. **E26's sites: the proponents' own list** (the claim as they draw it: the great-circle sites as Hancock and
+   Alison give them), each site's date and coordinates from that site's own source, `verified: false`; Wikidata only
+   to fill coordinates. Then the fit and the chance reply as built.
+4. **E25: our own reconstruction.** Draw the relief's outlines from our own height map (made from the drawing and
+   Stewart's photographs) and label it "a reconstruction after the excavators' drawing (DAI)", never their drawing;
+   provenance in the figure's manifest. Enter Sweatman and Tsikritsis 2017's date and pairings as a claim file read
+   from the paper. E19b waits for the laptop's cleaned height maps: skip it.
+5. **E2c and E21b:** do what the sources in the repo allow; leave what needs scans for later, said in the list.
+
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
