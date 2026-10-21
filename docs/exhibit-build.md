@@ -636,6 +636,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   need their sources read with care. A globe needs a world coastline, which the repo lacks (`data/places/basemap.json`
   is a box round Egypt): a Natural Earth 110 m import through `scripts/basemap.ts` if a globe is still wanted.
 
+- [ ] **E27. A recording of the exhibit, with its sound** (for a critic who watches it as a visitor would; Stewart fears
+  it is too slow). `scripts/capture_exhibit.py [--from LEAF] [--to LEAF] --out build/critic/NAME.mp4`: Playwright at
+  1280 by 720 with `record_video_dir`, muted, plays the exhibit in narrated play from leaf to leaf without touching it,
+  and logs each leaf's start time and each recording span it played; then lays the recorded narration
+  (`assets/narration/chN.mp3` spans and the replies if played) under the video at those times with the ffmpeg that
+  `imageio_ffmpeg.get_ffmpeg_exe()` gives, into one mp4. Test it on chapter 0 only (it records in real time); the
+  laptop runs the whole.
+- [ ] **E28. The laptop's review notes** (`docs/laptop-2026-10-20.md`, decision 18): (a) the head in the hand reads
+  rough: hide or cap the cut faces, light it as a museum object, let it fill its card, start at a three-quarter view
+  where the lion's head visibly encloses the king's; (b) chapter 8's "wells" leaf shows the plateau, not the wells;
+  (c) chapter 6's labels on the pyramid are small and crowd each other at 1280 by 720.
+
 ## Decisions
 
 1. **The exhibit reads `../walk/` for stations, overlays and panoramas** rather than copying them, so the 4096 by
