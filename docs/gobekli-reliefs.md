@@ -41,6 +41,13 @@ and drawings of every Enclosure D pillar.
 - 20 October: Pillar 43's front face, first height map (`build/gobekli/p43-height-a.png`, 1696 by 2528): every
   motif of the drawing in place, nothing invented. Next: clean the outline strokes and break lines, carve a test
   slab, then the plan's numbering in `enclosure_d.py`.
+- 21 October: Pillar 18's broad side (`build/gobekli/p18-side-height-a.png`: the arm and hand, the fox inside the
+  arm's curve, the belt of H and crescent signs, the pelt's start) and its narrow front
+  (`p18-front-height-b.png`: the two signs, the stola, the hands meeting, the belt's U buckle, the hanging pelt),
+  from the DAI's 3D-scan renders (Hochschule Karlsruhe, (c) DAI, via the Tepe Telegrams blog) and night photographs
+  Stewart found. The scan itself is not published; a request to the DAI for it is Stewart's to send. Stewart's
+  references are saved to `build/gobekli/stewart/` from now on. Still to come: Pillar 31 (the mirror of 18), 33
+  (its numbered drawing is in hand), 27 and 20 from the blog's photographs.
 
 ## For the exhibit
 
