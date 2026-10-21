@@ -550,9 +550,27 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `build/gobekli/p43-height-a.png`, or an outline from the excavators' drawing, labelled a reconstruction) laid over
   the sky `@seked/sky` computes at Göbekli Tepe, with Sweatman and Tsikritsis's date as the claim's free choice and
   the reply. See `docs/gobekli-reliefs.md`.
+  *Waiting on Stewart (chunk 9, 01:05 UTC):* the relief exists only as `build/gobekli/p43-height-a.png` on the laptop,
+  made from the excavators' drawing via Collins's page, which `docs/gobekli-reliefs.md` says is looked at, not
+  republished; laying it on a public page is his call. And the date and the figures' pairing (vulture as Cygnus,
+  scorpion as Scorpius) are the claim's inputs, so they want a claim file citing Sweatman and Tsikritsis 2017, read
+  from the paper rather than typed from memory. See For Stewart.
 - [ ] **E26. The world's pyramids on a globe and a timeline** (chapter 9's closing leaf, the plan's "Added 20
   October"): imported sites with date ranges, the best-fit great circle as the claim, the same fit for random sites in
   the same latitude band as the reply.
+  *First step done 2026-10-21 01:05 UTC, `d8c1c2d` (chunk 9): the arithmetic.* `apps/exhibit/src/greatcircle.ts`: the
+  least-squares great circle through a set of sites (its pole the smallest eigenvector of the sites' summed outer
+  products, by Jacobi rotations), each site's signed distance off it in degrees, and the reply, the same fit for as many
+  random sites spread by area over the same band of latitude, from a seeded generator, with the share that come as
+  close. 7 tests, one of which shows any three sites fitting well by chance. Kilometres need the Earth's radius from a
+  record, so the figure will convert. Left as E26b.
+- [ ] **E26b. The sites, then the globe and the timeline.** Waiting on the dataset (For Stewart). Wikidata, tried in
+  chunk 9 (`build/pyramids/query.rq`, everything that is an instance of a subclass of pyramid, Q12516, with
+  coordinates): 178 items, only 35 with an inception date, the Egyptian ones nearly all undated, and modern ones mixed in
+  (the Louvre's, a garden pyramid of 1748, a temple of 2021). Once a source is chosen: an importer in the manner of
+  `scripts/figures.ts` (download in `build/`, its sha256 in the source entry), `data/places/pyramids.json` with each
+  site's date range as its source gives it, then a figure: the sites on a turnable or flat globe with the fitted circle,
+  each site's distance in km, the chance share, and a timeline of the date ranges.
 
 ## Decisions
 
@@ -809,6 +827,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   nothing cut hundreds of metres into rock is known from ancient Egypt".
 - Rhind problem 56's figures (E22b) are text like the king lists: whatever shape you choose for `data/texts/` would
   take them too.
+
+- **E25, the Vulture Stone over the sky:** may the exhibit show Pillar 43's relief (the height map made from the
+  excavators' drawing on Collins's page) on its public pages? `docs/gobekli-reliefs.md` keeps those references
+  unpublished. The alternatives are an outline traced from the DAI's own published drawing with its permission, or
+  the sky alone with the animals named. The claim also wants a claim file from Sweatman and Tsikritsis 2017 (their date
+  and pairings, read from the paper).
+- **E26, the world's pyramids:** which dataset? Wikidata is CC0 but thin (35 of 178 dated, modern ones mixed in, the
+  Egyptian ones undated). Options: Wikidata with a stated rule (ancient classes only, dates from a second source);
+  a published scholarly list, if you know one; or the proponents' own list of sites (the claim as they draw it), with
+  dates from each site's own source. The fit and the chance reply are built and wait for the sites.
 
 - Chapter 4's king-list totals (Turin's 13,420 and 23,200, Manetho's) want a new data file, `data/texts/kinglists.json`,
   as the script proposes, with a sentence in `CLAUDE.md` for the new unit (years in a text, not a measurement). The
