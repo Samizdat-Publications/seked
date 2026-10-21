@@ -94,6 +94,14 @@
         "C:/Users/stewa/ClaudeProjects/seked/site"
       ],
       "port": 5191
+    },
+    {
+      "name": "voice-lab",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "scripts/voice_lab.py"
+      ],
+      "port": 5197
     }
   ]
 }
