@@ -620,13 +620,21 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   random sites spread by area over the same band of latitude, from a seeded generator, with the share that come as
   close. 7 tests, one of which shows any three sites fitting well by chance. Kilometres need the Earth's radius from a
   record, so the figure will convert. Left as E26b.
-- [ ] **E26b. The sites, then the globe and the timeline.** Waiting on the dataset (For Stewart). Wikidata, tried in
+- [x] **E26b. The sites, then the globe and the timeline.** *Done 2026-10-21 05:46 UTC (chunk 12), the sites, the fit, the reply and a figure; the dates, the sites' own coordinates and the timeline are E26c.* After the laptop's answer 3 (the proponents' own list): `6e1d5c2` enters Jim Alison's table (the circle Hancock draws on) as `data/places/great-circle.json`, his 17 sites in his degrees and minutes with his axis and tolerance sentences, a new proponent source `alison-great-circle`, `verified: false`, no circle stored; `apps/exhibit/src/worldsites.ts` fits it (within 0.34° of his axis; his six "0 miles" sites within a tenth of a degree of their own circle; but Giza sits 0.26°, about 29 km, off the axis he prints, so his axis and his miles disagree, which a test pins). `ed2ae45` the reply (decision 75): `pnpm run worldheritage` (`scripts/worldheritage.ts`) imports the World Heritage List's 944 cultural and mixed properties from Wikidata (CC0, sha256 in `wikidata-world-heritage`) into `data/places/world-heritage.json`; his circle passes within a quarter degree of 10 of them, 2,000 random circles about 4 on average, 12 per cent as many or more, the best 32. `2c6609c` the figure `great-circle` on "story" in `ch9-story`: the circle laid straight, one row a site, km from `earth.radius.mean`, and the random circles' counts as bars with his marked; hold 3 s. 9 tests; `pnpm test` 1255 passed. Looked at paused at both sizes with the bundle served, and in play (up from 7.5 s to 15.9 s). The earlier note follows. Waiting on the dataset (For Stewart). Wikidata, tried in
   chunk 9 (`build/pyramids/query.rq`, everything that is an instance of a subclass of pyramid, Q12516, with
   coordinates): 178 items, only 35 with an inception date, the Egyptian ones nearly all undated, and modern ones mixed in
   (the Louvre's, a garden pyramid of 1748, a temple of 2021). Once a source is chosen: an importer in the manner of
   `scripts/figures.ts` (download in `build/`, its sha256 in the source entry), `data/places/pyramids.json` with each
   site's date range as its source gives it, then a figure: the sites on a turnable or flat globe with the fitted circle,
   each site's distance in km, the chance share, and a timeline of the date ranges.
+- [ ] **E26c. The great circle's dates, the sites' own coordinates and the timeline.** The laptop's answer 3 asks for
+  each site's date range and coordinates from that site's own source (`verified: false`; Wikidata only to fill
+  coordinates). Add them beside Alison's figures in `data/places/great-circle.json` (a `own` block per site: point,
+  date range in years, source), run the fit on both and say in the caption how far the two sets differ, then a timeline
+  of the date ranges under the strip (Giza's pyramids, Nazca's lines, Easter Island's moai, Angkor's temples and the rest
+  span thousands of years, which is the plainest reply). Paratoari (a natural formation by most accounts) and Aneityum
+  need their sources read with care. A globe needs a world coastline, which the repo lacks (`data/places/basemap.json`
+  is a box round Egypt): a Natural Earth 110 m import through `scripts/basemap.ts` if a globe is still wanted.
 
 ## Decisions
 
@@ -891,6 +899,20 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 73. **C8's overlay is `panel`, carrying the pairings as params.** The pairings are the claim's inputs, so they live in
    its file; the viewer's scene is Giza's and holds nothing of Göbekli Tepe, which `panel` exists to say. The web test's
    list of panel claims names C8 with that reason.
+74. **The great circle's claim runs on Alison's own coordinates**, the claim as he draws it, like a text's figures. The
+   laptop's answer asked for each site's coordinates from its own source; those go in beside his (E26c) and the fit
+   runs on both, so the claim is never strengthened or weakened by our choice of points.
+75. **The reply draws on a pool, not random points in a band.** Seventeen random points never line up as well as
+   seventeen chosen ones (0 of 2,000 did), so that reply would flatter the claim and say nothing about choosing. The
+   fair question is how unusual his circle is among comparable places: the World Heritage List's cultural properties,
+   counted within his own quarter of a degree, against circles with random poles. `chance` in `greatcircle.ts` stays,
+   undrawn. Another pool (a list of ancient sites only) is one import away.
+76. **Whole properties with a cultural criterion, one point each** (the lowest Q number where Wikidata gives one id
+   several items): components would let a long serial property count many times.
+77. **The circle laid straight rather than on a globe**: one row a site reads on a phone, and the repo has no world
+   coastline. Reversible: the strip is one function.
+78. **On `ch9-story`, cued on "story", hold 3 s, no new words**: the sentence names the three readers and "one story",
+   which the circle is part of in Hancock's books, so nothing is re-recorded. A spoken line is in For Stewart.
 
 ## For Stewart
 
@@ -946,6 +968,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   the Vulture Stone, as a map of the sky dated to 10,950 BCE; by our reckoning the date they give misses their own reading
   by three centuries." It would mean re-recording chapter 7. Note the plan had their vulture as Cygnus; the paper says
   Sagittarius.
+
+- **The great circle in words?** (E26b, chunk 12.) It is a figure on chapter 9's "one story" leaf, unspoken. If you
+  want it said, a sentence for the script after that one might be: "Hancock's circle of world wonders passes close to
+  ten World Heritage sites; a circle drawn at random passes about four, and one in eight does as well." It would mean
+  re-recording chapter 9.
 
 ## Answers from the laptop session (21 October, about 05:10 UTC)
 
