@@ -449,6 +449,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   size with its sigmas from `data/measurements/g1-voids.json` (verified). (b) The two undrilled cores and the 2008
   boreholes in plan and section, once W1's depths and the boreholes' scaled positions are records (E2c's sources).
   (c) Chapter 8's depth scale returning with each claim's test beside it (after E20b).
+  *(a) done 2026-10-21 00:09 UTC, `72581c0`:* `corridor` on "error" in `ch9-answer`: the corridor in a north-south
+  section to scale from `g1-voids.json` (all verified, Procureur and others 2023), 9.06 by 2.18 m with a band of plus
+  and minus each sigma, 0.84 m behind the Chevron, its floor 20 m up on a broken axis, the width across in the caption
+  with "The Sphinx's claimed cavity has no comparable figures at all". The paper's length is the record `.width` (the
+  project's keys take length east to west); a test pins that. Looked at at both sizes; in play it draws about 10 s in.
 
 ## Decisions
 
