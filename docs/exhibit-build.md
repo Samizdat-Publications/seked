@@ -445,6 +445,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   player's list of figures that read the monuments). Looked at at both sizes, with the bundle built locally by
   `pnpm bundle` and served to the page by the screenshot script. Left: the Osiris Shaft and the paw cavity on the
   same scale (they need depth records), and Hawara's section.
+  *(b) done 2026-10-21 00:21 UTC, `c2bbef0` (chunk 7):* the Osiris Shaft (`osiris_shaft.bottom.depth`, about 30 m,
+  `hawass-2007`) and the paw cavity (`sphinx.paw_cavity.top.depth`, about 5 m, `dobecki-schoch-1992`) are records in
+  `data/measurements/underground.json`, both unchecked, each a depth below its own ground (decision 53). `khafre-depths`
+  draws them beside the pyramid's foot, the shaft in stone and the cavity dashed, and the caption names them; at this
+  scale they are a few pixels, which is the point. Labels crossing the heights bar are outlined. The story's chapter 8
+  scale (`apps/story/src/depths.ts`) now draws both instead of naming them undrawn. Looked at at both sizes, the
+  exhibit's figure and the story's scale (where the paw label was shortened to clear Hawara's column on a phone).
+  Left: Hawara's section. Its records exist (`data/measurements/hawara.json`, read by the story's scale), so it is
+  no longer waiting; it is E20c.
+- [ ] **E20c. Hawara's section on `ch8-hawara`.** Petrie's chips, the resistivity closures and the Mataha walls on
+  one depth scale from `data/measurements/hawara.json` (the keys `apps/story/src/depths.ts` reads), each by its tier,
+  as an exhibit figure cued in `ch8-hawara`.
 - [x] **E21. Chapter 9, "What would settle it": its leaves.** *Done 2026-10-21 00:04 UTC, `3ee1dd2`.* 10 leaves, every
   word in order and inside `ch9.json`, all today; every chapter of the script is now in leaves (113). Opens on the
   Sphinx at dawn with chapter 0's framing; the flank's floor for the seismic lines (yaw 285, pitch -30, as
@@ -646,6 +658,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
     millennium the chapter is about. The leaves for the monument look along its bearing from Giza, so the picture
     points where the words are. Reversible: give the monument leaves an `until` once a Göbekli station exists.
 
+53. **A depth below a thing's own ground is a `.depth` key, positive downwards**, as the story's scale and Hawara's
+   records already read them, not a `.up` key on the pyramid's base plane: the Osiris Shaft is measured from the
+   causeway and the paw cavity from the enclosure floor, and no record places either ground against G2's base. The
+   two values came from the structures' register notes and are unchecked; the figure says each is from its own
+   ground. Reversible by re-keying once a source gives the grounds' levels.
 
 ## For Stewart
 
