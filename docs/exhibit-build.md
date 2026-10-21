@@ -942,7 +942,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 
 - **Pillar 43 in words?** (E25, chunk 11.) Chapter 7's narration does not mention the Vulture Stone; the script left
   Sweatman out for want of checked sources, and the paper is now read (C8). The chart is a figure on "carved with
-  animals". If you want it spoken, a sentence for the script after that one might be: "Two engineers read one pillar,
+  animals". If you want it spoken, a sentence for the script after that one might be: "Two researchers at Edinburgh read one pillar,
   the Vulture Stone, as a map of the sky dated to 10,950 BCE; by our reckoning the date they give misses their own reading
   by three centuries." It would mean re-recording chapter 7. Note the plan had their vulture as Cygnus; the paper says
   Sagittarius.
