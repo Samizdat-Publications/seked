@@ -34,7 +34,8 @@ describe('the sky data', () => {
     const leo = data.figures.Leo!;
     expect(leo.lines.flat()).toContain('hip49669');   // Regulus
     for (const id of leo.lines.flat()) expect(ids.has(id), id).toBe(true);
-    expect(Object.keys(data.figures)).toEqual(['Leo', 'Ori']);
+    // the two drawn by default, then the constellations C8's sky chart reads
+    expect(Object.keys(data.figures)).toEqual(['Leo', 'Ori', ...Object.keys(data.claims.C8!.chart!.figures)]);
     expect(data.figures.Ori!.lines.flat().length).toBeGreaterThan(10);
     expect(data.attribution).toContain('Stellarium');
   });

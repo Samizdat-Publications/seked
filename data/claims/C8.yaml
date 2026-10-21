@@ -24,6 +24,16 @@ free_choices:
   - the summer solstice, chosen from the four seasons because its date lies nearest the radiocarbon dates; the others give 2000 AD, 4350 BC and 18,000 BC
   - the spout, γ Sagittarii, standing for where on the vulture the disc sits
   - sunset rather than sunrise, chosen for the figures' orientation
+overlay:
+  type: panel
+  params:
+    star: alnasl
+    figures:
+      Sgr: the vulture
+      Sco: the scorpion
+      Oph: the bent bird
+      Lib: the long-necked bird
+      Lup: the wolf
 sources:
   for: [sweatman-tsikritsis-2017]
   against: [notroff-2017]

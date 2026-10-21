@@ -482,9 +482,10 @@ describe('every overlay a claim declares is built', () => {
   it('leaves unbuilt only the type that says there is no picture', () => {
     const types = declared.map((c) => c.overlay?.type as string);
     expect([...new Set(types.filter((t) => !BUILT_OVERLAYS.has(t)))]).toEqual([PANEL_ONLY]);
-    // The three that declare it are each arithmetic on two numbers, which is
-    // a claim with nothing in the scene rather than an overlay left undone.
-    expect(declared.filter((c) => c.overlay?.type === PANEL_ONLY).map((c) => c.id)).toEqual(['A5', 'B2', 'B5']);
+    // A5, B2 and B5 are each arithmetic on two numbers, which is a claim with
+    // nothing in the scene rather than an overlay left undone; C8 is argued at
+    // Göbekli Tepe, not at Giza, and the exhibit draws its sky as a chart.
+    expect(declared.filter((c) => c.overlay?.type === PANEL_ONLY).map((c) => c.id)).toEqual(['A5', 'B2', 'B5', 'C8']);
   });
 });
 

@@ -1417,9 +1417,9 @@ const ROUND = (v: number, d = 1): string => v.toFixed(d);
 /**
  * The type a claim declares when there is nothing in the scene to draw. A5,
  * B2 and B5 are each arithmetic on two numbers, and a picture of that is a
- * picture of the panel. Saying so is how a claim states that the monument is
- * not where it is argued, which is a different thing from an overlay nobody
- * has built yet.
+ * picture of the panel. C8 is argued at Göbekli Tepe, which the scene does not
+ * hold. Saying so is how a claim states that the monument is not where it is
+ * argued, which is a different thing from an overlay nobody has built yet.
  */
 export const PANEL_ONLY = 'panel';
 

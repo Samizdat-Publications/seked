@@ -17,6 +17,7 @@ import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import texts from 'virtual:texts';
 import { bce, kingListsSvg, rhind56, rhind56Svg } from './texts';
+import { vultureChart, vultureChartSvg } from './vulturesky';
 import { degreesToSeked } from '@seked/units';
 import corridor from 'virtual:corridor';
 import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
@@ -271,6 +272,18 @@ function rhindFigure(b: Bundle | null): string {
     after the pyramids. Its figures after ${shortCite(texts.rhindCitation)}'s summary of Chace's edition${r.verified ? '' : ', not yet checked against the edition'}.</figcaption>`;
 }
 
+/** C8: Pillar 43's animals as Sweatman and Tsikritsis read them, on the sky of their date, with the miss computed. */
+function vultureFigure(): string {
+  const v = vultureChart(skyData);
+  if (!v) return '';
+  const pairs = v.figures.map((f) => `${f.animal} as ${f.name}`).join(', ');
+  return `${vultureChartSvg(v)}<figcaption>Pillar 43 read as a sky, as Sweatman and Tsikritsis read it in 2017: ${pairs}, and the
+    disc above the vulture's wing as the sun at the summer solstice, which they date to ${bce(v.epoch)} by the sun standing just
+    above the teapot's spout. Computed here from the catalogue and the precession of that year, the solstice sun stands
+    ${Math.abs(v.residual).toFixed(1)}&#176; of longitude ${v.residual > 0 ? 'west' : 'east'} of the spout; the receipt weighs that against the paper's own 250 years. The pairings are the
+    claim's own choices; the excavators read the animals as Göbekli Tepe's own world. The relief itself is not drawn yet.</figcaption>`;
+}
+
 /** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */
 function claimSortFigure(b: Bundle | null): string {
   if (!b) return '<figcaption>The claims are sorted from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
@@ -412,6 +425,7 @@ async function start(): Promise<void> {
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     if (id === 'king-lists') figure.innerHTML = kingListsFigure();
     if (id === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
+    if (id === 'vulture-sky') figure.innerHTML = vultureFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;

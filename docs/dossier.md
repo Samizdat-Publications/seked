@@ -557,6 +557,8 @@ Residual by survey preset:
 - the spout, γ Sagittarii, standing for where on the vulture the disc sits
 - sunset rather than sunrise, chosen for the figures' orientation
 
+**Overlay:** `panel` {"star":"alnasl","figures":{"Sgr":"the vulture","Sco":"the scorpion","Oph":"the bent bird","Lib":"the long-necked bird","Lup":"the wolf"}}
+
 **Proponents:** Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.
 
 **Context:** Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22. · astronexus. The HYG Database, version 4.2. A merge of the Hipparcos, Yale Bright Star and Gliese catalogues into one CSV, with positions and proper motions at epoch and equinox J2000, distances, magnitudes, spectral types, colour indices and catalogue designations. · Collins, A. (2006). The Cygnus Mystery. London: Watkins.

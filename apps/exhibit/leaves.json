@@ -1994,10 +1994,10 @@
    },
    "arrive": "turn",
    "say": "Then, as the cold lifts, a monument appears on a hilltop in south-east Turkey. Göbekli Tepe is a set of great rings of T-shaped stone pillars, carved with animals.",
-   "draw": [],
-   "hold": 1,
+   "draw": ["vulture-sky@animals"],
+   "hold": 5,
    "interact": "look",
-   "receipts": [],
+   "receipts": ["C8"],
    "reply": "ch7"
   },
   {
