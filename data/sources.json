@@ -1049,7 +1049,8 @@
     "year": 2017,
     "citation": "Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.",
     "url": "https://doi.org/10.5281/zenodo.400780",
-    "note": "Peer-reviewed. Unchecked: abstract (10950 BC ± 250 yrs) seen in search summary; the star identifications not confirmed. From docs/research/ch7.md, by its research job; not yet checked here."
+    "license": "CC BY 4.0",
+    "note": "Peer-reviewed. Read on 2026-10-21 by the night builder (chunk 11) in the Zenodo PDF (sha256 b5a1b30a35829581af65bf19d608722a8714f5282be212777d47302e53bcba11): the pairings on p. 237 (the vulture as the teapot of Sagittarius, not Cygnus; the bent bird as Ophiuchus, the long-necked bird as Libra, the animal left of the scorpion as Lupus), the disc as the sun and the four candidate dates on p. 238, where 10,950 BC is the summer solstice at sunset seen from Sanliurfa in Stellarium, with the sun slightly above the spout. Claim C8."
   },
   {
     "id": "trimble-1964",

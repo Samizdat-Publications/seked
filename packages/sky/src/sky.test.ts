@@ -225,6 +225,8 @@ const FROM_MEMORY: Record<string, [number, number, number, number]> = {
  * them to be checked against and nothing below tries to check one.
  */
 const CYGNUS = ['fawaris', 'sadr', 'aljanah', 'deneb'];
+/** Added the same way for C8: γ Sagittarii, the teapot's spout on the Vulture Stone. */
+const IMPORTED_ONLY = [...CYGNUS, 'alnasl'];
 
 /** Worst difference actually seen is Mizar at 0.455 arcseconds. */
 const POSITION_TOLERANCE_ARCSEC = 0.5;
@@ -245,10 +247,10 @@ describe('the named stars, against the values that were entered from memory', ()
   /** The ten of the catalogue that the remembered sheet has something to say about. */
   const fromMemory = stars.filter((s) => FROM_MEMORY[s.id] !== undefined);
 
-  it('still holds the remembered ten, adds the four Cygnus stars and nothing else, and cites HYG 4.2 throughout', () => {
+  it('still holds the remembered ten, adds the four Cygnus stars and Alnasl and nothing else, and cites HYG 4.2 throughout', () => {
     const ids = stars.map((s) => s.id);
     for (const id of Object.keys(FROM_MEMORY)) expect(ids, id).toContain(id);
-    expect(ids.filter((id) => FROM_MEMORY[id] === undefined).sort()).toEqual([...CYGNUS].sort());
+    expect(ids.filter((id) => FROM_MEMORY[id] === undefined).sort()).toEqual([...IMPORTED_ONLY].sort());
     for (const star of stars) expect(star.source, star.id).toBe('hyg-4.2');
   });
 

@@ -10,7 +10,7 @@
  *
  * Two files come out. `hyg-bright.json` is every HYG star to magnitude 6.5,
  * which is everything a dark-sky naked eye can see and everything the sky
- * dome will ever draw. `named.json` is the fourteen stars the claims and
+ * dome will ever draw. `named.json` is the fifteen stars the claims and
  * scripts/shafts.ts name, cut from the same import so the two can never
  * disagree; the script prints how far each of them moved from the values
  * that were in named.json before, which is the check the plan asked for on
@@ -43,7 +43,7 @@ const ATTRIBUTION = `HYG Database v4.2 by astronexus (https://codeberg.org/astro
 /**
  * The stars the claims name, their Hipparcos numbers, and what each one is
  * for. The roles are editorial and live here because named.json is generated;
- * everything else about these fourteen comes out of the import.
+ * everything else about these fifteen comes out of the import.
  */
 const NAMED: { id: string; hip: number; role: string }[] = [
   { id: 'alnitak', hip: 26727, role: "Orion's Belt, east; King's Chamber south shaft (C2); Orion Correlation (C4)" },
@@ -60,6 +60,7 @@ const NAMED: { id: string; hip: number; role: string }[] = [
   { id: 'sadr', hip: 100453, role: "γ Cygni, the wing star Collins lays on Khafre's pyramid (C7)" },
   { id: 'aljanah', hip: 102488, role: "ε Cygni, Gienah in Collins, the wing star he lays on Menkaure's pyramid (C7)" },
   { id: 'deneb', hip: 102098, role: "α Cygni; Collins has it rising over Heliopolis and setting into Khafre's pyramid from Gebel Gibli, neither modelled (C7)" },
+  { id: 'alnasl', hip: 88635, role: "γ Sagittarii, the spout of the teapot, where Sweatman and Tsikritsis put the solstice sun on Pillar 43 (C8)" },
 ];
 
 /** HYG writes Bayer letters as three-letter abbreviations; named.json shows the letter. */
