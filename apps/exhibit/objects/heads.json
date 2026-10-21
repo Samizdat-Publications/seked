@@ -1,0 +1,50 @@
+{
+ "about": "The ghosted head for the exhibit's object in the hand: the as-built king's head, solid, inside the First Time lion's head, drawn translucent. Written by render/export_heads.py; read by apps/exhibit.",
+ "frame": "glTF's: metres, +x east, +y up, -z north, centred on `centre` (project metres: +x east, +y north, +z up)",
+ "centre": [
+  337.585,
+  -432.9,
+  -23.1
+ ],
+ "crop": {
+  "box": {
+   "x0": 324.74,
+   "x1": 346.43,
+   "y0": -444.61,
+   "y1": -421.5,
+   "z0": -30.6,
+   "z1": -8.6
+  },
+  "look_choices": {
+   "aft": 8.0,
+   "fore": 4.0,
+   "side": 2.0,
+   "below": 3.0
+  },
+  "faces": 60000,
+  "texture_px": 1024
+ },
+ "objects": [
+  {
+   "id": "king",
+   "file": "head-king.glb",
+   "era": "built",
+   "role": "solid",
+   "model": "sphinx-built"
+  },
+  {
+   "id": "lion",
+   "file": "head-lion.glb",
+   "era": "first-time",
+   "role": "ghost",
+   "model": "sphinx-master"
+  }
+ ],
+ "head_scale": {
+  "used": 1.17,
+  "least": null,
+  "made_by": "render/giza/sphinx_eras.py --solve-head",
+  "target": "sphinx.head.height"
+ },
+ "standin": "Both heads are visual stand-ins (Meshy models), cut from the statues as the renders fit them to the Sphinx's footprint. Nothing of their form is a measurement; the enlargement is read off the two stand-ins."
+}
