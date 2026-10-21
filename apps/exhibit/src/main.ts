@@ -459,6 +459,12 @@ async function start(): Promise<void> {
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;
+    stage.request();   // the scene's labels step off the panel, or back
+  };
+  stage.keepOut = () => {
+    if (figure.hidden) return [];
+    const f = figure.getBoundingClientRect(), s = $('stage').getBoundingClientRect();
+    return [{ x: f.left - s.left, y: f.top - s.top, w: f.width, h: f.height }];
   };
   panel.onOpen = () => { if (player.playing) player.pause(); };
   player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); };
