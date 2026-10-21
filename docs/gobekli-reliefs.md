@@ -27,7 +27,7 @@ reserved, so they are looked at, not republished). Sources:
 | 43 | front | photograph with scale bar, early excavation | same page |
 | 43 | front | photograph today, under the shelter | same page |
 | 43 | front, the vulture | close-up | same page |
-| 43 | the sky reading | the relief laid over Stellarium's sky for 9600 BCE (Cygnus as the vulture, Scorpius as the scorpion) | Collins; and Sweatman and Tsikritsis 2017, *Mediterranean Archaeology and Archaeometry* (open access) |
+| 43 | the sky reading | the relief laid over the sky: for Collins the vulture is Cygnus; for Sweatman and Tsikritsis 2017 (*Mediterranean Archaeology and Archaeometry*, open access, p. 237) it is the teapot of Sagittarius, with Scorpius as the scorpion, at the summer solstice of 10,950 BC (p. 238; claim C8) | Collins; Sweatman and Tsikritsis 2017 |
 | 43 | | the DAI's account: "Of animals and a headless man" | https://www.dainst.blog/the-tepe-telegrams/2016/10/14/of-animals-and-a-headless-man-gobekli-tepe-pillar-43/ |
 | 18 or 31 (central) | side: arm, hands, belt with fox pelt | photograph © Fazli Karabacak | Stewart, 20 October |
 | Enclosure D | plan | schematic plan with pillar numbers (18, 19 to 22, 30 to 33, 38, 41 to 43) and the 350.5° axis | via Collins |
@@ -45,6 +45,6 @@ and drawings of every Enclosure D pillar.
 ## For the exhibit
 
 The Vulture Stone is a claim in its own right: Sweatman and Tsikritsis read it as a sky map dated by precession,
-the vulture as Cygnus and the scorpion as Scorpius. `@seked/sky` can draw the sky over Göbekli Tepe for any date,
+the vulture as Sagittarius and the scorpion as Scorpius (Cygnus is Collins's reading; corrected 21 October from the paper). `@seked/sky` can draw the sky over Göbekli Tepe for any date,
 so the exhibit can lay the relief over the computed sky in chapter 7, as chapter 5 does with Orion, with the
 claim, its free choices and the reply.
