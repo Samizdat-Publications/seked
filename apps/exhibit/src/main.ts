@@ -15,7 +15,8 @@ import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import corridor from 'virtual:corridor';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -138,6 +139,15 @@ function radiocarbonFigure(): string {
     reign lengths, not dated directly.${unchecked ? " Not yet checked against the papers' tables." : ''}</figcaption>`;
 }
 
+/** The model answer: the north-face corridor as its paper measured it, every figure with its error bar. */
+function corridorFigure(): string {
+  const d = corridor;
+  return `${corridorSvg(d)}<figcaption>The corridor behind the Great Pyramid's north face, found by muon imaging and
+    seen through an endoscope; ${d.across.value.toFixed(2)} &#177; ${d.across.sigma.toFixed(2)} m across, east to west.
+    ${shortCite(d.citation)}, ${d.verified ? 'checked against the paper' : 'not yet checked'}. The Sphinx's claimed cavity
+    has no comparable figures at all.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -250,6 +260,7 @@ async function start(): Promise<void> {
       no measured section through an original joint has been published, by either side.</figcaption>`;
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
+    if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

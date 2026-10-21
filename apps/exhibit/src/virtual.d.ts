@@ -18,3 +18,7 @@ declare module 'virtual:radiocarbon' {
   const data: import('./figures').RadiocarbonData;
   export default data;
 }
+declare module 'virtual:corridor' {
+  const data: import('./figures').CorridorData;
+  export default data;
+}

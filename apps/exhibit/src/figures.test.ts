@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -172,6 +172,21 @@ describe('the radiocarbon accessions', () => {
   });
   it('refuses an accession with only one end', () => {
     expect(() => radiocarbonData([{ key: 'chronology.aha.accession.earliest', value: -3217, source: 'dee-2013' }], read('sources.json'))).toThrow(/start or an end/);
+  });
+});
+
+describe('the north-face corridor', () => {
+  const d = corridorData(read('measurements/g1-voids.json'), read('sources.json'));
+  it("runs north to south as the paper's length, each figure with its sigma, checked", () => {
+    expect(d.along).toEqual({ value: 9.06, sigma: 0.07 });
+    expect(d.across).toEqual({ value: 2.02, sigma: 0.06 });
+    expect(d.verified).toBe(true);
+  });
+  it('draws the box to scale and writes every figure with its error bar', () => {
+    const svg = corridorSvg(d);
+    const box = /<rect class="wall draw-on" x="([\d.]+)" y="[\d.]+" width="([\d.]+)" height="([\d.]+)"/.exec(svg)!;
+    expect(Number(box[2]) / Number(box[3])).toBeCloseTo(9.06 / 2.18, 1);
+    for (const t of ['9.06 &#177; 0.07 m', '2.18 &#177; 0.17 m', '0.84 &#177; 0.05 m', '20.0 &#177; 0.5 m']) expect(svg).toContain(t);
   });
 });
 

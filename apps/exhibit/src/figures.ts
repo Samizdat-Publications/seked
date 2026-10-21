@@ -28,6 +28,9 @@
  * `radiocarbon`: the first king's accession and four later ones as radiocarbon models date them
  * (data/measurements/chronology.json), each a bar of its 95 per cent range on one line of years.
  *
+ * `corridor`: the model answer, the Great Pyramid's north-face corridor in section to scale, every dimension with
+ * its error bar (data/measurements/g1-voids.json).
+ *
  * `joint-claim`: the joint West and Schoch describe, drawn as they describe it (no survey of one exists).
  *
  * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
@@ -35,7 +38,7 @@
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -398,6 +401,60 @@ export function radiocarbonSvg(d: RadiocarbonData, width = 300): string {
   }).join('\n  ')}
   <line class="dim" x1="${X(lo)}" y1="${h - 20}" x2="${X(hi)}" y2="${h - 20}"/>
   ${ticks.map((t) => `<text class="north" x="${X(t)}" y="${h - 6}" text-anchor="middle">${yearText(t)}</text>`).join('')}
+</svg>`;
+}
+
+/** A measured length and its sigma, metres. */
+export interface Measured { value: number; sigma: number }
+export interface CorridorData { along: Measured; across: Measured; height: Measured; floor: Measured; behind: Measured; citation: string; verified: boolean }
+
+/**
+ * The north-face corridor cut from data/measurements/g1-voids.json. The keys use the project's sense of length (east
+ * to west), so the paper's "length", north to south, is `.width`; here it is `along`, the way the section runs.
+ */
+export function corridorData(records: { key: string; value: number; sigma?: number; source: string; verified?: boolean }[],
+  sources: { id: string; citation: string }[]): CorridorData {
+  const K = 'void.north_face_corridor.';
+  const rows = records.filter((r) => r.key.startsWith(K));
+  const get = (k: string): Measured => {
+    const r = rows.find((x) => x.key === K + k);
+    if (!r || r.sigma === undefined) throw new Error(`no ${K}${k} with a sigma`);
+    return { value: r.value, sigma: r.sigma };
+  };
+  const citation = sources.find((s) => s.id === rows[0]?.source)?.citation;
+  if (!citation) throw new Error('no source for the corridor');
+  return {
+    along: get('width'), across: get('length'), height: get('height'), floor: get('floor.up'), behind: get('from_north_face'),
+    citation, verified: rows.every((r) => !!r.verified),
+  };
+}
+
+const pm = (m: Measured) => `${m.value.toFixed(2)} &#177; ${m.sigma.toFixed(2)} m`;
+
+/**
+ * The corridor in a north-south section, to scale: the box with a faint band of plus and minus its sigma on each
+ * face, the gap to the Chevron's north face, and the floor's height above the ground on a broken axis below.
+ */
+export function corridorSvg(d: CorridorData, width = 300): string {
+  const pad = 22, run = d.behind.value + d.along.value, s = (width - 2 * pad) / run;
+  const top = 34, h = d.height.value * s, base = top + h, ground = base + 58, H = ground + 18;
+  const x0 = pad + d.behind.value * s, x1 = x0 + d.along.value * s;
+  const band = (x: number, y: number, w: number, hh: number, e: number, ev: number) =>
+    `<rect class="err" x="${(x - e).toFixed(1)}" y="${(y - ev).toFixed(1)}" width="${(w + 2 * e).toFixed(1)}" height="${(hh + 2 * ev).toFixed(1)}"/>`;
+  return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="The north-face corridor in section, ${d.along.value} metres long and ${d.height.value} high">
+  <text class="north" x="${pad}" y="12">N</text><text class="north" x="${width - pad}" y="12" text-anchor="end">S</text>
+  ${band(x0, top, d.along.value * s, h, d.along.sigma * s, d.height.sigma * s)}
+  <rect class="wall draw-on" x="${x0.toFixed(1)}" y="${top}" width="${(d.along.value * s).toFixed(1)}" height="${h.toFixed(1)}" pathLength="1" fill="none"/>
+  <line class="dim" x1="${pad}" y1="${top - 14}" x2="${pad}" y2="${base + 10}"/>
+  <text class="here-lab" x="${pad + 3}" y="${base + 14}">${pm(d.behind)} behind the Chevron</text>
+  <text class="lab" x="${((x0 + x1) / 2).toFixed(1)}" y="${top - 6}" text-anchor="middle">${pm(d.along)} long</text>
+  <text class="lab" x="${(x1 - 4).toFixed(1)}" y="${(top + h / 2 + 4).toFixed(1)}" text-anchor="end">${pm(d.height)} high</text>
+  <line class="dim" x1="${(x1 - 10).toFixed(1)}" y1="${base}" x2="${(x1 - 10).toFixed(1)}" y2="${ground - 24}"/>
+  <path class="dim" fill="none" style="stroke-dasharray: none" d="M ${(x1 - 16).toFixed(1)} ${ground - 22} l 12 -4 M ${(x1 - 16).toFixed(1)} ${ground - 17} l 12 -4"/>
+  <line class="dim" x1="${(x1 - 10).toFixed(1)}" y1="${ground - 17}" x2="${(x1 - 10).toFixed(1)}" y2="${ground}"/>
+  <line class="dim" x1="${pad}" y1="${ground}" x2="${width - pad}" y2="${ground}"/>
+  <text class="here-lab" x="${(x1 - 18).toFixed(1)}" y="${ground - 6}" text-anchor="end">floor ${d.floor.value.toFixed(1)} &#177; ${d.floor.sigma.toFixed(1)} m up</text>
+  <text class="north" x="${pad}" y="${ground + 13}">the ground</text>
 </svg>`;
 }
 

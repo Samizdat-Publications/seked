@@ -2425,7 +2425,7 @@
    },
    "arrive": "cut",
    "say": "An answer looks like this: inside the Great Pyramid, muon detectors found a hidden corridor, gave its size with error bars, and a camera confirmed it.",
-   "draw": [],
+   "draw": ["corridor@error"],
    "hold": 1.5,
    "interact": "look",
    "receipts": [],
