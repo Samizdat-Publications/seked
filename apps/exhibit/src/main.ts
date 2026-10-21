@@ -199,7 +199,8 @@ function sekedRuleFigure(b: Bundle | null, ground: Record<string, number> | null
   return `${sekedRuleSvg(r)}<figcaption>The builders' rule: a slope given as palms of run for a cubit of rise. The measured face,
     ${formatValue(result.comparisons[0]!.value, 'deg')}, against three slopes (A3): ${result.comparisons.map(line).join('; ')}.
     ${result.comparisons.every((c) => c.within) ? 'All three hold' : 'Not all hold'}, with ${result.freeChoices} free choices, so the survey cannot tell
-    them apart; only the seked is attested in Egyptian mathematics.</figcaption>`;
+    them apart; only the seked is attested in Egyptian mathematics. But the papyri that teach it are centuries younger than
+    the pyramid: no mathematical papyrus survives from the pyramid age itself.</figcaption>`;
 }
 
 /** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */
