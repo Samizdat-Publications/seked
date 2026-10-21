@@ -327,13 +327,15 @@ describe('the D1 ground line', () => {
   // takes it from the offsets `buildEnvironment` derives, which are built in
   // the same flat frame, so the change is a change of spelling and not of
   // number. Nothing else would let the site plan and the claim agree.
-  it('reads the same bearing the coordinates gave before the offsets were derived', () => {
-    const before = evaluate(
-      'atan2((heliopolis.obelisk.center.longitude - g1.center.longitude) * cos(g1.center.latitude), ' +
-        'heliopolis.obelisk.center.latitude - g1.center.latitude)',
+  it('reads the true initial bearing to Heliopolis, the great-circle one, from the derived offsets', () => {
+    // the standard spherical initial-bearing formula, written out here, not the code under test
+    const great = evaluate(
+      'atan2(sin(heliopolis.obelisk.center.longitude - g1.center.longitude) * cos(heliopolis.obelisk.center.latitude), ' +
+        'cos(g1.center.latitude) * sin(heliopolis.obelisk.center.latitude) - ' +
+        'sin(g1.center.latitude) * cos(heliopolis.obelisk.center.latitude) * cos(heliopolis.obelisk.center.longitude - g1.center.longitude))',
       model.env,
     );
-    expect(Math.abs((comparisons()[0]?.targetValue as number) - before)).toBeLessThan(1e-6);
+    expect(Math.abs((comparisons()[0]?.targetValue as number) - great)).toBeLessThan(1e-6);
   });
 });
 

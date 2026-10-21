@@ -112,10 +112,19 @@ describe('placing a structure that the database gives a coordinate for', () => {
       'sphinx.center.latitude': 30.01,
       'sphinx.center.longitude': 31.02,
     });
-    expect(env['sphinx.centre.offset.north']).toBeCloseTo(0.01 * METRES_PER_DEGREE, 9);
-    expect(env['sphinx.centre.offset.east']).toBeCloseTo(0.02 * Math.cos((30 * Math.PI) / 180) * METRES_PER_DEGREE, 9);
-    // A tenth of a degree of latitude is 11.1 km, so a hundredth is 1.1 km.
-    expect(env['sphinx.centre.offset.north'] as number).toBeCloseTo(1112, 0);
+    // The offsets lie on the azimuthal equidistant projection: their length is the great-circle distance, checked
+    // here by the haversine formula, and close in they agree with the flat conversion they replaced.
+    const east = env['sphinx.centre.offset.east'] as number, north = env['sphinx.centre.offset.north'] as number;
+    const R = METRES_PER_DEGREE * 180 / Math.PI, d = Math.PI / 180;
+    const hav = (x: number) => Math.sin(x / 2) ** 2;
+    const central = 2 * Math.asin(Math.sqrt(hav(0.01 * d) + Math.cos(30 * d) * Math.cos(30.01 * d) * hav(0.02 * d)));
+    expect(Math.hypot(east, north)).toBeCloseTo(R * central, 4);   // to 0.1 mm: acos and haversine round apart by microns
+    expect(north).toBeCloseTo(0.01 * METRES_PER_DEGREE, -1);    // within half a metre at 2 km
+    expect(east).toBeCloseTo(0.02 * Math.cos(30 * d) * METRES_PER_DEGREE, -1);
+    // due north, the offset is the meridian arc itself, to the millimetre
+    const due = buildEnvironment({ ...ORIGIN, 'sphinx.center.latitude': 30.01, 'sphinx.center.longitude': 31 });
+    expect(due['sphinx.centre.offset.north'] as number).toBeCloseTo(0.01 * METRES_PER_DEGREE, 3);
+    expect(due['sphinx.centre.offset.east'] as number).toBeCloseTo(0, 6);
   });
 
   it('leaves a structure the survey already placed exactly where the survey put it', () => {

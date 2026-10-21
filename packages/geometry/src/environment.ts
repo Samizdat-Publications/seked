@@ -19,7 +19,7 @@ const OFFSET_DIRECTIONS = ['east', 'north', 'west', 'south'] as const;
  * claim can name `sphinx.centre.offset.east` beside `g2.centre.offset.west`
  * and not care which way the position was come by.
  *
- * The conversion is the flat one D1 uses for the bearing to Heliopolis:
+ * The conversion is the azimuthal equidistant projection (below); it was once the flat one D1 used for the bearing to Heliopolis:
  * north is the difference in latitude and east the difference in longitude
  * times the cosine of the origin's latitude, both scaled by the mean Earth
  * radius. It ignores the ellipsoid, which at 30° N has a meridional radius of
@@ -32,12 +32,25 @@ const OFFSET_DIRECTIONS = ['east', 'north', 'west', 'south'] as const;
  * The origin is `g1.center.latitude` and `g1.center.longitude`, which is the
  * frame's own origin, so the Great Pyramid falls out of it at (0, 0) exactly.
  */
+/**
+ * East and north on the azimuthal equidistant projection about the origin: the great-circle distance laid out along
+ * the true initial bearing, so a bearing or a distance from Giza read off these offsets is exact on the sphere at any
+ * range. Until 21 October 2026 this was the flat (dlon cos lat0, dlat) conversion, which near the plateau agrees to
+ * well under a millimetre but put the bearings to the Delta's ends half a degree out (Argon's audit).
+ */
+export function azimuthalEquidistant(lat0: number, lon0: number, lat: number, lon: number, radius: number): [number, number] {
+  const p0 = lat0 * DEG, p = lat * DEG, dl = (lon - lon0) * DEG;
+  const cosc = Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(dl);
+  const c = Math.acos(Math.min(1, Math.max(-1, cosc)));
+  const az = Math.atan2(Math.sin(dl) * Math.cos(p), Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(dl));
+  return [radius * c * Math.sin(az), radius * c * Math.cos(az)];
+}
+
 function deriveCentreOffsets(env: Environment): void {
   const lat0 = env['g1.center.latitude'];
   const lon0 = env['g1.center.longitude'];
   const radius = env['earth.radius.mean'];
   if (lat0 === undefined || lon0 === undefined || radius === undefined) return;
-  const metresPerDegree = radius * DEG;
   for (const key of Object.keys(env)) {
     const match = /^(.+)\.center\.latitude$/.exec(key);
     if (!match) continue;
@@ -46,8 +59,9 @@ function deriveCentreOffsets(env: Environment): void {
     const longitude = env[`${structure}.center.longitude`];
     if (longitude === undefined) continue;
     if (OFFSET_DIRECTIONS.some((d) => env[`${structure}.centre.offset.${d}`] !== undefined)) continue;
-    env[`${structure}.centre.offset.east`] = (longitude - lon0) * Math.cos(lat0 * DEG) * metresPerDegree;
-    env[`${structure}.centre.offset.north`] = (latitude - lat0) * metresPerDegree;
+    const [east, north] = azimuthalEquidistant(lat0, lon0, latitude, longitude, radius);
+    env[`${structure}.centre.offset.east`] = east;
+    env[`${structure}.centre.offset.north`] = north;
   }
 }
 

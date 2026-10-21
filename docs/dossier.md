@@ -22,12 +22,12 @@ Generated 2026-10-21 from `data/` with the **canonical** preset. Every number be
 | C3 | Descending passage and the pole star | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | yes | 1 |
 | C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
 | C5 | Sphinx and Leo | −12°33′53″ | 10°14′04″ (+11.372 %) | no | 3 |
-| C6 | Solstice akhet | 2°38′15″ (+0.891 %) | 2°38′15″ (+0.891 %) | yes | 0 |
+| C6 | Solstice akhet | 2°38′19″ (+0.892 %) | 2°38′19″ (+0.892 %) | yes | 0 |
 | C7 | Cygnus alternative | −42.45 % | −22°33′24″ (−59.591 %) | no | 3 |
 | C8 | The Vulture Stone as a date | 4°10′16″ | 4°10′16″ | no | 5 |
-| D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
+| D1 | Giza diagonal to Heliopolis | −1°34′58″ (−3.522 %) | −1°38′55″ (−3.664 %) | no | 2 |
 | D2 | Legon's rectangle | +0.08 % | −0.12 % | yes | 1 |
-| D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −6°31′41″ (−14.507 %) | no | 2 |
+| D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −7°00′15″ (−15.565 %) | no | 2 |
 | D4 | Sphinx axis and the temples | −1.2′ | 22.0′ | yes | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
@@ -487,13 +487,13 @@ Seen from the Sphinx, the summer solstice sun sets in the gap between the Great 
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | `sun.solstice.summer.set.azimuth` vs `atan2((g1.centre.offset.east - g1.base.half + g2.base.half - g2.centre.offset.west) / 2 - sphinx.centre.offset.east, (g1.centre.offset.north - g1.base.half + g2.base.half - g2.centre.offset.south) / 2 - sphinx.centre.offset.north) + 360` | 298°31′21″ | 295°53′06″ | 2°38′15″ (+0.891 %) | yes (±8°00′00″) |
+| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | `sun.solstice.summer.set.azimuth` vs `atan2((g1.centre.offset.east - g1.base.half + g2.base.half - g2.centre.offset.west) / 2 - sphinx.centre.offset.east, (g1.centre.offset.north - g1.base.half + g2.base.half - g2.centre.offset.south) / 2 - sphinx.centre.offset.north) + 360` | 298°31′21″ | 295°53′02″ | 2°38′19″ (+0.892 %) | yes (±8°00′00″) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | 2°38′15″ (+0.891 %) | 2°38′16″ (+0.891 %) | 2°38′18″ (+0.892 %) | 2°38′19″ (+0.892 %) |
+| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | 2°38′19″ (+0.892 %) | 2°38′20″ (+0.892 %) | 2°38′22″ (+0.892 %) | 2°38′23″ (+0.892 %) |
 
 **Free choices (0)**: none.
 
@@ -577,14 +577,14 @@ A line through the south-east corners of the three pyramids runs at 45 degrees a
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2(heliopolis.obelisk.centre.offset.east, heliopolis.obelisk.centre.offset.north)` | 43°21′05″ | 44°59′57″ | −1°38′52″ (−3.662 %) | no (±2 %) |
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2(heliopolis.obelisk.centre.offset.east, heliopolis.obelisk.centre.offset.north)` | 43°21′05″ | 44°56′03″ | −1°34′58″ (−3.522 %) | no (±2 %) |
 | bearing of the corner line against 45 degrees | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `45` | 43°21′05″ | 45°00′00″ | −1°38′55″ (−3.664 %) | no (±2 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | −1°38′52″ (−3.662 %) | −1°44′19″ (−3.864 %) | −1°44′17″ (−3.862 %) | −1°38′47″ (−3.659 %) |
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | −1°34′58″ (−3.522 %) | −1°40′25″ (−3.725 %) | −1°40′22″ (−3.723 %) | −1°34′53″ (−3.519 %) |
 | bearing of the corner line against 45 degrees | −1°38′55″ (−3.664 %) | −1°44′22″ (−3.866 %) | −1°44′20″ (−3.864 %) | −1°38′50″ (−3.661 %) |
 
 **Free choices (2)**:
@@ -634,8 +634,8 @@ Stecchini's claim, as Tompkins gives it in his appendix: the Great Pyramid was s
 |---|---|---:|---:|---:|:---:|
 | the meridian against the Delta's apex | `g1.center.longitude` vs `delta.apex.center.longitude` | 31°08′03″ | 31°08′00″ | 3.1″ (+0.003 %) | yes (±0°03′00″) |
 | the meridian against the middle of the coast, Alexandria to Port Said | `g1.center.longitude` vs `(delta.west.center.longitude + delta.east.center.longitude) / 2` | 31°08′03″ | 31°06′30″ | 1.5′ (+0.083 %) | yes (±0°03′00″) |
-| bearing to the north-east corner against the base diagonal, 45° | `atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)` vs `45` | 38°28′19″ | 45°00′00″ | −6°31′41″ (−14.507 %) | no (±5 %) |
-| bearing to the north-west corner against the base diagonal, 45° west | `abs(atan2(delta.west.centre.offset.east, delta.west.centre.offset.north))` vs `45` | 40°49′16″ | 45°00′00″ | −4°10′44″ (−9.287 %) | no (±5 %) |
+| bearing to the north-east corner against the base diagonal, 45° | `atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)` vs `45` | 37°59′45″ | 45°00′00″ | −7°00′15″ (−15.565 %) | no (±5 %) |
+| bearing to the north-west corner against the base diagonal, 45° west | `abs(atan2(delta.west.centre.offset.east, delta.west.centre.offset.north))` vs `45` | 40°20′12″ | 45°00′00″ | −4°39′48″ (−10.363 %) | no (±5 %) |
 
 Residual by survey preset:
 
@@ -643,8 +643,8 @@ Residual by survey preset:
 |---|---:|---:|---:|---:|
 | the meridian against the Delta's apex | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) |
 | the meridian against the middle of the coast, Alexandria to Port Said | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) |
-| bearing to the north-east corner against the base diagonal, 45° | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) |
-| bearing to the north-west corner against the base diagonal, 45° west | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) |
+| bearing to the north-east corner against the base diagonal, 45° | −7°00′15″ (−15.565 %) | −7°00′15″ (−15.565 %) | −7°00′15″ (−15.565 %) | −7°00′15″ (−15.565 %) |
+| bearing to the north-west corner against the base diagonal, 45° west | −4°39′48″ (−10.363 %) | −4°39′48″ (−10.363 %) | −4°39′48″ (−10.363 %) | −4°39′48″ (−10.363 %) |
 
 **Free choices (2)**:
 - which places stand for the Delta's corners (Alexandria and Port Said here)
