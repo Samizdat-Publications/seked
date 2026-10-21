@@ -514,13 +514,19 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   phrases. (2) `222e7ee`: Hawara's section and the `looked` figure give each tier they draw in the same words in their
   captions. 2 tests. Looked at open at both sizes. Every claim in `data/claims/` reads excavated monuments today, so
   every receipt says "dug and dated"; the tiers below that show in the figures.
-- [ ] **E23b. What a reported claim would change if it held.** For each `claimed` structure the exhibit shows (the
+- [x] **E23b. What a reported claim would change if it held.** For each `claimed` structure the exhibit shows (the
   Khafre scans, `g2.sar-shafts`, the model case; the paw cavity; the Mataha walls), one line on what it would change,
   as the plan's Göbekli Tepe example. The line is prose about a structure, so its home is an optional field in
   `data/structures.json` (proposed `if_it_held`, with the zod schema in `packages/data` and the parity reader in
   `blender/seked_data.py` taught it), shown in the panel and the depth figures' captions. Draft the lines from the
   script's own replies and the plan's words on the Khafre scans ("preliminary, contested, the paper behind the method
   retracted, and if even part of it held, a rewrite of the plateau's history").
+  *Done 2026-10-21 00:51 UTC, `ddbcf8f` (chunk 8).* `if_it_held` is an optional field of a structure (zod schema in
+  `packages/data/src/core.ts`; the Python reader passes unknown fields through, so it needed nothing), set for
+  `g2.sar-shafts`, `sphinx.paw-cavity` and `hawara.mataha-walls` (decision 60). Khafre's depth figure ends its caption
+  with the scans' line, Hawara's with the walls'. A test holds that only `claimed` structures carry one. The paw
+  cavity's line is in the data but on no caption yet: `looked`'s caption is already long (a later place: the reply
+  panel of chapter 9, or E2c's floor figure). Looked at at both sizes with the bundle rebuilt.
 - [x] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
   deep anyone has drilled, dug or surveyed there, and who, each from its source (records, `verified: false`).
   *Done 2026-10-21 00:33 UTC, `0b5b0d0` (chunk 8).* One figure, `looked`, rather than a bar added to each of chapter 8's
@@ -748,6 +754,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 59. **A claim's evidence is the weakest tier among the structures its inputs belong to.** A claim reading a dug
    pyramid and a claimed shaft is only as far along as the shaft. Sky inputs (stars) and site-free records (units,
    constants) carry no tier and are left out. Reversible in `claimEvidence`.
+60. **What a reported structure would change is a field of the structure, `if_it_held`, written by the builder** from
+   the plan's and the script's own words, not a claim file and not a caption typed in code: it is about the structure,
+   the same in every place that shows it, and a test keeps it off anything dug. Stewart may want to read the three lines
+   (`data/structures.json`).
 
 ## For Stewart
 
@@ -777,6 +787,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   sentence for the script, to be re-recorded, might be: "Their own papyri teach the seked as a schoolroom exercise, but
   they were written centuries after the pyramids; no mathematics survives from the pyramid age itself." Say if you want
   it, and where.
+- The three "if it held" lines (E23b, `data/structures.json`, field `if_it_held`) were drafted by the builder: worth a
+  read, since they speak for the exhibit's tone. The Khafre one ends "the plateau's history would need rewriting, since
+  nothing cut hundreds of metres into rock is known from ancient Egypt".
 - Rhind problem 56's figures (E22b) are text like the king lists: whatever shape you choose for `data/texts/` would
   take them too.
 
