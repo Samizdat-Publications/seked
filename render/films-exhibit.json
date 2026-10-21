@@ -2,6 +2,69 @@
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a flight into each leaf that arrives by flight, from the last leaf's station camera and view to this one's, in the arriving leaf's era and moment, so its last frame is the leaf's panorama at the leaf's view. Render with render/build.py --films render/films-exhibit.json --film ID (try --preview 0,45,89 first), encode with render/film.py into `out`.",
  "films": [
   {
+   "id": "ch0-dawn--ch0-sunrise",
+   "name": "Flight into ch0-sunrise from ch0-dawn",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    27.82,
+    33.12
+   ],
+   "centre": [
+    565.0,
+    -431.6
+   ],
+   "path": [
+    [
+     690.9,
+     -418.3,
+     -22.83
+    ],
+    [
+     660.67,
+     -421.5,
+     10.17
+    ],
+    [
+     564.95,
+     -431.65,
+     37.17
+    ],
+    [
+     464.19,
+     -442.33,
+     10.5
+    ],
+    [
+     439.0,
+     -445.0,
+     -29.5
+    ]
+   ],
+   "look": [
+    [
+     632.69,
+     -403.79,
+     -21.79
+    ],
+    [
+     506.07,
+     -420.74,
+     -25.64
+    ],
+    [
+     379.45,
+     -437.69,
+     -29.5
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch0-dawn--ch0-sunrise.mp4"
+  },
+  {
    "id": "ch0-claim--ch0-schoch",
    "name": "Flight into ch0-schoch from ch0-claim",
    "state": "first-time",

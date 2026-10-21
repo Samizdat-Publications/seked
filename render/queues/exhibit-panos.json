@@ -1,12 +1,4 @@
 {
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: each leaf's panorama that apps/walk/pano/ lacks, its station in its era and moment. Render with render/build.py --queue, then python render/publish.py.",
- "renders": [
-  {
-   "state": "today",
-   "station": "nazlet-roof",
-   "moment": "equinox-dawn",
-   "out": "build/render/pano/nazlet-roof-today.png",
-   "for": "ch0-dawn"
-  }
- ]
+ "renders": []
 }
