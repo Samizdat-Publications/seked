@@ -485,6 +485,26 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   problem 56 in the scribe's steps beside our pyramid, the 5½-palm seked becoming 2π and φ with A3's receipt; north as
   a method (Spence's two stars, the equinox shadow, the drift that dates the pyramids); the engine's sorting made
   visible (no free choices, units chosen, fails); the gap said in words (no mathematical papyrus from the pyramid age).
+  *Four steps done 2026-10-21 00:45 UTC (chunk 8), without new spoken words (decision 57).* (1) `seked-rule` on
+  "ordinary" in `ch6-hancock`, `9145910`: a cubit's seven palms up and the seked's palms across, the seked read back from
+  A3's own target, stepped in whole cubits to the survey's height (40 steps: 440 by 280, beside the survey's 439.9 by
+  280.0), perimeter over height becoming 44/7 against 2π and the apothem over half the base against φ; caption A3's
+  three comparisons live with its count of free choices, and (`latest`) that the papyri are centuries younger than the
+  pyramid, no date typed. (2) `north-drift` on "compass" in `ch6-north`, `35ba0b5`, `591f9ac`: Khufu's, Khafre's and
+  Menkaure's turns from north in building order from their verified orientation records, at C1's exaggeration, with
+  Spence's reading in the caption. The player now shows a leaf's figures in turn, each at its word, the last when paused
+  (decision 58); checked in play, the square at 4.3 s and the drift at 9.4 s. (3) `claim-sort` on "shape" in
+  `ch6-smyth`, `1d26a4e`: every claim the chapter names sorted live into holds with nothing chosen, holds once something
+  is chosen (with the count), and does not hold; D1 to D3 added to `ch6-together`'s receipts, as the script's drawer
+  lists them. Holds raised to 5 s on both leaves so the late figures can be read. All looked at at both sizes. Left
+  for E22b.
+- [ ] **E22b. The rest of "how they did the math".** (a) Rhind problem 56 in the scribe's steps: its figures (a base of
+  360 cubits and a height of 250, as the research reads it) are text, not measurements, the same question as chapter 4's
+  king lists (For Stewart): enter them once that is settled, then draw the steps beside `seked-rule`. (b) Meidum, the
+  Bent and the Red Pyramid's orientations (`spence-2000` Table 1, Dorner, Petrie's *Medum*; `verified: false`), which
+  need structures and a site entry for Meidum and Dahshur, so the drift starts before Khufu. (c) Spence's two stars
+  (Mizar and Kochab) lining up over the pole, drawn with `@seked/sky` at the three pyramids' dates. (d) A spoken
+  sentence for the gap needs a script change and a re-recording of chapter 6 (For Stewart).
 - [ ] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
 - [x] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
@@ -704,6 +724,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    mark"): the wells are a hundred times deeper than the rest, and on a linear axis the paw cavity, the boreholes and
    Hawara would share a few pixels. The deepest look beside each claim is the nearest the records give: the boreholes
    stand beside the cavity, not in it, and the caption says that too.
+57. **"How they did the math" goes into chapter 6's existing leaves as figures, with no new spoken words.** A new leaf
+   needs words in `docs/script.md`, and chapter 6 is already recorded; new words mean a re-recording and Stewart's say
+   on the text. The figures sit on the sentences they answer: the seked on "an ordinary explanation", the drift on "no
+   compass", the sorting on "written into one shape" (the beat's own small multiples). Reversible by moving the cues.
+58. **A leaf may show more than one figure, each replacing the last at its word**, and a paused leaf shows the last,
+   where the leaf ends in play. One figure a leaf would have put the drift on a sentence about something else.
+   Reversible in `player.ts` (`setFigure`).
 
 ## For Stewart
 
@@ -728,6 +755,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - Sharp on a retina screen: the patches (E11) make the tight leaves sharp on an ordinary screen. On a retina
   laptop every leaf wants about twice the pixels; that means patches at 5120 by 2880 for all 22 leaves, or
   panoramas at 8192 by 4096. Both are only laptop time (a patch costs about what a panorama does). Worth it?
+
+- Chapter 6's "how they did the math" (E22) is in as figures on the existing leaves. If you want it spoken too, a
+  sentence for the script, to be re-recorded, might be: "Their own papyri teach the seked as a schoolroom exercise, but
+  they were written centuries after the pyramids; no mathematics survives from the pyramid age itself." Say if you want
+  it, and where.
+- Rhind problem 56's figures (E22b) are text like the king lists: whatever shape you choose for `data/texts/` would
+  take them too.
 
 - Chapter 4's king-list totals (Turin's 13,420 and 23,200, Manetho's) want a new data file, `data/texts/kinglists.json`,
   as the script proposes, with a sentence in `CLAUDE.md` for the new unit (years in a text, not a measurement). The
