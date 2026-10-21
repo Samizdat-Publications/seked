@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -160,6 +160,15 @@ function khafreDepthsFigure(ground: Record<string, number> | null): string {
     under the paws, never dug, about ${d.paw} m; neither figure yet checked against its page.` : ''}</figcaption>`;
 }
 
+/** Hawara's depths to one scale, each by its structure's tier, from the claims' environment. */
+function hawaraDepthsFigure(ground: Record<string, number> | null, structures: { id: string; evidence?: string }[] | undefined): string {
+  const rows = ground && structures && hawaraDepths(ground, structures);
+  if (!rows) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  return `${hawaraDepthsSvg(rows)}<figcaption>Under Hawara, in metres below the ground: the bed of chips Petrie dug at the
+    south foot, the two closures a resistivity survey found, and the walls the 2008 expedition reported, never dug. Drawn
+    by tier, from the records.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -231,6 +240,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
+    if (shownFigure === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
   });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once what it shows exists (the
@@ -275,6 +285,7 @@ async function start(): Promise<void> {
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
+    if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

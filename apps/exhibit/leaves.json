@@ -2235,7 +2235,7 @@
    },
    "arrive": "turn",
    "say": "Petrie found only a bed of stone chips, larger than the Great Pyramid's base. In 2008 Egypt's own geophysics institute surveyed the ground there, and the expedition behind it reported walls eight to twelve metres down.",
-   "draw": [],
+   "draw": ["hawara-depths@chips"],
    "hold": 1,
    "interact": "look",
    "receipts": [],

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -195,6 +195,21 @@ describe("Khafre's depths", () => {
     const svg = khafreDepthsSvg(rest);
     expect(svg).not.toContain('Osiris');
     expect(svg.match(/class="claimed"/g)).toHaveLength(4);
+  });
+});
+
+describe("Hawara's depths", () => {
+  const db = loadDatabase();
+  const rows = hawaraDepths(groundEnvironment(db), db.structures)!;
+  it('reads each range from its records and each tier from its structure, never from need', () => {
+    expect(rows.map((r) => [r.top, r.bottom])).toEqual([[4.572, 7.3152], [5, 7.5], [8, 12]]);
+    expect(rows.map((r) => r.tier)).toEqual(['excavated', 'instrumented', 'claimed']);
+    expect(hawaraDepths({}, db.structures)).toBeNull();
+  });
+  it('draws each tier as it is drawn everywhere', () => {
+    const svg = hawaraDepthsSvg(rows);
+    for (const c of ['statue', 'instrumented', 'claimed-box']) expect(svg).toContain(`<rect class="${c}"`);
+    expect(svg).toContain('8 to 12 m, claimed');
   });
 });
 

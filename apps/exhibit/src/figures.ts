@@ -41,7 +41,7 @@
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -458,6 +458,48 @@ export function khafreDepthsSvg(d: KhafreDepths, width = 300): string {
   ${Array.from({ length: n }, (_, i) => `<line class="wall" x1="${bar - 4}" y1="${f(Y(-(i + 1) * d.height))}" x2="${bar + 4}" y2="${f(Y(-(i + 1) * d.height))}"/><text class="here-lab" x="${bar + 8}" y="${f(Y(-(i + 1) * d.height) + 3)}">${i + 1}</text>`).join('\n  ')}
   <text class="here-lab" x="${bar + 8}" y="${f(Y(d.bottom) + 3)}">${(-d.bottom / d.height).toFixed(2)}</text>
   <text class="north" x="${bar}" y="${f(Y(0) - 6)}" text-anchor="middle">heights</text>
+</svg>`;
+}
+
+export interface HawaraRow { label: string; tier: string; top: number; bottom: number }
+
+/** What lies under Hawara, as the records give it: each a depth range below the ground, the shallow end first. */
+const HAWARA = [
+  { label: 'Petrie’s chips', structure: 'hawara.labyrinth', keys: ['hawara.labyrinth.chips.depth.south_foot.min', 'hawara.labyrinth.chips.depth.south_foot.max'] },
+  { label: 'resistivity closures', structure: 'hawara.ert-closures', keys: ['hawara.ert.closure.shallow.depth', 'hawara.ert.closure.deep.depth'] },
+  { label: 'walls, reported', structure: 'hawara.mataha-walls', keys: ['hawara.mataha.walls.depth.min', 'hawara.mataha.walls.depth.max'] },
+];
+
+/** Hawara's rows from the environment, each tier its structure's; null until every record and structure is there. */
+export function hawaraDepths(env: Record<string, number>, structures: { id: string; evidence?: string }[]): HawaraRow[] | null {
+  const rows: HawaraRow[] = [];
+  for (const r of HAWARA) {
+    const [a, b] = r.keys.map((k) => env[k]);
+    const tier = structures.find((x) => x.id === r.structure)?.evidence;
+    if (a === undefined || b === undefined || !tier) return null;
+    rows.push({ label: r.label, tier, top: Math.min(a, b), bottom: Math.max(a, b) });
+  }
+  return rows;
+}
+
+/** The rows as bars on one depth axis, side by side, drawn as their tiers are drawn everywhere: stone, blue, dashed. */
+export function hawaraDepthsSvg(rows: HawaraRow[], width = 300): string {
+  const top = 22, H = 200, deepest = Math.ceil(Math.max(...rows.map((r) => r.bottom)) / 2) * 2 + 2;
+  const Y = (d: number) => top + (d / deepest) * (H - top - 10), f = (z: number) => z.toFixed(1);
+  const cls: Record<string, string> = { excavated: 'statue', instrumented: 'instrumented', claimed: 'claimed-box' };
+  const ticks = Array.from({ length: deepest / 2 + 1 }, (_, i) => i * 2);
+  let last = -Infinity;
+  const m = (d: number) => `${+d.toFixed(1)}`;
+  return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="Under Hawara, to one depth scale: ${rows.map((r) => r.label).join(', ')}">
+  <line class="dim" x1="44" y1="${f(Y(0))}" x2="${width - 8}" y2="${f(Y(0))}"/>
+  <text class="north" x="${width - 8}" y="${f(Y(0) - 6)}" text-anchor="end">the ground</text>
+  ${ticks.map((d) => `<line class="wall" x1="40" y1="${f(Y(d))}" x2="44" y2="${f(Y(d))}" style="stroke-width: 1"/><text class="here-lab" x="36" y="${f(Y(d) + 3)}" text-anchor="end">${d} m</text>`).join('')}
+  ${rows.map((r, i) => {
+    const x = 60 + i * 22, mid = (Y(r.top) + Y(r.bottom)) / 2, y = (last = Math.max(mid + 3, last + 26));
+    return `<rect class="${cls[r.tier] ?? 'claimed-box'}" x="${x}" y="${f(Y(r.top))}" width="14" height="${f(Y(r.bottom) - Y(r.top))}"/>
+  <line class="dim" x1="${x + 14}" y1="${f(mid)}" x2="132" y2="${f(y - 3)}" style="stroke-dasharray: none; stroke-width: 0.5"/>
+  <text class="here-lab" x="136" y="${f(y - 2)}">${r.label}</text><text class="lab" x="136" y="${f(y + 10)}">${m(r.top)} to ${m(r.bottom)} m, ${r.tier}</text>`;
+  }).join('\n  ')}
 </svg>`;
 }
 

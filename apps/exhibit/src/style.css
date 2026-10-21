@@ -90,6 +90,7 @@ p { margin: 0; }
 .figure .granite { fill: rgba(176, 96, 84, 0.5); stroke: rgba(214, 150, 136, 0.8); stroke-width: 1; }
 /* the claimed tier, as the walkthrough draws it: dashed and translucent, never stone */
 .figure .claimed { stroke: rgba(240, 150, 70, 0.95); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.figure .instrumented { fill: rgba(126, 176, 232, 0.3); stroke: rgba(150, 192, 240, 0.9); stroke-width: 1; }
 .figure .claimed-box { fill: rgba(240, 150, 70, 0.14); stroke: rgba(240, 150, 70, 0.95); stroke-width: 1; stroke-dasharray: 4 3; }
 /* a measurement's error bar drawn as a band: plus and minus its sigma about the drawn edge */
 .figure .err { fill: rgba(242, 196, 107, 0.16); stroke: rgba(242, 196, 107, 0.35); stroke-width: 0.5; }
