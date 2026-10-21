@@ -20,6 +20,7 @@ import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthSca
 import { Panel, loadBundle } from './panel';
 import { TIER_WORDS, groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
+import { poleStars, poleStarsSvg } from './polestars';
 import { type Moment, comparisonsAt, epochOf, skyEnv, yearLabel } from './sky';
 import { type Claim, formatResidual, formatValue } from '@seked/claims/browser';
 import { SkyFigure } from './skyfigure';
@@ -93,6 +94,27 @@ function northDriftFigure(ground: Record<string, number> | null): string {
     built, drawn ${x} times larger. Khufu's is the smallest; after him it grows and swings east. Spence (2000) read that drift as the
     builders lining up two stars that circle the pole, one above the other: the stars slowly moved, so the error dates each
     pyramid. Meidum and Dahshur, before Khufu, are not yet in the records.</figcaption>`;
+}
+
+/** Spence's two stars computed: the plumb line's stray by year, each pyramid's turn as a year, the radiocarbon beside. */
+function poleStarsFigure(ground: Record<string, number> | null): string {
+  const n = ground && northDrift(ground);
+  const star = (id: string) => skyData.named.find((s) => s.id === id);
+  const mizar = star('mizar'), kochab = star('kochab');
+  const p = n && mizar && kochab && poleStars(mizar, kochab, skyData.latitudeDeg, n, radiocarbon.reigns);
+  if (!p) return '<figcaption>The pyramids\' turns are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const y = (v: number | null) => (v === null ? 'never' : yearLabel(v));
+  const khufu = p.readings[0]!, r = p.reigns.find((k) => k.king === khufu.king);
+  // how far the radiocarbon range sits before the stars' two years for the same king, nearest and furthest
+  const read = [khufu.upper, khufu.lower].filter((v): v is number => v !== null);
+  const gap = r && read.length ? [Math.min(...read) - r.latest, Math.max(...read) - r.earliest].map((v) => Math.round(v / 10) * 10) : null;
+  const apart = gap && gap[0]! > 0 ? ` Radiocarbon puts ${r!.king}'s accession at ${yearLabel(r!.earliest)} to ${yearLabel(r!.latest)},
+    ${gap[0]} to ${gap[1]} years earlier: the method and the dating do not yet agree.` : r ? ` Radiocarbon puts ${r.king}'s accession
+    at ${yearLabel(r.earliest)} to ${yearLabel(r.latest)}.` : '';
+  return `${poleStarsSvg(p)}<figcaption>Spence (2000): hang a plumb line so Mizar and Kochab sit on it, one above the pole and one
+    below, and call it north. Computed here from the star catalogue, the line is true north only in ${yearLabel(p.aligned)}; before
+    and after, it strays (solid with Mizar above, dashed with Kochab above). Read each pyramid's turn off it and the stars date
+    ${khufu.king} to ${y(khufu.upper)} or ${y(khufu.lower)}, by which star was above, a free choice of the reading.${apart}</figcaption>`;
 }
 
 /** A2 drawn, with A3's point that one slope serves π, φ and the seked alike. */
@@ -300,6 +322,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
+    if (shownFigure === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);
     if (shownFigure === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
     if (shownFigure === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'looked' || shownFigure === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, shownFigure === 'looked-tests');
@@ -349,6 +372,7 @@ async function start(): Promise<void> {
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
+    if (id === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);
     if (id === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');

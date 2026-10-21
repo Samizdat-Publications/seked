@@ -1796,10 +1796,11 @@
    "arrive": "cut",
    "say": "The sides run within four minutes of arc of true north. On a side of 230 metres that is a quarter of a metre, with no compass.",
    "draw": [
-    "north-square@north",
-    "north-drift@compass"
+    "north-square@sides",
+    "north-drift@north",
+    "pole-stars@compass"
    ],
-   "hold": 5,
+   "hold": 8,
    "interact": "look",
    "receipts": [
     "C1"
