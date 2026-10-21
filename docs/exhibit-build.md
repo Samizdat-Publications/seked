@@ -599,6 +599,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   republished; laying it on a public page is his call. And the date and the figures' pairing (vulture as Cygnus,
   scorpion as Scorpius) are the claim's inputs, so they want a claim file citing Sweatman and Tsikritsis 2017, read
   from the paper rather than typed from memory. See For Stewart.
+  *Two steps done 2026-10-21 05:32 UTC (chunk 11), after the laptop's answer 4.* (1) `f42ce37`: the paper read in its
+  Zenodo PDF (CC BY 4.0). Its vulture is the teapot of **Sagittarius**, not Cygnus (that is Collins's; the plan and the
+  reliefs note are corrected, `ca8ec2d`), and its date is the summer solstice at sunset, the sun just above the spout, in
+  10,950 BC ± 250 (pp. 237 to 238). Claim C8 tests the observer-free part: the spout's (Alnasl, γ Sgr, now a named star
+  from HYG) ecliptic longitude of date against the solstice sun's 90°, the paper's 250 years as the band (3.5°). It
+  misses by 4.2°: by Vondrák 2011 the spout reaches the solstice point about three centuries earlier. Checked two ways
+  (decision 71). (2) `6632254`: `vulture-sky` (`src/vulturesky.ts`, 3 tests) on "animals" in `ch7-monument` with C8's
+  receipt: the ecliptic of that year flat around the solstice sun, the five constellations C8's overlay pairs with the
+  animals, the spout, its miss computed apart from the engine and held equal to it by a test (decision 72). C8's
+  overlay is `panel` (decision 73). Looked at paused at both sizes and in play (drawn at 13.7 s). Left: the relief laid
+  over the chart, from the laptop's own reconstruction once its height maps are committed, labelled "a reconstruction
+  after the excavators' drawing (DAI)"; and whether the leaf should speak of it (For Stewart).
 - [ ] **E26. The world's pyramids on a globe and a timeline** (chapter 9's closing leaf, the plan's "Added 20
   October"): imported sites with date ranges, the best-fit great circle as the claim, the same fit for random sites in
   the same latitude band as the reply.
@@ -868,6 +880,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    draws; `ch4-first-king` keeps the radiocarbon bars. Reversible in `leaves.json`.
 70. **A leaf added after its chapter was recorded is named, not excused**: the recording test keeps every other leaf
    to the full check and requires the named leaf to be missing from the recording, so the exception expires by itself.
+71. **C8 compares longitudes, not the paper's picture.** The paper read its date by eye in Stellarium from Şanlıurfa at
+   sunset; the one part of that which needs no observer and no horizon is where the spout stood in longitude of date
+   against the solstice sun, so that is the comparison, with the paper's ±250 years as the band and "slightly above"
+   left untested. A wider band, or the sun's position against the vulture's wing rather than the spout, would be other
+   choices; each is a line in `data/claims/C8.yaml`.
+72. **The chart is flat in ecliptic coordinates of date**, not a sky over a panorama: no station stands at Göbekli Tepe
+   and the live sky is Giza's. Longitude rises to the left, as a southern sky is seen. Reversible: `vulture-sky` is one
+   figure on one leaf.
+73. **C8's overlay is `panel`, carrying the pairings as params.** The pairings are the claim's inputs, so they live in
+   its file; the viewer's scene is Giza's and holds nothing of Göbekli Tepe, which `panel` exists to say. The web test's
+   list of panel claims names C8 with that reason.
 
 ## For Stewart
 
@@ -916,6 +939,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - Chapter 4's king-list totals (Turin's 13,420 and 23,200, Manetho's) want a new data file, `data/texts/kinglists.json`,
   as the script proposes, with a sentence in `CLAUDE.md` for the new unit (years in a text, not a measurement). The
   builder has not created it: is that the shape you want?
+
+- **Pillar 43 in words?** (E25, chunk 11.) Chapter 7's narration does not mention the Vulture Stone; the script left
+  Sweatman out for want of checked sources, and the paper is now read (C8). The chart is a figure on "carved with
+  animals". If you want it spoken, a sentence for the script after that one might be: "Two engineers read one pillar,
+  the Vulture Stone, as a map of the sky dated to 10,950 BCE; by our reckoning the date they give misses their own reading
+  by three centuries." It would mean re-recording chapter 7. Note the plan had their vulture as Cygnus; the paper says
+  Sagittarius.
 
 ## Answers from the laptop session (21 October, about 05:10 UTC)
 
