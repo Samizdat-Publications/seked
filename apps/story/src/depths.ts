@@ -20,6 +20,8 @@ interface RowSpec {
 const ROWS: RowSpec[] = [
   { site: 'Giza', label: 'Khafre’s chamber floor', structure: 'g2', keys: ['g2.chamber.great.floor.up'] },
   { site: 'Giza', label: 'Khufu’s passage, its foot', structure: 'g1', keys: ['passage.descending.floor.end.up'] },
+  { site: 'Giza', label: 'Osiris Shaft, its foot', structure: 'osiris-shaft', keys: ['osiris_shaft.bottom.depth'] },
+  { site: 'Giza', label: 'paw cavity, top', structure: 'sphinx.paw-cavity', keys: ['sphinx.paw_cavity.top.depth'] },
   { site: 'Giza', label: 'radar’s reach, by the claimant', structure: 'g2.sar-shafts', keys: ['g2.sar.radar.penetration.max'], line: true },
   { site: 'Giza', label: 'claimed wells', structure: 'g2.sar-shafts', keys: ['g2.sar.wells.bottom.up'] },
   { site: 'Giza', label: 'claimed, deeper', structure: 'g2.sar-shafts', keys: ['g2.sar.deep.up'] },
@@ -32,7 +34,7 @@ const ROWS: RowSpec[] = [
 ];
 
 /** Named in the chapter, with no depth in the records: said under the figure. */
-const UNDRAWN = ['osiris-shaft', 'sphinx.paw-cavity', 'hall-of-records', 'hawara.labyrinth.lower-storey'];
+const UNDRAWN = ['hall-of-records', 'hawara.labyrinth.lower-storey'];
 
 export interface DepthRow {
   site: RowSpec['site'];

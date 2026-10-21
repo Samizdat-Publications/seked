@@ -262,6 +262,9 @@ class Plateau:
             if self.night is None:
                 self.night = night.Night(self.scene, self.scene.world.node_tree, self.log)
             n = self.night.show(m["night"], tuple(self.camera.location))
+            if m.get("stars") is False:
+                # the night's dark and airglow without its stars or Milky Way: the exhibit draws the sky over it live
+                self.night.hide_stars()
             alt, az = (n["sun"]["altitudeDeg"], n["sun"]["azimuthDeg"]) if n else (-30.0, 0.0)
             self.sky.set_sun(alt, az)
             self.sky.sun.data.energy = 0.0

@@ -32,7 +32,7 @@ describe('leafSpans', () => {
 });
 
 // The recordings themselves, when this checkout has them (assets/narration, Git LFS).
-const recorded = [0, 1].filter((n) => existsSync(join(repo, 'assets', 'narration', `ch${n}.json`)));
+const recorded = [...new Set(leaves.map((L) => L.chapter))].filter((n) => existsSync(join(repo, 'assets', 'narration', `ch${n}.json`)));
 describe.runIf(recorded.length > 0)('the recorded chapters', () => {
   it('hold every leaf of their chapter, in order, inside the recording', () => {
     for (const n of recorded) {

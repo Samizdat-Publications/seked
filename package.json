@@ -21,6 +21,7 @@
     "sky-bake": "tsx scripts/sky-bake.ts",
     "sky-rollback": "tsx scripts/sky-rollback.ts",
     "stars": "tsx scripts/stars.ts",
+    "figures": "tsx scripts/figures.ts",
     "icecore": "tsx scripts/icecore.ts",
     "basemap": "tsx scripts/basemap.ts",
     "footprints": "tsx scripts/footprints.ts",

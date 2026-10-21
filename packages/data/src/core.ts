@@ -20,15 +20,16 @@ export type Source = z.infer<typeof SourceSchema>;
 export const MeasurementSchema = z.object({
   key: z.string().regex(/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$/, 'keys are dotted lower-case identifiers'),
   structure: z.string(),
-  quantity: z.enum(['length', 'angle', 'latitude', 'longitude', 'elevation', 'count', 'ratio', 'speed', 'time']),
+  /** A `date` is a calendar year in astronomical numbering (1 BCE is 0, 2220 BCE is -2219), as the claims' epochs are. */
+  quantity: z.enum(['length', 'angle', 'latitude', 'longitude', 'elevation', 'count', 'ratio', 'speed', 'time', 'date']),
   value: z.number(),
-  unit: z.enum(['m', 'deg', 'count', 'ratio', 'm/s', 'day']),
+  unit: z.enum(['m', 'deg', 'count', 'ratio', 'm/s', 'day', 'year']),
   sigma: z.number().nonnegative().optional(),
   source: z.string(),
   method: z.string().optional(),
   note: z.string().optional(),
   verified: z.boolean().default(false),
-  /** Which site the record belongs to; `units` and `constants` records are site-free. */
+  /** Which site the record belongs to; `units`, `constants` and `chronology` records are site-free. */
   site: z.string().default('giza'),
 });
 export type Measurement = z.infer<typeof MeasurementSchema> & { file: string; order: number };
@@ -70,6 +71,8 @@ export const StructureSchema = z
     context: z.literal(true).optional(),
     source: z.string().optional(),
     note: z.string().optional(),
+    /** For a reported but unproven structure, one line on what it would change if it held (the exhibit's tone rule). */
+    if_it_held: z.string().optional(),
   })
   .refine((s) => (s.context === true) !== (s.evidence !== undefined), {
     message: 'a structure is either evidence at a tier or context, never both and never neither',

@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isFigure } from './figures';
-import { type Leaf, type RenderStations, cueIndex, drawCue, joinProblems, leafPanorama, readLeaves, stationMoment, withStandIns } from './leaves';
+import { type Leaf, type RenderStations, cueIndex, drawCue, figureCues, joinProblems, leafCues, leafPanorama, readLeaves, stationMoment, withStandIns } from './leaves';
 
 const repo = join(__dirname, '..', '..', '..');
 const read = (p: string) => readFileSync(join(repo, p), 'utf8');
@@ -47,14 +47,20 @@ describe('leaves.json', () => {
   });
 
   it('wipes only between eras taken from the same camera, so the two pictures register', () => {
+    // a published station's cameras as publish recorded them; one not rendered yet, where the renderer will put it
     const cams = (station: string, era: string) => {
-      const s = walk.stations.find((x) => x.id === station) as unknown as { camera: number[]; cameras?: Record<string, number[]> };
-      return (s.cameras?.[era] ?? s.camera).join();
+      const s = walk.stations.find((x) => x.id === station) as unknown as { camera: number[]; cameras?: Record<string, number[]> } | undefined;
+      if (s) return (s.cameras?.[era] ?? s.camera).join();
+      const r = render.stations.find((x) => x.id === station) as unknown as Record<string, unknown> & { by_state?: Record<string, Record<string, unknown>> };
+      const at = { ...r, ...r.by_state?.[era] };
+      return ['x', 'y', 'z', 'eye', 'roof'].map((k) => String(at[k])).join();
     };
-    leaves.forEach((L, i) => {
-      const prev = leaves[i - 1];
+    const check = (list: readonly Leaf[]) => list.forEach((L, i) => {
+      const prev = list[i - 1];
       if (L.arrive === 'wipe' && prev) expect(cams(L.station, L.era), `${L.id}: ${prev.era} to ${L.era}`).toBe(cams(prev.station, prev.era));
     });
+    check(leaves);
+    check(withStandIns(leaves, (id) => walk.stations.some((s) => s.id === id)));
   });
 
   it('stands only at stations, in eras and moments the renderer knows', () => {
@@ -86,6 +92,16 @@ describe('leaves.json', () => {
       }
       for (const r of L.receipts) expect(existsSync(join(repo, 'data', 'claims', `${r}.yaml`)), `${L.id}: ${r}`).toBe(true);
       expect(read('docs/script.md'), L.id).toContain(`## ${L.reply.slice(2)}. `);
+    }
+  });
+
+  it("draws a sky only on leaves the visitor may turn the sky on, in years that are today's or a claim's epoch", () => {
+    const epochOk = (ref: string) => ref === 'today' || /^epoch:\s*-?\d+/m.test(read(`data/claims/${ref}.yaml`));
+    for (const L of leaves) {
+      if (!L.sky) continue;
+      expect(L.interact, L.id).toBe('sky');
+      expect(epochOk(L.sky.at), `${L.id}: ${L.sky.at}`).toBe(true);
+      if (L.sky.from) expect(epochOk(L.sky.from), `${L.id}: ${L.sky.from}`).toBe(true);
     }
   });
 });
@@ -143,6 +159,10 @@ describe('the panorama a leaf needs', () => {
     expect(leafPanorama({ station: 'sphinx-face', era: 'today', moment: 'equinox-dawn' }, render)).toBe('pano/sphinx-face-today-equinox-dawn.jpg');
     expect(stationMoment(render, 'nowhere', 'today')).toBeNull();
   });
+  it("is the walkthrough's own at any moment for a station rendered at none (inside, by lamps)", () => {
+    expect(stationMoment(render, 'kings-chamber', 'built')).toBeNull();
+    expect(leafPanorama({ station: 'kings-chamber', era: 'built', moment: 'night-dark' }, render)).toBe('pano/kings-chamber-built.jpg');
+  });
 });
 
 describe('draw cues', () => {
@@ -157,6 +177,23 @@ describe('draw cues', () => {
     expect(cueIndex(say, 'coves')).toBe(15);
     expect(cueIndex(say, 'harder')).toBe(3);
     expect(cueIndex(say, 'fissure')).toBe(-1);
+  });
+  it("cues a figure by its own word even when the leaf's line is listed first", () => {
+    const say = 'Scale the pyramid up. Its height becomes the pole.';
+    expect(leafCues({ say, draw: ['g1-proportions', 'earth-scale@scale'] }, isFigure)).toEqual({ line: -1, figure: 0 });
+    expect(leafCues({ say, draw: ['g1-proportions@height', 'earth-scale'] }, isFigure)).toEqual({ line: 5, figure: -1 });
+    expect(leafCues({ say, draw: ['ditch-plan@pole'] }, isFigure)).toEqual({ line: -1, figure: 8 });
+  });
+  it('lists every figure a leaf draws in order, each at its word', () => {
+    const say = 'The sides run true. That is a quarter of a metre, with no compass.';
+    expect(figureCues({ say, draw: ['g1-proportions', 'north-square@true', 'north-drift@compass'] }, isFigure))
+      .toEqual([{ id: 'north-square', at: 3, cued: true }, { id: 'north-drift', at: 13, cued: true }]);
+    expect(figureCues({ say, draw: ['north-square', 'north-drift@quarter'] }, isFigure))
+      .toEqual([{ id: 'north-square', at: -1, cued: false }, { id: 'north-drift', at: 7, cued: true }]);
+  });
+  it("finds every cue's word in its leaf's words", () => {
+    for (const L of readLeaves(JSON.parse(read('apps/exhibit/leaves.json'))))
+      for (const d of L.draw.map(drawCue)) if (d.word) expect(cueIndex(L.say, d.word), `${L.id}: ${d.word}`).toBeGreaterThanOrEqual(0);
   });
   it('refuses a malformed draw entry', () => {
     const raw = JSON.parse(read('apps/exhibit/leaves.json'));

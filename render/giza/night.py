@@ -164,6 +164,13 @@ class Night:
             self.glow.inputs["Strength"].default_value = MILKY_WAY_STRENGTH
         return row
 
+    def hide_stars(self):
+        """The stars and the Milky Way off, the airglow left on: a night for a sky drawn over the picture."""
+        if self.dome is not None:
+            self.dome.hide_render = True
+        if self.glow is not None:
+            self.glow.inputs["Strength"].default_value = 0.0
+
     def hide(self):
         if self.dome is not None:
             self.dome.hide_render = True

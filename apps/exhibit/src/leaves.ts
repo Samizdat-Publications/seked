@@ -45,6 +45,16 @@ export const LeafSchema = z.object({
    * view from it. The player uses it only while the walkthrough's manifest lacks the leaf's station.
    */
   until: z.object({ station: z.string().min(1), view: View }).strict().optional(),
+  /**
+   * A live sky drawn over the panorama at the leaf's moment (src/sky.ts): `at` the year, `today` or a claim id whose
+   * epoch it takes; `from` a year it winds from in play; `figure` the constellation picked out in gold (as
+   * data/stars/figures.json keys it); `bearings` a claim whose sun-ribbon bearings stand on the horizon; `marks` a
+   * claim whose shafts are drawn across the meridian; `readout` a claim whose comparisons are read out at the year.
+   */
+  sky: z.object({
+    at: z.string().min(1), from: z.string().min(1).optional(), figure: z.string().regex(/^[A-Z][a-z]{2}$/).optional(),
+    bearings: z.string().min(1).optional(), marks: z.string().min(1).optional(), readout: z.string().min(1).optional(),
+  }).strict().optional(),
 }).strict();
 
 export type Leaf = z.infer<typeof LeafSchema>;
@@ -111,7 +121,9 @@ export function stationMoment(render: RenderStations, station: string, era: stri
  * queue (scripts/exhibit_queue.py) asks the laptop for.
  */
 export function leafPanorama(leaf: Pick<Leaf, 'station' | 'era' | 'moment'>, render: RenderStations): string {
-  return stationMoment(render, leaf.station, leaf.era) === leaf.moment
+  const own = stationMoment(render, leaf.station, leaf.era);
+  // a station rendered at no moment (inside, by the era's lamps) looks the same at any hour
+  return own === leaf.moment || (own === null && render.stations.some((s) => s.id === leaf.station))
     ? `pano/${leaf.station}-${leaf.era}.jpg`
     : `pano/${leaf.station}-${leaf.era}-${leaf.moment}.jpg`;
 }
@@ -128,4 +140,27 @@ export function cueIndex(say: string, word: string | null): number {
   const bare = (w: string) => w.toLowerCase().replace(/[^\p{L}\p{N}'-]/gu, '');
   const want = bare(word);
   return say.split(/\s+/).filter(Boolean).findIndex((w) => bare(w).startsWith(want));
+}
+
+/**
+ * Every figure a leaf draws, in order, each with the index of the word that shows it (-1 for one shown from the leaf's
+ * start, `cued` false). In play each replaces the one before at its word; paused, the last is shown.
+ */
+export function figureCues(L: Pick<Leaf, 'draw' | 'say'>, isFigure: (id: string) => boolean): { id: string; at: number; cued: boolean }[] {
+  return L.draw.map(drawCue).filter((c) => isFigure(c.overlay))
+    .map((c) => ({ id: c.overlay, at: c.word ? cueIndex(L.say, c.word) : -1, cued: !!c.word }));
+}
+
+/**
+ * The words that cue a leaf's line and its figure in play (-1: not cued, drawn from the start). The stage draws the
+ * first entry when it is an overlay; the figure is the first entry that is one, wherever it stands in `draw`, so a
+ * figure listed after the leaf's line still waits for its own word.
+ */
+export function leafCues(L: Pick<Leaf, 'draw' | 'say'>, isFigure: (id: string) => boolean): { line: number; figure: number } {
+  const first = L.draw[0] ? drawCue(L.draw[0]) : null;
+  const figure = L.draw.map(drawCue).find((c) => isFigure(c.overlay));
+  return {
+    line: first?.word && !isFigure(first.overlay) ? cueIndex(L.say, first.word) : -1,
+    figure: figure?.word ? cueIndex(L.say, figure.word) : -1,
+  };
 }

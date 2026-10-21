@@ -5,12 +5,13 @@
  */
 import type { Claim } from '@seked/claims/browser';
 import type { Database } from '@seked/data/browser';
+import { setDefaultStars, type Star } from '@seked/sky/browser';
 import type { Leaf } from './leaves';
 import { scriptPart } from './play';
 import { recordingUrl } from './narration';
-import { leafReceipts, receiptLine } from './receipts';
+import { claimEvidence, leafReceipts, receiptLine } from './receipts';
 
-type Bundle = Database & { claims: Claim[] };
+type Bundle = Database & { claims: Claim[]; stars?: Star[] };
 
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 /** The script's inline marks: code, bold and italics, everything escaped first. */
@@ -28,12 +29,16 @@ export function chapterReply(script: string, chapter: number): { spoken: string;
 
 let bundle: Promise<Bundle | null> | null = null;
 /** The bundled database (`pnpm bundle`), beside the page or beside the viewer on the site; null without it. */
-function loadBundle(): Promise<Bundle | null> {
+export function loadBundle(): Promise<Bundle | null> {
   bundle ??= (async () => {
     for (const url of ['./seked.json', '../viewer/seked.json']) {
       try {
         const r = await fetch(url);
-        if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) return (await r.json()) as Bundle;
+        if (!r.ok || !(r.headers.get('content-type') ?? '').includes('json')) continue;
+        const b = (await r.json()) as Bundle;
+        // sky claims (C2 to C7) read their stars from the bundle, as the viewer's do
+        if (b.stars) setDefaultStars(b.stars);
+        return b;
       } catch { /* try the next place */ }
     }
     return null;
@@ -129,10 +134,24 @@ export class Panel {
     if (!el || this.leaf !== L) return;
     if (!b) { el.innerHTML = '<p class="quiet">The receipts are computed from the bundled database (pnpm bundle), which this copy of the site lacks.</p>'; return; }
     const { sources, sites, structures, measurements, presets, materials } = b;
-    const results = leafReceipts({ sources, sites, structures, measurements, presets, materials }, b.claims, L.receipts);
+    let results;
+    try {
+      results = leafReceipts({ sources, sites, structures, measurements, presets, materials }, b.claims, L.receipts);
+    } catch (e) {
+      console.error(e);
+      el.innerHTML = '<p class="quiet">The receipts could not be computed from this copy of the database.</p>';
+      return;
+    }
+    const db = { sources, sites, structures, measurements, presets, materials };
+    const evidence = (id: string) => {
+      const claim = b.claims.find((c) => c.id === id);
+      const e = claim && claimEvidence(db, claim);
+      const names = e?.structures.map((n) => (/^the /i.test(n) ? n : `the ${n}`)).join(', ');
+      return e ? `<p class="quiet">It stands on ${inline(names!)}: ${inline(e.words)}.</p>` : '';
+    };
     el.innerHTML = results.length ? results.map((r) => `<p><strong>${inline(r.id)}, ${inline(r.title)}</strong>: ` +
       `${r.fits === undefined ? 'not computed yet' : r.fits ? 'holds' : 'does not hold'}, ` +
-      `${r.freeChoices} free choice${r.freeChoices === 1 ? '' : 's'}</p>` +
+      `${r.freeChoices} free choice${r.freeChoices === 1 ? '' : 's'}</p>${evidence(r.id)}` +
       `<ul>${r.comparisons.map((c) => `<li>${inline(receiptLine(c))}</li>`).join('')}</ul>`).join('')
       : '<p class="quiet">None of the claims this leaf names is in the database yet.</p>';
   }

@@ -12,6 +12,8 @@ describe("chapter 8's depth scale", () => {
     const at = (label: RegExp) => rows.find((r) => label.test(r.label))!;
     expect(at(/Khafre/).bottom).toBeCloseTo(3.0);
     expect(at(/claimed wells/).bottom).toBeCloseTo(648);
+    expect(at(/Osiris/).bottom).toBeCloseTo(30);
+    expect(at(/paw cavity/).top).toBeCloseTo(5);
     expect(at(/radar/).top).toBeCloseTo(10);
     expect([at(/Mataha/).top, at(/Mataha/).bottom]).toEqual([8, 12]);
     expect([at(/closures/).top, at(/closures/).bottom]).toEqual([5, 7.5]);
@@ -24,11 +26,13 @@ describe("chapter 8's depth scale", () => {
     expect(tier(/closures/)).toBe('instrumented');
     expect(tier(/claimed wells/)).toBe('claimed');
     expect(tier(/Mataha/)).toBe('claimed');
+    expect(tier(/Osiris/)).toBe('excavated');
+    expect(tier(/paw cavity/)).toBe('claimed');
   });
 
   it('names what has no depth in the records instead of drawing it', () => {
     const u = undrawn(db.structures);
-    expect(u.map((x) => x.tier).sort()).toEqual(['claimed', 'excavated', 'legendary', 'legendary']);
+    expect(u.map((x) => x.tier).sort()).toEqual(['legendary', 'legendary']);
     for (const x of u) expect(db.measurements.some((m) => m.structure === x.id && /depth|\.up$/.test(m.key)), x.id).toBe(false);
   });
 });
