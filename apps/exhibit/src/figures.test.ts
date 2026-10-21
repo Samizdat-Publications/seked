@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -210,6 +210,24 @@ describe("Hawara's depths", () => {
     const svg = hawaraDepthsSvg(rows);
     for (const c of ['statue', 'instrumented', 'claimed-box']) expect(svg).toContain(`<rect class="${c}"`);
     expect(svg).toContain('8 to 12 m, claimed');
+  });
+});
+
+describe("the builders' rule", () => {
+  const ground = groundEnvironment(loadDatabase());
+  const r = sekedRule(ground, (Math.atan(7 / 5.5) * 180) / Math.PI)!;
+  it("reads the seked back from the angle and steps it in whole cubits to the survey's height", () => {
+    expect(r.seked).toBeCloseTo(5.5, 12);
+    expect([r.rise, r.base, r.height]).toEqual([40, 440, 280]);
+    expect(Math.abs(r.surveyHeight - r.height)).toBeLessThan(1);
+    expect(Math.abs(r.surveyBase - r.base)).toBeLessThan(1);
+    expect(sekedRule({}, 51.8)).toBeNull();
+  });
+  it('shows 2π falling out as 44/7, and φ', () => {
+    const svg = sekedRuleSvg(r);
+    expect(svg).toContain('= 44/7 = 6.2857, and 2π = 6.2832');
+    expect(svg).toContain('5½ palms across');
+    expect(svg).toContain('and φ = 1.6180');
   });
 });
 

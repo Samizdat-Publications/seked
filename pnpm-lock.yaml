@@ -71,6 +71,9 @@ importers:
       '@seked/sky':
         specifier: workspace:*
         version: link:../../packages/sky
+      '@seked/units':
+        specifier: workspace:*
+        version: link:../../packages/units
       three:
         specifier: 0.186.0
         version: 0.186.0

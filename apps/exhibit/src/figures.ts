@@ -39,9 +39,16 @@
  * `allan-rank`: the 2026 study's shape test, cited: every triplet of bright stars it tried laid along one line, best
  * first, and the share that beat the pyramids' triangle marked at its end. The rank and the count are records
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
+ *
+ * `looked`, `looked-tests`: each claimed depth beside the deepest anyone has dug or drilled there (chapter 8), and
+ * with chapter 9's test for each.
+ *
+ * `seked-rule`: the builders' rule, a cubit's seven palms up and A3's seked across, at the Great Pyramid's size in
+ * whole cubits, and the 2π and φ that fall out of it.
  */
+import { degreesToSeked } from '@seked/units';
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -500,6 +507,52 @@ export function hawaraDepthsSvg(rows: HawaraRow[], width = 300): string {
   <line class="dim" x1="${x + 14}" y1="${f(mid)}" x2="132" y2="${f(y - 3)}" style="stroke-dasharray: none; stroke-width: 0.5"/>
   <text class="here-lab" x="136" y="${f(y - 2)}">${r.label}</text><text class="lab" x="136" y="${f(y + 10)}">${m(r.top)} to ${m(r.bottom)} m, ${r.tier}</text>`;
   }).join('\n  ')}
+</svg>`;
+}
+
+export interface SekedRule {
+  /** Palms of run for a cubit of rise, read back from the claim's target angle. */
+  seked: number;
+  /** Whole cubits of rise per step of the rule, so the pyramid is `rise` steps of one cubit. */
+  rise: number; base: number; height: number;
+  /** The survey's own base and height in royal cubits. */
+  surveyBase: number; surveyHeight: number;
+}
+
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+
+/**
+ * The builders' rule at the Great Pyramid's size: the seked of A3's first target (`sekedDeg`, from the claim's own
+ * formula), and the whole number of cubits of rise nearest the survey's height, so base and height are whole cubits.
+ */
+export function sekedRule(ground: Record<string, number>, sekedDeg: number): SekedRule | null {
+  const cubit = ground['cubit.royal'], side = ground['g1.base.side.mean'], h = ground['g1.height.original'];
+  if (cubit === undefined || side === undefined || h === undefined || !Number.isFinite(sekedDeg)) return null;
+  const seked = degreesToSeked(sekedDeg);
+  const rise = Math.round(h / cubit / 7);
+  return { seked, rise, base: Math.round(2 * seked * rise), height: 7 * rise, surveyBase: side / cubit, surveyHeight: h / cubit };
+}
+
+/** A cubit's seven palms up and the seked's palms across, then that triangle at the pyramid's size, and what falls out. */
+export function sekedRuleSvg(r: SekedRule, width = 300): string {
+  const f = (z: number) => z.toFixed(1), palm = 14, x0 = 30, y0 = 118;
+  const num = 4 * r.base, g = gcd(num, r.height), apothem = Math.hypot(r.height, r.base / 2) / (r.base / 2);
+  const palms = (n: number) => `${Math.floor(n)}${n % 1 ? '½' : ''}`;
+  return `<svg viewBox="0 0 ${width} 214" width="${width}" height="214" role="img" aria-label="A seked of ${palms(r.seked)} palms: ${r.base} cubits across and ${r.height} high, so perimeter over height is ${num / g}/${r.height / g}">
+  <path class="statue" d="M ${x0} ${y0} L ${f(x0 + r.seked * palm)} ${y0} L ${x0} ${y0 - 7 * palm} Z"/>
+  ${Array.from({ length: 8 }, (_, i) => `<line class="wall" x1="${x0 - 4}" y1="${y0 - i * palm}" x2="${x0}" y2="${y0 - i * palm}" style="stroke-width: 1"/>`).join('')}
+  ${Array.from({ length: Math.floor(r.seked) + 1 }, (_, i) => `<line class="wall" x1="${x0 + i * palm}" y1="${y0}" x2="${x0 + i * palm}" y2="${y0 + 4}" style="stroke-width: 1"/>`).join('')}
+  <line class="wall draw-on" x1="${x0}" y1="${y0}" x2="${f(x0 + r.seked * palm)}" y2="${y0}" pathLength="1"/>
+  <text class="here-lab" x="${x0 - 8}" y="${y0 - 7 * palm - 6}">1 cubit = 7 palms up</text>
+  <text class="lab" x="${x0}" y="${y0 + 16}">${palms(r.seked)} palms across</text>
+  <text class="here-lab" x="${x0 + 96}" y="${y0 - 70}">× ${r.rise}</text>
+  <text class="here-lab" x="${x0 + 96}" y="${y0 - 54}">${r.base} cubits across</text>
+  <text class="here-lab" x="${x0 + 96}" y="${y0 - 40}">${r.height} cubits high</text>
+  <text class="north" x="${x0 + 96}" y="${y0 - 22}">survey: ${r.surveyBase.toFixed(1)} by ${r.surveyHeight.toFixed(1)}</text>
+  <text class="here-lab" x="8" y="${y0 + 44}">perimeter ÷ height = 4 × ${r.base} ÷ ${r.height}</text>
+  <text class="lab" x="8" y="${y0 + 58}">= ${num / g}/${r.height / g} = ${(num / r.height).toFixed(4)}, and 2π = ${(2 * Math.PI).toFixed(4)}</text>
+  <text class="here-lab" x="8" y="${y0 + 78}">apothem ÷ half the base</text>
+  <text class="lab" x="8" y="${y0 + 92}">= ${apothem.toFixed(4)}, and φ = ${((1 + Math.sqrt(5)) / 2).toFixed(4)}</text>
 </svg>`;
 }
 

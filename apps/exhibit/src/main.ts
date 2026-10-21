@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -179,6 +179,18 @@ function lookedFigure(ground: Record<string, number> | null, structures: { id: s
     records, none yet checked against its page.</figcaption>`;
 }
 
+/** The builders' rule, A3's seked at the Great Pyramid's size, with A3's three comparisons live from the bundle. */
+function sekedRuleFigure(b: Bundle | null, ground: Record<string, number> | null): string {
+  const result = b && ground ? leafReceipts(b, b.claims, ['A3'])[0] : undefined;
+  const r = result && ground && sekedRule(ground, result.comparisons[0]!.targetValue);
+  if (!result || !r) return '<figcaption>The rule is drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const line = (c: (typeof result.comparisons)[number]) => `${c.label.replace('measured angle against ', '')}, ${formatValue(c.targetValue, 'deg')}: off by ${formatResidual(c)}`;
+  return `${sekedRuleSvg(r)}<figcaption>The builders' rule: a slope given as palms of run for a cubit of rise. The measured face,
+    ${formatValue(result.comparisons[0]!.value, 'deg')}, against three slopes (A3): ${result.comparisons.map(line).join('; ')}.
+    ${result.comparisons.every((c) => c.within) ? 'All three hold' : 'Not all hold'}, with ${result.freeChoices} free choices, so the survey cannot tell
+    them apart; only the seked is attested in Egyptian mathematics.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -250,6 +262,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
+    if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (shownFigure === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'looked' || shownFigure === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, shownFigure === 'looked-tests');
     if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
@@ -296,6 +309,7 @@ async function start(): Promise<void> {
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
+    if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();

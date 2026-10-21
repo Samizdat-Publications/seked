@@ -1842,7 +1842,7 @@
    },
    "arrive": "turn",
    "say": "For Hancock, the knowledge was inherited from a civilisation older than Egypt. Each number alone has an ordinary explanation.",
-   "draw": [],
+   "draw": ["seked-rule@ordinary"],
    "hold": 1,
    "interact": "look",
    "receipts": [
