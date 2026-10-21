@@ -5,7 +5,7 @@
  * on the view pauses play and hands the visitor the view; play resumes from that leaf.
  */
 import { isFigure } from './figures';
-import { type Leaf, drawCue, leafCues } from './leaves';
+import { type Leaf, drawCue, figureCues, leafCues } from './leaves';
 import { type ChapterRecording, type Span, leafSpans, recordingUrl } from './narration';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
@@ -44,23 +44,22 @@ export class Player {
   onLeaf: (leaf: Leaf) => void = () => {};
   /** Show one of the exhibit's own figures (src/figures.ts), or put it away with null. */
   onFigure: (id: string | null) => void = () => {};
-  /** A figure waiting for its word. */
-  private pendingFigure: string | null = null;
+  /** Figures waiting for their words, in order. */
+  private pendingFigures: { id: string; at: number; cued: boolean }[] = [];
 
   private token = 0;
   /** The recorded voice's element (public for capture and test scripts, through window.seked). */
   readonly audio = new Audio();
   /** Each chapter's recording, loaded once: its audio's address and each leaf's span in it (null without one). */
   private recordings = new Map<number, Promise<{ url: string; spans: Map<string, Span> } | null>>();
-  /** The word indices that start the leaf's overlay and show its figure, in play. */
+  /** The word index that starts the leaf's overlay, in play. */
   private cueAt = -1;
-  private figureAt = -1;
   private timers: number[] = [];
   private shown = -1;
 
   private word(k: number): void {
     if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); }
-    if (k >= this.figureAt && this.figureAt >= 0) { this.figureAt = -1; this.showPendingFigure(); }
+    while (this.pendingFigures[0] && this.pendingFigures[0].at >= 0 && k >= this.pendingFigures[0].at) this.onFigure(this.pendingFigures.shift()!.id);
     this.onWord(k);
   }
 
@@ -152,16 +151,21 @@ export class Player {
     this.offerCompare();
   }
 
-  /** A leaf's figure: shown now, or, in play with a cue, put away until its word. */
+  /**
+   * A leaf's figures: paused, the last of them now; in play, the last one with no cue now and each cued one put away
+   * until its word.
+   */
   private setFigure(L: Leaf): void {
-    const d = L.draw.map(drawCue).find((c) => isFigure(c.overlay));
-    this.pendingFigure = null;
-    if (!d) { this.onFigure(null); return; }
-    if (this.playing && d.word) { this.onFigure(null); this.pendingFigure = d.overlay; } else this.onFigure(d.overlay);
+    const cues = figureCues(L, isFigure);
+    const now = this.playing ? cues.filter((c) => !c.cued) : cues;
+    this.pendingFigures = this.playing ? cues.filter((c) => !now.includes(c)) : [];
+    this.onFigure(now[now.length - 1]?.id ?? null);
   }
 
   private showPendingFigure(): void {
-    if (this.pendingFigure) { this.onFigure(this.pendingFigure); this.pendingFigure = null; }
+    const last = this.pendingFigures[this.pendingFigures.length - 1];
+    this.pendingFigures = [];
+    if (last) this.onFigure(last.id);
   }
 
   /** The era a leaf is in, as the other side of a wipe or a comparison. */
@@ -294,7 +298,7 @@ export class Player {
   /** Say the leaf's words; when they end, hold, then go on. */
   private speak(token: number): void {
     const L = this.leaf;
-    ({ line: this.cueAt, figure: this.figureAt } = leafCues(L, isFigure));
+    this.cueAt = leafCues(L, isFigure).line;
     let ended = false;
     const end = () => {
       if (ended || token !== this.token) return;

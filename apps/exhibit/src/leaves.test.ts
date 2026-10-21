@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isFigure } from './figures';
-import { type Leaf, type RenderStations, cueIndex, drawCue, joinProblems, leafCues, leafPanorama, readLeaves, stationMoment, withStandIns } from './leaves';
+import { type Leaf, type RenderStations, cueIndex, drawCue, figureCues, joinProblems, leafCues, leafPanorama, readLeaves, stationMoment, withStandIns } from './leaves';
 
 const repo = join(__dirname, '..', '..', '..');
 const read = (p: string) => readFileSync(join(repo, p), 'utf8');
@@ -183,6 +183,13 @@ describe('draw cues', () => {
     expect(leafCues({ say, draw: ['g1-proportions', 'earth-scale@scale'] }, isFigure)).toEqual({ line: -1, figure: 0 });
     expect(leafCues({ say, draw: ['g1-proportions@height', 'earth-scale'] }, isFigure)).toEqual({ line: 5, figure: -1 });
     expect(leafCues({ say, draw: ['ditch-plan@pole'] }, isFigure)).toEqual({ line: -1, figure: 8 });
+  });
+  it('lists every figure a leaf draws in order, each at its word', () => {
+    const say = 'The sides run true. That is a quarter of a metre, with no compass.';
+    expect(figureCues({ say, draw: ['g1-proportions', 'north-square@true', 'north-drift@compass'] }, isFigure))
+      .toEqual([{ id: 'north-square', at: 3, cued: true }, { id: 'north-drift', at: 13, cued: true }]);
+    expect(figureCues({ say, draw: ['north-square', 'north-drift@quarter'] }, isFigure))
+      .toEqual([{ id: 'north-square', at: -1, cued: false }, { id: 'north-drift', at: 7, cued: true }]);
   });
   it("finds every cue's word in its leaf's words", () => {
     for (const L of readLeaves(JSON.parse(read('apps/exhibit/leaves.json'))))

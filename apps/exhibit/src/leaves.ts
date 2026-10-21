@@ -143,6 +143,15 @@ export function cueIndex(say: string, word: string | null): number {
 }
 
 /**
+ * Every figure a leaf draws, in order, each with the index of the word that shows it (-1 for one shown from the leaf's
+ * start, `cued` false). In play each replaces the one before at its word; paused, the last is shown.
+ */
+export function figureCues(L: Pick<Leaf, 'draw' | 'say'>, isFigure: (id: string) => boolean): { id: string; at: number; cued: boolean }[] {
+  return L.draw.map(drawCue).filter((c) => isFigure(c.overlay))
+    .map((c) => ({ id: c.overlay, at: c.word ? cueIndex(L.say, c.word) : -1, cued: !!c.word }));
+}
+
+/**
  * The words that cue a leaf's line and its figure in play (-1: not cued, drawn from the start). The stage draws the
  * first entry when it is an overlay; the figure is the first entry that is one, wherever it stands in `draw`, so a
  * figure listed after the leaf's line still waits for its own word.

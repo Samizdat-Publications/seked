@@ -1796,9 +1796,10 @@
    "arrive": "cut",
    "say": "The sides run within four minutes of arc of true north. On a side of 230 metres that is a quarter of a metre, with no compass.",
    "draw": [
-    "north-square@north"
+    "north-square@north",
+    "north-drift@compass"
    ],
-   "hold": 2,
+   "hold": 5,
    "interact": "look",
    "receipts": [
     "C1"
@@ -1818,9 +1819,7 @@
    },
    "arrive": "cut",
    "say": "Writers since Charles Piazzi Smyth in the 1860s have read these numbers as a design brief: the circle, the golden section, the size of the Earth and the slow turn of the sky, written into one shape.",
-   "draw": [
-    "north-drift@sky"
-   ],
+   "draw": [],
    "hold": 1,
    "interact": "look",
    "receipts": [
