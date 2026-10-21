@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -148,6 +148,16 @@ function corridorFigure(): string {
     has no comparable figures at all.</figcaption>`;
 }
 
+/** Chapter 8's depths: the pyramid, its rooms and the claimed wells to one scale, from the claims' environment. */
+function khafreDepthsFigure(ground: Record<string, number> | null): string {
+  const d = ground && khafreDepths(ground);
+  if (!d) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  return `${khafreDepthsSvg(d)}<figcaption>To one scale: Khafre's pyramid, its rooms ${-d.rooms} m under the base, and, dashed,
+    one of the two rows of wells and the two chambers ${formatValue(d.cube, 'm')} on a side, as the Khafre Project describes
+    them (a claim, not yet checked against its publication). Where they stand under the base is a look choice. ${-d.bottom} m
+    is ${(-d.bottom / d.height).toFixed(2)} times the pyramid's original height.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -218,6 +228,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
+    if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
   });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once what it shows exists (the
@@ -261,6 +272,7 @@ async function start(): Promise<void> {
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'corridor') figure.innerHTML = corridorFigure();
+    if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -172,6 +172,22 @@ describe('the radiocarbon accessions', () => {
   });
   it('refuses an accession with only one end', () => {
     expect(() => radiocarbonData([{ key: 'chronology.aha.accession.earliest', value: -3217, source: 'dee-2013' }], read('sources.json'))).toThrow(/start or an end/);
+  });
+});
+
+describe("Khafre's depths", () => {
+  const env = groundEnvironment(loadDatabase());
+  const d = khafreDepths(env)!;
+  it('reads the pyramid, its rooms and the claimed wells from the environment', () => {
+    expect(d).toMatchObject({ bottom: -648, rooms: -3, wells: 8, rows: 2, cubes: 2, cube: 80 });
+    expect(-d.bottom / d.height).toBeCloseTo(4.5, 0);   // "four and a half times the pyramid's height"
+    expect(khafreDepths({})).toBeNull();
+  });
+  it('draws one row of wells to the depth, the chambers at their foot and the heights counted down', () => {
+    const svg = khafreDepthsSvg(d);
+    expect(svg.match(/class="claimed"/g)).toHaveLength(4);
+    expect(svg.match(/class="claimed-box"/g)).toHaveLength(2);
+    expect(svg).toContain(`${(648 / d.height).toFixed(2)}</text>`);
   });
 });
 

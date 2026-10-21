@@ -28,6 +28,9 @@
  * `radiocarbon`: the first king's accession and four later ones as radiocarbon models date them
  * (data/measurements/chronology.json), each a bar of its 95 per cent range on one line of years.
  *
+ * `khafre-depths`: Khafre's pyramid, its known rooms and the Khafre Project's claimed wells and chambers on one depth
+ * scale, with the pyramid's height counted down beside them (the claims' environment).
+ *
  * `corridor`: the model answer, the Great Pyramid's north-face corridor in section to scale, every dimension with
  * its error bar (data/measurements/g1-voids.json).
  *
@@ -38,7 +41,7 @@
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -401,6 +404,47 @@ export function radiocarbonSvg(d: RadiocarbonData, width = 300): string {
   }).join('\n  ')}
   <line class="dim" x1="${X(lo)}" y1="${h - 20}" x2="${X(hi)}" y2="${h - 20}"/>
   ${ticks.map((t) => `<text class="north" x="${X(t)}" y="${h - 6}" text-anchor="middle">${yearText(t)}</text>`).join('')}
+</svg>`;
+}
+
+export interface KhafreDepths { side: number; height: number; rooms: number; bottom: number; cube: number; wells: number; rows: number; cubes: number }
+
+/** Khafre's pyramid, its deepest known room and the Khafre Project's wells and chambers, from the claims' environment. */
+export function khafreDepths(env: Record<string, number>): KhafreDepths | null {
+  const v = {
+    side: env['g2.base.side.mean'], height: env['g2.height.original'], rooms: env['g2.passage.horizontal.floor.begin.up'],
+    bottom: env['g2.sar.wells.bottom.up'], cube: env['g2.sar.cube.side'], wells: env['g2.sar.wells.count'],
+    rows: env['g2.sar.wells.rows'], cubes: env['g2.sar.cubes.count'],
+  };
+  return Object.values(v).some((x) => x === undefined) ? null : (v as KhafreDepths);
+}
+
+/**
+ * Everything on one depth scale, to scale: the pyramid above the ground in stone, its known rooms a hairline just under
+ * it, one row of the claimed wells dashed down to their depth and the claimed chambers at their foot, and beside them
+ * the pyramid's height counted down. Where the wells stand under the base and where the chambers sit at their foot are
+ * look choices: the team publishes no plan with a scale.
+ */
+export function khafreDepthsSvg(d: KhafreDepths, width = 300): string {
+  const top = 14, H = 330, k = (H - top - 26) / (d.height - d.bottom + d.cube);
+  const Y = (z: number) => top + (d.height - z) * k, cx = 104, half = (d.side / 2) * k;
+  const perRow = Math.round(d.wells / d.rows), cube = d.cube * k;
+  const wells = Array.from({ length: perRow }, (_, i) => cx - half * 0.7 + (i * 1.4 * half) / Math.max(1, perRow - 1));
+  const bar = width - 54, n = Math.floor(-d.bottom / d.height);
+  const f = (z: number) => z.toFixed(1);
+  return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="Khafre's pyramid above the ground and the claimed wells ${-d.bottom} metres below it, to one scale">
+  <line class="dim" x1="8" y1="${f(Y(0))}" x2="${width - 8}" y2="${f(Y(0))}"/>
+  <path class="statue" d="M ${f(cx - half)} ${f(Y(0))} L ${f(cx)} ${f(Y(d.height))} L ${f(cx + half)} ${f(Y(0))} Z"/>
+  <line class="statue" x1="${f(cx - 6)}" y1="${f(Y(d.rooms) + 1)}" x2="${f(cx + 6)}" y2="${f(Y(d.rooms) + 1)}"/>
+  <text class="here-lab" x="${f(cx + half + 6)}" y="${f(Y(0) + 12)}">known rooms, ${-d.rooms} m down</text>
+  ${wells.map((x) => `<line class="claimed" x1="${f(x)}" y1="${f(Y(0))}" x2="${f(x)}" y2="${f(Y(d.bottom))}"/>`).join('\n  ')}
+  ${Array.from({ length: d.cubes }, (_, i) => `<rect class="claimed-box" x="${f(cx + (i - d.cubes / 2) * cube * 1.15)}" y="${f(Y(d.bottom))}" width="${f(cube)}" height="${f(cube)}"/>`).join('')}
+  <text class="lab" x="${f(cx + half + 6)}" y="${f(Y(d.bottom) + 4)}">${-d.bottom} m</text>
+  <text class="here-lab" x="${f(cx + half + 6)}" y="${f(Y(d.bottom) + 18)}">the claimed chambers</text>
+  <line class="wall" x1="${bar}" y1="${f(Y(0))}" x2="${bar}" y2="${f(Y(d.bottom))}"/>
+  ${Array.from({ length: n }, (_, i) => `<line class="wall" x1="${bar - 4}" y1="${f(Y(-(i + 1) * d.height))}" x2="${bar + 4}" y2="${f(Y(-(i + 1) * d.height))}"/><text class="here-lab" x="${bar + 8}" y="${f(Y(-(i + 1) * d.height) + 3)}">${i + 1}</text>`).join('\n  ')}
+  <text class="here-lab" x="${bar + 8}" y="${f(Y(d.bottom) + 3)}">${(-d.bottom / d.height).toFixed(2)}</text>
+  <text class="north" x="${bar}" y="${f(Y(0) - 6)}" text-anchor="middle">heights</text>
 </svg>`;
 }
 
