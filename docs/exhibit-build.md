@@ -106,6 +106,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   *Blocked 2026-10-20 16:31 UTC on sources:* `assets/plates/` has neither Dobecki and Schoch's figures nor Reader's
   Fig. 5, and the script keeps the *KMT* depths in the notes until the paper's own figures are read. See For
   Stewart.
+  *Chunk 11, 2026-10-21 05:18 UTC:* still blocked, after the laptop's answer 5 (do what the repo's sources allow).
+  `data/measurements/` holds no bedding, fissure, seismic-line or weathering record for the enclosure, only the two
+  scaled margins `ditch-plan` already draws, and `assets/plates/` holds neither figure. Nothing more can be drawn without
+  the scans.
 - [x] **E7. The recorded voice in the player** (replaced by the laptop session, 20 October: the voice is chosen
   and recorded). `assets/narration/chN.mp3` and `chN-reply.mp3` hold each chapter of `docs/script.md` in Stewart's
   chosen voice, and `chN.json` the exact text spoken with every character's start and end time
@@ -412,10 +416,19 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   time (`virtual:radiocarbon`); its caption says which reigns the model places from reign lengths. Cued on "king" in
   `ch4-first-king` beside the sky (decision 51); in play it draws about 4 s in. `shortCite` now reads two-word surnames
   and "et al." ("Bronk Ramsey and others (2010)"). 4 tests. Looked at at both sizes paused and in play.
-- [ ] **E18c. Chapter 4's king lists.** The Turin and Manetho totals as a timeline unrolled back from Aha's median
+- [x] **E18c. Chapter 4's king lists.** The Turin and Manetho totals as a timeline unrolled back from Aha's median
   (`chronology.aha.accession.median`), with 13,420 alone, the two Turin figures summed (Schwaller's sum, not on the
   papyrus) and a thin line at 10,500 BCE, as the script's beat for "13,420 years and, in the next line, 23,200" asks.
   *Waiting on Stewart:* the totals want `data/texts/kinglists.json`, a new kind of file (see For Stewart).
+  *Done 2026-10-21 05:18 UTC (chunk 11), `ea2609c` and `6f2b3c5`.* `data/texts/` is a new kind of file (decision 67):
+  what a text says, in its own unit, cited to its line or problem, `verified: false`, validated by `loadTexts` in
+  `@seked/data` (3 tests) and ruled in `CLAUDE.md`. `kinglists.json` holds the Turin list's two totals (column II, lines 8
+  and 9, 13,420 + x and 23,200 + x, read at pharaoh.se) and Eusebius's Manetho (24,900 lunar years, which he makes 2,206;
+  Fr. 1, Loeb p. 7, read on LacusCurtius). The figure `king-lists` (`src/texts.ts`) unrolls each back from Aha's
+  radiocarbon median: 16,505 BCE for the Followers alone, 39,705 BCE for the two added (dashed, Schwaller's sum, not on
+  the papyrus), 5,291 BCE for Manetho, with "+ x" tails and a thin line at C5's epoch read from its claim (decision 68).
+  Cued on "13,420" in `ch4-numbers` and kept through `ch4-manetho` (decision 69). 3 tests. Looked at paused at both sizes,
+  beside the sky, and in play: drawn 5.9 s into its leaf.
 - [x] **E19. Chapter 7, "Before the flood": its leaves** (the plan's order: 3, 4, 7, 8, 9; added by chunk 6).
   *Done 2026-10-20 23:56 UTC, `8c76c9d`.* 10 leaves, every word in order and inside `ch7.json`. No station stands at
   Göbekli Tepe, so the chapter stays at Giza in the First Time, the same millennium (decision 52): the Younger Dryas
@@ -508,7 +521,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   is chosen (with the count), and does not hold; D1 to D3 added to `ch6-together`'s receipts, as the script's drawer
   lists them. Holds raised to 5 s on both leaves so the late figures can be read. All looked at at both sizes. Left
   for E22b.
-- [ ] **E22b. The rest of "how they did the math".** (a) Rhind problem 56 in the scribe's steps: its figures (a base of
+- [x] **E22b. The rest of "how they did the math".** (a) Rhind problem 56 in the scribe's steps: its figures (a base of
   360 cubits and a height of 250, as the research reads it) are text, not measurements, the same question as chapter 4's
   king lists (For Stewart): enter them once that is settled, then draw the steps beside `seked-rule`. (b) Meidum, the
   Bent and the Red Pyramid's orientations (`spence-2000` Table 1, Dorner, Petrie's *Medum*; `verified: false`), which
@@ -532,6 +545,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   building order at 70 times rather than C1's 120 (decision 64), its labels on two rows; `pole-stars` keeps Giza's three
   (decision 66). 1 new test, the two site-listing tests extended. Looked at in play at both sizes: the drift shows from
   4.4 to 9.5 s. Spence's own Table 1, which the research quotes for the same pyramids, was not read.
+  *(d) done 2026-10-21 05:18 UTC (chunk 11), `3265a38`:* the laptop's sentence follows "Each number alone has an ordinary
+  explanation" in `docs/script.md` (chapter 6 now 245 words, the running time 2,096 words) as its own leaf, `ch6-papyri`,
+  the seked rule still drawn. Until chapter 6 is re-recorded (For the laptop) that leaf speaks in the browser's voice; the
+  recording test lists it in `AWAITING_RECORDING`, and the entry fails once the new recording holds it (decision 70).
+  *(a) done the same chunk, `ea2609c` and `6f2b3c5`:* `data/texts/rhind.json` holds problem 56's base and height (360 and
+  250 cubits), from Greenberg's summary of Chace's edition, read through a page summary and unchecked; a new source,
+  `greenberg-rhind`. The papyrus's answer is not stored: `rhind-56` works it from those two in the scribe's steps (half
+  the base, over the height, 1/2 + 1/5 + 1/50 of a cubit, times 7 palms: 5 + 1/25), the fractions by the greedy unit
+  fraction rule, which gives the papyrus's own (a test pins both), beside Khufu's 5 + 1/2 read from A3's target, the
+  two slopes drawn on one cubit of rise. Cued on "papyri" in `ch6-papyri`, after the seked rule. 2 tests. Looked at at
+  both sizes; in play it draws 2.3 s into the leaf. E22b is complete.
 - [x] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
   *Done 2026-10-21 00:48 UTC (chunk 8), the plain words; the "what it would change" lines are E23b.* (1) `f719eb7`: every
@@ -833,6 +857,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 66. **`pole-stars` stays with Giza's three.** Read off Spence's line, Meidum's 24′ would push the plot's window out by
    decades and crowd its six labels, and the caption's dating speaks of Khufu. The drift shows the earlier three; the
    needles carry a `site` so the stars' figure can filter. Reversible in `main.ts` (`poleStarsFigure`).
+67. **`data/texts/` holds figures, not records**: its own schema (`TextFigureSchema`: key, text, locus, value, unit among
+   year, lunar year, cubit and palm, `plus_x`, reading, source, verified) rather than measurements with a new unit, so a
+   text's years can never reach a claim's environment or a preset. One file per subject (king lists, Rhind). Reversible:
+   the files and `loadTexts`.
+68. **The king lists end at Aha's radiocarbon median and the line is C5's epoch**, both read at build time, so the
+   figure types neither 3085 nor 10,500. Manetho is drawn in Eusebius's own conversion (2,206 years), his 24,900 lunar
+   years named in the caption: drawing 24,900 as years would be a reading neither the text nor its translator makes.
+69. **`king-lists` waits for "13,420" in `ch4-numbers`**, not `ch4-turin`, so the timeline arrives with the numbers it
+   draws; `ch4-first-king` keeps the radiocarbon bars. Reversible in `leaves.json`.
+70. **A leaf added after its chapter was recorded is named, not excused**: the recording test keeps every other leaf
+   to the full check and requires the named leaf to be missing from the recording, so the exception expires by itself.
 
 ## For Stewart
 
@@ -904,6 +939,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **Re-record chapter 6** (E22b d, `3265a38`): `python scripts/narrate_script.py 6`, then commit `assets/narration/ch6.*`
+  and take `ch6-papyri` out of `AWAITING_RECORDING` in `apps/exhibit/src/narration.test.ts` (the test fails until you do).
 
 - **The valley temple after E17c's move** (`59838a0`): `plan()` now lives in `render/giza/valley_plan.py`. Render
   `valley-temple` built once (or a preview) and compare with the current panorama: nothing should have moved. Then
