@@ -532,7 +532,7 @@
     "pitch": 8,
     "fov": 66
    },
-   "arrive": "cut",
+   "arrive": "wipe",
    "say": "The figure was a lion first.",
    "draw": [],
    "hold": 1,
@@ -586,7 +586,7 @@
     "pitch": 8,
     "fov": 66
    },
-   "arrive": "cut",
+   "arrive": "wipe",
    "say": "When a king of the pyramid age took it over, his sculptors cut a royal face into what was left.",
    "draw": [],
    "hold": 1,

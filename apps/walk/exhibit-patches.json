@@ -227,24 +227,6 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/sphinx-side-built-equinox-dawn-ch2-inside.jpg",
-   "pano": "pano/sphinx-side-built.jpg",
-   "leaf": "ch2-inside",
-   "yaw": 29,
-   "pitch": 15,
-   "fov": 44.2,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/sphinx-side-today-equinox-dawn-ch2-reader.jpg",
-   "pano": "pano/sphinx-side-today.jpg",
-   "leaf": "ch2-reader",
-   "yaw": 29,
-   "pitch": 15,
-   "fov": 44.2,
-   "aspect": 1.777778
-  },
-  {
    "src": "pano/patch/sphinx-today-equinox-dawn-ch0-sunrise.jpg",
    "pano": "pano/sphinx-today-equinox-dawn.jpg",
    "leaf": "ch0-sunrise",
