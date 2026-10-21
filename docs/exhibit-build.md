@@ -653,10 +653,22 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   source, from the mono recording spread to stereo), three frames looked at; and on two leaves, cut where the third
   went on. The video is the page's own recording, so a flight film plays in it as the visitor sees it. For the laptop:
   the whole run (below).
-- [ ] **E28. The laptop's review notes** (`docs/laptop-2026-10-20.md`, decision 18): (a) the head in the hand reads
+- [x] **E28. The laptop's review notes** (`docs/laptop-2026-10-20.md`, decision 18): (a) the head in the hand reads
   rough: hide or cap the cut faces, light it as a museum object, let it fill its card, start at a three-quarter view
   where the lion's head visibly encloses the king's; (b) chapter 8's "wells" leaf shows the plateau, not the wells;
   (c) chapter 6's labels on the pyramid are small and crowd each other at 1280 by 720.
+  *Done 2026-10-21 06:12 UTC (chunk 13).* (a) `b585e09`: the view cuts both heads again a metre inside the export's crop
+  box (2.5 m under the chin, where the lappets' edge is ragged) and fills the king's cut as flat dark stone, lights them as
+  a case would (warm key high front left, cool fill, a rim behind, little ambient, filmic tone mapping), frames on what the
+  cut leaves of both, and starts at a front three-quarter view from the north-east with the lion's head seen round the
+  king's (decision 82). The lion is drawn both sides, since the crop opens its face. 3 tests. (b) `b6d8952`: the claimed
+  wells are drawn in the scene, not only in the figure: `src/wells.ts` builds an overlay from the records the depth
+  figure reads (eight dashed wells from Khafre's base down 648 m, plunging out of the picture, the base outlined faintly,
+  the label saying it is a claim placed by choice), cued on "wells" before the figure on "falling" (decision 83). 3 tests.
+  (c) `cd8f979`: the scene's labels grow with the stage (1.28 times at 1280 wide, at most 1.4, unchanged on a phone),
+  move off a label already drawn, and step sideways off a figure's panel (decision 84). 5 tests. All looked at at 1280
+  by 720 and 390 by 844, (b) also in play; the heads with the laptop's export (`apps/exhibit/objects/`, not committed,
+  served to the page from the main checkout). `pnpm test` 1270 passed.
 
 ## Decisions
 
@@ -946,6 +958,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    speakers), so the recording cannot capture sound; the player writes when each span sounded in `Date` milliseconds
    and the script compares that with when the page (and so its video) opened, good to a frame or two. A leaf in the
    browser's voice is silent in the mp4 and named in its JSON rather than synthesised.
+82. **The head's clean cut is a look choice, a metre in (2.5 under the chin)**, stated in `objectview.ts`: the export's own
+   cut is the decimated mesh's ragged edge, and the heads are labelled stand-ins whose form is not a measurement, so
+   trimming them further changes nothing claimed. Reversible: `HEAD_INSET` and `HEAD_INSET_BELOW` at 0 restore the
+   export's edge.
+83. **Lines computed in the page beside the renders' overlays** (`SCENE_OVERLAYS` in `wells.ts`): the wells' records are in
+   the bundle, so drawing them needs no render, and the leaves test accepts these names beside `overlays.json`'s. Where
+   the wells stand under the base is the same look choice the depth figure already makes, said on the label.
+84. **Labels grow with the stage to 1.4 times, and step off a figure rather than the figure moving**: the figure is the
+   leaf's subject; the label can move sideways and still point near its mark. A label stepped off its point loses the
+   point under its plate at worst, which reads better than a label under a panel.
 
 ## For Stewart
 
