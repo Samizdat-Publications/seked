@@ -481,7 +481,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   E24's figure with chapter 9's test under each claim (open the cavity, release the radar data, dig below the chips).
   The beat's Hall of Records (ghosted) and rump passage (solid) are left out: neither has a depth record. Left: (b).
 
-- [ ] **E22. Chapter 6, "how they did the math"** (the plan's "Added 20 October" section, agreed with Stewart): Rhind
+- [x] **E22. Chapter 6, "how they did the math"** (the plan's "Added 20 October" section, agreed with Stewart): Rhind
   problem 56 in the scribe's steps beside our pyramid, the 5½-palm seked becoming 2π and φ with A3's receipt; north as
   a method (Spence's two stars, the equinox shadow, the drift that dates the pyramids); the engine's sorting made
   visible (no free choices, units chosen, fails); the gap said in words (no mathematical papyrus from the pyramid age).
@@ -489,7 +489,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   "ordinary" in `ch6-hancock`, `9145910`: a cubit's seven palms up and the seked's palms across, the seked read back from
   A3's own target, stepped in whole cubits to the survey's height (40 steps: 440 by 280, beside the survey's 439.9 by
   280.0), perimeter over height becoming 44/7 against 2π and the apothem over half the base against φ; caption A3's
-  three comparisons live with its count of free choices, and (`latest`) that the papyri are centuries younger than the
+  three comparisons live with its count of free choices, and (`55c8790`) that the papyri are centuries younger than the
   pyramid, no date typed. (2) `north-drift` on "compass" in `ch6-north`, `35ba0b5`, `591f9ac`: Khufu's, Khafre's and
   Menkaure's turns from north in building order from their verified orientation records, at C1's exaggeration, with
   Spence's reading in the caption. The player now shows a leaf's figures in turn, each at its word, the last when paused
