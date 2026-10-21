@@ -94,7 +94,12 @@ def seed(state):
 
 def git_bytes(spec):
     r = subprocess.run(["git", "-C", ROOT, "show", spec], capture_output=True)
-    return r.stdout if r.returncode == 0 else None
+    if r.returncode != 0:
+        return None
+    if r.stdout.startswith(b"version https://git-lfs"):   # the mp3s are in LFS: swap the pointer for the audio
+        r = subprocess.run(["git", "-C", ROOT, "lfs", "smudge"], input=r.stdout, capture_output=True)
+        return r.stdout if r.returncode == 0 and not r.stdout.startswith(b"version https://git-lfs") else None
+    return r.stdout
 
 
 def generate(item_id, text, voice):
