@@ -45,10 +45,16 @@
  *
  * `seked-rule`: the builders' rule, a cubit's seven palms up and A3's seked across, at the Great Pyramid's size in
  * whole cubits, and the 2π and φ that fall out of it.
+ *
+ * `north-drift`: the three Giza pyramids' turns from true north in the order they were built, as needles drawn at C1's
+ * exaggeration (their orientation records).
  */
-import { degreesToSeked } from '@seked/units';
+import { degreesToSeked, formatDms } from '@seked/units';
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'joint-claim', 'allan-rank'] as const;
+/** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
+const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
+
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -222,6 +228,32 @@ export function northSquareSvg(n: NonNullable<ReturnType<typeof northSquare>>, e
   <rect class="statue" x="${mid - half}" y="${mid - half}" width="${2 * half}" height="${2 * half}" fill="none"/>
   <polygon class="wall draw-on" points="${corners.join(' ')}" fill="none" pathLength="1"/>
   <text class="north" x="${mid + 6}" y="20">true north &#8593;</text>
+</svg>`;
+}
+
+export interface Needle { king: string; orientation: number }
+
+/** The Giza pyramids in the order they were built, each by its orientation record (negative is west of north). */
+const DRIFT = [{ king: 'Khufu', key: 'g1.orientation' }, { king: 'Khafre', key: 'g2.orientation' }, { king: 'Menkaure', key: 'g3.orientation' }];
+
+/** The needles from the environment; null until every orientation is there. */
+export function northDrift(ground: Record<string, number>): Needle[] | null {
+  const n = DRIFT.map((d) => ({ king: d.king, orientation: ground[d.key] }));
+  return n.every((x) => x.orientation !== undefined) ? (n as Needle[]) : null;
+}
+
+/** Each pyramid a needle beside true north, its turn drawn `exaggeration` times larger, in building order. */
+export function northDriftSvg(needles: Needle[], exaggeration: number, width = 300): string {
+  const H = 150, len = 96, base = 124, step = width / needles.length, f = (z: number) => z.toFixed(1);
+  return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="${needles.map((n) => `${n.king} ${arc(n.orientation)}`).join(', ')} from true north, drawn ${exaggeration} times larger">
+  ${needles.map((n, i) => {
+    const x = step * (i + 0.5), a = (n.orientation * exaggeration * Math.PI) / 180;
+    return `<line class="dim" x1="${f(x)}" y1="${base}" x2="${f(x)}" y2="${base - len - 6}"/>
+  <line class="wall draw-on${i ? ' late' : ''}" x1="${f(x)}" y1="${base}" x2="${f(x + len * Math.sin(a))}" y2="${f(base - len * Math.cos(a))}" pathLength="1"/>
+  <text class="here-lab" x="${f(x)}" y="${base + 12}" text-anchor="middle">${n.king}</text>
+  <text class="lab" x="${f(x)}" y="${base + 24}" text-anchor="middle">${arc(n.orientation)}</text>`;
+  }).join('\n  ')}
+  <text class="north" x="${f(step / 2 + 4)}" y="12">true north &#8593;</text>
 </svg>`;
 }
 

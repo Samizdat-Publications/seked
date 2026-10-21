@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -82,6 +82,17 @@ function northSquareFigure(ground: Record<string, number> | null): string {
   return `${northSquareSvg(n, x)}<figcaption>The base's sides run ${formatValue(Math.abs(n.orientation), 'deg')} ${n.orientation < 0 ? 'west' : 'east'} of
     true north (the grey square), here drawn ${x} times larger so it can be seen at all. On a side of ${formatValue(n.side, 'm')}, the far
     end strays ${formatValue(n.stray, 'm')} (C1).</figcaption>`;
+}
+
+/** North as a method: the three Giza pyramids' turns in building order, from their records, at C1's exaggeration. */
+function northDriftFigure(ground: Record<string, number> | null): string {
+  const n = ground && northDrift(ground);
+  const x = skyData.claims.C1?.exaggeration;
+  if (!n || !x) return '<figcaption>The needles are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  return `${northDriftSvg(n, x)}<figcaption>No compass, but a method: each pyramid's sides against true north, in the order they were
+    built, drawn ${x} times larger. Khufu's is the smallest; after him it grows and swings east. Spence (2000) read that drift as the
+    builders lining up two stars that circle the pole, one above the other: the stars slowly moved, so the error dates each
+    pyramid. Meidum and Dahshur, before Khufu, are not yet in the records.</figcaption>`;
 }
 
 /** A2 drawn, with A3's point that one slope serves π, φ and the seked alike. */
@@ -263,6 +274,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
+    if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (shownFigure === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'looked' || shownFigure === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, shownFigure === 'looked-tests');
     if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
@@ -310,6 +322,7 @@ async function start(): Promise<void> {
     if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
+    if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();

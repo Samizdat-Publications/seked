@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -228,6 +228,21 @@ describe("the builders' rule", () => {
     expect(svg).toContain('= 44/7 = 6.2857, and 2π = 6.2832');
     expect(svg).toContain('5½ palms across');
     expect(svg).toContain('and φ = 1.6180');
+  });
+});
+
+describe('north as a method', () => {
+  const ground = groundEnvironment(loadDatabase());
+  const n = northDrift(ground)!;
+  it('takes each pyramid in building order from its orientation record', () => {
+    expect(n.map((x) => x.king)).toEqual(['Khufu', 'Khafre', 'Menkaure']);
+    expect(n.map((x) => x.orientation)).toEqual([ground['g1.orientation'], ground['g2.orientation'], ground['g3.orientation']]);
+    expect(northDrift({})).toBeNull();
+  });
+  it('labels each turn in arc minutes and seconds', () => {
+    const svg = northDriftSvg([{ king: 'Khufu', orientation: -0.065 }, { king: 'Menkaure', orientation: 0.234167 }], 120);
+    expect(svg).toContain('>−3′54″</text>');
+    expect(svg).toContain('>14′03″</text>');
   });
 });
 
