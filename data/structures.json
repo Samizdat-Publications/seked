@@ -69,7 +69,8 @@
     "name": "Cavity beneath the Sphinx's forepaws",
     "evidence": "claimed",
     "source": "dobecki-schoch-1992",
-    "note": "Seismic refraction anomaly interpreted as a possible chamber about 5 m down; never excavated."
+    "note": "Seismic refraction anomaly interpreted as a possible chamber about 5 m down; never excavated.",
+    "if_it_held": "If it held and were opened, a cut chamber under the paws could hold tool marks, deposits or writing that dated it, the one kind of evidence the Sphinx's age has never had."
   },
   {
     "id": "g2.sar-shafts",
@@ -77,7 +78,8 @@
     "name": "Khafre Project SAR shafts and complex",
     "evidence": "claimed",
     "source": "khafre-project-2025",
-    "note": "Eight vertical shafts to about 648 m with spiral structures and cubic chambers, and a complex to about 1.2 km, announced at a March 2025 press conference from SAR Doppler tomography. Not peer reviewed; radar specialists dispute that SAR can image hundreds of metres into limestone; the Egyptian antiquities authority rejected it. Modelled as a claim, rendered as such."
+    "note": "Five 'Zed' structures in the pyramid's base; eight vertical wells in two north–south rows, wrapped in descending spirals, falling 648 m below the base into two cubes about 80 m a side; structures about 2 km down. From the team's conference abstract of 16 March 2025 (SAR Doppler tomography of Capella and Umbra data); its figures are in g2-sar.json. Not peer reviewed, and the method's only peer-reviewed paper (on Khufu, 2022) was retracted on 10 August 2026. Radar specialists dispute that surface vibrations seen from orbit can be inverted to these depths. Hawass, a former minister, called it false, and the Ministry authorized no work at Khafre. Modelled as a claim, rendered as such.",
+    "if_it_held": "The scans are preliminary and contested, and the paper behind the method has been retracted; but if even part of it held, the plateau's history would need rewriting, since nothing cut hundreds of metres into rock is known from ancient Egypt."
   },
   {
     "id": "hall-of-records",
@@ -144,11 +146,140 @@
     "note": "A place rather than a monument, and a modern town standing for the Pelusiac mouth at the Delta's eastern limit."
   },
   {
+    "id": "giza.pyramids",
+    "site": "giza",
+    "name": "The three pyramids as a group",
+    "evidence": "excavated",
+    "source": "petrie-1883",
+    "note": "G1, G2 and G3 taken together, for figures about their arrangement rather than any one pyramid: the statistics of the Orion correlation's triangle. Each pyramid keeps its own structure; this adds no monument."
+  },
+  {
     "id": "plateau",
     "site": "giza",
     "name": "The plateau's lesser monuments (Tier 3)",
     "evidence": "excavated",
     "source": "osm-2026",
     "note": "The queens' and satellite pyramids, Khentkawes, the four temples of Khafre and Menkaure, the Sphinx Temple and Amenhotep II's, the boat pits east of Khufu, the Wall of the Crow and the mastaba fields, as massing solids from OSM footprints registered onto the survey. Every one is excavated; what is not measured is their height, which is a seked-estimate where OSM gives none."
+  },
+  {
+    "id": "hawara.pyramid",
+    "site": "hawara",
+    "name": "Pyramid of Amenemhat III at Hawara",
+    "evidence": "excavated",
+    "source": "petrie-1890",
+    "note": "Mud brick, once cased in limestone; entered by Petrie in 1889, its burial chamber a single quartzite block. The Labyrinth's remains lie to its south."
+  },
+  {
+    "id": "hawara.labyrinth",
+    "site": "hawara",
+    "name": "The Labyrinth's foundation platform",
+    "evidence": "excavated",
+    "source": "petrie-1889",
+    "note": "Amenemhat III's mortuary temple, quarried away in antiquity to its beds of limestone chips and beton, which Petrie traced to about 1000 by 800 ft south of the pyramid. Herodotus's and Strabo's Labyrinth; Petrie's restored plan of courts and a columned hall (1912) is an interpretation."
+  },
+  {
+    "id": "hawara.mataha-anomalies",
+    "site": "hawara",
+    "name": "VLF-EM anomalies south of the pyramid (the 2008 survey, as published)",
+    "evidence": "instrumented",
+    "source": "khalil-2010",
+    "note": "The 2008 NRIAG survey's peer-reviewed result: elongated and square conductive anomalies at shallow depth on a 2 m grid, which the authors compare with Herodotus. Instrumented because it is published in a refereed journal (night decision 27); the deeper walls its organiser reports are hawara.mataha-walls."
+  },
+  {
+    "id": "hawara.ert-closures",
+    "site": "hawara",
+    "name": "Resistivity closures south of the pyramid",
+    "evidence": "instrumented",
+    "source": "elshazly-2024",
+    "note": "High-resistivity closures in inverted ERT sections, 6 m wide at about 7.5 m and 4 m wide at 5 m, which the authors say may be archaeological remains needing excavation. The 2008 survey's leader is among the authors."
+  },
+  {
+    "id": "hawara.mataha-walls",
+    "site": "hawara",
+    "name": "Walls reported 8–12 m down (Mataha Expedition, 2008)",
+    "evidence": "claimed",
+    "source": "de-cordier-2025-mataha",
+    "note": "Thick walls and nearly closed rooms 8–12 m down over hectares, and a wall over 17 m deep, as the expedition's organiser reports them. The NRIAG report is unpublished, so the tier is claimed (night decision 27).",
+    "if_it_held": "If they held, the Labyrinth Herodotus described would survive underground at Hawara, and a dig could find out when it was built."
+  },
+  {
+    "id": "hawara.merlin-burrows",
+    "site": "hawara",
+    "name": "Merlin Burrows multi-level complex",
+    "evidence": "claimed",
+    "source": "de-cordier-2025-merlin-burrows",
+    "note": "Four or five levels 20–50 m apart, to about 100 m, and two chambers under the pyramid, from satellite scans of 2015 by an undisclosed method. Depths no radar reaches."
+  },
+  {
+    "id": "hawara.sar-areas",
+    "site": "hawara",
+    "name": "Carlotto's areas of uncorrelated radar return",
+    "evidence": "claimed",
+    "source": "carlotto-2025",
+    "note": "Two areas either side of the canal south of the pyramid, outlined from Sentinel-1 and ALOS PALSAR. By the author's own figures the radar reaches 0.5–5 m. Claimed, not instrumented: the outlines are his reading of unexplained returns, not a located structure (night decision 33; plan decision 11 asks Stewart)."
+  },
+  {
+    "id": "hawara.labyrinth.lower-storey",
+    "site": "hawara",
+    "name": "The Labyrinth's underground half",
+    "evidence": "legendary",
+    "source": "herodotus-2-148",
+    "note": "Herodotus's 1,500 underground rooms, the tombs of the builders and of sacred crocodiles, which he was not shown and reports from hearsay. Nobody since has seen them."
+  },
+  {
+    "id": "giza.groundwater",
+    "site": "giza",
+    "name": "The plateau's water table",
+    "evidence": "instrumented",
+    "source": "sharafeldin-2019",
+    "note": "Mapped by ERT, seismic refraction, GPR and boreholes, peer reviewed. Not a monument: it is here because chapter 8's reply draws it in the section, where any shaft hundreds of metres deep would stand far below it."
+  },
+  {
+    "id": "hawara.groundwater",
+    "site": "hawara",
+    "name": "Hawara's water table",
+    "evidence": "instrumented",
+    "source": "elshazly-2024",
+    "note": "Mapped by ERT and TEM, peer reviewed. Not a monument: the Hawara section draws it because whatever lies under the Labyrinth lies in it."
+  },
+  {
+    "id": "hawara.bedrock",
+    "site": "hawara",
+    "name": "Hawara's bedrock and its cover",
+    "evidence": "instrumented",
+    "source": "szynkiewicz-2015",
+    "note": "From GPR to 20 m and cores: Eocene limestone under Holocene gravel and sand. Not a monument; drawn in the Hawara section."
+  },
+  {
+    "id": "gobekli.enclosure-d",
+    "site": "gobekli-tepe",
+    "name": "Enclosure D, Göbekli Tepe",
+    "evidence": "excavated",
+    "source": "haklay-gopher-2020",
+    "note": "The largest and best preserved of the Layer III enclosures in the main excavation area: a ring of T-shaped pillars set in a stone wall round two larger central pillars, carved with arms, belts and a fox. Dug by the German Archaeological Institute from 1995. Excavated, c. 9500 BCE; its tier says nothing about Giza."
+  },
+  {
+    "id": "meidum.pyramid",
+    "site": "meidum",
+    "name": "The pyramid at Meidum",
+    "evidence": "excavated",
+    "source": "petrie-1892",
+    "note": "Begun as a step pyramid, probably under Huni, and finished as a true pyramid under Sneferu; its outer casing has since collapsed. Surveyed by Petrie in 1891."
+  },
+  {
+    "id": "dahshur.bent",
+    "site": "dahshur",
+    "name": "The Bent Pyramid of Sneferu",
+    "evidence": "excavated",
+    "source": "dorner-1986",
+    "note": "Sneferu's second pyramid at Dahshur, its slope lowered partway up; most of its casing survives."
+  },
+  {
+    "id": "dahshur.red",
+    "site": "dahshur",
+    "name": "The Red Pyramid of Sneferu",
+    "evidence": "excavated",
+    "source": "dorner-1998",
+    "note": "Sneferu's last pyramid, the first finished as a true pyramid from the start, a generation before Khufu's."
   }
 ]

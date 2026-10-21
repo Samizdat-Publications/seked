@@ -1,0 +1,90 @@
+"""Plain-Python checks of render/giza/profile.py: python -m unittest discover -s render/tests"""
+import os
+import sys
+import unittest
+
+import numpy as np
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from giza import profile as P  # noqa: E402
+
+
+def head(points=40000, seed=3):
+    """A bust whose face looks along +x: (fwd, across, z). Its front, by height: the chest 2.0 at the foot,
+    the throat 1.0 at z 3, the chin's underside at z 4, the chin 2.6, the lips 2.4 at z 5, the nose 3.0 at z 6,
+    the brow 2.5 at z 7, and the crown at z 10, rounding back to 0."""
+    rng = np.random.default_rng(seed)
+    z = rng.uniform(0.0, 10.0, points)
+    across = rng.uniform(-2.0, 2.0, points)
+    knots_z = [0.0, 3.0, 3.9, 4.1, 4.5, 5.0, 6.0, 7.0, 9.0, 10.0]
+    knots_f = [2.0, 1.0, 1.2, 2.5, 2.6, 2.4, 3.0, 2.5, 1.5, 0.0]
+    front = np.interp(z, knots_z, knots_f)
+    fwd = front - rng.uniform(0.0, 3.0, points) * (rng.random(points) > 0.2)   # most points behind the front
+    return fwd, across, z
+
+
+class ChinToCrownTests(unittest.TestCase):
+    def test_finds_the_chin_and_the_crown(self):
+        chin, crown = P.chin_to_crown(*head())
+        self.assertAlmostEqual(crown, 10.0, delta=0.01)
+        self.assertAlmostEqual(chin, 4.0, delta=0.2)
+
+    def test_scales_with_the_head(self):
+        fwd, across, z = head()
+        chin, crown = P.chin_to_crown(fwd * 2.5, across * 2.5, z * 2.5 + 7.0)
+        self.assertAlmostEqual(crown - chin, 2.5 * 6.0, delta=0.5)
+
+    def test_the_sides_of_the_head_do_not_count(self):
+        fwd, across, z = head()
+        # a lappet far out to the side, standing well forward at the throat's height
+        side = (np.abs(across) > 1.6) & (z > 2.5) & (z < 3.5)
+        fwd = np.where(side, 2.8, fwd)
+        chin, _ = P.chin_to_crown(fwd, across, z)
+        self.assertAlmostEqual(chin, 4.0, delta=0.2)
+
+    def test_the_rim_of_the_beards_hole_is_not_the_chin(self):
+        fwd, across, z = head()
+        # the beard cut away under the chin: no points in the middle there, and the hole's rim, just outside the
+        # middle, standing at the chest's front
+        width = np.ptp(across)
+        hole = (np.abs(across) < 0.07 * width) & (z > 3.1) & (z < 3.9)
+        rim = (np.abs(across) >= 0.07 * width) & (np.abs(across) < 0.08 * width) & (z > 3.1) & (z < 3.9)
+        keep = ~hole
+        fwd = np.where(rim, 2.0, fwd)
+        chin, _ = P.chin_to_crown(fwd[keep], across[keep], z[keep])
+        self.assertAlmostEqual(chin, 4.0, delta=0.2)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class EnlargeHeadTests(unittest.TestCase):
+    def setUp(self):
+        rng = np.random.default_rng(5)
+        # a lion along -y (the face towards -y): a low body from y 0 to -8 at height 0 to 6, a head at y -7 to -9 up to 10
+        body = np.column_stack([rng.uniform(-1, 1, 4000), rng.uniform(-8, 0, 4000), rng.uniform(0, 6, 4000)])
+        head = np.column_stack([rng.uniform(-1, 1, 2000), rng.uniform(-9, -7, 2000), rng.uniform(6, 10, 2000)])
+        self.co = np.vstack([body, head])
+        self.frame = {"axis": 1, "sign": -1.0, "z0": 0.0, "zspan": 10.0, "aspan": 9.0}
+
+    def test_one_moves_nothing(self):
+        out, _ = P.enlarge_head(self.co, self.frame, 1.0, 0.36, 0.6, 0.08)
+        np.testing.assert_allclose(out, self.co)
+
+    def test_scales_the_head_about_its_foot_and_leaves_the_rump(self):
+        out, pivot = P.enlarge_head(self.co, self.frame, 1.3, 0.36, 0.6, 0.08)
+        self.assertAlmostEqual(pivot[2], 6.0)
+        top = self.co[:, 2] > 7.2
+        np.testing.assert_allclose(out[top] - pivot, 1.3 * (self.co[top] - pivot))
+        rump = self.co[:, 1] > -5.0
+        np.testing.assert_allclose(out[rump], self.co[rump])
+        self.assertAlmostEqual(out[:, 2].max() - 6.0, 1.3 * (self.co[:, 2].max() - 6.0))
+
+    def test_never_folds_up_the_neck(self):
+        # points stacked up the head's middle keep their order in height
+        z = np.linspace(0.0, 10.0, 201)
+        line = np.column_stack([np.zeros_like(z), np.full_like(z, -8.0), z])
+        co = np.vstack([self.co, line])
+        out, _ = P.enlarge_head(co, self.frame, 1.8, 0.36, 0.6, 0.08)
+        self.assertTrue(np.all(np.diff(out[-len(z):, 2]) > 0))

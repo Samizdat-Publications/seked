@@ -12,6 +12,7 @@ comparisons:
     formula: g1.base.socket.mean / unit.pyramid_inch
     target: year.tropical * 25
 tolerance_pct: 0.5
+fit: any
 free_choices:
   - the pyramid inch, a unit invented for the purpose (1.001 British inches)
   - the socket-corner base line rather than the casing base line

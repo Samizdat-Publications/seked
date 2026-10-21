@@ -51,6 +51,9 @@ import {
   SUN_STANDARD_ALTITUDE_DEG,
   type SeasonEvent,
 } from '@seked/sky';
+import { MERIDIAN_STAR, NIGHT_EPOCH, NIGHTS } from './nights';
+
+export { NIGHTS };
 
 /**
  * The epoch the daylight moments are computed at: C6's and C7's, which is the
@@ -60,24 +63,6 @@ import {
  * number and the file says which one it is.
  */
 const SUN_EPOCH = -2499;
-
-/** The epoch of the night view: C2's, Bauval and Gilbert's 2450 BCE. */
-const NIGHT_EPOCH = -2449;
-
-/** The star put on the meridian for the night view, by `data/stars/named.json`'s id. */
-const MERIDIAN_STAR = 'alnitak';
-
-/**
- * The nights the walkthrough renders (render/giza/night.py): an epoch, the star put
- * on the meridian, and what the night is for. `c2-2450` is the night `stars` has
- * always carried; `first-time` is Bauval and Hancock's 10,450 BCE, when Orion's belt
- * crossed the meridian at the lowest point of its precessional swing. Each is baked
- * the same way as `stars`, so a render of one is as honest as a render of the other.
- */
-export const NIGHTS: Record<string, { epoch: number; meridian: string; label: string }> = {
-  'c2-2450': { epoch: NIGHT_EPOCH, meridian: MERIDIAN_STAR, label: 'Bauval and Gilbert\'s 2450 BCE, Alnitak on the meridian' },
-  'first-time': { epoch: -10449, meridian: 'alnitak', label: 'The First Time, 10,450 BCE, Alnitak on the meridian at the lowest of the belt\'s precessional swing' },
-};
 
 /**
  * How far below the horizon the equinox sun stands in the dawns C5's pictures

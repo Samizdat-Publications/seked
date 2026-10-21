@@ -1,0 +1,13 @@
+[
+  {
+    "key": "giza.watertable.elevation",
+    "structure": "giza.groundwater",
+    "quantity": "elevation",
+    "value": 15.0,
+    "unit": "m",
+    "source": "sharafeldin-2019",
+    "method": "ERT, seismic refraction, GPR and boreholes",
+    "note": "Above mean sea level. 'The average water table elevation is about +15 m' (abstract); 'water table elevation ranges between 14.5 and 17 m in the area' (Sect. 4), 15.5–15.8 m at the Sphinx and its temple, and a perched table at 22–45 m on the higher ground toward Menkaure (Sect. 4). Read through the journal's web page, which carries no page numbers, so unverified.",
+    "verified": false
+  }
+]

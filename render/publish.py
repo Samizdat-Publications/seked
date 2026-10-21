@@ -22,6 +22,7 @@ from giza import data, states  # noqa: E402
 
 PANO_IN = os.path.join(data.REPO, "build", "render", "pano")
 PATCH_IN = os.path.join(data.REPO, "build", "render", "patch")
+EXHIBIT_PATCH_IN = os.path.join(data.REPO, "build", "render", "patch-exhibit")
 WALK = os.path.join(data.REPO, "apps", "walk")
 PANO_OUT = os.path.join(WALK, "pano")
 
@@ -36,7 +37,7 @@ def landmarks():
         p = data.PYRAMIDS[key]
         z, height = {}, {}
         for st in states.ORDER:
-            h = p["today"] if states.STATES[st]["pyramids"] in ("today", "stripped") else p["H"]
+            h = states.pyramid_height(p, st)
             z[st] = round(p["base"] + h, 2)
             height[st] = round(h, 1)
         out.append({"name": p["name"], "x": round(p["cx"], 2), "y": round(p["cy"], 2), "z": z, "height": height})
@@ -138,7 +139,7 @@ def night_sky(s, moments):
         apex = {}
         for key in ("g1", "g2", "g3"):
             p = data.PYRAMIDS[key]
-            h = p["today"] if states.STATES[st]["pyramids"] in ("today", "stripped") else p["H"]
+            h = states.pyramid_height(p, st)
             apex[key] = [round(p["cx"], 2), round(p["cy"], 2), round(p["base"] + h, 2)]
         links = [{"star": n, "at": at(by_name[n]), "to": apex[k], "pyramid": data.PYRAMIDS[k]["name"]} for n, k in BELT]
         out[st] = {"label": night.get("label", ""), "figures": figs, "stars": names, "links": links}
@@ -163,7 +164,9 @@ def overlays():
     import math
     p = data.PYRAMIDS["g1"]
     earth = {x["key"]: x["value"] for x in data.records("units-and-constants.json") if x.get("key", "").startswith("earth.")}
-    polar, equator = earth["earth.radius.polar"], earth["earth.circumference.equatorial"]
+    # WGS84's a and 1/f are stored; its other sizes are derived, as @seked/geometry and blender/seked_data.py derive them
+    a, b = earth["earth.radius.equatorial"], earth["earth.radius.equatorial"] * (1 - 1 / earth["earth.inverse_flattening"])
+    polar, equator = b, 2 * math.pi * a
     h, H, top, z0 = p["half"], p["H"], p["today"], p["base"]
     side, perim = 2 * h, 8 * h
     slant = math.hypot(H, h)
@@ -187,6 +190,22 @@ def overlays():
                 {"at": r(mid), "text": f"Side {side:.1f} m, perimeter {perim:.1f} m", "sub": f"× 43,200 = {km(perim * 43200)}; the equator is {km(equator)}", "place": "below"},
             ],
         },
+    }
+    # `valley-sockets`: the statue sockets on the granite hall's floor, at the spots valley_temple.py stands
+    # the statues on (giza/valley_plan.py, from the Blatt XVII records), so the marks meet the statues'
+    # feet. Hölscher's north row was scaled; the south row mirrors it, as the render does (look choice).
+    from giza import valley_plan
+    hall = valley_plan.plan()
+    rows = valley_plan.statue_spots(hall)[:2 * len(hall["sockets"])]   # the long hall's, south and north in turn
+    z, tick = hall["floor"] + 0.02, 0.3    # look choice: half a mark's length across the row
+    socket = {x["key"]: x["value"] for x in data.records("khafre-valley-temple.json")}
+    out["valley-sockets"] = {
+        "lines": [{"from": r([x, y - tick, z]), "to": r([x, y + tick, z]), "style": "edge"} for x, y, _ in rows]
+                 + [{"from": r([rows[k][0], rows[k][1], z]), "to": r([rows[-2 + k][0], rows[-2 + k][1], z]), "style": "dash"} for k in (0, 1)],
+        "labels": [
+            {"at": r([rows[1][0], rows[1][1], z]), "text": f"{len(hall['sockets'])} statue sockets a wall",
+             "sub": f"{socket['khafre_valley_temple.hall.socket.pitch']:.1f} m apart, scaled from Hölscher's plan; the south row mirrored", "place": "above"},
+        ],
     }
     # The rest needs the claims engine's own values: `pnpm tsx scripts/tour-values.ts` writes them.
     path = os.path.join(data.REPO, "build", "tour-values.json")
@@ -323,6 +342,39 @@ def detail_patches(station_id, panos):
     return out
 
 
+def exhibit_patches(patch_in=EXHIBIT_PATCH_IN, pano_in=PANO_IN, pano_out=PANO_OUT):
+    """
+    The exhibit's detail patches (scripts/exhibit_queue.py), one per leaf the panorama cannot hold sharp,
+    published into pano/patch/ and listed with the panorama each registers with, which its sidecar names. A
+    patch older than that panorama's render, or whose panorama was never rendered here, is left out: it may
+    not match. The aspect is the picture's own.
+    """
+    from PIL import Image
+    out = []
+    os.makedirs(os.path.join(pano_out, "patch"), exist_ok=True)
+    for png in sorted(glob.glob(os.path.join(patch_in, "*.png"))):
+        side = os.path.splitext(png)[0] + ".json"
+        name = os.path.basename(png)
+        if not os.path.exists(side):
+            continue
+        with io.open(side, encoding="utf-8") as f:
+            p = json.load(f).get("patch") or {}
+        if not p.get("pano"):
+            continue
+        pano_png = os.path.join(pano_in, os.path.splitext(os.path.basename(p["pano"]))[0] + ".png")
+        if not os.path.exists(pano_png) or os.path.getmtime(png) < os.path.getmtime(pano_png):
+            print(f"  WARNING: {name} is older than {os.path.basename(pano_png)}, or it is not here; left out until both are rendered")
+            continue
+        jpg = os.path.join(pano_out, "patch", os.path.splitext(name)[0] + ".jpg")
+        im = Image.open(png)
+        if not os.path.exists(jpg) or os.path.getmtime(jpg) < os.path.getmtime(png):
+            im.convert("RGB").save(jpg, quality=84, optimize=True, progressive=True)
+            print(f"  patch/{os.path.basename(jpg)}: {os.path.getsize(jpg) / 1e6:.2f} MB, for the exhibit")
+        out.append({"src": "pano/patch/" + os.path.basename(jpg), "pano": p["pano"], "leaf": p.get("leaf", ""),
+                    "yaw": p["yaw"], "pitch": p["pitch"], "fov": p["fov"], "aspect": round(im.width / im.height, 6)})
+    return out
+
+
 def main():
     from PIL import Image
     stations_src = data.load_json(HERE, "stations.json")
@@ -361,6 +413,15 @@ def main():
                 titles[st] = {"name": over.get("name", s["name"]), "where": over.get("where", s.get("where", ""))}
                 if "moment" in over:
                     titles[st]["moment"] = moments.get(over["moment"], {}).get("label", "")
+        # The exhibit's leaves lit at another moment (scripts/exhibit_queue.py): <station>-<era>-<moment>.png,
+        # published beside the walkthrough's own for apps/exhibit, and left out of the walkthrough's manifest.
+        for st in states.ORDER:
+            for m in moments:
+                png = os.path.join(PANO_IN, f"{s['id']}-{st}-{m}.png")
+                jpg = os.path.join(PANO_OUT, f"{s['id']}-{st}-{m}.jpg")
+                if os.path.exists(png) and (not os.path.exists(jpg) or os.path.getmtime(jpg) < os.path.getmtime(png)):
+                    Image.open(png).convert("RGB").save(jpg, quality=82, optimize=True, progressive=True)
+                    print(f"  {os.path.basename(jpg)}: {os.path.getsize(jpg) / 1e6:.2f} MB, for the exhibit")
         if not panos:
             print(f"{s['id']}: nothing rendered yet; left out")
             continue
@@ -397,6 +458,11 @@ def main():
     with io.open(os.path.join(WALK, "overlays.json"), "w", encoding="utf-8") as f:
         json.dump(figures, f, indent=1, ensure_ascii=False)
     print(f"wrote apps/walk/stations.json: {len(manifest['stations'])} stations")
+    leaf_patches = exhibit_patches()
+    with io.open(os.path.join(WALK, "exhibit-patches.json"), "w", encoding="utf-8") as f:
+        json.dump({"about": "Written by render/publish.py: the exhibit's detail patches (scripts/exhibit_queue.py), each with "
+                            "the panorama it registers with. Degrees; the field is vertical.", "patches": leaf_patches}, f, indent=1)
+    print(f"wrote apps/walk/exhibit-patches.json: {len(leaf_patches)} patches")
 
 
 if __name__ == "__main__":

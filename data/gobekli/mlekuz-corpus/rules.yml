@@ -1,0 +1,112 @@
+symmetric:
+  next_to: next_to
+  touches: touches
+  associated_with: associated_with
+  weakly_associated_with: weakly_associated_with
+  opposite: opposite
+  adjacent_to: adjacent_to
+  faces_toward: faces_toward
+
+inverse:
+  above: below
+  below: above
+
+  part_of: has_part
+  has_part: part_of
+
+  inside: contains
+  contains: inside
+
+  predator_of: prey_of
+  prey_of: predator_of
+
+  composed_of: component_of
+  component_of: composed_of
+
+  larger_than: smaller_than
+  smaller_than: larger_than
+
+  faces_toward: is_faced_by
+  is_faced_by: faces_toward
+
+  depicted_on: displays
+  displays: depicted_on
+
+  visible_on: displays_on
+  displays_on: visible_on
+
+class_relations:
+  - is
+  - instance_of
+
+predation_relations:
+  - eats
+  - hunts
+  - predator_of
+
+non_transitive:
+  - faces
+  - orientation
+  - position
+  - shows
+  - depicted
+  - has_attribute
+  - has_posture
+  - next_to
+  - touches
+  - associated_with
+  - weakly_associated_with
+  - opposite
+  - adjacent_to
+  - depicted_on
+  - visible_on
+  - tail_resembles
+  - eats
+  - hunts
+
+weakly_transitive:
+  - above
+  - below
+  - placed_in
+
+transitive:
+  - part_of
+  - has_part
+  - inside
+  - contains
+
+orientation_rules:
+
+  right_pillar:
+    front_side:
+      left:
+        - faces_center
+        - oriented_toward_center
+      right:
+        - faces_wall
+        - oriented_away_from_center
+
+    right_broadside:
+      right:
+        - faces_center
+        - oriented_toward_center
+      left:
+        - faces_wall
+        - oriented_away_from_center
+
+  left_pillar:
+    front_side:
+      right:
+        - faces_center
+        - oriented_toward_center
+      left:
+        - faces_wall
+        - oriented_away_from_center
+
+    left_broadside:
+      left:
+        - faces_center
+        - oriented_toward_center
+      right:
+        - faces_wall
+        - oriented_away_from_center

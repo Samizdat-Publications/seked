@@ -143,9 +143,12 @@ const DEFAULT_EXAMPLE_IDS = Object.keys(EXAMPLE_PROSE);
  * none, so a new derived key cannot slip into the prompt unlabelled.
  */
 const COMPUTED_UNITS: ReadonlyArray<readonly [RegExp, string]> = [
-  [/\.(base\.area|face\.area|lateral\.area|height\.squared)$/, 'm2'],
+  [/\.(base\.area|face\.area|lateral\.area|height\.squared|chipbed\.area)$/, 'm2'],
   [/\.volume$/, 'm3'],
-  [/\.(base\.half|base\.perimeter|apothem|arris\.length)$/, 'm'],
+  [/^earth\.(radius\.(polar|mean)|circumference\.(equatorial|meridional))$/, 'm'],
+  [/\.(base\.half|base\.perimeter|apothem|arris\.length|base\.side\.cased)$/, 'm'],
+  [/^hawara\.pyramid\.height\.original$/, 'm'],
+  [/\.chipbed\.ratio\.g1$/, 'ratio'],
   [/\.base\.socket\.perimeter$/, 'm'],
   [/\.centre\.offset\.(east|north)$/, 'm'],
   [/\.(face\.angle\.derived|arris\.angle)$/, 'deg'],

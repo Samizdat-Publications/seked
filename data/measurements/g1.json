@@ -530,6 +530,18 @@
     "verified": false
   },
   {
+    "key": "qc.shaft.north.angle",
+    "structure": "g1",
+    "quantity": "angle",
+    "value": 37.4667,
+    "unit": "deg",
+    "sigma": 0.13,
+    "source": "petrie-1883",
+    "method": "measured",
+    "note": "37 deg 28 min, Petrie section 44 (the Queen's Chamber north channel), from his three readings of its lower section only; sigma from their spread. A second source beside Gantenbrink's, so the presets choose (Stewart, 21 October 2026). Read by the research thread against Birdsall's transcription (ronaldbirdsall.com/gizeh/petrie/c7.html); not yet checked here against the page, so unverified. At this angle C2's Kochab comparison misses by -4.8 per cent (docs/research-handoff-2026-10-21.md).",
+    "verified": false
+  },
+  {
     "key": "qc.shaft.north.angle.min",
     "structure": "g1",
     "quantity": "angle",

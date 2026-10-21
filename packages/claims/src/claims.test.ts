@@ -76,7 +76,16 @@ describe('the classic ratios, from data alone', () => {
     const [casing, socket] = r.comparisons;
     expect(casing!.within).toBe(false);
     expect(socket!.within).toBe(true);
-    expect(r.fits).toBe(false);
+    // It holds as Smyth made it, on the socket line, a choice B4 lists among its free choices (fit: any)
+    expect(r.fits).toBe(true);
+    expect(r.freeChoices).toBe(3);
+  });
+  it('B2: holds on the perihelion, the alternative it names, at the ordinary tolerance', () => {
+    const r = byId('B2');
+    const [mean, perihelion] = r.comparisons;
+    expect(mean!.within).toBe(false);
+    expect(perihelion!.within).toBe(true);
+    expect(r.fits).toBe(true);
   });
 });
 
@@ -319,16 +328,29 @@ describe('a proposed claim', () => {
 });
 
 describe('a claim never cites the scenery', () => {
+  // A key belongs to a structure when it is the structure's id or starts with it and a dot; structure ids carry dots
+  // of their own (heliopolis.obelisk), so the first segment alone is not enough (Argon's audit, 21 October 2026).
+  const citesContext = (id: string, context: Set<string>) =>
+    [...context].some((s) => id === s || id.startsWith(`${s}.`));
+
   it('names no key belonging to a context structure', () => {
+    // Nothing is context yet; the guard is here so the modern city cannot quietly become evidence the day it lands.
     const context = new Set(db.structures.filter(isContext).map((s) => s.id));
-    // Nothing is context yet; the guard is here so the modern city cannot
-    // quietly become evidence the day it lands.
     for (const c of claims) {
       for (const cmp of c.comparisons) {
         for (const id of [...identifiers(cmp.formula), ...identifiers(cmp.target)]) {
-          expect(context.has(id.slice(0, id.indexOf('.'))), `${c.id} cites ${id}`).toBe(false);
+          expect(citesContext(id, context), `${c.id} cites ${id}`).toBe(false);
         }
       }
     }
+  });
+
+  it('would catch a claim that did, dotted ids included', () => {
+    // the guard above runs on an empty set today, so prove here that it can fail
+    const context = new Set(['city', 'heliopolis.obelisk']);
+    expect(citesContext('city.block.height', context)).toBe(true);
+    expect(citesContext('heliopolis.obelisk.center.latitude', context)).toBe(true);
+    expect(citesContext('heliopolis.temple.axis', context)).toBe(false);
+    expect(citesContext('cityscape.height', context)).toBe(false);
   });
 });

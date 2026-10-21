@@ -44,6 +44,11 @@
       "night": "c2-2450",
       "label": "night, 2450 BCE: Alnitak on the meridian"
     },
+    "night-dark": {
+      "night": "c2-2450",
+      "stars": false,
+      "label": "night with the renderer's stars and Milky Way left out, for the exhibit to draw the sky over live at whatever year it shows; the dark, the airglow and the sun below the horizon are 2450 BCE's"
+    },
     "temple-morning": {
       "date": "11-15",
       "solar": 10.0,
@@ -120,6 +125,25 @@
         }
       },
       "note": "z is absolute: the camera stays put while the sand of c. 1800 CE rises under it, and while the harbour of 2560 BCE and the claim eras' flood fill in below it. As built the eye stands 8 m higher and 41 m further east, over the Sphinx Temple's granite wall and clear of its roof, which at -29.5 filled two thirds of the view (critic round 16; a look choice)."
+    },
+    {
+      "id": "nazlet-roof",
+      "name": "A rooftop in Nazlet el-Samman",
+      "where": "On a flat roof in the village east of the Sphinx, looking west up its axis to the pyramids",
+      "x": 690.9,
+      "y": -418.3,
+      "eye": 1.7,
+      "roof": true,
+      "moment": "equinox-dawn",
+      "view": {
+        "yaw": 280,
+        "pitch": 3,
+        "fov": 40
+      },
+      "neighbours": [
+        "sphinx"
+      ],
+      "note": "For the exhibit's cold open ('from the rooftops of Nazlet el-Samman'). The building is Open Buildings record 48821 in data/footprints/city.bin (a 422 m2 box centred here, 354 m east of the Sphinx and 15 m north of its axis); the eye stands 1.7 m over its roof, whose height the renderer reads from that record (city.roof_at), so it is typed nowhere. That height is measured: the median of nine points of the Open Buildings 2.5D Temporal height raster (2023 imagery, stated mean absolute error 1.5 m). Chosen as the roof nearest the axis, among the 241 measured buildings of at least 120 m2 and 6 m tall between 470 and 1,100 m east and 250 and 650 m south of Khufu, from which a line to the Sphinx's head and chin and to Khufu's and Khafre's apexes clears the scene's terrain and every drawn building (the monuments between were not checked; the laptop's preview is the check). Only today has the city, so only today stands on the roof."
     },
     {
       "id": "east",
@@ -266,6 +290,45 @@
         "sphinx"
       ],
       "note": "Eye 1.7 m over the ditch floor. The weathering Schoch read is on both sides of this view: the body's flank cut back in its beds and the ditch wall's fissures."
+    },
+    {
+      "id": "sphinx-side",
+      "name": "Beside the Sphinx",
+      "where": "On the rock south of the ditch, between its rim and Khafre's causeway, looking north at the body side-on",
+      "x": 318.0,
+      "y": -468.0,
+      "z": -34.452,
+      "eye": 1.7,
+      "moment": "equinox-dawn",
+      "view": {
+        "yaw": 356,
+        "pitch": 8,
+        "fov": 66
+      },
+      "neighbours": [
+        "sphinx-flank",
+        "sphinx-back"
+      ],
+      "note": "For the exhibit's chapter 2 ('Beside that long body it is too small'): the side elevation the head-and-body argument is seen in, which the flank, 6 m from the body, is too close to give. 25 m from the body's south side and 35 m from its axis, so the rump (x 288) and the head (x 342) both stand inside a wide screen's 92-degree field. North of the causeway, whose corridor as built is 6 m tall and would hide the body from further south; the eye 1.7 m over the rock, from which the ditch's south rim hides only the lowest half metre of the body (the terrain sampled with the scene's own cut and rim, render/giza/sphinx.py). Chosen from those numbers, not from a render: the laptop's preview is the check."
+    },
+    {
+      "id": "sphinx-back",
+      "name": "Behind the Sphinx",
+      "where": "On the rock west of the ditch, behind the rump, looking east along the back to the head and the sunrise",
+      "x": 280.0,
+      "y": -433.0,
+      "eye": 1.7,
+      "moment": "equinox-dawn",
+      "view": {
+        "yaw": 90,
+        "pitch": 6,
+        "fov": 60
+      },
+      "neighbours": [
+        "sphinx-side",
+        "sphinx"
+      ],
+      "note": "For the exhibit's chapter 2 ('At the spring equinox the sun rises close to due east'): the lion's own eastward gaze, with the eastern horizon and the sky the stars are drawn on. On the Sphinx's axis (the body's footprint is centred on y -433), 3.7 m behind the ditch's west wall (x 283.7, from the west margin), the eye 1.7 m over the rim, about a metre over the top of the rump. Chosen from those numbers, not from a render: the laptop's preview is the check."
     },
     {
       "id": "menkaure",

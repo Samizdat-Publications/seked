@@ -65,15 +65,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -84,15 +84,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -103,15 +103,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -223,15 +223,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -242,15 +242,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -261,15 +261,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -352,15 +352,6 @@
     ]
    },
    "patches": {
-    "first-time": [
-     {
-      "src": "pano/patch/sphinx-first-time-lost.jpg",
-      "yaw": 166.71,
-      "pitch": 0,
-      "fov": 78.4,
-      "aspect": 2.0
-     }
-    ],
     "built": [
      {
       "src": "pano/patch/sphinx-built-akhet.jpg",
@@ -380,6 +371,135 @@
      }
     ]
    }
+  },
+  {
+   "id": "nazlet-roof",
+   "name": "A rooftop in Nazlet el-Samman",
+   "where": "On a flat roof in the village east of the Sphinx, looking west up its axis to the pyramids",
+   "moment": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim",
+   "camera": [
+    690.9,
+    -418.3,
+    -22.833
+   ],
+   "view": {
+    "yaw": 280,
+    "pitch": 3,
+    "fov": 40
+   },
+   "panoramas": {
+    "today": "pano/nazlet-roof-today.jpg"
+   },
+   "neighbours": [
+    "sphinx"
+   ],
+   "landmarks": [
+    {
+     "name": "Khufu",
+     "x": 0.0,
+     "y": 0.0,
+     "z": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 146.59,
+      "stripped": 138.75,
+      "today": 138.75
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 146.6,
+      "stripped": 138.7,
+      "today": 138.7
+     }
+    },
+    {
+     "name": "Khafre",
+     "x": -334.41,
+     "y": -353.86,
+     "z": {
+      "first-time": 10.0,
+      "lion": 10.0,
+      "built": 153.5,
+      "stripped": 146.4,
+      "today": 146.4
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 143.5,
+      "stripped": 136.4,
+      "today": 136.4
+     }
+    },
+    {
+     "name": "Menkaure",
+     "x": -574.45,
+     "y": -739.19,
+     "z": {
+      "first-time": 11.89,
+      "lion": 11.89,
+      "built": 76.89,
+      "stripped": 73.76,
+      "today": 73.76
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 65.0,
+      "stripped": 61.9,
+      "today": 61.9
+     }
+    },
+    {
+     "name": "The Sphinx",
+     "x": 337.0,
+     "y": -433.0,
+     "z": {
+      "first-time": -17.55,
+      "lion": -8.55,
+      "built": -13.35,
+      "stripped": -14.35,
+      "today": -14.35
+     }
+    },
+    {
+     "name": "Queens' pyramids",
+     "x": 193.0,
+     "y": -92.5,
+     "z": {
+      "built": 28.3,
+      "stripped": 16.3,
+      "today": 16.3
+     }
+    },
+    {
+     "name": "The Nile valley",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "first-time": -30.0,
+      "lion": -30.0,
+      "built": -30.0
+     }
+    },
+    {
+     "name": "The village",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "stripped": 10.0
+     }
+    },
+    {
+     "name": "Giza and Cairo",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "today": 10.0
+     }
+    }
+   ]
   },
   {
    "id": "east",
@@ -416,15 +536,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -435,15 +555,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -454,15 +574,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -579,15 +699,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -598,15 +718,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -617,15 +737,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -713,15 +833,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -732,15 +852,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -751,15 +871,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -815,24 +935,6 @@
     }
    ],
    "patches": {
-    "first-time": [
-     {
-      "src": "pano/patch/panorama-first-time-intro.jpg",
-      "yaw": 18.6,
-      "pitch": 1,
-      "fov": 26.88,
-      "aspect": 2.0
-     }
-    ],
-    "lion": [
-     {
-      "src": "pano/patch/panorama-lion-intro.jpg",
-      "yaw": 18.6,
-      "pitch": 1,
-      "fov": 26.88,
-      "aspect": 2.0
-     }
-    ],
     "built": [
      {
       "src": "pano/patch/panorama-built-intro.jpg",
@@ -884,15 +986,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -903,15 +1005,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -922,15 +1024,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1017,15 +1119,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1036,15 +1138,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1055,15 +1157,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1152,15 +1254,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1171,15 +1273,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1190,15 +1292,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1293,15 +1395,6 @@
     }
    },
    "patches": {
-    "first-time": [
-     {
-      "src": "pano/patch/sphinx-face-first-time-leo.jpg",
-      "yaw": 254.71,
-      "pitch": 28,
-      "fov": 78.4,
-      "aspect": 2.0
-     }
-    ],
     "built": [
      {
       "src": "pano/patch/sphinx-face-built-leo.jpg",
@@ -1345,15 +1438,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1364,15 +1457,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1383,15 +1476,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1475,6 +1568,270 @@
    }
   },
   {
+   "id": "sphinx-side",
+   "name": "Beside the Sphinx",
+   "where": "On the rock south of the ditch, between its rim and Khafre's causeway, looking north at the body side-on",
+   "moment": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim",
+   "camera": [
+    318.0,
+    -468.0,
+    -34.452
+   ],
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "panoramas": {
+    "first-time": "pano/sphinx-side-first-time.jpg",
+    "lion": "pano/sphinx-side-lion.jpg",
+    "built": "pano/sphinx-side-built.jpg",
+    "today": "pano/sphinx-side-today.jpg"
+   },
+   "neighbours": [
+    "sphinx-flank",
+    "sphinx-back"
+   ],
+   "landmarks": [
+    {
+     "name": "Khufu",
+     "x": 0.0,
+     "y": 0.0,
+     "z": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 146.59,
+      "stripped": 138.75,
+      "today": 138.75
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 146.6,
+      "stripped": 138.7,
+      "today": 138.7
+     }
+    },
+    {
+     "name": "Khafre",
+     "x": -334.41,
+     "y": -353.86,
+     "z": {
+      "first-time": 10.0,
+      "lion": 10.0,
+      "built": 153.5,
+      "stripped": 146.4,
+      "today": 146.4
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 143.5,
+      "stripped": 136.4,
+      "today": 136.4
+     }
+    },
+    {
+     "name": "Menkaure",
+     "x": -574.45,
+     "y": -739.19,
+     "z": {
+      "first-time": 11.89,
+      "lion": 11.89,
+      "built": 76.89,
+      "stripped": 73.76,
+      "today": 73.76
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 65.0,
+      "stripped": 61.9,
+      "today": 61.9
+     }
+    },
+    {
+     "name": "The Sphinx",
+     "x": 337.0,
+     "y": -433.0,
+     "z": {
+      "first-time": -17.55,
+      "lion": -8.55,
+      "built": -13.35,
+      "stripped": -14.35,
+      "today": -14.35
+     }
+    },
+    {
+     "name": "Queens' pyramids",
+     "x": 193.0,
+     "y": -92.5,
+     "z": {
+      "built": 28.3,
+      "stripped": 16.3,
+      "today": 16.3
+     }
+    },
+    {
+     "name": "The Nile valley",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "first-time": -30.0,
+      "lion": -30.0,
+      "built": -30.0
+     }
+    },
+    {
+     "name": "The village",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "stripped": 10.0
+     }
+    },
+    {
+     "name": "Giza and Cairo",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "today": 10.0
+     }
+    }
+   ]
+  },
+  {
+   "id": "sphinx-back",
+   "name": "Behind the Sphinx",
+   "where": "On the rock west of the ditch, behind the rump, looking east along the back to the head and the sunrise",
+   "moment": "early morning at the spring equinox, the sun low in the east on the Sphinx's axis and clear of the ditch's rim",
+   "camera": [
+    280.0,
+    -433.0,
+    -26.395
+   ],
+   "view": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 60
+   },
+   "panoramas": {
+    "first-time": "pano/sphinx-back-first-time.jpg",
+    "today": "pano/sphinx-back-today.jpg"
+   },
+   "neighbours": [
+    "sphinx-side",
+    "sphinx"
+   ],
+   "landmarks": [
+    {
+     "name": "Khufu",
+     "x": 0.0,
+     "y": 0.0,
+     "z": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 146.59,
+      "stripped": 138.75,
+      "today": 138.75
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 146.6,
+      "stripped": 138.7,
+      "today": 138.7
+     }
+    },
+    {
+     "name": "Khafre",
+     "x": -334.41,
+     "y": -353.86,
+     "z": {
+      "first-time": 10.0,
+      "lion": 10.0,
+      "built": 153.5,
+      "stripped": 146.4,
+      "today": 146.4
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 143.5,
+      "stripped": 136.4,
+      "today": 136.4
+     }
+    },
+    {
+     "name": "Menkaure",
+     "x": -574.45,
+     "y": -739.19,
+     "z": {
+      "first-time": 11.89,
+      "lion": 11.89,
+      "built": 76.89,
+      "stripped": 73.76,
+      "today": 73.76
+     },
+     "height": {
+      "first-time": 0.0,
+      "lion": 0.0,
+      "built": 65.0,
+      "stripped": 61.9,
+      "today": 61.9
+     }
+    },
+    {
+     "name": "The Sphinx",
+     "x": 337.0,
+     "y": -433.0,
+     "z": {
+      "first-time": -17.55,
+      "lion": -8.55,
+      "built": -13.35,
+      "stripped": -14.35,
+      "today": -14.35
+     }
+    },
+    {
+     "name": "Queens' pyramids",
+     "x": 193.0,
+     "y": -92.5,
+     "z": {
+      "built": 28.3,
+      "stripped": 16.3,
+      "today": 16.3
+     }
+    },
+    {
+     "name": "The Nile valley",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "first-time": -30.0,
+      "lion": -30.0,
+      "built": -30.0
+     }
+    },
+    {
+     "name": "The village",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "stripped": 10.0
+     }
+    },
+    {
+     "name": "Giza and Cairo",
+     "x": 3800.0,
+     "y": 900.0,
+     "z": {
+      "today": 10.0
+     }
+    }
+   ]
+  },
+  {
    "id": "menkaure",
    "name": "Menkaure",
    "where": "South-east of his mortuary temple, his three queens to the left",
@@ -1506,15 +1863,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1525,15 +1882,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1544,15 +1901,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1638,15 +1995,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1657,15 +2014,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1676,15 +2033,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1768,15 +2125,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1787,15 +2144,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1806,15 +2163,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -1898,15 +2255,15 @@
      "x": 0.0,
      "y": 0.0,
      "z": {
-      "first-time": 146.59,
-      "lion": 146.59,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.59,
       "stripped": 138.75,
       "today": 138.75
      },
      "height": {
-      "first-time": 146.6,
-      "lion": 146.6,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 146.6,
       "stripped": 138.7,
       "today": 138.7
@@ -1917,15 +2274,15 @@
      "x": -334.41,
      "y": -353.86,
      "z": {
-      "first-time": 153.5,
-      "lion": 153.5,
+      "first-time": 10.0,
+      "lion": 10.0,
       "built": 153.5,
       "stripped": 146.4,
       "today": 146.4
      },
      "height": {
-      "first-time": 143.5,
-      "lion": 143.5,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 143.5,
       "stripped": 136.4,
       "today": 136.4
@@ -1936,15 +2293,15 @@
      "x": -574.45,
      "y": -739.19,
      "z": {
-      "first-time": 76.89,
-      "lion": 76.89,
+      "first-time": 11.89,
+      "lion": 11.89,
       "built": 76.89,
       "stripped": 73.76,
       "today": 73.76
      },
      "height": {
-      "first-time": 65.0,
-      "lion": 65.0,
+      "first-time": 0.0,
+      "lion": 0.0,
       "built": 65.0,
       "stripped": 61.9,
       "today": 61.9
@@ -2456,7 +2813,7 @@
        "to": [
         0.0,
         0.0,
-        146.59
+        0.0
        ],
        "pyramid": "Khufu"
       },
@@ -2469,7 +2826,7 @@
        "to": [
         -334.41,
         -353.86,
-        153.5
+        10.0
        ],
        "pyramid": "Khafre"
       },
@@ -2482,7 +2839,7 @@
        "to": [
         -574.45,
         -739.19,
-        76.89
+        11.89
        ],
        "pyramid": "Menkaure"
       }

@@ -277,6 +277,15 @@
     "note": "HYG moved off github.com/astronexus/HYG-Database, which stops at v4.1 and points here. On Codeberg the file is stored with Git LFS, so the /media/ URL above returns the 13 MB gzip and the /raw/ one returns only the 133-byte pointer; sha256 of the gzip is 5ca9431ff364c8002a4a3efa91b2b9296746aea1543374db4cb6b4fab049d601 and the version is dated 2025-06-29 by its own gzip timestamp. HYG gives right ascension in hours and distance in parsecs; scripts/stars.ts converts both and cuts the catalogue to magnitude 6.5. Row 0 of the CSV is the Sun, at right ascension 0 and distance 0, and is dropped. A distance of 100000 pc or more is HYG marking a missing or negative Hipparcos parallax."
   },
   {
+    "id": "stellarium-modern",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Stellarium's team. The modern (Western) sky culture of Stellarium: the IAU constellations' figures, each a set of lines drawn between stars named by their Hipparcos numbers.",
+    "url": "https://raw.githubusercontent.com/Stellarium/stellarium/master/skycultures/modern/index.json",
+    "license": "CC BY-SA 4.0 for the sky culture's text and data (its description.md, section License), https://creativecommons.org/licenses/by-sa/4.0/. Required attribution: Stellarium's team, Stellarium modern sky culture, licensed CC BY-SA 4.0. data/stars/figures.json is an adapted database under that licence and carries the credit in its header.",
+    "note": "Downloaded 2026-10-20 from the master branch (the file has no version of its own), sha256 1f2f5ffd6c9e25a7d0dcfdbf1f756e2db03dd3b8ed4ec016a2839b09f6b0fe1e; scripts/figures.ts refuses any other file. A figure is a drawing convention, not a measurement: the exhibit labels every one it draws 'a modern figure'. The illustrations in the same folder are under the Free Art License and are not used."
+  },
+  {
     "id": "nasa-svs-4851",
     "kind": "reference",
     "year": 2020,
@@ -315,8 +324,9 @@
     "id": "khafre-project-2025",
     "kind": "proponent",
     "year": 2025,
-    "citation": "Malanga, C., Biondi, F. & Mei, A. (2025). Khafre Project: SAR Doppler tomography of the Giza plateau. Press conference, March 2025; not peer reviewed at the time of entry.",
-    "note": "Enter the published preprint or paper reference when one exists, and the specific critiques (radar penetration depth; the antiquities authority's statement)."
+    "citation": "Biondi, F., Mei, A. & Malanga, C. (2025). Khafre Project. Abstract of the Conference on March 16, 2025 (\"Abstract conf. English Version\"), 7 pp., March 2025. SAR Doppler tomography of Capella Space and Umbra open data. Not peer reviewed.",
+    "note": "The team's own document, read on 20 October 2026 (24,956,568 bytes, sha256 9f886dfc…4d083f; authors' copyright, not kept here). It gives five 'Zed' structures in the pyramid above Belzoni's chamber, each of five levels with a sloping roof; eight wells in two north–south rows descending 648 m from ground zero (the pyramid's base) into two cubes about 80 m a side, hollow and wrapped in descending spirals; and structures about two kilometres down. It gives no diameter, spacing, offset or spiral pitch, and its tomograms (pp. 4–6) carry no axes or scale bar. The data are Capella and Umbra, not COSMO-SkyMed (the 2022 Khufu paper's). Corrected from the March 2025 press-conference entry, after docs/research/khafre-sar.md.",
+    "url": "https://drive.google.com/file/d/1Leaa2tf3OHK31OTmdey_CRa-0vC9-CTD/view"
   },
   {
     "id": "cayce",
@@ -410,6 +420,15 @@
     "note": "The scale drawings of the Sphinx that the ARCE Sphinx Project made between 1979 and 1983, 6,048 media records in all, published on Open Context under CC BY 4.0 and served as full TIFFs and as a IIIF service on archive.org. Drawing d-gen-008 carries a printed scale of 1:200 in its own metadata, a scale bar ticked every 5 m from 10 m above zero to 50 m below it, and the project's own 10 m survey grid as crosses over the ditch floor. Fetched on 2026-09-17 to build/plates/ (gitignored) through https://iiif.archive.org/iiif/opencontext-101-drawing-d-gen-008/full/6726,/0/default.jpg, the full width of the scan, 6726 by 6225 pixels; nothing from it is committed but the numbers. The plate draws no dimension, so everything taken from it is scaled and never verified."
   },
   {
+    "id": "arce-sphinx-south-elevation-oc",
+    "kind": "survey",
+    "year": 2017,
+    "citation": "Lehner, M. (2017). ARCE Sphinx Project 1979-1983 Archive. Open Context, project 141e814a-ba2d-4560-879f-80f1afb019e9, https://doi.org/10.6078/M7CZ356B. Drawing d-ss-047, the Sphinx's south elevation, a photogrammetric survey by Ulrich Kapp (1979), its masonry coloured by phase, © 1997 Mark Lehner; Open Context media record b632d80f-c848-48e7-9013-85c344c9de50.",
+    "url": "https://opencontext.org/media/b632d80f-c848-48e7-9013-85c344c9de50",
+    "license": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0. Attribution: Mark Lehner, ARCE Sphinx Project 1979-1983 Archive, Open Context.",
+    "note": "The same archive as arce-sphinx-mapping-oc, a second sheet. Its title block reads 'SPHINX - GIZA, SOUTH - ELEVATION, Photogrammetric Survey'; it carries a printed scale of 1:50, a corner note of a 74 per cent reduction, a horizontal axis in the project's grid and an elevation axis from 10.0 to 30.0 m with 1 m ticks, which is what it is scaled against. The scan is 13,560 by 5,264 pixels. Fetched on 2026-10-20 to build/plates/d-ss-047/ (gitignored) as the region 7400,400,5600,3700 of https://iiif.archive.org/iiif/opencontext-101-drawing-d-ss-047/ at full resolution; nothing from it is committed but the numbers. The plate draws no dimension, so everything taken from it is scaled and never verified."
+  },
+  {
     "id": "hoelscher-1912",
     "kind": "survey",
     "year": 1912,
@@ -435,5 +454,967 @@
     "url": "https://sites.research.google/gr/open-buildings/temporal/",
     "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) or ODbL 1.0, at the user's choice. Attribution: Open Buildings 2.5D Temporal, Google Research.",
     "note": "Building height carries a stated mean absolute error of 1.5 m and is capped at 100 m, and is only meaningful where the presence band agrees. The tile containing the Great Pyramid is v1/geotiffs/14584_2023_06_30/tile_ZEIX66sm0PA.tif in the public bucket open-buildings-temporal-data, 25,000 by 25,000 px at 0.5 m in UTM 36N with its origin at 319912, 3321468; Giza sits near its north-west corner, so the north of the plateau's box needs a neighbouring tile, found by extent from v1/manifests/15_EPSG_32636_2023_06_30.json. A height from this raster is a measurement with an error bar, not a look choice. The tiles are cached outside the repo and are not committed."
+  },
+  {
+    "id": "biondi-malanga-2022",
+    "kind": "proponent",
+    "year": 2022,
+    "citation": "Biondi, F. & Malanga, C. (2022). Synthetic Aperture Radar Doppler Tomography Reveals Details of Undiscovered High-Resolution Internal Structure of the Great Pyramid of Giza. Remote Sensing 14(20), 5231. doi:10.3390/rs14205231. Retracted 10 August 2026.",
+    "url": "https://www.mdpi.com/2072-4292/14/20/5231",
+    "license": "CC BY 4.0",
+    "note": "The only peer-reviewed paper for the method, on Khufu's pyramid, not Khafre's. Crossref: published 19 October 2022, CC BY 4.0, updated by the retraction remote-sensing-retraction-2026. arXiv preprint 2208.00811. Its figures may be shown, captioned as retracted."
+  },
+  {
+    "id": "remote-sensing-retraction-2026",
+    "kind": "critique",
+    "year": 2026,
+    "citation": "Remote Sensing Editorial Office (2026). RETRACTED: Biondi, F.; Malanga, C. Synthetic Aperture Radar Doppler Tomography Reveals Details of Undiscovered High-Resolution Internal Structure of the Great Pyramid of Giza. Remote Sensing 18(16), 2679. doi:10.3390/rs18162679.",
+    "url": "https://www.mdpi.com/2072-4292/18/16/2679",
+    "license": "CC BY 4.0",
+    "note": "Date (10 August 2026) and licence from Crossref. The stated reason, 'serious methodological flaws and statistical errors' raised by a reader, with the authors disagreeing, is read only as Retraction Watch quotes it: MDPI's page refuses this container."
+  },
+  {
+    "id": "retraction-watch-2026-giza",
+    "kind": "critique",
+    "year": 2026,
+    "citation": "Santoro, H. (2026). Journal retracts paper claiming network of corridors inside the Great Pyramid of Giza. Retraction Watch, 31 August 2026 (updated 1 September).",
+    "url": "https://retractionwatch.com/2026/08/31/retraction-corridors-inside-great-pyramid-giza/",
+    "note": "Quotes the retraction's reason, Conyers (a satellite measures only what it sees; the vibrations are far too small) and Parcak. Journalism. The id is docs/research/ch8.md's (night decision 31)."
+  },
+  {
+    "id": "pilicy-2025",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "Pilicy, D. (2025). Tomographic Evidence Beneath the Pyramid of Khafre: Methodological Appraisal and Critical Responses. grahamhancock.com, 27 June 2025.",
+    "url": "https://grahamhancock.com/pilicyd1/",
+    "note": "The best-argued sympathetic appraisal. Concedes no paper, an undisclosed processing method, and no reproduction. Its Fig. 1 is the project's tomogram, reproduced with permission."
+  },
+  {
+    "id": "el-aref-2025",
+    "kind": "critique",
+    "year": 2025,
+    "citation": "El-Aref, N. (2025). Controversy over Pyramid claims. Al-Ahram Weekly, 8 April 2025.",
+    "url": "https://english.ahram.org.eg/NewsContent/50/1207/544236/AlAhram-Weekly/Heritage/Controversy-over-Pyramid-claims.aspx",
+    "note": "Hawass: radar use inside the pyramid 'completely false'; no radar devices used; the base is bedrock carved to about 8 m; the researchers never worked in Egypt."
+  },
+  {
+    "id": "moss-2025-natgeo",
+    "kind": "critique",
+    "year": 2025,
+    "citation": "Moss, C. (2025). Is there really a secret city under Egypt's Giza pyramids? National Geographic, 16 April 2025.",
+    "url": "https://www.nationalgeographic.com/history/article/is-there-a-secret-city-under-the-pyramids-",
+    "note": "Dibble, Rossi, Conyers, Hawass and Parcak; the water table would flood deep structures. Gives the cubes as 90 m. The id is docs/research/ch8.md's (night decision 31)."
+  },
+  {
+    "id": "alvarez-1970",
+    "kind": "survey",
+    "year": 1970,
+    "citation": "Alvarez, L. W. et al. (1970). Search for Hidden Chambers in the Pyramids. Science 167(3919), 832–839, 6 February 1970.",
+    "url": "https://bpb-us-e1.wpmucdn.com/sites.mit.edu/dist/9/2055/files/2025/08/AlvarezPyramids.pdf",
+    "license": "AAAS copyright",
+    "note": "Muon detectors in Khafre's Belzoni Chamber; a 35-degree half-angle cone, 19 per cent of the pyramid's volume; no chamber the size of the known Fourth Dynasty chambers (p. 839). Muons come from the sky, so it says nothing below the detector."
+  },
+  {
+    "id": "sharafeldin-2019",
+    "kind": "paper",
+    "year": 2019,
+    "citation": "Sharafeldin, S. M., Essa, K. S., Youssef, M. A. S., Karsli, H., Diab, Z. E. & Sayil, N. (2019). Shallow geophysical techniques to investigate the groundwater table at the Great Pyramids of Giza, Egypt. Geoscientific Instrumentation, Methods and Data Systems 8, 29–43. doi:10.5194/gi-8-29-2019.",
+    "url": "https://gi.copernicus.org/articles/8/29/2019/",
+    "license": "CC BY 4.0",
+    "note": "Peer reviewed. The water table at about +14.5 to +17 m above sea level across the plateau."
+  },
+  {
+    "id": "tbs-2025-khafre",
+    "kind": "reference",
+    "year": 2025,
+    "citation": "The Business Standard (2025). Scientists discover 'vast city' underneath Egypt's Giza pyramid, reveal new details about mysterious structures. TBS Report, 23 March 2025, after the Daily Mail.",
+    "url": "https://www.tbsnews.net/node/1099826",
+    "note": "Press, not the team. The only place the wells' diameter is given: 'about 33 to 39 feet in diameter'. Also 'two massive rectangular enclosures, each measuring approximately 260 feet on each side'."
+  },
+  {
+    "id": "petrie-1889",
+    "kind": "survey",
+    "year": 1889,
+    "citation": "Petrie, W. M. F. (1889). Hawara, Biahmu, and Arsinoe. London: Field & Tuer.",
+    "url": "https://archive.org/details/hawarabiahmuarsi00petruoft",
+    "license": "Public domain",
+    "note": "§5 (p. 5): the Labyrinth's chip and beton beds 'about 1000 feet long, and 800 feet broad', south of the pyramid; the plan is Pl. XXV. §7: the double paving and the architraves of Amenemhat III and Sobekneferu."
+  },
+  {
+    "id": "petrie-1890",
+    "kind": "survey",
+    "year": 1890,
+    "citation": "Petrie, W. M. F. (1890). Kahun, Gurob, and Hawara. London: Kegan Paul, Trench, Trübner.",
+    "url": "https://archive.org/details/kahungurobhawara00petr",
+    "license": "Public domain",
+    "note": "Measured in British inches. Ch. I, p. 13, §§17–18: the brickwork base 3692 in (measured); the casing 157 in, 'adopted as presumptive truth' from the entrance passage's slope; the casing angle 48° 45′ ± 3′ from one fragment. The finished base (4006 in) and the height (2284 in) are Petrie's derivations, computed here, never stored."
+  },
+  {
+    "id": "petrie-1912",
+    "kind": "survey",
+    "year": 1912,
+    "citation": "Petrie, W. M. F., Wainwright, G. A. & Mackay, E. (1912). The Labyrinth, Gerzeh and Mazghuneh. London: School of Archaeology in Egypt / Bernard Quaritch. Ch. X, pp. 28–33.",
+    "url": "https://archive.org/details/ERA21",
+    "license": "Public domain",
+    "note": "§41 the chips 15–24 ft deep along the pyramid's south foot and 2–4 ft elsewhere, and Lepsius's chambers a Roman town; §42 the restored plan (courts about 50 ft wide, a 27-column hall) and the ruin soon after 193 BCE. Read through archive.org's OCR only."
+  },
+  {
+    "id": "herodotus-2-148",
+    "kind": "reference",
+    "citation": "Herodotus, Histories II.148 (5th century BCE).",
+    "url": "http://www.perseus.tufts.edu/hopper/text?doc=Hdt.+2.148",
+    "note": "Twelve roofed courts and 3,000 chambers, half of them underground, the lower ones known to him only by hearsay as the tombs of kings and sacred crocodiles. Read only as quoted in carlotto-2025, pp. 408–409, whose translation is not named."
+  },
+  {
+    "id": "carlotto-2025",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "Carlotto, M. J. (2025). Space-Based Ground Penetrating Radar Imaging of a Possible Underground Structure at Hawara. Journal of Scientific Exploration 39(4), 407–422. doi:10.31275/20253579.",
+    "url": "https://journalofscientificexploration.org/index.php/jse/article/view/3579",
+    "license": "CC BY-NC 4.0 (base imagery © Maxar / Google Earth, not covered)",
+    "note": "Sentinel-1 and ALOS PALSAR; two areas of uncorrelated return either side of the canal south of the pyramid, the eastern about 450,000 sq ft (p. 419); penetration 0.5 m at C-band and 2–5 m at L-band by his own figures (p. 415); concedes the Roman settlement reading (p. 420). Tier claimed (night decision 33)."
+  },
+  {
+    "id": "khalil-2010",
+    "kind": "paper",
+    "year": 2010,
+    "citation": "Khalil, M. A., Abbas, A. M., Monteiro Santos, F. A., Mesbah, H. S. A. & Massoud, U. (2010). VLF-EM study for archaeological investigation of the labyrinth mortuary temple complex at Hawara area, Egypt. Near Surface Geophysics 8(3), 203–212. doi:10.3997/1873-0604.2010004.",
+    "url": "https://www.earthdoc.org/content/journals/10.3997/1873-0604.2010004",
+    "note": "Peer reviewed; the 2008 NRIAG survey's published result. Read only in its abstract: a 2 m grid, 'elongated and square subsurface anomalies at shallow depths'. The depths and figures are behind a paywall."
+  },
+  {
+    "id": "elshazly-2024",
+    "kind": "paper",
+    "year": 2024,
+    "citation": "Elshazly, M. F., Massoud, U., Abdeldayem, A., El-Khodary, S. & Abbas, A. M. (2024). Archaeological prospection and ground water hazard assessment of the Hawara Pyramid, Fayoum, Egypt. Delta Journal of Science 49(2), 39–53.",
+    "url": "https://djs.journals.ekb.eg/article_396440.html",
+    "note": "Peer reviewed. 25 ERT profiles and 40 TEM stations; closures 6 m wide at about 7.5 m and 4 m wide at 5 m south of the pyramid (p. 44), to be verified 'through standard excavation' (p. 51); the water table 1.5 m to 10 m below ground (pp. 48, 51); the pyramid's base about 32 m above sea level (p. 40). Abbas led the 2008 survey. Licence not stated."
+  },
+  {
+    "id": "szynkiewicz-2015",
+    "kind": "critique",
+    "year": 2015,
+    "citation": "Szynkiewicz, A. (2015). GPR research around the Hawara pyramid (Fayum, Egypt). Archaeologia Polona 53, 383–386.",
+    "url": "https://www.rcin.org.pl/iae//Content/86930/PDF/WA308_92311_P357_GPR-research-around.pdf",
+    "note": "GPR to 20 m for Cairo University; Eocene limestone at 12–15 m under 3–5 m of gravel and sand; the tomb flooded; possible remains east and south, but 'nothing to support the idea that this was Herodotus's labyrinth' (p. 386)."
+  },
+  {
+    "id": "de-cordier-2025-mataha",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "De Cordier, L. (2025). The Mataha Expedition; Unveiling the Lost Labyrinth; The Mataha Team (24 March 2025); The Mataha-Expedition Part I (21 July 2025). Labyrinth of Egypt (Substack).",
+    "url": "https://labyrinthofegypt.substack.com/p/the-mataha-expedition-part-i",
+    "note": "Self-published by the 2008 expedition's organiser; not peer reviewed. Walls 8–12 m deep and several metres thick over hectares; a wall over 17 m deep beside the pyramid; the NRIAG report dated April 2008 and unpublished."
+  },
+  {
+    "id": "de-cordier-2025-merlin-burrows",
+    "kind": "proponent",
+    "year": 2025,
+    "citation": "De Cordier, L. (2025). The Merlin Burrows Scans II. Labyrinth of Egypt (Substack), 6 June 2025. Tim Akers / Merlin Burrows satellite scans of Hawara, made in 2015.",
+    "url": "https://labyrinthofegypt.substack.com/p/the-merlin-burrows-scans-ii",
+    "note": "Method undisclosed, data unreleased, nothing reviewed. Four or five layers 20–50 m apart, to about 100 m; an atrium 40 by at least 100 m; two chambers under the pyramid. Images © Cosco Foundation, 2025. Stewart's lead, 'the Labyrinth under a pyramid, by new technology'."
+  },
+  {
+    "id": "amza-trt-2025",
+    "kind": "critique",
+    "year": 2025,
+    "citation": "Amza, A. (2025). EXCLUSIVE: Is there a secret city under the Giza Pyramids? Unpacking the controversy. TRT World (undated on the page; March or April 2025).",
+    "url": "https://www.trtworld.com/article/1bd4fb6965ee",
+    "note": "ESA's statement that SAR penetration 'can go up to 10 meters', and Biondi's own, that direct penetration is 'absolutely less than 10 meters'. Read by the khafre-sar research job, not yet here."
+  },
+  {
+    "id": "aera-khafre-monuments",
+    "kind": "critique",
+    "citation": "Ancient Egypt Research Associates. Khafre's Monuments. aeraweb.org, undated (site copyright 2025).",
+    "url": "https://aeraweb.org/khafres-monuments",
+    "note": "Checked 2026-10-20: the Valley Temple's north enclosure wall respects its granite casing; the Sphinx Temple was built after the Valley Temple; Ricke's study concluded one quarry and construction process. Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aera-radiocarbon",
+    "kind": "reference",
+    "citation": "Ancient Egypt Research Associates. How Old Are the Pyramids? (web page summarising the 1984 and 1995 radiocarbon projects).",
+    "url": "https://aeraweb.org/how-old-are-the-pyramids/",
+    "note": "Not peer reviewed; the project team's own summary. Checked: 1984 dates averaged 374 years older than expected; 1995 dates 100–200 years older; Khufu's dates scatter over about 400 years; old-wood explanation. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aera-sequence",
+    "kind": "critique",
+    "citation": "Ancient Egypt Research Associates. Why sequence is important. aeraweb.org, undated, read 2026-10-20.",
+    "url": "https://aeraweb.org/why-sequence-is-important/",
+    "note": "Checked: Valley Temple, then its enclosure wall, then the Sphinx Temple reusing that wall; Sphinx Temple core blocks matched to lower Member II of the Sphinx quarry; Sphinx and temple late in Khafre's programme 'with a high degree of probability'. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aera-sphinx-geology",
+    "kind": "reference",
+    "year": 2025,
+    "citation": "Ancient Egypt Research Associates. Geology of the Sphinx. Web page, (c) 2025.",
+    "url": "https://aeraweb.org/geology-of-the-sphinx/",
+    "note": "Checked, fetched 2026-10-20: Member I at the base, Member II the body, Member III the neck and head, 'softer at the neck and harder at the head'. Not peer reviewed. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "allan-2026",
+    "kind": "paper",
+    "year": 2026,
+    "citation": "Allan, E. (2026). A comprehensive statistical evaluation of the Orion–Giza correlation. Journal of Astronomical History and Heritage 29(2), 367–378.",
+    "url": "https://files.sciengine.com/pdfs/1440-2807/CD353FC8159543A09181EBB6B95CD63B.pdf",
+    "note": "Checked (full PDF read). Peer reviewed. Shape p = 0.0025 (rank 1,717/695,520); orientation, Menkaure offset, brightness, shaft convergence and Nile extension all fail; best-fit orientation epoch c. 11,625 BCE; uses Vondrák 2011 for the shaft table. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "aubourg-1995",
+    "kind": "paper",
+    "year": 1995,
+    "citation": "Aubourg, É. (1995). La date de conception du zodiaque du temple d'Hathor à Dendera. Bulletin de l'Institut français d'archéologie orientale 95, 1-10.",
+    "url": "https://www.ifao.egnet.net/bifao/95/1/",
+    "note": "Bibliographic data checked through the IFAO listing in search results; text not read. Dates the Dendera zodiac to c. 50 BC. Peer reviewed. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "badawy-1964",
+    "kind": "paper",
+    "year": 1964,
+    "citation": "Badawy, A. (1964). The stellar destiny of Pharaoh and the so-called air-shafts of Cheops' pyramid. Mitteilungen des Instituts für Orientforschung 10, 189–206.",
+    "url": "https://gizamedia.rc.fas.harvard.edu/documents/badawy_mio_10_1964.pdf",
+    "note": "Citation checked against the Harvard Giza bibliography and Allan 2026; text not read. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "bauval-1989",
+    "kind": "proponent",
+    "year": 1989,
+    "citation": "Bauval, R. (1989). A master-plan for the three pyramids of Giza based on the configuration of the three stars of the belt of Orion. Discussions in Egyptology 13, 7–18.",
+    "url": "https://gizamedia.rc.fas.harvard.edu/documents/bauval_de_13_1989.pdf",
+    "note": "Unchecked: the PDF fetch failed; title and pages from memory and the Harvard file name. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "bonani-2001",
+    "kind": "paper",
+    "year": 2001,
+    "citation": "Bonani, G., Haas, H., Hawass, Z., Lehner, M., Nakhla, S., Nolan, J., Wenke, R. & Wölfli, W. (2001). Radiocarbon dates of Old and Middle Kingdom monuments in Egypt. Radiocarbon 43(3), 1297–1320. doi:10.1017/S0033822200038558",
+    "url": "https://www.cambridge.org/core/journals/radiocarbon/article/radiocarbon-dates-of-old-and-middle-kingdom-monuments-in-egypt/A967302ADD527BFEB9226457682C0B4A",
+    "note": "Peer reviewed (proceedings of the 17th International 14C Conference). Checked pp. 1297–1300: over 450 samples 1984–1995; the 1984 project funded by the Edgar Cayce Foundation to test Cayce's 10,500 BC hypothesis (p. 1297); Figure 1 p. 1300 compares calibrated ranges with Clayton's chronology. Appendices not read. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "boury-2023",
+    "kind": "paper",
+    "year": 2023,
+    "citation": "Boury, S., Weady, S. & Ristroph, L. (2023). Sculpting the Sphinx. Physical Review Fluids 8, 110503. doi:10.1103/PhysRevFluids.8.110503",
+    "url": "https://doi.org/10.1103/PhysRevFluids.8.110503",
+    "license": "CC BY 4.0",
+    "note": "Checked against the PDF: a Gallery of Fluid Motion paper; clay mounds with hard inclusions eroded by water flow become Sphinx-like. On shape, not age. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "breasted-1906",
+    "kind": "reference",
+    "year": 1906,
+    "citation": "Breasted, J. H. (1906). Ancient Records of Egypt, vol. I. Chicago: University of Chicago Press. §§177–180, pp. 83–85 (the Inventory Stela).",
+    "url": "https://jasoncolavito.com/inventory-stela.html",
+    "note": "Checked against Colavito's transcription, not a scan of the book. The quotation 'house of Isis… beside the house of the Sphinx' and the late-date verdict in §177 were confirmed there. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "bronk-ramsey-2010",
+    "kind": "paper",
+    "year": 2010,
+    "citation": "Bronk Ramsey, C. et al. (2010). Radiocarbon-based chronology for dynastic Egypt. Science 328, 1554–1557.",
+    "url": "https://doi.org/10.1126/science.1189395",
+    "note": "Checked against the PDF. Table 1, p. 1556, 95% hpd: Djoser 2691–2625, Khufu 2629–2558, Khafre 2604–2528, Unas 2450–2363 BCE (Khufu, Khafre and Unas have no direct dates). 211 dates, Nile offset 19 ± 5 14C years. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "clare-2020",
+    "kind": "survey",
+    "year": 2020,
+    "citation": "Clare, L. (2020). Göbekli Tepe, Turkey. A brief summary of research at a new World Heritage Site (2015–2019). e-Forschungsberichte des DAI 2020-2, 81–88, §1–13.",
+    "url": "https://doi.org/10.34780/efb.v0i2.1012",
+    "note": "DAI report, not peer-reviewed. Checked against the PDF: hunter-gatherer builders §2; domestic buildings §5–8; cistern and channel §9; mortar dates §10; slope slides §11, Fig. 7. From docs/research/ch7.md, by its research job; not yet checked here. Read again on 2026-10-20 by the night builder in the DAI's PDF (sha256 31c0f142bd577a27d17fa47fd37a77f853a5b51656c97653210f30b684d630f2, fetched through its browser check): §11 on p. 86 and Fig. 7's caption; no depth of the fill is printed. CC BY-NC-ND 4.0."
+  },
+  {
+    "id": "dash-2017",
+    "kind": "paper",
+    "year": 2017,
+    "citation": "Dash, G. (2017). Occam's Egyptian razor: the equinox and the alignment of the pyramids. Journal of Ancient Egyptian Architecture 2, 1-8.",
+    "url": "https://web.ujaen.es/investiga/egiptologia/journalarchitecture/downloads/JAEA2/JAEA2_Dash.pdf",
+    "note": "Checked pp. 1, 6, 7 on 2026-10-20: gnomon test -7.3' against -5.9' expected (p. 6); mean of Khufu, Khafre, Red Pyramid -6.2' (p. 6); Table 3 casing alignments of six Fourth-Dynasty pyramids (p. 7). CC BY-NC 2.0. Distinct from dash-2015, the AERAgram survey. From docs/research/ch6.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "dee-2013",
+    "kind": "paper",
+    "year": 2013,
+    "citation": "Dee, M., Wengrow, D., Shortland, A., Stevenson, A., Brock, F., Girdland Flink, L. & Bronk Ramsey, C. (2013). An absolute chronology for early Egypt using radiocarbon dating and Bayesian statistical modelling. Proceedings of the Royal Society A 469, 20130395.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3780825/",
+    "note": "Checked: Aha's accession 3111–3045 BCE (68%), 3218–3035 (95%), median 3085 (§4, Table 1, Fig. 2). Naqada duration 477–825 years (95%). From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "dolphin-1978",
+    "kind": "survey",
+    "year": 1999,
+    "citation": "Dolphin, L. (1999). Geophysical Studies around the Sphinx (1978): project leader's notes on the 1978 seismic, resistivity and drilling survey, written 21 July 1999.",
+    "url": "https://www.ldolphin.org/egypt/sphinx.html",
+    "note": "Not peer reviewed; no formal report was filed. Checked: five 4-inch air-drilled holes into the largest anomalies (three in the temple area, two on the platform), borehole TV found 'only minor natural cracks'; sponsored by private investors with an add-on for the A.R.E. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "firestone-2007",
+    "kind": "paper",
+    "year": 2007,
+    "citation": "Firestone, R. B. et al. (2007). Evidence for an extraterrestrial impact 12,900 years ago that contributed to the megafaunal extinctions and the Younger Dryas cooling. PNAS 104(41), 16016–16021.",
+    "url": "https://doi.org/10.1073/pnas.0706977104",
+    "note": "Peer-reviewed; the founding YDIH paper. Unchecked: abstract and pages via search summary only. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "gardiner-1959",
+    "kind": "reference",
+    "year": 1959,
+    "citation": "Gardiner, A. H. (1959). The Royal Canon of Turin. Oxford: Griffith Institute.",
+    "note": "Unchecked. Column II lines 8–9 are the 'spirits, Followers of Horus, 13,420 + x years' and '23,200 + x years' lines; transliteration checked only at pharaoh.se (Turin col. 3), which follows Helck's restorations. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "gauri-1995",
+    "kind": "critique",
+    "year": 1995,
+    "citation": "Gauri, K. L., Sinai, J. J. & Bandyopadhyay, J. K. (1995). Geologic weathering and its implications on the age of the Sphinx. Geoarchaeology 10(2), 119-133. doi:10.1002/gea.3340100203",
+    "url": "https://doi.org/10.1002/gea.3340100203",
+    "note": "Checked against the Crossref record and abstract: arid weathering can make the rounded profile; the ditch-wall channels are 'pre-Pliocene karst features' exposed by excavation. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "graham-2022",
+    "kind": "paper",
+    "year": 2022,
+    "citation": "Graham, L. D. (2022). The sp tp.y (First Occasion) and the Dreamtime: Egyptian ḏ.t as a parallel to Aboriginal tjukurrpa? Birmingham Egyptology Journal 9, 52–84.",
+    "url": "https://more.bham.ac.uk/birminghamegyptology/wp-content/uploads/sites/54/2022/11/The-sp-tp.y-First-Occasion-and-the-Dreamtime.pdf",
+    "note": "Checked: abstract, p. 52. Student-run journal with light review. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hancock-2015",
+    "kind": "proponent",
+    "year": 2015,
+    "citation": "Hancock, G. (2015). Magicians of the Gods. London: Coronet.",
+    "note": "Unchecked: the use of Schoch's Sphinx geology beside Göbekli Tepe is from memory; chapter and page not found. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hancock-2023-saa",
+    "kind": "proponent",
+    "year": 2023,
+    "citation": "Hancock, G. (2023, 30 January). Response by Graham Hancock to the open letter to Netflix dated 30th November 2022 from the Society for American Archaeology concerning Ancient Apocalypse. grahamhancock.com.",
+    "url": "https://grahamhancock.com/hancockg22-saa/",
+    "note": "Checked (first 100k characters): absence of evidence; YDIH literature; denies racism charge. Göbekli Tepe not discussed. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hancock-fridman-2024",
+    "kind": "proponent",
+    "citation": "Hancock, G. Interview, Lex Fridman Podcast #449. Transcript at lexfridman.com.",
+    "url": "https://lexfridman.com/graham-hancock-transcript/",
+    "note": "Checked against the transcript, around 01:02:52: the Valley Temple 'attributed to Khafre on no good grounds whatsoever', limestone blocks 'up to 100 tons each', core blocks 'already eroded when the granite blocks were put there', granite 'deliberately cut to fit into the erosion marks'. The transcript page shows no air date; the year (2024) is unchecked. Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "harrell-1994",
+    "kind": "critique",
+    "year": 1994,
+    "citation": "Harrell, J. A. (1994). The Sphinx Controversy: Another Look at the Geological Evidence. KMT 5(2), 70-74.",
+    "url": "https://www.hallofmaat.com/?p=3243",
+    "note": "Checked against the Hall of Maat reprint: wet sand cover, capillary flood water, clay swelling and salts; seismic low-velocity layers may be depositional and S3's boundary picked too high. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "herz-fischler-2000",
+    "kind": "critique",
+    "year": 2000,
+    "citation": "Herz-Fischler, R. (2000). The Shape of the Great Pyramid. Waterloo, Ontario: Wilfrid Laurier University Press. xii + 293 pp. ISBN 0-88920-324-5.",
+    "url": "https://muse.jhu.edu/book/14297",
+    "note": "Checked: bibliographic details and table of contents (Project MUSE, catalogue records) on 2026-10-20. History of eleven theories of the shape, including pi, golden ratio, seked and the Herodotus reading. The author's own verdict among them is unchecked; academic press, not a journal. From docs/research/ch6.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "holliday-2023",
+    "kind": "critique",
+    "year": 2023,
+    "citation": "Holliday, V. T., Daulton, T. L., Bartlein, P. J., Boslough, M. B., Breslawski, R. P., Fisher, A. E., Jorgeson, I. A., Scott, A. C., Koeberl, C., Marlon, J. R., Severinghaus, J., Petaev, M. I. & Claeys, P. (2023). Comprehensive refutation of the Younger Dryas Impact Hypothesis (YDIH). Earth-Science Reviews 247, 104502.",
+    "url": "https://doi.org/10.1016/j.earscirev.2023.104502",
+    "note": "Peer-reviewed review. Checked against the abstract (University of Arizona record). From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "hornung-krauss-warburton-2006",
+    "kind": "reference",
+    "year": 2006,
+    "citation": "Hornung, E., Krauss, R. & Warburton, D. A. (eds.) (2006). Ancient Egyptian Chronology. Handbook of Oriental Studies, Section 1, vol. 83. Leiden: Brill. Chronological table p. 490.",
+    "url": "https://www.degruyterbrill.com/document/isbn/9789047404002/html",
+    "note": "Bibliography and table page checked through the contents; Khufu's accession at 2509 BCE and Unas's at 2321 checked as quoted in Bronk Ramsey et al. 2010, Table 1. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "iau-boundaries",
+    "kind": "reference",
+    "year": 1989,
+    "citation": "Davenhall, A. C. & Leggett, S. K. (1989). Constellation Boundary Data (after Delporte 1930). CDS catalogue VI/49.",
+    "note": "Not consulted for this brief; proposed for import into data/stars/ so that the epochs at which the vernal point crosses Leo's boundaries can be computed. Citation from memory, unchecked. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "khafre-enthroned-cg14",
+    "kind": "reference",
+    "citation": "Statue of Khafre enthroned, Egyptian Museum Cairo CG 14 / JE 10062, found by A. Mariette in 1860 in a pit in the vestibule of Khafre's Valley Temple. Harvard Digital Giza object record.",
+    "url": "https://giza.fas.harvard.edu/objects/55103/full/",
+    "note": "Findspot ('in well in vestibule'), numbers and the companion statues CG 9-17 checked only through search summaries of the Digital Giza, Egyptian Museum and Wikipedia pages; the object URL is one of the Digital Giza records returned and its match to CG 14 is unconfirmed. Mariette's own report not identified. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "kuper-kropelin-2006",
+    "kind": "paper",
+    "year": 2006,
+    "citation": "Kuper, R. & Kröpelin, S. (2006). Climate-Controlled Holocene Occupation in the Sahara: Motor of Africa's Evolution. Science 313, 803-807. doi:10.1126/science.1130989",
+    "url": "https://doi.org/10.1126/science.1130989",
+    "note": "Abstract's content seen in search results (humid onset c. 8500 BCE; desiccation from 5300 BCE); paper not read. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "lacovara-2026",
+    "kind": "critique",
+    "year": 2026,
+    "citation": "Lacovara, P. (2026). Review of C. D. Reader, Rewriting the History of the Great Sphinx. American Journal of Archaeology 131(1), January 2027 (published open access online 6 October 2026), https://doi.org/10.1086/744239.",
+    "url": "https://www.journals.uchicago.edu/doi/reader/10.1086/744239",
+    "note": "Checked: full text read 2026-10-20. States the Khafre case (quarry blocks in the Sphinx Temple, citing Lehner diss. pp. 8-9; the temple unfinished; no pre-4th Dynasty material; paws and tail in masonry; rock-cut sculpture beginning under Khafre) and cites Lehner & Hawass 2017, pp. 229-31. Peer-reviewed journal; book review. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "legon-1995",
+    "kind": "critique",
+    "year": 1995,
+    "citation": "Legon, J. A. R. (1995). The Orion correlation and air-shaft theories. Discussions in Egyptology 33, 45–56.",
+    "url": "https://www.hallofmaat.com/?p=648",
+    "note": "Checked via the authorised Hall of Maat reproduction (2002): inversion, brightness, distances to Abu Roash and Zawiyet el-Aryan, shaft angles as geometry. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "lehner-1994-kmt",
+    "kind": "critique",
+    "year": 1994,
+    "citation": "Lehner, M. (1994). Notes and Photographs on the West-Schoch Sphinx Hypothesis. KMT 5(3), 40-48.",
+    "url": "https://www.hallofmaat.com/sphinx/notes-and-photographs-on-the-west-schoch-sphinx-hypothesis",
+    "note": "Checked against the Hall of Maat reprint: different strata in the tomb comparison; west-wall cracks are joints; Menkaure temple shows limestone dressed to fit granite; Member I 3.70 m at the rump, 0.65-1.09 m at the paws. Does not address the seismic. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "lehner-2017-aeragram",
+    "kind": "critique",
+    "year": 2017,
+    "citation": "Lehner, M. (2017). Who Built the Sphinx? The Sphinx Temple Has the Answer. AERAgram 18(1), 2-7.",
+    "url": "https://aeraweb.org/who-built-the-sphinx/",
+    "note": "Checked against the web version: core blocks up to a hundred tons; block types A to G with Aigner; Type A and C from Member II of the Sphinx quarry, Type G from head level into the Valley Temple; Sphinx Temple left without its exterior granite casing. Page range from Wikipedia's citation, unchecked. Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "liritzis-vafiadou-2015",
+    "kind": "paper",
+    "year": 2015,
+    "citation": "Liritzis, I. & Vafiadou, A. (2015). Surface luminescence dating of some Egyptian monuments. Journal of Cultural Heritage 16, 134-150. doi:10.1016/j.culher.2014.05.007",
+    "url": "https://liritzis.eu/wp-content/uploads/2019/01/EGYPTIAN-MONUMENTS-DATED-BY-SURFACE-LUMINESCENCE-DATING.pdf",
+    "note": "Checked against the PDF, Table 1 p. 137: Sphinx Temple limestone ST2 2220 ± 220 BCE; granites ST3 1190 ± 340, ST4 2740 ± 640, ST5 3100 ± 540 BCE; Valley Temple granite VT1 3060 ± 470, limestone VT9a 1050 ± 540 BCE. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "moore-2020",
+    "kind": "paper",
+    "year": 2020,
+    "citation": "Moore, A. M. T., Kennett, J. P., Napier, W. M., Bunch, T. E., Weaver, J. C., LeCompte, M., et al. & West, A. (2020). Evidence of Cosmic Impact at Abu Hureyra, Syria at the Younger Dryas Onset (~12.8 ka): High-temperature melting at >2200 °C. Scientific Reports 10, 4185.",
+    "url": "https://doi.org/10.1038/s41598-020-60867-w",
+    "note": "Peer-reviewed. Checked against PMC7060197: meltglass Fig. 7, YDB 12,825 ± 55 cal BP. Corrected 2025 (moore-2025-correction); not retracted. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "moore-2025-correction",
+    "kind": "paper",
+    "year": 2025,
+    "citation": "Moore, A. M. T. et al. (2025). Correction: Evidence of Cosmic Impact at Abu Hureyra, Syria at the Younger Dryas Onset (~12.8 ka). Scientific Reports 15, 40645.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12630835",
+    "note": "Checked: Supplementary Table S1 inconsistent with its original data sources; table revised and geochronological discussion added. Effect on conclusions not stated. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "notroff-2017",
+    "kind": "critique",
+    "year": 2017,
+    "citation": "Notroff, J., Dietrich, O., Clare, L., Dietrich, L., Schlindwein, J., Kinzel, M., Lelek-Tvetmarken, C. & Sönmez, D. (2017). More than a vulture: A response to Sweatman and Tsikritsis. Mediterranean Archaeology and Archaeometry 17(2), 57–63.",
+    "url": "https://www.dainst.blog/the-tepe-telegrams/2017/07/03/more-than-a-vulture-a-response-to-sweatman-and-tsikritsis/",
+    "note": "Checked against the authors' DAI blog version; Zenodo doi 10.5281/zenodo.581724. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "pharaoh-se-turin",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "pharaoh.se. Turin King List: column 3 (transliteration, translation and readings, Gardiner II.1–25).",
+    "url": "https://pharaoh.se/ancient-egypt/kinglist/turin/column-3/",
+    "note": "Checked 2026-10-20. Secondary, not peer-reviewed; flags which numerals are restored. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "piankoff-1968",
+    "kind": "reference",
+    "year": 1968,
+    "citation": "Piankoff, A. (1968). The Pyramid of Unas. Bollingen Series XL.5. Princeton: Princeton University Press.",
+    "note": "Unchecked; named by Pyramid Texts Online as its base translation. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "pyramid-texts-online",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Pyramid Texts Online: the Pyramid of Unas, translation (a modernised version of Piankoff 1968), with Sethe's utterance and § numbers and wall locations.",
+    "url": "https://pyramidtextsonline.com/translation.html",
+    "note": "Checked 2026-10-20 for PT 214, 215, 216, 219, 245, 248, 262, 263, 268, 273–274, 302 and 320. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "reader-2001",
+    "kind": "paper",
+    "year": 2001,
+    "citation": "Reader, C. D. (2001). A Geomorphological Study of the Giza Necropolis, with Implications for the Development of the Site. Archaeometry 43(1), 149-165. doi:10.1111/1475-4754.00009",
+    "url": "https://doi.org/10.1111/1475-4754.00009",
+    "note": "Checked against the Crossref record and abstract: run-off erosion, rainfall known at Giza to the late Fifth Dynasty, Sphinx probably predates Khufu. Peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "reader-2026",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Reader, C. D. (2026). Rewriting the History of the Great Sphinx. Oxford: Archaeopress. ISBN 978-1-805-83209-6.",
+    "url": "https://the-past.com/review/books/rewriting-the-history-of-the-great-sphinx/",
+    "note": "Argues for a Second Dynasty Sphinx (a few centuries before Khufu, not pre-dynastic), head first Mafdet and recarved under Khufu. Checked only through the review in The Past, 16 April 2026; book not read. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "reader-giza-before-4th",
+    "kind": "proponent",
+    "citation": "Reader, C. Giza Before the Fourth Dynasty. 18 pp.",
+    "url": "https://www.academia.edu/21651229",
+    "note": "Checked on academia.edu: Fig. 5 caption gives S3 c. 1.2 m and S1, S2, S4 1.8-2.5 m (KMT), S4 approaching 4 m and S9 1.2-1.5 m (Dobecki & Schoch 1992), and the Sphinx Temple floor 3 m below the ditch floor. Venue and year not given on the page. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "retraction-watch-2026-ydih",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Retraction Watch (2026, 4 March). Controversial comet theory struck by two new retractions.",
+    "url": "https://retractionwatch.com/2026/03/04/controversial-comet-theory-struck-by-two-new-retractions",
+    "note": "Checked: PLOS ONE retractions of 11 Feb 2026 (doi 10.1371/journal.pone.0328347 and 10.1371/journal.pone.0319840); Tall el-Hammam Sci Rep 2021 retracted April 2025. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "ricke-1970",
+    "kind": "survey",
+    "year": 1970,
+    "citation": "Ricke, H. (1970). Der Harmachistempel des Chefren in Giseh. In H. Ricke & S. Schott, Beiträge zur ägyptischen Bauforschung und Altertumskunde 10. Wiesbaden: Franz Steiner.",
+    "url": "https://gizamedia.rc.fas.harvard.edu/documents/ricke_harmachistempel.pdf",
+    "note": "Bibliographic details checked against Harvard Digital Giza records; the PDF could not be fetched and the text was not read. Ricke's conclusion that the Sphinx, Sphinx Temple and Valley Temple were one quarry and construction process is checked only through AERA's Khafre's Monuments page; his remark on partially completed casing work only through Wikipedia. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "rogers-1998",
+    "kind": "paper",
+    "year": 1998,
+    "citation": "Rogers, J. H. (1998). Origins of the ancient constellations: I. The Mesopotamian traditions. Journal of the British Astronomical Association 108, 9-28.",
+    "url": "https://ui.adsabs.harvard.edu/abs/1998JBAA..108....9R/abstract",
+    "note": "Checked: ADS abstract. Mesopotamian constellations developed c. 3200-500 BC; the twelve zodiacal signs passed to the Greek sky map. Peer reviewed. From docs/research/ch2.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "rossi-imhausen-2009",
+    "kind": "paper",
+    "year": 2009,
+    "citation": "Rossi, C. & Imhausen, A. (2009). Architecture and mathematics in the time of Senusret I: Sections G, H and I of Papyrus Reisner I. In S. Ikram & A. Dodson (eds), Beyond the Horizon: Studies in Egyptian Art, Archaeology and History in Honour of Barry J. Kemp. Cairo, pp. 440 ff.",
+    "url": "https://re.public.polimi.it/retrieve/e0c31c09-da17-4599-e053-1705fe0aef77/Rossi%26Imhausen.pdf",
+    "note": "Checked pp. 440-441 against the PDF on 2026-10-20: the seked model against pi and phi theories (p. 440); six architectural problems RMP 56-60 and MMP 14, seked always in palms and fingers (p. 441). End page not found. From docs/research/ch6.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "ryholt-2004",
+    "kind": "paper",
+    "year": 2004,
+    "citation": "Ryholt, K. (2004). The Turin King-List. Ägypten und Levante 14, 135–155.",
+    "url": "https://www.academia.edu/5564190",
+    "note": "Peer-reviewed. Bibliography checked through search; content not read. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schmidt-2007",
+    "kind": "paper",
+    "year": 2007,
+    "citation": "Schmidt, K. (2007). Göbekli Tepe: Stone Age Sanctuaries in Upper Mesopotamia. Boletín de Arqueología PUCP 11.",
+    "url": "https://revistas.pucp.edu.pe/index.php/boletindearqueologia/article/view/1833",
+    "note": "Peer-reviewed journal. Unchecked: deliberate filling in the late 9th millennium BC per search summary; the page would not load; pages not found. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-1992-kmt",
+    "kind": "proponent",
+    "year": 1992,
+    "citation": "Schoch, R. M. (1992). Redating the Great Sphinx of Giza. KMT: A Modern Journal of Ancient Egypt 3(2), Summer 1992.",
+    "note": "Unchecked: volume and issue from a secondary page found in search; page range not found. Not peer reviewed. Source of the KMT seismic figures (S3 c. 1.2 m; S1, S2, S4 1.8-2.5 m) as reported by Reader. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-bauval-2017",
+    "kind": "proponent",
+    "year": 2017,
+    "citation": "Schoch, R. M. & Bauval, R. (2017). Origins of the Sphinx: Celestial Guardian of Pre-Pharaonic Civilization. Rochester, VT: Inner Traditions.",
+    "url": "https://www.simonandschuster.ca/books/Origins-of-the-Sphinx/Robert-M-Schoch/9781620555262",
+    "note": "Checked against the publisher's page: Sphinx first built c. 12,000 years ago, contemporary with Göbekli Tepe; 'reanalysis of seismic studies'; Zep Tepi c. 10,500-9700 BCE. Book itself not read. Not peer reviewed. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-sphinx-web",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Schoch, R. M. Research Highlights: The Great Sphinx. robertschoch.com, read 2026-10-20.",
+    "url": "https://www.robertschoch.com/sphinx.html",
+    "note": "Checked 2026-10-20: minimum of at least 7,000 years for the core body from seismic data 'calibrated very conservatively'; about 12,000 years 'more realistic'; latest view 'the end of the last ice age, circa 10,000 BCE'; Göbekli Tepe as the answer to 'where is the civilization'. Undated web page. From docs/research/ch1.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schwaller-1982",
+    "kind": "proponent",
+    "year": 1982,
+    "citation": "Schwaller de Lubicz, R. A. (1982). Sacred Science: The King of Pharaonic Theocracy. Rochester, VT: Inner Traditions.",
+    "note": "Unchecked. Hancock and Bauval cite p. 86 for the Turin totals, 36,620 years. From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "sweatman-tsikritsis-2017",
+    "kind": "proponent",
+    "year": 2017,
+    "citation": "Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.",
+    "url": "https://doi.org/10.5281/zenodo.400780",
+    "license": "CC BY 4.0",
+    "note": "Peer-reviewed. Read on 2026-10-21 by the night builder (chunk 11) in the Zenodo PDF (sha256 b5a1b30a35829581af65bf19d608722a8714f5282be212777d47302e53bcba11): the pairings on p. 237 (the vulture as the teapot of Sagittarius, not Cygnus; the bent bird as Ophiuchus, the long-necked bird as Libra, the animal left of the scorpion as Lupus), the disc as the sun and the four candidate dates on p. 238, where 10,950 BC is the summer solstice at sunset seen from Sanliurfa in Stellarium, with the sun slightly above the spout. Claim C8."
+  },
+  {
+    "id": "trimble-1964",
+    "kind": "paper",
+    "year": 1964,
+    "citation": "Trimble, V. (1964). Astronomical investigation concerning the so-called air-shafts of Cheops' pyramid. Mitteilungen des Instituts für Orientforschung 10, 183–187.",
+    "url": "https://giza.fas.harvard.edu/pubdocs/901/full/",
+    "note": "Citation checked against the Harvard Giza bibliography and Allan 2026; text not read. From docs/research/ch5.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "waddell-1940",
+    "kind": "reference",
+    "year": 1940,
+    "citation": "Waddell, W. G. (1940). Manetho. Loeb Classical Library 350. Cambridge, MA: Harvard University Press / London: Heinemann. Fr. 1 (Eusebius, Armenian), pp. 3–9; Fr. 2–3 (Syncellus), pp. 11–17.",
+    "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Manetho/History_of_Egypt/1*.html",
+    "note": "Checked against the LacusCurtius transcription: gods 13,900 years; demigods 1,255; spirits of the dead and demigods 5,813; '24,900 lunar years, which make 2206 solar years' (p. 7); Syncellus 11,985. The Old Chronicle's 36,525 at p. 227 is unchecked (from Hancock and Bauval's note). From docs/research/ch4.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "walker-2009",
+    "kind": "reference",
+    "year": 2009,
+    "citation": "Walker, M. et al. (2009). Formal definition and dating of the GSSP for the base of the Holocene using the Greenland NGRIP ice core. Journal of Quaternary Science 24(1).",
+    "url": "https://doi.org/10.1002/jqs.1227",
+    "note": "Peer-reviewed; the 11,700 b2k end of the Younger Dryas. The DOI, authors, title and volume were checked on 2026-10-20 against IntChron's page for it (https://intchron.org/doi/10.1002/jqs.1227), whose event table also gives GICC05's start of GS-1 and of the Holocene (data/icecore/events.json); the paper's own page was not read (Wiley refuses this container). From docs/research/ch7.md, by its research job."
+  },
+  {
+    "id": "west-1993-film",
+    "kind": "proponent",
+    "year": 1993,
+    "citation": "The Mystery of the Sphinx (1993). Documentary presented by Charlton Heston, with J. A. West and R. M. Schoch. NBC.",
+    "note": "Not seen. The statements on granite fitted to weathered limestone are checked only as quoted in Lehner (1994), KMT 5(3). Not peer reviewed. From docs/research/ch3.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "ysi-2009-sphinx",
+    "kind": "survey",
+    "year": 2009,
+    "citation": "YSI Inc. (2009). YSI Level Scouts Monitor Groundwater Levels to Help Protect the Great Sphinx. Application Note A579.",
+    "url": "https://www.xylem.com/siteassets/brand/ysi/resources/case-study/a579-ysi-level-scouts-monitor-groundwater-beneath-the-sphinx.pdf",
+    "note": "Vendor note, not peer reviewed. Checked pp. 1–2: early 2008, SCA with Cairo University's Engineering Center for Archaeology and Environment drilled four 4-inch boreholes 20 m into the bedrock around the Sphinx, with cameras; plan of PZ/S1–S4 with printed elevations 20.492, 20.480, 20.505, 20.193; water table 4.6 m below the surface; eight pump stations from June 2008. From docs/research/ch8.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "gicc05-ngrip-20yr",
+    "kind": "reference",
+    "year": 2006,
+    "citation": "NGRIP dating group (2006). Greenland Ice Core Chronology 2005 (GICC05): NGRIP and GRIP oxygen isotope ratios in 20-year means on the GICC05 time scale, 0 to 41.76 ka b2k. IGBP PAGES/World Data Center for Paleoclimatology Data Contribution Series 2006-118, NOAA/NCDC Paleoclimatology Program. Dating: Vinther et al. (2006), JGR 111, D13102; Rasmussen et al. (2006), JGR 111, D06102; Andersen et al. and Svensson et al. (2006), QSR 25.",
+    "url": "https://www.ncei.noaa.gov/pub/data/paleo/icecore/greenland/summit/ngrip/gicc05-20yr.txt",
+    "license": "Distributed free by NOAA's World Data Service for Paleoclimatology; the file asks users to cite the contributors, which this record and data/icecore/ngrip-d18o.json do. The same series is on PANGAEA under CC BY 3.0 (doi:10.1594/PANGAEA.586838).",
+    "note": "A data file, imported by scripts/icecore.ts into data/icecore/ngrip-d18o.json (NGRIP d18O and the maximum counting error by age; GRIP and the depths left out). Fetched 2026-10-20 to data/icecore/gicc05-20yr.txt (gitignored), 117058 bytes, sha256 0b1b042590b621da176d64f8b981cf5afedb0dabba0c12da3d19d1a1cd235be6. Ages are years b2k at the bottom of each 20-year interval; the file says its maximum counting error is to be read as 2 sigma."
+  },
+  {
+    "id": "dietrich-2019",
+    "kind": "paper",
+    "year": 2019,
+    "citation": "Dietrich, L., Meister, J., Dietrich, O., Notroff, J., Kiep, J., Heeb, J., Beuger, A. & Schütt, B. (2019). Cereal processing at Early Neolithic Göbekli Tepe, southeastern Turkey. PLOS ONE 14(5), e0215214.",
+    "url": "https://doi.org/10.1371/journal.pone.0215214",
+    "note": "Peer-reviewed. Unchecked: abstract summarised by search, not fetched. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "holliday-2024",
+    "kind": "critique",
+    "year": 2024,
+    "citation": "Holliday, V. T., Daulton, T. L., Bartlein, P. J., Boslough, M. B., Breslawski, R. P., Fisher, A. E., Jorgeson, I. A., Scott, A. C. et al. (2024). Rebuttal of Sweatman, Powell, and West's 'Rejection of Holliday et al.'s alleged refutation of the Younger Dryas Impact Hypothesis'. Earth-Science Reviews 258, 104961.",
+    "url": "https://doi.org/10.1016/j.earscirev.2024.104961",
+    "note": "Peer-reviewed. Unchecked: from repository listings via search. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "karul-2021",
+    "kind": "paper",
+    "year": 2021,
+    "citation": "Karul, N. (2021). Buried Buildings at Pre-Pottery Neolithic Karahantepe / Karahantepe Çanak-Çömleksiz Neolitik Dönem Gömü Yapıları. Türk Arkeoloji ve Etnografya Dergisi 86.",
+    "url": "https://en.wikipedia.org/wiki/Karahan_Tepe",
+    "note": "Unchecked: listings disagree on pages (19–31 vs 21–31); the article was not seen; the url is the encyclopedia entry that lists it. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "kenny-2022",
+    "kind": "paper",
+    "year": 2022,
+    "citation": "Kenny, G. G., Hyde, W. R., Storey, M., Garde, A. A., Whitehouse, M. J., Beck, P. et al. (2022). A Late Paleocene age for Greenland's Hiawatha impact structure. Science Advances 8(10), eabm2434.",
+    "url": "https://doi.org/10.1126/sciadv.abm2434",
+    "note": "Peer-reviewed. Unchecked: via Wikipedia (about 58 million years). Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "kinzel-clare-2020",
+    "kind": "critique",
+    "year": 2020,
+    "citation": "Kinzel, M. & Clare, L. (2020). Monumental – compared to what? A perspective from Göbekli Tepe. In Gebauer, A. B., Sørensen, L., Teather, A. & Valera, A. C. (eds.), Monumentalising Life in the Neolithic. Oxford: Oxbow, 29–48.",
+    "url": "https://doi.org/10.2307/j.ctv13pk66m.7",
+    "note": "Edited volume. Unchecked: the chapter was not read. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "pinter-2011",
+    "kind": "critique",
+    "year": 2011,
+    "citation": "Pinter, N., Scott, A. C., Daulton, T. L., Podoll, A., Koeberl, C., Anderson, R. S. & Ishman, S. E. (2011). The Younger Dryas impact hypothesis: A requiem. Earth-Science Reviews 106(3–4), 247–264.",
+    "url": "https://doi.org/10.1016/j.earscirev.2011.02.005",
+    "note": "Peer-reviewed. Unchecked: citation via Wikipedia; the DOI, given from memory in the brief, resolves. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "saa-2022",
+    "kind": "critique",
+    "year": 2022,
+    "citation": "Society for American Archaeology (D. Sandweiss, President) (2022, 30 November). Open letter to Netflix and ITN Productions concerning Ancient Apocalypse.",
+    "url": "https://documents.saa.org/container/docs/default-source/doc-governmentaffairs/saa-letter-ancient-apocalypse.pdf",
+    "note": "Not peer-reviewed. Unchecked: the PDF failed on TLS; date and addressees confirmed via hancock-2023-saa; wording via secondary sources. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schmidt-2010",
+    "kind": "paper",
+    "year": 2010,
+    "citation": "Schmidt, K. (2010). Göbekli Tepe – the Stone Age Sanctuaries. New results of ongoing excavations with a special focus on sculptures and high reliefs. Documenta Praehistorica 37, 239–256.",
+    "url": "https://doi.org/10.4312/dp.37.21",
+    "note": "Peer-reviewed. Unchecked: not read; the DOI, given from memory in the brief, resolves. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "schoch-2012",
+    "kind": "proponent",
+    "year": 2012,
+    "citation": "Schoch, R. M. (2012). Forgotten Civilization: The Role of Solar Outbursts in Our Past and Future. Rochester, VT: Inner Traditions.",
+    "note": "Not peer-reviewed. Unchecked: publisher blurbs for the expanded edition only. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "sweatman-2024",
+    "kind": "proponent",
+    "year": 2024,
+    "citation": "Sweatman, M. B. (2024). Representations of calendars and time at Göbekli Tepe and Karahan Tepe support an astronomical interpretation of their symbolism. Time and Mind 17(3–4), 191–247.",
+    "url": "https://doi.org/10.1080/1751696X.2024.2373876",
+    "note": "Peer-reviewed. Unchecked: publisher returned 403; content from press coverage. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "sweatman-2024-rebuttal",
+    "kind": "proponent",
+    "year": 2024,
+    "citation": "Sweatman, M. B., Powell, J. L. & West, A. (2024). Rebuttal of Holliday et al.'s comprehensive Gish gallop of the Younger Dryas impact hypothesis. Airbursts and Cratering Impacts 2(1).",
+    "url": "https://doi.org/10.14293/ACI.2024.0007",
+    "note": "In a journal associated with the proponents. Unchecked: the content. Crossref lists three authors (Sweatman, Powell, West); the brief's fourth (Young) is not in it. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "thy-2015",
+    "kind": "critique",
+    "year": 2015,
+    "citation": "Thy, P., Willcox, G., Barfod, G. H. & Fuller, D. Q. (2015). Anthropogenic origin of siliceous scoria droplets from Pleistocene and Holocene archaeological sites in northern Syria. Journal of Archaeological Science 54, 193–209.",
+    "url": "https://doi.org/10.1016/j.jas.2014.11.027",
+    "note": "Peer-reviewed. Unchecked: from search summary; the paper was not read. Title, journal, volume and pages confirmed against Crossref on 2026-10-20; the content is not. From docs/research/ch7.md, by its research job; not yet checked here."
+  },
+  {
+    "id": "natural-earth-5.1.2",
+    "kind": "reference",
+    "year": 2022,
+    "citation": "Natural Earth (2022). 1:50m Physical Vectors: Coastline, and Rivers + lake centerlines, version 5.1.2. Public domain.",
+    "url": "https://github.com/nvkelso/natural-earth-vector/tree/v5.1.2/geojson",
+    "note": "Data files, imported by scripts/basemap.ts into data/places/basemap.json, cut to 27-42° E, 27-39° N for chapter 7's map inset; context, not evidence. Fetched 2026-10-20 from the v5.1.2 tag to build/basemap/ (not in the repo): ne_50m_coastline.geojson, 1640858 bytes, sha256 271f1c4c1908312bac6b29d158ea1356544beafc129f260005300913aa5ea283; ne_50m_rivers_lake_centerlines.geojson, 827318 bytes, sha256 f286e0ce978fde999ca2d7a78c764be08542e19b63cded52b05c12d5173ccc51. Natural Earth asks no attribution; the page credits it anyway."
+  },
+  {
+    "id": "unesco-whc-1572",
+    "kind": "reference",
+    "year": 2018,
+    "citation": "UNESCO World Heritage Centre. Göbekli Tepe (World Heritage List no. 1572, inscribed 2018).",
+    "url": "https://whc.unesco.org/en/list/1572",
+    "note": "The property's coordinates, N37 13 23.671 E38 55 20.51, read on the list page on 2026-10-20 by the night builder (chunk 6); the point is the property's, not Enclosure D's."
+  },
+  {
+    "id": "wikipedia-abu-hureyra",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Tell Abu Hureyra. Wikipedia, revision as of 3 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Tell_Abu_Hureyra",
+    "note": "The coordinates 35°51′58″N 38°24′00″E, read 2026-10-20 (chunk 6). An encyclopedia, cited only for where a map puts the site: Moore et al. 2020 give no coordinates, only that it lay on the Euphrates' south-west bank, now under Lake Assad. Replace with an excavation report's figure when one is found."
+  },
+  {
+    "id": "haklay-gopher-2020",
+    "kind": "paper",
+    "year": 2020,
+    "citation": "Haklay, G. & Gopher, A. (2020). Geometry and Architectural Planning at Göbekli Tepe, Turkey. Cambridge Archaeological Journal 30(2), 343–357.",
+    "url": "https://doi.org/10.1017/S0959774319000660",
+    "note": "Peer-reviewed. CC BY-NC-ND 4.0 (Crossref's licence record). Read on 2026-10-20 in the publisher's PDF (sha256 4c784437743d4fa8fd6dea20968c0b929fbc2d73db38de30b6084bbea56a78a5): Enclosure D's dimensions on p. 347; Fig. 1 (p. 344), the main excavation area's schematic plan modified from O. Dietrich et al. 2014, with a 5 m scale bar and a north arrow, embedded at 485 by 672 px. Their geometric reading (an equilateral triangle of about 19.25 m through the centres of B, C and D, p. 350) is an interpretation, not a measurement. Fig. 1 is hosted unaltered in assets/plates/haklay-gopher-2020/ with the licence and attribution (Seked is non-commercial, Stewart, 20 October 2026)."
+  },
+  {
+    "id": "petrie-1892",
+    "kind": "survey",
+    "year": 1892,
+    "citation": "Petrie, W. M. F. (1892). Medum. London: D. Nutt.",
+    "note": "Not read here. Cited by dash-2017 (Table 3, p. 7, note 23: p. 6) for the casing alignments of the Meidum pyramid."
+  },
+  {
+    "id": "dorner-1986",
+    "kind": "paper",
+    "year": 1986,
+    "citation": "Dorner, J. (1986). Form und Ausmaße der Knickpyramide. Mitteilungen des Deutschen Archäologischen Instituts, Abteilung Kairo 42, 43-58.",
+    "note": "Not read here; the title is as the literature cites it, unchecked. Cited by dash-2017 (Table 3, p. 7, note 24: p. 51) for the Bent Pyramid's casing alignments."
+  },
+  {
+    "id": "dorner-1998",
+    "kind": "paper",
+    "year": 1998,
+    "citation": "Dorner, J. (1998). Die Absteckung und astronomische Orientierung ägyptischer Pyramiden. In: Stadelmann, R. (ed.), Die Rote Pyramide, cited by Dash (2017) as Dorner (1998), p. 23.",
+    "note": "Not read here and its full reference unchecked: dash-2017's bibliography is the only one consulted. Cited there (Table 3, p. 7, note 25: p. 23) for the Red Pyramid's east side."
+  },
+  {
+    "id": "wikidata-pyramid-coordinates",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikidata contributors. Meidum Pyramid (Q13444093), Bent Pyramid (Q459608), Red Pyramid (Q135332): coordinate location (P625). CC0.",
+    "url": "https://www.wikidata.org/wiki/Q135332",
+    "note": "Read through Special:EntityData on 2026-10-21 by the night builder (chunk 10), revisions 2543417441, 2527335327 and 2555589926: Meidum 29.38833333 N 31.15694444 E (precision one arc second), the Bent 29.790277777778 N 31.209166666667 E, the Red 29.808333333333 N 31.205833333333 E (no precision given). Cited only for where the sites' origins sit; nothing measured is taken from it."
+  },
+  {
+    "id": "greenberg-rhind",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Greenberg, M. J. The Rhind Mathematical Papyrus: problems 56 to 60 (a summary after Chace's edition). University of Washington, Department of Mathematics.",
+    "url": "https://sites.math.washington.edu/~greenber/Rhind.html",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 11), not the page itself: problem 56 gives a base of 360 and a height of 250 (cubits) and finds the seked 5 1/25 palms; 57 and 58 use 5 palms 1 finger; 59 gives 5 palms 2 fingers and 5 palms 1 finger; 60 is a pillar at 4 palms. The papyrus is Ahmes's copy of about 1650 BCE of a Twelfth Dynasty original. A secondary web summary; Peet (1923), Chace or Robins and Shute (1987) is the edition to check against. The author's full name and the page's date are unchecked."
+  },
+  {
+    "id": "alison-great-circle",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Alison, J. A New Look at an Old Design: The Prehistoric Alignment of World Wonders. Part 1, Great Circle. Self-published web pages, undated.",
+    "url": "http://home.hiwaay.net/~jalison/",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12), not the page itself: the table of sites near the circle (seventeen rows, latitude and longitude in degrees and minutes, distance to the circle and to the axis point in miles), the axis points 59 53 N 138 36 W and 59 53 S 41 24 E, and the tolerance sentences. Hancock draws on this circle in Heaven's Mirror (1998). The page's degree signs are garbled in its encoding; the figures to check against the page itself. data/places/great-circle.json."
+  },
+  {
+    "id": "wikidata-world-heritage",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikidata. Items with a UNESCO World Heritage Site id (P757) and coordinates (P625), with their World Heritage criteria (P2614), through the Wikidata Query Service.",
+    "url": "https://query.wikidata.org/",
+    "license": "CC0 1.0",
+    "note": "Queried on 2026-10-21 by the night builder (chunk 12) with the query in scripts/worldheritage.ts; the response's sha256 is c3bf0b2a45d6366641aaa691999e96e87d4a2b1ce5caa5c793b2766f825bc97d (6,430 rows). The script keeps whole properties with a cultural criterion, one point each. Wikidata's points are its editors' and its criteria are not checked here against UNESCO's own list; the count of kept properties is near the List's cultural and mixed total. data/places/world-heritage.json."
+  },
+  {
+    "id": "wikipedia-giza-pyramid-complex",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Giza pyramid complex. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Giza_pyramid_complex",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-siwa-oasis",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Siwa Oasis. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Siwa_Oasis",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-tassili-najjer",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Tassili n'Ajjer. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Tassili_n%27Ajjer",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "everybodywiki-paratoari",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "EverybodyWiki contributors. Paratoari. EverybodyWiki, as of 21 October 2026.",
+    "url": "https://en.everybodywiki.com/Paratoari",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-ollantaytambo",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Ollantaytambo. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Ollantaytambo",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-machu-picchu",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Machu Picchu. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Machu_Picchu",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-nazca-lines",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Nazca Lines. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Nazca_Lines",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-easter-island",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Easter Island. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Easter_Island",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-aneityum",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Aneityum. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Aneityum",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-preah-vihear-temple",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Preah Vihear Temple. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Preah_Vihear_Temple",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-sukhothai-historical-park",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Sukhothai Historical Park. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Sukhothai_Historical_Park",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-sri-ksetra-kingdom",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Sri Ksetra Kingdom. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Sri_Ksetra_Kingdom",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-khajuraho-group-of-monuments",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Khajuraho Group of Monuments. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Khajuraho_Group_of_Monuments",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-mohenjo-daro",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Mohenjo-daro. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Mohenjo-daro",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-persepolis",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Persepolis. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Persepolis",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-ur",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Ur. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Ur",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-petra",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Petra. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Petra",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
   }
 ]

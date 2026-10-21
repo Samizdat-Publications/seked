@@ -60,6 +60,30 @@
       "port": 5190
     },
     {
+      "name": "story",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5195",
+        "--strictPort"
+      ],
+      "port": 5195,
+      "cwd": "apps/story"
+    },
+    {
+      "name": "exhibit",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--port",
+        "5196",
+        "--strictPort"
+      ],
+      "port": 5196,
+      "cwd": "apps/exhibit"
+    },
+    {
       "name": "site",
       "runtimeExecutable": "python",
       "runtimeArgs": [

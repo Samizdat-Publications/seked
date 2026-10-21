@@ -19,7 +19,7 @@ const OFFSET_DIRECTIONS = ['east', 'north', 'west', 'south'] as const;
  * claim can name `sphinx.centre.offset.east` beside `g2.centre.offset.west`
  * and not care which way the position was come by.
  *
- * The conversion is the flat one D1 uses for the bearing to Heliopolis:
+ * The conversion is the azimuthal equidistant projection (below); it was once the flat one D1 used for the bearing to Heliopolis:
  * north is the difference in latitude and east the difference in longitude
  * times the cosine of the origin's latitude, both scaled by the mean Earth
  * radius. It ignores the ellipsoid, which at 30° N has a meridional radius of
@@ -32,12 +32,25 @@ const OFFSET_DIRECTIONS = ['east', 'north', 'west', 'south'] as const;
  * The origin is `g1.center.latitude` and `g1.center.longitude`, which is the
  * frame's own origin, so the Great Pyramid falls out of it at (0, 0) exactly.
  */
+/**
+ * East and north on the azimuthal equidistant projection about the origin: the great-circle distance laid out along
+ * the true initial bearing, so a bearing or a distance from Giza read off these offsets is exact on the sphere at any
+ * range. Until 21 October 2026 this was the flat (dlon cos lat0, dlat) conversion, which near the plateau agrees to
+ * well under a millimetre but put the bearings to the Delta's ends half a degree out (Argon's audit).
+ */
+export function azimuthalEquidistant(lat0: number, lon0: number, lat: number, lon: number, radius: number): [number, number] {
+  const p0 = lat0 * DEG, p = lat * DEG, dl = (lon - lon0) * DEG;
+  const cosc = Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(dl);
+  const c = Math.acos(Math.min(1, Math.max(-1, cosc)));
+  const az = Math.atan2(Math.sin(dl) * Math.cos(p), Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(dl));
+  return [radius * c * Math.sin(az), radius * c * Math.cos(az)];
+}
+
 function deriveCentreOffsets(env: Environment): void {
   const lat0 = env['g1.center.latitude'];
   const lon0 = env['g1.center.longitude'];
   const radius = env['earth.radius.mean'];
   if (lat0 === undefined || lon0 === undefined || radius === undefined) return;
-  const metresPerDegree = radius * DEG;
   for (const key of Object.keys(env)) {
     const match = /^(.+)\.center\.latitude$/.exec(key);
     if (!match) continue;
@@ -46,9 +59,29 @@ function deriveCentreOffsets(env: Environment): void {
     const longitude = env[`${structure}.center.longitude`];
     if (longitude === undefined) continue;
     if (OFFSET_DIRECTIONS.some((d) => env[`${structure}.centre.offset.${d}`] !== undefined)) continue;
-    env[`${structure}.centre.offset.east`] = (longitude - lon0) * Math.cos(lat0 * DEG) * metresPerDegree;
-    env[`${structure}.centre.offset.north`] = (latitude - lat0) * metresPerDegree;
+    const [east, north] = azimuthalEquidistant(lat0, lon0, latitude, longitude, radius);
+    env[`${structure}.centre.offset.east`] = east;
+    env[`${structure}.centre.offset.north`] = north;
   }
+}
+
+/**
+ * The ellipsoid's derived sizes from its two defining numbers, the equatorial radius and the inverse flattening
+ * (WGS84 defines a and 1/f; storing b, the mean radius and the circumferences beside them broke the rule that
+ * nothing derived is stored, Argon's audit of 21 October 2026). The mean radius is IUGG's R1 = (2a + b) / 3; the
+ * meridional circumference is the ellipse's perimeter by Ramanujan's second approximation, good to well under a
+ * millimetre at this flattening. blender/seked_data.py `earth` does the same.
+ */
+function deriveEarth(env: Environment): void {
+  const a = env['earth.radius.equatorial'];
+  const invf = env['earth.inverse_flattening'];
+  if (a === undefined || invf === undefined) return;
+  const b = a * (1 - 1 / invf);
+  const h = ((a - b) / (a + b)) ** 2;
+  env['earth.radius.polar'] ??= b;
+  env['earth.radius.mean'] ??= (2 * a + b) / 3;
+  env['earth.circumference.equatorial'] ??= 2 * Math.PI * a;
+  env['earth.circumference.meridional'] ??= Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
 }
 
 /**
@@ -62,6 +95,7 @@ const STRUCTURES = ['g1', 'g2', 'g3'] as const;
 
 export function buildEnvironment(measured: Record<string, number>): Environment {
   const env: Environment = { ...measured };
+  deriveEarth(env);
 
   for (const s of STRUCTURES) {
     const base = env[`${s}.base.side.mean`];
@@ -93,9 +127,42 @@ export function buildEnvironment(measured: Record<string, number>): Environment 
   }
 
   deriveCentreOffsets(env);
+  deriveHawara(env);
 
   return env;
 }
+
+/**
+ * Hawara, as Petrie derived it (petrie-1890, p. 13): the finished base is the
+ * brick base plus the casing on both sides, and the height follows from it and
+ * the casing angle. He measured only the brick base; the casing and the angle
+ * are his readings, so the base and height are computed here, never stored.
+ * The Labyrinth's chip bed gets its area and its ratio to Khufu's base.
+ */
+function deriveHawara(env: Environment): void {
+  const brick = env['hawara.pyramid.base.side.brick'];
+  const casing = env['hawara.pyramid.casing.thickness'];
+  const angle = env['hawara.pyramid.casing.angle'];
+  if (brick !== undefined && casing !== undefined) {
+    const side = brick + 2 * casing;
+    env['hawara.pyramid.base.side.cased'] = side;
+    if (angle !== undefined) env['hawara.pyramid.height.original'] = (side / 2) * Math.tan((angle * Math.PI) / 180);
+  }
+  const length = env['hawara.labyrinth.chipbed.length'];
+  const width = env['hawara.labyrinth.chipbed.width'];
+  if (length !== undefined && width !== undefined) {
+    env['hawara.labyrinth.chipbed.area'] = length * width;
+    const g1 = env['g1.base.area'];
+    if (g1 !== undefined) env['hawara.labyrinth.chipbed.ratio.g1'] = (length * width) / g1;
+  }
+}
+
+const HAWARA_INPUTS: Record<string, readonly string[]> = {
+  'hawara.pyramid.base.side.cased': ['hawara.pyramid.base.side.brick', 'hawara.pyramid.casing.thickness'],
+  'hawara.pyramid.height.original': ['hawara.pyramid.base.side.brick', 'hawara.pyramid.casing.thickness', 'hawara.pyramid.casing.angle'],
+  'hawara.labyrinth.chipbed.area': ['hawara.labyrinth.chipbed.length', 'hawara.labyrinth.chipbed.width'],
+  'hawara.labyrinth.chipbed.ratio.g1': ['hawara.labyrinth.chipbed.length', 'hawara.labyrinth.chipbed.width', 'g1.base.side.mean'],
+};
 
 /** What each derived quantity of a structure is computed from, by the suffix after its id. */
 const PROFILE_INPUTS: Record<string, readonly string[]> = {
@@ -129,6 +196,7 @@ export function recordsBehind(key: string, measured: Record<string, number>): st
     const inputs = PROFILE_INPUTS[suffix];
     if (inputs) return inputs.map((s) => `${structure}.${s}`);
   }
+  if (key in HAWARA_INPUTS) return [...(HAWARA_INPUTS[key] as readonly string[])];
   if (key === 'g1.base.socket.mean') return ['north', 'east', 'south', 'west'].map((d) => `g1.base.socket.${d}`);
   if (key === 'g1.base.socket.perimeter') {
     return 'g1.base.socket.mean' in measured ? ['g1.base.socket.mean'] : recordsBehind('g1.base.socket.mean', measured);

@@ -1,0 +1,14 @@
+{
+  "note": "Places the story's maps name that are not sites: no datum, no frame, no measurements, nothing modelled. Context, as the modern city is. Coordinates are entered as their sources print them, degrees, minutes and seconds north and east, and converted by code. Giza and Göbekli Tepe are not here: their points are their sites' origins in data/sites.json. A place that becomes a site moves there, as Göbekli Tepe did when Enclosure D's records went in. verified stays false until read again on the cited page.",
+  "places": [
+    {
+      "id": "abu-hureyra",
+      "name": "Abu Hureyra",
+      "latitude": [35, 51, 58],
+      "longitude": [38, 24, 0],
+      "source": "wikipedia-abu-hureyra",
+      "verified": false,
+      "note": "The tell lay on the Euphrates' south-west bank and has been under Lake Assad since the Tabqa dam closed in the 1970s; a point good to the seconds the encyclopedia gives."
+    }
+  ]
+}

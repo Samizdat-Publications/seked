@@ -188,7 +188,16 @@ class Plateau:
         """Point the camera at a shot or stand it at a station; rebuild the ground at its feet."""
         self._clear_view()
         x, y = v["x"], v["y"]
-        z = v["z"] if "z" in v else float(self.terrain.surface([x], [y])[0]) + v.get("eye", 1.7)
+        # A station on a roof (`roof`) stands its eye over the drawn building there, read from the city's own
+        # records, so the height is never typed into the station; in an era without the city, over the ground.
+        roof = 0.0
+        if v.get("roof") and self.spec["city"] == "city":
+            r = city.roof_at(x, y)
+            if r is None:
+                raise ValueError(f"{v['id']}: no drawn building at ({x}, {y}) to stand on")
+            roof = r["height"]
+            self.log(f"{v['id']}: on the roof of city record {r['record']}, {roof:.1f} m ({'measured' if r['measured'] else 'not measured'})")
+        z = v["z"] if "z" in v else float(self.terrain.surface([x], [y])[0]) + roof + v.get("eye", 1.7)
         self.inside = bool(v.get("inside"))
         if self.inside and self.inside_lamps is None:
             self.inside_lamps = interior.build(self.state, self._coll("inside"), self.mats, self.log)
@@ -253,6 +262,9 @@ class Plateau:
             if self.night is None:
                 self.night = night.Night(self.scene, self.scene.world.node_tree, self.log)
             n = self.night.show(m["night"], tuple(self.camera.location))
+            if m.get("stars") is False:
+                # the night's dark and airglow without its stars or Milky Way: the exhibit draws the sky over it live
+                self.night.hide_stars()
             alt, az = (n["sun"]["altitudeDeg"], n["sun"]["azimuthDeg"]) if n else (-30.0, 0.0)
             self.sky.set_sun(alt, az)
             self.sky.sun.data.energy = 0.0

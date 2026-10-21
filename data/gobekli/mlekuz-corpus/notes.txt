@@ -1,0 +1,1823 @@
+pillar 1
+building A
+central_pillar
+front_side:
+shaft:
+1 snake faces down
+2 snake faces down
+3 snake faces down
+4 snake faces down
+5 snake faces up
+1 snake above 4 snake
+2 snake above 4 snake
+1 snake next_to 2 snake
+2 snake next_to 3 snake
+4 snake above 5 snake
+right_broadside:
+shaft:
+6 snake faces up
+7 snake faces up
+8 snake faces up
+9 snake faces up
+10 snake faces up
+11 snake faces up
+12 snake faces up
+13 snake faces up
+14 snake faces down
+15 snake faces down
+16 snake faces down
+17 snake faces down
+18 snake faces down
+19 snake faces down
+20 snake faces down
+21 snake faces down
+22 snake faces down
+6  snake part_of  23 snake_pattern
+7  snake part_of  23 snake_pattern
+8  snake part_of  23 snake_pattern
+9  snake part_of  23 snake_pattern
+10 snake part_of  23 snake_pattern
+11 snake part_of  23 snake_pattern
+12 snake part_of  23 snake_pattern
+13 snake part_of  23 snake_pattern
+14 snake part_of  23 snake_pattern
+15 snake part_of  23 snake_pattern
+16 snake part_of  23 snake_pattern
+17 snake part_of  23 snake_pattern
+18 snake part_of  23 snake_pattern
+19 snake part_of  23 snake_pattern
+20 snake part_of  23 snake_pattern
+21 snake part_of  23 snake_pattern
+22 snake part_of  23 snake_pattern
+23 snake_pattern is net
+23 snake_pattern is arrangement
+23 snake_pattern position top
+23 snake_pattern  above 24 quadruped
+24 quadruped faces left
+24 quadruped shows horns
+24 quadruped is mouflon
+
+pillar 2
+building A
+central_pillar
+was_modified
+front_side:
+shaft:
+1 bucranium faces down
+1 bucranium position top
+left_broadside:
+shaft:
+2 aurochs faces right
+2 aurochs depicted sideview
+2 aurochs shows horns
+2 aurochs above 3 fox
+3 fox faces right
+3 fox shows teeth
+3 fox above 4 crane
+4 crane faces right
+4 crane next_to 5 bird
+5 bird faces right
+4 crane is_larger_than 5 bird
+mod1 type modification
+mod1 cuts 2 aurochs
+mod1 cuts unknown_motif
+3 fox part_of mod1
+4 crane part_of mod1
+5 bird part_of mod1
+
+pillar 5
+building A
+wall_pillar
+front_side:
+shaft:
+1 snake faces down
+1 snake position top
+
+pillar 3
+building A
+wall_pillar
+not_fully_excavated
+was_modified
+right_broadside:
+shaft:
+1 quadruped faces left
+1 quadruped is_maybe fox
+mod1 type modification
+mod1 cuts 1 quadruped
+mod1 erased 1 quadruped
+
+pillar 10
+building B
+central_pillar
+was_modified
+left_broadside:
+shaft:
+1 fox faces left
+1 fox position top
+1 fox shows phallus
+1 fox shows flexed_legs
+1 fox shows teeth
+1 fox above 2 quadruped
+1 fox is_larger_than 2 quadruped
+2 quadruped is_maybe boar
+2 quadruped faces left
+2 quadruped next_to 3 quadruped
+1 fox is_larger_than 3 quadruped
+3 quadruped faces left
+2 quadruped above 4 quadruped
+4 quadruped faces left
+1 fox is_larger_than 4 quadruped
+4 quadruped above 5 quadruped
+1 fox is_larger_than 5 quadruped
+5 quadruped faces left
+5 quadruped above 6 quadruped
+6 quadruped faces left
+1 fox is_larger_than 6 quadruped
+6 quadruped above 7 quadruped
+7 quadruped faces right
+1 fox is_larger_than 7 quadruped
+mod1 type modification
+mod1 affects 2 quadruped
+mod1 affects 3 quadruped
+mod1 affects 4 quadruped
+mod1 affects 5 quadruped
+mod1 affects 6 quadruped
+
+pillar 9
+building B
+central_pillar
+was_modified
+right_broadside:
+shaft:
+1 fox faces right
+1 fox position top
+1 fox shows flexed_legs
+1 fox shows teeth
+mod1 type modification
+1 fox part_of mod1
+
+pillar 6
+building B
+wall_pillar
+not_fully_excavated
+front_side:
+head:
+1 quadruped faces down
+1 quadruped depicted topview
+1 quadruped is_maybe leopard
+1 quadruped faces_toward  2 snake
+shaft:
+2 snake position top
+2 snake faces down
+
+pillar 14
+building B
+wall_pillar
+not_fully_excavated
+right_broadside:
+head:
+1 quadruped faces right
+1 quadruped is_maybe fox
+rear_side:
+head:
+2 snake faces unknown
+
+pillar 62
+building B
+wall_pillar
+not_fully_excavated
+was_modified
+front_side:
+head:
+1 snake faces unknown
+mod1 type modification
+mod1 erased 1 snake
+
+
+pillar 37
+building C
+central_pillar
+was_modified
+left_broadside:
+shaft:
+1 fox faces left
+1 fox shows flexed_legs
+mod1 type modification
+mod1 affects 2 quadruped
+2 quadruped is_maybe fox
+mod1 erased 2 quadruped
+1 fox part_of mod1
+
+pillar 35
+building C
+central_pillar
+was_modified
+right_broadside:
+shaft:
+1 quadruped faces right
+1 quadruped shows straight_legs
+1 quadruped is_maybe aurochs
+mod1 type modification
+mod1 affects 1 quadruped
+
+pillar 11
+building C
+wall_pillar
+outer_wall
+was_modified
+right_broadside:
+shaft:
+1 quadruped faces right
+1 quadruped is_maybe bear
+mod1 type modification
+mod1 affects 1 large_predator
+
+pillar 12
+building C
+wall_pillar
+outer_wall
+not_fully_excavated
+right_broadside:
+head:
+1 bird faces right
+2 bird faces right
+3 bird faces right
+4 bird faces right
+5 bird faces right
+6 bird faces right
+7 bird faces right
+3 bird above 2 bird
+3 bird above 4 bird
+3 bird above 5 bird
+2 bird above 1 bird
+4 bird above 5 bird
+5 bird above 6 bird
+6 bird above 7 bird
+1 bird is_maybe vulture
+2 bird is_maybe vulture
+3 bird is_maybe vulture
+4 bird is_maybe vulture
+5 bird is_maybe vulture
+6 bird is_maybe vulture
+7 bird is_maybe vulture
+1 bird part_of 8 bird_pattern
+2 bird part_of 8 bird_pattern
+3 bird part_of 8 bird_pattern
+4 bird part_of 8 bird_pattern
+5 bird part_of 8 bird_pattern
+6 bird part_of 8 bird_pattern
+7 bird part_of 8 bird_pattern
+8 bird_pattern is arrangement
+8 bird_pattern is flock
+8 bird_pattern above 11 stone_cluster
+9 net_pattern is arrangement
+9 net_pattern is net
+9 net_pattern above 8 bird_pattern
+11 stone_cluster is arrangement
+shaft:
+12 boar faces right
+13 boar faces right
+12 boar above 13 boar
+12 boar is_larger_than 13 boar
+12 boar shows teeth
+12 boar shows phallus
+
+
+pillar 45
+building C
+wall_pillar
+outer_wall
+not_fully_excavated
+was_modified
+front_side:
+shaft:
+1 aurochs faces up
+1 aurochs depicted topview
+1 aurochs shows horns
+
+pillar 23
+building C
+wall_pillar
+outer_wall
+not_fully_excavated
+was_modified
+left_broadside:
+shaft:
+1 boar faces left
+1 boar shows teeth
+right_broadside:
+head:
+2 bird faces right
+3 bird faces right
+4 bird faces right
+2 bird faces_toward 3 bird
+3 bird faces_toward 4 bird
+2 bird next_to 3 bird
+3 bird next_to 4 bird
+2 bird is_maybe vulture
+3 bird is_maybe vulture
+4 bird is_maybe vulture
+mod1 type modification
+mod1 affects 2 bird
+rear_side:
+head:
+5 human_face is_maybe human
+5 human_face is_maybe face
+
+
+pillar 24
+building C
+wall_pillar
+inner_wall
+not_fully_excavated
+was_modified
+right_broadside:
+shaft:
+1 quadruped faces right
+1 quadruped is_maybe leopard
+1 quadruped is_maybe fox
+1 quadruped shows teeth
+mod1 type modification
+1 quadruped part_of mod1
+
+pillar 13
+building C
+wall_pillar
+inner_wall
+not_fully_excavated
+was_modified
+right_broadside:
+shaft:
+1 quadruped faces right
+
+pillar 27
+building C
+wall_pillar
+inner_wall
+not_fully_excavated
+front_side:
+shaft:
+1 leopard faces down
+1 leopard shows teeth
+1 leopard position top
+1 leopard faces_toward 2 boar
+1 leopard depicted full
+1 leopard depicted topview
+2 boar depicted sideview
+left_broadside:
+shaft:
+3 quadruped faces left
+3 quadruped is_maybe leopard
+
+pillar 28
+building C
+wall_pillar
+inner_wall
+not_fully_excavated
+was_modified
+front_side:
+head:
+1 boar faces right
+1 boar position top
+1 boar depicted sideview
+shaft:
+2 crescent above 3 h_motif
+3 h_motif above 4 crescent
+2 crescent part_of 5 abstract_pattern
+3 h_motif part_of 5 abstract_pattern
+4 crescent part_of 5 abstract_pattern
+5 abstract_pattern is arrangement
+5 abstract_pattern above 9 h_motif
+9 h_motif depicted rotated
+right_broadside:
+head:
+6 boar above 7 boar
+6 boar faces left
+shaft:
+7 boar faces right
+7 boar above 8 boar
+8 boar faces left
+6 boar depicted sideview
+7 boar depicted sideview
+8 boar depicted sideview
+
+pillar 29
+building C
+wall_pillar
+inner_wall
+not_fully_excavated
+front_side:
+shaft:
+1 h_motif position middle
+right_broadside:
+head:
+2 bird faces right
+2 bird is_maybe crane
+
+pillar 26
+building C
+wall_pillar
+inner_wall
+not_fully_excavated
+was_modified
+front_side:
+head:
+1 boar faces right
+1 boar above 2 bucranium
+1 boar shows phallus
+shaft:
+2 bucranium position top
+mod1 type modification
+mod1 erased 2 bucranium
+
+
+pillar 40
+building C
+wall_pillar
+inner_wall
+was_modified
+front_side:
+shaft:
+1 necklace position top
+1 necklace above 2 necklace
+2 necklace above 3 hands
+right_broadside:
+shaft:
+4 arms faces right
+left_broadside:
+shaft:
+5 arms faces left
+mod1 type modification
+mod1 erased 5 arms
+
+pillar 36
+building C
+wall_pillar
+inner_wall
+was_modified
+not_fully_excavated
+right_broadside:
+shaft:
+1 unknown above 3 unknown
+2 unknown faces right
+3 unknown is_maybe bird
+3 unknown faces right
+2 unknown above 4 bird
+4 bird faces right
+4 bird above 5 crane
+5 crane faces right
+5 crane above 6 boar
+6 boar faces right
+mod1 type modification
+mod1 erased 1 unknown
+mod1 erased 2 unknown
+
+pillar 31
+building D
+central_pillar
+was_modified
+front_side:
+shaft:
+1 necklace position top
+1 necklace above 2 necklace
+2 necklace above 3 bucranium
+1 necklace part_of 7 neck_ornament
+2 necklace part_of 7 neck_ornament
+3 bucranium part_of 7 neck_ornament
+7 neck_ornament is arrangement
+7 neck_ornament above 4 hands
+4 hands above 5 belt
+5 belt above 6 loincloth
+6 loincloth shows pelt
+6 loincloth shows tail
+6 loincloth is_maybe fox
+5 belt visible_on front_side
+5 belt visible_on right_broadside
+5 belt visible_on left_broadside
+5 belt visible_on back_side
+right_broadside:
+shaft:
+8 arms faces right
+8 arms above 5 belt
+mod1 type modification
+mod1 erased 11 unknown
+left_broadside:
+shaft:
+9 arms faces left
+9 arms above 5 belt
+10 aurochs depicted_on 5 belt
+mod1 type modification
+mod1 erased 14 unknown
+back_side:
+shaft:
+mod1 type modification
+mod1 erased 12 unknown
+12 unknown  is_maybe snake
+mod1 erased 13 arthropod
+mod1 erased 14 arthropod
+12 unknown above 13 arthropod
+13 arthropod above 14 arthropod
+5 belt part_of 15 belt_ornament
+6 loincloth part_of 15 belt_ornament
+15 belt_ornament is arrangement
+
+
+pillar 18
+building D
+central_pillar
+was_modified
+front_side:
+shaft:
+1 necklace position top
+2 h_motif depicted_on 1 necklace
+2 h_motif above 3 circular_motif
+3 circular_motif above 4 crescent
+1 necklace part_of 5 neck_ornament
+2 h_motif part_of 5 neck_ornament
+3 circular_motif part_of 5 neck_ornament
+4 crescent part_of 5 neck_ornament
+3 bucranium part_of 5 neck_ornament
+5 neck_ornament is arrangement
+5 neck_ornament above 6 hands
+6 hands above 7 belt
+7 belt above 8 loincloth
+9 h_motif depicted_on 7 belt
+10 h_motif depicted_on 7 belt
+11 h_motif depicted_on 7 belt
+9 h_motif above 10 h_motif
+10 h_motif above 11 h_motif
+12 h_motif depicted_on 7 belt
+13 h_motif depicted_on 7 belt
+12 h_motif above 13 h_motif
+8 loincloth is pelt
+8 loincloth shows tail
+8 loincloth is_maybe fox
+7 belt visible_on front_side
+7 belt visible_on right_broadside
+7 belt visible_on left_broadside
+right_broadside:
+shaft:
+14 arms faces right
+14 arms above 7 belt
+15 quadruped faces right
+15 quadruped shows flexed_legs
+15 quadruped is_maybe fox
+15 quadruped position right
+16 crescent  depicted_on 7 belt
+17 crescent  depicted_on 7 belt
+18 h_motif depicted_on 7 belt
+19 crescent  depicted_on 7 belt
+mod1 type modification
+mod1 erased 20 arms
+left_broadside:
+shaft:
+21 arms faces left
+21 arms above 7 belt
+22 crescent  depicted_on 7 belt
+23 h_motif depicted_on 7 belt
+24 crescent  depicted_on 7 belt
+mod1 type modification
+mod1 erased 25 arms
+base:
+front_side:
+25 bird faces left
+26 bird faces left
+27 bird faces left
+28 bird faces left
+29 bird faces left
+30 bird faces left
+31 bird faces left
+25 bird part_of 32 bird_ornament
+26 bird part_of 32 bird_ornament
+27 bird part_of 32 bird_ornament
+28 bird part_of 32 bird_ornament
+29 bird part_of 32 bird_ornament
+30 bird part_of 32 bird_ornament
+31 bird part_of 32 bird_ornament
+32 bird_ornament is arrangement
+7 belt part_of 33 belt_ornament
+8 loincloth part_of 33 belt_ornament
+10 h_motif part_of 33 belt_ornament
+12 h_motif part_of 33 belt_ornament
+13 h_motif part_of 33 belt_ornament
+16 crescent  part_of 33 belt_ornament
+17 crescent  part_of 33 belt_ornament
+18 h_motif part_of 33 belt_ornament
+19 crescent  part_of 33 belt_ornament
+33 belt_ornament is arrangement
+33 belt_ornament visible_on front_side
+33 belt_ornament  visible_on right_broadside
+33 belt_ornament visible_on left_broadside
+
+
+pillar 33
+building D
+wall_pillar
+was_modified
+front_side:
+shaft:
+1 crescent position top
+1 crescent next_to 2 crescent
+1 crescent above 3 crescent
+2 crescent above 3 crescent
+3 crescent above 4 crescent
+3 crescent above 5 crescent
+4 crescent next_to 5 crescent
+4 crescent above 6 crescent
+5 crescent above 7 crescent
+6 crescent next_to 7 crescent
+6 crescent above 8 crescent
+7 crescent above 9 crescent
+8 crescent next_to 9 crescent
+1 crescent part_of 10 crescent_pattern
+2 crescent part_of 10 crescent_pattern
+3 crescent part_of 10 crescent_pattern
+4 crescent part_of 10 crescent_pattern
+5 crescent part_of 10 crescent_pattern
+6 crescent part_of 10 crescent_pattern
+7 crescent part_of 10 crescent_pattern
+8 crescent part_of 10 crescent_pattern
+9 crescent part_of 10 crescent_pattern
+10 crescent_pattern is arrangement
+10 crescent_pattern position top
+9 crescent above 11 chevron
+11 chevron position top
+11 chevron above 12 chevron
+12 chevron above 13 chevron
+13 chevron above 14 chevron
+14 chevron above 15 chevron
+15 chevron above 16 chevron
+16 chevron above 17 chevron
+17 chevron above 18 chevron
+18 chevron above 19 chevron
+19 chevron above 20 chevron
+20 chevron above 21 chevron
+21 chevron above 22 chevron
+22 chevron above 23 chevron
+23 chevron above 24 chevron
+24 chevron above 25 chevron
+11 chevron part_of 26 chevron_pattern
+12 chevron part_of 26 chevron_pattern
+13 chevron part_of 26 chevron_pattern
+14 chevron part_of 26 chevron_pattern
+15 chevron part_of 26 chevron_pattern
+16 chevron part_of 26 chevron_pattern
+17 chevron part_of 26 chevron_pattern
+18 chevron part_of 26 chevron_pattern
+19 chevron part_of 26 chevron_pattern
+20 chevron part_of 26 chevron_pattern
+21 chevron part_of 26 chevron_pattern
+22 chevron part_of 26 chevron_pattern
+23 chevron part_of 26 chevron_pattern
+24 chevron part_of 26 chevron_pattern
+25 chevron part_of 26 chevron_pattern
+26 chevron_pattern is arrangement
+10 crescent_pattern above 26 chevron_pattern
+25 chevron above 27 snake
+27 snake faces right
+28 snake faces right
+29 snake faces right
+30 snake faces right
+31 snake faces right
+32 snake faces right
+33 snake faces right
+34 snake faces right
+35 snake faces right
+36 snake faces right
+37 snake faces right
+27 snake above 28 snake
+28 snake above 29 snake
+29 snake above 30 snake
+30 snake above 31 snake
+31 snake above 32 snake
+32 snake above 33 snake
+33 snake above 34 snake
+34 snake above 35 snake
+35 snake above 36 snake
+36 snake above 37 snake
+27 snake part_of 38 snake_pattern
+28 snake part_of 38 snake_pattern
+29 snake part_of 38 snake_pattern
+30 snake part_of 38 snake_pattern
+31 snake part_of 38 snake_pattern
+32 snake part_of 38 snake_pattern
+33 snake part_of 38 snake_pattern
+34 snake part_of 38 snake_pattern
+35 snake part_of 38 snake_pattern
+36 snake part_of 38 snake_pattern
+37 snake part_of 38 snake_pattern
+38 snake_pattern is arrangement
+26 chevron_pattern above 38 snake_pattern
+38 snake_pattern visible_on front_side
+38 snake_pattern visible_on right_broadside
+37 snake above 39 h_motif
+39 h_motif depicted rotated
+10 crescent_pattern part_of 40 left_panel
+26 chevron_pattern part_of 40 left_panel
+38 snake_pattern part_of 40 left_panel
+39 h_motif part_of 40 left_panel
+40 left_panel instance_of arrangement
+40 left_panel position left
+# --- right panel crescent pattern (6 rows, asymmetric) ---
+# row 1: 1 crescent (left only)
+41 crescent position top
+41 crescent above 42 crescent
+41 crescent above 43 crescent
+42 crescent next_to 43 crescent
+42 crescent above 44 crescent
+43 crescent above 44 crescent
+44 crescent above 45 crescent
+44 crescent above 46 crescent
+45 crescent next_to 46 crescent
+45 crescent above 47 crescent
+46 crescent above 48 crescent
+47 crescent next_to 48 crescent
+47 crescent above 49 crescent
+48 crescent above 49 crescent
+41 crescent part_of 50 crescent_pattern
+42 crescent part_of 50 crescent_pattern
+43 crescent part_of 50 crescent_pattern
+44 crescent part_of 50 crescent_pattern
+45 crescent part_of 50 crescent_pattern
+46 crescent part_of 50 crescent_pattern
+47 crescent part_of 50 crescent_pattern
+48 crescent part_of 50 crescent_pattern
+49 crescent part_of 50 crescent_pattern
+50 crescent_pattern is arrangement
+50 crescent_pattern position top
+49 crescent above 51 chevron
+51 chevron above 52 chevron
+52 chevron above 53 chevron
+53 chevron above 54 chevron
+54 chevron above 55 chevron
+55 chevron above 56 chevron
+56 chevron above 57 chevron
+57 chevron above 58 chevron
+58 chevron above 59 chevron
+59 chevron above 60 chevron
+60 chevron above 61 chevron
+51 chevron part_of 62 chevron_pattern
+52 chevron part_of 62 chevron_pattern
+53 chevron part_of 62 chevron_pattern
+54 chevron part_of 62 chevron_pattern
+55 chevron part_of 62 chevron_pattern
+56 chevron part_of 62 chevron_pattern
+57 chevron part_of 62 chevron_pattern
+58 chevron part_of 62 chevron_pattern
+59 chevron part_of 62 chevron_pattern
+60 chevron part_of 62 chevron_pattern
+61 chevron part_of 62 chevron_pattern
+62 chevron_pattern is arrangement
+50 crescent_pattern above 62 chevron_pattern
+61 chevron above 63 snake
+63 snake faces right
+64 snake faces right
+65 snake faces right
+66 snake faces right
+67 snake faces right
+68 snake faces right
+69 snake faces right
+70 snake faces right
+71 snake faces right
+72 snake faces right
+73 snake faces right
+74 snake faces right
+75 snake faces right
+63 snake above 64 snake
+64 snake above 65 snake
+65 snake above 66 snake
+66 snake above 67 snake
+67 snake above 68 snake
+68 snake above 69 snake
+69 snake above 70 snake
+70 snake above 71 snake
+71 snake above 72 snake
+72 snake above 73 snake
+73 snake above 74 snake
+74 snake above 75 snake
+63 snake part_of 76 snake_pattern
+64 snake part_of 76 snake_pattern
+65 snake part_of 76 snake_pattern
+66 snake part_of 76 snake_pattern
+67 snake part_of 76 snake_pattern
+68 snake part_of 76 snake_pattern
+69 snake part_of 76 snake_pattern
+70 snake part_of 76 snake_pattern
+71 snake part_of 76 snake_pattern
+72 snake part_of 76 snake_pattern
+73 snake part_of 76 snake_pattern
+74 snake part_of 76 snake_pattern
+75 snake part_of 76 snake_pattern
+76 snake_pattern is arrangement
+99 h_motif below 76 snake_pattern
+62 chevron_pattern above 76 snake_pattern
+76 snake_pattern visible_on front_side
+76 snake_pattern visible_on left_broadside
+50 crescent_pattern part_of 77 right_panel
+62 chevron_pattern part_of 77 right_panel
+76 snake_pattern part_of 77 right_panel
+99 h_motif part_of 77 right_panel
+77 right_panel is arrangement
+77 right_panel position right
+99 h_motif depicted rotated
+# center panel
+78 geometric_sign position top
+78 geometric_sign above 79 geometric_sign
+79 geometric_sign above 80 geometric_sign
+80 geometric_sign above 81 h_motif
+81 h_motif above 82 quadruped
+81 h_motif above 83 oval
+81 h_motif above 84 quadruped
+85 snake faces down
+86 snake faces down
+87 snake faces down
+88 snake faces down
+85 snake next_to 86 snake
+86 snake next_to 87 snake
+87 snake next_to 88 snake
+85 snake part_of 89 snake_pattern
+86 snake part_of 89 snake_pattern
+87 snake part_of 89 snake_pattern
+88 snake part_of 89 snake_pattern
+89 snake_pattern is arrangement
+84 quadruped above 89 snake_pattern 
+83 oval  above 89 snake_pattern 
+82 quadruped  above 89 snake_pattern 
+89 snake_pattern above 90 h_motif
+90 h_motif above 91 arthropod
+91 arthropod above 92 snake_pattern
+92 snake_pattern is arrangement
+93 snake faces down
+94 snake faces down
+95 snake faces down
+93 snake part_of 92 snake_pattern
+94 snake part_of 92 snake_pattern
+95 snake part_of 92 snake_pattern
+93 snake next_to 94 snake
+94 snake next_to 95 snake
+96 chevron next_to 92 snake_pattern
+96 chevron depicted rotated
+96 chevron part_of 92 snake_pattern
+97 quadruped faces left
+92 snake_pattern above 97 quadruped
+97 quadruped above 98 arthropod
+39 h_motif next_to 98 arthropod
+98 arthropod next_to 99 h_motif
+78 geometric_sign part_of 100 center_panel
+79 geometric_sign part_of 100 center_panel
+80 geometric_sign part_of 100 center_panel
+81 h_motif part_of 100 center_panel
+82 quadruped part_of 100 center_panel
+83 oval part_of 100 center_panel
+84 quadruped part_of 100 center_panel
+89 snake_pattern part_of 100 center_panel
+90 h_motif part_of 100 center_panel
+91 arthropod part_of 100 center_panel
+92 snake_pattern part_of 100 center_panel
+96 chevron part_of 100 center_panel
+97 quadruped part_of 100 center_panel
+98 arthropod part_of 100 center_panel
+100 center_panel is arrangement
+100 center_panel position center
+right_broadside:
+head:
+101 bird faces right
+102 bird faces right
+103 bird faces right
+104 bird faces right
+105 bird faces right
+106 bird faces right
+101 bird is_maybe vulture
+102 bird is_maybe vulture
+103 bird is_maybe vulture
+104 bird is_maybe vulture
+105 bird is_maybe vulture
+106 bird is_maybe vulture
+101 bird above 102 bird
+102 bird above 103 bird
+103 bird above 104 bird
+101 bird next_to 102 bird
+102 bird next_to 103 bird
+103 bird next_to 104 bird
+105 bird next_to 101 bird
+105 bird above 102 bird
+104 bird above 106 bird
+101 bird part_of 107 bird_pattern
+102 bird part_of 107 bird_pattern
+103 bird part_of 107 bird_pattern
+104 bird part_of 107 bird_pattern
+105 bird part_of 107 bird_pattern
+106 bird part_of 107 bird_pattern
+107 bird_pattern is arrangement
+107 bird_pattern is flock
+shaft:
+108 geometric_sign part_of 117 geometric_pattern
+109 geometric_sign part_of 117 geometric_pattern
+110 geometric_sign part_of 117 geometric_pattern
+111 geometric_sign part_of 117 geometric_pattern
+112 geometric_sign part_of 117 geometric_pattern
+113 geometric_sign part_of 117 geometric_pattern
+114 geometric_sign part_of 117 geometric_pattern
+115 geometric_sign part_of 117 geometric_pattern
+116 geometric_sign part_of 117 geometric_pattern
+108 geometric_sign is_maybe h_motif
+109 geometric_sign is_maybe h_motif
+110 geometric_sign is_maybe h_motif
+111 geometric_sign is_maybe h_motif
+112 geometric_sign is_maybe h_motif
+113 geometric_sign is_maybe h_motif
+114 geometric_sign is_maybe h_motif
+115 geometric_sign is_maybe h_motif
+116 geometric_sign is_maybe h_motif
+117 geometric_pattern is arrangement
+117 geometric_pattern position top
+107 bird_pattern above 117 geometric_pattern
+118 quadruped faces right
+118 quadruped shows tail
+118 quadruped is_maybe fox
+117 geometric_pattern above 118 quadruped
+118 quadruped above 119 quadruped
+119 quadruped faces right
+119 quadruped is_maybe boar
+119 quadruped above 120 quadruped
+120 quadruped faces right
+120 quadruped shows tail
+120 quadruped is_maybe leopard
+119 quadruped next_to 121 crane
+120 quadruped next_to 121 crane
+121 crane faces right
+122 h_motif next_to 121 crane
+123 h_motif next_to 121 crane
+122 h_motif depicted rotated
+123 h_motif depicted rotated
+122 h_motif below 119 quadruped
+120 quadruped above 124 bird
+124 bird next_to 121 crane
+124 bird faces right
+123 h_motif above 125 quadruped
+125 quadruped faces right
+125 quadruped is_maybe fox
+125 quadruped above 126 h_motif
+125 quadruped above 127 h_motif
+125 quadruped above 128 h_motif
+126 h_motif depicted rotated
+127 h_motif depicted rotated
+128 h_motif depicted rotated
+129 crane faces right
+129 crane next_to 128 h_motif
+129 crane below 121 crane
+130 quadruped faces left
+130 quadruped is_maybe mouflon
+130 quadruped next_to 127 h_motif
+121 crane above 130 quadruped
+131 quadruped faces right
+131 quadruped is_maybe gazelle
+131 quadruped depicted sideview
+129 crane next_to 131 quadruped
+129 crane next_to 38 snake_pattern
+128 h_motif above 38 snake_pattern
+38 snake_pattern above 132 snake
+132 snake faces right
+133 h_motif depicted rotated
+133 h_motif next_to 129 crane
+133 h_motif below 121 crane
+left_broadside:
+shaft:
+134 snake faces left
+135 fox faces left
+135 fox shows teeth
+135 fox shows tail
+135 fox shows flexed_legs
+135 fox is_larger_than 134 snake
+134 snake above 135 fox
+135 fox above 76 snake_pattern
+76 snake_pattern above 136 snake
+136 snake faces left
+
+
+pillar 38
+building D
+wall_pillar
+was_modified
+front_side:
+shaft:
+1 bucranium position top
+1 bucranium position center
+1 bucranium above 2 crescent
+2 crescent position center
+2 crescent above 3 snake_pattern
+2 crescent above 9 snake
+# left panel — 4 snake heads
+3 snake_pattern is arrangement
+4 snake faces right
+5 snake faces right
+6 snake faces right
+7 snake faces right
+4 snake above 5 snake
+5 snake above 6 snake
+6 snake above 7 snake
+4 snake part_of 3 snake_pattern
+5 snake part_of 3 snake_pattern
+6 snake part_of 3 snake_pattern
+7 snake part_of 3 snake_pattern
+3 snake_pattern position left
+# right panel — 2 snakes
+9 snake faces left
+10 snake faces left
+9 snake above 10 snake
+9 snake position right
+10 snake position right
+right_broadside:
+head:
+11 aurochs faces right
+11 aurochs depicted sideview
+mod1 type modification
+mod1 erased 12 aurochs
+12 aurochs faces right
+shaft:
+13 fox faces right
+13 fox depicted sideview
+13 fox shows tail
+13 fox position top
+13 fox above 14 boar
+14 boar faces right
+14 boar depicted sideview
+14 boar shows teeth
+14 boar above 15 bird
+15 bird faces right
+16 bird faces right
+17 bird faces right
+15 bird next_to 16 bird
+16 bird next_to 17 bird
+15 bird is_maybe vulture
+16 bird is_maybe vulture
+17 bird is_maybe vulture
+15 bird part_of 18 bird_pattern
+16 bird part_of 18 bird_pattern
+17 bird part_of 18 bird_pattern
+18 bird_pattern is arrangement
+18 bird_pattern is flock
+mod2 type modification
+mod2 erased 19 snake
+
+
+pillar 41
+building D
+wall_pillar
+was_modified
+not_fully_excavated
+front_side:
+shaft:
+3 h_motif position top
+3 h_motif above 4 quadruped
+4 quadruped faces left
+4 quadruped shows horns
+4 quadruped above 5 h_motif
+5 h_motif above 6 crescent
+6 crescent above 7 quadruped
+7 quadruped faces left
+mod1 type modification
+mod1 affects 3 h_motif
+mod1 affects 4 quadruped
+mod1 affects 5 h_motif
+mod1 affects 6 crescent
+mod1 affects 7 quadruped
+left_broadside:
+head:
+1 bird faces left
+2 bird faces left
+1 bird next_to 2 bird
+
+pillar 42
+building D
+wall_pillar
+not_fully_excavated
+was_modified
+front_side:
+shaft:
+1 snake faces down
+1 snake position center
+1 snake above 2 bird
+2 bird faces right
+2 bird is_maybe vulture
+2 bird position center
+
+pillar 43
+building D
+wall_pillar
+not_fully_excavated
+was_modified
+front_side:
+head:
+1 leopard faces down
+1 leopard depicted topview
+1 leopard shows tail
+1 leopard shows ears
+1 leopard position top
+1 leopard above 2 arthropod
+2 arthropod faces up
+3 snake faces down
+3 snake next_to 1 leopard
+right_broadside:
+head:
+# register 1 — nested chevron pattern (7 units)
+1 nested_chevron next_to 2 nested_chevron
+2 nested_chevron next_to 3 nested_chevron
+3 nested_chevron next_to 4 nested_chevron
+4 nested_chevron next_to 5 nested_chevron
+5 nested_chevron next_to 6 nested_chevron
+6 nested_chevron next_to 7 nested_chevron
+1 nested_chevron part_of 8 nested_chevron_pattern
+2 nested_chevron part_of 8 nested_chevron_pattern
+3 nested_chevron part_of 8 nested_chevron_pattern
+4 nested_chevron part_of 8 nested_chevron_pattern
+5 nested_chevron part_of 8 nested_chevron_pattern
+6 nested_chevron part_of 8 nested_chevron_pattern
+7 nested_chevron part_of 8 nested_chevron_pattern
+8 nested_chevron_pattern is arrangement
+8 nested_chevron_pattern position top
+# register 2 — building frieze with animals
+9 building_symbol next_to 10 building_symbol
+10 building_symbol next_to 11 building_symbol
+9 building_symbol is_maybe building
+10 building_symbol is_maybe building
+11 building_symbol is_maybe building
+12 crane above 9 building_symbol
+12 crane faces right
+13 leopard above 10 building_symbol
+13 leopard faces right
+13 leopard depicted topview
+14 quadruped above 11 building_symbol
+14 quadruped faces right
+14 quadruped is_maybe leopard
+14 quadruped depicted topview
+9 building_symbol part_of 15 building_frieze
+10 building_symbol part_of 15 building_frieze
+11 building_symbol part_of 15 building_frieze
+12 crane part_of 15 building_frieze
+13 leopard part_of 15 building_frieze
+14 quadruped part_of 15 building_frieze
+15 building_frieze is arrangement
+8 nested_chevron_pattern above 15 building_frieze
+# register 3 — nested chevron pattern (15 units)
+16 nested_chevron next_to 17 nested_chevron
+17 nested_chevron next_to 18 nested_chevron
+18 nested_chevron next_to 19 nested_chevron
+19 nested_chevron next_to 20 nested_chevron
+20 nested_chevron next_to 21 nested_chevron
+21 nested_chevron next_to 22 nested_chevron
+22 nested_chevron next_to 23 nested_chevron
+23 nested_chevron next_to 24 nested_chevron
+24 nested_chevron next_to 25 nested_chevron
+25 nested_chevron next_to 26 nested_chevron
+26 nested_chevron next_to 27 nested_chevron
+27 nested_chevron next_to 28 nested_chevron
+28 nested_chevron next_to 29 nested_chevron
+29 nested_chevron next_to 30 nested_chevron
+16 nested_chevron part_of 31 nested_chevron_pattern
+17 nested_chevron part_of 31 nested_chevron_pattern
+18 nested_chevron part_of 31 nested_chevron_pattern
+19 nested_chevron part_of 31 nested_chevron_pattern
+20 nested_chevron part_of 31 nested_chevron_pattern
+21 nested_chevron part_of 31 nested_chevron_pattern
+22 nested_chevron part_of 31 nested_chevron_pattern
+23 nested_chevron part_of 31 nested_chevron_pattern
+24 nested_chevron part_of 31 nested_chevron_pattern
+25 nested_chevron part_of 31 nested_chevron_pattern
+26 nested_chevron part_of 31 nested_chevron_pattern
+27 nested_chevron part_of 31 nested_chevron_pattern
+28 nested_chevron part_of 31 nested_chevron_pattern
+29 nested_chevron part_of 31 nested_chevron_pattern
+30 nested_chevron part_of 31 nested_chevron_pattern
+31 nested_chevron_pattern is arrangement
+15 building_frieze above 31 nested_chevron_pattern
+# register 4 — square pattern (11 units)
+32 square next_to 33 square
+33 square next_to 34 square
+34 square next_to 35 square
+35 square next_to 36 square
+36 square next_to 37 square
+37 square next_to 38 square
+38 square next_to 39 square
+39 square next_to 40 square
+40 square next_to 41 square
+41 square next_to 42 square
+32 square part_of 43 square_pattern
+33 square part_of 43 square_pattern
+34 square part_of 43 square_pattern
+35 square part_of 43 square_pattern
+36 square part_of 43 square_pattern
+37 square part_of 43 square_pattern
+38 square part_of 43 square_pattern
+39 square part_of 43 square_pattern
+40 square part_of 43 square_pattern
+41 square part_of 43 square_pattern
+42 square part_of 43 square_pattern
+43 square_pattern is arrangement
+31 nested_chevron_pattern above 43 square_pattern
+# register 5 — nested chevron pattern (5 units)
+44 nested_chevron next_to 45 nested_chevron
+45 nested_chevron next_to 46 nested_chevron
+46 nested_chevron next_to 47 nested_chevron
+47 nested_chevron next_to 48 nested_chevron
+44 nested_chevron part_of 49 nested_chevron_pattern
+45 nested_chevron part_of 49 nested_chevron_pattern
+46 nested_chevron part_of 49 nested_chevron_pattern
+47 nested_chevron part_of 49 nested_chevron_pattern
+48 nested_chevron part_of 49 nested_chevron_pattern
+49 nested_chevron_pattern is arrangement
+43 square_pattern above 49 nested_chevron_pattern
+50 vulture faces right
+50 vulture shows wings
+50 vulture shows necklace
+50 vulture position right
+49 nested_chevron_pattern above 50 vulture
+51 disc next_to 50 vulture
+51 disc position center
+52 bird below 11 building_symbol
+52 bird next_to 53 snake
+52 bird faces right
+52 bird is_maybe crane
+52 bird shows legs
+53 snake next_to 52 bird
+53 snake faces down
+53 snake depicted curved
+53 snake is_maybe crescent
+54 h_motif next_to 53 snake
+55 h_motif above 54 h_motif
+55 h_motif depicted rotated
+52 bird above 56 bird
+56 bird faces right
+56 bird is_maybe vulture
+56 bird depicted sideview
+50 vulture is_larger_than 52 bird
+50 vulture is_larger_than 56 bird
+50 vulture shows wings
+57 fox faces right
+57 fox position left
+58 snake next_to 57 fox
+58 snake faces up
+58 snake depicted curved
+59 arthropod next_to 58 snake
+59 arthropod is_maybe scorpion
+57 fox above 60 bird
+60 bird faces left
+60 bird is_larger_than 57 fox
+61 human next_to 60 bird
+61 human depicted headless
+back_side:
+head:
+62 snake faces down
+62 snake position center
+mod2 type modification
+mod2 erased 63 snake
+63 snake faces down
+63 snake next_to 62 snake
+
+pillar 30
+building D
+wall_pillar
+was_modified
+front_side:
+head:
+1 h_motif depicted rotated
+1 h_motif position center
+1 h_motif above 2 snake
+2 snake faces down
+2 snake position right
+shaft:
+3 quadruped faces up
+3 quadruped is_maybe aurochs
+3 quadruped is_maybe wild_ass
+4 snake faces down
+5 snake faces down
+6 snake faces down
+7 snake faces down
+4 snake next_to 3 quadruped
+4 snake next_to 5 snake
+5 snake next_to 6 snake
+6 snake next_to 7 snake
+7 snake depicted double_headed
+4 snake part_of 8 snake_pattern
+5 snake part_of 8 snake_pattern
+6 snake part_of 8 snake_pattern
+7 snake part_of 8 snake_pattern
+8 snake_pattern is arrangement
+
+pillar 22
+building D
+wall_pillar
+not_fully_excavated
+front_side:
+shaft:
+1 snake faces down
+1 snake position center
+left_broadside:
+shaft:
+2 fox faces left
+2 fox above 3 quadruped
+3 quadruped faces left
+3 quadruped shows teeth
+3 quadruped is_maybe boar
+
+pillar 21
+building D
+wall_pillar
+front_side:
+shaft:
+1 arthropod position center
+1 arthropod above 2 arthropod
+2 arthropod position center
+left_broadside:
+shaft:
+3 quadruped faces left
+4 quadruped faces left
+5 quadruped faces left
+3 quadruped above 4 quadruped
+4 quadruped above 5 quadruped
+3 quadruped is_maybe gazelle
+4 quadruped is_maybe gazelle
+5 quadruped is_maybe leopard
+
+
+pillar 20
+building D
+wall_pillar
+not_fully_excavated
+front_side:
+shaft:
+1 snake faces down
+1 snake position center
+1 snake above 2 aurochs
+2 aurochs faces up
+2 aurochs depicted topview
+2 aurochs shows horns
+2 aurochs shows flexed_legs
+2 aurochs faces_toward 1 snake
+2 aurochs above 3 fox
+3 fox position left
+3 fox faces left
+left_broadside:
+shaft:
+4 fox faces left
+4 fox position top
+4 fox above 5 fox
+5 fox faces left
+
+
+pillar 19
+building D
+wall_pillar
+not_fully_excavated
+was_modified
+front_side:
+head:
+1 snake faces down
+1 snake position center
+
+pillar 67
+building D
+wall_pillar
+was_modified
+shaft:
+1 snake faces down
+2 snake faces down
+3 snake faces down
+4 snake faces down
+5 snake faces down
+6 snake faces down
+7 snake faces down
+8 snake faces down
+1 snake next_to 2 snake
+2 snake next_to 3 snake
+3 snake next_to 4 snake
+5 snake next_to 6 snake
+6 snake next_to 7 snake
+7 snake next_to 8 snake
+1 snake opposite 5 snake
+2 snake opposite 6 snake
+3 snake opposite 7 snake
+4 snake opposite 8 snake
+1 snake part_of 9 snake_pattern
+2 snake part_of 9 snake_pattern
+3 snake part_of 9 snake_pattern
+4 snake part_of 9 snake_pattern
+5 snake part_of 9 snake_pattern
+6 snake part_of 9 snake_pattern
+7 snake part_of 9 snake_pattern
+8 snake part_of 9 snake_pattern
+9 snake_pattern is arrangement
+mod1 type modification
+mod1 affects 1 snake
+mod1 affects 2 snake
+mod1 affects 3 snake
+mod1 affects 4 snake
+mod1 affects 5 snake
+mod1 affects 6 snake
+mod1 affects 7 snake
+mod1 affects 8 snake
+
+
+pillar 70
+building F
+central_pillar
+fragmented
+front_side:
+shaft:
+1 hands position middle
+right_broadside:
+shaft:
+2 arms faces right
+3 fox faces right
+3 fox displays flexed_legs
+left_broadside:
+shaft:
+4 arms faces left
+
+pillar 71
+building F
+central_pillar
+fragmented
+front_side:
+shaft:
+1 hands position middle
+
+pillar 74
+building F
+wall_pillar
+fragmented
+not_fully_excavated
+was_modified
+front_side:
+shaft:
+1 necklace position top
+1 necklace above 2 hands
+right_broadside:
+shaft:
+3 arms faces right
+left_broadside:
+shaft:
+4 arms faces left
+back_side:
+shaft:
+5 quadruped position top
+5 quadruped is_maybe leopard
+5 quadruped faces right
+5 quadruped above 6 human
+
+pillar 75
+building F
+wall_pillar
+fragmented
+not_fully_excavated
+was_modified
+front_side:
+shaft:
+1 necklace position top
+left_broadside:
+shaft:
+2 arms faces left
+mod1 type modification
+mod1 erased 3 arms
+mod1 replaced_by 2 arms
+3 arms faces left
+3 arms position left_broadside
+
+pillar 76
+building F
+wall_pillar
+fragmented
+not_fully_excavated
+was_modified
+left_broadside:
+shaft:
+1 quadruped above 2 bird
+1 quadruped is_maybe leopard
+2 bird is_maybe vulture
+
+pillar 51
+building H
+central_pillar
+fragmented
+was_modified
+front_side:
+shaft:
+1 hands position middle
+right_broadside:
+shaft:
+2 leopard faces right
+2 leopard shows teeth
+2 leopard shows phallus
+mod1 type modification
+mod1 erased 1 arms
+mod1 replaced_by 2 leopard
+1 arms faces right
+1 arms position right_broadside
+
+pillar 63
+building H
+central_pillar
+fragmented
+was_modified
+shaft:
+1 unknown position middle
+1 unknown is_maybe snake
+1 unknown is_maybe arms
+
+pillar 55
+building H
+wall_pillar
+fragmented
+was_modified
+front_side:
+shaft:
+1 bucranium position top
+
+pillar 57
+building H
+wall_pillar
+fragmented
+was_modified
+front_side:
+shaft:
+1 snake faces right
+1 snake faces_toward 2 disc
+3 snake faces left
+3 snake faces_toward 2 disc
+2 disc position center
+1 snake visible_on right_broadside
+3 snake visible_on left_broadside
+1 snake part_of 4 snake_pattern
+3 snake part_of 4 snake_pattern
+2 disc part_of 4 snake_pattern
+4 snake_pattern is arrangement
+4 snake_pattern position top
+4 snake_pattern above 5 chevron
+5 chevron above 6 chevron
+5 chevron part_of 7 chevron_pattern
+6 chevron part_of 7 chevron_pattern
+7 chevron_pattern is arrangement
+
+pillar 66
+building H
+wall_pillar
+fragmented
+was_modified
+right_broadside:
+head:
+1 aurochs faces right
+1 aurochs shows horns
+1 aurochs shows flexed_legs
+1 aurochs shows phallus
+1 aurochs shows tongue
+1 aurochs above 2 aurochs
+1 aurochs larger_than 2 aurochs
+2 aurochs faces left
+3 bird faces left
+4 bird faces left
+4 bird is_larger_than 3 bird
+mod1 type modification 
+mod1 erased 3 bird
+mod1 erased 4 bird
+1 aurochs part_of mod1
+2 aurochs part_of mod1
+shaft:
+5 quadruped faces left
+5 quadruped above 6 quadruped
+6 quadruped faces right 
+
+pillar 69
+building H
+wall_pillar
+was_modified
+not_fully_excavated
+right_broadside:
+shaft:
+1 leopard faces right
+2 leopard faces right
+1 leopard above 2 leopard
+1 leopard is_larger_than 2 leopard
+1 leopard shows teeth
+2 leopard shows teeth
+
+
+pillar 56
+building H
+wall_pillar
+was_modified
+not_fully_excavated
+front_side:
+head:
+1 snake faces down
+shaft:
+2 bucranium position top
+2 bucranium position center
+3 snake faces left
+4 snake faces right
+2 bucranium above 3 snake
+2 bucranium above 4 snake
+2 bucranium part_of 5 snake_pattern
+3 snake part_of 5 snake_pattern
+4 snake part_of 5 snake_pattern
+5 snake_pattern is arrangement
+left_broadside:
+head_shaft_border porous
+head:
+6 bird faces left
+7 bird faces left
+8 bird faces left
+9 bird faces left
+6 bird is_maybe vulture
+7 bird is_maybe vulture
+8 bird is_maybe vulture
+9 bird is_maybe vulture
+6 bird next_to 7 bird
+7 bird next_to 8 bird
+8 bird next_to 9 bird
+6 bird part_of 10 bird_pattern
+7 bird part_of 10 bird_pattern
+8 bird part_of 10 bird_pattern
+9 bird part_of 10 bird_pattern
+10 bird_pattern is arrangement
+10 bird_pattern position top
+11 snake faces left
+12 snake faces left
+13 snake faces left
+14 snake faces left
+11 snake next_to 12 snake
+12 snake next_to 13 snake
+13 snake next_to 14 snake
+11 snake part_of 15 snake_pattern
+12 snake part_of 15 snake_pattern
+13 snake part_of 15 snake_pattern
+14 snake part_of 15 snake_pattern
+15 snake_pattern is arrangement
+15 snake_pattern position top
+15 snake_pattern right_of 10 bird_pattern
+16 leopard faces left
+16 leopard shows tail
+16 leopard right_of 15 snake_pattern
+17 snake faces left
+17 snake right_of 16 leopard
+17 snake above 19 leopard
+18 leopard faces left
+18 leopard above 17 snake
+18 leopard shows teeth
+19 leopard faces left
+19 leopard above 20 leopard
+19 leopard larger_than 20 leopard
+19 leopard shows teeth
+20 leopard faces left
+21 quadruped faces left
+21 quadruped shows horns
+21 quadruped is_maybe gazelle
+21 quadruped below 20 leopard
+22 quadruped right_of 21 quadruped
+mod2 type modification
+mod2 erased 22 quadruped
+23 vulture faces right
+23 vulture shows beak
+23 vulture shows wings
+23 vulture left_of 19 leopard
+23 vulture below 16 leopard
+24 leopard faces left
+24 leopard left_of 23 vulture
+24 leopard below 23 vulture
+24 leopard below 10 bird_pattern
+25 vulture faces left
+25 vulture below 24 leopard
+26 vulture faces left
+26 vulture left_of 25 vulture
+26 vulture below 10 bird_pattern
+36 bird faces left
+36 bird is_maybe crane
+36 bird below 24 leopard
+37 bird faces left
+37 bird is_maybe crane
+37 bird below 24 leopard
+27 snake faces right
+28 snake faces right
+29 snake faces right
+30 snake faces left
+31 snake faces left
+32 snake faces left
+33 snake faces left
+27 snake above 28 snake
+28 snake above 29 snake
+29 snake above 30 snake
+31 snake above 32 snake
+32 snake above 33 snake
+27 snake left_of 31 snake
+28 snake left_of 32 snake
+29 snake left_of 33 snake
+27 snake part_of 34 snake_pattern
+28 snake part_of 34 snake_pattern
+29 snake part_of 34 snake_pattern
+30 snake part_of 34 snake_pattern
+31 snake part_of 34 snake_pattern
+32 snake part_of 34 snake_pattern
+33 snake part_of 34 snake_pattern
+34 snake_pattern is arrangement
+34 snake_pattern below 21 quadruped
+34 snake_pattern below 23 vulture
+34 snake_pattern below 36 bird
+34 snake_pattern below 37 bird
+27 snake visible_on shaft
+29 snake visible_on shaft
+33 snake visible_on shaft
+34 snake_pattern visible_on shaft
+shaft:
+38 crane faces left
+39 crane faces left
+40 crane faces left
+41 crane faces left
+38 crane shows legs
+39 crane shows legs
+40 crane shows legs
+41 crane shows legs
+42 bird faces left
+42 bird is_maybe crane
+43 bird faces left
+43 bird is_maybe crane
+44 bird faces left
+44 bird is_maybe crane
+38 crane part_of 45 bird_pattern
+39 crane part_of 45 bird_pattern
+40 crane part_of 45 bird_pattern
+41 crane part_of 45 bird_pattern
+42 bird part_of 45 bird_pattern
+43 bird part_of 45 bird_pattern
+44 bird part_of 45 bird_pattern
+45 bird_pattern is arrangement
+45 bird_pattern below 34 snake_pattern
+40 crane visible_on head
+41 crane visible_on head
+44 bird visible_on head
+46 snake faces up
+46 snake left_of 45 bird_pattern
+46 snake below 34 snake_pattern
+47 snake faces left
+48 snake faces left
+49 snake faces left
+50 snake faces left
+51 snake faces left
+52 snake faces left
+53 snake faces left
+54 snake faces left
+55 snake faces left
+56 snake faces left
+47 snake above 48 snake
+48 snake above 49 snake
+49 snake above 50 snake
+50 snake above 51 snake
+51 snake above 52 snake
+52 snake above 53 snake
+53 snake above 54 snake
+54 snake above 55 snake
+55 snake above 56 snake
+47 snake part_of 57 snake_pattern
+48 snake part_of 57 snake_pattern
+49 snake part_of 57 snake_pattern
+50 snake part_of 57 snake_pattern
+51 snake part_of 57 snake_pattern
+52 snake part_of 57 snake_pattern
+53 snake part_of 57 snake_pattern
+54 snake part_of 57 snake_pattern
+55 snake part_of 57 snake_pattern
+56 snake part_of 57 snake_pattern
+57 snake_pattern is arrangement
+57 snake_pattern orientation vertical
+57 snake_pattern below 45 bird_pattern
+58 crane faces left
+59 crane faces left
+60 crane faces left
+61 crane faces left
+62 crane faces left
+63 crane faces left
+64 crane faces left
+65 crane faces left
+58 crane shows legs
+59 crane shows legs
+60 crane shows legs
+61 crane shows legs
+62 crane shows legs
+63 crane shows legs
+64 crane shows legs
+65 crane shows legs
+58 crane part_of 66 crane_pattern
+59 crane part_of 66 crane_pattern
+60 crane part_of 66 crane_pattern
+61 crane part_of 66 crane_pattern
+62 crane part_of 66 crane_pattern
+63 crane part_of 66 crane_pattern
+64 crane part_of 66 crane_pattern
+65 crane part_of 66 crane_pattern
+66 crane_pattern is arrangement
+66 crane_pattern left_of 57 snake_pattern
+66 crane_pattern below 45 bird_pattern
+67 quadruped faces left
+67 quadruped shows horns
+67 quadruped is_maybe gazelle
+67 quadruped below 34 snake_pattern
+67 quadruped left_of 66 crane_pattern
+67 quadruped above 57 snake_pattern

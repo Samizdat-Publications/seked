@@ -1,0 +1,116 @@
+{
+  "note": "Figures shown as plates in the documentary: what the claimants and the reply published, beside what we drew from it (night decisions 24 and 25). Only open-licensed or public-domain figures are kept here, in Git LFS, each with its source, licence and checksum. Everything else is linked under 'linked', not hosted, until its rights holder answers the request drafted in docs/permissions/. A plate is read two ways, like any drawing: a printed dimension is transcribed and cites the figure; a distance scaled against the figure's own scale bar is 'scaled from plate', with its sigma, and never verified. A tomogram with no axes is placed by its labels and never scaled. CC BY-NC-ND figures are hosted too, since Seked is a personal, non-commercial project (Stewart, 20 October 2026): each is the publisher's own image, unaltered (no crop, no mark, nothing drawn on it); what we read from it or drew over it is shown beside it, never on it.",
+  "plates": [
+    {
+      "id": "biondi-malanga-2022-fig22",
+      "file": "biondi-malanga-2022/fig22.png",
+      "sha256": "fb30ab36193d4907c5cfb6f6ea9bd0e176663cdef863e077ad51a08eb2ab8c16",
+      "size": [
+        2408,
+        1949
+      ],
+      "source": "biondi-malanga-2022",
+      "figure": "Figure 22",
+      "caption": "Three-dimensional (3D) reconstruction of the pyramid of Khnum-Khufu downstream of the interpretation of tomograms estimated through radar ultrasound.",
+      "kind": "the authors' rendering of their interpretation",
+      "url": "https://mdpi-res.com/remotesensing/remotesensing-14-05231/article_deploy/html/images/remotesensing-14-05231-g022.png",
+      "licence": "CC BY 4.0 (Crossref's licence record for 10.3390/rs14205231)",
+      "attribution": "Biondi, F. & Malanga, C. (2022), Remote Sensing 14(20), 5231, Figure 22, CC BY 4.0. Retracted 10 August 2026.",
+      "retraction": "Retracted on 10 August 2026 (Remote Sensing 18(16), 2679, doi:10.3390/rs18162679) for 'serious methodological flaws and statistical errors'; the authors disagree. Shown only with that stated beside it.",
+      "registration": "None: a perspective rendering, with no scale.",
+      "about": "Khufu's pyramid, not Khafre's. The method's only peer-reviewed showing, for chapter 8's reply."
+    },
+    {
+      "id": "biondi-malanga-2022-fig24",
+      "file": "biondi-malanga-2022/fig24.png",
+      "sha256": "ff0f41d41c4ffc8aa86fee971e8098b9848d4ca9290a65d4d66a73bbe2b64510",
+      "size": [
+        2865,
+        1242
+      ],
+      "source": "biondi-malanga-2022",
+      "figure": "Figure 24",
+      "caption": "(a): Tomographic map of Khnum-Khufu overlapped to its schematic representation. (b): Tomographic map of Khnum-Khufu.",
+      "kind": "(a) processed data laid over the authors' section drawing; (b) processed data, axes labelled 'Height' and 'Azimuth' with no units",
+      "url": "https://mdpi-res.com/remotesensing/remotesensing-14-05231/article_deploy/html/images/remotesensing-14-05231-g024.png",
+      "licence": "CC BY 4.0 (Crossref's licence record for 10.3390/rs14205231)",
+      "attribution": "Biondi, F. & Malanga, C. (2022), Remote Sensing 14(20), 5231, Figure 24, CC BY 4.0. Retracted 10 August 2026.",
+      "retraction": "Retracted on 10 August 2026 (Remote Sensing 18(16), 2679, doi:10.3390/rs18162679) for 'serious methodological flaws and statistical errors'; the authors disagree. Shown only with that stated beside it.",
+      "registration": "Panel (a) is registered on its own 50 m scale bar, read on a pixel grid (scripts/plate.py grid, then scale): the bar runs from (65, 980) to (351, 980), so 286 ± 1.4 px is 50 m, 0.1748 ± 0.0009 m per pixel, horizontal only. The frame's origin is pinned where the authors' dashed outline meets its base line on the axis: the axis at x = 717.5 ± 2 (from the two dashed faces) and the base line at y = 863 ± 1. North is +x (the figure's arrow). Read two ways, the drawing disagrees with the survey: its base-left corner is at x = 53, a half base of 116.2 ± 0.6 m (Lehner's 115.17), but its apex, half hidden by the panel's title, lies near y = 59, a height of about 140.5 m against 146.59, so the authors' outline is drawn at about 50.4° where the survey gives 51.8°, or the figure's vertical scale is some 4% short of its bar. Scaled from plate, never verified. Panel (b) has no units and is placed beside (a), never scaled. scripts/plate_overlay.py draws the survey over it.",
+      "about": "Khufu's pyramid, not Khafre's: the tomogram the method drew over the known chambers, which a viewer can set against Khufu's surveyed section.",
+      "registered": {
+        "panel": "a",
+        "origin_px": [
+          717.5,
+          863.0
+        ],
+        "m_per_px": 0.17483,
+        "m_per_px_sigma": 0.0009,
+        "north_px": 1,
+        "up_px": 1,
+        "method": "scaled from plate",
+        "bar": [
+          [
+            65,
+            980
+          ],
+          [
+            351,
+            980
+          ],
+          50.0
+        ]
+      }
+    },
+    {
+      "id": "haklay-gopher-2020-fig1",
+      "file": "haklay-gopher-2020/fig1.jpg",
+      "sha256": "9eaed7c2276ae8e039f5fc8b382a4a71bd7b44d03ca73df60825f4a062d4f06e",
+      "size": [
+        485,
+        672
+      ],
+      "source": "haklay-gopher-2020",
+      "figure": "Figure 1 (p. 344)",
+      "caption": "The main excavation area: schematic plan. (Modified from O. Dietrich et al. 2014.)",
+      "kind": "an excavation plan, schematic",
+      "url": "https://doi.org/10.1017/S0959774319000660",
+      "extracted": "The JPEG stream embedded in the publisher's PDF (sha256 4c784437743d4fa8fd6dea20968c0b929fbc2d73db38de30b6084bbea56a78a5, page 2), written out byte for byte by pdfimages -j: not re-encoded, cropped or resized.",
+      "licence": "CC BY-NC-ND 4.0 (the article's own licence line, p. 343, and Crossref's licence record): non-commercial re-use with the work unaltered and properly cited.",
+      "attribution": "Haklay, G. & Gopher, A. (2020), Geometry and Architectural Planning at Göbekli Tepe, Turkey, Cambridge Archaeological Journal 30(2), 343–357, Figure 1, modified from O. Dietrich et al. 2014. CC BY-NC-ND 4.0. © McDonald Institute for Archaeological Research 2020.",
+      "registration": "Read two ways by scripts/enclosure_d_plan.py against the figure's own 5 m bar: the pillars' positions and bearings are the 'scaled from plate' records in data/measurements/gobekli.json (0.51 m sigma), never verified; the printed figures (p. 347) are transcribed there and cite the page. The image itself carries no mark of that reading.",
+      "about": "Chapter 7: Enclosure D as its excavators drew it, to stand beside the stand-in built from it (progress 0046 to 0049 and the orbit), so a viewer can see we drew what the plan says."
+    }
+  ],
+  "linked": [
+    {
+      "id": "khafre-project-2025-tomograms",
+      "what": "The Khafre Project's tomograms (abstract pp. 4-6) and its four 3D renderings of the eight wells (p. 5)",
+      "source": "khafre-project-2025",
+      "url": "https://drive.google.com/file/d/1Leaa2tf3OHK31OTmdey_CRa-0vC9-CTD/view",
+      "rights": "The authors' copyright. Requested in docs/permissions/khafre-project.md (not sent).",
+      "registration": "No axes and no scale bar: placed on the cutaway's section plane by its own labels (the base and 648 m), and captioned so. Until permission, a grey frame (render/underground.py --plate) and a link."
+    },
+    {
+      "id": "pilicy-2025-fig1",
+      "what": "The Khafre Project's 'latest tomography', Pilicy 2025, Fig. 1, 'Reproduced with permission of Khafre SAR Project'",
+      "source": "pilicy-2025",
+      "url": "https://grahamhancock.com/pilicyd1/",
+      "rights": "The Khafre Project's copyright, as above."
+    },
+    {
+      "id": "de-cordier-2025-merlin-burrows-scans",
+      "what": "The Merlin Burrows scans of Hawara, among them 'The 2 chambers below the Hawara Pyramid'",
+      "source": "de-cordier-2025-merlin-burrows",
+      "url": "https://labyrinthofegypt.substack.com/p/the-merlin-burrows-scans-ii",
+      "rights": "'Image © Cosco Foundation, 2025'. Requested in docs/permissions/de-cordier.md (not sent)."
+    },
+    {
+      "id": "nriag-2008-hawara-figures",
+      "what": "The 2008 NRIAG survey's figures (the Mataha Expedition), on De Cordier's Google Drive",
+      "source": "de-cordier-2025-mataha",
+      "url": "https://drive.google.com/file/d/1YqntaYOhvSWA7fd3jFYToPqx34odntjB/view",
+      "rights": "Not stated; photographs '© Louis De Cordier'. Requested in docs/permissions/de-cordier.md (not sent)."
+    }
+  ]
+}

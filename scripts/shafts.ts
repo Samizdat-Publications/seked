@@ -54,9 +54,17 @@ function solve(starId: string, side: 'north' | 'south', angle: number, from = -6
 
 const fmtEpoch = (e: number) => (e < 1 ? `${Math.round(1 - e)} BCE` : `${Math.round(e)} CE`);
 
+/** Which shaft angles have been checked against their page, read off the records, never typed (Argon, 21 October 2026). */
+function verifiedNote(): string {
+  const unchecked = SHAFTS.filter((sh) => records.get(sh.key)?.verified !== true).map((sh) => `\`${sh.key}\``);
+  if (unchecked.length === 0) return 'Every shaft angle has been checked against its source; see data/measurements/g1.json.';
+  if (unchecked.length === SHAFTS.length) return 'No shaft angle has yet been checked against its source; see data/measurements/g1.json.';
+  return `Shaft angles are checked against their sources except ${unchecked.join(', ')}; see data/measurements/g1.json.`;
+}
+
 const lines: string[] = [];
 lines.push('# Shaft alignments (claim C2)', '');
-lines.push(`For each shaft, the epoch at which the named star crossed the meridian at the shaft's measured altitude, from latitude ${formatDms(lat)} N, using Vondrák 2011 precession and linear proper motion. "Years per arcminute" is how far the solved date moves if the measured shaft angle changes by 1′. Shaft angles are unverified Gantenbrink values; see data/measurements/g1.json.`, '');
+lines.push(`For each shaft, the epoch at which the named star crossed the meridian at the shaft's measured altitude, from latitude ${formatDms(lat)} N, using Vondrák 2011 precession and linear proper motion. "Years per arcminute" is how far the solved date moves if the measured shaft angle changes by 1′. ${verifiedNote()}`, '');
 lines.push('| Shaft | Angle | Star | Culmination | Epoch | Years per 1′ of shaft angle |');
 lines.push('|---|---:|---|---|---:|---:|');
 for (const s of SHAFTS) {

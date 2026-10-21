@@ -1,0 +1,123 @@
+[
+  {
+    "key": "g2.sar.zeds.count",
+    "structure": "g2.sar-shafts",
+    "quantity": "count",
+    "value": 5,
+    "unit": "count",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "Five structures 'at the center of the pyramid, above Belzoni's chamber', likened to the 'Zed' over Khufu's King's Chamber. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.zed.levels",
+    "structure": "g2.sar-shafts",
+    "quantity": "count",
+    "value": 5,
+    "unit": "count",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "Each Zed has '5 horizontal levels and a sloping roof'. No size is given; the model's is a stated look choice. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.wells.count",
+    "structure": "g2.sar-shafts",
+    "quantity": "count",
+    "value": 8,
+    "unit": "count",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "'Eight of these structures ... descend to a depth of 648 meters': 'vertical wells, hollow inside, surrounded by descending spiral pathways'. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.wells.rows",
+    "structure": "g2.sar-shafts",
+    "quantity": "count",
+    "value": 2,
+    "unit": "count",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "'Arranged in two parallel rows from north to south'. No spacing, offset or side is given; the model takes the rows from the authors' own 3D renderings (inside the footprint, about its centre) as a stated look choice (night decision 29). The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.wells.bottom.up",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": -648.0,
+    "unit": "m",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "'Descend to a depth of 648 meters', measured from 'the ground level (ground zero) of the main structure', which is the pyramid's base. Negative because the frame measures up from that plane. Press reports round it to 610 m or give 2,130 ft. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.cubes.count",
+    "structure": "g2.sar-shafts",
+    "quantity": "count",
+    "value": 2,
+    "unit": "count",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "The wells are 'merging into two large cubic structures'. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.cube.side",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": 80.0,
+    "unit": "m",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "'Measuring approximately 80 meters per side'. National Geographic and TRT give 90 m; TBS 260 ft. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.deep.up",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": -2000.0,
+    "unit": "m",
+    "source": "khafre-project-2025",
+    "method": "as claimed",
+    "note": "Structures 'approximately two kilometers beneath ground zero', extending under Khufu and Menkaure. Secondary transcripts give about 1.2 km; the team's own document wins. The team's conference abstract of 16 March 2025 (khafre-project-2025); the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.well.diameter.min",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": 10.0584,
+    "unit": "m",
+    "source": "tbs-2025-khafre",
+    "method": "as claimed",
+    "note": "'About 33 to 39 feet in diameter': 33 ft. The press is the only source; the abstract gives no diameter.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.well.diameter.max",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": 11.8872,
+    "unit": "m",
+    "source": "tbs-2025-khafre",
+    "method": "as claimed",
+    "note": "'About 33 to 39 feet in diameter': 39 ft. The press is the only source; the abstract gives no diameter.",
+    "verified": false
+  },
+  {
+    "key": "g2.sar.radar.penetration.max",
+    "structure": "g2.sar-shafts",
+    "quantity": "length",
+    "value": 10.0,
+    "unit": "m",
+    "source": "amza-trt-2025",
+    "method": "as claimed",
+    "note": "Biondi's own figure for how far the radar itself reaches into the ground: 'absolutely less than 10 meters', as TRT World quotes him; ESA's statement in the same article, 'up to 10 meters', is the same number. The method claims to read surface vibrations instead, so the claim's 648 m is not a radar penetration depth; the reply draws the two depths together.",
+    "verified": false
+  }
+]

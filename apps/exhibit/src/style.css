@@ -1,0 +1,253 @@
+:root {
+  color-scheme: dark;
+  --stage: #0f0e0c;
+  --ink: #efe8dc;
+  --muted: #b3a896;
+  --rule: rgba(239, 232, 220, 0.28);
+  --claim: #f2b544;
+  --recon: #a9bdf0;
+  --g: 20px;
+  --bottom: max(var(--g), env(safe-area-inset-bottom));
+  --left: max(var(--g), env(safe-area-inset-left));
+  --right: max(var(--g), env(safe-area-inset-right));
+  --display: "Marcellus", "Trajan Pro", "Palatino Linotype", Georgia, serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--stage);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.stage {
+  position: relative; height: 100%; overflow: hidden;
+  user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#view { z-index: 0; cursor: grab; touch-action: none; }
+#view.grabbing { cursor: grabbing; }
+#view:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }
+.flat { position: absolute; inset: 0; z-index: 0; overflow-x: auto; overflow-y: hidden; }
+.flat img { display: block; height: 100%; width: auto; max-width: none; }
+.ink { z-index: 1; pointer-events: none; }
+/* a flight between two leaves, over the stage until its last frame, which is the next leaf's view */
+.flight { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; background: var(--stage); pointer-events: none; }
+.veil {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 34%; min-height: 180px;
+  background: linear-gradient(rgba(10, 9, 8, 0), rgba(10, 9, 8, 0.72));
+  pointer-events: none;
+}
+
+.status {
+  position: absolute; left: 50%; top: 50%; z-index: 3; transform: translate(-50%, -50%);
+  font: 400 12px/1 var(--mono); letter-spacing: 0.05em; color: var(--muted);
+  background: rgba(15, 14, 12, 0.6); border-radius: 999px; padding: 9px 14px;
+  pointer-events: none;
+}
+
+/* the wipe's edge, when the visitor may drag it: a grip at mid height and the two eras' names either side */
+.edge { position: absolute; left: 0; top: 0; bottom: 0; z-index: 3; width: 0; pointer-events: none; }
+.edge-grip {
+  position: absolute; top: 42%; left: -22px; width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center; padding: 0; cursor: ew-resize; pointer-events: auto; touch-action: none;
+  color: #1f1604; background: var(--claim); border: 0; box-shadow: 0 0 0 4px rgba(15, 14, 12, 0.35), 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+.edge-now, .edge-then {
+  position: absolute; top: calc(42% + 54px); white-space: nowrap;
+  font: 500 11px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+.edge-now { right: 10px; }
+.edge-then { left: 10px; }
+.edge.at-rest .edge-then { display: none; }
+.edge.at-rest .edge-grip { left: -40px; }
+.edge.at-rest .edge-now { right: 22px; }
+
+/* the exhibit's own figures, laid over the stage at its top left */
+.figure {
+  position: absolute; left: var(--left); top: max(var(--g), env(safe-area-inset-top)); z-index: 3; margin: 0;
+  width: min(330px, calc(100% - 2 * var(--g))); padding: 12px 14px 10px;
+  background: rgba(17, 15, 12, 0.78); border: 1px solid var(--rule); border-radius: 10px;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); pointer-events: none;
+  animation: figure-in 0.6s ease-out;
+}
+@keyframes figure-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.figure svg { display: block; width: 100%; height: auto; }
+/* on a sky leaf the year's panel holds the top left, so the figure takes the top right (below it on a phone) */
+.figure.beside-sky { left: auto; right: calc(var(--g) + 44px); }
+@media (max-width: 600px) { .figure.beside-sky { left: var(--left); right: auto; top: calc(max(var(--g), env(safe-area-inset-top)) + 84px); } }
+.figure .statue { fill: rgba(239, 232, 220, 0.28); stroke: rgba(239, 232, 220, 0.7); stroke-width: 1; }
+.figure .star { fill: rgba(255, 214, 140, 1); }
+.figure .granite { fill: rgba(176, 96, 84, 0.5); stroke: rgba(214, 150, 136, 0.8); stroke-width: 1; }
+/* the claimed tier, as the walkthrough draws it: dashed and translucent, never stone */
+.figure .claimed { stroke: rgba(240, 150, 70, 0.95); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.figure .instrumented { fill: rgba(126, 176, 232, 0.3); stroke: rgba(150, 192, 240, 0.9); stroke-width: 1; }
+.figure .claimed-box { fill: rgba(240, 150, 70, 0.14); stroke: rgba(240, 150, 70, 0.95); stroke-width: 1; stroke-dasharray: 4 3; }
+/* a measurement's error bar drawn as a band: plus and minus its sigma about the drawn edge */
+.figure .err { fill: rgba(242, 196, 107, 0.16); stroke: rgba(242, 196, 107, 0.35); stroke-width: 0.5; }
+.figure svg .draw-on { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw-on 1.6s ease-in-out forwards; }
+.figure svg .draw-on.late { animation-delay: 1.4s; }
+@keyframes draw-on { to { stroke-dashoffset: 0; } }
+.figure .wall { stroke: var(--claim); stroke-width: 2; stroke-linecap: round; }
+.figure .dim { stroke: rgba(248, 214, 140, 0.9); stroke-width: 1; stroke-dasharray: 3 3; }
+.figure .lab { font: 600 11px var(--mono); fill: rgba(248, 214, 140, 1); }
+.figure .here { fill: var(--ink); stroke: var(--stage); stroke-width: 2; }
+.figure .here-lab, .figure .north { font: 500 10px var(--mono); fill: var(--muted); letter-spacing: 0.06em; }
+/* a label that crosses a line reads over it, outlined in the panel's own dark */
+.figure .halo { paint-order: stroke; stroke: rgba(38, 36, 33, 0.95); stroke-width: 3px; stroke-linejoin: round; }
+.figure figcaption { margin-top: 8px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+
+/* the receipt and the reply: a tab at the right edge, a quiet panel when open */
+.tab {
+  position: absolute; right: 0; top: 66%; z-index: 4; transform: translateY(-50%);
+  writing-mode: vertical-rl; padding: 16px 9px; border-radius: 10px 0 0 10px;
+  font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  background: rgba(17, 15, 12, 0.55); border: 1px solid var(--rule); border-right: 0; cursor: pointer;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.tab:hover, .tab[aria-expanded="true"] { color: var(--ink); }
+.reply {
+  position: absolute; right: 44px; top: 50%; z-index: 5; transform: translateY(-50%);
+  width: min(400px, calc(100% - 72px)); max-height: calc(100% - 220px); overflow: auto; overscroll-behavior: contain;
+  padding: 18px 20px 16px; background: rgba(17, 15, 12, 0.88); border: 1px solid var(--rule); border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  user-select: text; -webkit-user-select: text;
+}
+.reply h2 { margin: 0 0 10px; font: 500 10.5px/1.3 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.reply p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; color: rgba(214, 205, 190, 0.92); }
+.reply .spoken { font: 400 17px/1.4 var(--display); color: var(--ink); }
+.reply .quiet { color: var(--muted); font-style: italic; }
+.reply .listen {
+  margin: -2px 0 12px; height: 30px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+  font: 500 12px/1 var(--body); color: var(--ink); background: none; border: 1px solid var(--rule);
+}
+.reply .listen:hover, .reply .listen[aria-pressed="true"] { border-color: rgba(239, 232, 220, 0.62); }
+.reply ul { margin: 0 0 12px; padding-left: 18px; font: 400 12px/1.55 var(--mono); color: var(--ink); }
+.reply section + section { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(239, 232, 220, 0.14); }
+.reply code { font: 400 0.92em var(--mono); color: var(--muted); }
+.reply-x {
+  float: right; margin: -6px -8px 0 8px; width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--rule); background: none; color: var(--muted); font: 400 18px/1 var(--body); cursor: pointer;
+}
+.reply-x:hover { color: var(--ink); }
+
+/* the caption band: quiet, low, the picture's servant */
+.band {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  padding: 0 var(--right) calc(var(--bottom) + 8px) var(--left);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; pointer-events: none;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+.where {
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 10px;
+  font: 500 11.5px/1.3 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.where .sep { opacity: 0.6; }
+.pill {
+  font: 600 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 999px; border: 1px solid var(--rule); text-shadow: none;
+}
+.pill.survey { color: var(--ink); background: rgba(239, 232, 220, 0.1); }
+.pill.reconstruction { color: var(--recon); border-color: rgba(169, 189, 240, 0.62); background: rgba(169, 189, 240, 0.12); }
+.pill.claim { color: var(--claim); border-color: rgba(242, 181, 68, 0.5); background: rgba(242, 181, 68, 0.1); }
+.caption {
+  max-width: 34em; min-height: 1.3em;
+  font: 400 clamp(19px, 2.1vw, 27px)/1.32 var(--display); letter-spacing: 0.01em; color: var(--ink);
+  text-wrap: balance;
+}
+/* the archaeologists' reply, spoken at a chapter's end: the other voice, set apart but as easy to read */
+.caption.reply-voice { font-style: italic; opacity: 0.92; border-left: 2px solid currentColor; padding-left: 14px; }
+/* the controls: small, low, out of the picture's way */
+.controls {
+  display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;
+  pointer-events: auto; text-shadow: none;
+}
+.ctl {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-width: 36px; height: 36px; padding: 0 10px;
+  font: 500 12.5px/1 var(--body); letter-spacing: 0.02em; color: var(--ink);
+  background: rgba(17, 15, 12, 0.5); border: 1px solid var(--rule); border-radius: 999px;
+  cursor: pointer; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.ctl:hover { border-color: rgba(239, 232, 220, 0.62); }
+.ctl:disabled { opacity: 0.35; cursor: default; }
+.ctl.play { padding: 0 16px 0 13px; background: var(--claim); border-color: var(--claim); color: #1f1604; font-weight: 600; }
+.ctl.play .i-pause { display: none; }
+.ctl.play[aria-pressed="true"] { background: rgba(17, 15, 12, 0.5); border-color: var(--rule); color: var(--ink); padding: 0 10px; }
+.ctl.play[aria-pressed="true"] .i-play, .ctl.play[aria-pressed="true"] .play-word { display: none; }
+.ctl.play[aria-pressed="true"] .i-pause { display: block; }
+.chapters { position: relative; }
+.ctl.chapter { max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; line-height: 34px; color: var(--muted); }
+.chapter-list {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; min-width: 260px; padding: 6px;
+  background: rgba(17, 15, 12, 0.9); border: 1px solid var(--rule); border-radius: 10px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.chapter-list button {
+  display: grid; grid-template-columns: 2ch 1fr; gap: 10px; align-items: baseline; text-align: left;
+  padding: 9px 10px; background: none; border: 0; border-radius: 7px; color: var(--ink); cursor: pointer;
+  font: 400 16px/1.25 var(--display);
+}
+.chapter-list button:hover { background: rgba(239, 232, 220, 0.07); }
+.chapter-list button[aria-current] { background: rgba(239, 232, 220, 0.12); }
+.chapter-list .n { font: 500 12px/1 var(--mono); color: var(--muted); }
+.count { min-width: 5ch; font: 400 11px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
+
+@media (max-width: 560px) {
+  :root { --g: 16px; }
+  .where { font-size: 10.5px; letter-spacing: 0.08em; }
+  .where .sep { display: none; }
+  #when { flex-basis: 100%; }
+  .caption { font-size: 19px; }
+  .count { display: none; }
+  .tab { top: 34%; }
+  .reply { left: 12px; right: 12px; top: auto; bottom: calc(var(--bottom) + 62px); width: auto; transform: none; max-height: 62%; }
+  /* reading the reply on a phone, the caption steps aside for it; the controls stay */
+  .reading .where, .reading .caption, .reading .tab { visibility: hidden; }
+  .ctl.chapter { max-width: 40vw; }
+  .chapter-list { left: auto; right: 0; transform: none; min-width: 0; width: max-content; max-width: calc(100vw - 32px); }
+}
+
+/* the live sky's year and slider (src/skyfigure.ts), top left where a figure would stand */
+.skybar {
+  position: absolute; left: var(--left); top: max(var(--g), env(safe-area-inset-top)); z-index: 3;
+  width: min(300px, calc(100% - 2 * var(--g) - 44px)); padding: 10px 14px 8px;
+  background: rgba(17, 15, 12, 0.72); border: 1px solid var(--rule); border-radius: 10px;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.skybar[hidden] { display: none; }
+.skybar .sky-year { margin: 0; font: 400 22px/1.2 var(--display); color: var(--ink); }
+.skybar .sky-k { font: 500 10px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.skybar input { width: 100%; margin: 6px 0 4px; accent-color: var(--claim); }
+.skybar .sky-note { margin: 0; font: 400 11px/1.4 var(--body); color: var(--muted); }
+.skybar .sky-reading p { margin: 0 0 4px; font: 400 12.5px/1.35 var(--body); color: var(--ink); }
+.skybar .sky-reading .sky-k { margin-right: 4px; }
+@media (max-width: 600px) { .skybar .sky-note { display: none; } }
+
+/* an object in the hand (src/objectview.ts) */
+.object {
+  position: absolute; left: 50%; top: max(var(--g), env(safe-area-inset-top)); z-index: 3; margin: 0; transform: translateX(-50%);
+  width: min(520px, calc(100% - 2 * var(--g))); padding: 0 0 10px;
+  background: var(--stage); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden;
+}
+.object[hidden] { display: none; }
+.object-view { position: relative; width: 100%; aspect-ratio: 1; }
+.object canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.object canvas:active { cursor: grabbing; }
+.object-reset {
+  position: absolute; right: 10px; top: 10px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink); background: rgba(17, 15, 12, 0.7); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 11px; cursor: pointer;
+}
+.object figcaption { padding: 8px 14px 0; font: 400 12px/1.45 var(--body); color: var(--muted); }
+@media (max-width: 600px) { .object-view { aspect-ratio: 4 / 3; } }

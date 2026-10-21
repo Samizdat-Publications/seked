@@ -1,6 +1,6 @@
 # Shaft alignments (claim C2)
 
-For each shaft, the epoch at which the named star crossed the meridian at the shaft's measured altitude, from latitude 29°58′45″ N, using Vondrák 2011 precession and linear proper motion. "Years per arcminute" is how far the solved date moves if the measured shaft angle changes by 1′. Shaft angles are unverified Gantenbrink values; see data/measurements/g1.json.
+For each shaft, the epoch at which the named star crossed the meridian at the shaft's measured altitude, from latitude 29°58′45″ N, using Vondrák 2011 precession and linear proper motion. "Years per arcminute" is how far the solved date moves if the measured shaft angle changes by 1′. Shaft angles are checked against their sources except `qc.shaft.north.angle`; see data/measurements/g1.json.
 
 | Shaft | Angle | Star | Culmination | Epoch | Years per 1′ of shaft angle |
 |---|---:|---|---|---:|---:|

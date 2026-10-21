@@ -1,0 +1,4 @@
+{"renders": [
+ {"state": "built", "station": "orion", "moment": "night-2450", "patch": {"yaw": 180, "pitch": 12, "fov": 40, "aspect": 1.0},
+  "transparent": true, "size": "1200x1200", "samples": 32, "out": "build/render/story/orion-sky.png"}
+]}

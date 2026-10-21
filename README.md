@@ -38,7 +38,7 @@ seked of 5½ is the whole π-and-φ story.
 5. **Pyramids from the survey; everything else placed, then labelled.** Temples, tombs and the Sphinx stand on surveyed footprints to about a metre and are marked as visual stand-ins.
 6. **Every era says what it is**: survey, reconstruction, or theorized, the case for an older Giza drawn at its strongest.
 
-`CLAUDE.md` carries the full set, and `docs/plan.html` the original plan.
+`CLAUDE.md` carries the full set, `docs/plan-2026-09.html` the original plan, and `docs/plan.html` the October rethink.
 
 ## Running it
 

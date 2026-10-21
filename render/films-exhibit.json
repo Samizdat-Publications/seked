@@ -1,0 +1,194 @@
+{
+ "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a flight into each leaf that arrives by flight, from the last leaf's station camera and view to this one's, in the arriving leaf's era and moment, so its last frame is the leaf's panorama at the leaf's view. Render with render/build.py --films render/films-exhibit.json --film ID (try --preview 0,45,89 first), encode with render/film.py into `out`.",
+ "films": [
+  {
+   "id": "ch0-promise--ch1-carved",
+   "name": "Flight into ch1-carved from ch0-promise",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    15.59,
+    14.46
+   ],
+   "centre": [
+    347.8,
+    -441.0
+   ],
+   "path": [
+    [
+     365.5,
+     -433.0,
+     -38.4
+    ],
+    [
+     361.24,
+     -434.92,
+     -33.04
+    ],
+    [
+     347.75,
+     -441.0,
+     -28.66
+    ],
+    [
+     333.55,
+     -447.4,
+     -32.56
+    ],
+    [
+     330.0,
+     -449.0,
+     -38.41
+    ]
+   ],
+   "look": [
+    [
+     308.47,
+     -431.01,
+     -19.85
+    ],
+    [
+     290.42,
+     -432.28,
+     -26.0
+    ],
+    [
+     272.36,
+     -433.56,
+     -32.14
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch0-promise--ch1-carved.mp4"
+  },
+  {
+   "id": "ch2-nemes--ch2-small",
+   "name": "Flight into ch2-small from ch2-nemes",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    14.46,
+    15.59
+   ],
+   "centre": [
+    324.0,
+    -458.5
+   ],
+   "path": [
+    [
+     330.0,
+     -449.0,
+     -38.41
+    ],
+    [
+     328.56,
+     -451.28,
+     -31.84
+    ],
+    [
+     324.0,
+     -458.5,
+     -26.45
+    ],
+    [
+     319.2,
+     -466.1,
+     -29.65
+    ],
+    [
+     318.0,
+     -468.0,
+     -34.45
+    ]
+   ],
+   "look": [
+    [
+     339.44,
+     -395.45,
+     -13.06
+    ],
+    [
+     326.65,
+     -402.09,
+     -19.58
+    ],
+    [
+     313.86,
+     -408.73,
+     -26.1
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch2-nemes--ch2-small.mp4"
+  },
+  {
+   "id": "ch2-leo--ch2-temples",
+   "name": "Flight into ch2-temples from ch2-leo",
+   "state": "first-time",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    15.59,
+    16.2
+   ],
+   "centre": [
+    359.5,
+    -439.0
+   ],
+   "path": [
+    [
+     280.0,
+     -433.0,
+     -26.39
+    ],
+    [
+     299.08,
+     -434.44,
+     -4.47
+    ],
+    [
+     359.5,
+     -439.0,
+     13.47
+    ],
+    [
+     423.1,
+     -443.8,
+     -3.72
+    ],
+    [
+     439.0,
+     -445.0,
+     -29.5
+    ]
+   ],
+   "look": [
+    [
+     334.2,
+     -448.54,
+     -5.87
+    ],
+    [
+     357.9,
+     -454.46,
+     -21.86
+    ],
+    [
+     381.61,
+     -460.38,
+     -37.85
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch2-leo--ch2-temples.mp4"
+  }
+ ]
+}

@@ -3,7 +3,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
-import { MaterialSchema, MeasurementSchema, StructureSchema, DATA_DIR, casedIn, isContext, loadDatabase, loadFootprints, resolve } from './index';
+import { MaterialSchema, MeasurementSchema, StructureSchema, DATA_DIR, casedIn, isContext, loadDatabase, loadFootprints, loadTexts, resolve } from './index';
 
 const db = loadDatabase();
 
@@ -35,8 +35,8 @@ describe('database', () => {
 });
 
 describe('sites and structures', () => {
-  it('registers Giza on Earth and the Cydonia placeholder on Mars', () => {
-    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars']);
+  it('registers Giza on Earth, the Cydonia placeholder on Mars, Hawara, Göbekli Tepe, Meidum and Dahshur on Earth', () => {
+    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars', 'hawara:earth', 'gobekli-tepe:earth', 'meidum:earth', 'dahshur:earth']);
   });
   it('gives every structure an evidence tier and a known site', () => {
     const tiers = new Set(db.structures.map((s) => s.evidence));
@@ -48,8 +48,46 @@ describe('sites and structures', () => {
     expect(db.structures.find((s) => s.id === 'g2.sar-shafts')?.evidence).toBe('claimed');
     expect(db.structures.find((s) => s.id === 'hall-of-records')?.evidence).toBe('legendary');
   });
-  it('defaults every measurement to the Giza site', () => {
-    for (const m of db.measurements) expect(m.site).toBe('giza');
+  it('defaults a measurement to the Giza site, and files each at its structure\'s site', () => {
+    expect(MeasurementSchema.parse({ key: 'x', structure: 'g1', quantity: 'length', value: 1, unit: 'm', source: 'petrie-1883' }).site).toBe('giza');
+    const siteOf = new Map(db.structures.map((s) => [s.id, s.site]));
+    for (const m of db.measurements) {
+      const site = siteOf.get(m.structure) ?? siteOf.get(m.structure.split('.')[0] as string);
+      if (site !== undefined) expect(m.site, m.key).toBe(site);
+    }
+    expect(new Set(db.measurements.map((m) => m.site))).toEqual(new Set(['giza', 'hawara', 'gobekli-tepe', 'meidum', 'dahshur']));
+  });
+  it('tiers Hawara by the rule: dug, published, announced, told', () => {
+    const tier = (id: string) => db.structures.find((s) => s.id === id)?.evidence;
+    expect(tier('hawara.labyrinth')).toBe('excavated');
+    expect(tier('hawara.mataha-anomalies')).toBe('instrumented');
+    expect(tier('hawara.mataha-walls')).toBe('claimed');
+    expect(tier('hawara.merlin-burrows')).toBe('claimed');
+    expect(tier('hawara.labyrinth.lower-storey')).toBe('legendary');
+    for (const s of db.structures.filter((s) => s.id.startsWith('hawara.'))) expect(s.site, s.id).toBe('hawara');
+  });
+  it('enters Enclosure D as excavated at Göbekli Tepe, its figures as its excavators published them', () => {
+    const d = db.structures.find((s) => s.id === 'gobekli.enclosure-d');
+    expect(d?.evidence).toBe('excavated');
+    expect(d?.site).toBe('gobekli-tepe');
+    const figures = db.measurements.filter((m) => m.structure === 'gobekli.enclosure-d');
+    expect(figures.filter((m) => m.method === 'as published').length).toBeGreaterThan(4);
+    // the plan read two ways: what is printed, and what is scaled off its bar, never verified
+    const scaled = figures.filter((m) => m.method === 'scaled from plate');
+    expect(scaled.filter((m) => m.key.endsWith('.east')).length).toBe(13); // two central pillars and the 11 in the wall
+    for (const m of figures) expect(['as published', 'scaled from plate'], m.key).toContain(m.method);
+    for (const m of scaled) {
+      expect(m.verified, m.key).toBe(false);
+      expect(m.sigma, m.key).toBeGreaterThan(0);
+    }
+  });
+  it('enters every claimed underground figure as claimed, unverified, from where it was said', () => {
+    const sar = db.measurements.filter((m) => m.structure === 'g2.sar-shafts');
+    expect(sar.length).toBeGreaterThan(5);
+    for (const m of sar) {
+      expect(m.method, m.key).toBe('as claimed');
+      expect(m.verified, m.key).toBe(false);
+    }
   });
 });
 
@@ -67,7 +105,7 @@ describe('presets', () => {
     expect(resolve(db, 'dash-2015').values['g1.base.side.mean']).toBe(230.363);
   });
   it('a key with a single source survives every preset', () => {
-    for (const p of db.presets) expect(resolve(db, p.id).values['earth.radius.polar']).toBe(6356752.314);
+    for (const p of db.presets) expect(resolve(db, p.id).values['earth.radius.equatorial']).toBe(6378137);
   });
   it('rejects an unknown preset', () => {
     expect(() => resolve(db, 'nope')).toThrow(/unknown preset/);
@@ -168,5 +206,32 @@ describe('what the buildings are made of', () => {
     expect(() => loadDatabase(copy)).toThrow(/cites unknown source "no-such-book"/);
 
     rmSync(copy, { recursive: true, force: true });
+  });
+});
+
+describe('texts', () => {
+  const texts = loadTexts();
+  it('loads every figure with its text, its place in it and a registered source', () => {
+    expect(texts.map((t) => t.key)).toEqual(expect.arrayContaining(['turin.followers.years', 'rhind.p56.base', 'rhind.p56.height']));
+    for (const t of texts) expect(t.locus.length).toBeGreaterThan(0);
+  });
+  it('keeps texts out of the measurements and stores no derived figure', () => {
+    const measured = new Set(db.measurements.map((m) => m.key));
+    for (const t of texts) expect(measured.has(t.key)).toBe(false);
+    // problem 56's answer follows from its base and height, so it is computed where shown
+    expect(texts.map((t) => t.key)).not.toContain('rhind.p56.seked');
+  });
+  it('rejects a figure whose source is not registered', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'seked-texts-'));
+    try {
+      cpSync(join(DATA_DIR, 'sources.json'), join(dir, 'sources.json'));
+      cpSync(join(DATA_DIR, 'texts'), join(dir, 'texts'), { recursive: true });
+      writeFileSync(join(dir, 'texts', 'bad.json'), JSON.stringify({ about: 'x', figures: [{ key: 'x.y', text: 'x', locus: 'l', value: 1, unit: 'year', source: 'nobody' }] }));
+      expect(() => loadTexts(dir)).toThrow(/unknown source nobody/);
+      writeFileSync(join(dir, 'texts', 'bad.json'), JSON.stringify({ about: 'x', figures: [{ key: 'rhind.p56.base', text: 'x', locus: 'l', value: 1, unit: 'cubit', source: 'greenberg-rhind' }] }));
+      expect(() => loadTexts(dir)).toThrow(/given twice/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

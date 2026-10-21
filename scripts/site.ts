@@ -1,6 +1,6 @@
 /**
  * Assemble the static site: the landing page (apps/home) at the root, the
- * path-traced walkthrough, films and sky alignments beside it, the realtime
+ * path-traced walkthrough, the exhibit, films and sky alignments beside it, the realtime
  * viewer under /viewer/, the milestone snapshots under /progress/ with a
  * generated index, and the generated documents under /docs/, as Markdown and
  * as pages. Run after `pnpm build:web`.
@@ -10,8 +10,9 @@
  * what it left out.
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { REPO_ROOT } from '@seked/data';
+import { escape, markdown } from './markdown';
 
 const apps = join(REPO_ROOT, 'apps');
 const dist = join(apps, 'web', 'dist');
@@ -43,8 +44,22 @@ for (const page of ['walk', 'films', 'alignments']) {
 }
 if (!existsSync(join(apps, 'walk', 'pano'))) skipped.push('walkthrough panoramas (python render/publish.py)');
 if (!existsSync(join(apps, 'films', 'films'))) skipped.push('films (render/film.py)');
+// The exhibit (pnpm --filter @seked/exhibit build) reads the walkthrough's panoramas at ../walk/, so it carries none.
+const exhibit = join(apps, 'exhibit', 'dist');
+if (existsSync(join(exhibit, 'index.html'))) {
+  cpSync(exhibit, join(site, 'exhibit'), { recursive: true });
+  // its flights are rendered on the laptop (render/films-exhibit.json); a leaf without one cuts
+  const flights = join(apps, 'exhibit', 'flights');
+  if (existsSync(flights)) cpSync(flights, join(site, 'exhibit', 'flights'), { recursive: true });
+  // the objects in the hand (render/export_heads.py); a leaf without its object shows the panorama
+  const objects = join(apps, 'exhibit', 'objects');
+  if (existsSync(objects)) cpSync(objects, join(site, 'exhibit', 'objects'), { recursive: true });
+  // the recorded narration (scripts/narrate_script.py); without it the browser's own voice reads the leaves
+  const narration = join(REPO_ROOT, 'assets', 'narration');
+  if (existsSync(narration)) cpSync(narration, join(site, 'exhibit', 'narration'), { recursive: true });
+  else skipped.push('the recorded narration (assets/narration)');
+} else skipped.push('the exhibit (pnpm --filter @seked/exhibit build)');
 
-const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** The page shell every generated page shares: the landing page's dark look, kept small. */
 const shell = (title: string, body: string, home = '../') => `<!doctype html>
@@ -90,49 +105,6 @@ ${body}
 </html>
 `;
 
-/**
- * The Markdown the generators write: headings, pipe tables with alignment,
- * bullet lists, paragraphs, **bold**, *italic*, `code` and [links](url).
- * Enough for the dossier and the shaft table; not a general renderer.
- */
-function markdown(md: string): string {
-  const inline = (s: string) => escape(s)
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>')
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
-  const cells = (row: string) => row.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
-  const out: string[] = [];
-  const lines = md.split(/\r?\n/);
-  for (let i = 0; i < lines.length; ) {
-    const line = lines[i] as string;
-    const h = /^(#{1,6})\s+(.*)$/.exec(line);
-    if (h) { out.push(`<h${h[1]!.length}>${inline(h[2]!)}</h${h[1]!.length}>`); i++; continue; }
-    if (line.startsWith('|') && /^\|[\s:|-]+\|$/.test((lines[i + 1] ?? '').trim())) {
-      const head = cells(line);
-      const align = cells(lines[i + 1]!).map((a) => (a.endsWith(':') ? (a.startsWith(':') ? 'c' : 'r') : ''));
-      const cls = (j: number) => (align[j] ? ` class="${align[j]}"` : '');
-      const rows: string[] = [];
-      for (i += 2; i < lines.length && (lines[i] as string).startsWith('|'); i++) {
-        rows.push(`<tr>${cells(lines[i]!).map((c, j) => `<td${cls(j)}>${inline(c)}</td>`).join('')}</tr>`);
-      }
-      out.push(`<div class="scroll"><table><thead><tr>${head.map((c, j) => `<th${cls(j)}>${inline(c)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`);
-      continue;
-    }
-    if (/^[-*]\s+/.test(line)) {
-      const items: string[] = [];
-      for (; i < lines.length && /^[-*]\s+/.test(lines[i]!); i++) items.push(`<li>${inline(lines[i]!.replace(/^[-*]\s+/, ''))}</li>`);
-      out.push(`<ul>${items.join('')}</ul>`);
-      continue;
-    }
-    if (!line.trim()) { i++; continue; }
-    const para: string[] = [];
-    for (; i < lines.length && lines[i]!.trim() && !/^(#|\||[-*]\s)/.test(lines[i]!); i++) para.push(lines[i]!);
-    out.push(`<p>${inline(para.join(' '))}</p>`);
-  }
-  return out.join('\n');
-}
-
 // Progress snapshots: copy the images and turn the README's table into a page.
 const progressDir = join(REPO_ROOT, 'docs', 'progress');
 const outProgress = join(site, 'progress');
@@ -158,14 +130,30 @@ ${cards}`));
 // Generated documents, as their Markdown and as pages.
 const outDocs = join(site, 'docs');
 mkdirSync(outDocs, { recursive: true });
-if (existsSync(join(REPO_ROOT, 'docs', 'plan.html'))) cpSync(join(REPO_ROOT, 'docs', 'plan.html'), join(outDocs, 'plan.html'));
-for (const [f, title] of [['dossier', 'Seked claims dossier'], ['shafts', 'Seked shaft alignments']] as const) {
+// The plan, and the September plan it superseded, which it links.
+for (const f of ['plan.html', 'plan-2026-09.html']) {
+  if (existsSync(join(REPO_ROOT, 'docs', f))) cpSync(join(REPO_ROOT, 'docs', f), join(outDocs, f));
+}
+const research = join(REPO_ROOT, 'docs', 'research');
+// A chapter's brief is chN.md; a topic the plan adds beside a chapter is titled by its own heading.
+const briefs = existsSync(research) ? readdirSync(research).filter((f) => f.endsWith('.md')).map((f) => f.slice(0, -3)).sort() : [];
+const briefTitle = (b: string): string => /^ch\d+$/.test(b)
+  ? `Seked research, chapter ${b.slice(2)}`
+  : `Seked research: ${(/^# (.+)$/m.exec(readFileSync(join(research, `${b}.md`), 'utf8'))?.[1] ?? b)}`;
+const pages: [string, string][] = [
+  ['dossier', 'Seked claims dossier'],
+  ['shafts', 'Seked shaft alignments'],
+  ['script', 'Seked: the script'],
+  ...briefs.map((b): [string, string] => [`research/${b}`, briefTitle(b)]),
+];
+for (const [f, title] of pages) {
   const src = join(REPO_ROOT, 'docs', `${f}.md`);
   if (!existsSync(src)) continue;
+  mkdirSync(dirname(join(outDocs, f)), { recursive: true });
   cpSync(src, join(outDocs, `${f}.md`));
-  writeFileSync(join(outDocs, `${f}.html`), shell(title, markdown(readFileSync(src, 'utf8'))));
+  writeFileSync(join(outDocs, `${f}.html`), shell(title, markdown(readFileSync(src, 'utf8')), f.includes('/') ? '../../' : '../'));
 }
 
 writeFileSync(join(site, '.nojekyll'), '');
-console.log(`site assembled at ${site}: landing page, walkthrough, films, alignments, viewer, ${rows.length} progress snapshots, docs`);
+console.log(`site assembled at ${site}: landing page, walkthrough, exhibit, films, alignments, viewer, ${rows.length} progress snapshots, docs`);
 if (skipped.length) console.log(`left out, not built in this checkout: ${skipped.join('; ')}`);

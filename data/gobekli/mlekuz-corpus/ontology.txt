@@ -1,0 +1,170 @@
+# ---------------------------------------------------------------------------
+# ontology.txt
+# Structural ontology: physical spatial relations only.
+#
+# Principles:
+#   - Physical topology only: how parts relate spatially
+#   - No zoological classification (predator/prey/animal/reptile)
+#   - No semantic associations (teeth=threat, horns=display)
+#   - No interpretive roles
+#   These should emerge from relational grammar or not at all.
+# ---------------------------------------------------------------------------
+
+# --- building spatial structure ---
+building contains center
+building contains wall
+center contains central_pillar
+wall contains wall_pillar
+
+# --- enclosure topology ---
+# physical facts about how pillars are arranged in the enclosure
+central_pillar inside wall
+central_pillar faces_toward central_pillar
+wall_pillar faces_toward central_pillar
+center surrounded_by wall
+
+# --- pillar type structure ---
+central_pillar part_of center
+wall_pillar part_of wall
+
+# --- pillar zone vertical structure ---
+head above shaft
+shaft above base
+neck above shaft
+head above neck
+head part_of pillar
+shaft part_of pillar
+base part_of pillar
+neck part_of pillar
+
+# --- pillar surface structure ---
+front_side part_of pillar
+back_side part_of pillar
+left_broadside part_of pillar
+right_broadside part_of pillar
+
+# --- pillar surface adjacency ---
+# physical adjacency of surfaces on the same pillar
+front_side adjacent_to left_broadside
+front_side adjacent_to right_broadside
+back_side adjacent_to left_broadside
+back_side adjacent_to right_broadside
+front_side opposite back_side
+left_broadside opposite right_broadside
+
+# --- body part topology ---
+# physical spatial relations between body parts
+head above torso
+neck below head
+neck above torso
+waist below torso
+hands connected_to arms
+arms connected_to torso
+body has_part head
+body has_part neck
+body has_part torso
+body has_part arms
+body has_part hands
+body has_part waist
+body has_part pelt
+body has_part tail
+
+# --- head part topology ---
+horns part_of head
+teeth part_of mouth
+mouth part_of head
+face part_of head
+ears part_of head
+beak part_of head
+tongue part_of mouth
+
+# --- body part topology (other) ---
+phallus part_of body
+tail part_of body
+legs part_of body
+flexed_legs part_of body
+straight_legs part_of body
+wings part_of body
+
+# --- anthropomorphic body organisation ---
+# necklace marks the neck boundary zone of the anthropomorphic pillar body
+necklace part_of neck
+belt part_of waist
+loincloth part_of body
+arms part_of torso
+hands part_of arms
+# necklace above belt follows from neck above waist through body topology
+
+# --- ornament internal structure ---
+neck_ornament has_part necklace
+belt_ornament has_part belt
+belt_ornament has_part loincloth
+
+# --- ornament type classification ---
+necklace instance_of ornament
+belt instance_of ornament
+loincloth instance_of ornament
+pelt instance_of ornament
+neck_ornament instance_of ornament
+belt_ornament instance_of ornament
+bird_ornament instance_of ornament
+
+# --- hands and arms as arrangements ---
+# physically: hands are a grouped set of parallel elements
+hands instance_of arrangement
+arms instance_of arrangement
+
+# --- pattern internal structure ---
+snake_pattern has_part snake
+bird_pattern has_part bird
+flock has_part bird
+net has_part weave
+chevron_pattern has_part chevron
+nested_chevron_pattern has_part nested_chevron
+square_pattern has_part square
+building_frieze has_part building_symbol
+
+# --- arrangement types ---
+net instance_of arrangement
+weave instance_of arrangement
+pattern instance_of arrangement
+flock instance_of arrangement
+snake_pattern instance_of arrangement
+bird_pattern instance_of arrangement
+chevron_pattern instance_of arrangement
+nested_chevron_pattern instance_of arrangement
+square_pattern instance_of arrangement
+building_frieze instance_of arrangement
+bird_ornament instance_of arrangement
+neck_ornament instance_of arrangement
+belt_ornament instance_of arrangement
+crane_pattern has_part crane
+crane_pattern instance_of bird_pattern
+
+# --- geometric motif relations ---
+# physical: nested_chevron contains chevron as constituent element
+nested_chevron has_part chevron
+# geometric_sign is supertype of h_motif, crescent, chevron, square, oval, disc
+h_motif instance_of geometric_sign
+crescent instance_of geometric_sign
+chevron instance_of geometric_sign
+square instance_of geometric_sign
+oval instance_of geometric_sign
+disc instance_of geometric_sign
+nested_chevron instance_of geometric_sign
+
+# --- bird types ---
+bustard instance_of bird
+crane instance_of bird
+vulture instance_of bird
+
+# --- quadruped types ---
+gazelle instance_of quadruped
+wild_ass instance_of quadruped
+aurochs instance_of quadruped
+mouflon instance_of quadruped
+boar instance_of quadruped
+fox instance_of quadruped
+leopard instance_of quadruped
+bear instance_of quadruped
+lizard instance_of quadruped

@@ -82,10 +82,14 @@ def import_model(path, name, keep_materials=False):
     mesh = bpy.data.meshes.new(name)
     bm.to_mesh(mesh)
     bm.free()
+    # Clearing the slots drops the faces' material indices, so they are put back after the slots are.
+    index = [0] * len(mesh.polygons)
+    mesh.polygons.foreach_get("material_index", index)
     mesh.materials.clear()
     if keep_materials:
         for mat in materials:
             mesh.materials.append(mat)
+        mesh.polygons.foreach_set("material_index", index)
     return mesh
 
 

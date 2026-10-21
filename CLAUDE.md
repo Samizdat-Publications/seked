@@ -7,18 +7,23 @@ The full plan is `docs/plan.html`; the generated claims dossier is
 
 ## What this is for
 
-A test of how beautiful a fully Claude-driven scene of the Giza plateau can be:
-modelled, lit, textured and given atmosphere, the pyramids above all, inside
-and out, under a correctly mapped sky, and still able to test a claim. It is
-"as close to survey as we can get, with the holes filled in", not a survey for
-its own sake. The pyramids stay as near survey as the sources allow, because
-they are what the claims are about. Everything else (temples, tombs, the
-Sphinx, causeways) needs its placement right, which the OSM registration
-gives to about a metre, and may use a good free 3D model fitted to its
-footprint and labelled as a visual stand-in. Filled-in parts are fine and are
-said to be filled. Render quality is a deliverable, not polish. Later: a tour
-of the star alignments, and an LLM that runs claims such as Hancock's against
-the sim. The next round's plan is `docs/geometry-blockers.md`.
+Since the October rethink (`docs/rethink-2026-10.md`, agreed with Stewart on
+19 and 20 October 2026; the plan is `docs/plan.html`): **the strongest case
+for an older Giza, illustrated for an ordinary viewer.** It is a steelman of
+Hancock, Bauval and Schoch, told as a scroll documentary in ten chapters and
+beautiful enough to show someone. The archaeologists' reply is in every
+chapter, quieter than the claim and never omitted. The checking machinery
+stays behind it: every number still comes from `data/`, and the claims engine
+gives each chapter its receipts. The steelman is in the words and the
+pictures, never in the numbers.
+
+What still holds from before: the scene is "as close to survey as we can
+get, with the holes filled in". The pyramids stay as near survey as the
+sources allow. Everything else (temples, tombs, the Sphinx, causeways) needs
+its placement right, which the OSM registration gives to about a metre, and
+may use a good free 3D model fitted to its footprint and labelled as a visual
+stand-in. Filled-in parts are said to be filled. Render quality is a
+deliverable, not polish. The September plan is `docs/plan-2026-09.html`.
 
 ## Commands
 
@@ -29,6 +34,7 @@ pnpm typecheck      # tsc --noEmit
 pnpm dossier        # regenerate docs/dossier.md from data/
 pnpm shafts         # solve the shaft alignment epochs into docs/shafts.md
 pnpm run stars      # re-import HYG 4.2 into data/stars/ (npm owns the bare `pnpm stars`)
+pnpm run figures    # re-import the constellation figures (Stellarium's modern sky culture) into data/stars/figures.json
 pnpm run footprints # re-import the plateau's lesser monuments from OSM into data/footprints/
 pnpm run city        # re-import the modern city from Open Buildings into data/footprints/city.* (1.3 GB streamed; caches in build/city/)
 pnpm claim -- "<prose>"      # put a claim in somebody's own words to the model; writes build/claims/ only, never data/ (ANTHROPIC_API_KEY in ~/.seked/keys.env)
@@ -40,7 +46,12 @@ python scripts/models.py     # fetch the stand-in models in blender/models.json 
 python scripts/textures.py   # fetch the CC0 Poly Haven texture sets in blender/textures.json into build/textures/ (md5-checked)
 python scripts/plate.py render|grid|scale|measure|register   # read a drawing: native scan, pixel grid, scale bar, scaled figure with its sigma
 python scripts/meshy.py generate ID [--tag T]   # generate a stand-in in blender/models.json from CC0 photographs with Meshy (MESHY_API_KEY in ~/.seked/keys.env)
+python scripts/meshy.py images ID               # a restyle's images only, to look at before paying for the mesh (then from_images, then generate)
+python scripts/meshy.py share [ID ...]          # the pinned Meshy generations on this machine into assets/meshy/ (Git LFS): Meshy keeps no API task
 python scripts/job.py claim|start|status        # own the repo, run a long job detached from the session, see who owns what (see "One session at a time")
+python scripts/headless.py -p "<prompt>" [claude flags]   # a headless `claude -p` job on the API key only (SEKED_ANTHROPIC_API_KEY, or in ~/.seked/keys.env); bulk research and drafting
+python scripts/research.py start|collect N...   # research documentary chapter N as a detached headless job; collect writes docs/research/chN.md
+python scripts/capture_exhibit.py [--from LEAF] [--to LEAF] --out build/critic/NAME.mp4   # the exhibit in narrated play, untouched and muted, recorded in real time with its narration laid under it
 ```
 
 ## Rules that keep the project honest
@@ -57,7 +68,7 @@ python scripts/job.py claim|start|status        # own the repo, run a long job d
   The starting sheet was entered from memory and secondary sources.
 - **Star data is imported, never typed.** Everything in `data/stars/` is
   written by `pnpm run stars` out of one HYG 4.2 CSV: `hyg-bright.json` is the
-  catalogue to magnitude 6.5, `named.json` the fourteen stars the claims name, cut
+  catalogue to magnitude 6.5, `named.json` the fifteen stars the claims name, cut
   from the same rows so the two cannot disagree. The raw CSV is gitignored and
   `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
   attribution the licence requires.
@@ -89,6 +100,14 @@ python scripts/job.py claim|start|status        # own the repo, run a long job d
   resolution, the drafting tolerance and the scan's shrinkage, and is never
   verified. A position guessed from how a picture looks is still not a
   measurement. (Agreed 2026-09-16.)
+- **A text's figures are what the text says.** `data/texts/*.json` holds the
+  years and figures ancient texts give (the Turin King List's totals,
+  Manetho's, the Rhind papyrus's seked problems), in the text's own unit,
+  each cited to its line, fragment or problem and page, `verified: false`
+  until checked against the edition. They are never measurements and never
+  enter a claim's environment; what follows from them is computed where it
+  is shown. A damaged total read as a minimum carries `plus_x`. (Agreed
+  2026-10-21.)
 - **Visual stand-ins are labelled.** A third-party model used for a
   non-pyramid structure is placed on that structure's footprint, keeps its
   licence and source in a manifest, and is marked a stand-in wherever it is

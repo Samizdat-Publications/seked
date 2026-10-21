@@ -8,6 +8,7 @@ import {
   massingParams,
   mergeMeshes,
   pyramidParams,
+  pyramidsStandIn,
   structuresFor,
   type Model,
   type PyramidParams,
@@ -269,6 +270,46 @@ describe('the lesser monuments per state', () => {
  * pin the two halves: the table reaching the built structure, and the label
  * saying what it found and how far it has been checked.
  */
+/**
+ * The First Time as its proponents have it (docs/rethink-2026-10.md): the
+ * Sphinx and the two temples in front of it, and nothing of the pyramids'
+ * builders, who come c. 2500 BCE to the older plan.
+ */
+describe('what stands in the First Time', () => {
+  const model = buildModel(bundle, 'canonical', null);
+  const ancient = model.plateau.structures('ancient');
+
+  it('has no pyramids', () => {
+    expect(pyramidsStandIn('ancient')).toBe(false);
+    for (const state of ['built', 'stripped', 'today'] as const) expect(pyramidsStandIn(state), state).toBe(true);
+  });
+
+  it('keeps the Sphinx and its two temples, and nothing else', () => {
+    expect(ancient.temples.map((t) => t.id).sort()).toEqual(['khafre.valley_temple', 'sphinx.temple']);
+    expect(ancient.fallback.length).toBeGreaterThan(0);
+    for (const one of ancient.fallback) expect(one.id, one.id).toMatch(/^sphinx\./);
+  });
+
+  it('has none of the pyramid builders\' queens, tombs, walls, causeway or pits', () => {
+    expect(ancient.queens).toEqual([]);
+    expect(ancient.mastabas).toBeUndefined();
+    expect(ancient.tombs).toEqual([]);
+    expect(ancient.walls).toEqual([]);
+    expect(ancient.enclosureWalls).toEqual([]);
+    expect(ancient.causeway).toBeUndefined();
+    expect(ancient.causewayWalls).toBeUndefined();
+    expect(ancient.causewayRoof).toBeUndefined();
+    expect(ancient.pits).toEqual([]);
+  });
+
+  it('leaves the states after it as they were', () => {
+    const built = model.plateau.structures('built');
+    expect(built.queens.length).toBeGreaterThan(0);
+    expect(built.enclosureWalls.length).toBeGreaterThan(0);
+    expect(built.causewayRoof).toBeDefined();
+  });
+});
+
 describe('the stone a building is drawn in', () => {
   const model = buildModel(bundle, 'canonical', null);
   const temples = model.plateau.structures('built').temples;

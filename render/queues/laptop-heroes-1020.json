@@ -1,0 +1,10 @@
+{
+ "about": "2026-10-20, the laptop's first finals of the story page's stills at 2400 by 1350 and 128 samples (plan phase 5): the First Time from the air (0041) and chapter 3's temples (0042 to 0045), which the cloud made as previews. The Sphinx's eras (0035, 0036, 0040) wait for night item 36; the underground and Hawara (0037 to 0039, 0050, 0051) wait for items 34 and 35.",
+ "renders": [
+  {"state": "first-time", "shot": "overview", "size": "2400x1350", "samples": 128, "out": "build/finals/heroes/0041-first-time-overview.png"},
+  {"state": "built", "shot": "sphinx-temple-core", "size": "2400x1350", "samples": 128, "out": "build/finals/heroes/0042-temple-core-built.png"},
+  {"state": "built", "shot": "valley-hall", "size": "2400x1350", "samples": 128, "out": "build/finals/heroes/0044-valley-hall-built.png"},
+  {"state": "lion", "shot": "sphinx-temple-core", "size": "2400x1350", "samples": 128, "out": "build/finals/heroes/0043-temple-core-long-rains.png"},
+  {"state": "lion", "shot": "valley-hall", "size": "2400x1350", "samples": 128, "exposure": -3.8, "out": "build/finals/heroes/0045-valley-hall-long-rains.png"}
+ ]
+}

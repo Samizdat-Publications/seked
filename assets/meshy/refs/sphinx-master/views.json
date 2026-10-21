@@ -1,0 +1,141 @@
+{
+  "headswap": {
+    "task": "01a15753-96b2-7530-ad16-808a59ce939b",
+    "prompt": "Edit this photograph of the Great Sphinx of Giza, changing only its head. Replace the human head, its face and its striped headcloth with a royal Egyptian lion's head carved from the same limestone, about half as large again as the present head: a face of broad flat planes, a squared muzzle, eyes looking straight ahead to the right, rounded ears, and a stiff ruff of flat tongue-shaped locks framing the face and falling in lappets onto the chest. Leave everything else in the photograph exactly as it is, pixel for pixel: the camera, the long body, the forelegs, the weathered stone, the people, the pyramid, the sky and the ground.",
+    "refs": [
+      {
+        "file": "File:Giza Plateau - Great Sphinx - side view.JPG",
+        "page": "https://commons.wikimedia.org/wiki/File:Giza_Plateau_-_Great_Sphinx_-_side_view.JPG",
+        "license": "CC BY-SA 4.0"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "16:9"
+    },
+    "consumed_credits": 9,
+    "sha256": "d92cc5ff28e725b18ab7428a09ac87d869f18c09b71fbabb83ae55f3d96a2d70"
+  },
+  "sidedressed": {
+    "task": "01a15754-4035-77fa-bc1d-f17d929988e5",
+    "prompt": "Edit this photograph of a colossal limestone lion statue, changing only its surface and its surroundings, never its shape. Keep the camera and the statue's outline exactly as they are: the long low body, the level back, the long forelegs, the paws, the haunch and the lion's head. Make every surface of the statue smoothly dressed, with crisp edges, as on the day it was finished: remove every gully, crack, missing part, horizontal band and repair block, so the body is one pale even bed of warm limestone, a cleanly carved recumbent lion. Where repair masonry hides a leg or the flank, carve the leg or the flank instead. Remove the people, the fences, the buildings and the pyramid behind; a plain clear sky and a flat rock floor.",
+    "refs": [
+      {
+        "view": "headswap",
+        "sha256": "d92cc5ff28e725b18ab7428a09ac87d869f18c09b71fbabb83ae55f3d96a2d70"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "16:9"
+    },
+    "consumed_credits": 9,
+    "sha256": "6f6a02f9eb9d8859788ffc93515d6a7c5d37d30eeb10aeeb6adcd712dc461adb"
+  },
+  "side": {
+    "task": "01a15755-66e8-736f-b73c-02dae20d529b",
+    "prompt": "Edit this image of a colossal limestone lion statue, changing only its tail. The tail must not rise from the ground or loop in the air: carve it in low relief, lying flat on the rock floor and curling forward along the outside of the haunch, as on the Great Sphinx of Giza. Leave everything else in the image exactly as it is, pixel for pixel.",
+    "refs": [
+      {
+        "view": "sidedressed",
+        "sha256": "6f6a02f9eb9d8859788ffc93515d6a7c5d37d30eeb10aeeb6adcd712dc461adb"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "16:9"
+    },
+    "consumed_credits": 9,
+    "sha256": "4521ac6e71d4fc12329341584729771e70e7dbd492457deaee0ee4c7da08f667"
+  },
+  "fronthead": {
+    "task": "01a15756-61fe-7554-9a18-78ee46088752",
+    "prompt": "Edit the first image, a photograph of the Great Sphinx of Giza seen from the front, the face towards the camera, changing only its head. Replace the human head, its face and its striped headcloth with the royal Egyptian lion's head of the second image, the same head carved from the same limestone and at the same size against the body, seen from the front, the face towards the camera: its flat planes, squared muzzle, rounded ears and stiff ruff of flat tongue-shaped locks falling in lappets. Leave everything else in the first photograph exactly as it is, pixel for pixel: the camera, the body, the forelegs, the weathered stone, the scaffolding, the people, the sky and the ground.",
+    "refs": [
+      {
+        "file": "File:Giza Plateau - Great Sphinx - front view.JPG",
+        "page": "https://commons.wikimedia.org/wiki/File:Giza_Plateau_-_Great_Sphinx_-_front_view.JPG",
+        "license": "CC BY-SA 4.0"
+      },
+      {
+        "view": "headswap",
+        "sha256": "d92cc5ff28e725b18ab7428a09ac87d869f18c09b71fbabb83ae55f3d96a2d70"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "13e62189ba10295962a0ae3fd604b883ab3f7e123a2f4573a88a9570cb4b87b0"
+  },
+  "backhead": {
+    "task": "01a15758-5799-76d6-ab90-c4179e3455b6",
+    "prompt": "Edit the first image, a photograph of the Great Sphinx of Giza seen from behind, the back of the head towards the camera, changing only its head. Replace the human head, its face and its striped headcloth with the royal Egyptian lion's head of the second image, the same head carved from the same limestone and at the same size against the body, seen from behind, the back of the head towards the camera: its flat planes, squared muzzle, rounded ears and stiff ruff of flat tongue-shaped locks falling in lappets. Leave everything else in the first photograph exactly as it is, pixel for pixel: the camera, the body, the forelegs, the weathered stone, the scaffolding, the people, the sky and the ground.",
+    "refs": [
+      {
+        "file": "File:Great Sphinx 2010 rear.jpg",
+        "page": "https://commons.wikimedia.org/wiki/File:Great_Sphinx_2010_rear.jpg",
+        "license": "CC BY-SA 3.0"
+      },
+      {
+        "view": "headswap",
+        "sha256": "d92cc5ff28e725b18ab7428a09ac87d869f18c09b71fbabb83ae55f3d96a2d70"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "efc35be5ec12127357dffdd1c8715523ea422aaf914ef31f4b57a957a5b6171d"
+  },
+  "back": {
+    "task": "01a15758-ffd6-7161-9cd5-143ff2b6cb5d",
+    "prompt": "Edit this photograph of a colossal limestone lion statue, changing only its surface and its surroundings, never its shape. Keep the camera and the statue's outline exactly as they are: the long low body, the level back, the long forelegs, the paws, the haunch and the lion's head. Make every surface of the statue smoothly dressed, with crisp edges, as on the day it was finished: remove every gully, crack, missing part, horizontal band and repair block, so the body is one pale even bed of warm limestone, a cleanly carved recumbent lion. Where repair masonry hides a leg or the flank, carve the leg or the flank instead. Remove the people, the fences, the buildings and the pyramid behind; a plain clear sky and a flat rock floor. The tail lies flat on the rock floor in low relief, curling forward along the outside of the haunch as on the Great Sphinx; it does not rise from the ground or loop in the air.",
+    "refs": [
+      {
+        "view": "backhead",
+        "sha256": "efc35be5ec12127357dffdd1c8715523ea422aaf914ef31f4b57a957a5b6171d"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "28a473ab3b28d2424501f0d4a3f3044e32c358e88ee0c7ca1d21668226df197b"
+  },
+  "frontdressed": {
+    "task": "01a15757-0d42-77cc-890b-0134d88de2fe",
+    "prompt": "Edit this photograph of a colossal limestone lion statue, changing only its surface and its surroundings, never its shape. Keep the camera and the statue's outline exactly as they are: the long low body, the level back, the long forelegs, the paws, the haunch and the lion's head. Make every surface of the statue smoothly dressed, with crisp edges, as on the day it was finished: remove every gully, crack, missing part, horizontal band and repair block, so the body is one pale even bed of warm limestone, a cleanly carved recumbent lion. Where repair masonry hides a leg or the flank, carve the leg or the flank instead. Remove the people, the fences, the buildings and the pyramid behind; a plain clear sky and a flat rock floor. The tail lies flat on the rock floor in low relief, curling forward along the outside of the haunch as on the Great Sphinx; it does not rise from the ground or loop in the air.",
+    "refs": [
+      {
+        "view": "fronthead",
+        "sha256": "13e62189ba10295962a0ae3fd604b883ab3f7e123a2f4573a88a9570cb4b87b0"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "814910ae2dacc35c039b2d8d5d94495c7869358ad4d72d8fed96eb20949dc0a6"
+  },
+  "front": {
+    "task": "01a1575a-9b3c-732d-a2ad-e7f4fe1f94ca",
+    "prompt": "Edit this image of a colossal limestone lion statue, changing only its tail. The tail must not rise from the ground or loop in the air: carve it in low relief, lying flat on the rock floor and curling forward along the outside of the haunch, as on the Great Sphinx of Giza. Leave everything else in the image exactly as it is, pixel for pixel.",
+    "refs": [
+      {
+        "view": "frontdressed",
+        "sha256": "814910ae2dacc35c039b2d8d5d94495c7869358ad4d72d8fed96eb20949dc0a6"
+      }
+    ],
+    "options": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "4:3"
+    },
+    "consumed_credits": 9,
+    "sha256": "ef202c714f92020040a5f9eab7c1ce942a495ab7e0e5e039fb43cc6f42c07c39"
+  }
+}

@@ -1,0 +1,144 @@
+{
+ "sequence": "enclosure-d-fill",
+ "frames": 32,
+ "size": "960x540",
+ "preview": true,
+ "made": "blender -b --factory-startup -P render/enclosure_d.py -- --size 960x540 --samples 16 --view air --fill level --level L --out fNNN.png, L = 2.6 i/31 m",
+ "first": {
+  "view": "air",
+  "camera": {
+   "eye": [
+    -14.0,
+    -17.0,
+    14.0
+   ],
+   "at": [
+    0.0,
+    -1.8,
+    0.5
+   ],
+   "lens": 30
+  },
+  "stand_in": true,
+  "look_choices": {
+   "ring_height": 3.5,
+   "thickness_central": 0.45,
+   "thickness_ring": 0.35,
+   "shaft": 0.72,
+   "head": 0.24,
+   "wall_thickness": 1.0,
+   "wall_out": 0.45,
+   "figure": 1.7,
+   "fill_level": 2.6,
+   "slide_from": 315.0,
+   "slide_dip": 18.0,
+   "ground_out": 30.0
+  },
+  "fill": "level",
+  "fill_level": 0.0,
+  "figure": [
+   -1.4500000000000002,
+   -1.9500000000000002,
+   1.7
+  ],
+  "note": "A stand-in for Enclosure D at Göbekli Tepe. Pillar positions, widths and the central pair's axes are scaled from Haklay & Gopher 2020 Fig. 1; the central pillars' height, their pedestals and the wall's preserved height are printed on its p. 347 (data/measurements/gobekli.json). The rest is look choices; no relief is carved."
+ },
+ "per_frame": [
+  {
+   "fill_level": 0.0
+  },
+  {
+   "fill_level": 0.0839
+  },
+  {
+   "fill_level": 0.1677
+  },
+  {
+   "fill_level": 0.2516
+  },
+  {
+   "fill_level": 0.3355
+  },
+  {
+   "fill_level": 0.4194
+  },
+  {
+   "fill_level": 0.5032
+  },
+  {
+   "fill_level": 0.5871
+  },
+  {
+   "fill_level": 0.671
+  },
+  {
+   "fill_level": 0.7548
+  },
+  {
+   "fill_level": 0.8387
+  },
+  {
+   "fill_level": 0.9226
+  },
+  {
+   "fill_level": 1.0065
+  },
+  {
+   "fill_level": 1.0903
+  },
+  {
+   "fill_level": 1.1742
+  },
+  {
+   "fill_level": 1.2581
+  },
+  {
+   "fill_level": 1.3419
+  },
+  {
+   "fill_level": 1.4258
+  },
+  {
+   "fill_level": 1.5097
+  },
+  {
+   "fill_level": 1.5935
+  },
+  {
+   "fill_level": 1.6774
+  },
+  {
+   "fill_level": 1.7613
+  },
+  {
+   "fill_level": 1.8452
+  },
+  {
+   "fill_level": 1.929
+  },
+  {
+   "fill_level": 2.0129
+  },
+  {
+   "fill_level": 2.0968
+  },
+  {
+   "fill_level": 2.1806
+  },
+  {
+   "fill_level": 2.2645
+  },
+  {
+   "fill_level": 2.3484
+  },
+  {
+   "fill_level": 2.4323
+  },
+  {
+   "fill_level": 2.5161
+  },
+  {
+   "fill_level": 2.6
+  }
+ ]
+}

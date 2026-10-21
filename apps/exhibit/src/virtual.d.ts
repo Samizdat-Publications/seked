@@ -1,0 +1,28 @@
+declare module 'virtual:sphinx-plan' {
+  const data: import('./figures').SphinxPlanData;
+  export default data;
+}
+declare module 'virtual:sky' {
+  const data: import('./sky').SkyData;
+  export default data;
+}
+declare module 'virtual:allan-rank' {
+  const data: import('./figures').RankData;
+  export default data;
+}
+declare module 'virtual:luminescence' {
+  const data: import('./figures').LuminescenceData;
+  export default data;
+}
+declare module 'virtual:radiocarbon' {
+  const data: import('./figures').RadiocarbonData;
+  export default data;
+}
+declare module 'virtual:corridor' {
+  const data: import('./figures').CorridorData;
+  export default data;
+}
+declare module 'virtual:texts' {
+  const data: { kingLists: import('./texts').KingListsData; rhind: import('./texts').TextFigureIn[]; rhindCitation: string };
+  export default data;
+}

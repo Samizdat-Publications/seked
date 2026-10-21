@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildBundle } from '../../../../../scripts/bundle';
-import { buildModel, type Structures } from '../../model';
+import { buildModel, pyramidsStandIn, type Structures } from '../../model';
 import { STATES, type StateId } from '../../view';
 import { sekedUserData, type Labelled } from './label';
 
@@ -29,7 +29,8 @@ describe('what a monument says when it is pointed at', () => {
     for (const { id } of STATES) {
       const state = id as StateId;
       const all = labelled(model.plateau.structures(state));
-      expect(all.length, state).toBeGreaterThan(15);
+      // The First Time holds only the Sphinx and its two temples (model.test.ts, 'what stands in the First Time').
+      expect(all.length, state).toBeGreaterThan(pyramidsStandIn(state) ? 15 : 2);
       for (const one of all) {
         const seked = sekedUserData(one, state);
         expect(seked.state, `${state} ${one.id}`).toBe(state);

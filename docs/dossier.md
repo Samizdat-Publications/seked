@@ -1,6 +1,6 @@
 # Seked claims dossier
 
-Generated 2026-10-02 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
+Generated 2026-10-21 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
 
 ## Summary
 
@@ -9,24 +9,25 @@ Generated 2026-10-02 from `data/` with the **canonical** preset. Every number be
 | A1 | π in the profile | +0.03 % | +0.03 % | yes | 0 |
 | A2 | φ in the face | +0.04 % | −0.09 % | yes | 0 |
 | A3 | Seked 5½ explains both | 5.9″ (+0.003 %) | 1.0′ (+0.033 %) | yes | 0 |
-| A4 | King's Chamber 3-4-5 | −0.01 % | −0.17 % | yes | 1 |
-| A5 | The cubit itself | +1 µm (+0.000 %) | −7 µm (−0.001 %) | yes | 1 |
+| A4 | King's Chamber 3-4-5 | −0.04 % | −0.19 % | yes | 1 |
+| A5 | The cubit itself | +141 µm (+0.03 %) | +149 µm (+0.03 %) | yes | 3 |
 | A7 | Khafre's 3-4-5 | 2.2′ (+0.069 %) | 2.2′ (+0.069 %) | yes | 0 |
 | B1 | 1 : 43,200 | −24.1 km (−0.38 %) | −274.0 km (−0.68 %) | yes | 2 |
 | B2 | Height × 10⁹ = Earth–Sun distance | −505,000.0 km (−0.34 %) | −3,007,870.7 km (−2.01 %) | yes | 2 |
 | B3 | Latitude equals the speed of light | −0.3″ (−0.000 %) | −0.3″ (−0.000 %) | yes | 3 |
-| B4 | Pyramid inch and the year | −0.16 % | −0.79 % | no | 3 |
+| B4 | Pyramid inch and the year | −0.16 % | −0.79 % | yes | 3 |
 | B5 | Half a minute of equatorial arc | −6.34 m (−0.68 %) | −6.34 m (−0.68 %) | yes | 2 |
 | C1 | True north | −3.9′ | −3.9′ | yes | 0 |
 | C2 | Shafts point at stars | −12.2′ (−0.450 %) | 39.5′ (+2.060 %) | no | 2 |
 | C3 | Descending passage and the pole star | 4.9′ (+0.312 %) | 4.9′ (+0.312 %) | yes | 1 |
 | C4 | Orion Correlation | +24.97 % | 13°00′33″ (+34.368 %) | no | 3 |
 | C5 | Sphinx and Leo | −12°33′53″ | 10°14′04″ (+11.372 %) | no | 3 |
-| C6 | Solstice akhet | 2°38′15″ (+0.891 %) | 2°38′15″ (+0.891 %) | yes | 0 |
+| C6 | Solstice akhet | 2°38′19″ (+0.892 %) | 2°38′19″ (+0.892 %) | yes | 0 |
 | C7 | Cygnus alternative | −42.45 % | −22°33′24″ (−59.591 %) | no | 3 |
-| D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
-| D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
-| D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −6°31′41″ (−14.507 %) | no | 2 |
+| C8 | The Vulture Stone as a date | 4°10′16″ | 4°10′16″ | no | 5 |
+| D1 | Giza diagonal to Heliopolis | −1°34′58″ (−3.522 %) | −1°38′55″ (−3.664 %) | no | 2 |
+| D2 | Legon's rectangle | +0.08 % | −0.12 % | yes | 1 |
+| D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −7°00′15″ (−15.565 %) | no | 2 |
 | D4 | Sphinx axis and the temples | −1.2′ | 22.0′ | yes | 1 |
 
 ## A · Proportion and geometry of the Great Pyramid
@@ -113,19 +114,19 @@ The King's Chamber measures 20 × 10 cubits with a height of 5√5 cubits, so th
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.9854 | 15 | −0.10 % | yes (±0.5 %) |
-| floor diagonal in cubits against √500 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2)` vs `sqrt(500)` | 22.3583 | 22.3607 | −0.01 % | yes (±0.5 %) |
-| space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9896 | 25 | −0.04 % | yes (±0.5 %) |
-| height in cubits against 5√5 | `kc.height / cubit.royal` vs `5 * sqrt(5)` | 11.1618 | 11.1803 | −0.17 % | yes (±0.5 %) |
+| end-wall diagonal in cubits against 15 | `sqrt((kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `15` | 14.9812 | 15 | −0.13 % | yes (±0.5 %) |
+| floor diagonal in cubits against √500 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2)` vs `sqrt(500)` | 22.352 | 22.3607 | −0.04 % | yes (±0.5 %) |
+| space diagonal in cubits against 25 | `sqrt((kc.length / cubit.royal)^2 + (kc.width / cubit.royal)^2 + (kc.height / cubit.royal)^2)` vs `25` | 24.9825 | 25 | −0.07 % | yes (±0.5 %) |
+| height in cubits against 5√5 | `kc.height / cubit.royal` vs `5 * sqrt(5)` | 11.1586 | 11.1803 | −0.19 % | yes (±0.5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| end-wall diagonal in cubits against 15 | −0.10 % | −0.13 % | −0.13 % | −0.10 % |
-| floor diagonal in cubits against √500 | −0.01 % | −0.04 % | −0.04 % | −0.01 % |
-| space diagonal in cubits against 25 | −0.04 % | −0.07 % | −0.07 % | −0.04 % |
-| height in cubits against 5√5 | −0.17 % | −0.19 % | −0.19 % | −0.17 % |
+| end-wall diagonal in cubits against 15 | −0.13 % | −0.13 % | −0.13 % | −0.13 % |
+| floor diagonal in cubits against √500 | −0.04 % | −0.04 % | −0.04 % | −0.04 % |
+| space diagonal in cubits against 25 | −0.07 % | −0.07 % | −0.07 % | −0.07 % |
+| height in cubits against 5√5 | −0.19 % | −0.19 % | −0.19 % | −0.19 % |
 
 **Free choices (1)**:
 - the cubit length used to convert the metric measurements
@@ -144,18 +145,20 @@ The royal cubit in metres equals π/6 and also φ²/5.
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| royal cubit against π/6 metres | `cubit.royal` vs `pi / 6` | 0.524 m | 0.524 m | +1 µm (+0.000 %) | yes (±0.1 %) |
-| royal cubit against φ²/5 metres | `cubit.royal` vs `phi^2 / 5` | 0.524 m | 0.524 m | −7 µm (−0.001 %) | yes (±0.1 %) |
+| royal cubit against π/6 metres | `cubit.royal` vs `pi / 6` | 0.524 m | 0.524 m | +149 µm (+0.03 %) | yes (±0.1 %) |
+| royal cubit against φ²/5 metres | `cubit.royal` vs `phi^2 / 5` | 0.524 m | 0.524 m | +141 µm (+0.03 %) | yes (±0.1 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| royal cubit against π/6 metres | +1 µm (+0.000 %) | +149 µm (+0.03 %) | +149 µm (+0.03 %) | +1 µm (+0.000 %) |
-| royal cubit against φ²/5 metres | −7 µm (−0.001 %) | +141 µm (+0.03 %) | +141 µm (+0.03 %) | −7 µm (−0.001 %) |
+| royal cubit against π/6 metres | +149 µm (+0.03 %) | +149 µm (+0.03 %) | +149 µm (+0.03 %) | +149 µm (+0.03 %) |
+| royal cubit against φ²/5 metres | +141 µm (+0.03 %) | +141 µm (+0.03 %) | +141 µm (+0.03 %) | +141 µm (+0.03 %) |
 
-**Free choices (1)**:
+**Free choices (3)**:
 - the metre, defined in 1793, as the unit of comparison
+- the divisor 6 under pi
+- the divisor 5 under phi, and squaring phi
 
 **Overlay:** `panel`
 
@@ -163,7 +166,7 @@ Residual by survey preset:
 
 **Context:** Petrie, W. M. F. (1883). The Pyramids and Temples of Gizeh. London: Field & Tuer.
 
-π/6 = 0.523599 and φ²/5 = 0.523607 agree with each other to 0.002 % with no help from Egypt, so any length near 0.5236 m "encodes" both. The cubit varied between 0.523 and 0.529 m across Egypt and across dynasties.
+π/6 = 0.523599 and φ²/5 = 0.523607 agree with each other to 0.002 % with no help from Egypt, so any length near 0.5236 m "encodes" both. The cubit varied between 0.523 and 0.529 m across Egypt and across dynasties. The cubit tested is Petrie's measured one (cubit.royal); the conventional 0.5236 m is pi/6 rounded, so testing it would be circular, and it is kept apart as cubit.royal.conventional.
 
 ### A7 · Khafre's 3-4-5
 
@@ -221,8 +224,8 @@ The original height multiplied by a thousand million is the distance from the Ea
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| height × 10⁹ against the astronomical unit | `g1.height.original * 1e9` vs `au` | 146,590,000 km | 149,597,870.7 km | −3,007,870.7 km (−2.01 %) | yes (±2.5 %) |
-| height × 10⁹ against the perihelion distance | `g1.height.original * 1e9` vs `earth.perihelion` | 146,590,000 km | 147,095,000 km | −505,000.0 km (−0.34 %) | yes (±2.5 %) |
+| height × 10⁹ against the astronomical unit | `g1.height.original * 1e9` vs `au` | 146,590,000 km | 149,597,870.7 km | −3,007,870.7 km (−2.01 %) | no (±0.5 %) |
+| height × 10⁹ against the perihelion distance | `g1.height.original * 1e9` vs `earth.perihelion` | 146,590,000 km | 147,095,000 km | −505,000.0 km (−0.34 %) | yes (±0.5 %) |
 
 Residual by survey preset:
 
@@ -369,7 +372,7 @@ Residual by survey preset:
 | King's Chamber south shaft against Alnitak | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) | −12.2′ (−0.450 %) |
 | King's Chamber north shaft against Thuban | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) | 39.5′ (+2.060 %) |
 | Queen's Chamber south shaft against Sirius | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) | 14.9′ (+0.632 %) |
-| Queen's Chamber north shaft against Kochab | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) | −14.3′ (−0.606 %) |
+| Queen's Chamber north shaft against Kochab | −14.3′ (−0.606 %) | −1°53′18″ (−4.799 %) | −1°53′18″ (−4.799 %) | −1°53′18″ (−4.799 %) |
 
 **Free choices (2)**:
 - the epoch
@@ -484,13 +487,13 @@ Seen from the Sphinx, the summer solstice sun sets in the gap between the Great 
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | `sun.solstice.summer.set.azimuth` vs `atan2((g1.centre.offset.east - g1.base.half + g2.base.half - g2.centre.offset.west) / 2 - sphinx.centre.offset.east, (g1.centre.offset.north - g1.base.half + g2.base.half - g2.centre.offset.south) / 2 - sphinx.centre.offset.north) + 360` | 298°31′21″ | 295°53′06″ | 2°38′15″ (+0.891 %) | yes (±8°00′00″) |
+| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | `sun.solstice.summer.set.azimuth` vs `atan2((g1.centre.offset.east - g1.base.half + g2.base.half - g2.centre.offset.west) / 2 - sphinx.centre.offset.east, (g1.centre.offset.north - g1.base.half + g2.base.half - g2.centre.offset.south) / 2 - sphinx.centre.offset.north) + 360` | 298°31′21″ | 295°53′02″ | 2°38′19″ (+0.892 %) | yes (±8°00′00″) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | 2°38′15″ (+0.891 %) | 2°38′16″ (+0.891 %) | 2°38′18″ (+0.892 %) | 2°38′19″ (+0.892 %) |
+| summer solstice sunset azimuth against the middle of the gap, from the Sphinx | 2°38′19″ (+0.892 %) | 2°38′20″ (+0.892 %) | 2°38′22″ (+0.892 %) | 2°38′23″ (+0.892 %) |
 
 **Free choices (0)**: none.
 
@@ -533,6 +536,39 @@ Residual by survey preset:
 
 This is C4's engine with another constellation in it: the same two shape comparisons, the same folding of right-ascension differences into ±180° with atan2(sin, cos), the same unsigned ground offsets from Petrie's §92, and the same 5 % band. What it is not is Collins' own thesis. That thesis is a view, not a plan: the three wing stars setting into their three pyramids as seen from Gebel Gibli, the knoll south-east of the Sphinx, and Deneb rising over Heliopolis. Testing it needs Gebel Gibli's position and the plateau's local horizon, and the database has neither, so only the ground plan is tested here. The wing is a far wider figure than the belt, and the flat sky map pays for it. Fawaris to Aljanah spans 16.2° at this epoch against the belt's 2.7°, so the map C4 uses, x = Δra × cos dec of the middle star and y = Δdec, is stretched where C4's is not: about Sadr it puts the wing's angle to the meridian at 15.30°, where a true tangent plane about the same star puts it at 14.27°. That is a full degree of projection error, against the arcminute or two the same approximation costs over Orion's belt. It changes no verdict below, but nothing here should be read to better than a degree. Neither comparison holds, and neither holds as well as Orion's. The wing's angle to the meridian comes out at 15°18′ against the pyramids' diagonal of 37°51′, wrong by 22°33′ (−59.6 %), where C4's belt at its own chosen epoch is wrong by 13°01′ (+34.4 %). Menkaure stands off the G1 to G2 line by 0.185 of that line's length and Aljanah stands off the Fawaris to Sadr line by 0.322 of it, so the wing is nearly twice as bent as the ground: −42.5 %, against Orion's +25.0 %. The angle is the half of this that an epoch can move. It sweeps about 0.7° a century here, and over the fifteen thousand years from 13,000 BCE to now it passes the pyramids' 37°51′ exactly twice, around 11,300 BCE and again around 700 CE, neither of them anywhere near the completion of the pyramids that Collins dates the correlation to. The offset ratio barely moves with the epoch at all, so no date rescues the shape. Long-term precession (Vondrák 2011) is what makes any of these dates mean anything; Bauval and Gilbert are cited for context because the method being applied is theirs.
 
+### C8 · The Vulture Stone as a date
+
+Sweatman and Tsikritsis (2017) read Pillar 43 at Göbekli Tepe, the Vulture Stone, as a picture of the sky: the vulture as the teapot of Sagittarius, the scorpion as Scorpius, the bent bird as Ophiuchus, the long-necked bird as Libra, the animal left of the scorpion as Lupus, and the disc above the vulture's wing as the sun. Seen at sunset on the summer solstice, the sun stands just above the teapot's spout in 10,950 BC, give or take 250 years, which they call a date stamp for the Younger Dryas.
+
+*Evaluated at epoch −10949 (10950 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| the spout's ecliptic longitude against the solstice sun's | `atan2(sin(atan2(sin(star.alnasl.ra) * cos(sun.obliquity) + tan(star.alnasl.dec) * sin(sun.obliquity), cos(star.alnasl.ra)) - 90), cos(atan2(sin(star.alnasl.ra) * cos(sun.obliquity) + tan(star.alnasl.dec) * sin(sun.obliquity), cos(star.alnasl.ra)) - 90))` vs `0` | 4°10′16″ | 0°00′00″ | 4°10′16″ | no (±3°30′00″) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| the spout's ecliptic longitude against the solstice sun's | 4°10′16″ | 4°10′16″ | 4°10′16″ | 4°10′16″ |
+
+**Free choices (5)**:
+- the reading itself, that the carvings are constellations and the disc is the sun
+- which constellation each animal is (the vulture as Sagittarius, not Collins's Cygnus)
+- the summer solstice, chosen from the four seasons because its date lies nearest the radiocarbon dates; the others give 2000 AD, 4350 BC and 18,000 BC
+- the spout, γ Sagittarii, standing for where on the vulture the disc sits
+- sunset rather than sunrise, chosen for the figures' orientation
+
+**Overlay:** `panel` {"star":"alnasl","figures":{"Sgr":"the vulture","Sco":"the scorpion","Oph":"the bent bird","Lib":"the long-necked bird","Lup":"the wolf"}}
+
+**Proponents:** Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.
+
+**Context:** Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22. · astronexus. The HYG Database, version 4.2. A merge of the Hipparcos, Yale Bright Star and Gliese catalogues into one CSV, with positions and proper motions at epoch and equinox J2000, distances, magnitudes, spectral types, colour indices and catalogue designations. · Collins, A. (2006). The Cygnus Mystery. London: Watkins.
+
+**Critiques:** Notroff, J., Dietrich, O., Clare, L., Dietrich, L., Schlindwein, J., Kinzel, M., Lelek-Tvetmarken, C. & Sönmez, D. (2017). More than a vulture: A response to Sweatman and Tsikritsis. Mediterranean Archaeology and Archaeometry 17(2), 57–63.
+
+Read from the paper (pp. 237 to 238): the pairings on p. 237, the four candidate dates and the choice of the summer solstice on p. 238, where the date is set by when "the sun is slightly above the spout of the teapot asterism of Sagittarius". The paper found its dates by eye in Stellarium from Şanlıurfa. Here the test is the one quantity that does not depend on the observer: at a solstice the sun's ecliptic longitude of date is 90° by definition, so the comparison is how far the spout's own longitude of date stands from it, folded into ±180°. The star's mean place of date comes from Vondrák 2011 with its proper motion applied, and the longitude from the obliquity of date. The tolerance of 3.5° is the paper's own ±250 years turned into longitude at the general precession of about 50.3″ a year; it says only that the paper's date is consistent with its own reading, not that the reading is right. It misses: the spout's longitude of date is about four degrees past the solstice point in the paper's year, and reaches it about three centuries earlier, just outside the paper's band. Precession by Vondrák 2011 runs slightly slower than today's rate over these millennia, which a constant-rate estimate would not show. "Slightly above" is the sun north of the spout by the star's ecliptic latitude, which no comparison tests. The claims' observer is Giza, a thousand kilometres from Göbekli Tepe, which changes nothing here: longitude of date is the same from anywhere. Notroff and others, the excavators, answer that the animals are those of Göbekli Tepe's own world, found across the site, and that the disc and the other motifs have readings in that context; see docs/gobekli-reliefs.md.
+
 ## D · Site plan and geodesy
 
 ### D1 · Giza diagonal to Heliopolis
@@ -541,14 +577,14 @@ A line through the south-east corners of the three pyramids runs at 45 degrees a
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2(heliopolis.obelisk.centre.offset.east, heliopolis.obelisk.centre.offset.north)` | 43°21′05″ | 44°59′57″ | −1°38′52″ (−3.662 %) | no (±2 %) |
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `atan2(heliopolis.obelisk.centre.offset.east, heliopolis.obelisk.centre.offset.north)` | 43°21′05″ | 44°56′03″ | −1°34′58″ (−3.522 %) | no (±2 %) |
 | bearing of the corner line against 45 degrees | `atan2(g1.base.half + g3.centre.offset.west - g3.base.half, g3.centre.offset.south + g3.base.half - g1.base.half)` vs `45` | 43°21′05″ | 45°00′00″ | −1°38′55″ (−3.664 %) | no (±2 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | −1°38′52″ (−3.662 %) | −1°44′19″ (−3.864 %) | −1°44′17″ (−3.862 %) | −1°38′47″ (−3.659 %) |
+| bearing of the G3 to G1 south-east corner line against the bearing to the obelisk | −1°34′58″ (−3.522 %) | −1°40′25″ (−3.725 %) | −1°40′22″ (−3.723 %) | −1°34′53″ (−3.519 %) |
 | bearing of the corner line against 45 degrees | −1°38′55″ (−3.664 %) | −1°44′22″ (−3.866 %) | −1°44′20″ (−3.864 %) | −1°38′50″ (−3.661 %) |
 
 **Free choices (2)**:
@@ -569,15 +605,15 @@ The three pyramids sit inside a rectangle bounded by the east and north faces of
 
 | Comparison | Formula | Value | Target | Residual | Within |
 |---|---|---:|---:|---:|:---:|
-| east-west extent in cubits against 1000 root 2 | `(g1.base.half + g3.centre.offset.west + g3.base.half) / cubit.royal` vs `1000 * sqrt(2)` | 1415.8 | 1414.21 | +0.11 % | yes (±0.5 %) |
-| north-south extent in cubits against 1000 root 3 | `(g1.base.half + g3.centre.offset.south + g3.base.half) / cubit.royal` vs `1000 * sqrt(3)` | 1730.43 | 1732.05 | −0.09 % | yes (±0.5 %) |
+| east-west extent in cubits against 1000 root 2 | `(g1.base.half + g3.centre.offset.west + g3.base.half) / cubit.royal` vs `1000 * sqrt(2)` | 1415.4 | 1414.21 | +0.08 % | yes (±0.5 %) |
+| north-south extent in cubits against 1000 root 3 | `(g1.base.half + g3.centre.offset.south + g3.base.half) / cubit.royal` vs `1000 * sqrt(3)` | 1729.94 | 1732.05 | −0.12 % | yes (±0.5 %) |
 
 Residual by survey preset:
 
 | Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
 |---|---:|---:|---:|---:|
-| east-west extent in cubits against 1000 root 2 | +0.11 % | +0.23 % | +0.23 % | +0.11 % |
-| north-south extent in cubits against 1000 root 3 | −0.09 % | −0.005 % | −0.004 % | −0.09 % |
+| east-west extent in cubits against 1000 root 2 | +0.08 % | +0.23 % | +0.23 % | +0.09 % |
+| north-south extent in cubits against 1000 root 3 | −0.12 % | −0.005 % | −0.004 % | −0.12 % |
 
 **Free choices (1)**:
 - the cubit length used to convert the metric extents
@@ -598,8 +634,8 @@ Stecchini's claim, as Tompkins gives it in his appendix: the Great Pyramid was s
 |---|---|---:|---:|---:|:---:|
 | the meridian against the Delta's apex | `g1.center.longitude` vs `delta.apex.center.longitude` | 31°08′03″ | 31°08′00″ | 3.1″ (+0.003 %) | yes (±0°03′00″) |
 | the meridian against the middle of the coast, Alexandria to Port Said | `g1.center.longitude` vs `(delta.west.center.longitude + delta.east.center.longitude) / 2` | 31°08′03″ | 31°06′30″ | 1.5′ (+0.083 %) | yes (±0°03′00″) |
-| bearing to the north-east corner against the base diagonal, 45° | `atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)` vs `45` | 38°28′19″ | 45°00′00″ | −6°31′41″ (−14.507 %) | no (±5 %) |
-| bearing to the north-west corner against the base diagonal, 45° west | `abs(atan2(delta.west.centre.offset.east, delta.west.centre.offset.north))` vs `45` | 40°49′16″ | 45°00′00″ | −4°10′44″ (−9.287 %) | no (±5 %) |
+| bearing to the north-east corner against the base diagonal, 45° | `atan2(delta.east.centre.offset.east, delta.east.centre.offset.north)` vs `45` | 37°59′45″ | 45°00′00″ | −7°00′15″ (−15.565 %) | no (±5 %) |
+| bearing to the north-west corner against the base diagonal, 45° west | `abs(atan2(delta.west.centre.offset.east, delta.west.centre.offset.north))` vs `45` | 40°20′12″ | 45°00′00″ | −4°39′48″ (−10.363 %) | no (±5 %) |
 
 Residual by survey preset:
 
@@ -607,8 +643,8 @@ Residual by survey preset:
 |---|---:|---:|---:|---:|
 | the meridian against the Delta's apex | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) | 3.1″ (+0.003 %) |
 | the meridian against the middle of the coast, Alexandria to Port Said | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) | 1.5′ (+0.083 %) |
-| bearing to the north-east corner against the base diagonal, 45° | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) | −6°31′41″ (−14.507 %) |
-| bearing to the north-west corner against the base diagonal, 45° west | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) | −4°10′44″ (−9.287 %) |
+| bearing to the north-east corner against the base diagonal, 45° | −7°00′15″ (−15.565 %) | −7°00′15″ (−15.565 %) | −7°00′15″ (−15.565 %) | −7°00′15″ (−15.565 %) |
+| bearing to the north-west corner against the base diagonal, 45° west | −4°39′48″ (−10.363 %) | −4°39′48″ (−10.363 %) | −4°39′48″ (−10.363 %) | −4°39′48″ (−10.363 %) |
 
 **Free choices (2)**:
 - which places stand for the Delta's corners (Alexandria and Port Said here)
@@ -659,16 +695,13 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 |---|---:|---|---|---|:---:|
 | au | 149597870700 | m | iau-2012 | defined | yes |
 | c | 299792458 | m/s | si-2019 | defined | yes |
-| cubit.royal | 0.5236 | m | lehner-1997 | tabulated | no |
+| cubit.royal | 0.523748 | m | petrie-1883 | weighted-mean | yes |
 | delta.apex.center.longitude | 31.1333 | deg | coords-delta-cited | cited | no |
 | delta.east.center.latitude | 31.25 | deg | coords-delta-cited | cited | no |
 | delta.east.center.longitude | 32.3 | deg | coords-delta-cited | cited | no |
 | delta.west.center.latitude | 31.2 | deg | coords-delta-cited | cited | no |
 | delta.west.center.longitude | 29.9167 | deg | coords-delta-cited | cited | no |
-| earth.circumference.equatorial | 40075016.686 | m | wgs84 | derived | yes |
 | earth.perihelion | 147095000000 | m | nasa-earth-fact-sheet | tabulated | yes |
-| earth.radius.mean | 6371008.8 | m | wgs84 | derived | yes |
-| earth.radius.polar | 6356752.314 | m | wgs84 | defined | yes |
 | g1.base.side.mean | 230.33 | m | lehner-1997 | tabulated | no |
 | g1.base.socket.mean | 231.798 | m | petrie-1883 | socket-corner | yes |
 | g1.center.latitude | 29.979167 | deg | coords-wgs84-cited |  | no |

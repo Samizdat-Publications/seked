@@ -112,7 +112,7 @@ def shaft_epochs():
 
 def pyramid_top(key, era):
     P = data.PYRAMIDS[key]
-    h = P["today"] if states.STATES[era]["pyramids"] in ("today", "stripped") else P["H"]
+    h = states.pyramid_height(P, era)
     return (P["cx"], P["cy"], P["base"] + h)
 
 

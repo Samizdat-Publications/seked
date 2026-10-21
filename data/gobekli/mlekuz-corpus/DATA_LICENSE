@@ -1,0 +1,10 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+This license covers the data in data/ (raw transcription
+and the frozen relational corpus derived from it) -- not the source
+code, which is MIT-licensed (see LICENSE).
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Attribution: cite the accompanying paper (see CITATION.cff) when using
+this data.

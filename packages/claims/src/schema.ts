@@ -51,6 +51,13 @@ export const ClaimSchema = z.object({
   unit: Unit.optional(),
   comparisons: z.array(ComparisonSchema).optional(),
   tolerance_pct: z.number().positive().default(0.5),
+  /**
+   * How the comparisons combine: `all` (the default) when every part of the claim must hold at once; `any` when the
+   * claim offers alternatives ("the mean distance or the perihelion, whichever fits") and holds if one does. The
+   * choice among them must be listed in `free_choices` (Argon's audit, 21 October 2026: B2's tolerance had been widened
+   * to make both alternatives pass under `all`).
+   */
+  fit: z.enum(['all', 'any']).default('all'),
   free_choices: z.array(z.string()).default([]),
   overlay: z.object({ type: z.string(), params: z.record(z.string(), z.unknown()).optional() }).optional(),
   sources: z.object({

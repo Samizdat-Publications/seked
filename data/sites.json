@@ -16,5 +16,41 @@
     "origin": { "latitude": 40.75, "longitude": -9.46, "elevation": 0 },
     "frame": "East-north-up at the 'Face' mesa. Placeholder: coordinates from memory and unverified; no structures entered.",
     "note": "Registered only so the model never assumes Earth or Giza. Imagery: Viking 1 frame 035A72 (1976), MGS MOC (2001), HiRISE (2007 onward, with DTMs). A Martian sky needs its own precession model; packages/sky is Earth-only."
+  },
+  {
+    "id": "hawara",
+    "name": "Hawara",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 29.274, "longitude": 30.898, "elevation": 32 },
+    "frame": "East-north-up at the base centre of Amenemhat III's pyramid; +Z up. No source checked gives the pyramid's azimuth, so its sides are taken as cardinal.",
+    "note": "Placeholder origin: the latitude and longitude are read off Elshazly et al. 2024, Fig. 1 (scaled, unverified), and the elevation is their 'about 32 m' above sea level for the pyramid's base (p. 40). The Labyrinth's remains lie south of the pyramid. Chapter 8 lays them over Giza for scale (night decision 26), and the distance in that label is computed from the two origins, not typed."
+  },
+  {
+    "id": "gobekli-tepe",
+    "name": "Göbekli Tepe",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 37.223242, "longitude": 38.922364, "elevation": 776 },
+    "frame": "East-north-up at the World Heritage property's point; +Z up. Not Enclosure D's centre, which no source checked gives in coordinates; a model of the enclosure places itself by its own plan.",
+    "note": "Placeholder origin. The latitude and longitude are UNESCO's N37 13 23.671 E38 55 20.51 (source unesco-whc-1572), converted. The elevation is GLO-30 sampled at that point (776.3 m on EGM2008, tile Copernicus_DSM_COG_10_N37_00_E038_00_DEM, sha256 5d96ac1876559801667d43560a30c3cf9feac0f43e071b1c967725bbadf1fdef), a surface model on the mound's top: a ring 150 m round runs 735 to 779 m. Chapter 7 only; nothing here bears on Giza."
+  },
+  {
+    "id": "meidum",
+    "name": "Meidum",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 29.388333, "longitude": 31.156944, "elevation": 37 },
+    "frame": "East-north-up at the Meidum pyramid's point as Wikidata gives it; +Z up. Its sides are taken as cardinal; their turn is the record meidum.pyramid.orientation.",
+    "note": "Placeholder origin. The latitude and longitude are Wikidata's coordinate location of Q13444093, 29 23 18 N 31 09 25 E (source wikidata-pyramid-coordinates). The elevation is the median of GLO-30 sampled on a ring 250 m round that point (37.2 m on EGM2008, 32.5 to 40.3 m, tile Copernicus_DSM_COG_10_N29_00_E031_00_DEM, sha256 88daaeb7722323e58aa9386fcd520fe6c46fcd6aacfffdb4025ab98bd0a77bc5): the ground outside the pyramid, since the surface model at the point reads the pyramid's mound (62.8 m). Chapter 6's orientation sequence only."
+  },
+  {
+    "id": "dahshur",
+    "name": "Dahshur",
+    "body": "earth",
+    "datum": "WGS84",
+    "origin": { "latitude": 29.808333, "longitude": 31.205833, "elevation": 58 },
+    "frame": "East-north-up at the Red Pyramid's point as Wikidata gives it; +Z up. The Bent Pyramid lies about 2 km south-south-west (Wikidata's 29.790278 N 31.209167 E for Q459608 puts it 2.0 km away). Sides taken as cardinal; their turns are the records dahshur.*.orientation.",
+    "note": "Placeholder origin. The latitude and longitude are Wikidata's coordinate location of Q135332, the Red Pyramid (source wikidata-pyramid-coordinates). The elevation is the median of GLO-30 sampled on a ring 250 m round that point (57.8 m on EGM2008, 55.1 to 61.5 m, tile Copernicus_DSM_COG_10_N29_00_E031_00_DEM, sha256 88daaeb7722323e58aa9386fcd520fe6c46fcd6aacfffdb4025ab98bd0a77bc5); the Bent's ring gives 57.2 m. Chapter 6's orientation sequence only."
   }
 ]

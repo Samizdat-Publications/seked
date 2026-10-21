@@ -112,10 +112,19 @@ describe('placing a structure that the database gives a coordinate for', () => {
       'sphinx.center.latitude': 30.01,
       'sphinx.center.longitude': 31.02,
     });
-    expect(env['sphinx.centre.offset.north']).toBeCloseTo(0.01 * METRES_PER_DEGREE, 9);
-    expect(env['sphinx.centre.offset.east']).toBeCloseTo(0.02 * Math.cos((30 * Math.PI) / 180) * METRES_PER_DEGREE, 9);
-    // A tenth of a degree of latitude is 11.1 km, so a hundredth is 1.1 km.
-    expect(env['sphinx.centre.offset.north'] as number).toBeCloseTo(1112, 0);
+    // The offsets lie on the azimuthal equidistant projection: their length is the great-circle distance, checked
+    // here by the haversine formula, and close in they agree with the flat conversion they replaced.
+    const east = env['sphinx.centre.offset.east'] as number, north = env['sphinx.centre.offset.north'] as number;
+    const R = METRES_PER_DEGREE * 180 / Math.PI, d = Math.PI / 180;
+    const hav = (x: number) => Math.sin(x / 2) ** 2;
+    const central = 2 * Math.asin(Math.sqrt(hav(0.01 * d) + Math.cos(30 * d) * Math.cos(30.01 * d) * hav(0.02 * d)));
+    expect(Math.hypot(east, north)).toBeCloseTo(R * central, 4);   // to 0.1 mm: acos and haversine round apart by microns
+    expect(north).toBeCloseTo(0.01 * METRES_PER_DEGREE, -1);    // within half a metre at 2 km
+    expect(east).toBeCloseTo(0.02 * Math.cos(30 * d) * METRES_PER_DEGREE, -1);
+    // due north, the offset is the meridian arc itself, to the millimetre
+    const due = buildEnvironment({ ...ORIGIN, 'sphinx.center.latitude': 30.01, 'sphinx.center.longitude': 31 });
+    expect(due['sphinx.centre.offset.north'] as number).toBeCloseTo(0.01 * METRES_PER_DEGREE, 3);
+    expect(due['sphinx.centre.offset.east'] as number).toBeCloseTo(0, 6);
   });
 
   it('leaves a structure the survey already placed exactly where the survey put it', () => {
@@ -143,5 +152,28 @@ describe('placing a structure that the database gives a coordinate for', () => {
     expect(env['sphinx.centre.offset.east'] as number).toBeGreaterThan(300);
     expect(env['sphinx.centre.offset.north'] as number).toBeLessThan(-400);
     expect(Math.hypot(env['sphinx.centre.offset.east'] as number, env['sphinx.centre.offset.north'] as number)).toBeCloseTo(555, 0);
+  });
+});
+
+describe('Hawara, as Petrie derived it', () => {
+  const inch = 0.0254;
+  const env = buildEnvironment({
+    'g1.base.side.mean': 230.33, 'g1.height.original': 146.59,
+    'hawara.pyramid.base.side.brick': 3692 * inch, 'hawara.pyramid.casing.thickness': 157 * inch, 'hawara.pyramid.casing.angle': 48.75,
+    'hawara.labyrinth.chipbed.length': 304.8, 'hawara.labyrinth.chipbed.width': 243.84,
+  });
+  it("reproduces Petrie's finished base of 4006 in and his height of 2284 in", () => {
+    expect((env['hawara.pyramid.base.side.cased'] as number) / inch).toBeCloseTo(4006, 6);
+    expect(Math.abs((env['hawara.pyramid.height.original'] as number) / inch - 2284)).toBeLessThan(1);
+  });
+  it('makes the chip bed about 1.4 times the Great Pyramid\'s base', () => {
+    expect(env['hawara.labyrinth.chipbed.ratio.g1']).toBeCloseTo((304.8 * 243.84) / (230.33 * 230.33), 9);
+    expect(env['hawara.labyrinth.chipbed.ratio.g1']).toBeGreaterThan(1.35);
+    expect(env['hawara.labyrinth.chipbed.ratio.g1']).toBeLessThan(1.45);
+  });
+  it('names the records behind each derived Hawara key', () => {
+    expect(recordsBehind('hawara.pyramid.height.original', {})).toEqual([
+      'hawara.pyramid.base.side.brick', 'hawara.pyramid.casing.thickness', 'hawara.pyramid.casing.angle',
+    ]);
   });
 });
