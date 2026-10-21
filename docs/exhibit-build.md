@@ -454,9 +454,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   exhibit's figure and the story's scale (where the paw label was shortened to clear Hawara's column on a phone).
   Left: Hawara's section. Its records exist (`data/measurements/hawara.json`, read by the story's scale), so it is
   no longer waiting; it is E20c.
-- [ ] **E20c. Hawara's section on `ch8-hawara`.** Petrie's chips, the resistivity closures and the Mataha walls on
+- [x] **E20c. Hawara's section on `ch8-hawara`.** Petrie's chips, the resistivity closures and the Mataha walls on
   one depth scale from `data/measurements/hawara.json` (the keys `apps/story/src/depths.ts` reads), each by its tier,
   as an exhibit figure cued in `ch8-hawara`.
+  *Done 2026-10-21 00:23 UTC, `79d93cf` (chunk 7):* `hawara-depths` draws the three ranges side by side on one
+  axis to 14 m, each bar's tier read from its structure (stone, blue, dashed), labelled with its range and tier. Cued
+  on "chips" in `ch8-chips`, not `ch8-hawara` (decision 54). 2 tests. Looked at at both sizes with the bundle served.
 - [x] **E21. Chapter 9, "What would settle it": its leaves.** *Done 2026-10-21 00:04 UTC, `3ee1dd2`.* 10 leaves, every
   word in order and inside `ch9.json`, all today; every chapter of the script is now in leaves (113). Opens on the
   Sphinx at dawn with chapter 0's framing; the flank's floor for the seismic lines (yaw 285, pitch -30, as
@@ -663,6 +666,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    causeway and the paw cavity from the enclosure floor, and no record places either ground against G2's base. The
    two values came from the structures' register notes and are unchecked; the figure says each is from its own
    ground. Reversible by re-keying once a source gives the grounds' levels.
+54. **Hawara's depths are drawn on `ch8-chips`, on "chips"**, not on `ch8-hawara` as E20c first said: `ch8-hawara`
+   only names the Labyrinth and Herodotus, and it is `ch8-chips` that says "eight to twelve metres down". Reversible
+   by moving the cue in `apps/exhibit/leaves.json`.
 
 ## For Stewart
 
