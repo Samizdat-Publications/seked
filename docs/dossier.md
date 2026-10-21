@@ -699,10 +699,7 @@ Values resolved under the **canonical** preset (Canonical (Lehner)). Unverified 
 | delta.east.center.longitude | 32.3 | deg | coords-delta-cited | cited | no |
 | delta.west.center.latitude | 31.2 | deg | coords-delta-cited | cited | no |
 | delta.west.center.longitude | 29.9167 | deg | coords-delta-cited | cited | no |
-| earth.circumference.equatorial | 40075016.686 | m | wgs84 | derived | yes |
 | earth.perihelion | 147095000000 | m | nasa-earth-fact-sheet | tabulated | yes |
-| earth.radius.mean | 6371008.8 | m | wgs84 | derived | yes |
-| earth.radius.polar | 6356752.314 | m | wgs84 | defined | yes |
 | g1.base.side.mean | 230.33 | m | lehner-1997 | tabulated | no |
 | g1.base.socket.mean | 231.798 | m | petrie-1883 | socket-corner | yes |
 | g1.center.latitude | 29.979167 | deg | coords-wgs84-cited |  | no |

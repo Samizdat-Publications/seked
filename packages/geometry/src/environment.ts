@@ -52,6 +52,25 @@ function deriveCentreOffsets(env: Environment): void {
 }
 
 /**
+ * The ellipsoid's derived sizes from its two defining numbers, the equatorial radius and the inverse flattening
+ * (WGS84 defines a and 1/f; storing b, the mean radius and the circumferences beside them broke the rule that
+ * nothing derived is stored, Argon's audit of 21 October 2026). The mean radius is IUGG's R1 = (2a + b) / 3; the
+ * meridional circumference is the ellipse's perimeter by Ramanujan's second approximation, good to well under a
+ * millimetre at this flattening. blender/seked_data.py `earth` does the same.
+ */
+function deriveEarth(env: Environment): void {
+  const a = env['earth.radius.equatorial'];
+  const invf = env['earth.inverse_flattening'];
+  if (a === undefined || invf === undefined) return;
+  const b = a * (1 - 1 / invf);
+  const h = ((a - b) / (a + b)) ** 2;
+  env['earth.radius.polar'] ??= b;
+  env['earth.radius.mean'] ??= (2 * a + b) / 3;
+  env['earth.circumference.equatorial'] ??= 2 * Math.PI * a;
+  env['earth.circumference.meridional'] ??= Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
+}
+
+/**
  * The flat numeric environment claims evaluate against: every resolved
  * measurement plus the derived quantities, all in metres and degrees.
  * Derived keys are computed here so they can never drift from their inputs.
@@ -62,6 +81,7 @@ const STRUCTURES = ['g1', 'g2', 'g3'] as const;
 
 export function buildEnvironment(measured: Record<string, number>): Environment {
   const env: Environment = { ...measured };
+  deriveEarth(env);
 
   for (const s of STRUCTURES) {
     const base = env[`${s}.base.side.mean`];

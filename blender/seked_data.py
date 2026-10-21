@@ -1941,11 +1941,23 @@ if __name__ == "__main__" and "--ground" in sys.argv:
 OFFSET_DIRECTIONS = ("east", "north", "west", "south")
 
 
+def earth(values):
+    """The ellipsoid's derived sizes from a and 1/f, as @seked/geometry's deriveEarth makes them (nothing derived is stored)."""
+    a, invf = values.get("earth.radius.equatorial"), values.get("earth.inverse_flattening")
+    if a is None or invf is None:
+        return {}
+    b = a * (1 - 1 / invf)
+    h = ((a - b) / (a + b)) ** 2
+    return {"earth.radius.polar": b, "earth.radius.mean": (2 * a + b) / 3,
+            "earth.circumference.equatorial": 2 * math.pi * a,
+            "earth.circumference.meridional": math.pi * (a + b) * (1 + 3 * h / (10 + math.sqrt(4 - 3 * h)))}
+
+
 def centre_offsets(values):
     """Derived east and north offsets, in metres, keyed as the environment keys them."""
     lat0 = values.get("g1.center.latitude")
     lon0 = values.get("g1.center.longitude")
-    radius = values.get("earth.radius.mean")
+    radius = values.get("earth.radius.mean", earth(values).get("earth.radius.mean"))
     derived = {}
     if lat0 is None or lon0 is None or radius is None:
         return derived

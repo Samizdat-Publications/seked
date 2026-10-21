@@ -145,6 +145,7 @@ const DEFAULT_EXAMPLE_IDS = Object.keys(EXAMPLE_PROSE);
 const COMPUTED_UNITS: ReadonlyArray<readonly [RegExp, string]> = [
   [/\.(base\.area|face\.area|lateral\.area|height\.squared|chipbed\.area)$/, 'm2'],
   [/\.volume$/, 'm3'],
+  [/^earth\.(radius\.(polar|mean)|circumference\.(equatorial|meridional))$/, 'm'],
   [/\.(base\.half|base\.perimeter|apothem|arris\.length|base\.side\.cased)$/, 'm'],
   [/^hawara\.pyramid\.height\.original$/, 'm'],
   [/\.chipbed\.ratio\.g1$/, 'ratio'],

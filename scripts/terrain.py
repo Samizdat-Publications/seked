@@ -251,7 +251,7 @@ def main(argv=None):
 
     values = seked_data.resolve(seked_data.load_database(), args.preset)["values"]
     a = values["earth.radius.equatorial"]
-    b = values["earth.radius.polar"]
+    b = values.get("earth.radius.polar", seked_data.earth(values).get("earth.radius.polar"))
     for key, value in (("g1.center.latitude", lat0), ("g1.center.longitude", lon0)):
         if key in values and abs(values[key] - value) > 1e-6:
             print(f"note: {key} is {values[key]} but sites.json says {value}; regenerate after deciding which is right", file=sys.stderr)

@@ -164,7 +164,9 @@ def overlays():
     import math
     p = data.PYRAMIDS["g1"]
     earth = {x["key"]: x["value"] for x in data.records("units-and-constants.json") if x.get("key", "").startswith("earth.")}
-    polar, equator = earth["earth.radius.polar"], earth["earth.circumference.equatorial"]
+    # WGS84's a and 1/f are stored; its other sizes are derived, as @seked/geometry and blender/seked_data.py derive them
+    a, b = earth["earth.radius.equatorial"], earth["earth.radius.equatorial"] * (1 - 1 / earth["earth.inverse_flattening"])
+    polar, equator = b, 2 * math.pi * a
     h, H, top, z0 = p["half"], p["H"], p["today"], p["base"]
     side, perim = 2 * h, 8 * h
     slant = math.hypot(H, h)

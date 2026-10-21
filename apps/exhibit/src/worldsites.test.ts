@@ -44,7 +44,9 @@ describe("Alison's great circle, as he draws it", () => {
     expect(s.along[0]).toBeCloseTo(0, 6);
     for (const a of s.along) expect(a).toBeGreaterThanOrEqual(0);
     for (const a of s.along) expect(a).toBeLessThan(360);
-    const km = (constants.find((r) => r.key === 'earth.radius.mean')!.value * Math.PI) / 180 / 1000;
+    const value = (k: string) => constants.find((r) => r.key === k)!.value;
+    const a = value('earth.radius.equatorial'), b = a * (1 - 1 / value('earth.inverse_flattening'));
+    const km = ((((2 * a + b) / 3) * Math.PI) / 180) / 1000;   // the mean radius, derived as buildEnvironment derives it
     const svg = stripSvg(s, km);
     for (const site of ALISON.sites) expect(svg).toContain(site.name);
     expect(svg).toContain('band: 28 km');

@@ -105,7 +105,7 @@ describe('presets', () => {
     expect(resolve(db, 'dash-2015').values['g1.base.side.mean']).toBe(230.363);
   });
   it('a key with a single source survives every preset', () => {
-    for (const p of db.presets) expect(resolve(db, p.id).values['earth.radius.polar']).toBe(6356752.314);
+    for (const p of db.presets) expect(resolve(db, p.id).values['earth.radius.equatorial']).toBe(6378137);
   });
   it('rejects an unknown preset', () => {
     expect(() => resolve(db, 'nope')).toThrow(/unknown preset/);
