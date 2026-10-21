@@ -36,7 +36,7 @@ const recorded = [...new Set(leaves.map((L) => L.chapter))].filter((n) => exists
 // Leaves whose words were added to the script after their chapter was recorded: the player speaks them in the
 // browser's voice until the laptop re-records (docs/exhibit-build.md, "For the laptop"). Each must really be missing,
 // so the entry fails, and is removed, once the new recording lands.
-const AWAITING_RECORDING = new Set(['ch6-papyri']);
+const AWAITING_RECORDING = new Set<string>([]);
 describe.runIf(recorded.length > 0)('the recorded chapters', () => {
   it('hold every leaf of their chapter, in order, inside the recording', () => {
     for (const n of recorded) {
