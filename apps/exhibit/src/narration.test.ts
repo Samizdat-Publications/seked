@@ -33,17 +33,28 @@ describe('leafSpans', () => {
 
 // The recordings themselves, when this checkout has them (assets/narration, Git LFS).
 const recorded = [...new Set(leaves.map((L) => L.chapter))].filter((n) => existsSync(join(repo, 'assets', 'narration', `ch${n}.json`)));
+// Leaves whose words were added to the script after their chapter was recorded: the player speaks them in the
+// browser's voice until the laptop re-records (docs/exhibit-build.md, "For the laptop"). Each must really be missing,
+// so the entry fails, and is removed, once the new recording lands.
+const AWAITING_RECORDING = new Set(['ch6-papyri']);
 describe.runIf(recorded.length > 0)('the recorded chapters', () => {
   it('hold every leaf of their chapter, in order, inside the recording', () => {
     for (const n of recorded) {
       const ch = JSON.parse(readFileSync(join(repo, 'assets', 'narration', `ch${n}.json`), 'utf8')) as ChapterRecording;
       const rec = ch.files.narration!;
-      const spans = leafSpans(rec, leaves.filter((L) => L.chapter === n).map((L) => L.say));
+      const chapter = leaves.filter((L) => L.chapter === n);
+      const spans = leafSpans(rec, chapter.map((L) => L.say));
+      let last = -1;
       spans.forEach((s, i) => {
+        if (AWAITING_RECORDING.has(chapter[i]!.id)) {
+          expect(s, `${chapter[i]!.id} is recorded now: take it out of AWAITING_RECORDING`).toBeNull();
+          return;
+        }
         expect(s, `chapter ${n}, leaf ${i}`).not.toBeNull();
         expect(s!.end).toBeGreaterThan(s!.start);
         expect(s!.end).toBeLessThanOrEqual(rec.seconds + 0.01);
-        if (i > 0) expect(s!.start).toBeGreaterThanOrEqual(spans[i - 1]!.end);
+        expect(s!.start).toBeGreaterThanOrEqual(last);
+        last = s!.end;
       });
     }
   });
