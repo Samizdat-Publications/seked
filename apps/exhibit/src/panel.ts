@@ -9,7 +9,7 @@ import { setDefaultStars, type Star } from '@seked/sky/browser';
 import type { Leaf } from './leaves';
 import { scriptPart } from './play';
 import { recordingUrl } from './narration';
-import { leafReceipts, receiptLine } from './receipts';
+import { claimEvidence, leafReceipts, receiptLine } from './receipts';
 
 type Bundle = Database & { claims: Claim[]; stars?: Star[] };
 
@@ -142,9 +142,16 @@ export class Panel {
       el.innerHTML = '<p class="quiet">The receipts could not be computed from this copy of the database.</p>';
       return;
     }
+    const db = { sources, sites, structures, measurements, presets, materials };
+    const evidence = (id: string) => {
+      const claim = b.claims.find((c) => c.id === id);
+      const e = claim && claimEvidence(db, claim);
+      const names = e?.structures.map((n) => (/^the /i.test(n) ? n : `the ${n}`)).join(', ');
+      return e ? `<p class="quiet">It stands on ${inline(names!)}: ${inline(e.words)}.</p>` : '';
+    };
     el.innerHTML = results.length ? results.map((r) => `<p><strong>${inline(r.id)}, ${inline(r.title)}</strong>: ` +
       `${r.fits === undefined ? 'not computed yet' : r.fits ? 'holds' : 'does not hold'}, ` +
-      `${r.freeChoices} free choice${r.freeChoices === 1 ? '' : 's'}</p>` +
+      `${r.freeChoices} free choice${r.freeChoices === 1 ? '' : 's'}</p>${evidence(r.id)}` +
       `<ul>${r.comparisons.map((c) => `<li>${inline(receiptLine(c))}</li>`).join('')}</ul>`).join('')
       : '<p class="quiet">None of the claims this leaf names is in the database yet.</p>';
   }

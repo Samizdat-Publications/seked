@@ -1,7 +1,7 @@
 import { loadClaims } from '@seked/claims';
 import { loadDatabase } from '@seked/data';
 import { describe, expect, it } from 'vitest';
-import { leafReceipts, receiptLine } from './receipts';
+import { TIER_WORDS, claimEvidence, leafReceipts, receiptLine } from './receipts';
 
 const db = loadDatabase();
 const claims = loadClaims();
@@ -23,5 +23,21 @@ describe("a leaf's receipts", () => {
     const line = receiptLine(c5!.comparisons[0]!);
     expect(line).toMatch(/^Regulus's rising azimuth against due east: 100°14′0\d″ against 90°00′00″/);
     expect(line).toMatch(/does not hold$/);
+  });
+});
+
+describe("how far a claim's evidence has got", () => {
+  const claim = (id: string) => claims.find((c) => c.id === id)!;
+  it('follows a derived quantity back to its records and names the structures they belong to', () => {
+    const e = claimEvidence(db, claim('A1'))!;
+    expect(e.tier).toBe('excavated');
+    expect(e.words).toBe(TIER_WORDS.excavated);
+    expect(e.structures).toEqual(['Great Pyramid of Khufu']);
+  });
+  it('takes the weakest tier among the inputs', () => {
+    const tiers = new Set(claims.map((c) => claimEvidence(db, c)?.tier));
+    expect([...tiers].every((t) => t === undefined || t in TIER_WORDS)).toBe(true);
+    const fake = { ...claim('A1'), comparisons: [{ ...claim('A1').comparisons[0]!, formula: 'g1.base.perimeter + g2.sar.wells.bottom.up' }] };
+    expect(claimEvidence(db, fake)!.tier).toBe('claimed');
   });
 });
