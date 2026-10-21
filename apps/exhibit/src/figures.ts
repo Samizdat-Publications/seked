@@ -48,13 +48,16 @@
  *
  * `north-drift`: the three Giza pyramids' turns from true north in the order they were built, as needles drawn at C1's
  * exaggeration (their orientation records).
+ *
+ * `claim-sort`: chapter 6's claims as the engine sorts them, live: holds with nothing chosen, holds once something is
+ * chosen, does not hold.
  */
 import { degreesToSeked, formatDms } from '@seked/units';
 
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'claim-sort', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -585,6 +588,41 @@ export function sekedRuleSvg(r: SekedRule, width = 300): string {
   <text class="lab" x="8" y="${y0 + 58}">= ${num / g}/${r.height / g} = ${(num / r.height).toFixed(4)}, and 2π = ${(2 * Math.PI).toFixed(4)}</text>
   <text class="here-lab" x="8" y="${y0 + 78}">apothem ÷ half the base</text>
   <text class="lab" x="8" y="${y0 + 92}">= ${apothem.toFixed(4)}, and φ = ${((1 + Math.sqrt(5)) / 2).toFixed(4)}</text>
+</svg>`;
+}
+
+export interface SortedClaim { id: string; title: string; freeChoices: number }
+export interface ClaimSort { free: SortedClaim[]; chosen: SortedClaim[]; fails: SortedClaim[] }
+
+/**
+ * The engine's sorting: claims that hold with no free choices, claims that hold only once something is chosen (a
+ * unit, a factor, an epoch), and claims that do not hold. A claim that cannot be computed yet is left out.
+ */
+export function claimSort(results: { id: string; title: string; freeChoices: number; fits: boolean | undefined }[]): ClaimSort {
+  const pick = (r: (typeof results)[number]): SortedClaim => ({ id: r.id, title: r.title, freeChoices: r.freeChoices });
+  return {
+    free: results.filter((r) => r.fits === true && r.freeChoices === 0).map(pick),
+    chosen: results.filter((r) => r.fits === true && r.freeChoices > 0).map(pick),
+    fails: results.filter((r) => r.fits === false).map(pick),
+  };
+}
+
+/** The three groups as lists, one claim a line, each with its count of free choices where it has any. */
+export function claimSortSvg(s: ClaimSort, width = 300): string {
+  const groups: [string, string, SortedClaim[]][] = [
+    ['holds, nothing chosen', 'wall', s.free], ['holds once something is chosen', 'claimed', s.chosen], ['does not hold', 'dim', s.fails]];
+  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  let y = 6;
+  const rows = groups.filter(([, , list]) => list.length).map(([head, cls, list]) => {
+    const top = (y += 16);
+    const lines = list.map((c) => `<text class="here-lab" x="22" y="${(y += 14)}"><tspan class="lab">${c.id}</tspan> ${esc(c.title.length > 30 ? `${c.title.slice(0, 29)}…` : c.title)}${c.freeChoices ? ` <tspan class="lab">${c.freeChoices}</tspan>` : ''}</text>`);
+    y += 6;
+    return `<line class="${cls}" x1="10" y1="${top + 4}" x2="10" y2="${y - 6}" style="stroke-width: 2"/>
+  <text class="north" x="22" y="${top}">${head}</text>
+  ${lines.join('\n  ')}`;
+  });
+  return `<svg viewBox="0 0 ${width} ${y + 4}" width="${width}" height="${y + 4}" role="img" aria-label="Chapter 6's claims sorted: ${s.free.length} hold with nothing chosen, ${s.chosen.length} hold once something is chosen, ${s.fails.length} do not hold">
+  ${rows.join('\n  ')}
 </svg>`;
 }
 

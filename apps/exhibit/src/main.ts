@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -202,6 +202,16 @@ function sekedRuleFigure(b: Bundle | null, ground: Record<string, number> | null
     them apart; only the seked is attested in Egyptian mathematics.</figcaption>`;
 }
 
+/** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */
+function claimSortFigure(b: Bundle | null): string {
+  if (!b) return '<figcaption>The claims are sorted from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const ids = [...new Set(LEAVES.filter((L) => L.chapter === 6).flatMap((L) => L.receipts))];
+  const s = claimSort(leafReceipts(b, b.claims, ids));
+  return `${claimSortSvg(s)}<figcaption>Every claim in this chapter, as the engine sorts it from the survey. A number beside a claim
+    counts what had to be chosen first (a unit, a factor, an epoch) before it held. The more there are, the less a match
+    says.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -275,6 +285,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
+    if (shownFigure === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
     if (shownFigure === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'looked' || shownFigure === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, shownFigure === 'looked-tests');
     if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
@@ -323,6 +334,7 @@ async function start(): Promise<void> {
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
+    if (id === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();

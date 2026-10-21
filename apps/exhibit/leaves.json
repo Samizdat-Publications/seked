@@ -1819,8 +1819,10 @@
    },
    "arrive": "cut",
    "say": "Writers since Charles Piazzi Smyth in the 1860s have read these numbers as a design brief: the circle, the golden section, the size of the Earth and the slow turn of the sky, written into one shape.",
-   "draw": [],
-   "hold": 1,
+   "draw": [
+    "claim-sort@shape"
+   ],
+   "hold": 5,
    "interact": "look",
    "receipts": [
     "A1",
@@ -1873,7 +1875,10 @@
     "A5",
     "B2",
     "B3",
-    "B4"
+    "B4",
+    "D1",
+    "D2",
+    "D3"
    ],
    "reply": "ch6"
   },

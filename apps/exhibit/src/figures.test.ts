@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -243,6 +243,18 @@ describe('north as a method', () => {
     const svg = northDriftSvg([{ king: 'Khufu', orientation: -0.065 }, { king: 'Menkaure', orientation: 0.234167 }], 120);
     expect(svg).toContain('>−3′54″</text>');
     expect(svg).toContain('>14′03″</text>');
+  });
+});
+
+describe("the engine's sorting", () => {
+  const r = (id: string, freeChoices: number, fits: boolean | undefined) => ({ id, title: `claim ${id}`, freeChoices, fits });
+  const s = claimSort([r('A1', 0, true), r('B3', 3, true), r('D1', 0, false), r('X', 0, undefined), r('B1', 2, true)]);
+  it('sorts by whether a claim holds and what had to be chosen first, leaving out what cannot be computed', () => {
+    expect([s.free, s.chosen, s.fails].map((g) => g.map((c) => c.id))).toEqual([['A1'], ['B3', 'B1'], ['D1']]);
+  });
+  it('draws only the groups that have claims, with the count of choices', () => {
+    expect(claimSortSvg(s)).toContain('<tspan class="lab">3</tspan>');
+    expect(claimSortSvg({ ...s, fails: [] })).not.toContain('does not hold');
   });
 });
 
