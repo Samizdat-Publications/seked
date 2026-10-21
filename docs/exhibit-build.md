@@ -407,7 +407,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   papyrus) and a thin line at 10,500 BCE, as the script's beat for "13,420 years and, in the next line, 23,200" asks.
   *Waiting on Stewart:* the totals want `data/texts/kinglists.json`, a new kind of file (see For Stewart).
 - [x] **E19. Chapter 7, "Before the flood": its leaves** (the plan's order: 3, 4, 7, 8, 9; added by chunk 6).
-  *Done 2026-10-21 00:02 UTC, `8c76c9d`.* 10 leaves, every word in order and inside `ch7.json`. No station stands at
+  *Done 2026-10-20 23:56 UTC, `8c76c9d`.* 10 leaves, every word in order and inside `ch7.json`. No station stands at
   Göbekli Tepe, so the chapter stays at Giza in the First Time, the same millennium (decision 52): the Younger Dryas
   over the empty plateau from the `panorama` stand (turning on from `ch6-held`), up to the sky for the comet, then a
   turn to yaw 40, the bearing of Göbekli Tepe from Giza computed from `data/sites.json` (39.7 degrees, 1,080 km), for
@@ -423,7 +423,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   again without its carvings, and they stand at one first height map for Pillar 43, gitignored on the laptop. Build
   the object once the cleaned height maps are committed, carving them as normal or bump maps on the pillars they
   belong to.
-- [x] **E20. Chapter 8, "Underneath": its leaves.** *Done 2026-10-21 00:10 UTC, `8d75bab`.* 10 leaves, every word in
+- [x] **E20. Chapter 8, "Underneath": its leaves.** *Done 2026-10-21 00:00 UTC, `8d75bab`.* 10 leaves, every word in
   order and inside `ch8.json`, all today. The wells from the `menkaure` station, looking at Khafre's pyramid (yaw 8,
   the bearing from the station to `g2.centre.offset.*`), down at the ground on the wells and up for "four and a half
   times the pyramid's height"; the same view turned south for the Labyrinth, along Hawara's bearing from Giza in
@@ -437,6 +437,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `ch8-wells`; the depth against `g2.height.original` (four and a half heights) on "height" in `ch8-height`. The
   claimed depths need records first if `data/` lacks them (`khafre-project-2025`, `verified: false`), never typed
   into the figure. Hawara's section waits for its proposed records.
+- [x] **E21. Chapter 9, "What would settle it": its leaves.** *Done 2026-10-21 00:04 UTC, `3ee1dd2`.* 10 leaves, every
+  word in order and inside `ch9.json`, all today; every chapter of the script is now in leaves (113). Opens on the
+  Sphinx at dawn with chapter 0's framing; the flank's floor for the seismic lines (yaw 285, pitch -30, as
+  `ch1-floor`), east along it for "in front of the lion" and the cores, the ditch wall for the 2008 boreholes; the
+  paws for "Underneath"; the north face for the muon corridor; and it ends on chapter 0's last frame (`ch0-ditch`'s
+  view at `sphinx-face`), as the beat asks, held 3 s. No receipts (the chapter's are tiers and the voids' records, not
+  claims); no new panorama, patch or flight. Looked at as a contact sheet and on a phone; played through muted, 100 s,
+  no errors.
+- [ ] **E21b. Chapter 9's figures.** (a) The model answer on "error bars" in `ch9-answer`: the north-face corridor's
+  size with its sigmas from `data/measurements/g1-voids.json` (verified). (b) The two undrilled cores and the 2008
+  boreholes in plan and section, once W1's depths and the boreholes' scaled positions are records (E2c's sources).
+  (c) Chapter 8's depth scale returning with each claim's test beside it (after E20b).
 
 ## Decisions
 
