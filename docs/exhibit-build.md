@@ -611,7 +611,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   overlay is `panel` (decision 73). Looked at paused at both sizes and in play (drawn at 13.7 s). Left: the relief laid
   over the chart, from the laptop's own reconstruction once its height maps are committed, labelled "a reconstruction
   after the excavators' drawing (DAI)"; and whether the leaf should speak of it (For Stewart).
-- [ ] **E26. The world's pyramids on a globe and a timeline** (chapter 9's closing leaf, the plan's "Added 20
+- [x] **E26. The world's pyramids on a globe and a timeline** *(done by E26b and E26c, chunk 12; laid straight, not on a globe: decision 77)* (chapter 9's closing leaf, the plan's "Added 20
   October"): imported sites with date ranges, the best-fit great circle as the claim, the same fit for random sites in
   the same latitude band as the reply.
   *First step done 2026-10-21 01:02 UTC, `d8c1c2d` (chunk 9): the arithmetic.* `apps/exhibit/src/greatcircle.ts`: the
@@ -627,7 +627,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `scripts/figures.ts` (download in `build/`, its sha256 in the source entry), `data/places/pyramids.json` with each
   site's date range as its source gives it, then a figure: the sites on a turnable or flat globe with the fitted circle,
   each site's distance in km, the chance share, and a timeline of the date ranges.
-- [ ] **E26c. The great circle's dates, the sites' own coordinates and the timeline.** The laptop's answer 3 asks for
+- [x] **E26c. The great circle's dates, the sites' own coordinates and the timeline.** *Done 2026-10-21 05:52 UTC (chunk 12), `52650d0`.* Each site's `own` block (point, years, what the years are of, the article's words, source, `verified: false`) from its encyclopedia article: 16 Wikipedia sources and EverybodyWiki for Paratoari (Wikipedia has no article), read through page summaries. Aneityum has no named monument and Paratoari is natural rock by the 1996 survey, so both are undated; Tassili (about 10,000 BCE on) and Petra are open-ended. Alison's Pyay is placed at Sri Ksetra (decision 79). The timeline is the strip's right-hand column rather than a third chart (decision 80): the works run from about 10,000 BCE to 1500 CE. On the sites' own points the best circle stays within a degree of his, the sites 33 km off it on average against 24 on his figures; the caption computes both. 4 tests; `pnpm test` 1259 passed. Looked at paused at both sizes and in play. The globe is not built (decision 77). The moai's dates come from Wikipedia's Moai article, named in the Easter Island source's note rather than a source of its own: worth its own entry when someone checks it. The laptop's answer 3 asks for
   each site's date range and coordinates from that site's own source (`verified: false`; Wikidata only to fill
   coordinates). Add them beside Alison's figures in `data/places/great-circle.json` (a `own` block per site: point,
   date range in years, source), run the fit on both and say in the caption how far the two sets differ, then a timeline
@@ -913,6 +913,13 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    coastline. Reversible: the strip is one function.
 78. **On `ch9-story`, cued on "story", hold 3 s, no new words**: the sentence names the three readers and "one story",
    which the circle is part of in Hancock's books, so nothing is re-recorded. A spoken line is in For Stewart.
+79. **Alison's Pyay is placed at Sri Ksetra**, the ancient city at Hmawza by Pyay, on the Payama stupa's point (one of the
+   two its article prints; the Pyay article prints none). His point is about 45 km north of it, in no named site. If he
+   meant a different work, the `own` block is one line.
+80. **The timeline shares the strip's rows**, distance off the circle on the left and years on the right, so each site
+   is read once and the figure still clears the narration on a phone. A year range is the work's as its source words
+   it (built, carved, painted, occupied: the `what` field), centuries read as their years, BCE negative, open ends drawn
+   faint.
 
 ## For Stewart
 
