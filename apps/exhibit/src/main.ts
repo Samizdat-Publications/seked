@@ -19,7 +19,8 @@ import texts from 'virtual:texts';
 import { bce, kingListsSvg, rhind56, rhind56Svg } from './texts';
 import { vultureChart, vultureChartSvg } from './vulturesky';
 import heritage from '../../../data/places/world-heritage.json';
-import { ALISON, poolReply, poolSvg, strip, stripSvg } from './worldsites';
+import { bestCircle } from './greatcircle';
+import { ALISON, era, poolReply, poolSvg, strip, stripSvg } from './worldsites';
 import { degreesToSeked } from '@seked/units';
 import corridor from 'virtual:corridor';
 import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
@@ -294,11 +295,14 @@ function greatCircleFigure(ground: Record<string, number> | null): string {
   const pool = heritage.properties.map(([, , lat, lon]) => ({ lat: lat as number, lon: lon as number }));
   const r = poolReply(s.fit.pole, pool, 0.25, 2000);
   const far = s.fit.offsets.reduce((m, o, i) => (Math.abs(o) > Math.abs(s.fit.offsets[m]!) ? i : m), 0);
+  const own = bestCircle(ALISON.sites.map((x) => x.own));
+  const years = ALISON.sites.flatMap((x) => [x.years.from, x.years.to]).filter((y): y is number => y !== null);
   return `${stripSvg(s, km)}${poolSvg(r)}<figcaption>Hancock's circle of world wonders, after Jim Alison: his ${ALISON.sites.length} sites
-    off the circle that fits them best, ${ALISON.sites[far]!.name} the farthest at ${Math.round(Math.abs(s.fit.offsets[far]!) * km)} km. The reply: of the World Heritage
-    List's ${pool.length} cultural sites, his circle passes within a quarter of a degree of ${r.claim}; a random circle passes about
-    ${Math.round(r.mean)}, and ${Math.round(r.share * 100)} in a hundred pass as many. His coordinates, not yet checked against his pages; the List's
-    points from Wikidata.</figcaption>`;
+    off the circle that fits them best, ${ALISON.sites[far]!.name} the farthest at ${Math.round(Math.abs(s.fit.offsets[far]!) * km)} km, and when each was made, from
+    ${era(Math.min(...years))} to ${era(Math.max(...years))}. The reply: of the World Heritage List's ${pool.length} cultural sites, his circle
+    passes within a quarter of a degree of ${r.claim}; a random circle passes about ${Math.round(r.mean)}, and ${Math.round(r.share * 100)} in a hundred
+    pass as many. His coordinates; on each site's own (from encyclopedias) the sites lie ${Math.round(own.rms * km)} km off their circle
+    on average, not ${Math.round(s.fit.rms * km)}. None yet checked against its page; the List's points from Wikidata.</figcaption>`;
 }
 
 /** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */

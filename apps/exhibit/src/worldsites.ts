@@ -7,19 +7,27 @@
 import doc from '../../../data/places/great-circle.json';
 import { bestCircle, offsets, seeded, toVec, type CircleFit, type Site, type Vec3 } from './greatcircle';
 
-export type Dms = [number, number, string];
+export type Dms = [number, number, string] | [number, number, number, string];
 
-/** Degrees from degrees, minutes and a hemisphere letter. */
-export function dms([d, m, h]: Dms): number {
+/** Degrees from degrees, minutes, seconds if given, and a hemisphere letter. */
+export function dms(a: Dms): number {
+  const h = a[a.length - 1] as string, [d, m, sec = 0] = a.slice(0, -1) as number[];
   if (!'NSEW'.includes(h)) throw new Error(`no hemisphere ${h}`);
-  return (d + m / 60) * (h === 'S' || h === 'W' ? -1 : 1);
+  return (d! + m! / 60 + sec / 3600) * (h === 'S' || h === 'W' ? -1 : 1);
 }
 
-export interface WorldSite extends Site { id: string; name: string; milesOff: number }
+/** A site's years as its own source gives them: BCE negative, no year zero, null where none is given. */
+export interface Years { from: number | null; to: number | null; what: string; source: string }
+
+export interface WorldSite extends Site { id: string; name: string; milesOff: number; own: Site; years: Years }
 
 export const ALISON = {
   source: doc.source,
-  sites: doc.sites.map((s): WorldSite => ({ id: s.id, name: s.name, lat: dms(s.latitude as Dms), lon: dms(s.longitude as Dms), milesOff: s.miles_off })),
+  sites: doc.sites.map((s): WorldSite => ({
+    id: s.id, name: s.name, lat: dms(s.latitude as Dms), lon: dms(s.longitude as Dms), milesOff: s.miles_off,
+    own: { lat: dms(s.own.latitude as Dms), lon: dms(s.own.longitude as Dms) },
+    years: { from: s.own.from, to: s.own.to, what: s.own.what, source: s.own.source },
+  })),
   axis: { lat: dms(doc.axis.latitude as Dms), lon: dms(doc.axis.longitude as Dms) } as Site,
 };
 
@@ -56,28 +64,41 @@ export function offAuthorsAxis(): number[] {
 
 const f1 = (x: number) => x.toFixed(1);
 
+
 /**
- * The circle laid straight down the page: one row a site, in their order round it from the first, each dot its
- * distance off the best circle (the upright line) to scale across, inside the author's "within one quarter of a
- * degree" as a band. `km` turns a degree into kilometres.
+ * The circle laid straight down the page, one row a site in their order round it from the first. On the left each
+ * dot is its distance off the best circle (the upright line) to scale, inside the author's "within one quarter of a
+ * degree" as a band; on the right, when its work was made, as its own source says, on one axis of years: a bar for a
+ * range, a faint bar for a range left open, words for a site with no date. `km` turns a degree into kilometres.
  */
 export function stripSvg(s: Strip, km: number, width = 300): string {
-  const pad = 10, name = 112, row = 12.5, top = 28, band = 0.25;
-  const half = Math.max(0.75, Math.ceil(s.fit.worst * 4) / 4), k = (width - name - 2 * pad) / (2 * half);
-  const cx = name + pad + half * k, h = top + s.sites.length * row + 26;
+  const pad = 8, name = 106, row = 12.5, top = 28, band = 0.25, gap = 6;
+  const offW = 60, yearsX = name + pad + offW + gap, yearsW = width - pad - yearsX;
+  const half = Math.max(0.75, Math.ceil(s.fit.worst * 4) / 4), k = offW / (2 * half);
+  const cx = name + pad + offW / 2, n = s.sites.length, h = top + n * row + 26;
   const X = (o: number) => f1(cx + o * k);
+  const dated = s.sites.filter((x) => x.years.from !== null);
+  const lo = Math.floor(Math.min(...dated.map((x) => x.years.from!)) / 2000) * 2000;
+  const hi = Math.ceil(Math.max(...dated.map((x) => x.years.to ?? x.years.from!)) / 2000) * 2000;
+  const ky = yearsW / (hi - lo), Yr = (y: number) => yearsX + (y - lo) * ky;
   const order = s.sites.map((_, i) => i).sort((a, b) => s.along[a]! - s.along[b]!);
-  const ticks = [-half, -band, band, half].filter((t, i, a) => a.indexOf(t) === i);
-  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="Jim Alison's ${s.sites.length} sites, each at its distance off the great circle that fits them best">
-  <rect x="${X(-band)}" y="${top - 6}" width="${f1(2 * band * k)}" height="${s.sites.length * row + 2}" fill="rgba(255,255,255,0.07)"/>
-  <line class="wall draw-on" x1="${X(0)}" y1="${top - 6}" x2="${X(0)}" y2="${top - 4 + s.sites.length * row}" pathLength="1"/>
-  <text class="north" x="${X(0)}" y="${top - 14}" text-anchor="middle">the circle</text>
-  ${ticks.map((t) => `<text class="north" x="${X(t)}" y="${top + s.sites.length * row + 8}" text-anchor="${t === half ? 'end' : 'middle'}">${Math.round(Math.abs(t) * km)} km</text>`).join('')}
+  const foot = top + n * row + 6;
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="Jim Alison's ${n} sites, each at its distance off the great circle that fits them best, and when each was made">
+  <rect x="${X(-band)}" y="${top - 6}" width="${f1(2 * band * k)}" height="${n * row + 2}" fill="rgba(255,255,255,0.07)"/>
+  <line class="wall draw-on" x1="${X(0)}" y1="${top - 6}" x2="${X(0)}" y2="${top - 4 + n * row}" pathLength="1"/>
+  <text class="north" x="${X(0)}" y="${top - 14}" text-anchor="middle">off the circle</text>
+  <text class="north" x="${f1(yearsX + yearsW / 2)}" y="${top - 14}" text-anchor="middle">when made</text>
+  <text class="north" x="${f1(Yr(lo))}" y="${foot + 6}" text-anchor="start">${era(lo)}</text>
+  ${lo < 0 && hi > 0 ? `<text class="north" x="${f1(Yr(0))}" y="${foot + 6}" text-anchor="end">1 CE</text>` : ''}
+  ${lo < 0 && hi > 0 ? `<line class="dim" x1="${f1(Yr(0))}" y1="${top - 6}" x2="${f1(Yr(0))}" y2="${top - 4 + n * row}"/>` : ''}
   ${order.map((i, j) => {
-    const y = top + j * row, o = s.fit.offsets[i]!;
-    return `<text class="lab" x="${name}" y="${y + 4}" text-anchor="end">${s.sites[i]!.name}</text><line class="dim" x1="${X(0)}" y1="${y}" x2="${X(o)}" y2="${y}"/><circle class="star" cx="${X(o)}" cy="${y}" r="3"/>`;
+    const y = top + j * row, o = s.fit.offsets[i]!, site = s.sites[i]!, yr = site.years;
+    const when = yr.from === null
+      ? `<text class="north" x="${f1(yearsX)}" y="${y + 4}">${yr.what === 'natural' ? 'natural rock' : 'no date'}</text>`
+      : (() => { const a = Yr(yr.from), b = yr.to === null ? Math.min(yearsX + yearsW, a + 14) : Math.max(a + 2, Yr(yr.to)); return `<rect x="${f1(a)}" y="${y - 3}" width="${f1(b - a)}" height="6" fill="rgba(255, 214, 140, ${yr.to === null ? 0.4 : 0.9})"/>`; })();
+    return `<text class="lab" x="${name}" y="${y + 4}" text-anchor="end">${site.name}</text><line class="dim" x1="${X(0)}" y1="${y}" x2="${X(o)}" y2="${y}"/><circle class="star" cx="${X(o)}" cy="${y}" r="3"/>${when}`;
   }).join('\n  ')}
-  <text class="north" x="${pad}" y="${h - 4}">in order round the Earth</text>
+  <text class="north" x="${pad}" y="${h - 4}">in order round the Earth; band: ${Math.round(band * km)} km</text>
 </svg>`;
 }
 
@@ -123,3 +144,10 @@ export function poolSvg(r: PoolReply, width = 300): string {
   <text class="north" x="${pad}" y="${h - 4}">${r.counts.length} random circles; ${Math.round(r.share * 100)}% catch as many</text>
 </svg>`;
 }
+
+/** A year as a reader says it: 10,000 BCE, 2600 BCE, 1450 CE. */
+export function era(y: number): string {
+  const n = Math.abs(y), t = n >= 10000 ? n.toLocaleString('en-GB') : String(n);
+  return y < 0 ? `${t} BCE` : `${t} CE`;
+}
+

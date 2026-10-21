@@ -47,7 +47,7 @@ describe("Alison's great circle, as he draws it", () => {
     const km = (constants.find((r) => r.key === 'earth.radius.mean')!.value * Math.PI) / 180 / 1000;
     const svg = stripSvg(s, km);
     for (const site of ALISON.sites) expect(svg).toContain(site.name);
-    expect(svg).toContain('28 km');
+    expect(svg).toContain('band: 28 km');
   });
 });
 
@@ -73,5 +73,34 @@ describe('the reply: a pool of comparable sites, and circles at random', () => {
     expect(r.best).toBeGreaterThan(2 * r.claim);
     expect(poolReply(bestCircle(ALISON.sites).pole, pool, 0.25, 2000)).toEqual(r);
     expect(poolSvg(r)).toContain(`Alison's circle: ${r.claim}`);
+  });
+});
+
+describe("each site as its own source gives it", () => {
+  it('has a point, years and a source of its own, unverified, and years in order', () => {
+    for (const s of doc.sites) {
+      expect(sources.some((x) => x.id === s.own.source)).toBe(true);
+      expect(s.own.verified).toBe(false);
+      if (s.own.from !== null && s.own.to !== null) expect(s.own.from).toBeLessThanOrEqual(s.own.to);
+      if (s.own.from === null) expect(s.own.to).toBeNull();
+    }
+  });
+
+  it('reads seconds when a source prints them', () => {
+    expect(dms([29, 58, 34, 'N'])).toBeCloseTo(29.97611, 5);
+  });
+
+  it("fits the sites' own points about as well as his, and close to the same circle", () => {
+    const his = bestCircle(ALISON.sites), own = bestCircle(ALISON.sites.map((s) => s.own));
+    expect(poleSeparation(his.pole, own.pole)).toBeLessThan(1);
+    expect(own.rms).toBeGreaterThan(his.rms);
+  });
+
+  it('spans thousands of years: the oldest work and the youngest are more than ten thousand years apart', () => {
+    const years = ALISON.sites.flatMap((s) => [s.years.from, s.years.to]).filter((y): y is number => y !== null);
+    expect(Math.max(...years) - Math.min(...years)).toBeGreaterThan(10000);
+    const svg = stripSvg(strip(ALISON.sites), 111.19);
+    expect(svg).toContain('natural rock');
+    expect(svg).toContain('10,000 BCE');
   });
 });

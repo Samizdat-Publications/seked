@@ -1280,5 +1280,141 @@
     "url": "https://query.wikidata.org/",
     "license": "CC0 1.0",
     "note": "Queried on 2026-10-21 by the night builder (chunk 12) with the query in scripts/worldheritage.ts; the response's sha256 is c3bf0b2a45d6366641aaa691999e96e87d4a2b1ce5caa5c793b2766f825bc97d (6,430 rows). The script keeps whole properties with a cultural criterion, one point each. Wikidata's points are its editors' and its criteria are not checked here against UNESCO's own list; the count of kept properties is near the List's cultural and mixed total. data/places/world-heritage.json."
+  },
+  {
+    "id": "wikipedia-giza-pyramid-complex",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Giza pyramid complex. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Giza_pyramid_complex",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-siwa-oasis",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Siwa Oasis. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Siwa_Oasis",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-tassili-najjer",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Tassili n'Ajjer. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Tassili_n%27Ajjer",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "everybodywiki-paratoari",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "EverybodyWiki contributors. Paratoari. EverybodyWiki, as of 21 October 2026.",
+    "url": "https://en.everybodywiki.com/Paratoari",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-ollantaytambo",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Ollantaytambo. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Ollantaytambo",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-machu-picchu",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Machu Picchu. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Machu_Picchu",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-nazca-lines",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Nazca Lines. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Nazca_Lines",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-easter-island",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Easter Island. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Easter_Island",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-aneityum",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Aneityum. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Aneityum",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-preah-vihear-temple",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Preah Vihear Temple. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Preah_Vihear_Temple",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-sukhothai-historical-park",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Sukhothai Historical Park. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Sukhothai_Historical_Park",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-sri-ksetra-kingdom",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Sri Ksetra Kingdom. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Sri_Ksetra_Kingdom",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-khajuraho-group-of-monuments",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Khajuraho Group of Monuments. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Khajuraho_Group_of_Monuments",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-mohenjo-daro",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Mohenjo-daro. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Mohenjo-daro",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-persepolis",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Persepolis. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Persepolis",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-ur",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Ur. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Ur",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-petra",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Petra. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Petra",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
   }
 ]
