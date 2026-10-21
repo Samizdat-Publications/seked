@@ -505,8 +505,22 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   need structures and a site entry for Meidum and Dahshur, so the drift starts before Khufu. (c) Spence's two stars
   (Mizar and Kochab) lining up over the pole, drawn with `@seked/sky` at the three pyramids' dates. (d) A spoken
   sentence for the gap needs a script change and a re-recording of chapter 6 (For Stewart).
-- [ ] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
+- [x] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
+  *Done 2026-10-21 00:48 UTC (chunk 8), the plain words; the "what it would change" lines are E23b.* (1) `f719eb7`: every
+  claim in the receipt panel says what it stands on and how far that has got ("It stands on the Great Pyramid of Khufu:
+  dug and dated."). `claimEvidence` (`receipts.ts`) follows the claim's formulas back through derived quantities to
+  their records and their structures and reports the weakest tier among them (decision 59); `TIER_WORDS` holds the four
+  phrases. (2) `222e7ee`: Hawara's section and the `looked` figure give each tier they draw in the same words in their
+  captions. 2 tests. Looked at open at both sizes. Every claim in `data/claims/` reads excavated monuments today, so
+  every receipt says "dug and dated"; the tiers below that show in the figures.
+- [ ] **E23b. What a reported claim would change if it held.** For each `claimed` structure the exhibit shows (the
+  Khafre scans, `g2.sar-shafts`, the model case; the paw cavity; the Mataha walls), one line on what it would change,
+  as the plan's Göbekli Tepe example. The line is prose about a structure, so its home is an optional field in
+  `data/structures.json` (proposed `if_it_held`, with the zod schema in `packages/data` and the parity reader in
+  `blender/seked_data.py` taught it), shown in the panel and the depth figures' captions. Draft the lines from the
+  script's own replies and the plan's words on the Khafre scans ("preliminary, contested, the paper behind the method
+  retracted, and if even part of it held, a rewrite of the plateau's history").
 - [x] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
   deep anyone has drilled, dug or surveyed there, and who, each from its source (records, `verified: false`).
   *Done 2026-10-21 00:33 UTC, `0b5b0d0` (chunk 8).* One figure, `looked`, rather than a bar added to each of chapter 8's
@@ -731,6 +745,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 58. **A leaf may show more than one figure, each replacing the last at its word**, and a paused leaf shows the last,
    where the leaf ends in play. One figure a leaf would have put the drift on a sentence about something else.
    Reversible in `player.ts` (`setFigure`).
+59. **A claim's evidence is the weakest tier among the structures its inputs belong to.** A claim reading a dug
+   pyramid and a claimed shaft is only as far along as the shaft. Sky inputs (stars) and site-free records (units,
+   constants) carry no tier and are left out. Reversible in `claimEvidence`.
 
 ## For Stewart
 
