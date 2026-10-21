@@ -2473,8 +2473,8 @@
    },
    "arrive": "cut",
    "say": "Hancock, Bauval and Schoch read the stone, the sky and the texts as one story. Where it has been measured, the measurements have mostly gone against it.",
-   "draw": [],
-   "hold": 1,
+   "draw": ["great-circle@story"],
+   "hold": 3,
    "interact": "look",
    "receipts": [],
    "reply": "ch9"

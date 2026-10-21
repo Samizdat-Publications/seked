@@ -62,7 +62,7 @@ const f1 = (x: number) => x.toFixed(1);
  * degree" as a band. `km` turns a degree into kilometres.
  */
 export function stripSvg(s: Strip, km: number, width = 300): string {
-  const pad = 10, name = 112, row = 15, top = 30, band = 0.25;
+  const pad = 10, name = 112, row = 12.5, top = 28, band = 0.25;
   const half = Math.max(0.75, Math.ceil(s.fit.worst * 4) / 4), k = (width - name - 2 * pad) / (2 * half);
   const cx = name + pad + half * k, h = top + s.sites.length * row + 26;
   const X = (o: number) => f1(cx + o * k);
@@ -109,7 +109,7 @@ export function poolReply(pole: Vec3, pool: Site[], tol: number, trials: number,
 
 /** The random circles' counts as a bar chart, the claim's circle marked among them. */
 export function poolSvg(r: PoolReply, width = 300): string {
-  const pad = 10, h = 120, base = h - 30, top = 22;
+  const pad = 10, h = 96, base = h - 30, top = 20;
   const bins = new Array(r.best + 1).fill(0) as number[];
   for (const c of r.counts) bins[c]!++;
   const peak = Math.max(...bins), bw = (width - 2 * pad) / bins.length;

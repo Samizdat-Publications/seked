@@ -18,6 +18,8 @@ import radiocarbon from 'virtual:radiocarbon';
 import texts from 'virtual:texts';
 import { bce, kingListsSvg, rhind56, rhind56Svg } from './texts';
 import { vultureChart, vultureChartSvg } from './vulturesky';
+import heritage from '../../../data/places/world-heritage.json';
+import { ALISON, poolReply, poolSvg, strip, stripSvg } from './worldsites';
 import { degreesToSeked } from '@seked/units';
 import corridor from 'virtual:corridor';
 import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
@@ -284,6 +286,21 @@ function vultureFigure(): string {
     claim's own choices; the excavators read the animals as Göbekli Tepe's own world. The relief itself is not drawn yet.</figcaption>`;
 }
 
+/** E26: Hancock's circle of world wonders as Jim Alison draws it, and the reply from the World Heritage List. */
+function greatCircleFigure(ground: Record<string, number> | null): string {
+  const radius = ground?.['earth.radius.mean'];
+  if (radius === undefined) return '<figcaption>The circle is measured in kilometres from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const km = (radius * DEG) / 1000, s = strip(ALISON.sites);
+  const pool = heritage.properties.map(([, , lat, lon]) => ({ lat: lat as number, lon: lon as number }));
+  const r = poolReply(s.fit.pole, pool, 0.25, 2000);
+  const far = s.fit.offsets.reduce((m, o, i) => (Math.abs(o) > Math.abs(s.fit.offsets[m]!) ? i : m), 0);
+  return `${stripSvg(s, km)}${poolSvg(r)}<figcaption>Hancock's circle of world wonders, after Jim Alison: his ${ALISON.sites.length} sites
+    off the circle that fits them best, ${ALISON.sites[far]!.name} the farthest at ${Math.round(Math.abs(s.fit.offsets[far]!) * km)} km. The reply: of the World Heritage
+    List's ${pool.length} cultural sites, his circle passes within a quarter of a degree of ${r.claim}; a random circle passes about
+    ${Math.round(r.mean)}, and ${Math.round(r.share * 100)} in a hundred pass as many. His coordinates, not yet checked against his pages; the List's
+    points from Wikidata.</figcaption>`;
+}
+
 /** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */
 function claimSortFigure(b: Bundle | null): string {
   if (!b) return '<figcaption>The claims are sorted from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
@@ -360,6 +377,7 @@ async function start(): Promise<void> {
     sky.setGround(ground);
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+    if (shownFigure === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
     if (shownFigure === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
@@ -426,6 +444,7 @@ async function start(): Promise<void> {
     if (id === 'king-lists') figure.innerHTML = kingListsFigure();
     if (id === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
     if (id === 'vulture-sky') figure.innerHTML = vultureFigure();
+    if (id === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;
