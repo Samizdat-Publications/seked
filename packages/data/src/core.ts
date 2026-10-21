@@ -71,6 +71,8 @@ export const StructureSchema = z
     context: z.literal(true).optional(),
     source: z.string().optional(),
     note: z.string().optional(),
+    /** For a reported but unproven structure, one line on what it would change if it held (the exhibit's tone rule). */
+    if_it_held: z.string().optional(),
   })
   .refine((s) => (s.context === true) !== (s.evidence !== undefined), {
     message: 'a structure is either evidence at a tier or context, never both and never neither',

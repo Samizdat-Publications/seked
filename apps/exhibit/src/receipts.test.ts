@@ -41,3 +41,11 @@ describe("how far a claim's evidence has got", () => {
     expect(claimEvidence(db, fake)!.tier).toBe('claimed');
   });
 });
+
+describe('what a reported structure would change', () => {
+  it('is said only of structures reported but not yet published or replicated, never of a dug one', () => {
+    const said = db.structures.filter((s) => s.if_it_held);
+    expect(said.map((s) => s.id)).toEqual(expect.arrayContaining(['g2.sar-shafts', 'sphinx.paw-cavity', 'hawara.mataha-walls']));
+    for (const s of said) expect(s.evidence, s.id).toBe('claimed');
+  });
+});

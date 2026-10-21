@@ -160,7 +160,7 @@ function corridorFigure(): string {
 }
 
 /** Chapter 8's depths: the pyramid, its rooms and the claimed wells to one scale, from the claims' environment. */
-function khafreDepthsFigure(ground: Record<string, number> | null): string {
+function khafreDepthsFigure(ground: Record<string, number> | null, structures?: StructureNote[]): string {
   const d = ground && khafreDepths(ground);
   if (!d) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
   return `${khafreDepthsSvg(d)}<figcaption>To one scale: Khafre's pyramid, its rooms ${-d.rooms} m under the base, and, dashed,
@@ -168,7 +168,14 @@ function khafreDepthsFigure(ground: Record<string, number> | null): string {
     them (a claim, not yet checked against its publication). Where they stand under the base is a look choice. ${-d.bottom} m
     is ${(-d.bottom / d.height).toFixed(2)} times the pyramid's original height.${d.osiris !== undefined && d.paw !== undefined ? ` Beside
     them, from their own ground by the Sphinx: the Osiris Shaft, dug, about ${d.osiris} m, and the cavity Dobecki and Schoch read
-    under the paws, never dug, about ${d.paw} m; neither figure yet checked against its page.` : ''}</figcaption>`;
+    under the paws, never dug, about ${d.paw} m; neither figure yet checked against its page.` : ''} ${ifItHeld(structures, ['g2.sar-shafts'])}</figcaption>`;
+}
+
+type StructureNote = { id: string; evidence?: string; if_it_held?: string };
+
+/** What reported structures would change if they held, from data/structures.json, as one sentence each. */
+function ifItHeld(structures: StructureNote[] | undefined, ids: string[]): string {
+  return ids.map((id) => structures?.find((s) => s.id === id)?.if_it_held).filter(Boolean).join(' ');
 }
 
 /** How a figure draws each tier, in the plain words of the tone rule, for the tiers it shows. */
@@ -179,12 +186,12 @@ function tierKey(tiers: string[]): string {
 }
 
 /** Hawara's depths to one scale, each by its structure's tier, from the claims' environment. */
-function hawaraDepthsFigure(ground: Record<string, number> | null, structures: { id: string; evidence?: string }[] | undefined): string {
+function hawaraDepthsFigure(ground: Record<string, number> | null, structures: StructureNote[] | undefined): string {
   const rows = ground && structures && hawaraDepths(ground, structures);
   if (!rows) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
   return `${hawaraDepthsSvg(rows)}<figcaption>Under Hawara, in metres below the ground: the bed of chips Petrie dug at the
     south foot, the two closures a resistivity survey found, and the walls the 2008 expedition reported, never dug. Drawn
-    by tier, from the records: ${tierKey(rows.map((r) => r.tier))}.</figcaption>`;
+    by tier, from the records: ${tierKey(rows.map((r) => r.tier))}. ${ifItHeld(structures, ['hawara.mataha-walls'])}</figcaption>`;
 }
 
 /** How deep anyone has looked beside each claimed depth, from the records; with `tests`, chapter 9's test for each. */
@@ -290,7 +297,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
-    if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
+    if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (shownFigure === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
@@ -339,7 +346,7 @@ async function start(): Promise<void> {
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'corridor') figure.innerHTML = corridorFigure();
-    if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
+    if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (id === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
