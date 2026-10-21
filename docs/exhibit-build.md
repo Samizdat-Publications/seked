@@ -505,6 +505,15 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   need structures and a site entry for Meidum and Dahshur, so the drift starts before Khufu. (c) Spence's two stars
   (Mizar and Kochab) lining up over the pole, drawn with `@seked/sky` at the three pyramids' dates. (d) A spoken
   sentence for the gap needs a script change and a re-recording of chapter 6 (For Stewart).
+  *(c) done 2026-10-21 01:00 UTC, `aa08a1e` (chunk 9):* `pole-stars` on "compass" in `ch6-north` (`src/polestars.ts`,
+  4 tests). The plumb line through Mizar and Kochab, from `data/stars/named.json` precessed by `@seked/sky` at Giza's
+  latitude, is true north only in 2465 BCE (Spence's 2467); it strays about a third of an arc minute a year, east or
+  west by which star is above. Each pyramid's orientation record is read off it as a year in both configurations (Khufu
+  2478 or 2453 BCE, Spence's 2478; Khafre 2483 or 2448; Menkaure 2420 or 2510), and Khufu's and Khafre's radiocarbon
+  accessions (`virtual:radiocarbon`) sit below on the same years, 80 to 180 years earlier, which the caption says
+  plainly (decision 62). The leaf's figures are spread over its sentence and its hold raised to 8 s (decision 61).
+  Looked at paused at both sizes and in play: the square at 1.8 s, the drift at 4.3 s, the stars at 9.4 s, held to
+  18.1 s. Still waiting: (a) and (d) on Stewart, (b) on its records.
 - [x] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
   *Done 2026-10-21 00:48 UTC (chunk 8), the plain words; the "what it would change" lines are E23b.* (1) `f719eb7`: every
