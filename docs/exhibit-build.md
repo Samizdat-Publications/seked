@@ -546,6 +546,8 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   with the scans' line, Hawara's with the walls'. A test holds that only `claimed` structures carry one. The paw
   cavity's line is in the data but on no caption yet: `looked`'s caption is already long (a later place: the reply
   panel of chapter 9, or E2c's floor figure). Looked at at both sizes with the bundle rebuilt.
+  *Chunk 9, 01:08 UTC, `eaf2ff5`:* the paw cavity's line now ends the `looked-tests` caption in `ch9-underneath`, beside
+  its test ("open the cavity"), as "The paw cavity: if it held ...". Looked at on a phone; it fits.
 - [x] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
   deep anyone has drilled, dug or surveyed there, and who, each from its source (records, `verified: false`).
   *Done 2026-10-21 00:33 UTC, `0b5b0d0` (chunk 8).* One figure, `looked`, rather than a bar added to each of chapter 8's
