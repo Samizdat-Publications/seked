@@ -217,13 +217,13 @@ function hawaraDepthsFigure(ground: Record<string, number> | null, structures: S
 }
 
 /** How deep anyone has looked beside each claimed depth, from the records; with `tests`, chapter 9's test for each. */
-function lookedFigure(ground: Record<string, number> | null, structures: { id: string; evidence?: string }[] | undefined, tests: boolean): string {
+function lookedFigure(ground: Record<string, number> | null, structures: StructureNote[] | undefined, tests: boolean): string {
   const rows = ground && structures && lookedDepths(ground, structures);
   if (!rows) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
   return `${lookedSvg(rows, tests)}<figcaption>How deep has anyone looked? Each claim, dashed, beside the deepest anyone has dug
     or drilled there, on a scale that grows tenfold at each mark. The 2008 boreholes stand beside the cavity, not in it, and their logs are unpublished; the 1978
     holes into the Sphinx's anomalies left no depth on record. The claims, dashed: ${[...new Set(rows.map((r) => TIER_WORDS[r.tier as keyof typeof TIER_WORDS] ?? r.tier))].join('; ')}. ${tests ? 'Below each, the test chapter 9 names. ' : ''}From the
-    records, none yet checked against its page.</figcaption>`;
+    records, none yet checked against its page.${tests ? ` The paw cavity: ${ifItHeld(structures, ['sphinx.paw-cavity']).replace(/^If/, 'if')}` : ''}</figcaption>`;
 }
 
 /** The builders' rule, A3's seked at the Great Pyramid's size, with A3's three comparisons live from the bundle. */
