@@ -431,7 +431,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   it" before the Sphinx, looking at the floor between the paws. No receipts: the script's are new labels without
   targets. Seven patches queued; no new panorama or flight. Looked at as a contact sheet and on a phone; played
   through muted, 110 s, no errors.
-- [ ] **E20b. Chapter 8's figures.** The script's receipts as figures, from the records: one depth scale with every
+- [x] **E20b. Chapter 8's figures.** The script's receipts as figures, from the records: one depth scale with every
   underground object by tier (`excavated` Khafre's chambers at `g2.passage.horizontal.floor.begin.up`, the Osiris
   Shaft; `claimed` the wells and chambers at 648 m, `g2.sar-shafts`; the paw cavity), drawn on "648 metres" in
   `ch8-wells`; the depth against `g2.height.original` (four and a half heights) on "height" in `ch8-height`. The
