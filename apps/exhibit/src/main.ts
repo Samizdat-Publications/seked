@@ -155,7 +155,9 @@ function khafreDepthsFigure(ground: Record<string, number> | null): string {
   return `${khafreDepthsSvg(d)}<figcaption>To one scale: Khafre's pyramid, its rooms ${-d.rooms} m under the base, and, dashed,
     one of the two rows of wells and the two chambers ${formatValue(d.cube, 'm')} on a side, as the Khafre Project describes
     them (a claim, not yet checked against its publication). Where they stand under the base is a look choice. ${-d.bottom} m
-    is ${(-d.bottom / d.height).toFixed(2)} times the pyramid's original height.</figcaption>`;
+    is ${(-d.bottom / d.height).toFixed(2)} times the pyramid's original height.${d.osiris !== undefined && d.paw !== undefined ? ` Beside
+    them, from their own ground by the Sphinx: the Osiris Shaft, dug, about ${d.osiris} m, and the cavity Dobecki and Schoch read
+    under the paws, never dug, about ${d.paw} m; neither figure yet checked against its page.` : ''}</figcaption>`;
 }
 
 /** The 2026 study's shape test, cited from its records, quietly. */

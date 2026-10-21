@@ -81,8 +81,7 @@ export function depthsWidget(rows: DepthRow[], undrawn: { name: string; tier: Ti
         `<text class="far-label" x="30.5" y="${f1(fy(r.bottom) - 1.4)}"><tspan>${r.label}</tspan><tspan x="30.5" dy="2.6">${m(r.bottom)}</tspan></text>`).join('')}
       ${placed.join('')}
       <g class="key">${tierKey.map((t, i) => `<rect class="${t}" x="${8 + i * 26}" y="${H - 15}" width="3" height="2.4" /><text x="${12 + i * 26}" y="${H - 13}">${t}</text>`).join('')}</g>
-      <text class="undrawn" x="8" y="${H - 7}">No depth in the records: ${undrawn.slice(0, 2).map((u) => `${u.name} (${u.tier})`).join(', ')},</text>
-      <text class="undrawn" x="8" y="${H - 3.6}">${undrawn.slice(2).map((u) => `${u.name} (${u.tier})`).join(', ')}.</text>
+      ${undrawnLines(undrawn).map((t, i, all) => `<text class="undrawn" x="8" y="${f1(H - 3.6 - (all.length - 1 - i) * 3.4)}">${t}</text>`).join('')}
     </svg>`;
   const rowsEl = [...el.querySelectorAll<SVGGElement>('.row')];
   const farBars = [...el.querySelectorAll<SVGRectElement>('rect.far')];
@@ -101,4 +100,14 @@ export function depthsWidget(rows: DepthRow[], undrawn: { name: string; tier: Ti
       });
     },
   };
+}
+
+/** "No depth in the records: ..." two names to a line, the last line on the figure's foot. */
+function undrawnLines(undrawn: { name: string; tier: Tier }[]): string[] {
+  if (!undrawn.length) return [];
+  const names = undrawn.map((u) => `${u.name} (${u.tier})`);
+  const lines: string[] = [];
+  for (let i = 0; i < names.length; i += 2) lines.push(names.slice(i, i + 2).join(', ') + (i + 2 < names.length ? ',' : '.'));
+  lines[0] = `No depth in the records: ${lines[0]}`;
+  return lines;
 }

@@ -1,0 +1,24 @@
+[
+  {
+    "key": "osiris_shaft.bottom.depth",
+    "structure": "osiris-shaft",
+    "quantity": "length",
+    "value": 30.0,
+    "unit": "m",
+    "source": "hawass-2007",
+    "method": "as published",
+    "note": "The shaft's three levels reach about 30 m below the Khafre causeway, with water standing in the lowest. Depth below its own ground, the causeway's surface, not below the pyramid's base plane: the two grounds differ, and nothing here places the causeway's level, so the figure that shows it says each depth is from its own ground. 'About' is the source's. Entered from the structure's register note, which came from the secondary literature; the page is not yet recorded, so unverified.",
+    "verified": false
+  },
+  {
+    "key": "sphinx.paw_cavity.top.depth",
+    "structure": "sphinx.paw-cavity",
+    "quantity": "length",
+    "value": 5.0,
+    "unit": "m",
+    "source": "dobecki-schoch-1992",
+    "method": "as claimed",
+    "note": "A seismic refraction anomaly in front of the forepaws, read by the authors as a possible cavity about 5 m below the floor of the Sphinx enclosure. Never excavated. Depth below the enclosure floor, not below the pyramid's base plane. Entered from the structure's register note; the paper's page and figure are not yet recorded, so unverified.",
+    "verified": false
+  }
+]

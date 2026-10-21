@@ -179,15 +179,22 @@ describe("Khafre's depths", () => {
   const env = groundEnvironment(loadDatabase());
   const d = khafreDepths(env)!;
   it('reads the pyramid, its rooms and the claimed wells from the environment', () => {
-    expect(d).toMatchObject({ bottom: -648, rooms: -3, wells: 8, rows: 2, cubes: 2, cube: 80 });
+    expect(d).toMatchObject({ bottom: -648, rooms: -3, wells: 8, rows: 2, cubes: 2, cube: 80, osiris: 30, paw: 5 });
     expect(-d.bottom / d.height).toBeCloseTo(4.5, 0);   // "four and a half times the pyramid's height"
     expect(khafreDepths({})).toBeNull();
   });
   it('draws one row of wells to the depth, the chambers at their foot and the heights counted down', () => {
     const svg = khafreDepthsSvg(d);
-    expect(svg.match(/class="claimed"/g)).toHaveLength(4);
+    expect(svg.match(/class="claimed"/g)).toHaveLength(5);   // four wells and the paw cavity
+    expect(svg).toContain('Osiris Shaft 30 m');
     expect(svg.match(/class="claimed-box"/g)).toHaveLength(2);
     expect(svg).toContain(`${(648 / d.height).toFixed(2)}</text>`);
+  });
+  it('leaves out the Osiris Shaft and the paw cavity where their depths are not records', () => {
+    const { osiris: _o, paw: _p, ...rest } = d;
+    const svg = khafreDepthsSvg(rest);
+    expect(svg).not.toContain('Osiris');
+    expect(svg.match(/class="claimed"/g)).toHaveLength(4);
   });
 });
 

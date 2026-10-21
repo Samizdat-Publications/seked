@@ -101,6 +101,8 @@ p { margin: 0; }
 .figure .lab { font: 600 11px var(--mono); fill: rgba(248, 214, 140, 1); }
 .figure .here { fill: var(--ink); stroke: var(--stage); stroke-width: 2; }
 .figure .here-lab, .figure .north { font: 500 10px var(--mono); fill: var(--muted); letter-spacing: 0.06em; }
+/* a label that crosses a line reads over it, outlined in the panel's own dark */
+.figure .halo { paint-order: stroke; stroke: rgba(38, 36, 33, 0.95); stroke-width: 3px; stroke-linejoin: round; }
 .figure figcaption { margin-top: 8px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
 
 /* the receipt and the reply: a tab at the right edge, a quiet panel when open */
