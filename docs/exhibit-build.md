@@ -477,6 +477,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   and minus each sigma, 0.84 m behind the Chevron, its floor 20 m up on a broken axis, the width across in the caption
   with "The Sphinx's claimed cavity has no comparable figures at all". The paper's length is the record `.width` (the
   project's keys take length east to west); a test pins that. Looked at at both sizes; in play it draws about 10 s in.
+  *(c) done 2026-10-21 00:33 UTC, `0b5b0d0` (chunk 8), with E24:* `looked-tests` on "underneath" in `ch9-underneath`,
+  E24's figure with chapter 9's test under each claim (open the cavity, release the radar data, dig below the chips).
+  The beat's Hall of Records (ghosted) and rump passage (solid) are left out: neither has a depth record. Left: (b).
 
 - [ ] **E22. Chapter 6, "how they did the math"** (the plan's "Added 20 October" section, agreed with Stewart): Rhind
   problem 56 in the scribe's steps beside our pyramid, the 5½-palm seked becoming 2π and φ with A3's receipt; north as
@@ -484,8 +487,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   visible (no free choices, units chosen, fails); the gap said in words (no mathematical papyrus from the pyramid age).
 - [ ] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
-- [ ] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
+- [x] **E24. "How deep has anyone looked?"** On chapter 8's depth figures, beside each claimed depth, a bar for how
   deep anyone has drilled, dug or surveyed there, and who, each from its source (records, `verified: false`).
+  *Done 2026-10-21 00:33 UTC, `0b5b0d0` (chunk 8).* One figure, `looked`, rather than a bar added to each of chapter 8's
+  figures (decision 55): the paw cavity (5 m) beside the 2008 boreholes (20 m, beside it, logs unpublished), the wells
+  under Khafre (648 m) beside Khafre's own rooms (3 m, none drilled), the walls at Hawara (8 to 12 m) beside Petrie's dig
+  through the chips (7.3 m), on one logarithmic axis (decision 56), each claim by its structure's tier. The boreholes'
+  depth is the one new record, `sphinx.boreholes_2008.depth` (`ysi-2009-sphinx`, unchecked); the rest were records.
+  The 1978 drill holes (`dolphin-1978`) have no depth on record, which the caption says. Cued on "dug" in `ch8-dug`.
+  2 tests; `pnpm test` 1213 passed. Looked at at both sizes with the bundle served. A radar's stated reach is not drawn:
+  no record gives one.
 - [ ] **E25. The Vulture Stone over the sky** (chapter 7): Pillar 43's relief (the line drawing's height map,
   `build/gobekli/p43-height-a.png`, or an outline from the excavators' drawing, labelled a reconstruction) laid over
   the sky `@seked/sky` computes at Göbekli Tepe, with Sweatman and Tsikritsis's date as the claim's free choice and
@@ -685,6 +696,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 54. **Hawara's depths are drawn on `ch8-chips`, on "chips"**, not on `ch8-hawara` as E20c first said: `ch8-hawara`
    only names the Labyrinth and Herodotus, and it is `ch8-chips` that says "eight to twelve metres down". Reversible
    by moving the cue in `apps/exhibit/leaves.json`.
+55. **"How deep has anyone looked?" is one figure for the three claims, not a bar on each depth figure.** Chapter 8's
+   two figures are drawn to linear scales (648 m and 14 m), where a 3 m dig or a 20 m borehole would be lost or crowd
+   the wells; one figure puts every claim beside its check, which is Stewart's point, and chapter 9 reuses it with the
+   tests. Reversible: the rows are a table in `figures.ts` (`LOOKED`).
+56. **Its depth axis is logarithmic, 1 to 1,000 m, and the caption says so** in plain words ("grows tenfold at each
+   mark"): the wells are a hundred times deeper than the rest, and on a linear axis the paw cavity, the boreholes and
+   Hawara would share a few pixels. The deepest look beside each claim is the nearest the records give: the boreholes
+   stand beside the cavity, not in it, and the caption says that too.
 
 ## For Stewart
 
