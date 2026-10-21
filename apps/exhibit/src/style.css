@@ -165,6 +165,8 @@ p { margin: 0; }
   font: 400 clamp(19px, 2.1vw, 27px)/1.32 var(--display); letter-spacing: 0.01em; color: var(--ink);
   text-wrap: balance;
 }
+/* the archaeologists' reply, spoken at a chapter's end: the other voice, set apart but as easy to read */
+.caption.reply-voice { font-style: italic; opacity: 0.92; border-left: 2px solid currentColor; padding-left: 14px; }
 /* the controls: small, low, out of the picture's way */
 .controls {
   display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;

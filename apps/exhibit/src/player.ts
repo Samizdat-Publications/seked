@@ -14,6 +14,9 @@ import type { Other, Shot, Stage } from './stage';
 
 /** How long play waits for a leaf's panorama before speaking over the blank anyway. */
 const READY_WAIT_MS = 8000;
+/** How far into a turn or a wipe the words begin, and the longest pause after a leaf's words (critic, 21 October). */
+const LEAD_MS = 350;
+const MAX_HOLD_S = 0.35;
 
 export interface PlayerUi {
   caption: HTMLElement;
@@ -129,8 +132,11 @@ export class Player {
     const samePlace = !!from && from.station === L.station && from.moment === L.moment;
     const begin = () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); };
     // the way in follows from what is on screen, so a jump through the chapter list arrives as sensibly as play
-    if (samePlace && from.era === L.era) this.stage.turn(this.shot(L), begin);
-    else if (samePlace) this.stage.wipe(this.shot(L), this.otherFor(from), begin);
+    // the words start a moment into a turn or a wipe rather than after it: waiting for each move to finish left
+    // dead air between every line (the critic's first complaint, 21 October)
+    const lead = () => this.later(LEAD_MS, begin);
+    if (samePlace && from.era === L.era) { this.stage.turn(this.shot(L)); lead(); }
+    else if (samePlace) { this.stage.wipe(this.shot(L), this.otherFor(from), () => {}); lead(); }
     else if (from && L.arrive === 'flight' && from === this.leaves[i - 1] && this.playing) this.fly(from, L, token, begin);
     else { this.stage.show(this.shot(L)); begin(); }
     this.offerCompare();
@@ -301,6 +307,34 @@ export class Player {
     for (const t of this.timers) clearTimeout(t);
     this.timers = [];
     window.speechSynthesis?.cancel();
+    if (this.replyAudio) { this.replyAudio.pause(); this.replyAudio = null; this.ui.caption.classList.remove('reply-voice'); }
+  }
+
+  private replyAudio: HTMLAudioElement | null = null;
+
+  /** The chapter's recorded spoken reply (chN-reply.mp3), captioned, then on; silent and straight on if there is none. */
+  private speakReply(token: number, chapter: number, done: () => void): void {
+    void (async () => {
+      try {
+        const res = await fetch(new URL(recordingUrl(chapter), location.href));
+        const rec = res.ok ? ((await res.json()) as ChapterRecording).files.reply : undefined;
+        if (!rec || token !== this.token) { done(); return; }
+        this.ui.caption.textContent = `The archaeologists' reply: ${rec.text}`;
+        this.ui.caption.classList.add('reply-voice');
+        const a = new Audio(new URL(recordingUrl(chapter, rec.file), location.href).href);
+        this.replyAudio = a;
+        const finish = () => {
+          if (this.replyAudio !== a) return;
+          this.replyAudio = null;
+          this.ui.caption.classList.remove('reply-voice');
+          this.later(MAX_HOLD_S * 1000, done);
+        };
+        a.onended = finish;
+        a.onerror = finish;
+        this.log.push({ kind: 'span', leaf: `ch${chapter}-reply`, chapter, file: rec.file, start: 0, end: rec.seconds, at: wallNow() });
+        await a.play().catch(finish);
+      } catch { done(); }
+    })();
   }
 
   private later(ms: number, f: () => void): void { this.timers.push(window.setTimeout(f, ms)); }
@@ -323,10 +357,18 @@ export class Player {
     const end = () => {
       if (ended || token !== this.token) return;
       ended = true;
-      this.later(L.hold * 1000, () => {
+      this.later(Math.min(L.hold, MAX_HOLD_S) * 1000, () => {
         if (token !== this.token || !this.playing) return;
-        if (this.index + 1 < this.leaves.length) this.go(this.index + 1);
-        else this.pause();
+        const onward = () => {
+          if (token !== this.token || !this.playing) return;
+          if (this.index + 1 < this.leaves.length) this.go(this.index + 1);
+          else this.pause();
+        };
+        // the chapter's last leaf: the archaeologists' reply is spoken before the next chapter, so narrated play is
+        // never the claim alone (the critic, 21 October: "it functions almost purely as advocacy")
+        const next = this.leaves[this.index + 1];
+        if (!next || next.chapter !== L.chapter) this.speakReply(token, L.chapter, onward);
+        else onward();
       });
     };
     void this.recording(L.chapter).then((r) => {
