@@ -15,6 +15,8 @@ export interface HeadsManifest {
   objects: { id: string; file: string; role: 'solid' | 'ghost' }[];
   head_scale: { used: number; least: number | null };
   standin: string;
+  /** The box the export cut both heads out of, in project metres (render/export_heads.py). */
+  crop?: { box: { x0: number; x1: number; y0: number; y1: number; z0: number; z1: number } };
 }
 
 /** What the view says of H1 beside the heads: the least enlargement the fit found, or only the renders' choice. */
@@ -25,7 +27,42 @@ export function factorLine(m: HeadsManifest): string {
     : `The lion's head is drawn ${used} times the size of the photographs' lion here, a look choice; the fit that finds the least enlargement was not run for this export.`;
 }
 
-const GHOST_OPACITY = 0.26;
+/**
+ * How far inside the export's crop box the view cuts the heads again (metres), a look choice: the export's own cut is
+ * the decimated mesh's ragged edge, so the view cuts each face of the box this much further in, where the cut is a
+ * clean plane, and fills it as stone.
+ */
+export const HEAD_INSET = 1.0;
+/** The cut under the chin goes further in: the export's lower edge runs ragged through the nemes' lappets. */
+export const HEAD_INSET_BELOW = 2.5;
+
+export interface ClipBox { min: [number, number, number]; max: [number, number, number] }
+
+/**
+ * The crop box in the heads' glTF frame (+x east, +y up, -z north, about `centre`), each face moved `inset` inwards:
+ * the clean cut the view makes. Null when the manifest carries no crop.
+ */
+export function headClip(m: HeadsManifest, inset = HEAD_INSET, below = HEAD_INSET_BELOW): ClipBox | null {
+  const b = m.crop?.box;
+  if (!b) return null;
+  const [cx, cy, cz] = m.centre as [number, number, number];
+  return {
+    min: [b.x0 - cx + inset, b.z0 - cz + below, -(b.y1 - cy) + inset],
+    max: [b.x1 - cx - inset, b.z1 - cz - inset, -(b.y0 - cy) - inset],
+  };
+}
+
+/**
+ * Where the head starts: a front three-quarter view from the north-east, a little above, where the lion's mane is
+ * seen to wrap the king's head (the statue faces east, +x, which a turn of -90 degrees brings to the viewer).
+ */
+export const HEAD_HOME = { yaw: -0.85, pitch: 0.12 };
+/** The two heads framed to this many times their largest half-extent. */
+const HEAD_MARGIN = 0.85;
+
+const GHOST_OPACITY = 0.3;
+/** The colour the cut faces are filled with: the stone in shadow, so a cut reads as a sawn face, not a hole. */
+const CUT_STONE = 0x4a3d2e;
 /** The lines drawn on the pyramid: the claim's gold, and a quiet grey for north. */
 const CLAIM_GOLD = 0xf2c46b;
 const NORTH_GREY = 0x9a9488;
@@ -40,6 +77,10 @@ export class ObjectView {
   private home = { yaw: 0.6, pitch: 0.15 };
   private frame = 0;
   private loaded: string | null = null;
+  /** The clean cut through the heads, in the group's own frame; turned with it before each draw. */
+  private clipLocal: THREE.Plane[] = [];
+  private clipWorld: THREE.Plane[] = [];
+  private lights: THREE.Object3D[] = [];
 
   constructor(host: HTMLElement, private base: URL) {
     this.el = document.createElement('figure');
@@ -51,11 +92,9 @@ export class ObjectView {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setClearColor(0x0f0e0c);
+    this.renderer.localClippingEnabled = true;
     this.scene.add(this.group);
-    this.scene.add(new THREE.HemisphereLight(0xfff4e0, 0x2a241c, 1.1));
-    const sun = new THREE.DirectionalLight(0xffffff, 2.2);
-    sun.position.set(-4, 6, 8);   // raking from the front left, as a low morning sun
-    this.scene.add(sun);
+    this.daylight();
     this.el.querySelector('.object-reset')!.addEventListener('click', () => { this.turn = { ...this.home }; this.draw(); });
     let drag: { x: number; y: number } | null = null;
     canvas.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; canvas.setPointerCapture(e.pointerId); });
@@ -70,38 +109,87 @@ export class ObjectView {
     window.addEventListener('resize', () => this.draw());
   }
 
+  /** The pyramid's light: a sky and a low morning sun. */
+  private daylight(): void {
+    this.setLights([new THREE.HemisphereLight(0xfff4e0, 0x2a241c, 1.1), at(new THREE.DirectionalLight(0xffffff, 2.2), -4, 6, 8)]);
+    this.renderer.toneMapping = THREE.NoToneMapping;
+    this.el.classList.remove('museum');
+  }
+
+  /**
+   * A museum case's light for a carved object: a warm key high at the front left, a cool fill low from the right, a
+   * rim behind that draws the outline off the dark, and little ambient, so the carving is read by its shadows.
+   */
+  private museum(): void {
+    this.setLights([
+      new THREE.HemisphereLight(0xf3eadb, 0x1a1712, 0.35),
+      at(new THREE.DirectionalLight(0xffe2bd, 3.2), -6, 7, 6),
+      at(new THREE.DirectionalLight(0xb9c8dc, 0.7), 7, -1, 4),
+      at(new THREE.DirectionalLight(0xfff1dc, 2.4), 2, 4, -9),
+    ]);
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.1;
+    this.el.classList.add('museum');
+  }
+
+  private setLights(ls: THREE.Object3D[]): void {
+    for (const l of this.lights) this.scene.remove(l);
+    this.lights = ls;
+    for (const l of ls) this.scene.add(l);
+  }
+
   /** Show the heads of `m` (loaded once), the caption beside them. */
   async show(m: HeadsManifest): Promise<void> {
     this.el.hidden = false;
+    this.museum();
     this.el.querySelector('figcaption')!.textContent = `${factorLine(m)} ${m.standin}`;
     this.el.querySelector('canvas')!.setAttribute('aria-label', "The king's head inside the lion's. Drag to turn it.");
     const key = m.objects.map((o) => o.file).join();
     if (this.loaded !== key) {
       this.loaded = key;
       this.group.clear();
+      const box = headClip(m);
+      this.clipLocal = box ? [
+        new THREE.Plane(new THREE.Vector3(1, 0, 0), -box.min[0]), new THREE.Plane(new THREE.Vector3(-1, 0, 0), box.max[0]),
+        new THREE.Plane(new THREE.Vector3(0, 1, 0), -box.min[1]), new THREE.Plane(new THREE.Vector3(0, -1, 0), box.max[1]),
+        new THREE.Plane(new THREE.Vector3(0, 0, 1), -box.min[2]), new THREE.Plane(new THREE.Vector3(0, 0, -1), box.max[2]),
+      ] : [];
+      this.clipWorld = this.clipLocal.map((p) => p.clone());
       const loader = new GLTFLoader();
       const parts = await Promise.all(m.objects.map(async (o) => {
         const gltf = await loader.loadAsync(new URL(o.file, this.base).href);
-        if (o.role === 'ghost') {
-          gltf.scene.traverse((n) => {
-            const mesh = n as THREE.Mesh;
-            if (!mesh.isMesh) return;
-            const mats = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((mt) => {
-              const g = (mt as THREE.MeshStandardMaterial).clone();
+        const meshes: THREE.Mesh[] = [];
+        gltf.scene.traverse((n) => { if ((n as THREE.Mesh).isMesh) meshes.push(n as THREE.Mesh); });
+        for (const mesh of meshes) {
+          const mats = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((mt) => {
+            const g = (mt as THREE.MeshStandardMaterial).clone();
+            g.clippingPlanes = this.clipWorld;
+            // the ghost both sides: the crop opens the lion's face, and its inside fills the outline as faint stone
+            g.side = o.role === 'ghost' ? THREE.DoubleSide : THREE.FrontSide;
+            if (o.role === 'ghost') {
               g.transparent = true;
               g.opacity = GHOST_OPACITY;
               g.depthWrite = false;
-              return g;
-            });
-            mesh.material = Array.isArray(mesh.material) ? mats : mats[0]!;
-            mesh.renderOrder = 1;   // after the solid head, so the head shows through the ghost
+            }
+            return g;
           });
+          mesh.material = Array.isArray(mesh.material) ? mats : mats[0]!;
+          if (o.role === 'ghost') mesh.renderOrder = 1;   // after the solid head, so the head shows through the ghost
+          else {
+            // the cut filled: the solid's inside, seen only where the clean cut has opened it, drawn as flat stone
+            mesh.add(new THREE.Mesh(mesh.geometry, new THREE.MeshBasicMaterial({ color: CUT_STONE, side: THREE.BackSide, clippingPlanes: this.clipWorld })));
+          }
         }
+        gltf.scene.userData.role = o.role;
         return gltf.scene;
       }));
       parts.forEach((p) => this.group.add(p));
-      // both were exported centred on the head, so the view turns about it; frame the whole of the larger one
-      this.frameGroup(new THREE.Vector3(), { yaw: 0.6, pitch: 0.15 });
+      // framed on what the clean cut leaves of both heads, turned about its middle, so the pair fills the card
+      const shown = new THREE.Box3();
+      for (const p of parts) shown.union(clippedBox(p, box));
+      if (shown.isEmpty()) shown.set(new THREE.Vector3(-1, -1, -1), new THREE.Vector3(1, 1, 1));
+      const half = shown.getSize(new THREE.Vector3()).multiplyScalar(0.5);
+      this.frameGroup(shown.getCenter(new THREE.Vector3()), HEAD_HOME, Math.max(half.x, half.y, half.z) * HEAD_MARGIN);
     }
     this.draw();
   }
@@ -109,12 +197,15 @@ export class ObjectView {
   /** Show the Great Pyramid with its lines; `caption` says what they are. */
   showPyramid(p: PyramidObject, caption: string): void {
     this.el.hidden = false;
+    this.daylight();
     this.el.querySelector('figcaption')!.textContent = caption;
     this.el.querySelector('canvas')!.setAttribute('aria-label', 'The Great Pyramid with a circle of radius its height round it and its golden triangle inside. Drag to turn it.');
     const key = `pyramid:${p.side}:${p.height}`;
     if (this.loaded !== key) {
       this.loaded = key;
       this.group.clear();
+      this.clipLocal = [];
+      this.clipWorld = [];
       const pos = new Float32Array(p.mesh.positions.length);
       for (let i = 0; i < pos.length; i += 3) pos.set(toThree([p.mesh.positions[i]!, p.mesh.positions[i + 1]!, p.mesh.positions[i + 2]!]), i);
       const geo = new THREE.BufferGeometry();
@@ -170,7 +261,18 @@ export class ObjectView {
         this.camera.updateProjectionMatrix();
       }
       this.group.rotation.set(this.turn.pitch, this.turn.yaw, 0, 'YXZ');
+      this.group.updateMatrixWorld(true);
+      this.clipLocal.forEach((p, i) => this.clipWorld[i]!.copy(p).applyMatrix4(this.group.matrixWorld));
       this.renderer.render(this.scene, this.camera);
     });
   }
+}
+
+function at<T extends THREE.Object3D>(o: T, x: number, y: number, z: number): T { o.position.set(x, y, z); return o; }
+
+/** `obj`'s box once cut by `box`: what of it is shown. */
+function clippedBox(obj: THREE.Object3D, box: ClipBox | null): THREE.Box3 {
+  const b = new THREE.Box3().setFromObject(obj);
+  if (box) b.intersect(new THREE.Box3(new THREE.Vector3(...box.min), new THREE.Vector3(...box.max)));
+  return b;
 }

@@ -7,8 +7,9 @@ import './style.css';
 import leavesJson from '../leaves.json';
 import renderStations from '../../../render/stations.json';
 import script from '../../../docs/script.md?raw';
-import { type Leaf, type RenderStations, leafPanorama, readLeaves, withStandIns } from './leaves';
-import { type Manifest, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
+import { type Leaf, type RenderStations, drawCue, leafPanorama, readLeaves, withStandIns } from './leaves';
+import { type Manifest, type Overlay, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
+import { khafreWells } from './wells';
 import { leafFromSearch, scriptChapters } from './play';
 import sphinxPlan from 'virtual:sphinx-plan';
 import skyData from 'virtual:sky';
@@ -327,7 +328,7 @@ type Bundle = Parameters<typeof groundEnvironment>[0] & { claims: Claim[] };
 async function start(): Promise<void> {
   const status = $('status');
   const fail = (msg: string) => { status.textContent = msg; status.hidden = false; };
-  let manifest: Manifest, overlays, leafPatches: unknown;
+  let manifest: Manifest, overlays: Record<string, Overlay>, leafPatches: unknown;
   try {
     // the exhibit's own detail patches are published once the laptop renders them; until then there are none
     [manifest, overlays, leafPatches] = await Promise.all([json('stations.json').then(readManifest), json('overlays.json').then(readOverlays, () => ({})),
@@ -379,6 +380,12 @@ async function start(): Promise<void> {
     ground = groundEnvironment(b);
     bundle = b as Bundle;
     sky.setGround(ground);
+    // lines in the scene drawn from the records, beside the renders' own; a leaf already showing one is shown again
+    const wells = khafreWells(ground);
+    if (wells) {
+      overlays['khafre-wells'] = wells;
+      if (player.leaf.draw[0] && drawCue(player.leaf.draw[0]).overlay === 'khafre-wells' && !player.playing) stage.show(player.shot(player.leaf));
+    }
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
     if (shownFigure === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
@@ -452,6 +459,12 @@ async function start(): Promise<void> {
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;
+    stage.request();   // the scene's labels step off the panel, or back
+  };
+  stage.keepOut = () => {
+    if (figure.hidden) return [];
+    const f = figure.getBoundingClientRect(), s = $('stage').getBoundingClientRect();
+    return [{ x: f.left - s.left, y: f.top - s.top, w: f.width, h: f.height }];
   };
   panel.onOpen = () => { if (player.playing) player.pause(); };
   player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); };

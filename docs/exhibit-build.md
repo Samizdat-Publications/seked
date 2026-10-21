@@ -636,17 +636,39 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   need their sources read with care. A globe needs a world coastline, which the repo lacks (`data/places/basemap.json`
   is a box round Egypt): a Natural Earth 110 m import through `scripts/basemap.ts` if a globe is still wanted.
 
-- [ ] **E27. A recording of the exhibit, with its sound** (for a critic who watches it as a visitor would; Stewart fears
+- [x] **E27. A recording of the exhibit, with its sound** (for a critic who watches it as a visitor would; Stewart fears
   it is too slow). `scripts/capture_exhibit.py [--from LEAF] [--to LEAF] --out build/critic/NAME.mp4`: Playwright at
   1280 by 720 with `record_video_dir`, muted, plays the exhibit in narrated play from leaf to leaf without touching it,
   and logs each leaf's start time and each recording span it played; then lays the recorded narration
   (`assets/narration/chN.mp3` spans and the replies if played) under the video at those times with the ffmpeg that
   `imageio_ffmpeg.get_ffmpeg_exe()` gives, into one mp4. Test it on chapter 0 only (it records in real time); the
   laptop runs the whole.
-- [ ] **E28. The laptop's review notes** (`docs/laptop-2026-10-20.md`, decision 18): (a) the head in the hand reads
+  *Done 2026-10-21 06:00 UTC (chunk 13), `eef3ed5`.* `scripts/capture_exhibit.py` starts the dev server, presses Play on the first leaf in
+  muted Chromium at 1280 by 720 and records until play leaves the last leaf (by default the first leaf's chapter). The
+  player now keeps `player.log`: each leaf put on the stage, each span of a recording from the moment it sounded to where
+  it stopped, and each leaf the browser's voice said instead, in wall-clock milliseconds, so the script lines them up
+  with the video (decision 81). ffmpeg trims each span out of its `chN.mp3`, delays it to its time and mixes it over
+  silence the length of the picture; a JSON timeline is written beside the mp4, listing any leaf that was silent because
+  the browser's voice said it. 8 tests. Run on chapter 0: 66.7 s, nine spans, the sound present (peak 3 dB under the
+  source, from the mono recording spread to stereo), three frames looked at; and on two leaves, cut where the third
+  went on. The video is the page's own recording, so a flight film plays in it as the visitor sees it. For the laptop:
+  the whole run (below).
+- [x] **E28. The laptop's review notes** (`docs/laptop-2026-10-20.md`, decision 18): (a) the head in the hand reads
   rough: hide or cap the cut faces, light it as a museum object, let it fill its card, start at a three-quarter view
   where the lion's head visibly encloses the king's; (b) chapter 8's "wells" leaf shows the plateau, not the wells;
   (c) chapter 6's labels on the pyramid are small and crowd each other at 1280 by 720.
+  *Done 2026-10-21 06:12 UTC (chunk 13).* (a) `b585e09`: the view cuts both heads again a metre inside the export's crop
+  box (2.5 m under the chin, where the lappets' edge is ragged) and fills the king's cut as flat dark stone, lights them as
+  a case would (warm key high front left, cool fill, a rim behind, little ambient, filmic tone mapping), frames on what the
+  cut leaves of both, and starts at a front three-quarter view from the north-east with the lion's head seen round the
+  king's (decision 82). The lion is drawn both sides, since the crop opens its face. 3 tests. (b) `b6d8952`: the claimed
+  wells are drawn in the scene, not only in the figure: `src/wells.ts` builds an overlay from the records the depth
+  figure reads (eight dashed wells from Khafre's base down 648 m, plunging out of the picture, the base outlined faintly,
+  the label saying it is a claim placed by choice), cued on "wells" before the figure on "falling" (decision 83). 3 tests.
+  (c) `cd8f979`: the scene's labels grow with the stage (1.28 times at 1280 wide, at most 1.4, unchanged on a phone),
+  move off a label already drawn, and step sideways off a figure's panel (decision 84). 5 tests. All looked at at 1280
+  by 720 and 390 by 844, (b) also in play; the heads with the laptop's export (`apps/exhibit/objects/`, not committed,
+  served to the page from the main checkout). `pnpm test` 1270 passed.
 
 ## Decisions
 
@@ -932,6 +954,20 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    is read once and the figure still clears the narration on a phone. A year range is the work's as its source words
    it (built, carved, painted, occupied: the `what` field), centuries read as their years, BCE negative, open ends drawn
    faint.
+81. **The capture lines the sound up by the player's own log, not by listening.** The page is muted (the laptop's
+   speakers), so the recording cannot capture sound; the player writes when each span sounded in `Date` milliseconds
+   and the script compares that with when the page (and so its video) opened, good to a frame or two. A leaf in the
+   browser's voice is silent in the mp4 and named in its JSON rather than synthesised.
+82. **The head's clean cut is a look choice, a metre in (2.5 under the chin)**, stated in `objectview.ts`: the export's own
+   cut is the decimated mesh's ragged edge, and the heads are labelled stand-ins whose form is not a measurement, so
+   trimming them further changes nothing claimed. Reversible: `HEAD_INSET` and `HEAD_INSET_BELOW` at 0 restore the
+   export's edge.
+83. **Lines computed in the page beside the renders' overlays** (`SCENE_OVERLAYS` in `wells.ts`): the wells' records are in
+   the bundle, so drawing them needs no render, and the leaves test accepts these names beside `overlays.json`'s. Where
+   the wells stand under the base is the same look choice the depth figure already makes, said on the label.
+84. **Labels grow with the stage to 1.4 times, and step off a figure rather than the figure moving**: the figure is the
+   leaf's subject; the label can move sideways and still point near its mark. A label stepped off its point loses the
+   point under its plate at worst, which reads better than a label under a panel.
 
 ## For Stewart
 
@@ -1015,6 +1051,11 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **The critic's recording** (E27, `eef3ed5`): the whole exhibit runs about half an hour in real time, so run it detached:
+  `python scripts/job.py start critic --then "look at build/critic/exhibit.mp4" -- python scripts/capture_exhibit.py --from ch0-dawn --to ch9-look --out build/critic/exhibit.mp4`
+  (`ch9-look` is the last leaf). `pnpm bundle` first so the receipts draw. Its JSON
+  names any leaf that is silent because its chapter's recording lacks it (`ch6-papyri` until chapter 6 is re-recorded).
 
 - **Re-record chapter 6** (E22b d, `3265a38`): `python scripts/narrate_script.py 6`, then commit `assets/narration/ch6.*`
   and take `ch6-papyri` out of `AWAITING_RECORDING` in `apps/exhibit/src/narration.test.ts` (the test fails until you do).

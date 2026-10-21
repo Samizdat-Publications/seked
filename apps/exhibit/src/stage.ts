@@ -4,7 +4,7 @@
  * station in one era at a time; the player (E3) tells it which.
  */
 import { cameraFor, type Manifest, type Overlay, type OverlayPoint, type Station, patchesByPanorama } from './manifest';
-import { drawOverlay } from './overlay';
+import { type Rect, drawOverlay } from './overlay';
 import { type Aim, WIPE_SECONDS, turnAt, turnSeconds, wipeAt } from './play';
 import {
   DEG, MAX_FOV, MIN_FOV, PITCH_MAX, type Patch, clamp, fitFov, frameAim, fromCamera, nearestPatch, project, wantsPatch, wrapAngle,
@@ -36,6 +36,8 @@ export class Stage {
   readonly view = { yaw: 0, pitch: 0, zoom: 1, vy: 0, vp: 0 };
   /** Called when the visitor takes the view (a drag, a pinch, the wheel or a key), so play can pause. */
   onHandsOn: () => void = () => {};
+  /** What the page lays over the stage (a figure's panel), in stage pixels: the scene's labels keep off it. */
+  keepOut: () => Rect[] = () => [];
   /** Called when the panorama on screen changes status: loading, ready, missing or error. */
   onStatus: (s: 'loading' | 'ready' | 'missing' | 'error') => void = () => {};
 
@@ -371,7 +373,7 @@ export class Stage {
     if (this.overlay && Number.isFinite(this.overlayT0) && (!this.cache || this.cache.status(this.current()) === 'ready')) {
       const camera = cameraFor(st, era);
       const at = (p: OverlayPoint) => this.project(Array.isArray(p) ? p : fromCamera(camera, p.dir), camera, fov);
-      if (drawOverlay(this.ctx, this.overlay, at, era, t - this.overlayT0, this.still, this.font)) busy = true;
+      if (drawOverlay(this.ctx, this.overlay, at, era, t - this.overlayT0, this.still, this.font, this.keepOut())) busy = true;
     }
     if (this.sky && (!this.cache || this.cache.status(this.current()) === 'ready')) {
       const camera = cameraFor(st, era);

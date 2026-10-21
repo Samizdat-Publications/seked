@@ -2188,7 +2188,7 @@
    },
    "arrive": "turn",
    "say": "What they read is eight hollow wells in two rows, wound with spiral paths, falling 648 metres to two great chambers about 80 metres on a side.",
-   "draw": ["khafre-depths@falling"],
+   "draw": ["khafre-wells@wells", "khafre-depths@falling"],
    "hold": 1,
    "interact": "look",
    "receipts": [],

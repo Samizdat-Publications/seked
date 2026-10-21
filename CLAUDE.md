@@ -51,6 +51,7 @@ python scripts/meshy.py share [ID ...]          # the pinned Meshy generations o
 python scripts/job.py claim|start|status        # own the repo, run a long job detached from the session, see who owns what (see "One session at a time")
 python scripts/headless.py -p "<prompt>" [claude flags]   # a headless `claude -p` job on the API key only (SEKED_ANTHROPIC_API_KEY, or in ~/.seked/keys.env); bulk research and drafting
 python scripts/research.py start|collect N...   # research documentary chapter N as a detached headless job; collect writes docs/research/chN.md
+python scripts/capture_exhibit.py [--from LEAF] [--to LEAF] --out build/critic/NAME.mp4   # the exhibit in narrated play, untouched and muted, recorded in real time with its narration laid under it
 ```
 
 ## Rules that keep the project honest
