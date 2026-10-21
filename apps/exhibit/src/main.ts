@@ -15,6 +15,9 @@ import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
+import texts from 'virtual:texts';
+import { bce, kingListsSvg, rhind56, rhind56Svg } from './texts';
+import { degreesToSeked } from '@seked/units';
 import corridor from 'virtual:corridor';
 import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
@@ -244,6 +247,30 @@ function sekedRuleFigure(b: Bundle | null, ground: Record<string, number> | null
     the pyramid: no mathematical papyrus survives from the pyramid age itself.</figcaption>`;
 }
 
+/** The king lists' years before the first king, counted back from his radiocarbon accession: chapter 4's beat. */
+function kingListsFigure(): string {
+  const d = texts.kingLists;
+  const [turin, summed, manetho] = d.spans;
+  const unchecked = d.spans.some((s) => !s.verified) || !d.anchor.verified;
+  return `${kingListsSvg(d)}<figcaption>The years the king lists give before the first king, counted back from Aha's accession
+    (the radiocarbon median, ${shortCite(d.citations[d.anchor.source]!)}). The Turin papyrus, ${turin!.locus.split(' (')[0]}: ${turin!.years.toLocaleString('en-GB')} + x
+    years; added to the next line's total, as Schwaller de Lubicz adds them (dashed: the sum is not on the papyrus),
+    ${summed!.years.toLocaleString('en-GB')} + x. Manetho, as Eusebius preserves him: ${d.lunar.toLocaleString('en-GB')} "lunar years", which
+    Eusebius himself makes ${manetho!.years.toLocaleString('en-GB')}. "+ x" marks a damaged total, read as at least that. None lands on the line at
+    ${bce(d.epoch)}.${unchecked ? ' Read from the transcriptions, not yet checked against the editions.' : ''}</figcaption>`;
+}
+
+/** Rhind problem 56 in the scribe's steps, beside the Great Pyramid's seked from A3's target. */
+function rhindFigure(b: Bundle | null): string {
+  const result = b ? leafReceipts(b, b.claims, ['A3'])[0] : undefined;
+  if (!result) return '<figcaption>The problem is set beside A3, from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const r = rhind56(texts.rhind, degreesToSeked(result.comparisons[0]!.targetValue));
+  return `${rhind56Svg(r)}<figcaption>A schoolroom problem, as the papyrus sets it: find the seked of a pyramid from its base
+    and height. The scribe halves the base, divides by the height, and writes the answer in unit fractions, as Egyptians
+    wrote every fraction. Khufu's builders worked to a seked of ${r.khufuSeked.toFixed(1).replace('.5', '½')} palms. The papyrus is a copy made centuries
+    after the pyramids. Its figures after ${shortCite(texts.rhindCitation)}'s summary of Chace's edition${r.verified ? '' : ', not yet checked against the edition'}.</figcaption>`;
+}
+
 /** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */
 function claimSortFigure(b: Bundle | null): string {
   if (!b) return '<figcaption>The claims are sorted from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
@@ -326,6 +353,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
+    if (shownFigure === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
     if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (shownFigure === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);
     if (shownFigure === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
@@ -382,6 +410,8 @@ async function start(): Promise<void> {
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
+    if (id === 'king-lists') figure.innerHTML = kingListsFigure();
+    if (id === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;
