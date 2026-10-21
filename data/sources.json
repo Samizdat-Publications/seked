@@ -1271,5 +1271,14 @@
     "citation": "Alison, J. A New Look at an Old Design: The Prehistoric Alignment of World Wonders. Part 1, Great Circle. Self-published web pages, undated.",
     "url": "http://home.hiwaay.net/~jalison/",
     "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12), not the page itself: the table of sites near the circle (seventeen rows, latitude and longitude in degrees and minutes, distance to the circle and to the axis point in miles), the axis points 59 53 N 138 36 W and 59 53 S 41 24 E, and the tolerance sentences. Hancock draws on this circle in Heaven's Mirror (1998). The page's degree signs are garbled in its encoding; the figures to check against the page itself. data/places/great-circle.json."
+  },
+  {
+    "id": "wikidata-world-heritage",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikidata. Items with a UNESCO World Heritage Site id (P757) and coordinates (P625), with their World Heritage criteria (P2614), through the Wikidata Query Service.",
+    "url": "https://query.wikidata.org/",
+    "license": "CC0 1.0",
+    "note": "Queried on 2026-10-21 by the night builder (chunk 12) with the query in scripts/worldheritage.ts; the response's sha256 is c3bf0b2a45d6366641aaa691999e96e87d4a2b1ce5caa5c793b2766f825bc97d (6,430 rows). The script keeps whole properties with a cultural criterion, one point each. Wikidata's points are its editors' and its criteria are not checked here against UNESCO's own list; the count of kept properties is near the List's cultural and mixed total. data/places/world-heritage.json."
   }
 ]

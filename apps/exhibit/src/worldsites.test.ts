@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import doc from '../../../data/places/great-circle.json';
+import heritage from '../../../data/places/world-heritage.json';
 import constants from '../../../data/measurements/units-and-constants.json';
 import sources from '../../../data/sources.json';
 import { bestCircle, toVec } from './greatcircle';
-import { ALISON, dms, offAuthorsAxis, poleSeparation, strip, stripSvg } from './worldsites';
+import { ALISON, dms, offAuthorsAxis, poleSeparation, poolReply, poolSvg, strip, stripSvg, within } from './worldsites';
 
 describe("Alison's great circle, as he draws it", () => {
   it('rests on the proponent\'s own page, unverified, and stores no circle of its own', () => {
@@ -47,5 +48,30 @@ describe("Alison's great circle, as he draws it", () => {
     const svg = stripSvg(s, km);
     for (const site of ALISON.sites) expect(svg).toContain(site.name);
     expect(svg).toContain('28 km');
+  });
+});
+
+describe('the reply: a pool of comparable sites, and circles at random', () => {
+  const pool = heritage.properties.map(([, , lat, lon]) => ({ lat: lat as number, lon: lon as number }));
+
+  it("draws on the World Heritage List's cultural properties, imported with their source", () => {
+    expect(sources.find((s) => s.id === heritage.source)?.note).toContain(heritage.sha256);
+    expect(pool.length).toBeGreaterThan(900);
+    expect(new Set(heritage.properties.map((p) => p[0])).size).toBe(pool.length);
+    for (const p of pool) { expect(Math.abs(p.lat)).toBeLessThanOrEqual(90); expect(Math.abs(p.lon)).toBeLessThanOrEqual(180); }
+  });
+
+  it('counts the sites near a circle: the equator catches what lies on it and nothing far off', () => {
+    const vs = [{ lat: 0.1, lon: 10 }, { lat: -0.2, lon: 50 }, { lat: 5, lon: 0 }].map(toVec);
+    expect(within([0, 0, 1], vs, 0.25)).toBe(2);
+  });
+
+  it("finds Alison's circle no rarer than about one random circle in nine: it catches more than the average, and the best random one far more", () => {
+    const r = poolReply(bestCircle(ALISON.sites).pole, pool, 0.25, 2000);
+    expect(r.claim).toBeGreaterThan(r.mean);
+    expect(r.share).toBeGreaterThan(0.05);
+    expect(r.best).toBeGreaterThan(2 * r.claim);
+    expect(poolReply(bestCircle(ALISON.sites).pole, pool, 0.25, 2000)).toEqual(r);
+    expect(poolSvg(r)).toContain(`Alison's circle: ${r.claim}`);
   });
 });

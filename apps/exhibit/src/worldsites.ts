@@ -5,7 +5,7 @@
  * claim means. Kilometres take the Earth's mean radius from its record.
  */
 import doc from '../../../data/places/great-circle.json';
-import { bestCircle, offsets, toVec, type CircleFit, type Site, type Vec3 } from './greatcircle';
+import { bestCircle, offsets, seeded, toVec, type CircleFit, type Site, type Vec3 } from './greatcircle';
 
 export type Dms = [number, number, string];
 
@@ -78,5 +78,48 @@ export function stripSvg(s: Strip, km: number, width = 300): string {
     return `<text class="lab" x="${name}" y="${y + 4}" text-anchor="end">${s.sites[i]!.name}</text><line class="dim" x1="${X(0)}" y1="${y}" x2="${X(o)}" y2="${y}"/><circle class="star" cx="${X(o)}" cy="${y}" r="3"/>`;
   }).join('\n  ')}
   <text class="north" x="${pad}" y="${h - 4}">in order round the Earth</text>
+</svg>`;
+}
+
+/** How many of `pool` lie within `tol` degrees of the great circle with this pole. */
+export function within(pole: Vec3, pool: Vec3[], tol: number): number {
+  const s = Math.sin(tol * D);
+  let n = 0;
+  for (const v of pool) if (Math.abs(dot(pole, v)) <= s) n++;
+  return n;
+}
+
+export interface PoolReply { tol: number; claim: number; counts: number[]; mean: number; share: number; best: number }
+
+/**
+ * The reply with a pool: how many of a list of comparable sites (the World Heritage List's cultural properties) the
+ * claim's circle passes within `tol` of, against as many great circles with their poles at random, evenly over the
+ * sphere, from a seeded generator. `share` is the part of the random circles that pass as many or more.
+ */
+export function poolReply(pole: Vec3, pool: Site[], tol: number, trials: number, seed = 1): PoolReply {
+  const vs = pool.map(toVec), rand = seeded(seed);
+  const claim = within(pole, vs, tol);
+  const counts: number[] = [];
+  for (let t = 0; t < trials; t++) {
+    const z = 2 * rand() - 1, th = 2 * Math.PI * rand(), r = Math.sqrt(1 - z * z);
+    counts.push(within([r * Math.cos(th), r * Math.sin(th), z], vs, tol));
+  }
+  return { tol, claim, counts, mean: counts.reduce((a, b) => a + b, 0) / trials, share: counts.filter((c) => c >= claim).length / trials, best: Math.max(...counts) };
+}
+
+/** The random circles' counts as a bar chart, the claim's circle marked among them. */
+export function poolSvg(r: PoolReply, width = 300): string {
+  const pad = 10, h = 120, base = h - 30, top = 22;
+  const bins = new Array(r.best + 1).fill(0) as number[];
+  for (const c of r.counts) bins[c]!++;
+  const peak = Math.max(...bins), bw = (width - 2 * pad) / bins.length;
+  const X = (n: number) => pad + n * bw;
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="How many World Heritage sites ${r.counts.length} random great circles pass near, with Alison's circle among them">
+  ${bins.map((b, n) => b ? `<rect x="${f1(X(n) + 0.5)}" y="${f1(base - (b / peak) * (base - top))}" width="${f1(Math.max(1, bw - 1))}" height="${f1((b / peak) * (base - top))}" fill="${n >= r.claim ? 'rgba(255, 214, 140, 0.85)' : 'rgba(255,255,255,0.35)'}" stroke="none"/>` : '').join('')}
+  <line class="wall draw-on" x1="${f1(X(r.claim) + bw / 2)}" y1="${top - 8}" x2="${f1(X(r.claim) + bw / 2)}" y2="${base}" pathLength="1"/>
+  <text class="here-lab halo" x="${f1(X(r.claim) + bw / 2 + 4)}" y="${top}">Alison's circle: ${r.claim}</text>
+  <text class="north" x="${f1(X(0))}" y="${base + 12}">0</text>
+  <text class="north" x="${f1(X(r.best) + bw)}" y="${base + 12}" text-anchor="end">${r.best} sites</text>
+  <text class="north" x="${pad}" y="${h - 4}">${r.counts.length} random circles; ${Math.round(r.share * 100)}% catch as many</text>
 </svg>`;
 }
