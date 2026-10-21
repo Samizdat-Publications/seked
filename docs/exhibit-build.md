@@ -437,6 +437,14 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `ch8-wells`; the depth against `g2.height.original` (four and a half heights) on "height" in `ch8-height`. The
   claimed depths need records first if `data/` lacks them (`khafre-project-2025`, `verified: false`), never typed
   into the figure. Hawara's section waits for its proposed records.
+  *(a) done 2026-10-21 00:15 UTC, `3994f1e`:* the records were already in `data/measurements/g2-sar.json`
+  (`khafre-project-2025`, unchecked). `khafre-depths`, cued on "falling" in `ch8-wells` and kept on `ch8-height`: to
+  one scale from the claims' environment, Khafre's pyramid in stone, its rooms 3 m down, one row of the claimed wells
+  dashed to 648 m and the two 80 m chambers at their foot, the pyramid's height counted down beside them to 4.52.
+  Where the wells stand under the base is a look choice, said in the caption. Redrawn when the bundle lands (the
+  player's list of figures that read the monuments). Looked at at both sizes, with the bundle built locally by
+  `pnpm bundle` and served to the page by the screenshot script. Left: the Osiris Shaft and the paw cavity on the
+  same scale (they need depth records), and Hawara's section.
 - [x] **E21. Chapter 9, "What would settle it": its leaves.** *Done 2026-10-21 00:04 UTC, `3ee1dd2`.* 10 leaves, every
   word in order and inside `ch9.json`, all today; every chapter of the script is now in leaves (113). Opens on the
   Sphinx at dawn with chapter 0's framing; the flank's floor for the seismic lines (yaw 285, pitch -30, as
