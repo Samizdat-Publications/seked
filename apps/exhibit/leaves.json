@@ -1115,7 +1115,7 @@
    },
    "arrive": "turn",
    "say": "In the most probable reading of its damaged numbers, it gives the spirits and Followers 13,420 years and, in the next line, 23,200.",
-   "draw": [],
+   "draw": ["king-lists@13"],
    "hold": 1,
    "interact": "sky",
    "receipts": [],
@@ -1138,7 +1138,7 @@
    },
    "arrive": "turn",
    "say": "Manetho, a thousand years later, tells the same story.",
-   "draw": [],
+   "draw": ["king-lists"],
    "hold": 1,
    "interact": "sky",
    "receipts": [],
@@ -1857,6 +1857,27 @@
    "reply": "ch6"
   },
   {
+   "id": "ch6-papyri",
+   "chapter": 6,
+   "station": "panorama",
+   "era": "built",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 24,
+    "pitch": -2,
+    "fov": 30
+   },
+   "arrive": "turn",
+   "say": "Their own papyri teach the seked as a schoolroom exercise, but they were written centuries after the pyramids; no mathematics survives from the pyramid age itself.",
+   "draw": ["seked-rule", "rhind-56@papyri"],
+   "hold": 3,
+   "interact": "look",
+   "receipts": [
+    "A3"
+   ],
+   "reply": "ch6"
+  },
+  {
    "id": "ch6-together",
    "chapter": 6,
    "station": "panorama",
@@ -1973,10 +1994,10 @@
    },
    "arrive": "turn",
    "say": "Then, as the cold lifts, a monument appears on a hilltop in south-east Turkey. Göbekli Tepe is a set of great rings of T-shaped stone pillars, carved with animals.",
-   "draw": [],
-   "hold": 1,
+   "draw": ["vulture-sky@animals"],
+   "hold": 5,
    "interact": "look",
-   "receipts": [],
+   "receipts": ["C8"],
    "reply": "ch7"
   },
   {
@@ -2452,8 +2473,8 @@
    },
    "arrive": "cut",
    "say": "Hancock, Bauval and Schoch read the stone, the sky and the texts as one story. Where it has been measured, the measurements have mostly gone against it.",
-   "draw": [],
-   "hold": 1,
+   "draw": ["great-circle@story"],
+   "hold": 3,
    "interact": "look",
    "receipts": [],
    "reply": "ch9"

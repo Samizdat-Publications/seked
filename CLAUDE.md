@@ -67,7 +67,7 @@ python scripts/research.py start|collect N...   # research documentary chapter N
   The starting sheet was entered from memory and secondary sources.
 - **Star data is imported, never typed.** Everything in `data/stars/` is
   written by `pnpm run stars` out of one HYG 4.2 CSV: `hyg-bright.json` is the
-  catalogue to magnitude 6.5, `named.json` the fourteen stars the claims name, cut
+  catalogue to magnitude 6.5, `named.json` the fifteen stars the claims name, cut
   from the same rows so the two cannot disagree. The raw CSV is gitignored and
   `data/sources.json` carries its URL, its checksum and the CC BY-SA 4.0
   attribution the licence requires.
@@ -99,6 +99,14 @@ python scripts/research.py start|collect N...   # research documentary chapter N
   resolution, the drafting tolerance and the scan's shrinkage, and is never
   verified. A position guessed from how a picture looks is still not a
   measurement. (Agreed 2026-09-16.)
+- **A text's figures are what the text says.** `data/texts/*.json` holds the
+  years and figures ancient texts give (the Turin King List's totals,
+  Manetho's, the Rhind papyrus's seked problems), in the text's own unit,
+  each cited to its line, fragment or problem and page, `verified: false`
+  until checked against the edition. They are never measurements and never
+  enter a claim's environment; what follows from them is computed where it
+  is shown. A damaged total read as a minimum carries `plus_x`. (Agreed
+  2026-10-21.)
 - **Visual stand-ins are labelled.** A third-party model used for a
   non-pyramid structure is placed on that structure's footprint, keeps its
   licence and source in a manifest, and is marked a stand-in wherever it is

@@ -71,8 +71,8 @@ first two paragraphs (`eleven_multilingual_v2`, stability 0.55, similarity 0.8, 
 about 127 words a minute, so the whole script of about 2,265 words runs near 18 minutes.
 
 **Chapter 7 gains a sky leaf** (agreed with Stewart, 20 October): Pillar 43, the Vulture Stone, laid over the sky
-`@seked/sky` computes for Göbekli Tepe, as Sweatman and Tsikritsis and Collins read it (the vulture as Cygnus, the
-scorpion as Scorpius, c. 9600 BCE), with the claim, its free choices and the reply. See `docs/gobekli-reliefs.md`.
+`@seked/sky` computes for Göbekli Tepe, as Sweatman and Tsikritsis read it (the vulture as Sagittarius, the
+scorpion as Scorpius, 10,950 BC; Collins reads the vulture as Cygnus; corrected 21 October from the paper, claim C8), with the claim, its free choices and the reply. See `docs/gobekli-reliefs.md`.
 
 ## Building on what exists
 

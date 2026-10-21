@@ -24,6 +24,7 @@
     "figures": "tsx scripts/figures.ts",
     "icecore": "tsx scripts/icecore.ts",
     "basemap": "tsx scripts/basemap.ts",
+    "worldheritage": "tsx scripts/worldheritage.ts",
     "footprints": "tsx scripts/footprints.ts",
     "city": "tsx scripts/city.ts",
     "props": "python scripts/props.py && tsx scripts/web-assets.ts",

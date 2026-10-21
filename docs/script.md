@@ -300,7 +300,7 @@ The shape is real. The same 2026 study calls the match "real but narrow". Almost
 
 ## 6. Numbers in the stone
 
-**Narration** (219 words)
+**Narration** (245 words)
 
 Measure the Great Pyramid. Walk once round its base and divide the distance by its original height. The answer is two times pi, to within three hundredths of one per cent.
 
@@ -310,7 +310,7 @@ Scale the pyramid up 43,200 times. Its height becomes the distance from the Eart
 
 The sides run within four minutes of arc of true north. On a side of 230 metres that is a quarter of a metre, with no compass.
 
-Writers since Charles Piazzi Smyth in the 1860s have read these numbers as a design brief: the circle, the golden section, the size of the Earth and the slow turn of the sky, written into one shape. For Hancock, the knowledge was inherited from a civilisation older than Egypt. Each number alone has an ordinary explanation. The proponents ask whether the explanations hold when the numbers come together.
+Writers since Charles Piazzi Smyth in the 1860s have read these numbers as a design brief: the circle, the golden section, the size of the Earth and the slow turn of the sky, written into one shape. For Hancock, the knowledge was inherited from a civilisation older than Egypt. Each number alone has an ordinary explanation. Their own papyri teach the seked as a schoolroom exercise, but they were written centuries after the pyramids; no mathematics survives from the pyramid age itself. The proponents ask whether the explanations hold when the numbers come together.
 
 Knowledge that old needs people to have held it.
 
@@ -550,11 +550,11 @@ At 150 words a minute:
 | 3. Temples of the same stone | 218 | 1:27 |
 | 4. The First Time | 219 | 1:28 |
 | 5. The sky as a clock | 219 | 1:28 |
-| 6. Numbers in the stone | 219 | 1:28 |
+| 6. Numbers in the stone | 245 | 1:38 |
 | 7. Before the flood | 210 | 1:24 |
 | 8. Underneath (draft) | 215 | 1:26 |
 | 9. What would settle it | 219 | 1:28 |
-| **Total** | **2,070** | **13:48** |
+| **Total** | **2,096** | **13:58** |
 
 The ten spoken replies come to about 320 words, roughly two minutes, so autoplay runs about 16 minutes, a minute over the plan's 12 to 15. Chapter 8 is where to trim if Stewart wants it back inside.
 

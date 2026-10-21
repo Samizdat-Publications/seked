@@ -1,6 +1,6 @@
 # Seked claims dossier
 
-Generated 2026-10-20 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
+Generated 2026-10-21 from `data/` with the **canonical** preset. Every number below is computed from the measurement database; nothing is typed in by hand. Residual is (value − target) / target. "Free choices" counts the decisions a claim needs before the numbers line up: a unit, a base line, an epoch, a scale factor.
 
 ## Summary
 
@@ -24,6 +24,7 @@ Generated 2026-10-20 from `data/` with the **canonical** preset. Every number be
 | C5 | Sphinx and Leo | −12°33′53″ | 10°14′04″ (+11.372 %) | no | 3 |
 | C6 | Solstice akhet | 2°38′15″ (+0.891 %) | 2°38′15″ (+0.891 %) | yes | 0 |
 | C7 | Cygnus alternative | −42.45 % | −22°33′24″ (−59.591 %) | no | 3 |
+| C8 | The Vulture Stone as a date | 4°10′16″ | 4°10′16″ | no | 5 |
 | D1 | Giza diagonal to Heliopolis | −1°38′52″ (−3.662 %) | −1°38′55″ (−3.664 %) | no | 2 |
 | D2 | Legon's rectangle | −0.09 % | +0.11 % | yes | 1 |
 | D3 | Prime meridian and the Delta | 3.1″ (+0.003 %) | −6°31′41″ (−14.507 %) | no | 2 |
@@ -532,6 +533,39 @@ Residual by survey preset:
 **Context:** Bauval, R. & Gilbert, A. (1994). The Orion Mystery. London: Heinemann. · Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22.
 
 This is C4's engine with another constellation in it: the same two shape comparisons, the same folding of right-ascension differences into ±180° with atan2(sin, cos), the same unsigned ground offsets from Petrie's §92, and the same 5 % band. What it is not is Collins' own thesis. That thesis is a view, not a plan: the three wing stars setting into their three pyramids as seen from Gebel Gibli, the knoll south-east of the Sphinx, and Deneb rising over Heliopolis. Testing it needs Gebel Gibli's position and the plateau's local horizon, and the database has neither, so only the ground plan is tested here. The wing is a far wider figure than the belt, and the flat sky map pays for it. Fawaris to Aljanah spans 16.2° at this epoch against the belt's 2.7°, so the map C4 uses, x = Δra × cos dec of the middle star and y = Δdec, is stretched where C4's is not: about Sadr it puts the wing's angle to the meridian at 15.30°, where a true tangent plane about the same star puts it at 14.27°. That is a full degree of projection error, against the arcminute or two the same approximation costs over Orion's belt. It changes no verdict below, but nothing here should be read to better than a degree. Neither comparison holds, and neither holds as well as Orion's. The wing's angle to the meridian comes out at 15°18′ against the pyramids' diagonal of 37°51′, wrong by 22°33′ (−59.6 %), where C4's belt at its own chosen epoch is wrong by 13°01′ (+34.4 %). Menkaure stands off the G1 to G2 line by 0.185 of that line's length and Aljanah stands off the Fawaris to Sadr line by 0.322 of it, so the wing is nearly twice as bent as the ground: −42.5 %, against Orion's +25.0 %. The angle is the half of this that an epoch can move. It sweeps about 0.7° a century here, and over the fifteen thousand years from 13,000 BCE to now it passes the pyramids' 37°51′ exactly twice, around 11,300 BCE and again around 700 CE, neither of them anywhere near the completion of the pyramids that Collins dates the correlation to. The offset ratio barely moves with the epoch at all, so no date rescues the shape. Long-term precession (Vondrák 2011) is what makes any of these dates mean anything; Bauval and Gilbert are cited for context because the method being applied is theirs.
+
+### C8 · The Vulture Stone as a date
+
+Sweatman and Tsikritsis (2017) read Pillar 43 at Göbekli Tepe, the Vulture Stone, as a picture of the sky: the vulture as the teapot of Sagittarius, the scorpion as Scorpius, the bent bird as Ophiuchus, the long-necked bird as Libra, the animal left of the scorpion as Lupus, and the disc above the vulture's wing as the sun. Seen at sunset on the summer solstice, the sun stands just above the teapot's spout in 10,950 BC, give or take 250 years, which they call a date stamp for the Younger Dryas.
+
+*Evaluated at epoch −10949 (10950 BCE).*
+
+| Comparison | Formula | Value | Target | Residual | Within |
+|---|---|---:|---:|---:|:---:|
+| the spout's ecliptic longitude against the solstice sun's | `atan2(sin(atan2(sin(star.alnasl.ra) * cos(sun.obliquity) + tan(star.alnasl.dec) * sin(sun.obliquity), cos(star.alnasl.ra)) - 90), cos(atan2(sin(star.alnasl.ra) * cos(sun.obliquity) + tan(star.alnasl.dec) * sin(sun.obliquity), cos(star.alnasl.ra)) - 90))` vs `0` | 4°10′16″ | 0°00′00″ | 4°10′16″ | no (±3°30′00″) |
+
+Residual by survey preset:
+
+| Comparison | canonical | petrie-1883 | cole-1925 | dash-2015 |
+|---|---:|---:|---:|---:|
+| the spout's ecliptic longitude against the solstice sun's | 4°10′16″ | 4°10′16″ | 4°10′16″ | 4°10′16″ |
+
+**Free choices (5)**:
+- the reading itself, that the carvings are constellations and the disc is the sun
+- which constellation each animal is (the vulture as Sagittarius, not Collins's Cygnus)
+- the summer solstice, chosen from the four seasons because its date lies nearest the radiocarbon dates; the others give 2000 AD, 4350 BC and 18,000 BC
+- the spout, γ Sagittarii, standing for where on the vulture the disc sits
+- sunset rather than sunrise, chosen for the figures' orientation
+
+**Overlay:** `panel` {"star":"alnasl","figures":{"Sgr":"the vulture","Sco":"the scorpion","Oph":"the bent bird","Lib":"the long-necked bird","Lup":"the wolf"}}
+
+**Proponents:** Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.
+
+**Context:** Vondrák, J., Capitaine, N. & Wallace, P. (2011). New precession expressions, valid for long time intervals. Astronomy & Astrophysics 534, A22. · astronexus. The HYG Database, version 4.2. A merge of the Hipparcos, Yale Bright Star and Gliese catalogues into one CSV, with positions and proper motions at epoch and equinox J2000, distances, magnitudes, spectral types, colour indices and catalogue designations. · Collins, A. (2006). The Cygnus Mystery. London: Watkins.
+
+**Critiques:** Notroff, J., Dietrich, O., Clare, L., Dietrich, L., Schlindwein, J., Kinzel, M., Lelek-Tvetmarken, C. & Sönmez, D. (2017). More than a vulture: A response to Sweatman and Tsikritsis. Mediterranean Archaeology and Archaeometry 17(2), 57–63.
+
+Read from the paper (pp. 237 to 238): the pairings on p. 237, the four candidate dates and the choice of the summer solstice on p. 238, where the date is set by when "the sun is slightly above the spout of the teapot asterism of Sagittarius". The paper found its dates by eye in Stellarium from Şanlıurfa. Here the test is the one quantity that does not depend on the observer: at a solstice the sun's ecliptic longitude of date is 90° by definition, so the comparison is how far the spout's own longitude of date stands from it, folded into ±180°. The star's mean place of date comes from Vondrák 2011 with its proper motion applied, and the longitude from the obliquity of date. The tolerance of 3.5° is the paper's own ±250 years turned into longitude at the general precession of about 50.3″ a year; it says only that the paper's date is consistent with its own reading, not that the reading is right. It misses: the spout's longitude of date is about four degrees past the solstice point in the paper's year, and reaches it about three centuries earlier, just outside the paper's band. Precession by Vondrák 2011 runs slightly slower than today's rate over these millennia, which a constant-rate estimate would not show. "Slightly above" is the sun north of the spout by the star's ecliptic latitude, which no comparison tests. The claims' observer is Giza, a thousand kilometres from Göbekli Tepe, which changes nothing here: longitude of date is the same from anywhere. Notroff and others, the excavators, answer that the animals are those of Göbekli Tepe's own world, found across the site, and that the disc and the other motifs have readings in that context; see docs/gobekli-reliefs.md.
 
 ## D · Site plan and geodesy
 

@@ -16,7 +16,7 @@ const COL = { id: 0, name: 1, bf: 2, ra: 3, dec: 4, pmRa: 5, pmDec: 6, mag: 8 } 
  */
 export function buildSkyData(sites: { id: string; origin: { latitude: number; longitude: number } }[],
   bright: { attribution: string; stars: unknown[][] }, named: Star[],
-  claims: { id: string; epoch?: number | null; overlay?: { type?: string; params?: { bearings?: { label: string; azimuth: string | number }[]; exaggeration?: number } };
+  claims: { id: string; epoch?: number | null; overlay?: { type?: string; params?: { bearings?: { label: string; azimuth: string | number }[]; exaggeration?: number; star?: string; figures?: Record<string, string> } };
     comparisons?: { label: string; formula: string | number; target: string | number; unit?: string }[] }[],
   figures: { attribution: string; figures: Record<string, { name: string; lines: string[][] }> } | null = null,
   nights: Record<string, { meridian: string }> = {}, drawn: readonly string[] = ['Leo', 'Ori'], magnitudeLimit = 4.5): SkyData {
@@ -30,9 +30,13 @@ export function buildSkyData(sites: { id: string; origin: { latitude: number; lo
     const comparisons = (c.comparisons ?? []).map((k) => ({ label: k.label, formula: String(k.formula), target: String(k.target), unit: k.unit ?? '' }));
     // a compass rose's exaggeration (C1) is the overlay's own, so a figure drawing it states the claim's factor
     const exaggeration = c.overlay?.type === 'compass-rose' ? c.overlay.params?.exaggeration : undefined;
-    if (c.epoch !== undefined || bearings.length || exaggeration) out[c.id] = { epoch: c.epoch ?? null, bearings, comparisons, ...(exaggeration ? { exaggeration } : {}) };
+    // a claim argued away from Giza (C8, the panel type) may name the constellations it reads and its date's star
+    const chart = c.overlay?.params?.figures && c.overlay.params.star
+      ? { star: c.overlay.params.star, figures: c.overlay.params.figures } : undefined;
+    if (c.epoch !== undefined || bearings.length || exaggeration) out[c.id] = { epoch: c.epoch ?? null, bearings, comparisons, ...(exaggeration ? { exaggeration } : {}), ...(chart ? { chart } : {}) };
   }
-  const chosen = Object.fromEntries(drawn.flatMap((k) => (figures?.figures[k] ? [[k, figures.figures[k]!]] : [])));
+  const charted = Object.values(out).flatMap((c) => Object.keys(c.chart?.figures ?? {}));
+  const chosen = Object.fromEntries([...new Set([...drawn, ...charted])].flatMap((k) => (figures?.figures[k] ? [[k, figures.figures[k]!]] : [])));
   const attribution = figures ? `${bright.attribution} ${figures.attribution}` : bright.attribution;
   const meridians = Object.fromEntries(Object.entries(nights).map(([id, n]) => [id, n.meridian]));
   return { latitudeDeg: giza.origin.latitude, longitudeDeg: giza.origin.longitude, magnitudeLimit, stars, named, claims: out, figures: chosen, nights: meridians, attribution };

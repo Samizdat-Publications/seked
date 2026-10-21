@@ -22,3 +22,7 @@ declare module 'virtual:corridor' {
   const data: import('./figures').CorridorData;
   export default data;
 }
+declare module 'virtual:texts' {
+  const data: { kingLists: import('./texts').KingListsData; rhind: import('./texts').TextFigureIn[]; rhindCitation: string };
+  export default data;
+}

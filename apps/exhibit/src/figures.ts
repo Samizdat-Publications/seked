@@ -54,13 +54,16 @@
  *
  * `claim-sort`: chapter 6's claims as the engine sorts them, live: holds with nothing chosen, holds once something is
  * chosen, does not hold.
+ *
+ * `great-circle`: Alison's circle of world wonders laid straight, each of his sites at its distance off the best
+ * circle, and the reply, the World Heritage List's sites it passes beside random circles' (src/worldsites.ts).
  */
 import { degreesToSeked, formatDms } from '@seked/units';
 
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 

@@ -106,6 +106,10 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   *Blocked 2026-10-20 16:31 UTC on sources:* `assets/plates/` has neither Dobecki and Schoch's figures nor Reader's
   Fig. 5, and the script keeps the *KMT* depths in the notes until the paper's own figures are read. See For
   Stewart.
+  *Chunk 11, 2026-10-21 05:18 UTC:* still blocked, after the laptop's answer 5 (do what the repo's sources allow).
+  `data/measurements/` holds no bedding, fissure, seismic-line or weathering record for the enclosure, only the two
+  scaled margins `ditch-plan` already draws, and `assets/plates/` holds neither figure. Nothing more can be drawn without
+  the scans.
 - [x] **E7. The recorded voice in the player** (replaced by the laptop session, 20 October: the voice is chosen
   and recorded). `assets/narration/chN.mp3` and `chN-reply.mp3` hold each chapter of `docs/script.md` in Stewart's
   chosen voice, and `chN.json` the exact text spoken with every character's start and end time
@@ -412,10 +416,19 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   time (`virtual:radiocarbon`); its caption says which reigns the model places from reign lengths. Cued on "king" in
   `ch4-first-king` beside the sky (decision 51); in play it draws about 4 s in. `shortCite` now reads two-word surnames
   and "et al." ("Bronk Ramsey and others (2010)"). 4 tests. Looked at at both sizes paused and in play.
-- [ ] **E18c. Chapter 4's king lists.** The Turin and Manetho totals as a timeline unrolled back from Aha's median
+- [x] **E18c. Chapter 4's king lists.** The Turin and Manetho totals as a timeline unrolled back from Aha's median
   (`chronology.aha.accession.median`), with 13,420 alone, the two Turin figures summed (Schwaller's sum, not on the
   papyrus) and a thin line at 10,500 BCE, as the script's beat for "13,420 years and, in the next line, 23,200" asks.
   *Waiting on Stewart:* the totals want `data/texts/kinglists.json`, a new kind of file (see For Stewart).
+  *Done 2026-10-21 05:18 UTC (chunk 11), `ea2609c` and `6f2b3c5`.* `data/texts/` is a new kind of file (decision 67):
+  what a text says, in its own unit, cited to its line or problem, `verified: false`, validated by `loadTexts` in
+  `@seked/data` (3 tests) and ruled in `CLAUDE.md`. `kinglists.json` holds the Turin list's two totals (column II, lines 8
+  and 9, 13,420 + x and 23,200 + x, read at pharaoh.se) and Eusebius's Manetho (24,900 lunar years, which he makes 2,206;
+  Fr. 1, Loeb p. 7, read on LacusCurtius). The figure `king-lists` (`src/texts.ts`) unrolls each back from Aha's
+  radiocarbon median: 16,505 BCE for the Followers alone, 39,705 BCE for the two added (dashed, Schwaller's sum, not on
+  the papyrus), 5,291 BCE for Manetho, with "+ x" tails and a thin line at C5's epoch read from its claim (decision 68).
+  Cued on "13,420" in `ch4-numbers` and kept through `ch4-manetho` (decision 69). 3 tests. Looked at paused at both sizes,
+  beside the sky, and in play: drawn 5.9 s into its leaf.
 - [x] **E19. Chapter 7, "Before the flood": its leaves** (the plan's order: 3, 4, 7, 8, 9; added by chunk 6).
   *Done 2026-10-20 23:56 UTC, `8c76c9d`.* 10 leaves, every word in order and inside `ch7.json`. No station stands at
   Göbekli Tepe, so the chapter stays at Giza in the First Time, the same millennium (decision 52): the Younger Dryas
@@ -508,7 +521,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   is chosen (with the count), and does not hold; D1 to D3 added to `ch6-together`'s receipts, as the script's drawer
   lists them. Holds raised to 5 s on both leaves so the late figures can be read. All looked at at both sizes. Left
   for E22b.
-- [ ] **E22b. The rest of "how they did the math".** (a) Rhind problem 56 in the scribe's steps: its figures (a base of
+- [x] **E22b. The rest of "how they did the math".** (a) Rhind problem 56 in the scribe's steps: its figures (a base of
   360 cubits and a height of 250, as the research reads it) are text, not measurements, the same question as chapter 4's
   king lists (For Stewart): enter them once that is settled, then draw the steps beside `seked-rule`. (b) Meidum, the
   Bent and the Red Pyramid's orientations (`spence-2000` Table 1, Dorner, Petrie's *Medum*; `verified: false`), which
@@ -532,6 +545,17 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   building order at 70 times rather than C1's 120 (decision 64), its labels on two rows; `pole-stars` keeps Giza's three
   (decision 66). 1 new test, the two site-listing tests extended. Looked at in play at both sizes: the drift shows from
   4.4 to 9.5 s. Spence's own Table 1, which the research quotes for the same pyramids, was not read.
+  *(d) done 2026-10-21 05:18 UTC (chunk 11), `3265a38`:* the laptop's sentence follows "Each number alone has an ordinary
+  explanation" in `docs/script.md` (chapter 6 now 245 words, the running time 2,096 words) as its own leaf, `ch6-papyri`,
+  the seked rule still drawn. Until chapter 6 is re-recorded (For the laptop) that leaf speaks in the browser's voice; the
+  recording test lists it in `AWAITING_RECORDING`, and the entry fails once the new recording holds it (decision 70).
+  *(a) done the same chunk, `ea2609c` and `6f2b3c5`:* `data/texts/rhind.json` holds problem 56's base and height (360 and
+  250 cubits), from Greenberg's summary of Chace's edition, read through a page summary and unchecked; a new source,
+  `greenberg-rhind`. The papyrus's answer is not stored: `rhind-56` works it from those two in the scribe's steps (half
+  the base, over the height, 1/2 + 1/5 + 1/50 of a cubit, times 7 palms: 5 + 1/25), the fractions by the greedy unit
+  fraction rule, which gives the papyrus's own (a test pins both), beside Khufu's 5 + 1/2 read from A3's target, the
+  two slopes drawn on one cubit of rise. Cued on "papyri" in `ch6-papyri`, after the seked rule. 2 tests. Looked at at
+  both sizes; in play it draws 2.3 s into the leaf. E22b is complete.
 - [x] **E23. Every claim marked by how far its evidence has got** (the plan's tone rule): plain words from its tier on
   every claim shown, and for a reported but unproven one, one line on what it would change if it held.
   *Done 2026-10-21 00:48 UTC (chunk 8), the plain words; the "what it would change" lines are E23b.* (1) `f719eb7`: every
@@ -575,7 +599,19 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   republished; laying it on a public page is his call. And the date and the figures' pairing (vulture as Cygnus,
   scorpion as Scorpius) are the claim's inputs, so they want a claim file citing Sweatman and Tsikritsis 2017, read
   from the paper rather than typed from memory. See For Stewart.
-- [ ] **E26. The world's pyramids on a globe and a timeline** (chapter 9's closing leaf, the plan's "Added 20
+  *Two steps done 2026-10-21 05:32 UTC (chunk 11), after the laptop's answer 4.* (1) `f42ce37`: the paper read in its
+  Zenodo PDF (CC BY 4.0). Its vulture is the teapot of **Sagittarius**, not Cygnus (that is Collins's; the plan and the
+  reliefs note are corrected, `ca8ec2d`), and its date is the summer solstice at sunset, the sun just above the spout, in
+  10,950 BC ± 250 (pp. 237 to 238). Claim C8 tests the observer-free part: the spout's (Alnasl, γ Sgr, now a named star
+  from HYG) ecliptic longitude of date against the solstice sun's 90°, the paper's 250 years as the band (3.5°). It
+  misses by 4.2°: by Vondrák 2011 the spout reaches the solstice point about three centuries earlier. Checked two ways
+  (decision 71). (2) `6632254`: `vulture-sky` (`src/vulturesky.ts`, 3 tests) on "animals" in `ch7-monument` with C8's
+  receipt: the ecliptic of that year flat around the solstice sun, the five constellations C8's overlay pairs with the
+  animals, the spout, its miss computed apart from the engine and held equal to it by a test (decision 72). C8's
+  overlay is `panel` (decision 73). Looked at paused at both sizes and in play (drawn at 13.7 s). Left: the relief laid
+  over the chart, from the laptop's own reconstruction once its height maps are committed, labelled "a reconstruction
+  after the excavators' drawing (DAI)"; and whether the leaf should speak of it (For Stewart).
+- [x] **E26. The world's pyramids on a globe and a timeline** *(done by E26b and E26c, chunk 12; laid straight, not on a globe: decision 77)* (chapter 9's closing leaf, the plan's "Added 20
   October"): imported sites with date ranges, the best-fit great circle as the claim, the same fit for random sites in
   the same latitude band as the reply.
   *First step done 2026-10-21 01:02 UTC, `d8c1c2d` (chunk 9): the arithmetic.* `apps/exhibit/src/greatcircle.ts`: the
@@ -584,13 +620,33 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   random sites spread by area over the same band of latitude, from a seeded generator, with the share that come as
   close. 7 tests, one of which shows any three sites fitting well by chance. Kilometres need the Earth's radius from a
   record, so the figure will convert. Left as E26b.
-- [ ] **E26b. The sites, then the globe and the timeline.** Waiting on the dataset (For Stewart). Wikidata, tried in
+- [x] **E26b. The sites, then the globe and the timeline.** *Done 2026-10-21 05:46 UTC (chunk 12), the sites, the fit, the reply and a figure; the dates, the sites' own coordinates and the timeline are E26c.* After the laptop's answer 3 (the proponents' own list): `6e1d5c2` enters Jim Alison's table (the circle Hancock draws on) as `data/places/great-circle.json`, his 17 sites in his degrees and minutes with his axis and tolerance sentences, a new proponent source `alison-great-circle`, `verified: false`, no circle stored; `apps/exhibit/src/worldsites.ts` fits it (within 0.34° of his axis; his six "0 miles" sites within a tenth of a degree of their own circle; but Giza sits 0.26°, about 29 km, off the axis he prints, so his axis and his miles disagree, which a test pins). `ed2ae45` the reply (decision 75): `pnpm run worldheritage` (`scripts/worldheritage.ts`) imports the World Heritage List's 944 cultural and mixed properties from Wikidata (CC0, sha256 in `wikidata-world-heritage`) into `data/places/world-heritage.json`; his circle passes within a quarter degree of 10 of them, 2,000 random circles about 4 on average, 12 per cent as many or more, the best 32. `2c6609c` the figure `great-circle` on "story" in `ch9-story`: the circle laid straight, one row a site, km from `earth.radius.mean`, and the random circles' counts as bars with his marked; hold 3 s. 9 tests; `pnpm test` 1255 passed. Looked at paused at both sizes with the bundle served, and in play (up from 7.5 s to 15.9 s). The earlier note follows. Waiting on the dataset (For Stewart). Wikidata, tried in
   chunk 9 (`build/pyramids/query.rq`, everything that is an instance of a subclass of pyramid, Q12516, with
   coordinates): 178 items, only 35 with an inception date, the Egyptian ones nearly all undated, and modern ones mixed in
   (the Louvre's, a garden pyramid of 1748, a temple of 2021). Once a source is chosen: an importer in the manner of
   `scripts/figures.ts` (download in `build/`, its sha256 in the source entry), `data/places/pyramids.json` with each
   site's date range as its source gives it, then a figure: the sites on a turnable or flat globe with the fitted circle,
   each site's distance in km, the chance share, and a timeline of the date ranges.
+- [x] **E26c. The great circle's dates, the sites' own coordinates and the timeline.** *Done 2026-10-21 05:52 UTC (chunk 12), `52650d0`.* Each site's `own` block (point, years, what the years are of, the article's words, source, `verified: false`) from its encyclopedia article: 16 Wikipedia sources and EverybodyWiki for Paratoari (Wikipedia has no article), read through page summaries. Aneityum has no named monument and Paratoari is natural rock by the 1996 survey, so both are undated; Tassili (about 10,000 BCE on) and Petra are open-ended. Alison's Pyay is placed at Sri Ksetra (decision 79). The timeline is the strip's right-hand column rather than a third chart (decision 80): the works run from about 10,000 BCE to 1500 CE. On the sites' own points the best circle stays within a degree of his, the sites 33 km off it on average against 24 on his figures; the caption computes both. 4 tests; `pnpm test` 1259 passed. Looked at paused at both sizes and in play. The globe is not built (decision 77). The moai's dates come from Wikipedia's Moai article, named in the Easter Island source's note rather than a source of its own: worth its own entry when someone checks it. The laptop's answer 3 asks for
+  each site's date range and coordinates from that site's own source (`verified: false`; Wikidata only to fill
+  coordinates). Add them beside Alison's figures in `data/places/great-circle.json` (a `own` block per site: point,
+  date range in years, source), run the fit on both and say in the caption how far the two sets differ, then a timeline
+  of the date ranges under the strip (Giza's pyramids, Nazca's lines, Easter Island's moai, Angkor's temples and the rest
+  span thousands of years, which is the plainest reply). Paratoari (a natural formation by most accounts) and Aneityum
+  need their sources read with care. A globe needs a world coastline, which the repo lacks (`data/places/basemap.json`
+  is a box round Egypt): a Natural Earth 110 m import through `scripts/basemap.ts` if a globe is still wanted.
+
+- [ ] **E27. A recording of the exhibit, with its sound** (for a critic who watches it as a visitor would; Stewart fears
+  it is too slow). `scripts/capture_exhibit.py [--from LEAF] [--to LEAF] --out build/critic/NAME.mp4`: Playwright at
+  1280 by 720 with `record_video_dir`, muted, plays the exhibit in narrated play from leaf to leaf without touching it,
+  and logs each leaf's start time and each recording span it played; then lays the recorded narration
+  (`assets/narration/chN.mp3` spans and the replies if played) under the video at those times with the ffmpeg that
+  `imageio_ffmpeg.get_ffmpeg_exe()` gives, into one mp4. Test it on chapter 0 only (it records in real time); the
+  laptop runs the whole.
+- [ ] **E28. The laptop's review notes** (`docs/laptop-2026-10-20.md`, decision 18): (a) the head in the hand reads
+  rough: hide or cap the cut faces, light it as a museum object, let it fill its card, start at a three-quarter view
+  where the lion's head visibly encloses the king's; (b) chapter 8's "wells" leaf shows the plateau, not the wells;
+  (c) chapter 6's labels on the pyramid are small and crowd each other at 1280 by 720.
 
 ## Decisions
 
@@ -833,6 +889,49 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 66. **`pole-stars` stays with Giza's three.** Read off Spence's line, Meidum's 24′ would push the plot's window out by
    decades and crowd its six labels, and the caption's dating speaks of Khufu. The drift shows the earlier three; the
    needles carry a `site` so the stars' figure can filter. Reversible in `main.ts` (`poleStarsFigure`).
+67. **`data/texts/` holds figures, not records**: its own schema (`TextFigureSchema`: key, text, locus, value, unit among
+   year, lunar year, cubit and palm, `plus_x`, reading, source, verified) rather than measurements with a new unit, so a
+   text's years can never reach a claim's environment or a preset. One file per subject (king lists, Rhind). Reversible:
+   the files and `loadTexts`.
+68. **The king lists end at Aha's radiocarbon median and the line is C5's epoch**, both read at build time, so the
+   figure types neither 3085 nor 10,500. Manetho is drawn in Eusebius's own conversion (2,206 years), his 24,900 lunar
+   years named in the caption: drawing 24,900 as years would be a reading neither the text nor its translator makes.
+69. **`king-lists` waits for "13,420" in `ch4-numbers`**, not `ch4-turin`, so the timeline arrives with the numbers it
+   draws; `ch4-first-king` keeps the radiocarbon bars. Reversible in `leaves.json`.
+70. **A leaf added after its chapter was recorded is named, not excused**: the recording test keeps every other leaf
+   to the full check and requires the named leaf to be missing from the recording, so the exception expires by itself.
+71. **C8 compares longitudes, not the paper's picture.** The paper read its date by eye in Stellarium from Şanlıurfa at
+   sunset; the one part of that which needs no observer and no horizon is where the spout stood in longitude of date
+   against the solstice sun, so that is the comparison, with the paper's ±250 years as the band and "slightly above"
+   left untested. A wider band, or the sun's position against the vulture's wing rather than the spout, would be other
+   choices; each is a line in `data/claims/C8.yaml`.
+72. **The chart is flat in ecliptic coordinates of date**, not a sky over a panorama: no station stands at Göbekli Tepe
+   and the live sky is Giza's. Longitude rises to the left, as a southern sky is seen. Reversible: `vulture-sky` is one
+   figure on one leaf.
+73. **C8's overlay is `panel`, carrying the pairings as params.** The pairings are the claim's inputs, so they live in
+   its file; the viewer's scene is Giza's and holds nothing of Göbekli Tepe, which `panel` exists to say. The web test's
+   list of panel claims names C8 with that reason.
+74. **The great circle's claim runs on Alison's own coordinates**, the claim as he draws it, like a text's figures. The
+   laptop's answer asked for each site's coordinates from its own source; those go in beside his (E26c) and the fit
+   runs on both, so the claim is never strengthened or weakened by our choice of points.
+75. **The reply draws on a pool, not random points in a band.** Seventeen random points never line up as well as
+   seventeen chosen ones (0 of 2,000 did), so that reply would flatter the claim and say nothing about choosing. The
+   fair question is how unusual his circle is among comparable places: the World Heritage List's cultural properties,
+   counted within his own quarter of a degree, against circles with random poles. `chance` in `greatcircle.ts` stays,
+   undrawn. Another pool (a list of ancient sites only) is one import away.
+76. **Whole properties with a cultural criterion, one point each** (the lowest Q number where Wikidata gives one id
+   several items): components would let a long serial property count many times.
+77. **The circle laid straight rather than on a globe**: one row a site reads on a phone, and the repo has no world
+   coastline. Reversible: the strip is one function.
+78. **On `ch9-story`, cued on "story", hold 3 s, no new words**: the sentence names the three readers and "one story",
+   which the circle is part of in Hancock's books, so nothing is re-recorded. A spoken line is in For Stewart.
+79. **Alison's Pyay is placed at Sri Ksetra**, the ancient city at Hmawza by Pyay, on the Payama stupa's point (one of the
+   two its article prints; the Pyay article prints none). His point is about 45 km north of it, in no named site. If he
+   meant a different work, the `own` block is one line.
+80. **The timeline shares the strip's rows**, distance off the circle on the left and years on the right, so each site
+   is read once and the figure still clears the narration on a phone. A year range is the work's as its source words
+   it (built, carved, painted, occupied: the `what` field), centuries read as their years, BCE negative, open ends drawn
+   faint.
 
 ## For Stewart
 
@@ -882,6 +981,18 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   as the script proposes, with a sentence in `CLAUDE.md` for the new unit (years in a text, not a measurement). The
   builder has not created it: is that the shape you want?
 
+- **Pillar 43 in words?** (E25, chunk 11.) Chapter 7's narration does not mention the Vulture Stone; the script left
+  Sweatman out for want of checked sources, and the paper is now read (C8). The chart is a figure on "carved with
+  animals". If you want it spoken, a sentence for the script after that one might be: "Two researchers at Edinburgh read one pillar,
+  the Vulture Stone, as a map of the sky dated to 10,950 BCE; by our reckoning the date they give misses their own reading
+  by three centuries." It would mean re-recording chapter 7. Note the plan had their vulture as Cygnus; the paper says
+  Sagittarius.
+
+- **The great circle in words?** (E26b, chunk 12.) It is a figure on chapter 9's "one story" leaf, unspoken. If you
+  want it said, a sentence for the script after that one might be: "Hancock's circle of world wonders passes close to
+  ten World Heritage sites; a circle drawn at random passes about four, and one in eight does as well." It would mean
+  re-recording chapter 9.
+
 ## Answers from the laptop session (21 October, about 05:10 UTC)
 
 1. **E22's spoken line: yes.** Add the builder's sentence to chapter 6 of `docs/script.md` at the beat where the
@@ -904,6 +1015,9 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **Re-record chapter 6** (E22b d, `3265a38`): `python scripts/narrate_script.py 6`, then commit `assets/narration/ch6.*`
+  and take `ch6-papyri` out of `AWAITING_RECORDING` in `apps/exhibit/src/narration.test.ts` (the test fails until you do).
 
 - **The valley temple after E17c's move** (`59838a0`): `plan()` now lives in `render/giza/valley_plan.py`. Render
   `valley-temple` built once (or a preview) and compare with the current panorama: nothing should have moved. Then

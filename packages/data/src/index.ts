@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
-import { FootprintFileSchema, MaterialSchema, MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, type Database, type FootprintFile, type Measurement } from './core';
+import { FootprintFileSchema, MaterialSchema, MeasurementSchema, PresetSchema, SiteSchema, SourceSchema, StructureSchema, TextFileSchema, type Database, type FootprintFile, type Measurement, type TextFigure } from './core';
 
 export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 export const DATA_DIR = join(REPO_ROOT, 'data');
@@ -80,6 +80,22 @@ export function loadDatabase(dataDir = DATA_DIR): Database {
     seen.add(k);
   }
   return { sources, sites, structures, measurements, presets, materials };
+}
+
+/** Every figure in data/texts/, validated: each key once, each source registered. */
+export function loadTexts(dataDir = DATA_DIR): TextFigure[] {
+  const sources = new Set(z.array(SourceSchema).parse(readJson(join(dataDir, 'sources.json'))).map((s) => s.id));
+  const figures: TextFigure[] = [];
+  const seen = new Set<string>();
+  for (const file of readdirSync(join(dataDir, 'texts')).filter((f) => f.endsWith('.json')).sort()) {
+    for (const f of TextFileSchema.parse(readJson(join(dataDir, 'texts', file))).figures) {
+      if (!sources.has(f.source)) throw new Error(`${file}: ${f.key} cites unknown source ${f.source}`);
+      if (seen.has(f.key)) throw new Error(`${file}: ${f.key} given twice`);
+      seen.add(f.key);
+      figures.push({ ...f, file });
+    }
+  }
+  return figures;
 }
 
 /** The footprint import, validated. Written by `pnpm run footprints`. */

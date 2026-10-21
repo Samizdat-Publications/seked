@@ -15,6 +15,13 @@ import skyData from 'virtual:sky';
 import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
+import texts from 'virtual:texts';
+import { bce, kingListsSvg, rhind56, rhind56Svg } from './texts';
+import { vultureChart, vultureChartSvg } from './vulturesky';
+import heritage from '../../../data/places/world-heritage.json';
+import { bestCircle } from './greatcircle';
+import { ALISON, era, poolReply, poolSvg, strip, stripSvg } from './worldsites';
+import { degreesToSeked } from '@seked/units';
 import corridor from 'virtual:corridor';
 import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
@@ -244,6 +251,60 @@ function sekedRuleFigure(b: Bundle | null, ground: Record<string, number> | null
     the pyramid: no mathematical papyrus survives from the pyramid age itself.</figcaption>`;
 }
 
+/** The king lists' years before the first king, counted back from his radiocarbon accession: chapter 4's beat. */
+function kingListsFigure(): string {
+  const d = texts.kingLists;
+  const [turin, summed, manetho] = d.spans;
+  const unchecked = d.spans.some((s) => !s.verified) || !d.anchor.verified;
+  return `${kingListsSvg(d)}<figcaption>The years the king lists give before the first king, counted back from Aha's accession
+    (the radiocarbon median, ${shortCite(d.citations[d.anchor.source]!)}). The Turin papyrus, ${turin!.locus.split(' (')[0]}: ${turin!.years.toLocaleString('en-GB')} + x
+    years; added to the next line's total, as Schwaller de Lubicz adds them (dashed: the sum is not on the papyrus),
+    ${summed!.years.toLocaleString('en-GB')} + x. Manetho, as Eusebius preserves him: ${d.lunar.toLocaleString('en-GB')} "lunar years", which
+    Eusebius himself makes ${manetho!.years.toLocaleString('en-GB')}. "+ x" marks a damaged total, read as at least that. None lands on the line at
+    ${bce(d.epoch)}.${unchecked ? ' Read from the transcriptions, not yet checked against the editions.' : ''}</figcaption>`;
+}
+
+/** Rhind problem 56 in the scribe's steps, beside the Great Pyramid's seked from A3's target. */
+function rhindFigure(b: Bundle | null): string {
+  const result = b ? leafReceipts(b, b.claims, ['A3'])[0] : undefined;
+  if (!result) return '<figcaption>The problem is set beside A3, from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const r = rhind56(texts.rhind, degreesToSeked(result.comparisons[0]!.targetValue));
+  return `${rhind56Svg(r)}<figcaption>A schoolroom problem, as the papyrus sets it: find the seked of a pyramid from its base
+    and height. The scribe halves the base, divides by the height, and writes the answer in unit fractions, as Egyptians
+    wrote every fraction. Khufu's builders worked to a seked of ${r.khufuSeked.toFixed(1).replace('.5', '½')} palms. The papyrus is a copy made centuries
+    after the pyramids. Its figures after ${shortCite(texts.rhindCitation)}'s summary of Chace's edition${r.verified ? '' : ', not yet checked against the edition'}.</figcaption>`;
+}
+
+/** C8: Pillar 43's animals as Sweatman and Tsikritsis read them, on the sky of their date, with the miss computed. */
+function vultureFigure(): string {
+  const v = vultureChart(skyData);
+  if (!v) return '';
+  const pairs = v.figures.map((f) => `${f.animal} as ${f.name}`).join(', ');
+  return `${vultureChartSvg(v)}<figcaption>Pillar 43 read as a sky, as Sweatman and Tsikritsis read it in 2017: ${pairs}, and the
+    disc above the vulture's wing as the sun at the summer solstice, which they date to ${bce(v.epoch)} by the sun standing just
+    above the teapot's spout. Computed here from the catalogue and the precession of that year, the solstice sun stands
+    ${Math.abs(v.residual).toFixed(1)}&#176; of longitude ${v.residual > 0 ? 'west' : 'east'} of the spout; the receipt weighs that against the paper's own 250 years. The pairings are the
+    claim's own choices; the excavators read the animals as Göbekli Tepe's own world. The relief itself is not drawn yet.</figcaption>`;
+}
+
+/** E26: Hancock's circle of world wonders as Jim Alison draws it, and the reply from the World Heritage List. */
+function greatCircleFigure(ground: Record<string, number> | null): string {
+  const radius = ground?.['earth.radius.mean'];
+  if (radius === undefined) return '<figcaption>The circle is measured in kilometres from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  const km = (radius * DEG) / 1000, s = strip(ALISON.sites);
+  const pool = heritage.properties.map(([, , lat, lon]) => ({ lat: lat as number, lon: lon as number }));
+  const r = poolReply(s.fit.pole, pool, 0.25, 2000);
+  const far = s.fit.offsets.reduce((m, o, i) => (Math.abs(o) > Math.abs(s.fit.offsets[m]!) ? i : m), 0);
+  const own = bestCircle(ALISON.sites.map((x) => x.own));
+  const years = ALISON.sites.flatMap((x) => [x.years.from, x.years.to]).filter((y): y is number => y !== null);
+  return `${stripSvg(s, km)}${poolSvg(r)}<figcaption>Hancock's circle of world wonders, after Jim Alison: his ${ALISON.sites.length} sites
+    off the circle that fits them best, ${ALISON.sites[far]!.name} the farthest at ${Math.round(Math.abs(s.fit.offsets[far]!) * km)} km, and when each was made, from
+    ${era(Math.min(...years))} to ${era(Math.max(...years))}. The reply: of the World Heritage List's ${pool.length} cultural sites, his circle
+    passes within a quarter of a degree of ${r.claim}; a random circle passes about ${Math.round(r.mean)}, and ${Math.round(r.share * 100)} in a hundred
+    pass as many. His coordinates; on each site's own (from encyclopedias) the sites lie ${Math.round(own.rms * km)} km off their circle
+    on average, not ${Math.round(s.fit.rms * km)}. None yet checked against its page; the List's points from Wikidata.</figcaption>`;
+}
+
 /** Chapter 6's claims as the engine sorts them, from the bundle: the receipts of every one the chapter names. */
 function claimSortFigure(b: Bundle | null): string {
   if (!b) return '<figcaption>The claims are sorted from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
@@ -320,12 +381,14 @@ async function start(): Promise<void> {
     sky.setGround(ground);
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+    if (shownFigure === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
     if (shownFigure === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
+    if (shownFigure === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
     if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (shownFigure === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);
     if (shownFigure === 'claim-sort') figure.innerHTML = claimSortFigure(bundle);
@@ -382,6 +445,10 @@ async function start(): Promise<void> {
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
     if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
+    if (id === 'king-lists') figure.innerHTML = kingListsFigure();
+    if (id === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
+    if (id === 'vulture-sky') figure.innerHTML = vultureFigure();
+    if (id === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;

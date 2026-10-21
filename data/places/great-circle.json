@@ -1,0 +1,632 @@
+{
+ "about": "The world's ancient sites on one great circle, as the claim's own author draws it: Jim Alison's table of sites near the circle, in his figures (degrees and minutes as he prints them; his distance off the circle in statute miles, rounded as he rounds it). These are what the proponent says, like a text's figures: never measurements, verified false until read again on the page. The circle itself is not stored; the exhibit fits it from these coordinates and compares the fit with the axis he gives. Each site's own coordinates and dates, from its own source, are a later step. Each site's \"own\" block is the same place as an encyclopedia gives it, read 2026-10-21 (chunk 12): its point and the years of the work the circle is said to pass (built, carved, occupied, as \"what\" says), BCE negative and no year zero, with the article's words in \"reading\" and null where the source gives no year or the site is no work at all.",
+ "source": "alison-great-circle",
+ "axis": {
+  "latitude": [
+   59,
+   53,
+   "N"
+  ],
+  "longitude": [
+   138,
+   36,
+   "W"
+  ],
+  "note": "The circle's northern axis point as the page gives it, 'in northwestern British Columbia'; the southern one is its antipode, 59 53 S, 41 24 E."
+ },
+ "tolerances": [
+  "within one tenth of one degree of this great circle (Giza, Tassili n'Ajjer, Paratoari, Ollantaytambo, Nazca, Easter Island and others, as the page lists them)",
+  "within one quarter of a degree (Machupicchu and Cuzco; Siwa; Mohenjo Daro and Ganweriwala; Preah Vihear)",
+  "within one degree of the great circle (Ur and Angkor)"
+ ],
+ "verified": false,
+ "sites": [
+  {
+   "id": "giza",
+   "name": "Giza",
+   "latitude": [
+    29,
+    59,
+    "N"
+   ],
+   "longitude": [
+    31,
+    9,
+    "E"
+   ],
+   "miles_off": 0,
+   "own": {
+    "latitude": [
+     29,
+     58,
+     34,
+     "N"
+    ],
+    "longitude": [
+     31,
+     7,
+     58,
+     "E"
+    ],
+    "from": -2600,
+    "to": -2500,
+    "what": "built",
+    "reading": "between c. 2600 – c. 2500 BC (the lead; the infobox gives periods only)",
+    "source": "wikipedia-giza-pyramid-complex",
+    "verified": false,
+    "note": "Revision 1378290137."
+   }
+  },
+  {
+   "id": "siwa",
+   "name": "Siwa",
+   "latitude": [
+    29,
+    14,
+    "N"
+   ],
+   "longitude": [
+    25,
+    31,
+    "E"
+   ],
+   "miles_off": 10,
+   "own": {
+    "latitude": [
+     29,
+     12,
+     19,
+     "N"
+    ],
+    "longitude": [
+     25,
+     31,
+     10,
+     "E"
+    ],
+    "from": -400,
+    "to": -301,
+    "what": "inscribed",
+    "reading": "the Oracle of Amun's temple, 'with some inscriptions dating from the 4th century BCE'; no building date given",
+    "source": "wikipedia-siwa-oasis",
+    "verified": false,
+    "note": "The oasis's point, not the temple's."
+   }
+  },
+  {
+   "id": "tassili",
+   "name": "Tassili n'Ajjer",
+   "latitude": [
+    26,
+    32,
+    "N"
+   ],
+   "longitude": [
+    9,
+    50,
+    "E"
+   ],
+   "miles_off": 0,
+   "own": {
+    "latitude": [
+     25,
+     30,
+     0,
+     "N"
+    ],
+    "longitude": [
+     9,
+     0,
+     0,
+     "E"
+    ],
+    "from": -10000,
+    "to": null,
+    "what": "painted",
+    "reading": "'the earliest pieces of art are presumed to be 12,000 years old'; the last tradition, Camel, '1000 BCE and onward'",
+    "source": "wikipedia-tassili-najjer",
+    "verified": false,
+    "note": "A point for a plateau some 500 km long, to the degree and half degree the infobox gives. 12,000 years before now read as 10,000 BCE; the end is open."
+   }
+  },
+  {
+   "id": "paratoari",
+   "name": "Paratoari",
+   "latitude": [
+    12,
+    48,
+    "S"
+   ],
+   "longitude": [
+    71,
+    25,
+    "W"
+   ],
+   "miles_off": 0,
+   "own": {
+    "latitude": [
+     12,
+     40,
+     23.39,
+     "S"
+    ],
+    "longitude": [
+     71,
+     27,
+     40.32,
+     "W"
+    ],
+    "from": null,
+    "to": null,
+    "what": "natural",
+    "reading": "a 1996 expedition led by Gregory Deyermenjian identified the formations as natural sandstone (truncated ridge spurs)",
+    "source": "everybodywiki-paratoari",
+    "verified": false,
+    "note": "EverybodyWiki, not Wikipedia, which has no article: the weakest source here, for the weakest site. No date: not a monument by the only survey on record."
+   }
+  },
+  {
+   "id": "ollantaytambo",
+   "name": "Ollantaytambo",
+   "latitude": [
+    13,
+    15,
+    "S"
+   ],
+   "longitude": [
+    72,
+    16,
+    "W"
+   ],
+   "miles_off": 0,
+   "own": {
+    "latitude": [
+     13,
+     15,
+     29,
+     "S"
+    ],
+    "longitude": [
+     72,
+     15,
+     48,
+     "W"
+    ],
+    "from": 1450,
+    "to": 1500,
+    "what": "built",
+    "reading": "Pachacuti razed the earlier town 'around the mid-15th century'; 'Ollantaytambo dates from the late 15th century'",
+    "source": "wikipedia-ollantaytambo",
+    "verified": false,
+    "note": "The centuries read as 1450 to 1500."
+   }
+  },
+  {
+   "id": "machu-picchu",
+   "name": "Machupicchu",
+   "latitude": [
+    13,
+    6,
+    "S"
+   ],
+   "longitude": [
+    72,
+    35,
+    "W"
+   ],
+   "miles_off": 15,
+   "own": {
+    "latitude": [
+     13,
+     9,
+     48,
+     "S"
+    ],
+    "longitude": [
+     72,
+     32,
+     44,
+     "W"
+    ],
+    "from": 1450,
+    "to": 1470,
+    "what": "built",
+    "reading": "Built c. 1450 – c. 1470 (infobox); abandoned c. 1532 – c. 1565",
+    "source": "wikipedia-machu-picchu",
+    "verified": false
+   }
+  },
+  {
+   "id": "nazca",
+   "name": "Nazca",
+   "latitude": [
+    14,
+    42,
+    "S"
+   ],
+   "longitude": [
+    75,
+    6,
+    "W"
+   ],
+   "miles_off": 0,
+   "own": {
+    "latitude": [
+     14,
+     41,
+     51,
+     "S"
+    ],
+    "longitude": [
+     75,
+     8,
+     6,
+     "W"
+    ],
+    "from": -500,
+    "to": 500,
+    "what": "made",
+    "reading": "'They were created between 500 BC and 500 AD'",
+    "source": "wikipedia-nazca-lines",
+    "verified": false
+   }
+  },
+  {
+   "id": "easter-island",
+   "name": "Easter Island",
+   "latitude": [
+    27,
+    6,
+    "S"
+   ],
+   "longitude": [
+    109,
+    20,
+    "W"
+   ],
+   "miles_off": 0,
+   "own": {
+    "latitude": [
+     27,
+     7,
+     0,
+     "S"
+    ],
+    "longitude": [
+     109,
+     21,
+     0,
+     "W"
+    ],
+    "from": 1250,
+    "to": 1500,
+    "what": "carved",
+    "reading": "the moai carved 'between the years 1250 and 1500' (Wikipedia, Moai)",
+    "source": "wikipedia-easter-island",
+    "verified": false,
+    "note": "The island's point, to the minute; the date from the Moai article (https://en.wikipedia.org/wiki/Moai)."
+   }
+  },
+  {
+   "id": "aneityum",
+   "name": "Aneityum Island",
+   "latitude": [
+    20,
+    10,
+    "S"
+   ],
+   "longitude": [
+    169,
+    48,
+    "E"
+   ],
+   "miles_off": 8,
+   "own": {
+    "latitude": [
+     20,
+     12,
+     0,
+     "S"
+    ],
+    "longitude": [
+     169,
+     49,
+     0,
+     "E"
+    ],
+    "from": null,
+    "to": null,
+    "what": "none",
+    "reading": "the article names no ancient monument; its earliest dates are European contact (1793, about 1830)",
+    "source": "wikipedia-aneityum",
+    "verified": false,
+    "note": "No date: an island, not a work."
+   }
+  },
+  {
+   "id": "preah-vihear",
+   "name": "Preah Vihear",
+   "latitude": [
+    14,
+    24,
+    "N"
+   ],
+   "longitude": [
+    104,
+    40,
+    "E"
+   ],
+   "miles_off": 25,
+   "own": {
+    "latitude": [
+     14,
+     23,
+     26,
+     "N"
+    ],
+    "longitude": [
+     104,
+     40,
+     49,
+     "E"
+    ],
+    "from": 1001,
+    "to": 1200,
+    "what": "built",
+    "reading": "11th–12th centuries AD (infobox)",
+    "source": "wikipedia-preah-vihear-temple",
+    "verified": false,
+    "note": "The centuries read as 1001 to 1200."
+   }
+  },
+  {
+   "id": "sukhothai",
+   "name": "Sukhothai",
+   "latitude": [
+    17,
+    1,
+    "N"
+   ],
+   "longitude": [
+    99,
+    42,
+    "E"
+   ],
+   "miles_off": 5,
+   "own": {
+    "latitude": [
+     17,
+     1,
+     16,
+     "N"
+    ],
+    "longitude": [
+     99,
+     42,
+     13,
+     "E"
+    ],
+    "from": 1201,
+    "to": 1400,
+    "what": "capital",
+    "reading": "the capital of the Sukhothai Kingdom 'in the 13th and 14th centuries'",
+    "source": "wikipedia-sukhothai-historical-park",
+    "verified": false,
+    "note": "The centuries read as 1201 to 1400."
+   }
+  },
+  {
+   "id": "pyay",
+   "name": "Pyay",
+   "latitude": [
+    19,
+    15,
+    "N"
+   ],
+   "longitude": [
+    95,
+    5,
+    "E"
+   ],
+   "miles_off": 5,
+   "own": {
+    "latitude": [
+     18,
+     50,
+     3,
+     "N"
+    ],
+    "longitude": [
+     95,
+     18,
+     7,
+     "E"
+    ],
+    "from": 601,
+    "to": 900,
+    "what": "built",
+    "reading": "the majority of material 'is dated between the seventh and ninth centuries AD'; the kingdom c. 3rd to 9th century",
+    "source": "wikipedia-sri-ksetra-kingdom",
+    "verified": false,
+    "note": "Alison's Pyay; the ancient city is Sri Ksetra at Hmawza near it, and the point is the Payama stupa's, one of the two the article prints (the Pyay article prints none). Alison's 19°15'N lies some 45 km north of it."
+   }
+  },
+  {
+   "id": "khajuraho",
+   "name": "Khajuraho",
+   "latitude": [
+    24,
+    51,
+    "N"
+   ],
+   "longitude": [
+    79,
+    56,
+    "E"
+   ],
+   "miles_off": 12,
+   "own": {
+    "latitude": [
+     24,
+     51,
+     16,
+     "N"
+    ],
+    "longitude": [
+     79,
+     55,
+     17,
+     "E"
+    ],
+    "from": 885,
+    "to": 1000,
+    "what": "built",
+    "reading": "'Most Khajuraho temples were built between 885 CE and 1000 CE by the Chandela dynasty'",
+    "source": "wikipedia-khajuraho-group-of-monuments",
+    "verified": false
+   }
+  },
+  {
+   "id": "mohenjo-daro",
+   "name": "Mohenjo Daro",
+   "latitude": [
+    27,
+    15,
+    "N"
+   ],
+   "longitude": [
+    68,
+    17,
+    "E"
+   ],
+   "miles_off": 20,
+   "own": {
+    "latitude": [
+     27,
+     19,
+     45,
+     "N"
+    ],
+    "longitude": [
+     68,
+     8,
+     20,
+     "E"
+    ],
+    "from": -2500,
+    "to": -1700,
+    "what": "occupied",
+    "reading": "Built c. 2500 BC, abandoned c. 1700 BC (infobox)",
+    "source": "wikipedia-mohenjo-daro",
+    "verified": false
+   }
+  },
+  {
+   "id": "persepolis",
+   "name": "Persepolis",
+   "latitude": [
+    29,
+    56,
+    "N"
+   ],
+   "longitude": [
+    52,
+    55,
+    "E"
+   ],
+   "miles_off": 5,
+   "own": {
+    "latitude": [
+     29,
+     56,
+     6,
+     "N"
+    ],
+    "longitude": [
+     52,
+     53,
+     24,
+     "E"
+    ],
+    "from": -600,
+    "to": -330,
+    "what": "occupied",
+    "reading": "Built 6th century BC, abandoned 330 BC (infobox)",
+    "source": "wikipedia-persepolis",
+    "verified": false,
+    "note": "The century's start, 600 BC, taken as the range's start."
+   }
+  },
+  {
+   "id": "ur",
+   "name": "Ur",
+   "latitude": [
+    30,
+    57,
+    "N"
+   ],
+   "longitude": [
+    46,
+    7,
+    "E"
+   ],
+   "miles_off": 40,
+   "own": {
+    "latitude": [
+     30,
+     57,
+     42,
+     "N"
+    ],
+    "longitude": [
+     46,
+     6,
+     18,
+     "E"
+    ],
+    "from": -3800,
+    "to": -500,
+    "what": "occupied",
+    "reading": "Built c. 3800 BC, abandoned after 500 BC (infobox)",
+    "source": "wikipedia-ur",
+    "verified": false
+   }
+  },
+  {
+   "id": "petra",
+   "name": "Petra",
+   "latitude": [
+    30,
+    19,
+    "N"
+   ],
+   "longitude": [
+    35,
+    28,
+    "E"
+   ],
+   "miles_off": 6,
+   "own": {
+    "latitude": [
+     30,
+     19,
+     43,
+     "N"
+    ],
+    "longitude": [
+     35,
+     26,
+     31,
+     "E"
+    ],
+    "from": -500,
+    "to": null,
+    "what": "built",
+    "reading": "Built 'possibly as early as the 5th century BC' (infobox)",
+    "source": "wikipedia-petra",
+    "verified": false,
+    "note": "Start only; the end left open."
+   }
+  }
+ ]
+}

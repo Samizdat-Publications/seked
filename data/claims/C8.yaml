@@ -1,0 +1,64 @@
+id: C8
+title: The Vulture Stone as a date
+group: sky
+status: computed
+epoch: -10949
+summary: >-
+  Sweatman and Tsikritsis (2017) read Pillar 43 at Göbekli Tepe, the Vulture
+  Stone, as a picture of the sky: the vulture as the teapot of Sagittarius, the
+  scorpion as Scorpius, the bent bird as Ophiuchus, the long-necked bird as
+  Libra, the animal left of the scorpion as Lupus, and the disc above the
+  vulture's wing as the sun. Seen at sunset on the summer solstice, the sun
+  stands just above the teapot's spout in 10,950 BC, give or take 250 years,
+  which they call a date stamp for the Younger Dryas.
+comparisons:
+  - label: the spout's ecliptic longitude against the solstice sun's
+    formula: >-
+      atan2(sin(atan2(sin(star.alnasl.ra) * cos(sun.obliquity) + tan(star.alnasl.dec) * sin(sun.obliquity), cos(star.alnasl.ra)) - 90), cos(atan2(sin(star.alnasl.ra) * cos(sun.obliquity) + tan(star.alnasl.dec) * sin(sun.obliquity), cos(star.alnasl.ra)) - 90))
+    target: "0"
+    unit: deg
+    tolerance_abs: 3.5
+free_choices:
+  - the reading itself, that the carvings are constellations and the disc is the sun
+  - which constellation each animal is (the vulture as Sagittarius, not Collins's Cygnus)
+  - the summer solstice, chosen from the four seasons because its date lies nearest the radiocarbon dates; the others give 2000 AD, 4350 BC and 18,000 BC
+  - the spout, γ Sagittarii, standing for where on the vulture the disc sits
+  - sunset rather than sunrise, chosen for the figures' orientation
+overlay:
+  type: panel
+  params:
+    star: alnasl
+    figures:
+      Sgr: the vulture
+      Sco: the scorpion
+      Oph: the bent bird
+      Lib: the long-necked bird
+      Lup: the wolf
+sources:
+  for: [sweatman-tsikritsis-2017]
+  against: [notroff-2017]
+  context: [vondrak-2011, hyg-4.2, collins-2006]
+notes: >-
+  Read from the paper (pp. 237 to 238): the pairings on p. 237, the four
+  candidate dates and the choice of the summer solstice on p. 238, where the
+  date is set by when "the sun is slightly above the spout of the teapot
+  asterism of Sagittarius". The paper found its dates by eye in Stellarium
+  from Şanlıurfa. Here the test is the one quantity that does not depend on
+  the observer: at a solstice the sun's ecliptic longitude of date is 90° by
+  definition, so the comparison is how far the spout's own longitude of date
+  stands from it, folded into ±180°. The star's mean place of date comes from
+  Vondrák 2011 with its proper motion applied, and the longitude from the
+  obliquity of date. The tolerance of 3.5° is the paper's own ±250 years
+  turned into longitude at the general precession of about 50.3″ a year; it
+  says only that the paper's date is consistent with its own reading, not
+  that the reading is right. It misses: the spout's longitude of date is about four
+  degrees past the solstice point in the paper's year, and reaches it about
+  three centuries earlier, just outside the paper's band. Precession by
+  Vondrák 2011 runs slightly slower than today's rate over these millennia,
+  which a constant-rate estimate would not show. "Slightly above" is the sun north of the spout
+  by the star's ecliptic latitude, which no comparison tests. The claims'
+  observer is Giza, a thousand kilometres from Göbekli Tepe, which changes
+  nothing here: longitude of date is the same from anywhere. Notroff and
+  others, the excavators, answer that the animals are those of Göbekli Tepe's
+  own world, found across the site, and that the disc and the other motifs
+  have readings in that context; see docs/gobekli-reliefs.md.

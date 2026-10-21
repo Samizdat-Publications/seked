@@ -1049,7 +1049,8 @@
     "year": 2017,
     "citation": "Sweatman, M. B. & Tsikritsis, D. (2017). Decoding Göbekli Tepe with Archaeoastronomy: What Does the Fox Say? Mediterranean Archaeology and Archaeometry 17(1), 233–250.",
     "url": "https://doi.org/10.5281/zenodo.400780",
-    "note": "Peer-reviewed. Unchecked: abstract (10950 BC ± 250 yrs) seen in search summary; the star identifications not confirmed. From docs/research/ch7.md, by its research job; not yet checked here."
+    "license": "CC BY 4.0",
+    "note": "Peer-reviewed. Read on 2026-10-21 by the night builder (chunk 11) in the Zenodo PDF (sha256 b5a1b30a35829581af65bf19d608722a8714f5282be212777d47302e53bcba11): the pairings on p. 237 (the vulture as the teapot of Sagittarius, not Cygnus; the bent bird as Ophiuchus, the long-necked bird as Libra, the animal left of the scorpion as Lupus), the disc as the sun and the four candidate dates on p. 238, where 10,950 BC is the summer solstice at sunset seen from Sanliurfa in Stellarium, with the sun slightly above the spout. Claim C8."
   },
   {
     "id": "trimble-1964",
@@ -1254,5 +1255,166 @@
     "citation": "Wikidata contributors. Meidum Pyramid (Q13444093), Bent Pyramid (Q459608), Red Pyramid (Q135332): coordinate location (P625). CC0.",
     "url": "https://www.wikidata.org/wiki/Q135332",
     "note": "Read through Special:EntityData on 2026-10-21 by the night builder (chunk 10), revisions 2543417441, 2527335327 and 2555589926: Meidum 29.38833333 N 31.15694444 E (precision one arc second), the Bent 29.790277777778 N 31.209166666667 E, the Red 29.808333333333 N 31.205833333333 E (no precision given). Cited only for where the sites' origins sit; nothing measured is taken from it."
+  },
+  {
+    "id": "greenberg-rhind",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Greenberg, M. J. The Rhind Mathematical Papyrus: problems 56 to 60 (a summary after Chace's edition). University of Washington, Department of Mathematics.",
+    "url": "https://sites.math.washington.edu/~greenber/Rhind.html",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 11), not the page itself: problem 56 gives a base of 360 and a height of 250 (cubits) and finds the seked 5 1/25 palms; 57 and 58 use 5 palms 1 finger; 59 gives 5 palms 2 fingers and 5 palms 1 finger; 60 is a pillar at 4 palms. The papyrus is Ahmes's copy of about 1650 BCE of a Twelfth Dynasty original. A secondary web summary; Peet (1923), Chace or Robins and Shute (1987) is the edition to check against. The author's full name and the page's date are unchecked."
+  },
+  {
+    "id": "alison-great-circle",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Alison, J. A New Look at an Old Design: The Prehistoric Alignment of World Wonders. Part 1, Great Circle. Self-published web pages, undated.",
+    "url": "http://home.hiwaay.net/~jalison/",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12), not the page itself: the table of sites near the circle (seventeen rows, latitude and longitude in degrees and minutes, distance to the circle and to the axis point in miles), the axis points 59 53 N 138 36 W and 59 53 S 41 24 E, and the tolerance sentences. Hancock draws on this circle in Heaven's Mirror (1998). The page's degree signs are garbled in its encoding; the figures to check against the page itself. data/places/great-circle.json."
+  },
+  {
+    "id": "wikidata-world-heritage",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikidata. Items with a UNESCO World Heritage Site id (P757) and coordinates (P625), with their World Heritage criteria (P2614), through the Wikidata Query Service.",
+    "url": "https://query.wikidata.org/",
+    "license": "CC0 1.0",
+    "note": "Queried on 2026-10-21 by the night builder (chunk 12) with the query in scripts/worldheritage.ts; the response's sha256 is c3bf0b2a45d6366641aaa691999e96e87d4a2b1ce5caa5c793b2766f825bc97d (6,430 rows). The script keeps whole properties with a cultural criterion, one point each. Wikidata's points are its editors' and its criteria are not checked here against UNESCO's own list; the count of kept properties is near the List's cultural and mixed total. data/places/world-heritage.json."
+  },
+  {
+    "id": "wikipedia-giza-pyramid-complex",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Giza pyramid complex. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Giza_pyramid_complex",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-siwa-oasis",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Siwa Oasis. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Siwa_Oasis",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-tassili-najjer",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Tassili n'Ajjer. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Tassili_n%27Ajjer",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "everybodywiki-paratoari",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "EverybodyWiki contributors. Paratoari. EverybodyWiki, as of 21 October 2026.",
+    "url": "https://en.everybodywiki.com/Paratoari",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-ollantaytambo",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Ollantaytambo. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Ollantaytambo",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-machu-picchu",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Machu Picchu. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Machu_Picchu",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-nazca-lines",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Nazca Lines. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Nazca_Lines",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-easter-island",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Easter Island. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Easter_Island",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-aneityum",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Aneityum. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Aneityum",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-preah-vihear-temple",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Preah Vihear Temple. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Preah_Vihear_Temple",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-sukhothai-historical-park",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Sukhothai Historical Park. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Sukhothai_Historical_Park",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-sri-ksetra-kingdom",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Sri Ksetra Kingdom. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Sri_Ksetra_Kingdom",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-khajuraho-group-of-monuments",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Khajuraho Group of Monuments. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Khajuraho_Group_of_Monuments",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-mohenjo-daro",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Mohenjo-daro. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Mohenjo-daro",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-persepolis",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Persepolis. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Persepolis",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-ur",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Ur. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Ur",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
+  },
+  {
+    "id": "wikipedia-petra",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikipedia contributors. Petra. Wikipedia, revision as of 21 October 2026.",
+    "url": "https://en.wikipedia.org/wiki/Petra",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12): the point and the dates in data/places/great-circle.json's \"own\" block for this site. An encyclopedia, cited for where a site is and roughly when it was made, for the great circle's timeline; replace with an excavation report's figures where one is found."
   }
 ]

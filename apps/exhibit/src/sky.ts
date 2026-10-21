@@ -23,7 +23,7 @@ export interface SkyData {
   /** data/stars/named.json, for the rising keys the bearings name. */
   named: Star[];
   /** Each claim with an epoch or a sun-ribbon overlay: its epoch, its bearings and its comparisons as written. */
-  claims: Record<string, { epoch: number | null; bearings: { label: string; azimuth: string }[]; comparisons: { label: string; formula: string; target: string; unit: string }[]; exaggeration?: number }>;
+  claims: Record<string, { epoch: number | null; bearings: { label: string; azimuth: string }[]; comparisons: { label: string; formula: string; target: string; unit: string }[]; exaggeration?: number; chart?: { star: string; figures: Record<string, string> } }>;
   /** The sky bake's nights (scripts/sky-bake.ts NIGHTS): the named star each puts on the meridian. */
   nights: Record<string, string>;
   /** The figures drawn (data/stars/figures.json, Stellarium's modern sky culture): runs of catalogue ids. */
