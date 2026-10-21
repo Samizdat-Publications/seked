@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the paper below."
+type: software
+title: "Statistical Structuralism at Göbekli Tepe: reproducibility repository"
+version: 1.0.0
+# date-released: "YYYY-MM-DD"  -- fill in when you cut the GitHub release
+repository-code: "https://github.com/USERNAME/gobekli-statistical-structuralism"  # fill in your username
+license: MIT
+authors:
+  - family-names: "Mlekuž Vrhovnik"
+    given-names: Dimitrij
+    orcid: "https://orcid.org/0000-0002-6721-640X"
+    affiliation: "Department of Archaeology, Faculty of Arts, University of Ljubljana"
+identifiers:
+  - type: doi
+    value: "10.xxxx/zenodo.xxxxxxx"  # fill in once Zenodo mints the archive DOI
+    description: "Archived snapshot of this repository on Zenodo"
+preferred-citation:
+  type: article
+  title: "Reconstructing symbolic structure: A relational approach to Göbekli Tepe"
+  authors:
+    - family-names: "Mlekuž Vrhovnik"
+      given-names: Dimitrij
+      orcid: "https://orcid.org/0000-0002-6721-640X"
+      affiliation: "Department of Archaeology, Faculty of Arts, University of Ljubljana"
+  journal: "Journal of Archaeological Science (submitted)"
+  year: 2026
+  # doi: "10.xxxx/xxxxx"  -- fill in once assigned by the journal

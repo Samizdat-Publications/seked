@@ -1,0 +1,748 @@
+token,primary_type,analytic_group,structural_role,is_type,in_structural,freq,notes
+above,relation,REL_VERTICAL,relation,False,True,3443,
+abstract_pattern_28_5,pattern_instance,PATTERN_ABSTRACT,both,False,True,32,instance of abstract_pattern
+adjacent_to,relation,REL_ADJACENCY,relation,False,False,21,"surface adjacency, symmetric"
+arms,bodypart,BODYPART_ANTHROPOMORPHIC,both,True,True,134,
+arms_18_14,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_18_21,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_31_8,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_31_9,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_40_4,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_40_5,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_51_1,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,8,instance of arms
+arms_70_2,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,4,instance of arms
+arms_70_4,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,4,instance of arms
+arms_74_3,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_74_4,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_75_2,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,12,instance of arms
+arms_75_3,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,16,instance of arms
+arrangement,pattern_type,PATTERN_ABSTRACT,both,True,True,3085,generic arrangement class
+arthropod,motif_type,ARTHROPOD,both,True,True,270,"liminal, appears in transition zones"
+arthropod_21_1,motif_instance,ARTHROPOD,both,False,True,12,instance of arthropod
+arthropod_21_2,motif_instance,ARTHROPOD,both,False,True,12,instance of arthropod
+arthropod_31_13,motif_instance,ARTHROPOD,both,False,True,16,instance of arthropod
+arthropod_31_14,motif_instance,ARTHROPOD,both,False,True,8,instance of arthropod
+arthropod_33_91,motif_instance,ARTHROPOD,both,False,True,24,instance of arthropod
+arthropod_33_98,motif_instance,ARTHROPOD,both,False,True,32,instance of arthropod
+arthropod_43_2,motif_instance,ARTHROPOD,both,False,True,12,instance of arthropod
+arthropod_43_59,motif_instance,ARTHROPOD,both,False,True,16,instance of arthropod
+aurochs,motif_type,PREY,both,True,True,375,
+aurochs_20_2,motif_instance,PREY,both,False,True,44,instance of aurochs
+aurochs_2_2,motif_instance,PREY,both,False,True,20,instance of aurochs
+aurochs_31_10,motif_instance,PREY,both,False,True,8,instance of aurochs
+aurochs_38_11,motif_instance,PREY,both,False,True,16,instance of aurochs
+aurochs_38_12,motif_instance,PREY,both,False,True,12,instance of aurochs
+aurochs_45_1,motif_instance,PREY,both,False,True,12,instance of aurochs
+aurochs_66_1,motif_instance,PREY,both,False,True,52,instance of aurochs
+aurochs_66_2,motif_instance,PREY,both,False,True,36,instance of aurochs
+back_side,architecture,ARCH_SURFACE,object,False,True,30,
+base,architecture,ARCH_ZONE,object,False,False,4,
+beak,bodypart,BODYPART_ACTIVATED,both,True,True,14,bird display marker
+bear,motif_type,PREDATOR,both,True,True,8,
+below,relation,REL_VERTICAL,relation,False,True,3443,inferred inverse
+belt,motif_type,ORNAMENT,both,True,True,478,waist marker on anthropomorphic pillars
+belt_18_7,motif_instance,ORNAMENT,both,False,True,136,instance of belt
+belt_31_5,motif_instance,ORNAMENT,both,False,True,48,instance of belt
+belt_ornament,pattern_type,ORNAMENT,both,True,False,4,belt+loincloth+depicted motifs
+belt_ornament_18_33,motif_instance,ORNAMENT,both,False,True,72,instance of belt_ornament
+belt_ornament_31_15,motif_instance,ORNAMENT,both,False,True,16,instance of belt_ornament
+bird,motif_type,BIRD,both,True,True,1887,
+bird_12_1,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_12_2,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_12_3,motif_instance,BIRD,both,False,True,52,instance of bird
+bird_12_4,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_12_5,motif_instance,BIRD,both,False,True,52,instance of bird
+bird_12_6,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_12_7,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_18_25,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_18_26,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_18_27,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_18_28,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_18_29,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_18_30,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_18_31,motif_instance,BIRD,both,False,True,12,instance of bird
+bird_23_2,motif_instance,BIRD,both,False,True,40,instance of bird
+bird_23_3,motif_instance,BIRD,both,False,True,60,instance of bird
+bird_23_4,motif_instance,BIRD,both,False,True,40,instance of bird
+bird_29_2,motif_instance,BIRD,both,False,True,20,instance of bird
+bird_2_5,motif_instance,BIRD,both,False,True,28,instance of bird
+bird_33_101,motif_instance,BIRD,both,False,True,52,instance of bird
+bird_33_102,motif_instance,BIRD,both,False,True,68,instance of bird
+bird_33_103,motif_instance,BIRD,both,False,True,60,instance of bird
+bird_33_104,motif_instance,BIRD,both,False,True,52,instance of bird
+bird_33_105,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_33_106,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_33_124,motif_instance,BIRD,both,False,True,28,instance of bird
+bird_36_4,motif_instance,BIRD,both,False,True,28,instance of bird
+bird_38_15,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_38_16,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_38_17,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_41_1,motif_instance,BIRD,both,False,True,20,instance of bird
+bird_41_2,motif_instance,BIRD,both,False,True,20,instance of bird
+bird_42_2,motif_instance,BIRD,both,False,True,32,instance of bird
+bird_43_52,motif_instance,BIRD,both,False,True,56,instance of bird
+bird_43_56,motif_instance,BIRD,both,False,True,40,instance of bird
+bird_43_60,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_56_36,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_56_37,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_56_42,motif_instance,BIRD,both,False,True,28,instance of bird
+bird_56_43,motif_instance,BIRD,both,False,True,28,instance of bird
+bird_56_44,motif_instance,BIRD,both,False,True,28,instance of bird
+bird_56_6,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_56_7,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_56_8,motif_instance,BIRD,both,False,True,44,instance of bird
+bird_56_9,motif_instance,BIRD,both,False,True,36,instance of bird
+bird_66_3,motif_instance,BIRD,both,False,True,20,instance of bird
+bird_66_4,motif_instance,BIRD,both,False,True,20,instance of bird
+bird_76_2,motif_instance,BIRD,both,False,True,16,instance of bird
+bird_ornament_18_32,motif_instance,PATTERN_FLOCK,both,False,True,56,instance of bird_ornament
+bird_pattern,pattern_type,PATTERN_FLOCK,both,True,False,2,collective bird arrangement
+bird_pattern_12_8,pattern_instance,PATTERN_FLOCK,both,False,True,72,instance of bird_pattern
+bird_pattern_33_107,pattern_instance,PATTERN_FLOCK,both,False,True,56,instance of bird_pattern
+bird_pattern_38_18,pattern_instance,PATTERN_FLOCK,both,False,True,24,instance of bird_pattern
+bird_pattern_56_10,pattern_instance,PATTERN_FLOCK,both,False,True,52,instance of bird_pattern
+bird_pattern_56_45,pattern_instance,PATTERN_FLOCK,both,False,True,80,instance of bird_pattern
+boar,motif_type,PREY,both,True,True,402,"singularized, display-marked"
+boar_12_12,motif_instance,PREY,both,False,True,36,instance of boar
+boar_12_13,motif_instance,PREY,both,False,True,28,instance of boar
+boar_23_1,motif_instance,PREY,both,False,True,16,instance of boar
+boar_26_1,motif_instance,PREY,both,False,True,24,instance of boar
+boar_27_2,motif_instance,PREY,both,False,True,16,instance of boar
+boar_28_1,motif_instance,PREY,both,False,True,20,instance of boar
+boar_28_6,motif_instance,PREY,both,False,True,24,instance of boar
+boar_28_7,motif_instance,PREY,both,False,True,32,instance of boar
+boar_28_8,motif_instance,PREY,both,False,True,24,instance of boar
+boar_36_6,motif_instance,PREY,both,False,True,20,instance of boar
+boar_38_14,motif_instance,PREY,both,False,True,36,instance of boar
+body,bodypart,BODYPART_ANTHROPOMORPHIC,both,True,False,28,
+bucranium,motif_type,BUCRANIUM,both,True,True,229,"detached head, liminal"
+bucranium_18_3,motif_instance,BUCRANIUM,both,False,True,8,instance of bucranium
+bucranium_26_2,motif_instance,BUCRANIUM,both,False,True,12,instance of bucranium
+bucranium_2_1,motif_instance,BUCRANIUM,both,False,True,8,instance of bucranium
+bucranium_31_3,motif_instance,BUCRANIUM,both,False,True,16,instance of bucranium
+bucranium_38_1,motif_instance,BUCRANIUM,both,False,True,16,instance of bucranium
+bucranium_55_1,motif_instance,BUCRANIUM,both,False,True,4,instance of bucranium
+bucranium_56_2,motif_instance,BUCRANIUM,both,False,True,32,instance of bucranium
+building,architecture,ARCH_STRUCTURE,object,False,True,48,
+building_a,architecture,ARCH_STRUCTURE,object,False,False,18,
+building_b,architecture,ARCH_STRUCTURE,object,False,False,6,
+building_c,architecture,ARCH_STRUCTURE,object,False,False,34,
+building_context,relation,REL_ARCHITECTURAL,relation,False,False,160,building membership
+building_d,architecture,ARCH_STRUCTURE,object,False,False,62,building token
+building_f,architecture,ARCH_STRUCTURE,object,False,False,12,building token
+building_frieze,pattern_type,PATTERN_ABSTRACT,both,True,False,2,row of building symbols with animals
+building_frieze_43_15,motif_instance,PATTERN_ABSTRACT,both,False,True,64,instance of building_frieze
+building_h,architecture,ARCH_STRUCTURE,object,False,False,28,building token
+building_symbol,motif_type,ABSTRACT_MOTIF,both,True,True,181,possible architectural representation
+building_symbol_43_10,motif_instance,ABSTRACT_MOTIF,both,False,True,40,instance of building_symbol
+building_symbol_43_11,motif_instance,ABSTRACT_MOTIF,both,False,True,40,instance of building_symbol
+building_symbol_43_9,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of building_symbol
+center,attribute,ATTR_POSITION,object,False,True,1591,also orientation target
+center_panel_33_100,motif_instance,PATTERN_ABSTRACT,both,False,True,116,instance of center_panel
+central_pillar,architecture,ARCH_ROLE,object,False,False,55,
+chevron,motif_type,ABSTRACT_MOTIF,both,True,True,961,"geometric body unit, structurally near snake"
+chevron_33_11,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of chevron
+chevron_33_12,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_13,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_14,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_15,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_16,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_17,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_18,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_19,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_20,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_21,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_22,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_23,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_24,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_25,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_51,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_52,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_53,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_54,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_55,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_56,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_57,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_58,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_59,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_60,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_61,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_33_96,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of chevron
+chevron_57_5,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of chevron
+chevron_57_6,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of chevron
+chevron_pattern,pattern_type,PATTERN_ABSTRACT,both,True,False,2,vertical stack of chevrons
+chevron_pattern_33_26,motif_instance,PATTERN_ABSTRACT,both,False,True,144,instance of chevron_pattern
+chevron_pattern_33_62,motif_instance,PATTERN_ABSTRACT,both,False,True,112,instance of chevron_pattern
+chevron_pattern_57_7,motif_instance,PATTERN_ABSTRACT,both,False,True,16,instance of chevron_pattern
+circular_motif,motif_type,ABSTRACT_MOTIF,both,True,True,69,
+circular_motif_18_3,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of circular_motif
+connected_to,relation,REL_ADJACENCY,relation,False,False,2,symmetric
+contains,relation,REL_ADJACENCY,relation,False,False,5,inverse of inside
+crane,motif_type,BIRD,both,True,True,612,
+crane_2_4,motif_instance,BIRD,both,False,True,36,instance of crane
+crane_33_121,motif_instance,BIRD,both,False,True,76,instance of crane
+crane_33_129,motif_instance,BIRD,both,False,True,52,instance of crane
+crane_36_5,motif_instance,BIRD,both,False,True,28,instance of crane
+crane_43_12,motif_instance,BIRD,both,False,True,28,instance of crane
+crane_56_38,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_39,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_40,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_41,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_58,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_59,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_60,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_61,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_62,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_63,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_64,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_56_65,motif_instance,BIRD,both,False,True,24,instance of crane
+crane_pattern,pattern_type,PATTERN_FLOCK,both,True,False,2,"arrangement of cranes, subtype of bird_pattern"
+crane_pattern_56_66,motif_instance,PATTERN_FLOCK,both,False,True,72,instance of crane_pattern
+crescent,motif_type,ABSTRACT_MOTIF,both,True,True,1075,
+crescent_18_16,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_18_17,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_18_19,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_18_22,motif_instance,ABSTRACT_MOTIF,both,False,True,8,instance of crescent
+crescent_18_24,motif_instance,ABSTRACT_MOTIF,both,False,True,8,instance of crescent
+crescent_18_4,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_28_2,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_28_4,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_33_1,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of crescent
+crescent_33_2,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of crescent
+crescent_33_3,motif_instance,ABSTRACT_MOTIF,both,False,True,40,instance of crescent
+crescent_33_4,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_41,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of crescent
+crescent_33_42,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_43,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_44,motif_instance,ABSTRACT_MOTIF,both,False,True,40,instance of crescent
+crescent_33_45,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_46,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_47,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_48,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_49,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_5,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_6,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_7,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_33_8,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of crescent
+crescent_33_9,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of crescent
+crescent_38_2,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of crescent
+crescent_41_6,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of crescent
+crescent_pattern_33_10,motif_instance,PATTERN_ABSTRACT,both,False,True,92,instance of crescent_pattern
+crescent_pattern_33_50,motif_instance,PATTERN_ABSTRACT,both,False,True,92,instance of crescent_pattern
+curved,attribute,ATTR_VIEW,object,False,True,20,depicted in curved form
+depicted,relation,REL_DEPICTION,relation,False,True,336,
+disc,motif_type,ABSTRACT_MOTIF,both,True,True,92,
+disc_43_51,motif_instance,ABSTRACT_MOTIF,both,False,True,12,instance of disc
+disc_57_2,motif_instance,ABSTRACT_MOTIF,both,False,True,36,instance of disc
+displays,relation,REL_DEPICTION,relation,False,True,16,inverse of depicted_on
+displays_on,relation,REL_ARCHITECTURAL,relation,False,True,52,inverse of visible_on
+double_headed,attribute,ATTR_VIEW,object,False,True,12,snake with heads at both ends
+down,attribute,ATTR_DIRECTION,object,False,True,400,
+ears,bodypart,BODYPART_ACTIVATED,both,True,True,14,
+face,bodypart,BODYPART_ANTHROPOMORPHIC,both,True,True,22,
+faces,relation,REL_ORIENTATION,relation,False,True,2340,
+faces_center,relation,REL_ORIENTATION,relation,False,True,532,inferred from topology
+faces_toward,relation,REL_ORIENTATION,relation,False,True,151,
+faces_wall,relation,REL_ORIENTATION,relation,False,True,184,inferred from topology
+flexed_legs,bodypart,BODYPART_ACTIVATED,both,True,True,70,posture: activated
+flock,pattern_type,PATTERN_FLOCK,both,True,True,210,
+fox,motif_type,PREDATOR,both,True,True,526,singularized mediator
+fox_10_1,motif_instance,PREDATOR,both,False,True,76,instance of fox
+fox_20_3,motif_instance,PREDATOR,both,False,True,24,instance of fox
+fox_20_4,motif_instance,PREDATOR,both,False,True,24,instance of fox
+fox_20_5,motif_instance,PREDATOR,both,False,True,20,instance of fox
+fox_22_2,motif_instance,PREDATOR,both,False,True,20,instance of fox
+fox_2_3,motif_instance,PREDATOR,both,False,True,32,instance of fox
+fox_33_135,motif_instance,PREDATOR,both,False,True,48,instance of fox
+fox_37_1,motif_instance,PREDATOR,both,False,True,16,instance of fox
+fox_38_13,motif_instance,PREDATOR,both,False,True,32,instance of fox
+fox_43_57,motif_instance,PREDATOR,both,False,True,40,instance of fox
+fox_70_3,motif_instance,PREDATOR,both,False,True,4,instance of fox
+fox_9_1,motif_instance,PREDATOR,both,False,True,24,instance of fox
+front_side,architecture,ARCH_SURFACE,object,False,True,66,
+full,attribute,ATTR_VIEW,object,False,True,12,
+gazelle,motif_type,PREY,both,True,True,40,
+geometric_pattern_33_117,motif_instance,PATTERN_ABSTRACT,both,False,True,92,instance of geometric_pattern
+geometric_sign,ontology_class,ABSTRACT_MOTIF,object,True,True,378,supertype of geometric motifs
+geometric_sign_33_108,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_109,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_110,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_111,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_112,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_113,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_114,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_115,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_116,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of geometric_sign
+geometric_sign_33_78,motif_instance,ABSTRACT_MOTIF,both,False,True,20,instance of geometric_sign
+geometric_sign_33_79,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of geometric_sign
+geometric_sign_33_80,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of geometric_sign
+h_motif,motif_type,ABSTRACT_MOTIF,both,True,True,964,structurally unclassified
+h_motif_18_10,motif_instance,ABSTRACT_MOTIF,both,False,True,32,instance of h_motif
+h_motif_18_11,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of h_motif
+h_motif_18_12,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of h_motif
+h_motif_18_13,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of h_motif
+h_motif_18_18,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of h_motif
+h_motif_18_2,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of h_motif
+h_motif_18_23,motif_instance,ABSTRACT_MOTIF,both,False,True,8,instance of h_motif
+h_motif_18_9,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of h_motif
+h_motif_28_3,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of h_motif
+h_motif_28_9,motif_instance,ABSTRACT_MOTIF,both,False,True,12,instance of h_motif
+h_motif_29_1,motif_instance,ABSTRACT_MOTIF,both,False,True,4,instance of h_motif
+h_motif_30_1,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of h_motif
+h_motif_33_122,motif_instance,ABSTRACT_MOTIF,both,False,True,20,instance of h_motif
+h_motif_33_123,motif_instance,ABSTRACT_MOTIF,both,False,True,20,instance of h_motif
+h_motif_33_126,motif_instance,ABSTRACT_MOTIF,both,False,True,12,instance of h_motif
+h_motif_33_127,motif_instance,ABSTRACT_MOTIF,both,False,True,20,instance of h_motif
+h_motif_33_128,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of h_motif
+h_motif_33_133,motif_instance,ABSTRACT_MOTIF,both,False,True,20,instance of h_motif
+h_motif_33_39,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of h_motif
+h_motif_33_81,motif_instance,ABSTRACT_MOTIF,both,False,True,40,instance of h_motif
+h_motif_33_90,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of h_motif
+h_motif_33_99,motif_instance,ABSTRACT_MOTIF,both,False,True,28,instance of h_motif
+h_motif_41_3,motif_instance,ABSTRACT_MOTIF,both,False,True,12,instance of h_motif
+h_motif_41_5,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of h_motif
+h_motif_43_54,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of h_motif
+h_motif_43_55,motif_instance,ABSTRACT_MOTIF,both,False,True,12,instance of h_motif
+hands,bodypart,BODYPART_ANTHROPOMORPHIC,both,True,True,115,
+hands_18_6,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,16,instance of hands
+hands_31_4,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,16,instance of hands
+hands_40_3,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,8,instance of hands
+hands_51_1,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,4,instance of hands
+hands_70_1,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,4,instance of hands
+hands_71_1,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,4,instance of hands
+hands_74_2,motif_instance,BODYPART_ANTHROPOMORPHIC,both,False,True,8,instance of hands
+has_part,relation,REL_MEREOLOGY,relation,False,True,3843,inferred inverse
+head,architecture,ARCH_ZONE,object,False,True,72,also bodypart in ontology
+headless,attribute,ATTR_VIEW,object,False,True,12,human body without head
+horns,bodypart,BODYPART_ACTIVATED,both,True,True,78,display/defense marker
+human,motif_type,HUMAN,both,True,True,70,
+human_43_61,motif_instance,HUMAN,both,False,True,12,instance of human
+human_74_6,motif_instance,HUMAN,both,False,True,8,instance of human
+human_face,motif_type,HUMAN,both,True,True,42,partial anthropomorphic
+human_face_23_5,motif_instance,HUMAN,both,False,True,16,instance of human_face
+inner_wall,architecture,ARCH_ROLE,object,False,False,24,
+inside,relation,REL_ADJACENCY,relation,False,False,5,
+is_faced_by,relation,REL_ORIENTATION,relation,False,True,106,inferred inverse
+larger_than,relation,REL_COMPARISON,relation,False,True,228,
+left,attribute,ATTR_POSITION,object,False,True,900,panel or compositional position
+left_broadside,architecture,ARCH_SURFACE,object,False,True,76,
+left_panel_33_40,motif_instance,PATTERN_ABSTRACT,both,False,True,36,instance of left_panel
+legs,bodypart,BODYPART_ACTIVATED,both,True,True,114,
+leopard,motif_type,PREDATOR,both,True,True,573,
+leopard_27_1,motif_instance,PREDATOR,both,False,True,32,instance of leopard
+leopard_43_1,motif_instance,PREDATOR,both,False,True,36,instance of leopard
+leopard_43_13,motif_instance,PREDATOR,both,False,True,32,instance of leopard
+leopard_51_2,motif_instance,PREDATOR,both,False,True,12,instance of leopard
+leopard_56_16,motif_instance,PREDATOR,both,False,True,24,instance of leopard
+leopard_56_18,motif_instance,PREDATOR,both,False,True,24,instance of leopard
+leopard_56_19,motif_instance,PREDATOR,both,False,True,40,instance of leopard
+leopard_56_20,motif_instance,PREDATOR,both,False,True,36,instance of leopard
+leopard_56_24,motif_instance,PREDATOR,both,False,True,52,instance of leopard
+leopard_69_1,motif_instance,PREDATOR,both,False,True,32,instance of leopard
+leopard_69_2,motif_instance,PREDATOR,both,False,True,32,instance of leopard
+loincloth,motif_type,ORNAMENT,both,True,True,87,"pelt garment, often fox; incomplete transformation"
+loincloth_18_8,motif_instance,ORNAMENT,both,False,True,28,instance of loincloth
+loincloth_31_6,motif_instance,ORNAMENT,both,False,True,32,instance of loincloth
+middle,attribute,ATTR_POSITION,object,False,True,52,
+mod1,modification,MODIFICATION,both,False,True,168,modification event token
+mouflon,motif_type,PREY,both,True,True,50,
+mouth,bodypart,BODYPART_ACTIVATED,both,True,False,6,
+neck,architecture,ARCH_ZONE,object,False,False,12,
+neck_ornament,pattern_type,ORNAMENT,both,True,False,2,necklace+h_motif+crescent arrangement
+neck_ornament_18_5,motif_instance,ORNAMENT,both,False,True,48,instance of neck_ornament
+neck_ornament_31_7,motif_instance,ORNAMENT,both,False,True,32,instance of neck_ornament
+necklace,motif_type,ORNAMENT,both,True,True,225,anthropomorphic marker
+necklace_18_1,motif_instance,ORNAMENT,both,False,True,20,instance of necklace
+necklace_31_1,motif_instance,ORNAMENT,both,False,True,20,instance of necklace
+necklace_31_2,motif_instance,ORNAMENT,both,False,True,24,instance of necklace
+necklace_40_1,motif_instance,ORNAMENT,both,False,True,12,instance of necklace
+necklace_40_2,motif_instance,ORNAMENT,both,False,True,16,instance of necklace
+necklace_74_1,motif_instance,ORNAMENT,both,False,True,12,instance of necklace
+necklace_75_1,motif_instance,ORNAMENT,both,False,True,4,instance of necklace
+nested_chevron,motif_type,ABSTRACT_MOTIF,both,True,True,601,"recursive chevron, chevron within chevron"
+nested_chevron_43_1,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of nested_chevron
+nested_chevron_43_16,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of nested_chevron
+nested_chevron_43_17,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_18,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_19,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_2,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_20,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_21,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_22,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_23,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_24,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_25,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_26,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_27,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_28,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_29,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_3,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_30,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of nested_chevron
+nested_chevron_43_4,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_44,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of nested_chevron
+nested_chevron_43_45,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_46,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_47,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_48,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of nested_chevron
+nested_chevron_43_5,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_6,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of nested_chevron
+nested_chevron_43_7,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of nested_chevron
+nested_chevron_pattern,pattern_type,PATTERN_ABSTRACT,both,True,False,2,frieze of nested chevrons
+nested_chevron_pattern_43_31,motif_instance,PATTERN_ABSTRACT,both,False,True,136,instance of nested_chevron_pattern
+nested_chevron_pattern_43_49,motif_instance,PATTERN_ABSTRACT,both,False,True,56,instance of nested_chevron_pattern
+nested_chevron_pattern_43_8,motif_instance,PATTERN_ABSTRACT,both,False,True,68,instance of nested_chevron_pattern
+net,pattern_type,PATTERN_NET,both,True,True,40,
+net_pattern_12_9,pattern_instance,PATTERN_NET,both,False,True,8,instance of net_pattern
+next_to,relation,REL_ADJACENCY,relation,False,True,1724,symmetric
+opposite,relation,REL_ADJACENCY,relation,False,True,72,"surface opposition, symmetric"
+oriented_away_from_center,relation,REL_ORIENTATION,relation,False,True,184,inferred
+oriented_toward_center,relation,REL_ORIENTATION,relation,False,True,532,inferred
+ornament,ontology_class,ORNAMENT,object,True,True,24,
+outer_wall,architecture,ARCH_ROLE,object,False,False,14,
+oval,motif_type,ABSTRACT_MOTIF,both,True,True,77,
+oval_33_83,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of oval
+part_of,relation,REL_MEREOLOGY,relation,False,True,3937,
+pelt,attribute,ATTR_VIEW,object,False,True,76,depicted as pelt/skin
+phallus,bodypart,BODYPART_ACTIVATED,both,True,True,58,display/male marker
+pillar,architecture,ARCH_STRUCTURE,object,False,False,16,
+pillar_1,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_10,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_10_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_11,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_11_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_12,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_12_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_12_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_13,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_13_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_14,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_14_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_18,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_18_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_19,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_19_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_1_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_2,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_20,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_20_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_21,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_21_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_22,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_22_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_23,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_23_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_23_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_24,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_24_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_26,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_26_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_26_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_27,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_27_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_28,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_28_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_28_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_29,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_29_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_29_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_2_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_3,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_30,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_30_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_30_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_31,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_31_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_33,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_33_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_33_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_35,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_35_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_36,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_36_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_37,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_37_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_38,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_38_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_38_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_3_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_40,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_40_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_41,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_41_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_41_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_42,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_42_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_43,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_43_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_45,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_45_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_5,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_51,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_51_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_55,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_55_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_56,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_56_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_56_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_57,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_57_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_5_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_6,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_62,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_62_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_66,architecture,ARCH_PILLAR,both,False,False,3,pillar token
+pillar_66_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_66_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_67,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_67_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_69,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_69_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_6_head,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_6_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_70,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_70_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_71,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_71_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_74,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_74_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_75,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_75_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_76,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_76_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_9,architecture,ARCH_PILLAR,both,False,False,2,pillar token
+pillar_9_shaft,architecture,ARCH_PILLAR_ZONE,both,False,False,2,pillar zone token
+pillar_role,architecture,ARCH_ROLE,object,False,False,98,token in arch layer
+placed_on,relation,REL_ARCHITECTURAL,relation,False,False,187,surface placement
+position,relation,REL_DEPICTION,relation,False,True,644,spatial placement attribute
+quadruped,motif_type,PREY,both,True,True,1413,"unspecified quadruped, often prey context"
+quadruped_10_2,motif_instance,PREY,both,False,True,44,instance of quadruped
+quadruped_10_3,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_10_4,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_10_5,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_10_6,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_10_7,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_11_1,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_13_1,motif_instance,PREY,both,False,True,12,instance of quadruped
+quadruped_14_1,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_18_15,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_1_24,motif_instance,PREY,both,False,True,16,instance of quadruped
+quadruped_21_3,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_21_4,motif_instance,PREY,both,False,True,36,instance of quadruped
+quadruped_21_5,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_22_3,motif_instance,PREY,both,False,True,32,instance of quadruped
+quadruped_24_1,motif_instance,PREY,both,False,True,40,instance of quadruped
+quadruped_27_3,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_30_3,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_33_118,motif_instance,PREY,both,False,True,40,instance of quadruped
+quadruped_33_119,motif_instance,PREY,both,False,True,52,instance of quadruped
+quadruped_33_120,motif_instance,PREY,both,False,True,48,instance of quadruped
+quadruped_33_125,motif_instance,PREY,both,False,True,52,instance of quadruped
+quadruped_33_130,motif_instance,PREY,both,False,True,36,instance of quadruped
+quadruped_33_131,motif_instance,PREY,both,False,True,32,instance of quadruped
+quadruped_33_82,motif_instance,PREY,both,False,True,24,instance of quadruped
+quadruped_33_84,motif_instance,PREY,both,False,True,24,instance of quadruped
+quadruped_33_97,motif_instance,PREY,both,False,True,36,instance of quadruped
+quadruped_35_1,motif_instance,PREY,both,False,True,16,instance of quadruped
+quadruped_37_2,motif_instance,PREY,both,False,True,8,instance of quadruped
+quadruped_3_1,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_41_4,motif_instance,PREY,both,False,True,32,instance of quadruped
+quadruped_41_7,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_43_14,motif_instance,PREY,both,False,True,40,instance of quadruped
+quadruped_56_21,motif_instance,PREY,both,False,True,40,instance of quadruped
+quadruped_56_67,motif_instance,PREY,both,False,True,40,instance of quadruped
+quadruped_66_5,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_66_6,motif_instance,PREY,both,False,True,20,instance of quadruped
+quadruped_6_1,motif_instance,PREY,both,False,True,28,instance of quadruped
+quadruped_74_5,motif_instance,PREY,both,False,True,24,instance of quadruped
+quadruped_76_1,motif_instance,PREY,both,False,True,16,instance of quadruped
+right,attribute,ATTR_POSITION,object,False,True,988,panel or compositional position
+right_broadside,architecture,ARCH_SURFACE,object,False,True,92,
+right_panel_33_77,motif_instance,PATTERN_ABSTRACT,both,False,True,36,instance of right_panel
+rotated,attribute,ATTR_VIEW,object,False,True,104,
+scorpion,motif_type,ARTHROPOD,both,True,True,20,
+self_above,relation,REL_SELF,relation,False,True,60,type self-relation marker
+self_below,relation,REL_SELF,relation,False,True,8,self-relation marker
+self_faces_toward,relation,REL_SELF,relation,False,True,4,type self-relation marker
+self_larger_than,relation,REL_SELF,relation,False,True,16,type self-relation marker
+self_next_to,relation,REL_SELF,relation,False,True,28,type self-relation marker
+self_opposite,relation,REL_SELF,relation,False,True,4,self-relation marker
+self_part_of,relation,REL_SELF,relation,False,True,4,self-relation marker
+self_weakly_associated_with,relation,REL_SELF,relation,False,True,12,self-relation marker
+shaft,architecture,ARCH_ZONE,object,False,True,94,main display surface
+shows,relation,REL_DEPICTION,relation,False,True,632,
+sideview,attribute,ATTR_VIEW,object,False,True,108,
+smaller_than,relation,REL_COMPARISON,relation,False,True,228,inferred inverse
+snake,motif_type,REPTILE,both,True,True,2978,distributed operator
+snake_14_2,motif_instance,REPTILE,both,False,True,4,instance of snake
+snake_19_1,motif_instance,REPTILE,both,False,True,8,instance of snake
+snake_1_1,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_1_10,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_11,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_12,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_13,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_14,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_15,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_16,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_17,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_18,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_19,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_2,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_1_20,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_21,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_22,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_3,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_4,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_1_5,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_6,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_7,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_8,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_1_9,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_20_1,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_22_1,motif_instance,REPTILE,both,False,True,8,instance of snake
+snake_30_2,motif_instance,REPTILE,both,False,True,16,instance of snake
+snake_30_4,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_30_5,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_30_6,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_30_7,motif_instance,REPTILE,both,False,True,24,instance of snake
+snake_33_132,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_33_134,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_33_136,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_33_27,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_28,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_29,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_30,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_31,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_32,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_33,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_34,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_35,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_36,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_37,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_63,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_64,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_65,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_66,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_67,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_68,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_69,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_70,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_71,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_72,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_73,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_74,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_33_75,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_33_85,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_33_86,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_33_87,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_33_88,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_33_93,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_33_94,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_33_95,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_38_10,motif_instance,REPTILE,both,False,True,24,instance of snake
+snake_38_4,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_38_5,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_38_6,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_38_7,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_38_9,motif_instance,REPTILE,both,False,True,32,instance of snake
+snake_42_1,motif_instance,REPTILE,both,False,True,16,instance of snake
+snake_43_3,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_43_53,motif_instance,REPTILE,both,False,True,32,instance of snake
+snake_43_58,motif_instance,REPTILE,both,False,True,24,instance of snake
+snake_43_62,motif_instance,REPTILE,both,False,True,16,instance of snake
+snake_43_63,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_56_1,motif_instance,REPTILE,both,False,True,4,instance of snake
+snake_56_11,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_12,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_13,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_14,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_17,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_27,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_28,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_29,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_3,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_30,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_31,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_32,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_33,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_4,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_46,motif_instance,REPTILE,both,False,True,12,instance of snake
+snake_56_47,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_56_48,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_49,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_50,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_51,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_52,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_53,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_54,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_55,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_56_56,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_57_1,motif_instance,REPTILE,both,False,True,32,instance of snake
+snake_57_3,motif_instance,REPTILE,both,False,True,32,instance of snake
+snake_5_1,motif_instance,REPTILE,both,False,True,8,instance of snake
+snake_62_1,motif_instance,REPTILE,both,False,True,4,instance of snake
+snake_67_1,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_67_2,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_67_3,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_67_4,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_67_5,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_67_6,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_67_7,motif_instance,REPTILE,both,False,True,36,instance of snake
+snake_67_8,motif_instance,REPTILE,both,False,True,28,instance of snake
+snake_6_2,motif_instance,REPTILE,both,False,True,20,instance of snake
+snake_pattern,pattern_type,PATTERN_NET,both,True,False,2,net arrangement of snakes
+snake_pattern_1_23,pattern_instance,PATTERN_NET,both,False,True,148,instance of snake_pattern
+snake_pattern_30_8,pattern_instance,PATTERN_NET,both,False,True,32,instance of snake_pattern
+snake_pattern_33_38,pattern_instance,PATTERN_NET,both,False,True,128,instance of snake_pattern
+snake_pattern_33_76,pattern_instance,PATTERN_NET,both,False,True,144,instance of snake_pattern
+snake_pattern_33_89,pattern_instance,PATTERN_NET,both,False,True,72,instance of snake_pattern
+snake_pattern_33_92,pattern_instance,PATTERN_NET,both,False,True,64,instance of snake_pattern
+snake_pattern_38_3,pattern_instance,PATTERN_NET,both,False,True,44,instance of snake_pattern
+snake_pattern_56_15,pattern_instance,PATTERN_NET,both,False,True,36,instance of snake_pattern
+snake_pattern_56_34,pattern_instance,PATTERN_NET,both,False,True,112,instance of snake_pattern
+snake_pattern_56_5,pattern_instance,PATTERN_NET,both,False,True,24,instance of snake_pattern
+snake_pattern_56_57,pattern_instance,PATTERN_NET,both,False,True,96,instance of snake_pattern
+snake_pattern_57_4,pattern_instance,PATTERN_NET,both,False,True,36,instance of snake_pattern
+snake_pattern_67_9,pattern_instance,PATTERN_NET,both,False,True,64,instance of snake_pattern
+square,motif_type,ABSTRACT_MOTIF,both,True,True,271,
+square_43_32,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of square
+square_43_33,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_34,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_35,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_36,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_37,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_38,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_39,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_40,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_41,motif_instance,ABSTRACT_MOTIF,both,False,True,24,instance of square
+square_43_42,motif_instance,ABSTRACT_MOTIF,both,False,True,16,instance of square
+square_pattern,pattern_type,PATTERN_ABSTRACT,both,True,False,2,row of squares
+square_pattern_43_43,motif_instance,PATTERN_ABSTRACT,both,False,True,104,instance of square_pattern
+stone_cluster_12_11,pattern_instance,PATTERN_ABSTRACT,both,False,True,8,instance of stone_cluster
+straight_legs,bodypart,BODYPART_ACTIVATED,both,True,True,14,posture: passive
+surrounded_by,relation,REL_ADJACENCY,relation,False,False,1,enclosure topology
+tail,bodypart,BODYPART_ACTIVATED,both,True,True,86,"display marker, retained on loincloth"
+teeth,bodypart,BODYPART_ACTIVATED,both,True,True,138,threat/predation marker
+tongue,bodypart,BODYPART_ACTIVATED,both,True,True,14,display marker
+top,attribute,ATTR_POSITION,object,False,True,312,
+topview,attribute,ATTR_VIEW,object,False,True,68,
+torso,bodypart,BODYPART_ANTHROPOMORPHIC,both,True,False,11,
+unknown,motif_type,UNKNOWN,both,True,True,150,unidentified motif
+unknown_31_12,motif_instance,UNKNOWN,both,False,True,16,instance of unknown
+unknown_36_1,motif_instance,UNKNOWN,both,False,True,8,instance of unknown
+unknown_36_2,motif_instance,UNKNOWN,both,False,True,20,instance of unknown
+unknown_36_3,motif_instance,UNKNOWN,both,False,True,28,instance of unknown
+unknown_63_1,motif_instance,UNKNOWN,both,False,True,20,instance of unknown
+up,attribute,ATTR_DIRECTION,object,False,True,136,
+vulture,motif_type,BIRD,both,True,True,444,scavenger role
+vulture_43_50,motif_instance,BIRD,both,False,True,56,instance of vulture
+vulture_56_23,motif_instance,BIRD,both,False,True,44,instance of vulture
+vulture_56_25,motif_instance,BIRD,both,False,True,20,instance of vulture
+vulture_56_26,motif_instance,BIRD,both,False,True,20,instance of vulture
+waist,bodypart,BODYPART_ANTHROPOMORPHIC,both,True,False,6,
+wall,architecture,ARCH_STRUCTURE,object,False,False,9,
+wall_pillar,architecture,ARCH_ROLE,object,False,False,63,
+wall_position,relation,REL_ARCHITECTURAL,relation,False,False,38,inner/outer wall
+weakly_associated_with,relation,REL_ADJACENCY,relation,False,True,1384,ambiguous identification link
+weave,pattern_type,PATTERN_NET,both,True,False,2,
+wild_ass,motif_type,PREY,both,True,True,8,
+wings,bodypart,BODYPART_ACTIVATED,both,True,True,22,display/flight marker
