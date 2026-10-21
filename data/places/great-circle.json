@@ -1,0 +1,280 @@
+{
+ "about": "The world's ancient sites on one great circle, as the claim's own author draws it: Jim Alison's table of sites near the circle, in his figures (degrees and minutes as he prints them; his distance off the circle in statute miles, rounded as he rounds it). These are what the proponent says, like a text's figures: never measurements, verified false until read again on the page. The circle itself is not stored; the exhibit fits it from these coordinates and compares the fit with the axis he gives. Each site's own coordinates and dates, from its own source, are a later step.",
+ "source": "alison-great-circle",
+ "axis": {
+  "latitude": [
+   59,
+   53,
+   "N"
+  ],
+  "longitude": [
+   138,
+   36,
+   "W"
+  ],
+  "note": "The circle's northern axis point as the page gives it, 'in northwestern British Columbia'; the southern one is its antipode, 59 53 S, 41 24 E."
+ },
+ "tolerances": [
+  "within one tenth of one degree of this great circle (Giza, Tassili n'Ajjer, Paratoari, Ollantaytambo, Nazca, Easter Island and others, as the page lists them)",
+  "within one quarter of a degree (Machupicchu and Cuzco; Siwa; Mohenjo Daro and Ganweriwala; Preah Vihear)",
+  "within one degree of the great circle (Ur and Angkor)"
+ ],
+ "verified": false,
+ "sites": [
+  {
+   "id": "giza",
+   "name": "Giza",
+   "latitude": [
+    29,
+    59,
+    "N"
+   ],
+   "longitude": [
+    31,
+    9,
+    "E"
+   ],
+   "miles_off": 0
+  },
+  {
+   "id": "siwa",
+   "name": "Siwa",
+   "latitude": [
+    29,
+    14,
+    "N"
+   ],
+   "longitude": [
+    25,
+    31,
+    "E"
+   ],
+   "miles_off": 10
+  },
+  {
+   "id": "tassili",
+   "name": "Tassili n'Ajjer",
+   "latitude": [
+    26,
+    32,
+    "N"
+   ],
+   "longitude": [
+    9,
+    50,
+    "E"
+   ],
+   "miles_off": 0
+  },
+  {
+   "id": "paratoari",
+   "name": "Paratoari",
+   "latitude": [
+    12,
+    48,
+    "S"
+   ],
+   "longitude": [
+    71,
+    25,
+    "W"
+   ],
+   "miles_off": 0
+  },
+  {
+   "id": "ollantaytambo",
+   "name": "Ollantaytambo",
+   "latitude": [
+    13,
+    15,
+    "S"
+   ],
+   "longitude": [
+    72,
+    16,
+    "W"
+   ],
+   "miles_off": 0
+  },
+  {
+   "id": "machu-picchu",
+   "name": "Machupicchu",
+   "latitude": [
+    13,
+    6,
+    "S"
+   ],
+   "longitude": [
+    72,
+    35,
+    "W"
+   ],
+   "miles_off": 15
+  },
+  {
+   "id": "nazca",
+   "name": "Nazca",
+   "latitude": [
+    14,
+    42,
+    "S"
+   ],
+   "longitude": [
+    75,
+    6,
+    "W"
+   ],
+   "miles_off": 0
+  },
+  {
+   "id": "easter-island",
+   "name": "Easter Island",
+   "latitude": [
+    27,
+    6,
+    "S"
+   ],
+   "longitude": [
+    109,
+    20,
+    "W"
+   ],
+   "miles_off": 0
+  },
+  {
+   "id": "aneityum",
+   "name": "Aneityum Island",
+   "latitude": [
+    20,
+    10,
+    "S"
+   ],
+   "longitude": [
+    169,
+    48,
+    "E"
+   ],
+   "miles_off": 8
+  },
+  {
+   "id": "preah-vihear",
+   "name": "Preah Vihear",
+   "latitude": [
+    14,
+    24,
+    "N"
+   ],
+   "longitude": [
+    104,
+    40,
+    "E"
+   ],
+   "miles_off": 25
+  },
+  {
+   "id": "sukhothai",
+   "name": "Sukhothai",
+   "latitude": [
+    17,
+    1,
+    "N"
+   ],
+   "longitude": [
+    99,
+    42,
+    "E"
+   ],
+   "miles_off": 5
+  },
+  {
+   "id": "pyay",
+   "name": "Pyay",
+   "latitude": [
+    19,
+    15,
+    "N"
+   ],
+   "longitude": [
+    95,
+    5,
+    "E"
+   ],
+   "miles_off": 5
+  },
+  {
+   "id": "khajuraho",
+   "name": "Khajuraho",
+   "latitude": [
+    24,
+    51,
+    "N"
+   ],
+   "longitude": [
+    79,
+    56,
+    "E"
+   ],
+   "miles_off": 12
+  },
+  {
+   "id": "mohenjo-daro",
+   "name": "Mohenjo Daro",
+   "latitude": [
+    27,
+    15,
+    "N"
+   ],
+   "longitude": [
+    68,
+    17,
+    "E"
+   ],
+   "miles_off": 20
+  },
+  {
+   "id": "persepolis",
+   "name": "Persepolis",
+   "latitude": [
+    29,
+    56,
+    "N"
+   ],
+   "longitude": [
+    52,
+    55,
+    "E"
+   ],
+   "miles_off": 5
+  },
+  {
+   "id": "ur",
+   "name": "Ur",
+   "latitude": [
+    30,
+    57,
+    "N"
+   ],
+   "longitude": [
+    46,
+    7,
+    "E"
+   ],
+   "miles_off": 40
+  },
+  {
+   "id": "petra",
+   "name": "Petra",
+   "latitude": [
+    30,
+    19,
+    "N"
+   ],
+   "longitude": [
+    35,
+    28,
+    "E"
+   ],
+   "miles_off": 6
+  }
+ ]
+}

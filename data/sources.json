@@ -1263,5 +1263,13 @@
     "citation": "Greenberg, M. J. The Rhind Mathematical Papyrus: problems 56 to 60 (a summary after Chace's edition). University of Washington, Department of Mathematics.",
     "url": "https://sites.math.washington.edu/~greenber/Rhind.html",
     "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 11), not the page itself: problem 56 gives a base of 360 and a height of 250 (cubits) and finds the seked 5 1/25 palms; 57 and 58 use 5 palms 1 finger; 59 gives 5 palms 2 fingers and 5 palms 1 finger; 60 is a pillar at 4 palms. The papyrus is Ahmes's copy of about 1650 BCE of a Twelfth Dynasty original. A secondary web summary; Peet (1923), Chace or Robins and Shute (1987) is the edition to check against. The author's full name and the page's date are unchecked."
+  },
+  {
+    "id": "alison-great-circle",
+    "kind": "proponent",
+    "year": 2026,
+    "citation": "Alison, J. A New Look at an Old Design: The Prehistoric Alignment of World Wonders. Part 1, Great Circle. Self-published web pages, undated.",
+    "url": "http://home.hiwaay.net/~jalison/",
+    "note": "Read through a page summary on 2026-10-21 by the night builder (chunk 12), not the page itself: the table of sites near the circle (seventeen rows, latitude and longitude in degrees and minutes, distance to the circle and to the axis point in miles), the axis points 59 53 N 138 36 W and 59 53 S 41 24 E, and the tolerance sentences. Hancock draws on this circle in Heaven's Mirror (1998). The page's degree signs are garbled in its encoding; the figures to check against the page itself. data/places/great-circle.json."
   }
 ]
