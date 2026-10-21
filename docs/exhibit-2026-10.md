@@ -121,3 +121,32 @@ between consecutive leaves), so adding a leaf never means writing a render by ha
    showpieces.
 3. Chapter 6 (the numbers, the pyramid in the hand), then 3, 4, 7, 8 and 9.
 4. Narration recorded, the trailer captured, the site deployed (Stewart's say-so).
+
+## Added 20 October, from Stewart's questions
+
+- **The world's pyramids, on a globe and a timeline** (a closing leaf of chapter 9, or a side room). Every known
+  pyramid and pyramid-like monument imported from a dataset with its date range and coordinates (never typed), on
+  a turnable globe and a timeline. The claim drawn as its proponents draw it: the best-fitting great circle through
+  the sites, with each site's distance from it. The reply drawn beside it from the same data: the same fit for
+  random sites in the same latitude band, so the visitor sees how close "a line" comes by chance, and the dates
+  spread over four thousand years.
+- **"How deep has anyone looked?"** On chapter 8's depth scale, beside each claimed depth (the Khafre wells to
+  648 m, the Hawara walls at 8 to 12 m, the paw cavity), a bar for how deep anyone has actually drilled, dug or
+  surveyed there and who did it, each from its source: the 2008 groundwater boreholes at the Sphinx, Petrie's pits
+  at Hawara, the radar's own stated reach. Stewart's point, that the official checks stop short of where the
+  claims begin, is then shown by the data rather than asserted, and where a check did go deep enough, that shows too.
+- **Chapter 6: how they did the math** (agreed with Stewart). A leaf that shows what the Egyptians are known to have
+  computed, from their own texts: Rhind papyrus problem 56, a seked worked in the scribe's steps, beside our
+  pyramid, then the 5½-palm seked turning into 2π (perimeter over height, 2 x 22/7) and φ as the visitor watches,
+  A3's receipt live ("holds, 0 free choices"). Then the north alignment as a method, not a formula: the two stars
+  lining up over the pole (Spence 2000) and the equinox shadow, with the drift of successive pyramids' errors that
+  dates them. Then the engine's sorting made visible: claims that hold with no free choices, claims that hold only
+  after choosing units (B3, the speed of light), claims that fail (D1). The honest gap goes in the words: no
+  mathematical papyrus survives from the pyramid age itself; ours are 700 years later.
+- **The tone: settled, reported, claimed, and what each would change** (Stewart: not a steelman of a conspiracy
+  theory, but fair to the fact that the official account waits for hard evidence and so lags the edge). Every
+  claim the exhibit shows carries how far its evidence has got, in plain words from its tier (dug and dated;
+  measured by an instrument and published; reported but not yet published or replicated; told), and for a claim
+  that is reported but unproven, one line on what it would change if it held up, as Göbekli Tepe changed the
+  order of farming and monuments. The Khafre scans are the model case: preliminary, contested, the paper behind
+  the method retracted, and if even part of it held, a rewrite of the plateau's history.
