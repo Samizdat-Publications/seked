@@ -29,6 +29,14 @@ export interface PlayerUi {
   flight: HTMLVideoElement;
 }
 
+export type PlayLog =
+  | { kind: 'leaf'; leaf: string; at: number }
+  | { kind: 'span'; leaf: string; chapter: number; file: string; start: number; end: number; at: number }
+  | { kind: 'voice'; leaf: string; at: number };
+
+/** Wall-clock milliseconds, with the page clock's resolution. */
+const wallNow = () => performance.timeOrigin + performance.now();
+
 const HONESTY: Record<string, string> = { claim: 'Theorized', reconstruction: 'Reconstruction', survey: 'Survey' };
 
 export class Player {
@@ -47,11 +55,19 @@ export class Player {
   /** Figures waiting for their words, in order. */
   private pendingFigures: { id: string; at: number; cued: boolean }[] = [];
 
+  /**
+   * What play has done, in wall-clock milliseconds (`Date` time, so a script outside the page can line it up with its
+   * own clock): each leaf put on the stage, each span of a chapter's recording from when it sounded to when it
+   * stopped, each leaf the browser's voice said instead. `scripts/capture_exhibit.py` lays the recording under its
+   * video by it.
+   */
+  readonly log: PlayLog[] = [];
+
   private token = 0;
   /** The recorded voice's element (public for capture and test scripts, through window.seked). */
   readonly audio = new Audio();
   /** Each chapter's recording, loaded once: its audio's address and each leaf's span in it (null without one). */
-  private recordings = new Map<number, Promise<{ url: string; spans: Map<string, Span> } | null>>();
+  private recordings = new Map<number, Promise<{ url: string; file: string; spans: Map<string, Span> } | null>>();
   /** The word index that starts the leaf's overlay, in play. */
   private cueAt = -1;
   private timers: number[] = [];
@@ -106,6 +122,7 @@ export class Player {
     this.cancel();
     const token = this.token;
     this.label(L);
+    this.log.push({ kind: 'leaf', leaf: L.id, at: wallNow() });
     this.onLeaf(L);
     this.setFigure(L);
     history.replaceState(null, '', searchWithLeaf(location.search, L.id));
@@ -219,7 +236,7 @@ export class Player {
   private landing: (() => void) | null = null;
 
   /** A chapter's recording (narration/chN.json and its mp3), with each of its leaves' spans; null without one. */
-  private recording(chapter: number): Promise<{ url: string; spans: Map<string, Span> } | null> {
+  private recording(chapter: number): Promise<{ url: string; file: string; spans: Map<string, Span> } | null> {
     let r = this.recordings.get(chapter);
     if (!r) {
       r = (async () => {
@@ -234,7 +251,7 @@ export class Player {
           // the whole file, played from memory: a blob can always be sought, whatever the server does with ranges
           const audio = await fetch(new URL(recordingUrl(chapter, rec.file), location.href));
           if (!audio.ok) return null;
-          return { url: URL.createObjectURL(await audio.blob()), spans };
+          return { url: URL.createObjectURL(await audio.blob()), file: rec.file, spans };
         } catch {
           return null;
         }
@@ -248,14 +265,17 @@ export class Player {
    * Play a leaf's span of its chapter's recording, the words cued from the audio's own clock; `fallback` if the
    * audio will not play. Stops at the span's end and calls `end`.
    */
-  private playSpan(token: number, url: string, span: Span, end: () => void, fallback: () => void): void {
-    const a = this.audio;
+  private playSpan(token: number, L: Leaf, rec: { url: string; file: string }, span: Span, end: () => void, fallback: () => void): void {
+    const a = this.audio, url = rec.url;
+    let heard: Extract<PlayLog, { kind: 'span' }> | null = null;
     this.words = span.words;
     let k = 0, failed = false;
     const fail = () => { if (failed || token !== this.token) return; failed = true; a.pause(); fallback(); };
     const tick = () => {
       if (token !== this.token || failed) return;
       const t = a.currentTime - span.start;
+      if (!heard) this.log.push(heard = { kind: 'span', leaf: L.id, chapter: L.chapter, file: rec.file, start: span.start, end: span.start, at: wallNow() - t * 1000 });
+      heard.end = Math.min(a.currentTime, span.end);
       while (k < span.words.length && span.words[k]!.at <= t) this.word(k++);
       if (a.currentTime >= span.end || a.ended) { a.pause(); end(); return; }
       requestAnimationFrame(tick);
@@ -312,7 +332,7 @@ export class Player {
     void this.recording(L.chapter).then((r) => {
       if (token !== this.token) return;
       const span = r?.spans.get(L.id);
-      if (r && span) this.playSpan(token, r.url, span, end, () => { console.info(`${L.id}: the recording would not play, so the browser's voice says it`); this.speakAloud(token, L, end); });
+      if (r && span) this.playSpan(token, L, r, span, end, () => { console.info(`${L.id}: the recording would not play, so the browser's voice says it`); this.speakAloud(token, L, end); });
       else {
         if (r) console.info(`${L.id}: its words are not in chapter ${L.chapter}'s recording, so the browser's voice says them`);
         this.speakAloud(token, L, end);
@@ -322,6 +342,7 @@ export class Player {
 
   /** The browser's own voice, its word boundaries the timing; an estimate when there is no voice or it stalls. */
   private speakAloud(token: number, L: Leaf, end: () => void): void {
+    this.log.push({ kind: 'voice', leaf: L.id, at: wallNow() });
     // the estimate, used as it stands when there is no voice, and as a watchdog when the voice goes quiet
     const estimate = wordTimes(L.say);
     const last = estimate[estimate.length - 1];
