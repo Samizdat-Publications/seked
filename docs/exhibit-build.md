@@ -423,6 +423,20 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   again without its carvings, and they stand at one first height map for Pillar 43, gitignored on the laptop. Build
   the object once the cleaned height maps are committed, carving them as normal or bump maps on the pillars they
   belong to.
+- [x] **E20. Chapter 8, "Underneath": its leaves.** *Done 2026-10-21 00:10 UTC, `8d75bab`.* 10 leaves, every word in
+  order and inside `ch8.json`, all today. The wells from the `menkaure` station, looking at Khafre's pyramid (yaw 8,
+  the bearing from the station to `g2.centre.offset.*`), down at the ground on the wells and up for "four and a half
+  times the pyramid's height"; the same view turned south for the Labyrinth, along Hawara's bearing from Giza in
+  `data/sites.json` (196 degrees, 82 km), as chapter 7 faces Göbekli Tepe; the paws and "Nobody has dug for any of
+  it" before the Sphinx, looking at the floor between the paws. No receipts: the script's are new labels without
+  targets. Seven patches queued; no new panorama or flight. Looked at as a contact sheet and on a phone; played
+  through muted, 110 s, no errors.
+- [ ] **E20b. Chapter 8's figures.** The script's receipts as figures, from the records: one depth scale with every
+  underground object by tier (`excavated` Khafre's chambers at `g2.passage.horizontal.floor.begin.up`, the Osiris
+  Shaft; `claimed` the wells and chambers at 648 m, `g2.sar-shafts`; the paw cavity), drawn on "648 metres" in
+  `ch8-wells`; the depth against `g2.height.original` (four and a half heights) on "height" in `ch8-height`. The
+  claimed depths need records first if `data/` lacks them (`khafre-project-2025`, `verified: false`), never typed
+  into the figure. Hawara's section waits for its proposed records.
 
 ## Decisions
 
