@@ -237,29 +237,52 @@ export function northSquareSvg(n: NonNullable<ReturnType<typeof northSquare>>, e
 </svg>`;
 }
 
-export interface Needle { king: string; orientation: number }
+export interface Needle { king: string; orientation: number; site?: string }
 
-/** The Giza pyramids in the order they were built, each by its orientation record (negative is west of north). */
-const DRIFT = [{ king: 'Khufu', key: 'g1.orientation' }, { king: 'Khafre', key: 'g2.orientation' }, { king: 'Menkaure', key: 'g3.orientation' }];
+/**
+ * The Fourth Dynasty's pyramids in the order they were built, each by its orientation record (negative is west of
+ * north): Sneferu's three, labelled by place since one king built them, then Giza's three by king.
+ */
+const DRIFT = [
+  { king: 'Meidum', key: 'meidum.pyramid.orientation', site: 'meidum' },
+  { king: 'Bent', key: 'dahshur.bent.orientation', site: 'dahshur' },
+  { king: 'Red', key: 'dahshur.red.orientation', site: 'dahshur' },
+  { king: 'Khufu', key: 'g1.orientation', site: 'giza' },
+  { king: 'Khafre', key: 'g2.orientation', site: 'giza' },
+  { king: 'Menkaure', key: 'g3.orientation', site: 'giza' },
+];
 
 /** The needles from the environment; null until every orientation is there. */
 export function northDrift(ground: Record<string, number>): Needle[] | null {
-  const n = DRIFT.map((d) => ({ king: d.king, orientation: ground[d.key] }));
+  const n = DRIFT.map((d) => ({ king: d.king, orientation: ground[d.key], site: d.site }));
   return n.every((x) => x.orientation !== undefined) ? (n as Needle[]) : null;
 }
 
+/** The largest turn a needle is drawn at, degrees, so the steepest still reads as a lean and not a fall. */
+const MAX_LEAN = 30;
+
+/** The claim's exaggeration, or the largest multiple of ten under it that keeps every needle within `MAX_LEAN`. */
+export function driftExaggeration(needles: Needle[], claim: number): number {
+  const most = Math.max(...needles.map((n) => Math.abs(n.orientation)));
+  return most * claim <= MAX_LEAN ? claim : Math.max(1, Math.floor(MAX_LEAN / most / 10) * 10);
+}
+
 /** Each pyramid a needle beside true north, its turn drawn `exaggeration` times larger, in building order. */
-export function northDriftSvg(needles: Needle[], exaggeration: number, width = 300): string {
-  const H = 150, len = 96, base = 124, step = width / needles.length, f = (z: number) => z.toFixed(1);
+export function northDriftSvg(needles: Needle[], exaggeration: number, width = 330): string {
+  const len = 72, base = 102, rows = needles.length > 4 ? 2 : 1, H = base + 2 + rows * 26, f = (z: number) => z.toFixed(1);
+  // room at either end for the outermost needles' lean
+  const pad = len * Math.sin((MAX_LEAN * Math.PI) / 180) - 8, step = (width - 2 * pad) / needles.length;
   return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="${needles.map((n) => `${n.king} ${arc(n.orientation)}`).join(', ')} from true north, drawn ${exaggeration} times larger">
   ${needles.map((n, i) => {
-    const x = step * (i + 0.5), a = (n.orientation * exaggeration * Math.PI) / 180;
+    // past four needles the labels take two rows, alternately, so neighbours do not run together
+    const x = pad + step * (i + 0.5), a = (n.orientation * exaggeration * Math.PI) / 180, dy = rows > 1 && i % 2 ? 26 : 0;
     return `<line class="dim" x1="${f(x)}" y1="${base}" x2="${f(x)}" y2="${base - len - 6}"/>
   <line class="wall draw-on${i ? ' late' : ''}" x1="${f(x)}" y1="${base}" x2="${f(x + len * Math.sin(a))}" y2="${f(base - len * Math.cos(a))}" pathLength="1"/>
-  <text class="here-lab" x="${f(x)}" y="${base + 12}" text-anchor="middle">${n.king}</text>
-  <text class="lab" x="${f(x)}" y="${base + 24}" text-anchor="middle">${arc(n.orientation)}</text>`;
+  ${dy ? `<line class="dim" x1="${f(x)}" y1="${base}" x2="${f(x)}" y2="${base + dy}"/>` : ''}
+  <text class="here-lab" x="${f(x)}" y="${base + dy + 12}" text-anchor="middle">${n.king}</text>
+  <text class="lab" x="${f(x)}" y="${base + dy + 24}" text-anchor="middle">${arc(n.orientation)}</text>`;
   }).join('\n  ')}
-  <text class="north" x="${f(step / 2 + 4)}" y="12">true north &#8593;</text>
+  <text class="north" x="${f(pad + step / 2 + 4)}" y="${base - len - 12}">true north &#8593;</text>
 </svg>`;
 }
 

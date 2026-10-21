@@ -1225,5 +1225,34 @@
     "citation": "Haklay, G. & Gopher, A. (2020). Geometry and Architectural Planning at Göbekli Tepe, Turkey. Cambridge Archaeological Journal 30(2), 343–357.",
     "url": "https://doi.org/10.1017/S0959774319000660",
     "note": "Peer-reviewed. CC BY-NC-ND 4.0 (Crossref's licence record). Read on 2026-10-20 in the publisher's PDF (sha256 4c784437743d4fa8fd6dea20968c0b929fbc2d73db38de30b6084bbea56a78a5): Enclosure D's dimensions on p. 347; Fig. 1 (p. 344), the main excavation area's schematic plan modified from O. Dietrich et al. 2014, with a 5 m scale bar and a north arrow, embedded at 485 by 672 px. Their geometric reading (an equilateral triangle of about 19.25 m through the centres of B, C and D, p. 350) is an interpretation, not a measurement. Fig. 1 is hosted unaltered in assets/plates/haklay-gopher-2020/ with the licence and attribution (Seked is non-commercial, Stewart, 20 October 2026)."
+  },
+  {
+    "id": "petrie-1892",
+    "kind": "survey",
+    "year": 1892,
+    "citation": "Petrie, W. M. F. (1892). Medum. London: D. Nutt.",
+    "note": "Not read here. Cited by dash-2017 (Table 3, p. 7, note 23: p. 6) for the casing alignments of the Meidum pyramid."
+  },
+  {
+    "id": "dorner-1986",
+    "kind": "paper",
+    "year": 1986,
+    "citation": "Dorner, J. (1986). Form und Ausmaße der Knickpyramide. Mitteilungen des Deutschen Archäologischen Instituts, Abteilung Kairo 42, 43-58.",
+    "note": "Not read here; the title is as the literature cites it, unchecked. Cited by dash-2017 (Table 3, p. 7, note 24: p. 51) for the Bent Pyramid's casing alignments."
+  },
+  {
+    "id": "dorner-1998",
+    "kind": "paper",
+    "year": 1998,
+    "citation": "Dorner, J. (1998). Die Absteckung und astronomische Orientierung ägyptischer Pyramiden. In: Stadelmann, R. (ed.), Die Rote Pyramide, cited by Dash (2017) as Dorner (1998), p. 23.",
+    "note": "Not read here and its full reference unchecked: dash-2017's bibliography is the only one consulted. Cited there (Table 3, p. 7, note 25: p. 23) for the Red Pyramid's east side."
+  },
+  {
+    "id": "wikidata-pyramid-coordinates",
+    "kind": "reference",
+    "year": 2026,
+    "citation": "Wikidata contributors. Meidum Pyramid (Q13444093), Bent Pyramid (Q459608), Red Pyramid (Q135332): coordinate location (P625). CC0.",
+    "url": "https://www.wikidata.org/wiki/Q135332",
+    "note": "Read through Special:EntityData on 2026-10-21 by the night builder (chunk 10), revisions 2543417441, 2527335327 and 2555589926: Meidum 29.38833333 N 31.15694444 E (precision one arc second), the Bent 29.790277777778 N 31.209166666667 E, the Red 29.808333333333 N 31.205833333333 E (no precision given). Cited only for where the sites' origins sit; nothing measured is taken from it."
   }
 ]

@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { TIER_WORDS, groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -90,15 +90,20 @@ function northDriftFigure(ground: Record<string, number> | null): string {
   const n = ground && northDrift(ground);
   const x = skyData.claims.C1?.exaggeration;
   if (!n || !x) return '<figcaption>The needles are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
-  return `${northDriftSvg(n, x)}<figcaption>No compass, but a method: each pyramid's sides against true north, in the order they were
-    built, drawn ${x} times larger. Khufu's is the smallest; after him it grows and swings east. Spence (2000) read that drift as the
-    builders lining up two stars that circle the pole, one above the other: the stars slowly moved, so the error dates each
-    pyramid. Meidum and Dahshur, before Khufu, are not yet in the records.</figcaption>`;
+  const k = driftExaggeration(n, x), steep = n.reduce((a, b) => (Math.abs(b.orientation) > Math.abs(a.orientation) ? b : a));
+  return `${northDriftSvg(n, k)}<figcaption>No compass, but a method: each pyramid's sides against true north, in the order they were
+    built, drawn ${k} times larger${k === x ? '' : ` (the north claim draws Khufu's ${x} times, which would tip ${steep.king}'s
+    ${Math.round(Math.abs(steep.orientation) * x)} degrees)`}. Sneferu's
+    three, Meidum, the Bent and the Red, close in on north; Khufu's is the smallest; after him it grows and swings east.
+    Spence (2000) read that drift as the builders lining up two stars that circle the pole, one above the other: the stars
+    slowly moved, so the error dates each pyramid. The first three are as Dash (2017) tabulates them from Petrie and Dorner,
+    not yet checked against their pages; the Red Pyramid's is its east side alone.</figcaption>`;
 }
 
 /** Spence's two stars computed: the plumb line's stray by year, each pyramid's turn as a year, the radiocarbon beside. */
 function poleStarsFigure(ground: Record<string, number> | null): string {
-  const n = ground && northDrift(ground);
+  // Giza's three only: Sneferu's would crowd the plot, and the caption reads Khufu first
+  const n = ground && northDrift(ground)?.filter((x) => x.site === 'giza');
   const star = (id: string) => skyData.named.find((s) => s.id === id);
   const mizar = star('mizar'), kochab = star('kochab');
   const p = n && mizar && kochab && poleStars(mizar, kochab, skyData.latitudeDeg, n, radiocarbon.reigns);

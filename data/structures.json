@@ -257,5 +257,29 @@
     "evidence": "excavated",
     "source": "haklay-gopher-2020",
     "note": "The largest and best preserved of the Layer III enclosures in the main excavation area: a ring of T-shaped pillars set in a stone wall round two larger central pillars, carved with arms, belts and a fox. Dug by the German Archaeological Institute from 1995. Excavated, c. 9500 BCE; its tier says nothing about Giza."
+  },
+  {
+    "id": "meidum.pyramid",
+    "site": "meidum",
+    "name": "The pyramid at Meidum",
+    "evidence": "excavated",
+    "source": "petrie-1892",
+    "note": "Begun as a step pyramid, probably under Huni, and finished as a true pyramid under Sneferu; its outer casing has since collapsed. Surveyed by Petrie in 1891."
+  },
+  {
+    "id": "dahshur.bent",
+    "site": "dahshur",
+    "name": "The Bent Pyramid of Sneferu",
+    "evidence": "excavated",
+    "source": "dorner-1986",
+    "note": "Sneferu's second pyramid at Dahshur, its slope lowered partway up; most of its casing survives."
+  },
+  {
+    "id": "dahshur.red",
+    "site": "dahshur",
+    "name": "The Red Pyramid of Sneferu",
+    "evidence": "excavated",
+    "source": "dorner-1998",
+    "note": "Sneferu's last pyramid, the first finished as a true pyramid from the start, a generation before Khufu's."
   }
 ]

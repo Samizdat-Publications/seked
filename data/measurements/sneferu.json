@@ -1,0 +1,38 @@
+[
+  {
+    "key": "meidum.pyramid.orientation",
+    "structure": "meidum.pyramid",
+    "quantity": "angle",
+    "value": -0.406667,
+    "unit": "deg",
+    "source": "petrie-1892",
+    "method": "casing-mean",
+    "note": "−24.4′, the average of the casing sides N. −35.4′, E. −20.6′, S. −23.6′, W. −18.1′, as Dash 2017 (dash-2017), Table 3, p. 7, gives them from Petrie 1892, p. 6. Negative is counterclockwise, west of north, the project's sense and Dash's (his note 17). Transcribed from Dash's table, read on the page image of the journal's PDF (sha256 816e5893ae038564a8892f6b1278c7ccbd5442e67f5b68c960218897c2548965) on 2026-10-21; not checked against Petrie. No sigma: Dash prints none, and the sides spread over 17′.",
+    "verified": false,
+    "site": "meidum"
+  },
+  {
+    "key": "dahshur.bent.orientation",
+    "structure": "dahshur.bent",
+    "quantity": "angle",
+    "value": -0.17,
+    "unit": "deg",
+    "source": "dorner-1986",
+    "method": "casing-mean",
+    "note": "−10.2′, the average of the casing sides N. −7.5′, E. −17.3′, S. −4.2′, W. −11.8′, as Dash 2017 (dash-2017), Table 3, p. 7, gives them from Dorner 1986, p. 51. Negative is west of north. Transcribed from Dash's table on the page image (the PDF named under meidum.pyramid.orientation); not checked against Dorner. No sigma printed.",
+    "verified": false,
+    "site": "dahshur"
+  },
+  {
+    "key": "dahshur.red.orientation",
+    "structure": "dahshur.red",
+    "quantity": "angle",
+    "value": -0.145,
+    "unit": "deg",
+    "source": "dorner-1998",
+    "method": "casing, one side",
+    "note": "−8.7′, the east side only: Dash 2017 (dash-2017), Table 3, p. 7, gives no other side and no average for the Red Pyramid, from Dorner 1998, p. 23. Negative is west of north. Transcribed from Dash's table on the page image (the PDF named under meidum.pyramid.orientation); not checked against Dorner. No sigma printed.",
+    "verified": false,
+    "site": "dahshur"
+  }
+]

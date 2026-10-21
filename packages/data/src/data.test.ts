@@ -35,8 +35,8 @@ describe('database', () => {
 });
 
 describe('sites and structures', () => {
-  it('registers Giza on Earth, the Cydonia placeholder on Mars, Hawara and Göbekli Tepe on Earth', () => {
-    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars', 'hawara:earth', 'gobekli-tepe:earth']);
+  it('registers Giza on Earth, the Cydonia placeholder on Mars, Hawara, Göbekli Tepe, Meidum and Dahshur on Earth', () => {
+    expect(db.sites.map((s) => `${s.id}:${s.body}`)).toEqual(['giza:earth', 'cydonia:mars', 'hawara:earth', 'gobekli-tepe:earth', 'meidum:earth', 'dahshur:earth']);
   });
   it('gives every structure an evidence tier and a known site', () => {
     const tiers = new Set(db.structures.map((s) => s.evidence));
@@ -55,7 +55,7 @@ describe('sites and structures', () => {
       const site = siteOf.get(m.structure) ?? siteOf.get(m.structure.split('.')[0] as string);
       if (site !== undefined) expect(m.site, m.key).toBe(site);
     }
-    expect(new Set(db.measurements.map((m) => m.site))).toEqual(new Set(['giza', 'hawara', 'gobekli-tepe']));
+    expect(new Set(db.measurements.map((m) => m.site))).toEqual(new Set(['giza', 'hawara', 'gobekli-tepe', 'meidum', 'dahshur']));
   });
   it('tiers Hawara by the rule: dug, published, announced, told', () => {
     const tier = (id: string) => db.structures.find((s) => s.id === id)?.evidence;
