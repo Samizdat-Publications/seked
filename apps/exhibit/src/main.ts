@@ -16,7 +16,7 @@ import allanRank from 'virtual:allan-rank';
 import luminescence from 'virtual:luminescence';
 import radiocarbon from 'virtual:radiocarbon';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -169,6 +169,16 @@ function hawaraDepthsFigure(ground: Record<string, number> | null, structures: {
     by tier, from the records.</figcaption>`;
 }
 
+/** How deep anyone has looked beside each claimed depth, from the records; with `tests`, chapter 9's test for each. */
+function lookedFigure(ground: Record<string, number> | null, structures: { id: string; evidence?: string }[] | undefined, tests: boolean): string {
+  const rows = ground && structures && lookedDepths(ground, structures);
+  if (!rows) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  return `${lookedSvg(rows, tests)}<figcaption>How deep has anyone looked? Each claim, dashed, beside the deepest anyone has dug
+    or drilled there, on a scale that grows tenfold at each mark. The 2008 boreholes stand beside the cavity, not in it, and their logs are unpublished; the 1978
+    holes into the Sphinx's anomalies left no depth on record. ${tests ? 'Below each, the test chapter 9 names. ' : ''}From the
+    records, none yet checked against its page.</figcaption>`;
+}
+
 /** The 2026 study's shape test, cited from its records, quietly. */
 function allanRankFigure(): string {
   const d = allanRank;
@@ -241,6 +251,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (shownFigure === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
+    if (shownFigure === 'looked' || shownFigure === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, shownFigure === 'looked-tests');
     if (player.leaf.interact === 'object:pyramid') objectFor(player.leaf);
   });
   // an object in the hand: three.js loads only when a leaf asks for one, and only once what it shows exists (the
@@ -286,6 +297,7 @@ async function start(): Promise<void> {
     if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground);
     if (id === 'hawara-depths') figure.innerHTML = hawaraDepthsFigure(ground, bundle?.structures);
+    if (id === 'looked' || id === 'looked-tests') figure.innerHTML = lookedFigure(ground, bundle?.structures, id === 'looked-tests');
     if (id === 'allan-rank') figure.innerHTML = allanRankFigure();
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;

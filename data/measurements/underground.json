@@ -20,5 +20,16 @@
     "method": "as claimed",
     "note": "A seismic refraction anomaly in front of the forepaws, read by the authors as a possible cavity about 5 m below the floor of the Sphinx enclosure. Never excavated. Depth below the enclosure floor, not below the pyramid's base plane. Entered from the structure's register note; the paper's page and figure are not yet recorded, so unverified.",
     "verified": false
+  },
+  {
+    "key": "sphinx.boreholes_2008.depth",
+    "structure": "sphinx",
+    "quantity": "length",
+    "value": 20.0,
+    "unit": "m",
+    "source": "ysi-2009-sphinx",
+    "method": "as published",
+    "note": "Four 4-inch boreholes, PZ/S1 to S4, drilled early in 2008 by the SCA and Cairo University's Engineering Center for Archaeology and Environment '20 meters (66 feet) deep into the bedrock' around the Sphinx, to watch the groundwater; cameras were lowered into them, and no log of the rock has been published. Depth below each hole's own ground, about the enclosure's level by the printed elevations. Entered from the source's register note (pp. 1 to 2), which came from the chapter 8 research job; not yet checked against the page here, so unverified.",
+    "verified": false
   }
 ]

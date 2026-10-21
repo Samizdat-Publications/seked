@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -210,6 +210,24 @@ describe("Hawara's depths", () => {
     const svg = hawaraDepthsSvg(rows);
     for (const c of ['statue', 'instrumented', 'claimed-box']) expect(svg).toContain(`<rect class="${c}"`);
     expect(svg).toContain('8 to 12 m, claimed');
+  });
+});
+
+describe('how deep anyone has looked', () => {
+  const db = loadDatabase();
+  const rows = lookedDepths(groundEnvironment(db), db.structures)!;
+  it("puts each claim's depth beside the deepest look, every figure a record and each tier its structure's", () => {
+    expect(rows.map((r) => [r.top, r.bottom, r.looked])).toEqual([[5, 5, 20], [648, 648, 3], [8, 12, 7.3152]]);
+    expect(rows.map((r) => r.tier)).toEqual(['claimed', 'claimed', 'claimed']);
+    const { ['sphinx.boreholes_2008.depth']: _b, ...rest } = groundEnvironment(db);
+    expect(lookedDepths(rest, db.structures)).toBeNull();
+  });
+  it("names chapter 9's tests only when asked", () => {
+    expect(lookedSvg(rows)).not.toContain('test:');
+    const svg = lookedSvg(rows, true);
+    expect(svg).toContain('test: dig below the chips');
+    expect(svg).toContain('8 to 12 m, claimed');
+    expect(svg).toContain('looked: 20 m');
   });
 });
 

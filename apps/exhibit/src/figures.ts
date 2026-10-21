@@ -41,7 +41,7 @@
  * (data/measurements/orion-correlation.json); the p-value is their quotient.
  */
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'joint-claim', 'allan-rank'] as const;
+export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'joint-claim', 'allan-rank'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -500,6 +500,65 @@ export function hawaraDepthsSvg(rows: HawaraRow[], width = 300): string {
   <line class="dim" x1="${x + 14}" y1="${f(mid)}" x2="132" y2="${f(y - 3)}" style="stroke-dasharray: none; stroke-width: 0.5"/>
   <text class="here-lab" x="136" y="${f(y - 2)}">${r.label}</text><text class="lab" x="136" y="${f(y + 10)}">${m(r.top)} to ${m(r.bottom)} m, ${r.tier}</text>`;
   }).join('\n  ')}
+</svg>`;
+}
+
+export interface LookedRow {
+  claim: string; tier: string; top: number; bottom: number;
+  /** The deepest anyone has dug, drilled or surveyed there, and who; null where nobody has. */
+  looked: number | null; by: string; test: string;
+}
+
+/**
+ * Each claimed depth beside how deep anyone has actually looked there, from the records: a key with a leading minus is
+ * a height on its structure's base plane, turned into a depth. `test` is chapter 9's words for what would settle it.
+ */
+const LOOKED = [
+  { claim: 'cavity under the paws', structure: 'sphinx.paw-cavity', keys: ['sphinx.paw_cavity.top.depth', 'sphinx.paw_cavity.top.depth'],
+    looked: 'sphinx.boreholes_2008.depth', by: 'boreholes of 2008, beside it', test: 'open the cavity' },
+  { claim: 'wells under Khafre', structure: 'g2.sar-shafts', keys: ['-g2.sar.wells.bottom.up', '-g2.sar.wells.bottom.up'],
+    looked: '-g2.passage.horizontal.floor.begin.up', by: 'its own rooms; none drilled', test: 'release the radar data' },
+  { claim: 'walls at Hawara', structure: 'hawara.mataha-walls', keys: ['hawara.mataha.walls.depth.min', 'hawara.mataha.walls.depth.max'],
+    looked: 'hawara.labyrinth.chips.depth.south_foot.max', by: 'Petrie, through the chips', test: 'dig below the chips' },
+];
+
+/** The rows from the environment, each claim's tier its structure's; null until every record and structure is there. */
+export function lookedDepths(env: Record<string, number>, structures: { id: string; evidence?: string }[]): LookedRow[] | null {
+  const depth = (k: string) => (k.startsWith('-') ? (env[k.slice(1)] === undefined ? undefined : -env[k.slice(1)]!) : env[k]);
+  const rows: LookedRow[] = [];
+  for (const r of LOOKED) {
+    const [a, b] = r.keys.map(depth), looked = depth(r.looked);
+    const tier = structures.find((x) => x.id === r.structure)?.evidence;
+    if (a === undefined || b === undefined || looked === undefined || !tier) return null;
+    rows.push({ claim: r.claim, tier, top: Math.min(a, b), bottom: Math.max(a, b), looked, by: r.by, test: r.test });
+  }
+  return rows;
+}
+
+/**
+ * Each claim a row on one logarithmic depth axis (1 to 1,000 m, since the wells are a hundred times deeper than the
+ * rest): the claim dashed as its tier is drawn, under it how deep anyone has looked in stone. With `tests`, each row
+ * also names what would settle it, as chapter 9 says.
+ */
+export function lookedSvg(rows: LookedRow[], tests = false, width = 300): string {
+  const pad = 14, row = tests ? 66 : 54, top = 4, h = top + rows.length * row + 24, f = (z: number) => z.toFixed(1);
+  const X = (d: number) => pad + (Math.log10(Math.min(1000, Math.max(1, d))) / 3) * (width - 2 * pad);
+  const m = (d: number) => `${+d.toFixed(1)}`;
+  return `<svg viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="How deep anyone has looked, beside each claimed depth: ${rows.map((r) => r.claim).join(', ')}">
+  ${rows.map((r, i) => {
+    const y = top + i * row + 22, wide = r.bottom - r.top > 0.5;
+    const claim = wide
+      ? `<rect class="${r.tier === 'claimed' ? 'claimed-box' : 'instrumented'}" x="${f(X(r.top))}" y="${y - 3}" width="${f(X(r.bottom) - X(r.top))}" height="6"/>`
+      : `<line class="claimed" x1="${f(X(1))}" y1="${y}" x2="${f(X(r.bottom))}" y2="${y}"/><rect class="claimed-box" x="${f(X(r.bottom) - 3)}" y="${y - 3}" width="6" height="6"/>`;
+    const looked = r.looked === null ? '' : `<line class="wall draw-on late" x1="${f(X(1))}" y1="${y + 12}" x2="${f(X(r.looked))}" y2="${y + 12}" pathLength="1"/>`;
+    return `<text class="here-lab" x="${pad}" y="${y - 8}">${r.claim} <tspan class="lab">${wide ? `${m(r.top)} to ` : ''}${m(r.bottom)} m, ${r.tier}</tspan></text>
+  ${claim}
+  ${looked}<text class="here-lab" x="${pad}" y="${y + 24}">looked: ${r.looked === null ? 'nobody' : `${m(r.looked)} m, ${r.by}`}</text>${tests ? `
+  <text class="lab" x="${pad}" y="${y + 36}">test: ${r.test}</text>` : ''}`;
+  }).join('\n  ')}
+  <line class="dim" x1="${pad}" y1="${h - 20}" x2="${width - pad}" y2="${h - 20}"/>
+  ${[1, 10, 100, 1000].map((d) => `<line class="wall" x1="${f(X(d))}" y1="${h - 23}" x2="${f(X(d))}" y2="${h - 17}" style="stroke-width: 1"/>`).join('')}
+  ${[1, 10, 100, 1000].map((d) => `<text class="north" x="${f(X(d))}" y="${h - 6}" text-anchor="${d === 1 ? 'start' : d === 1000 ? 'end' : 'middle'}">${d.toLocaleString('en-GB')} m</text>`).join('')}
 </svg>`;
 }
 
