@@ -361,7 +361,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `ch3-west`: the wall in section, schematic, the same worn profile on the core and the granite's back, captioned as
   the claim and not a survey; it holds no measurement. Both looked at at both sizes and cued in play (5 to 11 s in).
   3 tests; `pnpm test` 1200 passed.
-- [ ] **E17c. The statue sockets on the hall floor.** `khafre_valley_temple.hall.socket.pitch` and
+- [x] **E17c. The statue sockets on the hall floor.** `khafre_valley_temple.hall.socket.pitch` and
   `.socket.first.east` exist (scaled from Hölscher's Blatt XVII). Draw the row of sockets on `ch3-statues`'s floor
   as registered lines in the scene: find how `apps/walk/overlays.json` is generated, add the row there from the
   records (never typed into the overlay), and cue it on "statues".
@@ -374,6 +374,16 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `valley-sockets`. It also types the count: `range(7)` in `plan()`, where Hölscher's seven is only in the pitch
   record's note; a `khafre_valley_temple.hall.socket.count` record (`hoelscher-1912`, unchecked) should replace it.
   Best done by the laptop session, which can render the hall after the move and see that nothing shifted.
+  *Done 2026-10-21 01:07 UTC, `59838a0` (chunk 9), the code; a render of the hall should confirm nothing moved.*
+  `plan()`, `_r()`, `statue_spots()`, `TEMPLE` and `FLOOR_LIFT` are cut verbatim into `render/giza/valley_plan.py` and
+  `centroid` into `render/giza/rings.py`, both free of bpy; `valley_temple.py` and `temples.py` import them back, so
+  `temples.centroid` still works. The count is the record `khafre_valley_temple.hall.socket.count` (7, `hoelscher-1912`,
+  "counted on plate", unchecked), moved from `range(7)`. `publish.overlays()` writes `valley-sockets` before its
+  tour-values early return: a 0.6 m mark across each long-hall statue spot at the floor, a dashed line along each row, and
+  a label with the pitch record and "the south row mirrored". Written into `apps/walk/overlays.json` (that key alone, so
+  the rest stays the laptop's last publish) and cued on "statues" in `ch3-statues` (decision 63). 4 render tests
+  (`render/tests/test_valley_plan.py`). Looked at: turned west down the long hall (yaw 285, pitch -6) the nearest mark
+  on each side meets a statue's feet; the others are drawn across the pillars hiding their statues.
 - [x] **E18. Chapter 4, "The First Time": its leaves.** Cut chapter 4 likewise, on panoramas that exist, with
   `until` stand-ins where a station is new; receipts as the script assigns them; the queue run.
   *Done 2026-10-20 23:41 UTC, `8495e43`.* 11 leaves, every word in order and inside `ch4.json`. The texts (Turin,
@@ -550,7 +560,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
   `build/gobekli/p43-height-a.png`, or an outline from the excavators' drawing, labelled a reconstruction) laid over
   the sky `@seked/sky` computes at Göbekli Tepe, with Sweatman and Tsikritsis's date as the claim's free choice and
   the reply. See `docs/gobekli-reliefs.md`.
-  *Waiting on Stewart (chunk 9, 01:05 UTC):* the relief exists only as `build/gobekli/p43-height-a.png` on the laptop,
+  *Waiting on Stewart (chunk 9, 01:02 UTC):* the relief exists only as `build/gobekli/p43-height-a.png` on the laptop,
   made from the excavators' drawing via Collins's page, which `docs/gobekli-reliefs.md` says is looked at, not
   republished; laying it on a public page is his call. And the date and the figures' pairing (vulture as Cygnus,
   scorpion as Scorpius) are the claim's inputs, so they want a claim file citing Sweatman and Tsikritsis 2017, read
@@ -558,7 +568,7 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 - [ ] **E26. The world's pyramids on a globe and a timeline** (chapter 9's closing leaf, the plan's "Added 20
   October"): imported sites with date ranges, the best-fit great circle as the claim, the same fit for random sites in
   the same latitude band as the reply.
-  *First step done 2026-10-21 01:05 UTC, `d8c1c2d` (chunk 9): the arithmetic.* `apps/exhibit/src/greatcircle.ts`: the
+  *First step done 2026-10-21 01:02 UTC, `d8c1c2d` (chunk 9): the arithmetic.* `apps/exhibit/src/greatcircle.ts`: the
   least-squares great circle through a set of sites (its pole the smallest eigenvector of the sites' summed outer
   products, by Jacobi rotations), each site's signed distance off it in degrees, and the reply, the same fit for as many
   random sites spread by area over the same band of latitude, from a seeded generator, with the share that come as
@@ -794,6 +804,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
    so the gap between the stars' dates and the radiocarbon dates is computed, never typed. Reversible in
    `src/polestars.ts`.
 
+63. **The sockets are cued on `ch3-statues` but its view is kept**, the close-up of one transverse-hall statue: the
+   socketed rows run west of the camera, behind the visitor, so in play the overlay is out of frame and a visitor who
+   turns round finds it. Turning the leaf west would show the rows, but drawn across the pillars that hide most of the
+   statues (overlays have no depth), and would throw away the leaf's queued patch. A clean view wants a camera in the
+   long hall's middle aisle (For the laptop). Reversible: the leaf's `view` in `apps/exhibit/leaves.json`.
+
 ## For Stewart
 
 - **The prototype is ready to judge in the browser**, on the walkthrough's panoramas until tonight's renders land:
@@ -845,6 +861,12 @@ laptop session (`laptop-lead`), which renders, looks and merges. The builder wor
 ## For the laptop
 
 Renders the laptop session should run, with the queue or command, as items need them.
+
+- **The valley temple after E17c's move** (`59838a0`): `plan()` now lives in `render/giza/valley_plan.py`. Render
+  `valley-temple` built once (or a preview) and compare with the current panorama: nothing should have moved. Then
+  `python render/publish.py` rewrites `apps/walk/overlays.json` whole, `valley-sockets` included. If the sockets should
+  be seen from in front, a station in the long hall's middle aisle, looking west between the two rows of statues, would
+  show both rows with no pillar between; say if you want one and the builder will add it and move `ch3-statues` there.
 
 - **`orion` First Time at `night-dark`** (already queued for E15) now also carries chapter 4's opening: until it is
   rendered, the walkthrough's `orion-first-time.jpg` stands in, and it shows the three pyramids in the First Time
