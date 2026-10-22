@@ -1,6 +1,20 @@
 {
- "about": "22 October: the claim eras' Sphinx re-cut as rock (scripts/sphinx_lab/rock.py); every panorama that shows it close, re-rendered",
+ "about": "22 October: the claim eras' Sphinx re-cut as rock (scripts/sphinx_lab/rock.py), the head rising with the raised back; every panorama that shows it close, and chapter 2's Leo at twilight",
  "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-twilight",
+   "size": "1600x800",
+   "samples": 48,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/test-twilight/sphinx-back-first-time-equinox-twilight.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-twilight",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-back-first-time-equinox-twilight.png"
+  },
   {
    "state": "first-time",
    "station": "sphinx-back",
@@ -43,6 +57,12 @@
    "state": "first-time",
    "station": "sphinx-side",
    "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-lion-equinox-dawn.png"
   },
   {
    "state": "lion",

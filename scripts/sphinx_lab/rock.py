@@ -79,7 +79,8 @@ PARAMS = {
     "hard_share": 0.55,     # a hard bed's thickness against a soft one's
     "joint_skip": 0.35,     # the chance a joint stops short of the foot
     "back_to": 11.6,        # m: the top of the back raised to this (the master's is 9.8; Member III's root at 12.5)
-    "neck_top": 15.0,       # m: above this the head is left as drawn; between, the neck takes the raise up
+    "neck_top": 15.0,       # m: the widening fades out from the back up to here, so the head keeps its own width
+    "head_rise": 1.2,       # m: how far the crown rises with the raised back
     "widen": 1.3,           # the body widened towards ARCE's 19.1 m (the master's is 14.3), the head not
     "head_u": 0.5,
     "fore_u": 0.78,         # from here forward and under fore_z, the forelegs and paws: worn smooth, no beds
@@ -192,8 +193,12 @@ def proportion(mesh, P):
     body = u < P["head_u"]
     back = float(np.percentile(z[body & (u > 0.1)], 99))
     k = P["back_to"] / back
+    # above the back, neck and head rise together, gently compressed so the crown rises by head_rise: squeezing the
+    # whole rise into the neck sat the lion's head low on the raised body like a cap (sphinx-side, 22 October)
+    crown = float(z.max())
+    a = (crown + P["head_rise"] - P["back_to"]) / (crown - back)
+    z2 = np.where(z <= back, z * k, P["back_to"] + (z - back) * a)
     top = P["neck_top"]
-    z2 = np.where(z <= back, z * k, np.where(z < top, P["back_to"] + (z - back) * (top - P["back_to"]) / (top - back), z))
     fade = np.clip((top - z) / (top - back), 0.0, 1.0)
     w = 1.0 + (P["widen"] - 1.0) * fade
     cx = (co[:, 0].min() + co[:, 0].max()) / 2
@@ -201,7 +206,7 @@ def proportion(mesh, P):
     co[:, 2] = z2
     mesh.vertices.foreach_set("co", co.ravel())
     mesh.update()
-    print(f"proportioned: back {back:.2f} -> {P['back_to']} m, widened {P['widen']}", flush=True)
+    print(f"proportioned: back {back:.2f} -> {P['back_to']} m, crown {crown:.2f} -> {crown + P['head_rise']:.2f} m, widened {P['widen']}", flush=True)
 
 
 def rebuild(mesh, P):
