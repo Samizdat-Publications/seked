@@ -12,6 +12,7 @@ exhibit's leaves are cut from the script, so the script must say the same words.
 is ELEVENLABS_API_KEY in the environment or ~/.seked/keys.env, and is never printed or sent to the page.
 """
 import base64
+import hashlib
 import json
 import os
 import subprocess
@@ -156,6 +157,8 @@ def apply():
         a = take["alignment"]
         meta["files"][part] = {"file": name, "text": take["text"], "seconds": round(a["end"][-1], 2), "alignment": a}
         meta["voice"] = take["voice"]
+        found = ns.chapters(open(ns.SCRIPT, encoding="utf-8").read())[n]   # so narrate_script.py sees it as current
+        meta["sha256"] = hashlib.sha256(json.dumps([found[0], found[1], ns.VOICE], sort_keys=True).encode()).hexdigest()
         with open(meta_path, "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False)
         print(f"{item_id}: {tid}")
