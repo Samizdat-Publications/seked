@@ -45,6 +45,27 @@ Gemini and ElevenLabs are approved: spend what it takes.*
   camera motion, the green-era grass and the tourists, two lines it calls redundant ("Nobody disputes that", "You
   can only carve a smaller shape out of a larger one"), and ambient sound.
 
+## 0b. Decisions taken while Stewart was away (22 October, evening)
+
+Stewart: "don't let me be a blocker on anything, make decisions, log them and keep going." These were decided here;
+any can be reversed.
+
+1. **The trailer's night shot draws its sky.** `ch0-t05` had no live sky, so it showed a blank night (Stewart's
+   note). It now draws 2450 BCE's stars, Orion in gold, the meridian and Alnitak on it, framed to keep the
+   pyramids at the foot (view 182/25/84).
+2. **The long rains' lion is less deeply channelled** (Stewart: "I don't think the sphinx has channels that deep").
+   Coves 1.1 m instead of 1.6, joints 0.6 m and narrow instead of 1.5 m. Reasoning: the body's beds are worn back on
+   the order of a metre and its joints are cracks; the deep vertical runnels are mostly a feature of the ditch walls.
+   To check against ARCE's elevations when someone reads them.
+3. **Every reply shot says what it shows**, with callouts in the scene (chapters 1, 2, 3, 5, 6). Chapter 3's shot
+   was re-aimed: the ruin it first pointed at is not Menkaure's temple, which stands at bearing 307 from the station.
+   Chapters 4, 7, 8 and 9 have no callouts yet (the plateau today; the ditch floor; the opening view).
+4. **Scene callouts are larger** (up to 1.9 times on a wide screen), after the critic's "illegible panels".
+5. **Leo is two shots**: the lion facing the eastern glow, then a turn up to Leo rising; the words are unchanged.
+6. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
+   only carve a smaller shape out of a larger one", and ambient sound. Those change the script or add a new layer,
+   and wait for Stewart.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of
