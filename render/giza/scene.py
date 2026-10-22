@@ -283,6 +283,9 @@ class Plateau:
             self.sky.sun.data.energy = energy * veil["scale"]
             self.sky.sun.data.angle = math.radians(veil["angle"])
         self.log(f"sun at {alt:.1f} deg altitude, {az:.1f} deg azimuth (declination {dec:.1f}), beam {energy:.0f}")
+        if "exposure" in m:
+            # a twilight: the sun under the horizon, the sky's own glow a dozen stops under the day's (look choice)
+            self.scene.view_settings.exposure = m["exposure"]
         if not getattr(self, "inside", False) and not getattr(self, "in_hall", False):
             self._shadow_check(alt, az)
 
