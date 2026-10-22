@@ -69,6 +69,7 @@
       "solar": 12.0,
       "label": "midday, November, the sun over the south wall of the ditch"
     },
+    "equinox-twilight": {"date": "03-20", "solar": 5.35, "label": "nautical twilight at the spring equinox, the sun about 8 degrees below the eastern horizon: the stars still out over the dawn glow, for the exhibit to draw the claim's constellation over live (the critic on version 3: Leo drawn over daylight read as an unfinished preview)"},
     "equinox-dawn": {
       "date": "03-20",
       "solar": 7.25,

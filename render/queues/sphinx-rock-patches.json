@@ -1,0 +1,85 @@
+{
+ "about": "22 October: the patches over the claim eras' re-rendered Sphinx panoramas (render/queues/sphinx-rock.json)",
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-back-first-time-equinox-dawn-ch2-drift.png",
+   "patch": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch2-drift",
+    "pano": "pano/sphinx-back-first-time.jpg"
+   }
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-first-time-equinox-dawn-ch0-claim.png",
+   "patch": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 57.2,
+    "aspect": 1.777778,
+    "leaf": "ch0-claim",
+    "pano": "pano/sphinx-first-time-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-flank-first-time-equinox-dawn-ch1-ice-age.png",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch1-ice-age",
+    "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-flank-first-time-equinox-dawn-ch4-stela.png",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch4-stela",
+    "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-flank-lion-equinox-dawn-ch1-exposure.png",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch1-exposure",
+    "pano": "pano/sphinx-flank-lion-equinox-dawn.jpg"
+   }
+  }
+ ]
+}

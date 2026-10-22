@@ -107,7 +107,8 @@ def material(mesh, name="sphinx limestone", fresh=False):
     brk.inputs["Scale"].default_value = 0.9
     brk.inputs["Detail"].default_value = 4.0
     w_hard = ramp(math("ADD", hard, math("MULTIPLY", math("SUBTRACT", brk.outputs["Fac"], 0.5), 0.35)), 0.45, 0.6)
-    w_foot = ramp(member, 0.2, 0.05)
+    # Member I's own grey only once weathered: on the day it was cut the foot is the same dressed stone as the body
+    w_foot = math("MULTIPLY", ramp(member, 0.2, 0.05), 0.0 if fresh else 1.0)
     hard_col = mix(1.0, hard_c, HARD_TINT, "MULTIPLY")
     soft_col = mix(1.0, soft_c, SOFT_TINT, "MULTIPLY")
     if fresh:

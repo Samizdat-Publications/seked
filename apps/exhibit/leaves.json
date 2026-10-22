@@ -141,13 +141,13 @@
   {
    "id": "ch0-t08",
    "chapter": 0,
-   "station": "sphinx",
+   "station": "sphinx-face",
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 280,
-    "pitch": -2,
-    "fov": 44
+    "yaw": 270,
+    "pitch": 8,
+    "fov": 70
    },
    "arrive": "cut",
    "say": "If he is right, a civilisation was lost at the end of the Ice Age.",
@@ -1046,13 +1046,13 @@
   {
    "id": "ch7-schoch",
    "chapter": 7,
-   "station": "sphinx",
+   "station": "sphinx-face",
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 280,
-    "pitch": -2,
-    "fov": 44
+    "yaw": 260,
+    "pitch": 10,
+    "fov": 60
    },
    "arrive": "cut",
    "say": "Schoch points to it when asked where the older civilisation was.",
@@ -1065,13 +1065,13 @@
   {
    "id": "ch7-plan",
    "chapter": 7,
-   "station": "sphinx",
+   "station": "sphinx-face",
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
     "yaw": 280,
-    "pitch": -2,
-    "fov": 44
+    "pitch": 0,
+    "fov": 80
    },
    "arrive": "turn",
    "say": "If hunters could raise this, a plan at Giza in the Ice Age is not absurd.",
