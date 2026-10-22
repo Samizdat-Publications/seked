@@ -3,7 +3,7 @@ A local page for choosing the narration take by ear: every chapter's narration a
 a player on each, the text and the voice settings editable, and a button that records a new take with ElevenLabs.
 
     python scripts/voice_lab.py            # serve http://localhost:5197 (the key stays on this machine)
-    python scripts/voice_lab.py apply      # copy the picked takes into assets/narration/, alignment and all
+    python scripts/voice_lab.py apply      # the picked takes into assets/narration/, tightened (TIGHTEN), alignment and all
 
 Takes live in build/voice-lab/ (gitignored): takes/<id>.mp3 and takes.json (text, settings, alignment, which is
 picked). The first run seeds each item with the current recording and the first one (git a3de4f0), so the old
@@ -24,6 +24,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import narrate_script as ns  # noqa: E402
+from tighten import tighten  # noqa: E402
 
 LAB = os.path.join(ROOT, "build", "voice-lab")
 TAKES = os.path.join(LAB, "takes")
@@ -31,6 +32,8 @@ STATE = os.path.join(LAB, "takes.json")
 NARRATION = os.path.join(ROOT, "assets", "narration")
 FIRST = "a3de4f0"   # the first recording, all ten chapters
 PORT = 5197
+# Stewart's choice by ear, 22 October 2026: pauses cut to 0.45 s and the read 15% faster, its pitch kept
+TIGHTEN = {"pause": 0.45, "tempo": 1.15}
 
 
 def key():
@@ -151,11 +154,13 @@ def apply():
             continue
         n, part = item["chapter"], item["part"]
         name = f"ch{n}.mp3" if part == "narration" else f"ch{n}-reply.mp3"
-        open(os.path.join(NARRATION, name), "wb").write(open(os.path.join(TAKES, tid + ".mp3"), "rb").read())
+        remap, _ = tighten(os.path.join(TAKES, tid + ".mp3"), os.path.join(NARRATION, name), **TIGHTEN)
         meta_path = os.path.join(NARRATION, f"ch{n}.json")
         meta = json.load(open(meta_path, encoding="utf-8"))
         a = take["alignment"]
-        meta["files"][part] = {"file": name, "text": take["text"], "seconds": round(a["end"][-1], 2), "alignment": a}
+        a = {"characters": a["characters"], "start": [remap(x) for x in a["start"]], "end": [remap(x) for x in a["end"]]}
+        meta["files"][part] = {"file": name, "text": take["text"], "seconds": round(a["end"][-1], 2), "alignment": a,
+                               "take": tid, "tightened": TIGHTEN}
         meta["voice"] = take["voice"]
         found = ns.chapters(open(ns.SCRIPT, encoding="utf-8").read())[n]   # so narrate_script.py sees it as current
         meta["sha256"] = hashlib.sha256(json.dumps([found[0], found[1], ns.VOICE], sort_keys=True).encode()).hexdigest()
