@@ -148,6 +148,7 @@ export class Player {
     else { this.stage.show(this.shot(L)); begin(); }
     this.offerCompare();
     void this.recording(L.chapter);
+    void this.replyRecording(L.chapter);
     const next = this.leaves[i + 1];
     if (next) void this.recording(next.chapter);
     const ahead = next && { yaw: next.view.yaw * DEG, pitch: next.view.pitch * DEG, fov: next.view.fov * DEG };
@@ -333,16 +334,41 @@ export class Player {
 
   private replyAudio: HTMLAudioElement | null = null;
 
+  private replies = new Map<number, Promise<{ rec: NonNullable<ChapterRecording['files']['reply']>; url: string } | null>>();
+
+  /**
+   * A chapter's spoken reply and its audio, fetched once and held in memory: fetched when the reply was due, it
+   * left nearly four seconds of silence before it (the critic's capture, 22 October), so go() asks ahead.
+   */
+  private replyRecording(chapter: number): Promise<{ rec: NonNullable<ChapterRecording['files']['reply']>; url: string } | null> {
+    let r = this.replies.get(chapter);
+    if (!r) {
+      r = (async () => {
+        try {
+          const res = await fetch(new URL(recordingUrl(chapter), location.href));
+          const rec = res.ok ? ((await res.json()) as ChapterRecording).files.reply : undefined;
+          if (!rec) return null;
+          const audio = await fetch(new URL(recordingUrl(chapter, rec.file), location.href));
+          return audio.ok ? { rec, url: URL.createObjectURL(await audio.blob()) } : null;
+        } catch {
+          return null;
+        }
+      })();
+      this.replies.set(chapter, r);
+    }
+    return r;
+  }
+
   /** The chapter's recorded spoken reply (chN-reply.mp3), captioned, then on; silent and straight on if there is none. */
   private speakReply(token: number, chapter: number, done: () => void, from = 0): void {
     void (async () => {
       try {
-        const res = await fetch(new URL(recordingUrl(chapter), location.href));
-        const rec = res.ok ? ((await res.json()) as ChapterRecording).files.reply : undefined;
-        if (!rec || token !== this.token) { done(); return; }
+        const got = await this.replyRecording(chapter);
+        const rec = got?.rec;
+        if (!got || !rec || token !== this.token) { done(); return; }
         this.ui.caption.textContent = `The archaeologists' reply: ${rec.text}`;
         this.ui.caption.classList.add('reply-voice');
-        const a = new Audio(new URL(recordingUrl(chapter, rec.file), location.href).href);
+        const a = new Audio(got.url);
         this.replyAudio = a;
         this.sounding = { leaf: this.leaf.id, part: 'reply', audio: a };
         if (from > 0) a.currentTime = from;
