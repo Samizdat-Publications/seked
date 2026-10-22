@@ -9,8 +9,8 @@ const script = readFileSync(join(repo, 'docs', 'script.md'), 'utf8');
 const leaves = readLeaves(JSON.parse(readFileSync(join(repo, 'apps', 'exhibit', 'leaves.json'), 'utf8')));
 
 describe('the reply', () => {
-  it('is there, spoken and in full, for every chapter the leaves cover', () => {
-    for (const ch of new Set(leaves.map((L) => Number(L.reply.slice(2))))) {
+  it('is there, spoken and in full, for every chapter the leaves cover but the trailer', () => {
+    for (const ch of new Set(leaves.map((L) => Number(L.reply.slice(2))).filter((n) => n !== 0))) {
       const r = chapterReply(script, ch);
       expect(r.spoken.length, `chapter ${ch}`).toBeGreaterThan(40);
       expect(r.full.length, `chapter ${ch}`).toBeGreaterThan(r.spoken.length);

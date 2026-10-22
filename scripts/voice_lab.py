@@ -127,10 +127,10 @@ def generate(item_id, text, voice):
 
 
 def batch():
-    """One take in the project's voice for every item that has none, picked as the default."""
+    """One take in the project's voice of the script's words for every item that has none, picked as the default."""
     state = load()
     for item in script_items():
-        mine = [t for t in state["takes"] if t["item"] == item["id"] and t["voice"] == ns.VOICE]
+        mine = [t for t in state["takes"] if t["item"] == item["id"] and t["voice"] == ns.VOICE and t["text"] == item["text"]]
         if mine:
             continue
         take = generate(item["id"], item["text"], ns.VOICE)
@@ -142,9 +142,19 @@ def batch():
 
 def apply():
     state, script = load(), {i["id"]: i for i in script_items()}
+    for n, (narration, reply) in ns.chapters(open(ns.SCRIPT, encoding="utf-8").read()).items():
+        meta_path = os.path.join(NARRATION, f"ch{n}.json")
+        if not reply and os.path.exists(meta_path):   # a part the script no longer has leaves the recording too
+            meta = json.load(open(meta_path, encoding="utf-8"))
+            if meta["files"].pop("reply", None):
+                with open(meta_path, "w", encoding="utf-8") as f:
+                    json.dump(meta, f, ensure_ascii=False)
+                if os.path.exists(os.path.join(NARRATION, f"ch{n}-reply.mp3")):
+                    os.remove(os.path.join(NARRATION, f"ch{n}-reply.mp3"))
+                print(f"ch{n}: its spoken reply removed, as the script has none")
     by_id = {t["id"]: t for t in state["takes"]}
     for item_id, tid in sorted(state["picks"].items()):
-        if not tid:
+        if not tid or item_id not in script:   # an item the script no longer has (version 3's trailer has no reply)
             continue
         take, item = by_id[tid], script[item_id]
         if take["text"] != item["text"]:

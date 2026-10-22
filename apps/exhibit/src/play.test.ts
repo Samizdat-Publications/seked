@@ -15,14 +15,15 @@ describe('the script', () => {
   it('has its ten chapters, titled', () => {
     const ch = scriptChapters(script);
     expect(ch.map((c) => c.n)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    expect(ch[0]?.title).toBe('Cold open');
-    expect(ch[1]?.title).toBe('Older than it should be');
+    expect(ch[0]?.title).toBe('Trailer');
+    expect(ch[1]?.title).toBe('Rain on the stone');
   });
   it('gives each chapter its reply and its spoken reply, and nothing past them', () => {
     const reply = scriptPart(script, 1, 'The reply');
     expect(reply.startsWith('The strongest answer is the order of building.')).toBe(true);
     expect(reply).not.toContain('**');
-    expect(scriptPart(script, 0, 'Spoken reply')).toBe("Archaeologists answer that the Sphinx was cut from Khafre's quarry about 2500 BCE. Each chapter sets their reasons beside the claim.");
+    expect(scriptPart(script, 1, 'Spoken reply')).toMatch(/^Archaeologists answer that the ditch was Khafre's quarry/);
+    expect(scriptPart(script, 0, 'Spoken reply')).toBe('');   // the trailer promises the replies; each beat gives its own
     expect(scriptPart(script, 42, 'The reply')).toBe('');
   });
 });
@@ -30,8 +31,8 @@ describe('the script', () => {
 describe('chapterStarts', () => {
   it('finds the first leaf of each chapter', () => {
     const starts = chapterStarts(leaves, scriptChapters(script));
-    expect(starts[0]).toEqual({ chapter: { n: 0, title: 'Cold open' }, index: 0 });
-    expect(starts[1]?.chapter.title).toBe('Older than it should be');
+    expect(starts[0]).toEqual({ chapter: { n: 0, title: 'Trailer' }, index: 0 });
+    expect(starts[1]?.chapter.title).toBe('Rain on the stone');
     expect(leaves[starts[1]!.index]?.chapter).toBe(1);
     expect(leaves[starts[1]!.index - 1]?.chapter).toBe(0);
   });

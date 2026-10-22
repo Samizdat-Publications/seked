@@ -2,17 +2,25 @@
 
 # Seked: the script
 
+*Version 3, 22 October 2026: the trailer and the nine beats from `docs/script-v3-draft.md`, approved by Stewart for a first cut. Each chapter's beats, receipts and long reply below are version 2's and still stand; the narration and spoken reply are version 3's.*
+
 *First draft, 20 October 2026, edited the same day (the edits are listed at the end). It is built from `docs/research/ch1.md` to `ch8.md` (chapter 8's brief is now chapter 9's), `khafre-sar.md` and `labyrinth.md` for the new chapter 8, the claims in `data/claims/` and `docs/dossier.md` (generated 2 October; regenerate it before the receipts are wired). In the source lists, "(new)" marks an id that a brief proposed and checked, and "(new, unchecked)" marks one the brief did not check. Ids without a mark are already in `data/sources.json`.*
 
 ---
 
-## 0. Cold open
+## 0. Trailer
 
-**Narration** (70 words)
+**Narration** (138 words)
 
-Today's Sphinx wears a pharaoh's head, and the textbooks say Khafre's workmen carved it about 2500 BCE. Graham Hancock, Robert Bauval and the geologist Robert Schoch say it began as a lion, in a green Sahara, about 10,500 BCE.
+Every textbook says the Sphinx was carved about 2500 BCE, for the pharaoh Khafre.
 
-So how old is it? The walls of the ditch are where Schoch started. This piece gives their case as strongly as it can be made, and then the archaeologists' answer.
+The geologist Robert Schoch says rain wore it down thousands of years before that.
+
+Graham Hancock says it was a lion first, watching its own constellation rise. That its temples are far older than the king who used them. That Egypt's own records remember a First Time, written in the stars over Giza and in numbers built into the Great Pyramid. That Göbekli Tepe proves someone was building long before we thought possible. And that there are rooms underground no one has entered.
+
+If he is right, a civilisation was lost at the end of the Ice Age.
+
+Here is the case, at its strongest. At each step, what the archaeologists say back. And at the end, what it would take to settle it.
 
 **Beats**
 
@@ -32,21 +40,23 @@ So how old is it? The walls of the ditch are where Schoch started. This piece gi
 
 Egyptologists date the Sphinx to Khafre's reign, in the middle of the third millennium BCE, and they read that date from the ground the Sphinx stands in rather than from its face. Its ditch is a quarry. The blocks cut from it built the temple at its paws, and that temple was built after Khafre's Valley Temple, on its enclosure wall. The quarry's southern edge forms the side of Khafre's causeway. None of the physical dates taken at Giza, by radiocarbon or by luminescence, comes anywhere near 10,500 BCE. Colin Reader, a geologist who argues for an earlier Sphinx, puts it only a few centuries before Khufu. Each chapter that follows sets one part of this answer beside the claim it meets.
 
-**Spoken reply**: Archaeologists answer that the Sphinx was cut from Khafre's quarry about 2500 BCE. Each chapter sets their reasons beside the claim.
-
 **Sources**: `lehner-hawass-2017`, `hancock-bauval-1996`, `dobecki-schoch-1992`, `open-buildings-v3`, `open-buildings-25d-temporal`, `aera-sequence` (new), `reader-2026` (new; checked only through reviews), `liritzis-vafiadou-2015` (new), `bonani-2001` (new)
 
 ---
 
-## 1. Older than it should be
+## 1. Rain on the stone
 
-**Narration** (139 words)
+**Narration** (126 words)
 
-The Sphinx was not built. It was carved from bedrock, so the walls of its ditch are as old as the statue.
+The Sphinx was not built. It was carved out of the bedrock, so the walls of its ditch are as old as the statue.
 
-The geologist Robert Schoch read those walls as rain-cut: soft beds cut back into coves, fissures widest at the top. Wind and sand, he says, cut sharp level grooves. Even Colin Reader, who rejects his date, agrees water cut them. Archaeologists answer that the ditch was Khafre's quarry.
+The geologist Robert Schoch read those walls as cut by rain: soft beds worn back into deep coves, cracks widest at
+the top, where water ran in. Wind and sand, he says, cut sharp, level grooves instead. Even Colin Reader, who rejects
+his date, agrees that water did this.
 
-Then he looked under the floor. A 1992 seismic survey, by his account, found the rock weathered about two metres deep in front and a little over one behind. Deeper means longer exposed, so the front was cut first. On his most cautious reckoning the core is at least seven thousand years old; he prefers about 10,000 BCE. Other geologists say the rock's own layers could explain the difference.
+Then Schoch looked under the floor. A 1992 seismic survey, by his account, found the rock weathered about two metres
+deep in front and only a little over one behind. Deeper means longer exposed. On his most cautious reckoning the
+core is at least seven thousand years old. He prefers about 10,000 BCE.
 
 **Beats**
 
@@ -82,23 +92,25 @@ Then he looked under the floor. A 1992 seismic survey, by his account, found the
 
 The strongest answer is the order of building. The Sphinx Temple's core blocks match the lower beds of the Sphinx ditch, layer for layer. The temple was built on the enclosure wall of Khafre's Valley Temple, and the quarry's southern edge forms the side of Khafre's causeway. AERA, Mark Lehner's research group, puts the Sphinx "late in the sequence" of Khafre's works. That dates the last quarrying, but not necessarily the first cut. On the wear itself, Gauri and colleagues argue in the same journal as the seismic survey that the channels are ancient karst opened up by the digging, and that a dry climate can round soft beds. Harrell suggests the seismic contrast may be the rock's original layering, and Lehner notes that the lowest bed thins from the rump to the paws. Reader accepts that rain did it but puts the rain in the early dynasties. Nobody has drilled the floor to test either reading.
 
-**Spoken reply**: Archaeologists answer that the ditch was quarried for Khafre's temples, and geologists that old cracks and the rock's own layers can explain the wear. No one has drilled the floor to test either reading.
+**Spoken reply**: Archaeologists answer that the ditch was Khafre's quarry, and geologists that the rock's own layers
 
 **Sources**: `dobecki-schoch-1992`, `arce-sphinx-mapping-oc`, `arce-sphinx-1991`, `lehner-hawass-2017`, `schoch-sphinx-web` (new), `schoch-1992-kmt` (new, unchecked), `reader-giza-before-4th` (new), `reader-2001` (new), `gauri-1995` (new), `harrell-1994` (new), `lehner-1994-kmt` (new), `aera-sequence` (new), `kuper-kropelin-2006` (new; abstract only)
 
 ---
 
-## 2. A lion, not a king
+## 2. A lion first
 
-**Narration** (153 words)
+**Narration** (110 words)
 
-Look at the head. It wears a Fourth Dynasty king's headcloth, it is better kept than the body, and it is too small for it. Nobody disputes that.
+Look at the head. It wears a pyramid-age king's headcloth, it is better kept than the body, and it is too small for
+it. Nobody disputes that.
 
-Hancock, Bauval and Schoch say the figure was a lion first. Rain wore its head away, and a king of the pyramid age had a royal face cut into what was left. You can only carve a smaller form inside a larger one, so the new head came out small. Egyptologists say the head is small because the rock is harder there.
+Hancock, Bauval and Schoch say the figure was a lion first. Rain wore its head away, and a king of the pyramid age had
+his own face cut into what was left. You can only carve a smaller shape out of a larger one, so the new head came out
+small.
 
-The equinox sun rises almost due east in every age, so the gaze dates nothing. But the stars behind it drift. About 10,500 BCE, Hancock and Bauval calculate, the constellation Leo rose in the east just before the equinox sun. Egyptologists add that Leo is a Mesopotamian figure, late in Egypt.
-
-If the lion is that old, they argue, so are its temples.
+And the lion looks due east, where the sun rises at the equinox. About 10,500 BCE, Hancock and Bauval calculate, the
+constellation Leo, the lion, rose there just before the equinox sun.
 
 **Beats**
 
@@ -133,7 +145,7 @@ If the lion is that old, they argue, so are its temples.
 
 Egyptology's case for Khafre rests on the ground, not on the face. Peter Lacovara's 2026 review of Reader's book sets it out: the Sphinx Temple is built of blocks cut from the Sphinx ditch, the temple was left unfinished, nothing near the Sphinx is older than the Fourth Dynasty, and the paws had to be finished in masonry, as they would be if a remnant of rock were being made into a figure. The head is small and well kept because of the rock it is in. The body is cut through alternating hard and soft beds, while the neck and head lie in a higher bed, "softer at the neck and harder at the head". In a 2023 flume experiment, flowing water wore a clay mound with a hard core into a lion-like shape. And the zodiac's Lion is a Mesopotamian figure; the Egyptian zodiacs that show it, such as Dendera's of about 50 BCE, are late. Seked's own model makes a smaller point of its own: the lion drawn from the photographs could not hold the head the Sphinx has, and its head had to be enlarged by a sixth before the claim's carving would work.
 
-**Spoken reply**: Egyptologists answer that the head is small because it was cut from a harder band of rock, and that the Sphinx fits Khafre's quarry, his temples and their alignment to the sun.
+**Spoken reply**: Egyptologists answer that the head is small because it was cut from a harder band of rock, and that
 
 **Sources**: `hancock-bauval-1996`, `hancock-1995`, `krupp-1997`, `vondrak-2011`, `hyg-4.2`, `nell-ruggles-2014`, `lehner-1997`, `lehner-hawass-2017`, `arce-sphinx-1991`, `arce-sphinx-mapping-oc`, `coords-sphinx-cited`, `schoch-bauval-2017` (new; publisher's page only), `reader-2026` (new; checked through Lacovara's review), `lacovara-2026` (new), `aera-sphinx-geology` (new), `boury-2023` (new), `rogers-1998` (new), `aubourg-1995` (new; listing only), `iau-boundaries` (new, unchecked)
 
@@ -141,17 +153,14 @@ Egyptology's case for Khafre rests on the ground, not on the face. Peter Lacovar
 
 ## 3. Temples of the same stone
 
-**Narration** (135 words)
+**Narration** (83 words)
 
-At the Sphinx's paws stand two temples. The Valley Temple is lined with red granite over a limestone core, in blocks that Flinders Petrie found ranging to over a hundred tons each. Those blocks were cut from the Sphinx's own ditch; all sides agree.
+At the Sphinx's paws stand two temples, built from blocks cut out of the Sphinx's own ditch, some of them over a
+hundred tons each.
 
-John Anthony West and Schoch went further. In a 1993 film they said the limestone behind the granite is rounded and fissured like the ditch walls, and the granite was cut to fit it. Nobody weathers a wall and then cases it, they say: the granite is a refit.
-
-Mark Lehner answers that the exposed cores weathered only after being cleared in the early 1900s.
-
-Khafre's statues, found inside, show he used the temple. They leave its core's age open.
-
-And Egypt's own records put long ages before its first king.
+In a 1993 film, John Anthony West and Schoch showed that the limestone behind the Valley Temple's granite facing is
+rounded and fissured, like the ditch walls. And the granite was cut to fit that worn surface. Nobody weathers a wall
+and then cases it, they say. The granite is a refit, added to a far older building.
 
 **Beats**
 
@@ -180,7 +189,7 @@ And Egypt's own records put long ages before its first king.
 
 Archaeologists read the order of building in the walls. The Valley Temple came first: its enclosure wall respects its finished granite casing. The Sphinx Temple was then built on that wall's foundation and left without its outer granite, so on its outside there is no granite over weathered stone at all. Petrie showed in 1883 that the Valley Temple's passage was built skewed to meet Khafre's causeway. Mark Lehner answers the joint directly. Where granite has been removed, the limestone surface the masons cut to receive it survives, and the exposed cores have weathered only since Hölscher cleared them early in the twentieth century. At Menkaure's unfinished temple, core and casing went up together. A limestone block at the base of the Sphinx Temple's wall gives a luminescence date of 2220 ± 220 BCE. Neither side has published a measured section through an original joint.
 
-**Spoken reply**: Archaeologists answer that core and casing went up together, as at Menkaure's unfinished temple, and that the Sphinx Temple never received its outer granite at all.
+**Spoken reply**: Archaeologists answer that the cores weathered only after they were cleared in the early 1900s,
 
 **Sources**: `petrie-1883`, `hoelscher-1912`, `reisner-1931`, `nell-ruggles-2014`, `arce-sphinx-mapping-oc`, `arce-sphinx-1991`, `lehner-hawass-2017`, `hancock-1995`, `schoch-sphinx-web` (new), `west-1993-film` (new, unchecked; known only as quoted in `lehner-1994-kmt`), `lehner-1994-kmt` (new), `lehner-2017-aeragram` (new), `aera-khafre-monuments` (new), `hancock-fridman-2024` (new), `liritzis-vafiadou-2015` (new), `ricke-1970` (new, unchecked), `khafre-enthroned-cg14` (new, unchecked)
 
@@ -188,17 +197,18 @@ Archaeologists read the order of building in the walls. The Valley Temple came f
 
 ## 4. The First Time
 
-**Narration** (156 words)
+**Narration** (108 words)
 
-A papyrus in Turin, copied about 1250 BCE, lists kings back to Menes, and before him gods, spirits and Followers of Horus. On its most probable reading, the spirits and Followers get 13,420 years and, in the next line, 23,200. The papyrus is some 1,850 years younger than Menes, and partly restored.
+Egypt's own records count back further than its kings.
 
-The Egyptians called that beginning sep tepi, the First Time. Hancock and Bauval read it as memory, not myth.
+A papyrus in Turin, copied about 1250 BCE, lists the kings back to the first, Menes, and before him gods, spirits and
+the Followers of Horus, who reigned, on its likeliest reading, for more than thirteen thousand years. The Egyptians
+called that beginning sep tepi, the First Time. Hancock and Bauval read it as memory, not myth.
 
-A stela by the Great Pyramid has Khufu finding a house of Isis "beside the house of the Sphinx". So, they argue, the Sphinx predates Khafre. Its translator, James Breasted, called the evidence for a late date "entirely conclusive."
+A stela beside the Great Pyramid has Khufu finding a temple "beside the house of the Sphinx", so the Sphinx, they
+argue, was already there before Khafre.
 
-In King Unas's tomb, about 2400 BCE, the oldest Pyramid Texts say "Unas appears as a star" and "Orion is encircled by the Duat," with Sothis, our Sirius, and Unas.
-
-None of these texts gives a date. Hancock and Bauval look for one in the sky.
+None of these texts gives a date. So they looked for one in the sky.
 
 **Beats**
 
@@ -230,7 +240,7 @@ None of these texts gives a date. Hancock and Bauval look for one in the sky.
 
 Every one of these texts was written long after the time it describes, and none carries a date. The Turin papyrus is some 1,850 years younger than Menes, and its oldest numbers are partly restored. Manetho's totals differ from one later copyist to the next, and Eusebius, who preserved one version, already turned his years into months. James Breasted, who translated the Inventory Stela, called the evidence of its late date "entirely conclusive". A 2022 study reads the First Time as a pattern renewed in each coronation and temple foundation, not as an era that can be dated. The star religion of the Pyramid Texts is real, and the Great Pyramid's shafts point at Orion's belt and Sirius in the century the pyramids were built. Radiocarbon, which depends on none of these texts, dates Egypt's first king to about 3100 BCE and runs unbroken from there to Khufu.
 
-**Spoken reply**: Egyptologists answer that every one of these texts was written long after the time it describes, that none carries a date, and that radiocarbon dates Egypt's first king to about 3100 BCE without them.
+**Spoken reply**: Egyptologists answer that every one of these texts was written long after the time it describes,
 
 **Sources**: `hancock-bauval-1996`, `bauval-gilbert-1994`, `gantenbrink-1993`, `vondrak-2011`, `hyg-4.2`, `pharaoh-se-turin` (new), `gardiner-1959` (new, unchecked), `ryholt-2004` (new; content unchecked), `schwaller-1982` (new, unchecked), `waddell-1940` (new), `breasted-1906` (new), `pyramid-texts-online` (new), `piankoff-1968` (new, unchecked), `graham-2022` (new), `bronk-ramsey-2010` (new), `dee-2013` (new), `hornung-krauss-warburton-2006` (new)
 
@@ -238,13 +248,18 @@ Every one of these texts was written long after the time it describes, and none 
 
 ## 5. The sky as a clock
 
-**Narration** (167 words)
+**Narration** (124 words)
 
-In 1989 Robert Bauval argued that Giza's three pyramids copy Orion's belt: two nearly equal, the third smaller and off the line, like Mintaka. A 2026 study ranks the match in the top quarter of one per cent of almost 700,000 star triplets, but calls it "real but narrow."
+In 1989 Robert Bauval saw that Giza's three pyramids copy the three stars of Orion's belt: two nearly equal, the
+third smaller and set off the line. A 2026 study ranks the match in the top quarter of one per cent of almost
+700,000 star patterns.
 
-Bauval and Hancock read the plan as a clock. The Earth's wobble raises and lowers the belt over 26,000 years, and about 10,500 BCE it hits the bottom of its swing: the First Time, they say. But Seked's engine puts the belt thirteen degrees off the pyramids' line then, and the swing is too flat to name a century.
+Bauval and Hancock read the plan as a clock. The Earth's slow wobble raises and lowers the belt over 26,000 years,
+and about 10,500 BCE it reaches the bottom of its swing: the First Time, they say.
 
-Inside the Great Pyramid, a shaft from the King's Chamber climbs south at 45 degrees. About 2450 BCE Alnitak, the belt's easternmost star, crossed the meridian within a fifth of a degree of that line. So the stone holds two dates, they say: its building and its plan. The shafts, say astronomers, date only the building, in Khufu's century.
+Inside the Great Pyramid, a shaft climbs south at 45 degrees. About 2450 BCE, Alnitak, the belt's eastern star,
+crossed that line almost exactly. So the stone holds two dates, they say: when it was built, and when it was
+planned.
 
 **Beats**
 
@@ -280,7 +295,7 @@ Inside the Great Pyramid, a shaft from the King's Chamber climbs south at 45 deg
 
 The shape is real. The same 2026 study calls the match "real but narrow". Almost everything built on it fails. At no epoch does the pyramids' axis match the belt's better than chance, and its best fit, about 11,625 BCE, has no archaeology behind it. The best way to assign the stars to the pyramids is the reverse of Bauval's, and no assignment keeps both the shape and the order of brightness. At 10,450 BCE, Seked's own engine puts the belt thirteen degrees off the pyramids' diagonal. Nor is 10,450 BCE the bottom of the swing: the engine puts Alnitak's lowest crossing near 10,700 BCE, and the star stays within half a degree of that low for some fourteen centuries, from about 11,450 to 10,000 BCE. As a clock, the belt cannot name a century. The shafts were never sightlines: the King's Chamber shafts bend on their way out, and the Queen's Chamber shafts stop at small stone doors about sixty metres in. The epochs the shafts give cluster between about 2500 and 2330 BCE, close to Khufu's reign. The sky dates the building, where Egyptologists already had it, not an older plan.
 
-**Spoken reply**: Astronomers answer that the shape is real but narrow, that in 10,450 BCE the belt lies thirteen degrees off the pyramids' line, and that the shafts point to Khufu's century, not the Ice Age.
+**Spoken reply**: Astronomers answer that the shape is real but narrow, that in 10,500 BCE the belt lies thirteen
 
 **Sources**: `bauval-gilbert-1994`, `hancock-1995`, `hancock-bauval-1996`, `gantenbrink-1993`, `gantenbrink-1999`, `vondrak-2011`, `hyg-4.2`, `krupp-1997`, `fairall-1999`, `collins-2006`, `petrie-1883`, `spence-2000`, `bauval-1989` (new; citation checked, text unchecked), `allan-2026` (new), `trimble-1964` (new; citation checked, text unchecked), `badawy-1964` (new; citation checked, text unchecked), `legon-1995` (new)
 
@@ -288,19 +303,17 @@ The shape is real. The same 2026 study calls the match "real but narrow". Almost
 
 ## 6. Numbers in the stone
 
-**Narration** (166 words)
+**Narration** (100 words)
 
-Measure the Great Pyramid. Walk round its base and divide by its original height: two times pi, within three hundredths of one per cent.
+Measure the Great Pyramid. Walk round its base and divide by its original height: two times pi, within three
+hundredths of one per cent.
 
 Its slant height over half its base is the golden ratio, within a twentieth of one per cent.
 
-Scale it up 43,200 times and its height is the Earth's polar radius, its perimeter the equator, each within one per cent. Hancock notes that 43,200 is 600 times 72, and 72 years is about how long the stars take to drift one degree.
+Scale it up 43,200 times and its height is the Earth's polar radius, its perimeter the equator, each within one per
+cent. And its sides run within four minutes of arc of true north: a quarter of a metre over 230.
 
-The sides run within four minutes of arc of true north, a quarter of a metre over 230 metres.
-
-For Hancock, that knowledge was inherited from a civilisation older than Egypt.
-
-Egyptian builders gave slopes as a seked, and five and a half palms of run to each cubit of rise gives both numbers. The survey cannot tell the slopes apart, and 43,200 is a factor chosen to fit. Their papyri teach the seked, but date centuries after the pyramids.
+For Hancock, knowledge like that was not invented in a century. It was inherited from someone older.
 
 **Beats**
 
@@ -344,7 +357,7 @@ Egyptian builders gave slopes as a seked, and five and a half palms of run to ea
 
 Egyptian builders gave a slope as a seked: so many palms of run for a rise of one cubit, which is seven palms. A seked of five and a half makes a pyramid 440 cubits wide and 280 high. Its perimeter divided by its height is then 44/7, which is 2π to within 0.04 per cent, and the same triangle comes within 0.04 per cent of φ. Both numbers fall out of one whole-number rule, and the papyri set seked problems as exercises. Seked's A3 shows the survey cannot tell the three slopes apart. The original height is not measured either: the apex is gone, so π, φ and 43,200 are one face angle seen three ways. And 43,200 is chosen: the best-fitting factors are about 43,364 and 43,497. On north, Spence's survey of the Fourth Dynasty pyramids shows alignment improving up to Khufu and then slipping.
 
-**Spoken reply**: Mathematicians answer that one builders' rule, a slope of five and a half palms in seven, gives both pi and the golden ratio, and that 43,200 is a number chosen to fit.
+**Spoken reply**: Mathematicians answer that one builders' rule, a slope of five and a half palms in seven, gives
 
 **Sources**: `petrie-1883`, `cole-1925`, `dash-2015`, `lehner-1997`, `smyth-1864`, `tompkins-1971`, `hancock-1995`, `rossi-2004`, `spence-2000`, `legon-1979`, `wgs84`, `coords-wgs84-cited`, `si-2019`, `rossi-imhausen-2009` (new), `dash-2017` (new), `herz-fischler-2000` (new)
 
@@ -352,13 +365,17 @@ Egyptian builders gave a slope as a seked: so many palms of run for a rise of on
 
 ## 7. Before the flood
 
-**Narration** (150 words)
+**Narration** (99 words)
 
-About 12,900 years ago the warming stopped and the northern world fell back into cold for over a thousand years: the Younger Dryas. Hancock cites about a hundred peer-reviewed studies blaming a comet, with glass melted above 2,200 degrees at Abu Hureyra. Thirteen specialists called that refuted in 2023.
+About 12,900 years ago the world's warming suddenly stopped, and the north fell back into cold for over a thousand
+years. Hancock cites about a hundred peer-reviewed studies blaming a comet.
 
-Göbekli Tepe, in south-east Turkey, is a set of rings of T-shaped pillars built about 9500 BCE, seven thousand years before the Great Pyramid. Its builders, the excavators say, were hunters and foragers with no farms, pottery or metal. Klaus Schmidt thought they filled it in on purpose; later excavators say slope slides did.
+And in south-east Turkey stands Göbekli Tepe: rings of carved T-shaped pillars, some over five metres tall, raised
+about 9500 BCE, seven thousand years before the Great Pyramid, by people the excavators say had no farms, no
+pottery and no metal.
 
-Schoch points to Göbekli Tepe when asked where the older civilisation was. If non-farmers could raise this, a plan at Giza in the eleventh millennium BCE is not absurd, and for this piece that makes the rest worth taking seriously. Nothing found there links it to Egypt.
+Schoch points to it when asked where the older civilisation was. If hunters could raise this, a plan at Giza in the
+Ice Age is not absurd.
 
 **Beats**
 
@@ -395,7 +412,7 @@ Schoch points to Göbekli Tepe when asked where the older civilisation was. If n
 
 No one doubts Göbekli Tepe's age, or that hunter-gatherers built it. What the excavators have changed since 2019 is the picture of the place. Lee Clare's 2020 summary for the German Archaeological Institute reports round houses with hearths on the bedrock, a burial under a floor, and a rock-cut pit eight metres across, possibly a cistern, with a channel cut nearby. The special buildings stood in use for more than five centuries. The fill, once read as a deliberate burial, now looks like slope slides of debris from the higher ground around them. On the comet, thirteen specialists published a "comprehensive refutation" in 2023: no crater has been found, and the markers are too small and too poorly dated. Several of the group's other papers were retracted in 2025 and 2026. Nothing found at Göbekli links it to Egypt, about 1,100 kilometres away.
 
-**Spoken reply**: The excavators answer that Göbekli Tepe was a lived-in place with houses and a possible cistern, filled by slope slides rather than by hand, and that nothing found there links it to Egypt.
+**Spoken reply**: Thirteen specialists called the comet evidence refuted in 2023, and the excavators answer that
 
 **Sources**: `hancock-1995`, `hancock-bauval-1996`, `clare-2020` (new), `hancock-2023-saa` (new), `schoch-sphinx-web` (new), `moore-2020` (new), `moore-2025-correction` (new), `holliday-2023` (new), `retraction-watch-2026-ydih` (new), `notroff-2017` (new), `firestone-2007` (new, unchecked), `walker-2009` (new, unchecked), `schmidt-2007` (new, unchecked), `sweatman-tsikritsis-2017` (new, unchecked), `hancock-2015` (new, unchecked)
 
@@ -405,15 +422,18 @@ No one doubts Göbekli Tepe's age, or that hunter-gatherers built it. What the e
 
 *A draft, written by the night builder on 20 October from `docs/research/khafre-sar.md` and `docs/research/labyrinth.md` (night list, decisions 23 to 27). It has not yet been edited by the session or read by Stewart.*
 
-**Narration** (158 words)
+**Narration** (105 words)
 
 Now the claims go underground.
 
-In March 2025 a team including the radar engineer Filippo Biondi said satellites had found, under Khafre's pyramid, eight wells falling 648 metres, four and a half pyramid heights, to two chambers about 80 metres on a side. The rooms anyone has entered lie three metres below the base. Radar specialists say vibrations from that depth cannot be detected from orbit, and the method's only peer-reviewed paper was retracted in 2026.
+In 2025 a team including the radar engineer Filippo Biondi said satellites had found eight wells under Khafre's
+pyramid, falling 648 metres, four and a half pyramid heights, to two great chambers.
 
-At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half underground. Petrie found only a bed of stone chips, larger than the Great Pyramid's base. The expedition behind a 2008 survey reported walls eight to twelve metres down; archaeologists say it was Amenemhat III's temple, and later surveys find only shallow remains.
+At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half of them underground. In 2008 a survey of the
+ground south of its pyramid reported walls eight to twelve metres down, in a grid of rooms.
 
-Under the Sphinx's paws, Schoch's seismic survey found a hollow no one has opened, where Edgar Cayce placed a Hall of Records. Nobody has dug for any of it.
+And under the Sphinx's paws, Schoch's survey found a hollow no one has opened, where the psychic Edgar Cayce placed a
+Hall of Records. Nobody has dug for any of it.
 
 **Beats**
 
@@ -446,7 +466,7 @@ Under the Sphinx's paws, Schoch's seismic survey found a hollow no one has opene
 
 The method's only peer-reviewed paper, Biondi and Malanga's 2022 study of Khufu's pyramid, was retracted on 10 August 2026 for "serious methodological flaws and statistical errors"; the authors disagree. Radar specialists say that a satellite measures only the surface it sees, and that vibrations from hundreds of metres down are far too small to detect from orbit. No data or code has been released, so nobody has been able to check the processing. Egypt's antiquities authority gave no permission for work at Khafre, and Zahi Hawass says the pyramid sits on bedrock carved about eight metres down. Wells that deep would stand hundreds of metres below the water table. At Hawara, Petrie found Amenemhat III's name on the Labyrinth's architraves: it was his temple, built in the nineteenth century BCE, seven centuries after Khufu. The 2008 survey's own leader has since published, with colleagues, anomalies only five to seven and a half metres down, and an independent radar survey found "nothing to support the idea that this was Herodotus's labyrinth". Herodotus says himself that he only heard of the lower rooms.
 
-**Spoken reply**: Archaeologists answer that the radar method's only peer-reviewed paper was retracted and its data never released, and that the Labyrinth was Amenemhat III's temple, where published surveys find only shallow remains.
+**Spoken reply**: Archaeologists answer that the radar method's only peer-reviewed paper was retracted in 2026, and
 
 **Sources**: `khafre-project-2025`, `maragioglio-rinaldi-1966`, `petrie-1883`, `hawass-2007`, `dobecki-schoch-1992`, `cayce`, `biondi-malanga-2022` (new), `remote-sensing-retraction-2026` (new), `retraction-watch-2026-giza` (new), `pilicy-2025` (new), `el-aref-2025` (new), `moss-2025-natgeo` (new), `alvarez-1970` (new), `sharafeldin-2019` (new), `herodotus-2-148` (new; checked only as quoted by Carlotto), `petrie-1889` (new), `petrie-1890` (new), `petrie-1912` (new), `elshazly-2024` (new), `szynkiewicz-2015` (new), `khalil-2010` (new; abstract only), `de-cordier-2025-mataha` (new), `de-cordier-2025-merlin-burrows` (new)
 
@@ -454,17 +474,21 @@ The method's only peer-reviewed paper, Biondi and Malanga's 2022 study of Khufu'
 
 ## 9. What would settle it
 
-**Narration** (151 words)
+**Narration** (120 words)
 
-Much of this case can be tested. The one measured support for the early date is Schoch's seismic finding that the rock is weathered more deeply in front of the Sphinx than behind it. No one has drilled to test it. Two cores, at the paws and behind the rump, would show whether it is weathering or a change in the rock.
+Much of this can be tested.
 
-In 2008 Egypt's antiquities authority and Cairo University drilled four boreholes twenty metres deep around the Sphinx; we have found no published record of its weathering.
+The one measured support for the early date is the weathering under the Sphinx's floor, deeper in front than
+behind. Two drill cores, one at the paws and one behind the rump, would show whether it is weathering or a change in
+the rock.
 
-Underneath, the paw cavity could be opened, the radar data released, and Hawara dug.
+Underneath, the cavity at the paws could be opened, the radar data released, Hawara dug.
 
-An answer looks like this: muon detectors found a hidden corridor in the Great Pyramid, with error bars, and a camera confirmed it.
+That is what an answer looks like: muon detectors found a hidden corridor inside the Great Pyramid, with error bars,
+and in 2023 a camera went in and saw it.
 
-Where the case has been measured, the measurements have mostly gone against it. The ditch floor has not been tested, and that is where to look.
+Where the case has been measured, the measurements have mostly gone against it. The ditch floor has not been tested.
+That is where to look.
 
 **Beats**
 
@@ -512,7 +536,7 @@ Where the case has been measured, the measurements have mostly gone against it. 
 
 Most of what could be dated has been. In 1984 the Edgar Cayce Foundation, interested in Cayce's claim that the pyramids dated to 10,500 BCE, paid for radiocarbon dates on organic material in their mortar. More than 450 samples from 1984 and 1995 place the Fourth Dynasty monuments between about 2900 and 2400 BCE. That is a few centuries older than the historical dates, which the team traces to old wood burned for the mortar. The luminescence team that the proponents cite found nothing that "corroborates a prehistoric age". In 1978, five holes drilled into the largest anomalies around the Sphinx found "only minor natural cracks". Egypt permits instrumented, peer-reviewed work: that is how the corridor was found.
 
-**Spoken reply**: Archaeologists answer that no physical date from Giza, the first of them paid for by Cayce's own foundation, comes near 10,500 BCE, and that holes drilled around the Sphinx in 1978 found only cracks.
+**Spoken reply**: Archaeologists answer that no physical date from Giza comes anywhere near 10,500 BCE.
 
 **Sources**: `dobecki-schoch-1992`, `morishima-2017`, `procureur-2023`, `cayce`, `arce-sphinx-1991`, `bonani-2001` (new), `aera-radiocarbon` (new), `liritzis-vafiadou-2015` (new), `dolphin-1978` (new), `ysi-2009-sphinx` (new), `sharafeldin-2019` (new), `harrell-1994` (new), `schoch-1992-kmt` (new, unchecked)
 

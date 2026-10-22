@@ -49,17 +49,13 @@ falling 648 metres under Khafre's pyramid; the Labyrinth's grid at Hawara. The l
 
 Every textbook says the Sphinx was carved about 2500 BCE, for the pharaoh Khafre.
 
-A geologist says rain wore it down thousands of years before that.
+The geologist Robert Schoch says rain wore it down thousands of years before that.
 
-A writer says it was a lion first, watching its own stars rise.
+Graham Hancock says it was a lion first, watching its own constellation rise. That its temples are far older than the king who used them. That Egypt's own records remember a First Time, written in the stars over Giza and in numbers built into the Great Pyramid. That Göbekli Tepe proves someone was building long before we thought possible. And that there are rooms underground no one has entered.
 
-Others say the Great Pyramid encodes pi, the golden ratio and the size of the Earth. That the pyramids copy Orion's
-belt. That there are rooms underground no one has entered.
+If he is right, a civilisation was lost at the end of the Ice Age.
 
-Graham Hancock, Robert Bauval and Robert Schoch say all of it points to a civilisation lost at the end of the Ice
-Age.
-
-Here is their case, at its strongest. And at each step, what the archaeologists say back.
+Here is the case, at its strongest. At each step, what the archaeologists say back. And at the end, what it would take to settle it.
 
 **Spoken reply:** none (the trailer promises the replies; each beat delivers its own).
 
@@ -241,10 +237,8 @@ That is where to look.
 
 ## For Stewart to decide
 
-1. **The trailer's claim list.** It names five claims in the order the piece takes them. Fewer and punchier, or all
-   eight?
-2. **"A writer says it was a lion first"** in the trailer: it is Hancock and Bauval with Schoch; naming them there
-   would cost a sentence.
+1. **Settled, 22 October:** the trailer touches all nine beats, in order.
+2. **Settled, 22 October:** the trailer names Graham Hancock and Robert Schoch; the audience knows them.
 3. **Chapter 7's reply** now leads with the comet refutation, because the comet is the chapter's opening claim. The
    current script puts it in the narration.
 4. **Facts that moved** (none are new, all from `docs/script.md`): the Valley Temple's granite detail is shortened;

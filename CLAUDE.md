@@ -17,6 +17,21 @@ stays behind it: every number still comes from `data/`, and the claims engine
 gives each chapter its receipts. The steelman is in the words and the
 pictures, never in the numbers.
 
+Stewart sharpened this on 22 October 2026. The viewer already knows Hancock's
+arguments, more or less, and has grown up on shorts: catch them in the first
+minute and keep the piece under fifteen minutes. The aim is to show, faithfully
+and beautifully, what Hancock and the others say happened: that a civilisation,
+perhaps a global one, was doing things far earlier than we assume, and that
+seemingly unconnected things fit that story. If they are right, it rewrites
+history as much as Göbekli Tepe did, a site that twenty years earlier would have
+been called unscientific even to propose. So the piece sits in a grey area on
+purpose: not peer-reviewed-only, and not "look it up, bro". It adds rigour where
+rigour is possible, says plainly what cannot be settled now (a Labyrinth, a Hall
+of Records), and gives an honest one-line refutation after each claim so the
+viewer knows what is contested, not to win the argument. Version 3 of the script
+(`docs/script.md`) has this shape: a trailer, nine beats each told whole in the
+claimants' corner and closed by one spoken reply, then what would settle it.
+
 What still holds from before: the scene is "as close to survey as we can
 get, with the holes filled in". The pyramids stay as near survey as the
 sources allow. Everything else (temples, tombs, the Sphinx, causeways) needs

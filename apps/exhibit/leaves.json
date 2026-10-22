@@ -2,7 +2,7 @@
  "about": "The exhibit's leaves, in order: where the visitor stands (a station in render/stations.json), in which era and moment, looking which way (degrees), how the leaf arrives from the one before, and the words spoken, cut from docs/script.md with every word of a chapter kept in order. The player, the render queue (scripts/exhibit_queue.py) and the narration are all built from this file. Plan: docs/exhibit-2026-10.md.",
  "leaves": [
   {
-   "id": "ch0-textbooks",
+   "id": "ch0-t01",
    "chapter": 0,
    "station": "sphinx",
    "era": "today",
@@ -13,15 +13,135 @@
     "fov": 44
    },
    "arrive": "cut",
-   "say": "Today's Sphinx wears a pharaoh's head, and the textbooks say Khafre's workmen carved it about 2500 BCE.",
+   "say": "Every textbook says the Sphinx was carved about 2500 BCE, for the pharaoh Khafre.",
    "draw": [],
-   "hold": 1,
+   "hold": 0.3,
    "interact": "look",
    "receipts": [],
    "reply": "ch0"
   },
   {
-   "id": "ch0-claim",
+   "id": "ch0-t02",
+   "chapter": 0,
+   "station": "sphinx-flank",
+   "era": "lion",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
+   },
+   "arrive": "cut",
+   "say": "The geologist Robert Schoch says rain wore it down thousands of years before that.",
+   "draw": [],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-t03",
+   "chapter": 0,
+   "station": "sphinx-side",
+   "era": "first-time",
+   "moment": "equinox-dawn",
+   "view": {
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
+   },
+   "arrive": "cut",
+   "say": "Graham Hancock says it was a lion first, watching its own constellation rise.",
+   "draw": [],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-t04",
+   "chapter": 0,
+   "station": "valley-temple",
+   "era": "built",
+   "moment": "temple-morning",
+   "view": {
+    "yaw": 22,
+    "pitch": -15,
+    "fov": 60
+   },
+   "arrive": "cut",
+   "say": "That its temples are far older than the king who used them.",
+   "draw": [],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-t05",
+   "chapter": 0,
+   "station": "orion",
+   "era": "built",
+   "moment": "night-dark",
+   "view": {
+    "yaw": 180,
+    "pitch": 44,
+    "fov": 60
+   },
+   "arrive": "cut",
+   "say": "That Egypt's own records remember a First Time, written in the stars over Giza and in numbers built into the Great Pyramid.",
+   "draw": [
+    "belt-plan"
+   ],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-t06",
+   "chapter": 0,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 0,
+    "fov": 50
+   },
+   "arrive": "cut",
+   "say": "That Göbekli Tepe proves someone was building long before we thought possible.",
+   "draw": [
+    "vulture-sky"
+   ],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-t07",
+   "chapter": 0,
+   "station": "menkaure",
+   "era": "today",
+   "moment": "winter-afternoon",
+   "view": {
+    "yaw": 8,
+    "pitch": 0,
+    "fov": 40
+   },
+   "arrive": "cut",
+   "say": "And that there are rooms underground no one has entered.",
+   "draw": [
+    "khafre-wells"
+   ],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch0"
+  },
+  {
+   "id": "ch0-t08",
    "chapter": 0,
    "station": "sphinx",
    "era": "first-time",
@@ -31,16 +151,16 @@
     "pitch": -2,
     "fov": 44
    },
-   "arrive": "wipe",
-   "say": "Graham Hancock, Robert Bauval and the geologist Robert Schoch say it began as a lion, in a green Sahara, about 10,500 BCE.",
+   "arrive": "cut",
+   "say": "If he is right, a civilisation was lost at the end of the Ice Age.",
    "draw": [],
-   "hold": 1,
-   "interact": "era",
+   "hold": 0.3,
+   "interact": "look",
    "receipts": [],
    "reply": "ch0"
   },
   {
-   "id": "ch0-question",
+   "id": "ch0-t09",
    "chapter": 0,
    "station": "sphinx-face",
    "era": "today",
@@ -51,15 +171,15 @@
     "fov": 66
    },
    "arrive": "cut",
-   "say": "So how old is it? The walls of the ditch are where Schoch started.",
+   "say": "Here is the case, at its strongest.",
    "draw": [],
-   "hold": 2,
-   "interact": "era",
+   "hold": 0.3,
+   "interact": "look",
    "receipts": [],
    "reply": "ch0"
   },
   {
-   "id": "ch0-promise",
+   "id": "ch0-t10",
    "chapter": 0,
    "station": "sphinx-face",
    "era": "today",
@@ -70,9 +190,9 @@
     "fov": 66
    },
    "arrive": "turn",
-   "say": "This piece gives their case as strongly as it can be made, and then the archaeologists' answer.",
+   "say": "At each step, what the archaeologists say back. And at the end, what it would take to settle it.",
    "draw": [],
-   "hold": 1,
+   "hold": 0.3,
    "interact": "look",
    "receipts": [],
    "reply": "ch0"
@@ -89,7 +209,7 @@
     "fov": 70
    },
    "arrive": "flight",
-   "say": "The Sphinx was not built. It was carved from bedrock, so the walls of its ditch are as old as the statue.",
+   "say": "The Sphinx was not built. It was carved out of the bedrock, so the walls of its ditch are as old as the statue.",
    "draw": [
     "ditch-plan@ditch"
    ],
@@ -110,7 +230,7 @@
     "fov": 60
    },
    "arrive": "turn",
-   "say": "The geologist Robert Schoch read those walls as rain-cut: soft beds cut back into coves, fissures widest at the top.",
+   "say": "The geologist Robert Schoch read those walls as cut by rain: soft beds worn back into deep coves, cracks widest at the top, where water ran in.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -129,7 +249,7 @@
     "fov": 70
    },
    "arrive": "turn",
-   "say": "Wind and sand, he says, cut sharp level grooves.",
+   "say": "Wind and sand, he says, cut sharp, level grooves instead.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -148,7 +268,7 @@
     "fov": 70
    },
    "arrive": "turn",
-   "say": "Even Colin Reader, who rejects his date, agrees water cut them.",
+   "say": "Even Colin Reader, who rejects his date, agrees that water did this.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -167,7 +287,7 @@
     "fov": 70
    },
    "arrive": "turn",
-   "say": "Archaeologists answer that the ditch was Khafre's quarry. Then he looked under the floor.",
+   "say": "Then Schoch looked under the floor.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -186,7 +306,7 @@
     "fov": 60
    },
    "arrive": "turn",
-   "say": "A 1992 seismic survey, by his account, found the rock weathered about two metres deep in front and a little over one behind.",
+   "say": "A 1992 seismic survey, by his account, found the rock weathered about two metres deep in front and only a little over one behind.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -205,7 +325,7 @@
     "fov": 60
    },
    "arrive": "wipe",
-   "say": "Deeper means longer exposed, so the front was cut first.",
+   "say": "Deeper means longer exposed.",
    "draw": [],
    "hold": 1,
    "interact": "era",
@@ -224,28 +344,9 @@
     "fov": 60
    },
    "arrive": "turn",
-   "say": "On his most cautious reckoning the core is at least seven thousand years old; he prefers about 10,000 BCE.",
+   "say": "On his most cautious reckoning the core is at least seven thousand years old. He prefers about 10,000 BCE.",
    "draw": [],
    "hold": 1,
-   "interact": "era",
-   "receipts": [],
-   "reply": "ch1"
-  },
-  {
-   "id": "ch1-head",
-   "chapter": 1,
-   "station": "sphinx-flank",
-   "era": "first-time",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 18,
-    "pitch": 34,
-    "fov": 70
-   },
-   "arrive": "wipe",
-   "say": "Other geologists say the rock's own layers could explain the difference.",
-   "draw": [],
-   "hold": 2,
    "interact": "era",
    "receipts": [],
    "reply": "ch1"
@@ -281,7 +382,7 @@
     "fov": 70
    },
    "arrive": "turn",
-   "say": "It wears a Fourth Dynasty king's headcloth, it is better kept than the body, and it is too small for it.",
+   "say": "It wears a pyramid-age king's headcloth, it is better kept than the body, and it is too small for it.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -354,7 +455,7 @@
     "fov": 66
    },
    "arrive": "wipe",
-   "say": "Rain wore its head away, and a king of the pyramid age had a royal face cut into what was left.",
+   "say": "Rain wore its head away, and a king of the pyramid age had his own face cut into what was left.",
    "draw": [],
    "hold": 1,
    "interact": "era",
@@ -381,7 +482,7 @@
     "fov": 34
    },
    "arrive": "turn",
-   "say": "You can only carve a smaller form inside a larger one, so the new head came out small.",
+   "say": "You can only carve a smaller shape out of a larger one, so the new head came out small.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -397,98 +498,6 @@
    }
   },
   {
-   "id": "ch2-ghost",
-   "chapter": 2,
-   "station": "sphinx-side",
-   "era": "built",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 29,
-    "pitch": 15,
-    "fov": 34
-   },
-   "arrive": "turn",
-   "say": "Egyptologists say the head is small because the rock is harder there.",
-   "draw": [],
-   "hold": 2,
-   "interact": "object:head",
-   "receipts": [],
-   "reply": "ch2",
-   "until": {
-    "station": "sphinx-flank",
-    "view": {
-     "yaw": 18,
-     "pitch": 30,
-     "fov": 50
-    }
-   }
-  },
-  {
-   "id": "ch2-equinox",
-   "chapter": 2,
-   "station": "sphinx-back",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 90,
-    "pitch": 6,
-    "fov": 60
-   },
-   "arrive": "cut",
-   "say": "The equinox sun rises almost due east in every age, so the gaze dates nothing.",
-   "draw": [],
-   "hold": 1,
-   "interact": "sky",
-   "receipts": [],
-   "reply": "ch2",
-   "until": {
-    "station": "sphinx-flank",
-    "view": {
-     "yaw": 80,
-     "pitch": 8,
-     "fov": 70
-    }
-   },
-   "sky": {
-    "at": "today",
-    "figure": "Leo",
-    "bearings": "C5"
-   }
-  },
-  {
-   "id": "ch2-drift",
-   "chapter": 2,
-   "station": "sphinx-back",
-   "era": "first-time",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 90,
-    "pitch": 6,
-    "fov": 60
-   },
-   "arrive": "wipe",
-   "say": "But the stars behind it drift.",
-   "draw": [],
-   "hold": 3,
-   "interact": "sky",
-   "receipts": [],
-   "reply": "ch2",
-   "until": {
-    "station": "sphinx-flank",
-    "view": {
-     "yaw": 80,
-     "pitch": 8,
-     "fov": 70
-    }
-   },
-   "sky": {
-    "at": "C5",
-    "from": "today",
-    "figure": "Leo",
-    "bearings": "C5"
-   }
-  },
-  {
    "id": "ch2-leo",
    "chapter": 2,
    "station": "sphinx-back",
@@ -499,8 +508,8 @@
     "pitch": 20,
     "fov": 66
    },
-   "arrive": "turn",
-   "say": "About 10,500 BCE, Hancock and Bauval calculate, the constellation Leo rose in the east just before the equinox sun.",
+   "arrive": "cut",
+   "say": "And the lion looks due east, where the sun rises at the equinox. About 10,500 BCE, Hancock and Bauval calculate, the constellation Leo, the lion, rose there just before the equinox sun.",
    "draw": [],
    "hold": 1,
    "interact": "sky",
@@ -523,28 +532,6 @@
    }
   },
   {
-   "id": "ch2-temples",
-   "chapter": 2,
-   "station": "sphinx",
-   "era": "first-time",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 255,
-    "pitch": -8,
-    "fov": 64
-   },
-   "arrive": "flight",
-   "say": "Egyptologists add that Leo is a Mesopotamian figure, late in Egypt. If the lion is that old, they argue, so are its temples.",
-   "draw": [],
-   "hold": 2,
-   "interact": "sky",
-   "receipts": [
-    "D4",
-    "C6"
-   ],
-   "reply": "ch2"
-  },
-  {
    "id": "ch3-temples",
    "chapter": 3,
    "station": "sphinx",
@@ -555,52 +542,14 @@
     "pitch": -8,
     "fov": 64
    },
-   "arrive": "wipe",
-   "say": "At the Sphinx's paws stand two temples.",
+   "arrive": "cut",
+   "say": "At the Sphinx's paws stand two temples, built from blocks cut out of the Sphinx's own ditch, some of them over a hundred tons each.",
    "draw": [],
    "hold": 1,
    "interact": "era",
    "receipts": [
     "D4"
    ],
-   "reply": "ch3"
-  },
-  {
-   "id": "ch3-core",
-   "chapter": 3,
-   "station": "sphinx",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 235,
-    "pitch": -22,
-    "fov": 45
-   },
-   "arrive": "turn",
-   "say": "The Valley Temple is lined with red granite over a limestone core, in blocks that Flinders Petrie found ranging to over a hundred tons each.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch3"
-  },
-  {
-   "id": "ch3-ditch",
-   "chapter": 3,
-   "station": "sphinx",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 275,
-    "pitch": -4,
-    "fov": 60
-   },
-   "arrive": "turn",
-   "say": "Those blocks were cut from the Sphinx's own ditch; all sides agree.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
    "reply": "ch3"
   },
   {
@@ -615,7 +564,7 @@
     "fov": 70
    },
    "arrive": "cut",
-   "say": "John Anthony West and Schoch went further. In a 1993 film they said the limestone behind the granite is rounded and fissured like the ditch walls, and the granite was cut to fit it.",
+   "say": "In a 1993 film, John Anthony West and Schoch showed that the limestone behind the Valley Temple's granite facing is rounded and fissured, like the ditch walls. And the granite was cut to fit that worn surface.",
    "draw": [
     "joint-claim"
    ],
@@ -636,70 +585,13 @@
     "fov": 70
    },
    "arrive": "turn",
-   "say": "Nobody weathers a wall and then cases it, they say: the granite is a refit.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch3"
-  },
-  {
-   "id": "ch3-statues",
-   "chapter": 3,
-   "station": "valley-temple",
-   "era": "built",
-   "moment": "temple-morning",
-   "view": {
-    "yaw": 22,
-    "pitch": -15,
-    "fov": 60
-   },
-   "arrive": "wipe",
-   "say": "Mark Lehner answers that the exposed cores weathered only after being cleared in the early 1900s. Khafre's statues, found inside, show he used the temple.",
+   "say": "Nobody weathers a wall and then cases it, they say. The granite is a refit, added to a far older building.",
    "draw": [
-    "valley-sockets@statues",
-    "luminescence@core"
+    "valley-sockets",
+    "luminescence"
    ],
    "hold": 1,
    "interact": "era",
-   "receipts": [],
-   "reply": "ch3"
-  },
-  {
-   "id": "ch3-statues-b",
-   "chapter": 3,
-   "station": "valley-temple",
-   "era": "built",
-   "moment": "temple-morning",
-   "view": {
-    "yaw": 22,
-    "pitch": -15,
-    "fov": 60
-   },
-   "arrive": "turn",
-   "say": "They leave its core's age open.",
-   "draw": [],
-   "hold": 1,
-   "interact": "era",
-   "receipts": [],
-   "reply": "ch3"
-  },
-  {
-   "id": "ch3-records",
-   "chapter": 3,
-   "station": "sphinx-face",
-   "era": "first-time",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 272,
-    "pitch": 18,
-    "fov": 66
-   },
-   "arrive": "cut",
-   "say": "And Egypt's own records put long ages before its first king.",
-   "draw": [],
-   "hold": 2,
-   "interact": "look",
    "receipts": [],
    "reply": "ch3"
   },
@@ -715,34 +607,9 @@
     "fov": 78
    },
    "arrive": "cut",
-   "say": "A papyrus in Turin, copied about 1250 BCE, lists kings back to Menes, and before him gods, spirits and Followers of Horus.",
+   "say": "Egypt's own records count back further than its kings. A papyrus in Turin, copied about 1250 BCE, lists the kings back to the first, Menes, and before him gods, spirits and the Followers of Horus, who reigned, on its likeliest reading, for more than thirteen thousand years.",
    "draw": [
     "radiocarbon@king"
-   ],
-   "hold": 1,
-   "interact": "sky",
-   "receipts": [],
-   "reply": "ch4",
-   "sky": {
-    "at": "C5",
-    "figure": "Ori"
-   }
-  },
-  {
-   "id": "ch4-numbers",
-   "chapter": 4,
-   "station": "orion",
-   "era": "first-time",
-   "moment": "night-dark",
-   "view": {
-    "yaw": 182,
-    "pitch": 14,
-    "fov": 78
-   },
-   "arrive": "turn",
-   "say": "On its most probable reading, the spirits and Followers get 13,420 years and, in the next line, 23,200. The papyrus is some 1,850 years younger than Menes, and partly restored.",
-   "draw": [
-    "king-lists@13"
    ],
    "hold": 1,
    "interact": "sky",
@@ -790,54 +657,12 @@
     "fov": 60
    },
    "arrive": "cut",
-   "say": "A stela by the Great Pyramid has Khufu finding a house of Isis \"beside the house of the Sphinx\". So, they argue, the Sphinx predates Khafre.",
+   "say": "A stela beside the Great Pyramid has Khufu finding a temple \"beside the house of the Sphinx\", so the Sphinx, they argue, was already there before Khafre.",
    "draw": [],
    "hold": 1,
    "interact": "look",
    "receipts": [],
    "reply": "ch4"
-  },
-  {
-   "id": "ch4-stela-b",
-   "chapter": 4,
-   "station": "sphinx-flank",
-   "era": "first-time",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 340,
-    "pitch": 15,
-    "fov": 60
-   },
-   "arrive": "turn",
-   "say": "Its translator, James Breasted, called the evidence for a late date \"entirely conclusive.\"",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch4"
-  },
-  {
-   "id": "ch4-unas",
-   "chapter": 4,
-   "station": "orion",
-   "era": "built",
-   "moment": "night-dark",
-   "view": {
-    "yaw": 182,
-    "pitch": 26,
-    "fov": 78
-   },
-   "arrive": "cut",
-   "say": "In King Unas's tomb, about 2400 BCE, the oldest Pyramid Texts say \"Unas appears as a star\" and \"Orion is encircled by the Duat,\" with Sothis, our Sirius, and Unas.",
-   "draw": [],
-   "hold": 1,
-   "interact": "sky",
-   "receipts": [],
-   "reply": "ch4",
-   "sky": {
-    "at": "C2",
-    "figure": "Ori"
-   }
   },
   {
    "id": "ch4-sky",
@@ -850,8 +675,8 @@
     "pitch": 26,
     "fov": 78
    },
-   "arrive": "turn",
-   "say": "None of these texts gives a date. Hancock and Bauval look for one in the sky.",
+   "arrive": "cut",
+   "say": "None of these texts gives a date. So they looked for one in the sky.",
    "draw": [],
    "hold": 2,
    "interact": "sky",
@@ -874,7 +699,7 @@
     "fov": 78
    },
    "arrive": "turn",
-   "say": "In 1989 Robert Bauval argued that Giza's three pyramids copy Orion's belt: two nearly equal, the third smaller and off the line, like Mintaka.",
+   "say": "In 1989 Robert Bauval saw that Giza's three pyramids copy the three stars of Orion's belt: two nearly equal, the third smaller and set off the line.",
    "draw": [],
    "hold": 1,
    "interact": "sky",
@@ -899,7 +724,7 @@
     "fov": 60
    },
    "arrive": "turn",
-   "say": "A 2026 study ranks the match in the top quarter of one per cent of almost 700,000 star triplets, but calls it \"real but narrow.\"",
+   "say": "A 2026 study ranks the match in the top quarter of one per cent of almost 700,000 star patterns.",
    "draw": [
     "belt-plan",
     "allan-rank@ranks"
@@ -956,7 +781,7 @@
     "fov": 78
    },
    "arrive": "turn",
-   "say": "The Earth's wobble raises and lowers the belt over 26,000 years, and about 10,500 BCE it hits the bottom of its swing: the First Time, they say. But Seked's engine puts the belt thirteen degrees off the pyramids' line then, and the swing is too flat to name a century.",
+   "say": "The Earth's slow wobble raises and lowers the belt over 26,000 years, and about 10,500 BCE it reaches the bottom of its swing: the First Time, they say.",
    "draw": [],
    "hold": 3,
    "interact": "sky",
@@ -983,7 +808,7 @@
     "fov": 64
    },
    "arrive": "cut",
-   "say": "Inside the Great Pyramid, a shaft from the King's Chamber climbs south at 45 degrees.",
+   "say": "Inside the Great Pyramid, a shaft climbs south at 45 degrees.",
    "draw": [
     "kc-shaft@shaft"
    ],
@@ -1007,7 +832,7 @@
     "fov": 50
    },
    "arrive": "cut",
-   "say": "About 2450 BCE Alnitak, the belt's easternmost star, crossed the meridian within a fifth of a degree of that line.",
+   "say": "About 2450 BCE, Alnitak, the belt's eastern star, crossed that line almost exactly.",
    "draw": [],
    "hold": 2,
    "interact": "sky",
@@ -1034,7 +859,7 @@
     "fov": 78
    },
    "arrive": "turn",
-   "say": "So the stone holds two dates, they say: its building and its plan.",
+   "say": "So the stone holds two dates, they say: when it was built, and when it was planned.",
    "draw": [],
    "hold": 2,
    "interact": "sky",
@@ -1047,29 +872,6 @@
     "at": "C2",
     "figure": "Ori",
     "marks": "C2"
-   }
-  },
-  {
-   "id": "ch5-numbers",
-   "chapter": 5,
-   "station": "orion",
-   "era": "built",
-   "moment": "night-dark",
-   "view": {
-    "yaw": 184,
-    "pitch": 8,
-    "fov": 50
-   },
-   "arrive": "turn",
-   "say": "The shafts, say astronomers, date only the building, in Khufu's century.",
-   "draw": [],
-   "hold": 2,
-   "interact": "sky",
-   "receipts": [],
-   "reply": "ch5",
-   "sky": {
-    "at": "C2",
-    "figure": "Ori"
    }
   },
   {
@@ -1170,30 +972,6 @@
    "reply": "ch6"
   },
   {
-   "id": "ch6-72",
-   "chapter": 6,
-   "station": "south",
-   "era": "built",
-   "moment": "golden-south",
-   "view": {
-    "yaw": 0,
-    "pitch": 10,
-    "fov": 58
-   },
-   "arrive": "turn",
-   "say": "Hancock notes that 43,200 is 600 times 72, and 72 years is about how long the stars take to drift one degree.",
-   "draw": [
-    "g1-proportions",
-    "earth-scale"
-   ],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [
-    "B1"
-   ],
-   "reply": "ch6"
-  },
-  {
    "id": "ch6-north",
    "chapter": 6,
    "station": "north",
@@ -1205,8 +983,10 @@
     "fov": 66
    },
    "arrive": "cut",
-   "say": "The sides run within four minutes of arc of true north, a quarter of a metre over 230 metres.",
+   "say": "And its sides run within four minutes of arc of true north: a quarter of a metre over 230.",
    "draw": [
+    "g1-proportions",
+    "earth-scale",
     "north-square@sides",
     "north-drift@north",
     "pole-stars"
@@ -1230,62 +1010,17 @@
     "fov": 30
    },
    "arrive": "cut",
-   "say": "For Hancock, that knowledge was inherited from a civilisation older than Egypt. Egyptian builders gave slopes as a seked, and five and a half palms of run to each cubit of rise gives both numbers.",
+   "say": "For Hancock, knowledge like that was not invented in a century. It was inherited from someone older.",
    "draw": [
     "claim-sort",
-    "seked-rule"
-   ],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [
-    "A3",
-    "A7"
-   ],
-   "reply": "ch6"
-  },
-  {
-   "id": "ch6-hancock-b",
-   "chapter": 6,
-   "station": "panorama",
-   "era": "built",
-   "moment": "summer-evening",
-   "view": {
-    "yaw": 24,
-    "pitch": -2,
-    "fov": 30
-   },
-   "arrive": "turn",
-   "say": "The survey cannot tell the slopes apart, and 43,200 is a factor chosen to fit.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [
-    "A3",
-    "A7"
-   ],
-   "reply": "ch6"
-  },
-  {
-   "id": "ch6-papyri",
-   "chapter": 6,
-   "station": "panorama",
-   "era": "built",
-   "moment": "summer-evening",
-   "view": {
-    "yaw": 24,
-    "pitch": -2,
-    "fov": 30
-   },
-   "arrive": "turn",
-   "say": "Their papyri teach the seked, but date centuries after the pyramids.",
-   "draw": [
     "seked-rule",
-    "rhind-56@papyri"
+    "rhind-56"
    ],
-   "hold": 3,
+   "hold": 1,
    "interact": "era",
    "receipts": [
-    "A3"
+    "A3",
+    "A7"
    ],
    "reply": "ch6"
   },
@@ -1301,7 +1036,7 @@
     "fov": 60
    },
    "arrive": "wipe",
-   "say": "About 12,900 years ago the warming stopped and the northern world fell back into cold for over a thousand years: the Younger Dryas.",
+   "say": "About 12,900 years ago the world's warming suddenly stopped, and the north fell back into cold for over a thousand years.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -1320,26 +1055,7 @@
     "fov": 70
    },
    "arrive": "turn",
-   "say": "Hancock cites about a hundred peer-reviewed studies blaming a comet, with glass melted above 2,200 degrees at Abu Hureyra.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch7"
-  },
-  {
-   "id": "ch7-hureyra",
-   "chapter": 7,
-   "station": "panorama",
-   "era": "first-time",
-   "moment": "summer-evening",
-   "view": {
-    "yaw": 40,
-    "pitch": 4,
-    "fov": 60
-   },
-   "arrive": "turn",
-   "say": "Thirteen specialists called that refuted in 2023.",
+   "say": "Hancock cites about a hundred peer-reviewed studies blaming a comet.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -1358,48 +1074,10 @@
     "fov": 50
    },
    "arrive": "turn",
-   "say": "Göbekli Tepe, in south-east Turkey, is a set of rings of T-shaped pillars built about 9500 BCE, seven thousand years before the Great Pyramid.",
+   "say": "And in south-east Turkey stands Göbekli Tepe: rings of carved T-shaped pillars, some over five metres tall, raised about 9500 BCE, seven thousand years before the Great Pyramid, by people the excavators say had no farms, no pottery and no metal.",
    "draw": [
     "vulture-sky"
    ],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch7"
-  },
-  {
-   "id": "ch7-hunters",
-   "chapter": 7,
-   "station": "panorama",
-   "era": "first-time",
-   "moment": "summer-evening",
-   "view": {
-    "yaw": 40,
-    "pitch": 0,
-    "fov": 50
-   },
-   "arrive": "turn",
-   "say": "Its builders, the excavators say, were hunters and foragers with no farms, pottery or metal.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch7"
-  },
-  {
-   "id": "ch7-filled",
-   "chapter": 7,
-   "station": "panorama",
-   "era": "first-time",
-   "moment": "summer-evening",
-   "view": {
-    "yaw": 40,
-    "pitch": 0,
-    "fov": 50
-   },
-   "arrive": "turn",
-   "say": "Klaus Schmidt thought they filled it in on purpose; later excavators say slope slides did.",
-   "draw": [],
    "hold": 1,
    "interact": "look",
    "receipts": [],
@@ -1417,7 +1095,7 @@
     "fov": 44
    },
    "arrive": "cut",
-   "say": "Schoch points to Göbekli Tepe when asked where the older civilisation was.",
+   "say": "Schoch points to it when asked where the older civilisation was.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -1436,7 +1114,7 @@
     "fov": 44
    },
    "arrive": "turn",
-   "say": "If non-farmers could raise this, a plan at Giza in the eleventh millennium BCE is not absurd, and for this piece that makes the rest worth taking seriously. Nothing found there links it to Egypt.",
+   "say": "If hunters could raise this, a plan at Giza in the Ice Age is not absurd.",
    "draw": [
     "belt-plan@plan"
    ],
@@ -1478,31 +1156,9 @@
     "fov": 52
    },
    "arrive": "turn",
-   "say": "In March 2025 a team including the radar engineer Filippo Biondi said satellites had found, under Khafre's pyramid, eight wells falling 648 metres, four and a half pyramid heights, to two chambers about 80 metres on a side.",
+   "say": "In 2025 a team including the radar engineer Filippo Biondi said satellites had found eight wells under Khafre's pyramid, falling 648 metres, four and a half pyramid heights, to two great chambers.",
    "draw": [],
    "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch8"
-  },
-  {
-   "id": "ch8-rooms",
-   "chapter": 8,
-   "station": "menkaure",
-   "era": "today",
-   "moment": "winter-afternoon",
-   "view": {
-    "yaw": 8,
-    "pitch": 0,
-    "fov": 40
-   },
-   "arrive": "turn",
-   "say": "The rooms anyone has entered lie three metres below the base.",
-   "draw": [
-    "khafre-wells",
-    "khafre-depths"
-   ],
-   "hold": 1.5,
    "interact": "look",
    "receipts": [],
    "reply": "ch8"
@@ -1519,8 +1175,11 @@
     "fov": 60
    },
    "arrive": "turn",
-   "say": "Radar specialists say vibrations from that depth cannot be detected from orbit, and the method's only peer-reviewed paper was retracted in 2026. At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half underground.",
-   "draw": [],
+   "say": "At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half of them underground.",
+   "draw": [
+    "khafre-wells",
+    "khafre-depths"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],
@@ -1538,9 +1197,9 @@
     "fov": 60
    },
    "arrive": "turn",
-   "say": "Petrie found only a bed of stone chips, larger than the Great Pyramid's base. The expedition behind a 2008 survey reported walls eight to twelve metres down; archaeologists say it was Amenemhat III's temple, and later surveys find only shallow remains.",
+   "say": "In 2008 a survey of the ground south of its pyramid reported walls eight to twelve metres down, in a grid of rooms.",
    "draw": [
-    "hawara-depths@chips"
+    "hawara-depths"
    ],
    "hold": 1,
    "interact": "look",
@@ -1559,7 +1218,7 @@
     "fov": 70
    },
    "arrive": "cut",
-   "say": "Under the Sphinx's paws, Schoch's seismic survey found a hollow no one has opened, where Edgar Cayce placed a Hall of Records.",
+   "say": "And under the Sphinx's paws, Schoch's survey found a hollow no one has opened, where the psychic Edgar Cayce placed a Hall of Records.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -1599,7 +1258,7 @@
     "fov": 34
    },
    "arrive": "cut",
-   "say": "Much of this case can be tested.",
+   "say": "Much of this can be tested.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -1618,26 +1277,7 @@
     "fov": 70
    },
    "arrive": "cut",
-   "say": "The one measured support for the early date is Schoch's seismic finding that the rock is weathered more deeply in front of the Sphinx than behind it.",
-   "draw": [],
-   "hold": 1,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch9"
-  },
-  {
-   "id": "ch9-only",
-   "chapter": 9,
-   "station": "sphinx-flank",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 90,
-    "pitch": -20,
-    "fov": 70
-   },
-   "arrive": "turn",
-   "say": "No one has drilled to test it.",
+   "say": "The one measured support for the early date is the weathering under the Sphinx's floor, deeper in front than behind.",
    "draw": [],
    "hold": 1,
    "interact": "look",
@@ -1656,28 +1296,9 @@
     "fov": 76
    },
    "arrive": "turn",
-   "say": "Two cores, at the paws and behind the rump, would show whether it is weathering or a change in the rock.",
+   "say": "Two drill cores, one at the paws and one behind the rump, would show whether it is weathering or a change in the rock.",
    "draw": [],
    "hold": 1.5,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch9"
-  },
-  {
-   "id": "ch9-boreholes",
-   "chapter": 9,
-   "station": "sphinx-flank",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 250,
-    "pitch": 2,
-    "fov": 70
-   },
-   "arrive": "turn",
-   "say": "In 2008 Egypt's antiquities authority and Cairo University drilled four boreholes twenty metres deep around the Sphinx; we have found no published record of its weathering.",
-   "draw": [],
-   "hold": 1,
    "interact": "look",
    "receipts": [],
    "reply": "ch9"
@@ -1694,7 +1315,7 @@
     "fov": 70
    },
    "arrive": "cut",
-   "say": "Underneath, the paw cavity could be opened, the radar data released, and Hawara dug.",
+   "say": "Underneath, the cavity at the paws could be opened, the radar data released, Hawara dug.",
    "draw": [
     "looked-tests@underneath"
    ],
@@ -1715,7 +1336,7 @@
     "fov": 66
    },
    "arrive": "cut",
-   "say": "An answer looks like this: muon detectors found a hidden corridor in the Great Pyramid, with error bars, and a camera confirmed it.",
+   "say": "That is what an answer looks like: muon detectors found a hidden corridor inside the Great Pyramid, with error bars, and in 2023 a camera went in and saw it.",
    "draw": [
     "corridor@error"
    ],
@@ -1757,7 +1378,7 @@
     "fov": 70
    },
    "arrive": "cut",
-   "say": "The ditch floor has not been tested, and that is where to look.",
+   "say": "The ditch floor has not been tested. That is where to look.",
    "draw": [],
    "hold": 3,
    "interact": "look",
