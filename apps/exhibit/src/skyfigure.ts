@@ -71,7 +71,8 @@ export class SkyFigure {
     this.manual = null;
     this.cached = null;
     this.bar.hidden = false;
-    this.note.textContent = this.noteFor(moment, pick);
+    const sunAlt = moment.night ? null : skyAt(this.data, to, moment, pick, this.ground).sun?.altDeg ?? null;
+    this.note.textContent = this.noteFor(moment, pick, sunAlt);
     if (carried) this.stage.request();
     else this.stage.setSky((ctx, at, since, still, font) => this.draw(ctx, at, since, still, font));
   }
@@ -85,12 +86,14 @@ export class SkyFigure {
   }
 
   /** What the panel says the drawing is, from what the leaf picks out. */
-  private noteFor(moment: Moment, pick: SkyPick): string {
+  private noteFor(moment: Moment, pick: SkyPick, sunAlt: number | null = null): string {
     const d = this.data;
     const fig = pick.figure ? d.figures[pick.figure] : undefined;
     const gold = pick.figure ? ` ${fig?.name ?? pick.figure}'s in gold${fig ? " with Stellarium's modern figure drawn through them" : ''}.` : '';
     const star = moment.night ? d.named.find((s) => s.id === d.nights[moment.night!])?.name ?? 'its star' : null;
-    const when = star ? ` The sky is turned to the hour ${star} crosses the meridian in the year shown.` : ' By day none would be seen.';
+    // a twilight (the sun more than six degrees down) still shows the brighter stars; by day none would be seen
+    const dusk = sunAlt !== null && sunAlt < -6 ? ` At this hour the sun is ${Math.round(-sunAlt)} degrees under the horizon, and the brighter stars still show.` : null;
+    const when = star ? ` The sky is turned to the hour ${star} crosses the meridian in the year shown.` : dusk ?? ' By day none would be seen.';
     const ticks = pick.bearings ? ` Ticks on the horizon: ${pick.bearings}'s bearings.` : '';
     const marks = pick.marks ? ` Dashed across the meridian: ${pick.marks}'s shafts, at their surveyed angles.` : '';
     return `The ${d.stars.length} stars of the HYG catalogue to magnitude ${d.magnitudeLimit}, precessed (Vondrák 2011) to the year shown and drawn where they stood at this picture's moment.${gold}${when}${ticks}${marks} Stars: HYG 4.2, by astronexus; figures: Stellarium; both CC BY-SA 4.0.`;

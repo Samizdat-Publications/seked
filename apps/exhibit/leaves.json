@@ -462,11 +462,11 @@
    "chapter": 2,
    "station": "sphinx-back",
    "era": "first-time",
-   "moment": "equinox-dawn",
+   "moment": "equinox-twilight",
    "view": {
     "yaw": 106,
-    "pitch": 20,
-    "fov": 66
+    "pitch": 10,
+    "fov": 62
    },
    "arrive": "cut",
    "say": "And the lion looks due east, where the sun rises at the equinox. About 10,500 BCE, Hancock and Bauval calculate, the constellation Leo, the lion, rose there just before the equinox sun.",
