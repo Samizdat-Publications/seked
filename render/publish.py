@@ -169,6 +169,18 @@ def reply_callouts():
             label([318, 0, 99], "Menkaure's temple, left unfinished", "its core and its casing were going up together", "below"),
             label([300, 6, 200], "Menkaure's granite casing", "laid as the pyramid rose, and never dressed", "above"),
         ]},
+        "reply-ch4": {"lines": [], "labels": [
+            label([24, 1, 2000], "Giza in its own century", "radiocarbon puts Egypt's first king about 3100 BCE", "above"),
+        ]},
+        "reply-ch7": {"lines": [], "labels": [
+            label([30, 1, 2000], "The same plateau today", "nothing found at Göbekli Tepe links it to Egypt", "above"),
+        ]},
+        "reply-ch8": {"lines": [], "labels": [
+            label([7, 9, 550], "Khafre's pyramid", "the radar method's only peer-reviewed paper was retracted in 2026", "above"),
+        ]},
+        "reply-ch9": {"lines": [], "labels": [
+            label([280, 4, 150], "No physical date near 10,500 BCE", "more than 450 radiocarbon dates from the mortar: about 2900 to 2400 BCE", "above"),
+        ]},
         "reply-ch5": {"lines": [], "labels": [
             label([270, 22, 300], "The Great Pyramid as built", "its shafts date the building, in Khufu's century", "above"),
         ]},

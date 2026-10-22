@@ -423,6 +423,74 @@
    }
   ]
  },
+ "reply-ch4": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      24,
+      1,
+      2000
+     ]
+    },
+    "text": "Giza in its own century",
+    "sub": "radiocarbon puts Egypt's first king about 3100 BCE",
+    "place": "above"
+   }
+  ]
+ },
+ "reply-ch7": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      30,
+      1,
+      2000
+     ]
+    },
+    "text": "The same plateau today",
+    "sub": "nothing found at Göbekli Tepe links it to Egypt",
+    "place": "above"
+   }
+  ]
+ },
+ "reply-ch8": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      7,
+      9,
+      550
+     ]
+    },
+    "text": "Khafre's pyramid",
+    "sub": "the radar method's only peer-reviewed paper was retracted in 2026",
+    "place": "above"
+   }
+  ]
+ },
+ "reply-ch9": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      280,
+      4,
+      150
+     ]
+    },
+    "text": "No physical date near 10,500 BCE",
+    "sub": "more than 450 radiocarbon dates from the mortar: about 2900 to 2400 BCE",
+    "place": "above"
+   }
+  ]
+ },
  "reply-ch5": {
   "lines": [],
   "labels": [
