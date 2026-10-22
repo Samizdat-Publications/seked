@@ -30,6 +30,9 @@ export interface Shot {
 /** The era a wipe comes from, or a comparison shows beside the one on stage. */
 export interface Other { era: string; title: string; panoramas: string[] }
 
+/** The drift's limit (the fov's fraction it pushes in to), how fast it closes on it (per second) and its turn. */
+const DRIFT_ZOOM = 0.86, DRIFT_RATE = 0.045, DRIFT_YAW = 0.25 * DEG;
+
 export class Stage {
   station: Station | null = null;
   era: string | null = null;
@@ -67,6 +70,9 @@ export class Stage {
   private keys = new Set<string>();
   private font = 'sans-serif';
   private reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null;
+  /** In narrated play the held view creeps in and turns a little, so no shot sits dead still (the critic, 22 Oct). */
+  drift = false;
+  private driftSign = 1;
 
   constructor(private root: HTMLElement, private canvas: HTMLCanvasElement, private ink: HTMLCanvasElement,
     private flat: HTMLElement, private manifest: Manifest, private overlays: Record<string, Overlay>, private base: URL) {
@@ -128,6 +134,7 @@ export class Stage {
     this.fitted = framed.fov;
     this.view.zoom = 1;
     this.view.vy = this.view.vp = 0;
+    this.driftSign = -this.driftSign;
     this.setOverlay(shot);
     if (changed) this.showFlat();
     this.request();
@@ -409,6 +416,10 @@ export class Stage {
       v.vy *= k;
       v.vp *= k;
       moving = true;
+    } else if (this.drift && !this.drag && !this.wipeRun && !this.still) {
+      v.zoom = Math.max(DRIFT_ZOOM, v.zoom - (v.zoom - DRIFT_ZOOM) * DRIFT_RATE * dt);
+      v.yaw += this.driftSign * DRIFT_YAW * dt * (v.zoom - DRIFT_ZOOM) / (1 - DRIFT_ZOOM);
+      moving = v.zoom > DRIFT_ZOOM + 1e-3;
     }
     v.yaw = wrapAngle(v.yaw);
     v.pitch = clamp(v.pitch, -PITCH_MAX, PITCH_MAX);

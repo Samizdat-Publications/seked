@@ -14,6 +14,7 @@ const env = buildEnvironment(resolve(loadDatabase(), 'canonical').values);
 
 const file: ClaimFile = {
   id: 'P1',
+  fit: 'all',
   title: 'The circle in the stone',
   group: 'proportion',
   summary: 'The base perimeter over the original height is two pi.',

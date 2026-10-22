@@ -15,6 +15,7 @@ import { KEYS_FILE, PROPOSED_DIR, anthropicKey, proposedIds, writeProposal } fro
 
 const proposal: ClaimFile = {
   id: 'P999',
+  fit: 'all',
   title: 'A claim written by a test',
   group: 'proportion',
   summary: 'Written so the test can read it back and delete it.',

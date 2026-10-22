@@ -150,6 +150,7 @@ export class Player {
   play(): void {
     if (this.playing) return;
     this.playing = true;
+    this.stage.drift = true;
     this.onPlay();
     this.stage.compare(null);
     if (this.leaf.draw[0] && drawCue(this.leaf.draw[0]).word) this.stage.cueOverlay();
@@ -165,6 +166,7 @@ export class Player {
 
   pause(): void {
     this.playing = false;
+    this.stage.drift = false;
     this.ui.play.setAttribute('aria-pressed', 'false');
     this.ui.play.setAttribute('aria-label', 'Play');
     document.body.classList.remove('playing');

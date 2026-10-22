@@ -70,6 +70,7 @@ function fakeStorage(): Storage {
  */
 const FILE: ClaimFile = {
   id: 'P1',
+  fit: 'all',
   title: 'The King’s Chamber south shaft points at Orion’s belt',
   group: 'sky',
   summary: 'The south shaft of the King’s Chamber is said to point at Alnitak at its culmination in 2450 BCE.',

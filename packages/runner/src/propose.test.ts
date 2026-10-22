@@ -183,6 +183,7 @@ describe('putting prose to the model', () => {
 describe('the checks a claim file has to pass', () => {
   const file: ClaimFile = {
     id: 'P1',
+    fit: 'all',
     title: 'x',
     group: 'proportion',
     summary: 'x',
