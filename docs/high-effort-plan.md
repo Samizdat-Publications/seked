@@ -10,6 +10,35 @@ exhibit runs with `cd apps/exhibit; npx vite --port 5196`, the voice lab with `p
 (`build/critic/ch0-2-v2-critique.md`). Run at high effort, or extra high where a step needs it. Credits for Meshy,
 Gemini and ElevenLabs are approved: spend what it takes.*
 
+## 0. Done in the high-effort session of 22 October (afternoon)
+
+- **The Sphinx lab** (`scripts/sphinx_lab/`): `lab_sheet.py` renders seven fixed views of an era's statue, in its
+  material and in clay, through the renderer's own statue code; `critic.py` scores a sheet with Gemini 3.1 pro
+  briefed as a senior modeller, or compares two (`--against`, order swapped each run). Single scores swing a point
+  between runs; the pairwise comparison is the signal. Rounds are in `build/sphinx-lab/rounds/`.
+- **The claim eras' lion re-cut as rock** (`scripts/sphinx_lab/rock.py`, `render/giza/limestone.py`): the old long
+  rains' lion was the master pushed in and smoothed (the melted wax). Now the master is rebuilt as a solid,
+  reproportioned towards ARCE (back to 11.6 m, 1.3 times wider), its beds cut in the geometry (coves, ledges with
+  broken lips, joints, a worn foot set back under the lowest ledge, the head left hard), and its rock is three
+  Poly Haven scans laid bed by bed. The quarry-wall photograph was the "wood grain": its tool marks run
+  diagonally. Long rains 3 to 4 single-scored, and preferred in every pairwise run over the old (3 against 7);
+  First Time preferred 4 of 4 (4 to 5.75). Installed as the finishes `lion-rock` and `first-time-rock`.
+- **Still to do on the Sphinx:** today's (sphinx-meshy) scaffolding is fused into a mesh that is not watertight, so
+  the SDF tricks fail; the First Time's flank reads soft and draped close up (the master's own forms); the as-built
+  era still uses sphinx-built.
+- **The spoken replies were cut off.** Version 3 kept only the first wrapped line of each spoken reply in
+  `docs/script.md`, and they were recorded so ("...and geologists that the rock's own layers"). Restored from
+  `docs/script-v3-draft.md`, re-recorded and applied (commit 488bb9c).
+- **Every reply has its own picture** (2b.1): `replies` in `apps/exhibit/leaves.json`, played by the player while the
+  reply speaks, labelled as the survey it is.
+- **Chapter 1's seismic survey** is a section figure under the ditch floor (2.3, 2b.3), its depths entered in
+  `data/measurements/underground.json` as claimed and unverified; **figures are large cards** (2b.4).
+- **ch0-t08, ch7-schoch, ch7-plan** moved from behind the temple wall to the face station (2b.5).
+- **Leo at twilight** (2b.2): moment `equinox-twilight` added; the panorama renders in job `sphinx-rock-2`; then move
+  `ch2-leo` to it.
+- **To finish:** publish the re-renders and patches (jobs `sphinx-rock`, `sphinx-rock-2`), capture chapters 0 to 2
+  and run the video critic against version 3's 3:01 capture.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of
