@@ -12,7 +12,8 @@ played (`player.log` in `apps/exhibit/src/player.ts`): each leaf as it went on t
 chapter's recording from when it sounded to where it stopped. The script lays those spans of
 `assets/narration/chN.mp3` under the video at those times with the ffmpeg `imageio_ffmpeg` gives, into one mp4,
 and writes a JSON of the timeline beside it. A leaf the browser's voice said (its words not in the recording)
-is silent in the mp4 and listed in the JSON as `voice`. The replies are not in narrated play, so not here.
+is silent in the mp4 and listed in the JSON as `voice`. Each chapter's spoken reply plays at its end over its own
+shot (the player logs it as the leaf chN-reply), and is recorded with the chapter.
 
 If `apps/web/public/seked.json` exists (`pnpm bundle`) it is served to the page, so receipts and the figures that
 read the monuments draw as on the site.
@@ -57,10 +58,18 @@ def leaf_range(ids, first, last):
     return ids[a:b + 1]
 
 
+def in_range(leaf, leaves):
+    """A leaf of the range, or the reply shot (chN-reply) of one of its chapters, which plays inside it."""
+    if leaf in leaves:
+        return True
+    ch, _, rest = leaf.partition("-")
+    return rest == "reply" and any(x.split("-")[0] == ch for x in leaves)
+
+
 def stop_time(log, leaves, pressed_ms, stopped_ms):
     """When play left the range: the first leaf outside it put on the stage after Play, or when recording stopped."""
     for e in log:
-        if e.get("kind") == "leaf" and e["at"] > pressed_ms and e["leaf"] not in leaves:
+        if e.get("kind") == "leaf" and e["at"] > pressed_ms and not in_range(e["leaf"], leaves):
             return min(e["at"], stopped_ms)
     return stopped_ms
 

@@ -33,6 +33,11 @@ class Plan(unittest.TestCase):
         self.assertEqual(c.stop_time(log, leaves, 10_500, 30_000), 25_000)
         self.assertEqual([p[0] for p in c.audio_plan(log, 10_000, 25_000)], ["ch0.mp3"])
 
+    def test_a_chapters_reply_shot_plays_inside_the_range(self):
+        leaves = ["ch0-dawn", "ch0-sunrise"]
+        log = LOG + [{"kind": "leaf", "leaf": "ch0-reply", "at": 20_000}, {"kind": "leaf", "leaf": "ch1-reply", "at": 26_000}]
+        self.assertEqual(c.stop_time(log, leaves, 10_500, 30_000), 26_000)
+
     def test_the_timeline_is_in_seconds_from_the_origin(self):
         rows = c.timeline(LOG, 10_000)
         self.assertEqual([r["at"] for r in rows], [0.0, 1.0, 9.0, 9.5, 9.6, 15.25])
