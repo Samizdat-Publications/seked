@@ -114,7 +114,8 @@ export interface Rect { x: number; y: number; w: number; h: number }
  * a phone and read small on a laptop (the laptop's review at 1280 by 720), so they grow with the stage to a limit.
  */
 export function labelScale(width: number): number {
-  return clamp(width / 1000, 1, 1.4);
+  // read from across the room at full screen (the critic on version 4: callouts too small to read without leaning in)
+  return clamp(width / 800, 1, 1.9);
 }
 
 /**

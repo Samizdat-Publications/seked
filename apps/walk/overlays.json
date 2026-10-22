@@ -336,6 +336,127 @@
    }
   ]
  },
+ "reply-ch1": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      76,
+      -12,
+      14
+     ]
+    },
+    "text": "The Sphinx Temple's core blocks",
+    "sub": "cut from the ditch as it was quarried, archaeologists answer",
+    "place": "center"
+   },
+   {
+    "at": {
+     "dir": [
+      106,
+      -9,
+      16
+     ]
+    },
+    "text": "The same beds as the ditch walls",
+    "sub": "harder and softer layers, which can wear unevenly without rain",
+    "place": "center"
+   }
+  ]
+ },
+ "reply-ch2": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      27,
+      24,
+      60
+     ]
+    },
+    "text": "The head: a harder band of rock",
+    "sub": "it has kept its shape; the softer body wore back",
+    "place": "above"
+   },
+   {
+    "at": {
+     "dir": [
+      8,
+      7,
+      60
+     ]
+    },
+    "text": "The body: softer beds",
+    "sub": "worn back into coves, the band the head stands on",
+    "place": "below"
+   }
+  ]
+ },
+ "reply-ch3": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      318,
+      0,
+      99
+     ]
+    },
+    "text": "Menkaure's temple, left unfinished",
+    "sub": "its core and its casing were going up together",
+    "place": "below"
+   },
+   {
+    "at": {
+     "dir": [
+      300,
+      6,
+      200
+     ]
+    },
+    "text": "Menkaure's granite casing",
+    "sub": "laid as the pyramid rose, and never dressed",
+    "place": "above"
+   }
+  ]
+ },
+ "reply-ch5": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      270,
+      22,
+      300
+     ]
+    },
+    "text": "The Great Pyramid as built",
+    "sub": "its shafts date the building, in Khufu's century",
+    "place": "above"
+   }
+  ]
+ },
+ "reply-ch6": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      18,
+      22,
+      200
+     ]
+    },
+    "text": "One builders' rule",
+    "sub": "a slope of five and a half palms in seven gives both pi and the golden ratio",
+    "place": "above"
+   }
+  ]
+ },
  "akhet": {
   "lines": [
    {

@@ -153,6 +153,31 @@ def dms(deg):
     return f"{d}°{m:02d}′"
 
 
+def reply_callouts():
+    """Callouts for the chapters' reply shots, as directions (azimuth, altitude, metres) from each station's camera."""
+    label = lambda d, text, sub, place="center": {"at": {"dir": d}, "text": text, "sub": sub, "place": place}
+    return {
+        "reply-ch1": {"lines": [], "labels": [
+            label([76, -12, 14], "The Sphinx Temple's core blocks", "cut from the ditch as it was quarried, archaeologists answer"),
+            label([106, -9, 16], "The same beds as the ditch walls", "harder and softer layers, which can wear unevenly without rain"),
+        ]},
+        "reply-ch2": {"lines": [], "labels": [
+            label([27, 24, 60], "The head: a harder band of rock", "it has kept its shape; the softer body wore back", "above"),
+            label([8, 7, 60], "The body: softer beds", "worn back into coves, the band the head stands on", "below"),
+        ]},
+        "reply-ch3": {"lines": [], "labels": [
+            label([318, 0, 99], "Menkaure's temple, left unfinished", "its core and its casing were going up together", "below"),
+            label([300, 6, 200], "Menkaure's granite casing", "laid as the pyramid rose, and never dressed", "above"),
+        ]},
+        "reply-ch5": {"lines": [], "labels": [
+            label([270, 22, 300], "The Great Pyramid as built", "its shafts date the building, in Khufu's century", "above"),
+        ]},
+        "reply-ch6": {"lines": [], "labels": [
+            label([18, 22, 200], "One builders' rule", "a slope of five and a half palms in seven gives both pi and the golden ratio", "above"),
+        ]},
+    }
+
+
 def overlays():
     """
     Figures the guided tour draws over a station, in the project frame, computed here from the survey
@@ -207,6 +232,10 @@ def overlays():
              "sub": f"{socket['khafre_valley_temple.hall.socket.pitch']:.1f} m apart, scaled from Hölscher's plan; the south row mirrored", "place": "above"},
         ],
     }
+    # The reply shots' callouts (apps/exhibit/leaves.json `replies`): what each reply's picture shows for the reply,
+    # placed as directions from the station's camera, as the hall's are (the critic on version 4: a reply over
+    # "anonymous pavement stones" says nothing). The words are the replies' own, from docs/script.md.
+    out.update(reply_callouts())
     # The rest needs the claims engine's own values: `pnpm tsx scripts/tour-values.ts` writes them.
     path = os.path.join(data.REPO, "build", "tour-values.json")
     if not os.path.exists(path):

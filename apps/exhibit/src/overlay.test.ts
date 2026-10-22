@@ -4,8 +4,8 @@ import { labelScale, nudge, sideStep } from './overlay';
 describe("the scene's labels", () => {
   it('keep their phone size on a phone and grow on a laptop, to a limit', () => {
     expect(labelScale(390)).toBe(1);
-    expect(labelScale(1280)).toBeCloseTo(1.28, 6);
-    expect(labelScale(2560)).toBe(1.4);
+    expect(labelScale(1280)).toBeCloseTo(1.6, 6);
+    expect(labelScale(2560)).toBe(1.9);
   });
   it('stay where they are when nothing is in the way', () => {
     const r = { x: 100, y: 100, w: 200, h: 40 };

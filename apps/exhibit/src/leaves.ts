@@ -66,6 +66,8 @@ export type Leaf = z.infer<typeof LeafSchema>;
  */
 export const ReplyShotSchema = z.object({
   station: z.string().min(1), era: z.string().min(1), moment: z.string().min(1), view: View, why: z.string().min(1),
+  /** Callouts (overlays.json) drawn into the reply's picture, so it says what it shows for the reply. */
+  draw: z.array(z.string().regex(/^[\w-]+$/)).optional(),
 }).strict();
 
 export type ReplyShot = z.infer<typeof ReplyShotSchema>;
@@ -88,7 +90,7 @@ export function readReplyShots(raw: unknown): Record<string, ReplyShot> {
 /** A reply shot as a leaf of its chapter's last leaf, so the stage, the panel and the sky can take it as one. */
 export function replyLeaf(last: Leaf, shot: ReplyShot): Leaf {
   return { ...last, id: `${last.reply}-reply`, station: shot.station, era: shot.era, moment: shot.moment, view: shot.view,
-    draw: [], receipts: [], interact: 'look', sky: undefined, until: undefined };
+    draw: shot.draw ?? [], receipts: [], interact: 'look', sky: undefined, until: undefined };
 }
 
 /**

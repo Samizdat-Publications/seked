@@ -226,9 +226,13 @@ describe('reply shots', () => {
     }
   });
 
-  it('becomes a leaf of its chapter with nothing of the claim drawn on it', () => {
-    const last = leaves.find((L) => L.reply === 'ch1')!;
+  it('becomes a leaf of its chapter drawing its own callouts and nothing of the claim', () => {
+    const last = [...leaves].reverse().find((L) => L.reply === 'ch1')!;
     const R = replyLeaf(last, shots.ch1!);
-    expect([R.station, R.era, R.draw.length, R.receipts.length, R.sky]).toEqual([shots.ch1!.station, shots.ch1!.era, 0, 0, undefined]);
+    expect([R.station, R.era, R.draw, R.receipts.length, R.sky]).toEqual([shots.ch1!.station, shots.ch1!.era, shots.ch1!.draw ?? [], 0, undefined]);
+  });
+
+  it('draws only callouts the walkthrough publishes', () => {
+    for (const [k, s] of Object.entries(shots)) for (const d of s.draw ?? []) expect(overlays[d], `${k}: ${d}`).toBeDefined();
   });
 });
