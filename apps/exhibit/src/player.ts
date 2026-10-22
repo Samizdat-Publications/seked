@@ -17,6 +17,8 @@ const READY_WAIT_MS = 8000;
 /** How far into a turn or a wipe the words begin, and the longest pause after a leaf's words (critic, 21 October). */
 const LEAD_MS = 350;
 const MAX_HOLD_S = 0.35;
+/** Seconds the words back up when play takes up where it stopped. */
+const REWIND_S = 1;
 
 export interface PlayerUi {
   caption: HTMLElement;
@@ -73,6 +75,10 @@ export class Player {
   private recordings = new Map<number, Promise<{ url: string; file: string; spans: Map<string, Span> } | null>>();
   /** The word index that starts the leaf's overlay, in play. */
   private cueAt = -1;
+  /** Where the words were when play stopped, so play takes up from there rather than the leaf's start. */
+  private resumeAt: { leaf: string; part: 'say' | 'reply'; t: number } | null = null;
+  /** The leaf's recording span now sounding, read when play stops. */
+  private sounding: { leaf: string; part: 'say' | 'reply'; audio: HTMLAudioElement } | null = null;
   private timers: number[] = [];
   private shown = -1;
 
@@ -121,6 +127,7 @@ export class Player {
     const from = this.shown >= 0 ? this.leaves[this.shown] : undefined;
     this.index = i;
     this.shown = i;
+    this.resumeAt = null;
     const L = this.leaf;
     this.cancel();
     const token = this.token;
@@ -160,11 +167,22 @@ export class Player {
     document.body.classList.add('playing');
     this.cancel();
     const token = this.token;
-    // back to the leaf's own view if the visitor looked away, then its words from the start
-    this.stage.turn(this.shot(this.leaf), () => { if (token === this.token && this.playing) this.whenReady(token, () => this.speak(token)); });
+    // back to the leaf's own view if the visitor looked away, eased, then its words from where they stopped
+    const back = this.resumeAt?.leaf === this.leaf.id ? this.resumeAt : null;
+    this.resumeAt = null;
+    this.stage.turn(this.shot(this.leaf), () => {
+      if (token !== this.token || !this.playing) return;
+      this.whenReady(token, () => {
+        if (back?.part === 'reply') this.speakReply(token, this.leaf.chapter, () => this.onward(token), back.t);
+        else this.speak(token, back?.t);
+      });
+    });
   }
 
   pause(): void {
+    const s = this.sounding;
+    // a second back, so the sentence picks up with its sense
+    this.resumeAt = s && !s.audio.paused ? { leaf: s.leaf, part: s.part, t: Math.max(0, s.audio.currentTime - REWIND_S) } : null;
     this.playing = false;
     this.stage.drift = false;
     this.ui.play.setAttribute('aria-pressed', 'false');
@@ -273,7 +291,7 @@ export class Player {
    * Play a leaf's span of its chapter's recording, the words cued from the audio's own clock; `fallback` if the
    * audio will not play. Stops at the span's end and calls `end`.
    */
-  private playSpan(token: number, L: Leaf, rec: { url: string; file: string }, span: Span, end: () => void, fallback: () => void): void {
+  private playSpan(token: number, L: Leaf, rec: { url: string; file: string }, span: Span, end: () => void, fallback: () => void, from?: number): void {
     const a = this.audio, url = rec.url;
     let heard: Extract<PlayLog, { kind: 'span' }> | null = null;
     this.words = span.words;
@@ -290,14 +308,15 @@ export class Player {
     };
     const go = () => {
       if (token !== this.token) return;
-      a.currentTime = span.start;
+      a.currentTime = from !== undefined && from > span.start && from < span.end ? from : span.start;
+      this.sounding = { leaf: L.id, part: 'say', audio: a };
       a.play().then(tick, fail);
     };
     a.onerror = fail;
     if (a.src !== url) { a.src = url; a.preload = 'auto'; }
     if (a.readyState >= 1) go(); else a.addEventListener('loadedmetadata', go, { once: true });
     // audio that stalls still lets play go on
-    this.later((span.end - span.start + 6) * 1000, () => { if (token === this.token && !failed) { a.pause(); end(); } });
+    this.later((span.end - (from ?? span.start) + 6) * 1000, () => { if (token === this.token && !failed) { a.pause(); end(); } });
   }
 
   private cancel(): void {
@@ -315,7 +334,7 @@ export class Player {
   private replyAudio: HTMLAudioElement | null = null;
 
   /** The chapter's recorded spoken reply (chN-reply.mp3), captioned, then on; silent and straight on if there is none. */
-  private speakReply(token: number, chapter: number, done: () => void): void {
+  private speakReply(token: number, chapter: number, done: () => void, from = 0): void {
     void (async () => {
       try {
         const res = await fetch(new URL(recordingUrl(chapter), location.href));
@@ -325,6 +344,8 @@ export class Player {
         this.ui.caption.classList.add('reply-voice');
         const a = new Audio(new URL(recordingUrl(chapter, rec.file), location.href).href);
         this.replyAudio = a;
+        this.sounding = { leaf: this.leaf.id, part: 'reply', audio: a };
+        if (from > 0) a.currentTime = from;
         const finish = () => {
           if (this.replyAudio !== a) return;
           this.replyAudio = null;
@@ -337,6 +358,13 @@ export class Player {
         await a.play().catch(finish);
       } catch { done(); }
     })();
+  }
+
+  /** On to the next leaf, or stop at the last. */
+  private onward(token: number): void {
+    if (token !== this.token || !this.playing) return;
+    if (this.index + 1 < this.leaves.length) this.go(this.index + 1);
+    else this.pause();
   }
 
   private later(ms: number, f: () => void): void { this.timers.push(window.setTimeout(f, ms)); }
@@ -352,7 +380,7 @@ export class Player {
   }
 
   /** Say the leaf's words; when they end, hold, then go on. */
-  private speak(token: number): void {
+  private speak(token: number, from?: number): void {
     const L = this.leaf;
     this.cueAt = leafCues(L, isFigure).line;
     let ended = false;
@@ -361,11 +389,7 @@ export class Player {
       ended = true;
       this.later(Math.min(L.hold, MAX_HOLD_S) * 1000, () => {
         if (token !== this.token || !this.playing) return;
-        const onward = () => {
-          if (token !== this.token || !this.playing) return;
-          if (this.index + 1 < this.leaves.length) this.go(this.index + 1);
-          else this.pause();
-        };
+        const onward = () => this.onward(token);
         // the chapter's last leaf: the archaeologists' reply is spoken before the next chapter, so narrated play is
         // never the claim alone (the critic, 21 October: "it functions almost purely as advocacy")
         const next = this.leaves[this.index + 1];
@@ -376,7 +400,7 @@ export class Player {
     void this.recording(L.chapter).then((r) => {
       if (token !== this.token) return;
       const span = r?.spans.get(L.id);
-      if (r && span) this.playSpan(token, L, r, span, end, () => { console.info(`${L.id}: the recording would not play, so the browser's voice says it`); this.speakAloud(token, L, end); });
+      if (r && span) this.playSpan(token, L, r, span, end, () => { console.info(`${L.id}: the recording would not play, so the browser's voice says it`); this.speakAloud(token, L, end); }, from);
       else {
         if (r) console.info(`${L.id}: its words are not in chapter ${L.chapter}'s recording, so the browser's voice says them`);
         this.speakAloud(token, L, end);
