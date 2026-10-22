@@ -1,0 +1,192 @@
+{
+ "about": "22 October: today's Sphinx panoramas without the two crowds at the Sphinx (render/giza/scatter.py)",
+ "renders": [
+  {
+   "state": "today",
+   "station": "sphinx-back",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-back-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-face-today-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-face",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-face-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-today-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-today-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-today.png"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-back",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-back-today-equinox-dawn-ch2-equinox.png",
+   "patch": {
+    "yaw": 90,
+    "pitch": 6,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch2-equinox",
+    "pano": "pano/sphinx-back-today.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-flank-today-equinox-dawn-ch1-fissures.png",
+   "patch": {
+    "yaw": 235,
+    "pitch": 11,
+    "fov": 72.8,
+    "aspect": 1.777778,
+    "leaf": "ch1-fissures",
+    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-flank-today-equinox-dawn-ch1-rain.png",
+   "patch": {
+    "yaw": 235,
+    "pitch": 7,
+    "fov": 80.6,
+    "aspect": 1.777778,
+    "leaf": "ch1-rain",
+    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-flank-today-equinox-dawn-ch1-rolls.png",
+   "patch": {
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch1-rolls",
+    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-sunrise.png",
+   "patch": {
+    "yaw": 277,
+    "pitch": 0,
+    "fov": 44.2,
+    "aspect": 1.777778,
+    "leaf": "ch0-sunrise",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-textbooks.png",
+   "patch": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 57.2,
+    "aspect": 1.777778,
+    "leaf": "ch0-textbooks",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-today-equinox-dawn-ch3-core.png",
+   "patch": {
+    "yaw": 235,
+    "pitch": -22,
+    "fov": 58.5,
+    "aspect": 1.777778,
+    "leaf": "ch3-core",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-today-equinox-dawn-ch3-ditch.png",
+   "patch": {
+    "yaw": 275,
+    "pitch": -4,
+    "fov": 78.0,
+    "aspect": 1.777778,
+    "leaf": "ch3-ditch",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   }
+  },
+  {
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/patch-exhibit/sphinx-today-equinox-dawn-ch9-tested.png",
+   "patch": {
+    "yaw": 277,
+    "pitch": 0,
+    "fov": 44.2,
+    "aspect": 1.777778,
+    "leaf": "ch9-tested",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   }
+  }
+ ]
+}

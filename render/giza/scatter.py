@@ -69,8 +69,10 @@ QUAY_TOP = -43.3 + 1.2        # the harbour's water plus harbour.QUAY_TOP_ABOVE_
 CROWDS = {
     "today": [(0, 128, 70, 40, 60, None), (120, 30, 20, 60, 60, None), (60, -125, 60, 30, 60, None),
               (-125, -40, 20, 50, 60, None), (215, -60, 15, 80, 60, None), (150, -250, 60, 40, 60, None),
-              (-8, -318, 10, 8, 9, None), (-70, -300, 14, 10, 9, None), (392, -484, 14, 6, 30, None),
-              (300, -458, 22, 3, 18, None)],
+              (-8, -318, 10, 8, 9, None), (-70, -300, 14, 10, 9, None)],
+    # The two crowds at the Sphinx (by its temple and along the ditch's south side) were taken out on 22 October:
+    # seen from a few metres they read as stiff mannequins in every review of the exhibit; at the pyramids,
+    # further off, the figures still give the scale.
     "built": [(417.6, -470.0, 0.8, 68.0, 34, QUAY_TOP, 7), (156.0, 0.0, 8.0, 19.0, 14, 0.5),
               (300.0, -120.0, 50.0, 75.0, 18, None), (60.0, -140.0, 40.0, 8.0, 8, None),
               (-300.0, 50.0, 110.0, 70.0, 22, None),                                      # the Western Cemetery's streets

@@ -156,10 +156,12 @@ export class Player {
     void this.replyRecording(L.chapter);
     const next = this.leaves[i + 1];
     if (next) void this.recording(next.chapter);
-    const reply = (!next || next.chapter !== L.chapter) ? this.replyShotFor(L) : null;
-    if (reply) for (const p of this.panoramas(reply)) this.stage.prefetch(this.manifest.byId[reply.station]!, reply.era, p);
     const ahead = next && { yaw: next.view.yaw * DEG, pitch: next.view.pitch * DEG, fov: next.view.fov * DEG };
     if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p, ahead);
+    // the reply's picture comes before the next leaf's, so it is asked for last and is the fresher in the cache
+    const reply = (!next || next.chapter !== L.chapter) ? this.replyShotFor(L) : null;
+    const facing = reply && { yaw: reply.view.yaw * DEG, pitch: reply.view.pitch * DEG, fov: reply.view.fov * DEG };
+    if (reply) for (const p of this.panoramas(reply)) this.stage.prefetch(this.manifest.byId[reply.station]!, reply.era, p, facing!);
   }
 
   play(): void {

@@ -62,7 +62,14 @@ any can be reversed.
    Chapters 4, 7, 8 and 9 have no callouts yet (the plateau today; the ditch floor; the opening view).
 4. **Scene callouts are larger** (up to 1.9 times on a wide screen), after the critic's "illegible panels".
 5. **Leo is two shots**: the lion facing the eastern glow, then a turn up to Leo rising; the words are unchanged.
-6. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
+6. **The crowds at the Sphinx are gone from today's panoramas** (every critic review called them stiff mannequins;
+   the plan listed them). The crowds at the pyramids stay, for scale. `render/giza/scatter.py`.
+7. **A loading gap fixed:** a prefetched panorama was evicted as soon as it arrived (the cache stamped it when its
+   fetch began), which showed 2 s of "Loading the panorama" before chapter 2's reply.
+8. **Version 5's critic** (`build/critic/ch0-2-v5-critique.md`): 5.0 overall, against 5.5 for version 4; within the
+   critic's swing of about half a point. It still wants faster narration, no on-screen captions duplicating the
+   voice, a tighter cold open without Gobekli Tepe, and the seismic numbers out of the voice: all Stewart's calls.
+9. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
    only carve a smaller shape out of a larger one", and ambient sound. Those change the script or add a new layer,
    and wait for Stewart.
 

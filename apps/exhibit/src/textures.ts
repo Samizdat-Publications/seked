@@ -54,6 +54,9 @@ export class TextureCache {
       img.close();
       e.status = 'ready';
       e.readyAt = performance.now();
+      // a fresh arrival counts as used now: stamped only when its fetch began, a prefetched panorama was the oldest
+      // entry by the time it landed and was let go at once (the 2 s of "Loading" before chapter 2's reply, 22 October)
+      e.used = ++this.clock;
       this.evict();
     } catch (err) {
       console.warn(`${e.url} did not load`, err);
