@@ -24,7 +24,7 @@ import { bestCircle } from './greatcircle';
 import { ALISON, era, poolReply, poolSvg, strip, stripSvg } from './worldsites';
 import { degreesToSeked } from '@seked/units';
 import corridor from 'virtual:corridor';
-import { allanRankSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
+import { allanRankSvg, seismicSection, seismicSectionSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { TIER_WORDS, groundEnvironment, leafReceipts } from './receipts';
 import { Player } from './player';
@@ -192,6 +192,15 @@ function corridorFigure(): string {
     seen through an endoscope; ${d.across.value.toFixed(2)} &#177; ${d.across.sigma.toFixed(2)} m across, east to west.
     ${shortCite(d.citation)}, ${d.verified ? 'checked against the paper' : 'not yet checked'}. The Sphinx's claimed cavity
     has no comparable figures at all.</figcaption>`;
+}
+
+/** Chapter 1's floor: the weathered layer Schoch reads under the ditch, deeper in front than behind, from the records. */
+function seismicSectionFigure(ground: Record<string, number> | null): string {
+  const d = ground && seismicSection(ground);
+  if (!d) return '<figcaption>The depths are drawn from the bundled database (pnpm bundle), which this copy of the site lacks.</figcaption>';
+  return `${seismicSectionSvg(d)}<figcaption>Under the ditch floor, by seismic refraction (Dobecki and Schoch, 1992): the rock
+    weathered ${d.front[0]} to ${d.front[1]} m deep in front and along the sides, about ${d.rear} m behind the rump, depths as
+    Schoch reported them and Reader repeats them, not yet checked against the paper. Depths to scale; the statue is not.</figcaption>`;
 }
 
 /** Chapter 8's depths: the pyramid, its rooms and the claimed wells to one scale, from the claims' environment. */
@@ -389,6 +398,7 @@ async function start(): Promise<void> {
     }
     // a figure drawn from the monuments before they loaded is drawn again with them
     if (shownFigure === 'belt-plan') figure.innerHTML = beltPlanFigure(ground);
+    if (shownFigure === 'seismic-section') figure.innerHTML = seismicSectionFigure(ground);
     if (shownFigure === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
     if (shownFigure === 'pi-circle') figure.innerHTML = piCircleFigure(ground);
     if (shownFigure === 'north-square') figure.innerHTML = northSquareFigure(ground);
@@ -440,6 +450,7 @@ async function start(): Promise<void> {
     if (id === 'north-square') figure.innerHTML = northSquareFigure(ground);
     if (id === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (id === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
+    if (id === 'seismic-section') figure.innerHTML = seismicSectionFigure(ground);
     if (id === 'joint-claim') figure.innerHTML = `${jointClaimSvg()}<figcaption>The claim as West and Schoch describe it, not a survey:
       no measured section through an original joint has been published, by either side.</figcaption>`;
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();

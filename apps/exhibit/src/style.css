@@ -72,18 +72,20 @@ p { margin: 0; }
 .edge.at-rest .edge-grip { left: -40px; }
 .edge.at-rest .edge-now { right: 22px; }
 
-/* the exhibit's own figures, laid over the stage at its top left */
+/* the exhibit's own figures: while one is up it is the picture, a large card over the middle of the stage, so its lines
+   and labels read at full screen (the critic on version 3: "small panels with tiny text"); the drawing scales up with it */
 .figure {
-  position: absolute; left: var(--left); top: max(var(--g), env(safe-area-inset-top)); z-index: 3; margin: 0;
-  width: min(330px, calc(100% - 2 * var(--g))); padding: 12px 14px 10px;
-  background: rgba(17, 15, 12, 0.78); border: 1px solid var(--rule); border-radius: 10px;
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); pointer-events: none;
+  position: absolute; left: 50%; top: max(5vh, var(--g), env(safe-area-inset-top)); z-index: 3; margin: 0;
+  width: min(820px, calc(100% - 2 * var(--g))); padding: 22px 26px 18px; transform: translateX(-50%);
+  background: rgba(17, 15, 12, 0.86); border: 1px solid var(--rule); border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); pointer-events: none;
   animation: figure-in 0.6s ease-out;
 }
-@keyframes figure-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-.figure svg { display: block; width: 100%; height: auto; }
-/* on a sky leaf the year's panel holds the top left, so the figure takes the top right (below it on a phone) */
-.figure.beside-sky { left: auto; right: calc(var(--g) + 44px); }
+@keyframes figure-in { from { opacity: 0; } to { opacity: 1; } }
+.figure svg { display: block; width: 100%; height: auto; max-height: 58vh; margin: 0 auto; }
+/* on a sky leaf the sky is the picture and the year's panel holds the top left, so the figure stands at the right */
+.figure.beside-sky { left: auto; right: calc(var(--g) + 44px); transform: none; width: min(460px, calc(100% - 2 * var(--g))); }
 @media (max-width: 600px) { .figure.beside-sky { left: var(--left); right: auto; top: calc(max(var(--g), env(safe-area-inset-top)) + 84px); } }
 .figure .statue { fill: rgba(239, 232, 220, 0.28); stroke: rgba(239, 232, 220, 0.7); stroke-width: 1; }
 .figure .star { fill: rgba(255, 214, 140, 1); }
@@ -104,7 +106,12 @@ p { margin: 0; }
 .figure .here-lab, .figure .north { font: 500 10px var(--mono); fill: var(--muted); letter-spacing: 0.06em; }
 /* a label that crosses a line reads over it, outlined in the panel's own dark */
 .figure .halo { paint-order: stroke; stroke: rgba(38, 36, 33, 0.95); stroke-width: 3px; stroke-linejoin: round; }
-.figure figcaption { margin-top: 8px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+.figure figcaption { margin: 12px auto 0; max-width: 72ch; font-size: 15px; line-height: 1.5; color: var(--muted); }
+/* chapter 1's section: the weathered rock under the floor, the range paler */
+.figure .weathered { fill: rgba(196, 132, 70, 0.55); }
+.figure .weathered-range { fill: rgba(196, 132, 70, 0.22); stroke: rgba(214, 160, 100, 0.6); stroke-width: 1; stroke-dasharray: 4 3; }
+.figure .sec-lab { font: 600 20px var(--mono); fill: rgba(248, 214, 140, 1); }
+.figure .sec-sub { font: 500 12px var(--mono); fill: var(--muted); letter-spacing: 0.06em; }
 
 /* the receipt and the reply: a tab at the right edge, a quiet panel when open */
 .tab {

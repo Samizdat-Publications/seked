@@ -63,7 +63,7 @@ import { degreesToSeked, formatDms } from '@seked/units';
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
+export const FIGURES = ['ditch-plan', 'seismic-section', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -529,6 +529,46 @@ export function khafreDepthsSvg(d: KhafreDepths, width = 300): string {
   ${Array.from({ length: n }, (_, i) => `<line class="wall" x1="${bar - 4}" y1="${f(Y(-(i + 1) * d.height))}" x2="${bar + 4}" y2="${f(Y(-(i + 1) * d.height))}"/><text class="here-lab" x="${bar + 8}" y="${f(Y(-(i + 1) * d.height) + 3)}">${i + 1}</text>`).join('\n  ')}
   <text class="here-lab" x="${bar + 8}" y="${f(Y(d.bottom) + 3)}">${(-d.bottom / d.height).toFixed(2)}</text>
   <text class="north" x="${bar}" y="${f(Y(0) - 6)}" text-anchor="middle">heights</text>
+</svg>`;
+}
+
+export interface SeismicSection {
+  /** Below the ditch floor, metres: in front and along the sides (shallow and deep ends), and behind the rump. */
+  front: [number, number]; rear: number;
+}
+
+/** Schoch's floor weathering from the records, or null until they are there. */
+export function seismicSection(env: Record<string, number>): SeismicSection | null {
+  const a = env['sphinx.enclosure.weathering.depth.front.min'], b = env['sphinx.enclosure.weathering.depth.front.max'];
+  const rear = env['sphinx.enclosure.weathering.depth.rear'];
+  return a === undefined || b === undefined || rear === undefined ? null : { front: [Math.min(a, b), Math.max(a, b)], rear };
+}
+
+/**
+ * The ditch in long section, the Sphinx on its floor facing right and the weathered layer under the floor to a depth
+ * scale: shallow behind the rump, deeper in front and along the sides, the range drawn as a paler band. Above the floor
+ * the statue is a sign for where the lines run, not to scale; below it the depths are.
+ */
+export function seismicSectionSvg(d: SeismicSection, width = 640): string {
+  const floor = 132, k = 44, H = floor + k * Math.ceil(d.front[1] + 0.6) + 34, f = (z: number) => z.toFixed(1);
+  const Y = (m: number) => floor + m * k, split = 168, right = width - 70;
+  const sphinx = `M 150 ${floor} L 150 102 Q 152 90 172 88 L 368 86 Q 380 84 386 74 L 392 46 Q 396 36 410 34 L 432 34
+    Q 446 36 448 50 L 450 66 Q 450 78 440 82 L 442 104 Q 446 112 458 112 L 532 114 Q 542 116 542 124 L 542 ${floor} Z`;
+  const ticks = Array.from({ length: Math.ceil(d.front[1]) + 1 }, (_, i) => i);
+  return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="Under the Sphinx's ditch: weathered ${d.rear} metres deep behind the rump, ${d.front[0]} to ${d.front[1]} in front and along the sides">
+  <path class="statue" d="${sphinx}"/>
+  <text class="north" x="260" y="${floor - 54}" text-anchor="middle">the Sphinx, on the ditch floor</text>
+  <rect class="weathered" x="24" y="${f(floor)}" width="${split - 24}" height="${f(d.rear * k)}"/>
+  <rect class="weathered" x="${split}" y="${f(floor)}" width="${right - split}" height="${f(d.front[0] * k)}"/>
+  <rect class="weathered-range" x="${split}" y="${f(Y(d.front[0]))}" width="${right - split}" height="${f((d.front[1] - d.front[0]) * k)}"/>
+  <line class="wall" x1="16" y1="${floor}" x2="${right + 8}" y2="${floor}"/>
+  <line class="dim" x1="${split}" y1="${floor - 4}" x2="${split}" y2="${f(Y(d.front[1]) + 10)}"/>
+  <text class="sec-lab" x="${(24 + split) / 2}" y="${f(Y(d.rear) + 26)}" text-anchor="middle">${d.rear} m</text>
+  <text class="sec-sub" x="${(24 + split) / 2}" y="${f(Y(d.rear) + 44)}" text-anchor="middle">behind the rump</text>
+  <text class="sec-lab" x="${(split + right) / 2}" y="${f(Y(d.front[1]) + 26)}" text-anchor="middle">${d.front[0]} to ${d.front[1]} m</text>
+  <text class="sec-sub" x="${(split + right) / 2}" y="${f(Y(d.front[1]) + 44)}" text-anchor="middle">in front and along the sides</text>
+  ${ticks.map((m) => `<line class="dim" x1="${right + 14}" y1="${f(Y(m))}" x2="${right + 22}" y2="${f(Y(m))}" style="stroke-dasharray: none"/><text class="here-lab" x="${right + 26}" y="${f(Y(m) + 4)}">${m} m</text>`).join('\n  ')}
+  <line class="dim" x1="${right + 18}" y1="${floor}" x2="${right + 18}" y2="${f(Y(ticks[ticks.length - 1]!))}" style="stroke-dasharray: none"/>
 </svg>`;
 }
 
