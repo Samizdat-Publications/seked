@@ -185,6 +185,14 @@ class Handler(BaseHTTPRequestHandler):
                      for t in state["takes"]]
             return self.send(200, {"items": script_items(), "takes": takes, "picks": state["picks"],
                                    "voice": ns.VOICE})
+        if self.path == "/api/samples":
+            folder = os.path.join(LAB, "samples")
+            names = sorted(os.listdir(folder)) if os.path.isdir(folder) else []
+            return self.send(200, [n for n in names if n.endswith(".mp3")])
+        if self.path.startswith("/sample/") and self.path.endswith(".mp3"):
+            path = os.path.join(LAB, "samples", os.path.basename(self.path))
+            if os.path.exists(path):
+                return self.send(200, open(path, "rb").read(), "audio/mpeg")
         if self.path.startswith("/take/") and self.path.endswith(".mp3"):
             path = os.path.join(TAKES, os.path.basename(self.path))
             if os.path.exists(path):

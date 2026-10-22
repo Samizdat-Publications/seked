@@ -54,6 +54,7 @@ let S;
 async function load() {
   S = await (await fetch("/api/state")).json();
   render();
+  await samples();
 }
 
 function el(tag, attrs = {}, ...kids) {
@@ -69,6 +70,15 @@ function describe(v) {
 }
 
 function same(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+
+async function samples() {
+  const names = await (await fetch("/api/samples")).json();
+  if (!names.length) return;
+  const box = el("section", {id: "samples"}, el("h2", {}, "Samples to compare", el("small", {}, "build/voice-lab/samples")));
+  for (const n of names) box.append(el("div", {class: "take"}, el("span"),
+    el("div", {}, el("audio", {controls: "", preload: "none", src: `/sample/${n}`}), el("div", {class: "meta"}, n.replace(".mp3", ""))), el("span")));
+  document.getElementById("main").prepend(box);
+}
 
 function render() {
   const main = document.getElementById("main"), nav = document.getElementById("nav");
