@@ -63,6 +63,9 @@ It praised the writing, the head shots and the era wipes. Its ranked asks, with 
 3. Close-ups of the ditch wall's coves beside a wind-scoured face; cut the dirty-concrete floor shot.
 4. Figures as clean full-screen graphics or overlays drawn into the scene, not small panels with tiny text.
 5. The green-era grass and the head over the wall "like a garden ornament" (`ch0-t08`, borrowed from `ch0-claim`).
+Done at the end of 22 October's medium session: the trailer's agenda line cut, Orion's trailer shot lowered, each
+reply's audio fetched ahead (commit e5d150f, tested in code only: confirm in the next capture that the 3.8 s gap
+before a reply is gone), and the critic's brief (`build/critic/brief-exhibit.md`) now asks for scores out of 10.
 Ignored, on purpose: cutting Göbekli Tepe from the trailer (Stewart wants all nine beats; the critic does not know
 the piece covers it) and a 25-second trailer (too short for nine beats).
 
