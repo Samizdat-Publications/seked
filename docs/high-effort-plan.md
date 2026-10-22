@@ -36,8 +36,14 @@ Gemini and ElevenLabs are approved: spend what it takes.*
 - **ch0-t08, ch7-schoch, ch7-plan** moved from behind the temple wall to the face station (2b.5).
 - **Leo at twilight** (2b.2): moment `equinox-twilight` added; the panorama renders in job `sphinx-rock-2`; then move
   `ch2-leo` to it.
-- **To finish:** publish the re-renders and patches (jobs `sphinx-rock`, `sphinx-rock-2`), capture chapters 0 to 2
-  and run the video critic against version 3's 3:01 capture.
+- **Leo at twilight is in:** `ch2-leo` stands at `equinox-twilight` (exposure 3.4), Leo rising over the lion's head.
+- **The critic on version 4** (`build/critic/ch0-2-v4-critique.md`, chapters 0 to 2, 3:03, the same brief as version
+  3 rescored in `ch0-2-v3-rescored.md`): overall 5.5 against 4.3; pacing 4 (3), narration 6 (5), camera 5 (4),
+  pictures 6 (6), clarity 7 (5), hook 5 (3). Its asks now: the reply shots need to explain themselves (callouts in
+  the scene: "cut from the ditch", the harder band at the head), the Leo hold shorter with the figure drawn sooner,
+  callouts drawn into the scene rather than cards, Gobekli Tepe out of the trailer (Stewart keeps it), continuous
+  camera motion, the green-era grass and the tourists, two lines it calls redundant ("Nobody disputes that", "You
+  can only carve a smaller shape out of a larger one"), and ambient sound.
 
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
