@@ -1,5 +1,11 @@
 # The high-effort session: what it is for
 
+**Starting cold (a new session after the 22 October quota reset):** claim the repo first
+(`python scripts/job.py claim <session name>`; the last owner was `laptop-lead`, whose thread has ended). Read
+`CLAUDE.md` (its purpose was sharpened on 22 October), this file, then `build/critic/ch0-2-v3-critique.md`. The
+exhibit runs with `cd apps/exhibit; npx vite --port 5196`, the voice lab with `python scripts/voice_lab.py`
+(port 5197). Version 3 of the script is live; the order of work is below, the Sphinx models first.
+
 *Written 22 October 2026, from Stewart's direction that day and the Gemini critic's review of chapters 0 to 2
 (`build/critic/ch0-2-v2-critique.md`). Run at high effort, or extra high where a step needs it. Credits for Meshy,
 Gemini and ElevenLabs are approved: spend what it takes.*
