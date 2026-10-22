@@ -7,7 +7,7 @@ import './style.css';
 import leavesJson from '../leaves.json';
 import renderStations from '../../../render/stations.json';
 import script from '../../../docs/script.md?raw';
-import { type Leaf, type RenderStations, drawCue, leafPanorama, readLeaves, withStandIns } from './leaves';
+import { type Leaf, type RenderStations, drawCue, leafPanorama, readLeaves, readReplyShots, withStandIns } from './leaves';
 import { type Manifest, type Overlay, patchesByPanorama, pickEra, readManifest, readOverlays } from './manifest';
 import { khafreWells } from './wells';
 import { leafFromSearch, scriptChapters } from './play';
@@ -368,6 +368,7 @@ async function start(): Promise<void> {
     play: $<HTMLButtonElement>('play'), prev: $<HTMLButtonElement>('prev'), next: $<HTMLButtonElement>('next'),
     chapterBtn: $<HTMLButtonElement>('chapter'), chapterList: $('chapter-list'), count: $('count'), flight: $<HTMLVideoElement>('flight'),
   }, panoramasFor(manifest));
+  player.replyShots = readReplyShots(leavesJson);
   const panel = new Panel($('stage'), script);
   const sky = new SkyFigure(stage, skyData, (RENDER as unknown as { moments: Record<string, Moment> }).moments, $('skybar'));
   sky.onHandsOn = () => { if (player.playing) player.pause(); };

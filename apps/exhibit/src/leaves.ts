@@ -59,11 +59,36 @@ export const LeafSchema = z.object({
 
 export type Leaf = z.infer<typeof LeafSchema>;
 
-export const LeavesSchema = z.object({ about: z.string(), leaves: z.array(LeafSchema).min(1) }).strict();
+/**
+ * A chapter's reply shot: where the view goes while the archaeologists' reply is spoken, so the reply has a picture
+ * of its own and is not heard over the claim's (the critic on version 3, 22 October: "one line of reply over one
+ * picture of the reply"). `why` says what the picture shows for the reply.
+ */
+export const ReplyShotSchema = z.object({
+  station: z.string().min(1), era: z.string().min(1), moment: z.string().min(1), view: View, why: z.string().min(1),
+}).strict();
+
+export type ReplyShot = z.infer<typeof ReplyShotSchema>;
+
+export const LeavesSchema = z.object({
+  about: z.string(), leaves: z.array(LeafSchema).min(1),
+  replies: z.record(z.string().regex(/^ch\d+$/), ReplyShotSchema).optional(),
+}).strict();
 
 /** Parse leaves.json; throws with zod's account of the first thing wrong. */
 export function readLeaves(raw: unknown): Leaf[] {
   return LeavesSchema.parse(raw).leaves;
+}
+
+/** The chapters' reply shots from leaves.json, keyed `chN`. */
+export function readReplyShots(raw: unknown): Record<string, ReplyShot> {
+  return LeavesSchema.parse(raw).replies ?? {};
+}
+
+/** A reply shot as a leaf of its chapter's last leaf, so the stage, the panel and the sky can take it as one. */
+export function replyLeaf(last: Leaf, shot: ReplyShot): Leaf {
+  return { ...last, id: `${last.reply}-reply`, station: shot.station, era: shot.era, moment: shot.moment, view: shot.view,
+    draw: [], receipts: [], interact: 'look', sky: undefined, until: undefined };
 }
 
 /**

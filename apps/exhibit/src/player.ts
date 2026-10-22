@@ -5,7 +5,7 @@
  * on the view pauses play and hands the visitor the view; play resumes from that leaf.
  */
 import { isFigure } from './figures';
-import { type Leaf, drawCue, figureCues, leafCues } from './leaves';
+import { type Leaf, type ReplyShot, drawCue, figureCues, leafCues, replyLeaf } from './leaves';
 import { type ChapterRecording, type Span, leafSpans, recordingUrl } from './narration';
 import type { Manifest } from './manifest';
 import { type Chapter, chapterStarts, flightFile, searchWithLeaf, wordTimes } from './play';
@@ -81,6 +81,9 @@ export class Player {
   private sounding: { leaf: string; part: 'say' | 'reply'; audio: HTMLAudioElement } | null = null;
   private timers: number[] = [];
   private shown = -1;
+  /** Each chapter's reply shot (leaves.json `replies`), and the one on the stage now, if a reply's picture is up. */
+  replyShots: Record<string, ReplyShot> = {};
+  private replyShown: Leaf | null = null;
 
   private word(k: number): void {
     if (k >= this.cueAt && this.cueAt >= 0) { this.cueAt = -1; this.stage.startOverlay(); }
@@ -124,7 +127,9 @@ export class Player {
   /** Show a leaf; if playing, speak it and go on. The arrival is a turn when the leaf stays in the panorama on screen. */
   go(i: number): void {
     if (i < 0 || i >= this.leaves.length) return;
-    const from = this.shown >= 0 ? this.leaves[this.shown] : undefined;
+    // after a reply's picture, the next leaf arrives from that picture, not from the leaf before the reply
+    const from = this.replyShown ?? (this.shown >= 0 ? this.leaves[this.shown] : undefined);
+    this.replyShown = null;
     this.index = i;
     this.shown = i;
     this.resumeAt = null;
@@ -151,6 +156,8 @@ export class Player {
     void this.replyRecording(L.chapter);
     const next = this.leaves[i + 1];
     if (next) void this.recording(next.chapter);
+    const reply = (!next || next.chapter !== L.chapter) ? this.replyShotFor(L) : null;
+    if (reply) for (const p of this.panoramas(reply)) this.stage.prefetch(this.manifest.byId[reply.station]!, reply.era, p);
     const ahead = next && { yaw: next.view.yaw * DEG, pitch: next.view.pitch * DEG, fov: next.view.fov * DEG };
     if (next) for (const p of this.panoramas(next)) this.stage.prefetch(this.manifest.byId[next.station]!, next.era, p, ahead);
   }
@@ -171,7 +178,8 @@ export class Player {
     // back to the leaf's own view if the visitor looked away, eased, then its words from where they stopped
     const back = this.resumeAt?.leaf === this.leaf.id ? this.resumeAt : null;
     this.resumeAt = null;
-    this.stage.turn(this.shot(this.leaf), () => {
+    const onReply = back?.part === 'reply' ? this.replyShown : null;
+    this.stage.turn(this.shot(onReply ?? this.leaf), () => {
       if (token !== this.token || !this.playing) return;
       this.whenReady(token, () => {
         if (back?.part === 'reply') this.speakReply(token, this.leaf.chapter, () => this.onward(token), back.t);
@@ -359,13 +367,38 @@ export class Player {
     return r;
   }
 
-  /** The chapter's recorded spoken reply (chN-reply.mp3), captioned, then on; silent and straight on if there is none. */
+  /** The chapter's reply shot as a leaf, from its last leaf `L`, or null if the chapter has none or its station is not rendered. */
+  private replyShotFor(L: Leaf): Leaf | null {
+    const shot = this.replyShots[L.reply];
+    return shot && this.manifest.byId[shot.station] ? replyLeaf(L, shot) : null;
+  }
+
+  /** Put the reply's picture on the stage, arriving as a leaf would from the one on screen; `then` once it is there. */
+  private showReply(token: number, R: Leaf, then: () => void): void {
+    const from = this.replyShown ?? this.leaf;
+    this.replyShown = R;
+    this.label(R);   // the reply's place and era, and its honesty: a survey, not the claim's theorized era
+    this.log.push({ kind: 'leaf', leaf: R.id, at: wallNow() });
+    this.onLeaf(R);
+    this.onFigure(null);
+    const go = () => { if (token === this.token) this.whenReady(token, then); };
+    if (from.station === R.station && from.moment === R.moment && from.era === R.era) { this.stage.turn(this.shot(R)); this.later(LEAD_MS, go); }
+    else if (from.station === R.station && from.moment === R.moment) { this.stage.wipe(this.shot(R), this.otherFor(from), () => {}); this.later(LEAD_MS, go); }
+    else { this.stage.show(this.shot(R)); go(); }
+  }
+
+  /** The chapter's recorded spoken reply (chN-reply.mp3) over its own picture, captioned, then on; straight on if there is none. */
   private speakReply(token: number, chapter: number, done: () => void, from = 0): void {
     void (async () => {
       try {
         const got = await this.replyRecording(chapter);
         const rec = got?.rec;
         if (!got || !rec || token !== this.token) { done(); return; }
+        const R = this.replyShotFor(this.leaf);
+        if (R && this.replyShown?.id !== R.id) {
+          await new Promise<void>((ok) => this.showReply(token, R, ok));
+          if (token !== this.token) return;
+        }
         this.ui.caption.textContent = `The archaeologists' reply: ${rec.text}`;
         this.ui.caption.classList.add('reply-voice');
         const a = new Audio(got.url);

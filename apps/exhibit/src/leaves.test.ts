@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isFigure } from './figures';
 import { SCENE_OVERLAYS } from './wells';
-import { type Leaf, type RenderStations, cueIndex, drawCue, figureCues, joinProblems, leafCues, leafPanorama, readLeaves, stationMoment, withStandIns } from './leaves';
+import { type Leaf, type RenderStations, cueIndex, drawCue, figureCues, joinProblems, leafCues, leafPanorama, readLeaves, readReplyShots, replyLeaf, stationMoment, withStandIns } from './leaves';
 
 const repo = join(__dirname, '..', '..', '..');
 const read = (p: string) => readFileSync(join(repo, p), 'utf8');
@@ -200,5 +200,35 @@ describe('draw cues', () => {
     const raw = JSON.parse(read('apps/exhibit/leaves.json'));
     raw.leaves[0].draw = ['two words'];
     expect(() => readLeaves(raw)).toThrow();
+  });
+});
+
+describe('reply shots', () => {
+  const shots = readReplyShots(JSON.parse(read('apps/exhibit/leaves.json')));
+  const chapters = [...new Set(leaves.map((L) => L.chapter))].filter((n) => existsSync(join(repo, 'assets', 'narration', `ch${n}-reply.mp3`)));
+
+  it('gives every chapter with a recorded reply a picture of its own', () => {
+    for (const n of chapters) expect(shots[`ch${n}`], `ch${n}`).toBeDefined();
+  });
+
+  it('points each at a panorama that is published', () => {
+    for (const [k, s] of Object.entries(shots)) {
+      const pano = leafPanorama(s, render);
+      expect(existsSync(join(repo, 'apps', 'walk', pano)), `${k}: ${pano}`).toBe(true);
+    }
+  });
+
+  it('is not the picture its chapter ends on', () => {
+    for (const [k, s] of Object.entries(shots)) {
+      const last = [...leaves].reverse().find((L) => L.reply === k)!;
+      const same = last.station === s.station && last.era === s.era && last.view.yaw === s.view.yaw && last.view.pitch === s.view.pitch;
+      expect(same, k).toBe(false);
+    }
+  });
+
+  it('becomes a leaf of its chapter with nothing of the claim drawn on it', () => {
+    const last = leaves.find((L) => L.reply === 'ch1')!;
+    const R = replyLeaf(last, shots.ch1!);
+    expect([R.station, R.era, R.draw.length, R.receipts.length, R.sky]).toEqual([shots.ch1!.station, shots.ch1!.era, 0, 0, undefined]);
   });
 });
