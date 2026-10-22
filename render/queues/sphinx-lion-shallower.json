@@ -1,0 +1,37 @@
+{
+ "about": "22 October: the long rains' lion with shallower coves and narrow joints (Stewart: the channels looked too deep)",
+ "renders": [
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "moment": "equinox-dawn",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-lion-equinox-dawn.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-lion-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-lion.png"
+  }
+ ]
+}

@@ -45,12 +45,15 @@ import render_standins as rs  # noqa: E402
 
 MODELS = os.path.join(REPO, "build", "models")
 
+# 22 October, Stewart on the first cut: the channels looked deeper than the real body's. The body's soft beds are worn
+# back on the order of a metre, and its vertical joints are narrow cracks; the deep runnels Schoch draws on are mostly
+# in the ditch walls. So the coves are 1.1 m (was 1.6) and the joints 0.6 m and narrow (was 1.5 m) (look choices).
 PARAMS = {
     "voxel": 0.07,          # m, the SDF's voxel
     "close": 0.25,          # m, the closing that fills undercuts and fuses the paws to the floor
     "open": 0.18,           # m, the opening that takes off flaps thinner than about twice this
-    "soft": 1.6,           # m, how deep a soft bed's cove is worn at its middle
-    "edge": 0.5,           # m, the recession where a soft bed meets a hard one
+    "soft": 1.1,           # m, how deep a soft bed's cove is worn at its middle
+    "edge": 0.4,           # m, the recession where a soft bed meets a hard one
     "hard": 0.18,           # m, a hard bed's face at its middle, standing out as a ledge
     "neck": 0.55,           # m, Member III's softer neck
     "head": 0.06,           # m, the hard head: pitted, not worn back
@@ -64,8 +67,8 @@ PARAMS = {
     "joint_spacing": 4.2,   # m
     "joint_dist": "exponential",
     "joint_widths": False,  # whether each joint opens to its own width
-    "joint_depth": 1.5,     # m at the top of the body
-    "joint_width": (0.12, 0.4),   # m half-width at the foot and at the top
+    "joint_depth": 0.6,     # m at the top of the body
+    "joint_width": (0.08, 0.25),   # m half-width at the foot and at the top
     "spall": 0.26,          # m, the deepest blocky break-out
     "spall_cell": 2.2,      # m, the size of the blocks that break out
     "grain": 0.035,         # m, the grain's amplitude
@@ -86,7 +89,7 @@ PARAMS = {
     "fore_u": 0.78,         # from here forward and under fore_z, the forelegs and paws: worn smooth, no beds
     "fore_z": 5.5,         # along the body, from here forward and above the back, the head and neck: no beds cut
     "fracture": 0.22,
-    "lip_break": 0.35,      # m, the deepest chunk broken out of a ledge's lip
+    "lip_break": 0.25,      # m, the deepest chunk broken out of a ledge's lip
     "head_lines": 0.045,
     "head_grain": 0.0,    # m, the hard head's pitting and grain
     "chips": 0.14,          # m, the small chips along every hard edge
