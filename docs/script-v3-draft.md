@@ -55,8 +55,6 @@ Graham Hancock says it was a lion first, watching its own constellation rise. Th
 
 If he is right, a civilisation was lost at the end of the Ice Age.
 
-Here is the case, at its strongest. At each step, what the archaeologists say back. And at the end, what it would take to settle it.
-
 **Spoken reply:** none (the trailer promises the replies; each beat delivers its own).
 
 ---
@@ -234,6 +232,12 @@ That is where to look.
 **Spoken reply:** Archaeologists answer that no physical date from Giza comes anywhere near 10,500 BCE.
 
 ---
+
+## Changed after the critic, 22 October
+
+The trailer's closing agenda line ("Here is the case, at its strongest. At each step, what the archaeologists say
+back. And at the end, what it would take to settle it.") is cut: "stating an agenda kills suspense". It now ends on
+the stakes.
 
 ## For Stewart to decide
 

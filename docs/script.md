@@ -10,7 +10,7 @@
 
 ## 0. Trailer
 
-**Narration** (138 words)
+**Narration** (112 words)
 
 Every textbook says the Sphinx was carved about 2500 BCE, for the pharaoh Khafre.
 
@@ -19,8 +19,6 @@ The geologist Robert Schoch says rain wore it down thousands of years before tha
 Graham Hancock says it was a lion first, watching its own constellation rise. That its temples are far older than the king who used them. That Egypt's own records remember a First Time, written in the stars over Giza and in numbers built into the Great Pyramid. That Göbekli Tepe proves someone was building long before we thought possible. And that there are rooms underground no one has entered.
 
 If he is right, a civilisation was lost at the end of the Ice Age.
-
-Here is the case, at its strongest. At each step, what the archaeologists say back. And at the end, what it would take to settle it.
 
 **Beats**
 

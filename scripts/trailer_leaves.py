@@ -22,12 +22,10 @@ SHOTS = [
     ("ch1-cautious", []),      # rain wore it down: the long-rains flank
     ("ch2-lion", []),          # a lion first, watching its constellation rise
     ("ch3-statues", []),       # its temples older than the king who used them
-    ("ch5-belt", []),          # the First Time, in the stars and in numbers: the belt over the plateau
+    ("ch5-numbers", []),       # the First Time, in the stars and in numbers: the pyramids low under the belt
     ("ch7-built", ["vulture-sky"]),  # Göbekli Tepe
     ("ch8-rooms", ["khafre-wells"]),  # rooms underground
     ("ch0-claim", []),         # a civilisation lost at the end of the Ice Age
-    ("ch0-question", []),      # the case at its strongest, and the replies
-    ("ch0-promise", []),       # what it would take to settle it
 ]
 
 
@@ -40,8 +38,7 @@ def main():
     by_id = {L["id"]: L for L in before["leaves"]}
     text = ns.chapters(open(ns.SCRIPT, encoding="utf-8").read())[0][0]
     said = sentences(text)
-    # two short sentences may share a leaf (the file's rule is at most two): the last three lines pair up as two
-    groups = said[:9] + [" ".join(said[9:])] if len(said) > 10 else said
+    groups = said
     trailer = []
     for k, say in enumerate(groups):
         src_id, draw = SHOTS[min(k, len(SHOTS) - 1)]

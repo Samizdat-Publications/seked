@@ -84,9 +84,9 @@
    "era": "built",
    "moment": "night-dark",
    "view": {
-    "yaw": 182,
-    "pitch": 26,
-    "fov": 78
+    "yaw": 184,
+    "pitch": 8,
+    "fov": 50
    },
    "arrive": "cut",
    "say": "That Egypt's own records remember a First Time, written in the stars over Giza and in numbers built into the Great Pyramid.",
@@ -158,44 +158,6 @@
    "reply": "ch0"
   },
   {
-   "id": "ch0-t09",
-   "chapter": 0,
-   "station": "sphinx-face",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 272,
-    "pitch": 18,
-    "fov": 66
-   },
-   "arrive": "cut",
-   "say": "Here is the case, at its strongest.",
-   "draw": [],
-   "hold": 0.3,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch0"
-  },
-  {
-   "id": "ch0-t10",
-   "chapter": 0,
-   "station": "sphinx-face",
-   "era": "today",
-   "moment": "equinox-dawn",
-   "view": {
-    "yaw": 272,
-    "pitch": 18,
-    "fov": 66
-   },
-   "arrive": "turn",
-   "say": "At each step, what the archaeologists say back. And at the end, what it would take to settle it.",
-   "draw": [],
-   "hold": 0.3,
-   "interact": "look",
-   "receipts": [],
-   "reply": "ch0"
-  },
-  {
    "id": "ch1-carved",
    "chapter": 1,
    "station": "sphinx-flank",
@@ -206,7 +168,7 @@
     "pitch": 6,
     "fov": 70
    },
-   "arrive": "flight",
+   "arrive": "cut",
    "say": "The Sphinx was not built. It was carved out of the bedrock, so the walls of its ditch are as old as the statue.",
    "draw": [
     "ditch-plan@ditch"
