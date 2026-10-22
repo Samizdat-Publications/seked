@@ -1,0 +1,74 @@
+{
+ "about": "22 October: the claim eras' Sphinx re-cut as rock (scripts/sphinx_lab/rock.py); every panorama that shows it close, re-rendered",
+ "renders": [
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-back-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-face-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-first-time-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-first-time-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-flank",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-first-time.png"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-first-time-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-first-time.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-face",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-face-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-flank",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-flank-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-lion.png"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-lion-equinox-dawn.png",
+   "moment": "equinox-dawn"
+  },
+  {
+   "state": "lion",
+   "station": "sphinx-side",
+   "out": "C:/Users/stewa/ClaudeProjects/seked/build/render/pano/sphinx-side-lion.png"
+  }
+ ]
+}

@@ -20,7 +20,7 @@ import sys
 import bpy
 import numpy as np
 
-from . import data, states
+from . import data, limestone, states
 from .nodes import Tree, hexlin
 
 BLENDER_DIR = os.path.join(data.REPO, "blender")
@@ -33,9 +33,13 @@ if BLENDER_DIR not in sys.path:
 # statue with the king's head carved inside the lion's, and today is that statue worn on, with its losses
 # and its masonry casing. The stripped state (1800 CE, before the casing) keeps the model made from photographs.
 DERIVED = {"sphinx-master"}      # whose finishes are eras, not surfaces: a missing one is no statue, not the master
-MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion"),
-             "lion-fresh": ("sphinx-master", "first-time"), "carved": ("sphinx-built", None),
+MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion-rock"),
+             "lion-fresh": ("sphinx-master", "first-time-rock"), "carved": ("sphinx-built", None),
              "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
+# The two claim eras are the master cut as rock (scripts/sphinx_lab/rock.py, 22 October: the modeller critic's
+# loop in build/sphinx-lab/): rebuilt as a solid, reproportioned towards ARCE's height and width, the beds cut in
+# the geometry and carried to the limestone material (render/giza/limestone.py). rock.py reads the master's
+# first-time finish, so render/giza/sphinx_eras.py --eras first-time runs first.
 # The real eras keep the Meshy models (sphinx-built, and sphinx-meshy from photographs); the master serves the
 # two claim eras only. Carving and wearing the master into the as-built and today states was dropped on
 # 20 October (docs/laptop-2026-10-20.md, decision 8): the carved chest and the worn body never read.
@@ -56,6 +60,7 @@ CARVED = {"sphinx-lion-pristine": 0.3, "sphinx-carved": 0.7, "sphinx-lion-first"
 # them (critic rounds 12 to 15 read the First Time lion as "a resin garden ornament", "orange clay";
 # fresh limestone in a humid forest greys and greens in its first years).
 DAMP = {"sphinx-lion-pristine": 1.0, "sphinx-lion-first": 0.4, "sphinx-master": 0.4}
+ROCK_DAMP = 0.5           # of DAMP on a finish cut as rock, whose own coves and stains already carry the weather
 # Generated textures with brush-stroke striations baked in that read as wood grain: their colour is
 # taken most of the way to plain fresh limestone, the carving left to the geometry and the normal map
 # (how far, and the stone's colour, are look choices).
@@ -126,7 +131,11 @@ def statue(state, coll, log=print):
         log(f"sphinx: {path} is not on disk (python scripts/models.py fetches it); no statue")
         return None
     mesh = rs.import_model(path, model["name"], keep_materials=True)
-    obj = rs.cut_and_reduce(mesh, model.get("cut_z"), model.get("faces", 300000), model.get("largest_part_only", False))
+    # A finish cut as rock (scripts/sphinx_lab/rock.py) carries its beds in the geometry and as a colour
+    # attribute: it keeps its density, and the limestone material replaces the generated texture.
+    rock = limestone.has_strata(mesh)
+    faces = max(model.get("faces", 300000), 2000000) if rock else model.get("faces", 300000)
+    obj = rs.cut_and_reduce(mesh, model.get("cut_z"), faces, model.get("largest_part_only", False) and not rock)
     done = rs.fit(obj, model, data.FOOTPRINTS)
     # The statue is cut from the bedrock it stands on: set its lowest point on the ditch's floor, where
     # the fit leaves the paws hanging a few tenths of a metre over it (the floor sits under the lowest footprint base).
@@ -157,7 +166,15 @@ def statue(state, coll, log=print):
                 casing.node_tree.links.new(base.links[0].from_socket, warm.inputs["Color1"])
                 casing.node_tree.links.new(warm.outputs["Color"], base)
             obj.data.materials[i] = casing
-    for mat in obj.data.materials:
+    if rock:
+        stone = limestone.material(obj.data, fresh=bool(finish) and finish.startswith("first-time"))
+        bsdf = next(nd for nd in stone.node_tree.nodes if nd.type == "BSDF_PRINCIPLED")
+        if model_id in DAMP:
+            _damp(stone.node_tree, bsdf, DAMP[model_id] * ROCK_DAMP)
+        obj.data.materials.clear()
+        obj.data.materials.append(stone)
+        obj.data.polygons.foreach_set("material_index", [0] * len(obj.data.polygons))
+    for mat in ([] if rock else obj.data.materials):
         if mat and mat.name == "sphinx masonry":
             continue
         if mat and mat.node_tree:
