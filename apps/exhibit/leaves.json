@@ -1347,7 +1347,7 @@
   }
  ],
   "replies": {
-    "ch1": {"station": "sphinx-face", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 90, "pitch": -8, "fov": 50}, "why": "The Sphinx Temple's core blocks, cut from the ditch itself: the archaeologists' quarry."},
+    "ch1": {"station": "sphinx-face", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 90, "pitch": -13, "fov": 46}, "why": "The Sphinx Temple's core blocks, cut from the ditch itself: the archaeologists' quarry."},
     "ch2": {"station": "sphinx-side", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 20, "pitch": 14, "fov": 36}, "why": "The head today, above the body: cut from a harder bed of the rock than the body below it."},
     "ch3": {"station": "menkaure", "era": "today", "moment": "winter-afternoon", "view": {"yaw": 60, "pitch": -4, "fov": 60}, "why": "What is left of Menkaure's temple, where core and casing went up together."},
     "ch4": {"station": "panorama", "era": "today", "moment": "summer-evening", "view": {"yaw": 24, "pitch": -2, "fov": 30}, "why": "The plateau in its own century: the date radiocarbon gives, not the texts."},
