@@ -31,24 +31,24 @@
   button:disabled { opacity:.5; cursor:wait; }
   .actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .takes { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
-  .take { display:grid; grid-template-columns: 26px 1fr auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:8px; padding:8px 10px; }
+  .take { display:grid; grid-template-columns: 26px 1fr 0; gap:10px; align-items:center; border:1px solid var(--line); border-radius:8px; padding:8px 10px; }
   .take.picked { border-color:var(--pick); box-shadow:0 0 0 1px var(--pick) inset; }
   .take audio { width:100%; height:34px; }
   .take .meta { font-size:12px; color:var(--muted); }
   .take input[type=radio] { accent-color:var(--pick); width:18px; height:18px; }
+  .meta { font-size:13px; color:var(--muted); }
+  details summary { cursor:pointer; color:var(--muted); font-size:13px; margin:10px 0 6px; }
   .err { color:var(--err); font-size:13px; margin-top:6px; }
 </style>
 </head>
 <body>
 <header>
   <h1>Voice Lab</h1>
-  <p>Play each take, pick the one that passes (the radio button), edit the words or the settings and record more. Picks are saved as you click; nothing reaches the exhibit until the takes are applied.</p>
+  <p>One voice throughout (v3, chosen on chapter 0). Play the takes, pull another until one passes, and pick it. The first take stays picked unless you choose another. Nothing reaches the exhibit until the picks are applied.</p>
   <nav id="nav"></nav>
 </header>
 <main id="main">Loading...</main>
 <script>
-const SLIDERS = [["stability", 0, 1, .05], ["similarity_boost", 0, 1, .05], ["style", 0, 1, .05], ["speed", .7, 1.2, .01]];
-const MODELS = ["eleven_multilingual_v2", "eleven_v3", "eleven_turbo_v2_5"];
 let S;
 
 async function load() {
@@ -68,68 +68,48 @@ function describe(v) {
   return `${v.model_id.replace("eleven_", "")} · stab ${s.stability} · sim ${s.similarity_boost} · style ${s.style}` + (s.speed ? ` · speed ${s.speed}` : "");
 }
 
+function same(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+
 function render() {
   const main = document.getElementById("main"), nav = document.getElementById("nav");
   main.innerHTML = ""; nav.innerHTML = "";
   for (const item of S.items) {
-    const takes = S.takes.filter(t => t.item === item.id);
+    const takes = S.takes.filter(t => t.item === item.id && same(t.voice, S.voice));
     const picked = S.picks[item.id];
-    const pickedTake = takes.find(t => t.id === picked);
-    const isNew = pickedTake && pickedTake.label !== "current recording";
-    nav.append(el("a", {href: "#" + item.id, class: isNew ? "done" : null}, `${item.chapter}${item.part === "reply" ? "r" : ""}`));
-    const last = takes[takes.length - 1];
-    const voice = structuredClone(last?.voice || S.voice);
-    const startText = (takes.filter(t => t.made).pop() || {}).text || item.text;
-    const text = el("textarea", {}, startText);
+    nav.append(el("a", {href: "#" + item.id, class: takes.some(t => t.id === picked) ? "done" : null}, `${item.chapter}${item.part === "reply" ? "r" : ""}`));
+    const text = el("textarea", {}, (takes.filter(t => t.made).pop() || {}).text || item.text);
     const changed = el("span", {class: "changed"});
     const markChanged = () => changed.textContent = text.value === item.text ? "" : "differs from docs/script.md";
     text.addEventListener("input", markChanged); markChanged();
-
-    const model = el("select", {onchange: () => voice.model_id = model.value}, ...MODELS.map(m => el("option", {value: m}, m)));
-    model.value = voice.model_id;
-    const settings = el("div", {class: "settings"}, el("span", {}, "model"), model, el("span"));
-    for (const [k, lo, hi, step] of SLIDERS) {
-      const val = voice.voice_settings[k] ?? 1;
-      const out = el("span", {}, String(val));
-      const r = el("input", {type: "range", min: lo, max: hi, step, value: val,
-        oninput: () => { voice.voice_settings[k] = +r.value; out.textContent = r.value; }});
-      settings.append(el("span", {}, k.replace("_boost", "")), r, out);
-    }
-
     const err = el("div", {class: "err"});
-    const go = async (btn, useText) => {
-      btn.disabled = true; btn.textContent = "Recording..."; err.textContent = "";
+    const pull = el("button", {class: "primary", onclick: async () => {
+      pull.disabled = true; pull.textContent = "Recording..."; err.textContent = "";
       const r = await fetch("/api/generate", {method: "POST", headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({item: item.id, text: useText, voice})});
+        body: JSON.stringify({item: item.id, text: text.value, voice: S.voice})});
       const d = await r.json();
-      if (!r.ok) { err.textContent = d.error; btn.disabled = false; btn.textContent = "Try again"; return; }
+      if (!r.ok) { err.textContent = d.error; pull.disabled = false; pull.textContent = "Try again"; return; }
       await load(); location.hash = item.id;
-    };
-    const rec = el("button", {class: "primary", onclick: () => go(rec, text.value)}, "Record a new take");
-    const reset = el("button", {onclick: () => { text.value = item.text; markChanged(); }}, "Reset words to the script");
-
+    }}, "Pull another take");
+    const words = el("details", {}, el("summary", {}, "Edit the words"), text, changed,
+      el("div", {class: "actions"}, el("button", {onclick: () => { text.value = item.text; markChanged(); }}, "Reset to the script")));
     const list = el("div", {class: "takes"});
+    if (!takes.length) list.append(el("div", {class: "meta"}, "Recording the first take..."));
     takes.slice().reverse().forEach((t, i) => {
       const radio = el("input", {type: "radio", name: item.id, onchange: async () => {
         await fetch("/api/pick", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({item: item.id, take: t.id})});
         S.picks[item.id] = t.id; render(); location.hash = item.id;
       }});
       radio.checked = t.id === picked;
-      const redo = el("button", {title: "Record again with this take's words and settings", onclick: () => {
-        Object.assign(voice, structuredClone(t.voice)); go(redo, t.text || item.text); }}, "Redo");
+      const n = takes.length - i;
       list.append(el("div", {class: "take" + (t.id === picked ? " picked" : "")}, radio,
         el("div", {}, el("audio", {controls: "", preload: "none", src: `/take/${t.id}.mp3`}),
-          el("div", {class: "meta"}, `#${takes.length - i} · ${t.label || "made " + t.made} · ${describe(t.voice)}` +
-            (t.text && t.text !== item.text ? " · edited words" : "") + (t.aligned ? "" : " · no timing, can't be applied"))),
-        redo));
+          el("div", {class: "meta"}, `Take ${n}${n === 1 ? " (the default)" : ""} · made ${t.made}` + (t.text !== item.text ? " · edited words" : ""))),
+        el("span")));
     });
-
     main.append(el("section", {id: item.id},
       el("h2", {}, `Chapter ${item.chapter} · ${item.part === "reply" ? "the archaeologists' reply" : "narration"}`, el("small", {}, `${takes.length} takes`)),
-      el("div", {class: "grid"},
-        el("div", {}, text, changed),
-        el("div", {}, settings, el("div", {class: "actions"}, rec, reset), err)),
-      list));
+      el("p", {class: "meta"}, item.text.slice(0, 160) + (item.text.length > 160 ? "..." : "")),
+      el("div", {class: "actions"}, pull), err, words, list));
   }
 }
 load();

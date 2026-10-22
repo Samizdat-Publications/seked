@@ -122,6 +122,20 @@ def generate(item_id, text, voice):
     return take
 
 
+def batch():
+    """One take in the project's voice for every item that has none, picked as the default."""
+    state = load()
+    for item in script_items():
+        mine = [t for t in state["takes"] if t["item"] == item["id"] and t["voice"] == ns.VOICE]
+        if mine:
+            continue
+        take = generate(item["id"], item["text"], ns.VOICE)
+        state = load()
+        state["picks"][item["id"]] = take["id"]
+        save(state)
+        print(f"{item['id']}: {take['id']}", flush=True)
+
+
 def apply():
     state, script = load(), {i["id"]: i for i in script_items()}
     by_id = {t["id"]: t for t in state["takes"]}
@@ -195,6 +209,8 @@ def main():
     os.makedirs(TAKES, exist_ok=True)
     if sys.argv[1:] == ["apply"]:
         return apply()
+    if sys.argv[1:] == ["batch"]:
+        return batch()
     key()
     seed(load())
     print(f"voice lab on http://localhost:{PORT}")

@@ -24,8 +24,9 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPT = os.path.join(ROOT, "docs", "script.md")
 OUT = os.path.join(ROOT, "assets", "narration")
-VOICE = {"voice_id": "ppLqTilh7rH7fbUVlXsf", "name": "David - Documentary", "model_id": "eleven_multilingual_v2",
-         "voice_settings": {"stability": 0.55, "similarity_boost": 0.8, "style": 0.15, "use_speaker_boost": True}}
+# Stewart's pick by ear in the voice lab, 21 October 2026 (chapter 0, take ch0-narration-040): the v3 model.
+VOICE = {"voice_id": "ppLqTilh7rH7fbUVlXsf", "name": "David - Documentary", "model_id": "eleven_v3",
+         "voice_settings": {"stability": 0.5, "similarity_boost": 0.8, "style": 0.0, "use_speaker_boost": True}}
 
 
 def plain(md):
