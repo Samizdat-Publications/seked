@@ -22,7 +22,7 @@ SHOTS = [
     ("ch1-cautious", []),      # rain wore it down: the long-rains flank
     ("ch2-lion", []),          # a lion first, watching its constellation rise
     ("ch3-statues", []),       # its temples older than the king who used them
-    ("ch5-allan", ["belt-plan"]),   # the First Time, in the stars and in numbers
+    ("ch5-belt", []),          # the First Time, in the stars and in numbers: the belt over the plateau
     ("ch7-built", ["vulture-sky"]),  # Göbekli Tepe
     ("ch8-rooms", ["khafre-wells"]),  # rooms underground
     ("ch0-claim", []),         # a civilisation lost at the end of the Ice Age
@@ -34,8 +34,8 @@ SHOTS = [
 def main():
     path = "apps/exhibit/leaves.json"
     doc = json.load(open(path, encoding="utf-8"))
-    # the shots are borrowed from the leaves as committed, before the recut dropped some of them
-    before = json.loads(subprocess.run(["git", "show", "HEAD:apps/exhibit/leaves.json"], capture_output=True,
+    # the shots are borrowed from version 2's leaves (ab3309b), before version 3's recut dropped some of them
+    before = json.loads(subprocess.run(["git", "show", "ab3309b:apps/exhibit/leaves.json"], capture_output=True,
                                        check=True).stdout)
     by_id = {L["id"]: L for L in before["leaves"]}
     text = ns.chapters(open(ns.SCRIPT, encoding="utf-8").read())[0][0]
@@ -48,7 +48,7 @@ def main():
         src = by_id[src_id]
         trailer.append({"id": f"ch0-t{k + 1:02d}", "chapter": 0, "station": src["station"], "era": src["era"],
                         "moment": src["moment"], "view": dict(src["view"]), "arrive": "cut", "say": say,
-                        "draw": draw, "hold": 0.3, "interact": "look", "receipts": [], "reply": "ch0"})
+                        "draw": draw, "hold": 0.3, "interact": src["interact"] if src["interact"] in ("look", "sky") else "look", "receipts": [], "reply": "ch0"})
     rest = [L for L in doc["leaves"] if L["chapter"] != 0]
     out = trailer + rest
     walk = json.load(open("apps/walk/stations.json", encoding="utf-8"))

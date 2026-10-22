@@ -84,17 +84,15 @@
    "era": "built",
    "moment": "night-dark",
    "view": {
-    "yaw": 180,
-    "pitch": 44,
-    "fov": 60
+    "yaw": 182,
+    "pitch": 26,
+    "fov": 78
    },
    "arrive": "cut",
    "say": "That Egypt's own records remember a First Time, written in the stars over Giza and in numbers built into the Great Pyramid.",
-   "draw": [
-    "belt-plan"
-   ],
+   "draw": [],
    "hold": 0.3,
-   "interact": "look",
+   "interact": "sky",
    "receipts": [],
    "reply": "ch0"
   },
