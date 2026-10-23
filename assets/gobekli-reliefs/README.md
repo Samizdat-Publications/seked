@@ -77,11 +77,11 @@ closely, and those people are owed the credit:
 - **Pillar 18**: the DAI's 3D-scan renders (Hochschule Karlsruhe, © DAI, on the Tepe Telegrams blog) and
   photographs of the pillar at night.
 - **Pillar 31**: photographs of the full-size replica of Enclosure D in the Şanlıurfa Archaeology Museum by
-  Zeynel Cebeci on Wikimedia Commons (CC BY-SA 4.0), "Urfa museum Gobeklitepe Temple D replica sept 2019 4824" and
-  "4831".
+  Dosseman on Wikimedia Commons (CC BY-SA 4.0), "Urfa museum Gobeklitepe Temple D replica sept 2019 4824" and
+  "Urfa museum Gobeklitepe Temple D replica 4831".
 - **Pillar 33**: the excavators' numbered line drawing and a photograph of the face (DAI), as reproduced in the
   reference set gathered for Seked.
-- **Pillar 27**: photograph "Göbeklitepe Building C sept 2019 5373crop" by Zeynel Cebeci on Wikimedia Commons
+- **Pillar 27**: photograph "Göbeklitepe Building C sept 2019 5373crop" by Dosseman on Wikimedia Commons
   (CC BY-SA 4.0).
 
 The drawings, scans and photographs themselves are not in this folder and are not ours to share. If you hold rights
