@@ -272,6 +272,15 @@
    "aspect": 1.777778
   },
   {
+   "src": "pano/patch/sphinx-quarter-today-equinox-dawn-ch2-nemes.jpg",
+   "pano": "pano/sphinx-quarter-today.jpg",
+   "leaf": "ch2-nemes",
+   "yaw": 308,
+   "pitch": 12,
+   "fov": 80.6,
+   "aspect": 1.777778
+  },
+  {
    "src": "pano/patch/sphinx-today-equinox-dawn-ch0-sunrise.jpg",
    "pano": "pano/sphinx-today-equinox-dawn.jpg",
    "leaf": "ch0-sunrise",

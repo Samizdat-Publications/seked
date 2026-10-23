@@ -1,4 +1,12 @@
 {
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: each leaf's panorama that apps/walk/pano/ lacks, its station in its era and moment. Render with render/build.py --queue, then python render/publish.py.",
- "renders": []
+ "renders": [
+  {
+   "state": "today",
+   "station": "sphinx-quarter",
+   "moment": "equinox-dawn",
+   "out": "build/render/pano/sphinx-quarter-today.png",
+   "for": "ch2-nemes"
+  }
+ ]
 }

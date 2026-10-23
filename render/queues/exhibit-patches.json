@@ -2,7 +2,24 @@
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a detail patch for each leaf the panorama cannot hold sharp, from the leaf's panorama's camera in its era and moment. Render with render/build.py --queue after exhibit-panos.json, then python render/publish.py.",
  "renders": [
   {
-   "state": "first-time",
+   "state": "today",
+   "station": "sphinx",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 280,
+    "pitch": -2,
+    "fov": 57.2,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch0-t01",
+    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch0-t01.png",
+   "for": "ch0-t01"
+  },
+  {
+   "state": "lion",
    "station": "sphinx-flank",
    "moment": "equinox-dawn",
    "patch": {
@@ -10,64 +27,30 @@
     "pitch": 15,
     "fov": 78.0,
     "aspect": 1.7777777777777777,
-    "leaf": "ch4-stela",
-    "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg"
+    "leaf": "ch0-t02",
+    "pano": "pano/sphinx-flank-lion-equinox-dawn.jpg"
    },
    "size": "2560x1440",
    "samples": 96,
-   "out": "build/render/patch-exhibit/sphinx-flank-first-time-equinox-dawn-ch4-stela.png",
-   "for": "ch4-stela"
+   "out": "build/render/patch-exhibit/sphinx-flank-lion-equinox-dawn-ch0-t02.png",
+   "for": "ch0-t02"
   },
   {
    "state": "built",
-   "station": "orion",
-   "moment": "night-dark",
+   "station": "valley-temple",
+   "moment": "temple-morning",
    "patch": {
-    "yaw": 180,
-    "pitch": 44,
+    "yaw": 22,
+    "pitch": -15,
     "fov": 78.0,
     "aspect": 1.7777777777777777,
-    "leaf": "ch5-allan",
-    "pano": "pano/orion-built-night-dark.jpg"
+    "leaf": "ch0-t04",
+    "pano": "pano/valley-temple-built.jpg"
    },
    "size": "2560x1440",
    "samples": 96,
-   "out": "build/render/patch-exhibit/orion-built-night-dark-ch5-allan.png",
-   "for": "ch5-allan"
-  },
-  {
-   "state": "built",
-   "station": "panorama",
-   "moment": "summer-evening",
-   "patch": {
-    "yaw": 24,
-    "pitch": -2,
-    "fov": 39.0,
-    "aspect": 1.7777777777777777,
-    "leaf": "ch6-hancock",
-    "pano": "pano/panorama-built.jpg"
-   },
-   "size": "2560x1440",
-   "samples": 96,
-   "out": "build/render/patch-exhibit/panorama-built-summer-evening-ch6-hancock.png",
-   "for": "ch6-hancock"
-  },
-  {
-   "state": "first-time",
-   "station": "panorama",
-   "moment": "summer-evening",
-   "patch": {
-    "yaw": 30,
-    "pitch": -2,
-    "fov": 78.0,
-    "aspect": 1.7777777777777777,
-    "leaf": "ch7-cold",
-    "pano": "pano/panorama-first-time.jpg"
-   },
-   "size": "2560x1440",
-   "samples": 96,
-   "out": "build/render/patch-exhibit/panorama-first-time-summer-evening-ch7-cold.png",
-   "for": "ch7-cold"
+   "out": "build/render/patch-exhibit/valley-temple-built-temple-morning-ch0-t04.png",
+   "for": "ch0-t04"
   },
   {
    "state": "first-time",
@@ -78,30 +61,98 @@
     "pitch": 0,
     "fov": 65.0,
     "aspect": 1.7777777777777777,
-    "leaf": "ch7-built",
+    "leaf": "ch0-t06",
     "pano": "pano/panorama-first-time.jpg"
    },
    "size": "2560x1440",
    "samples": 96,
-   "out": "build/render/patch-exhibit/panorama-first-time-summer-evening-ch7-built.png",
-   "for": "ch7-built"
+   "out": "build/render/patch-exhibit/panorama-first-time-summer-evening-ch0-t06.png",
+   "for": "ch0-t06"
   },
   {
    "state": "today",
-   "station": "sphinx",
-   "moment": "equinox-dawn",
+   "station": "menkaure",
+   "moment": "winter-afternoon",
    "patch": {
-    "yaw": 277,
+    "yaw": 8,
     "pitch": 0,
-    "fov": 44.2,
+    "fov": 52.0,
     "aspect": 1.7777777777777777,
-    "leaf": "ch9-tested",
-    "pano": "pano/sphinx-today-equinox-dawn.jpg"
+    "leaf": "ch0-t07",
+    "pano": "pano/menkaure-today.jpg"
    },
    "size": "2560x1440",
    "samples": 96,
-   "out": "build/render/patch-exhibit/sphinx-today-equinox-dawn-ch9-tested.png",
-   "for": "ch9-tested"
+   "out": "build/render/patch-exhibit/menkaure-today-winter-afternoon-ch0-t07.png",
+   "for": "ch0-t07"
+  },
+  {
+   "state": "today",
+   "station": "sphinx-quarter",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 308,
+    "pitch": 12,
+    "fov": 80.6,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-nemes",
+    "pano": "pano/sphinx-quarter-today.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-quarter-today-equinox-dawn-ch2-nemes.png",
+   "for": "ch2-nemes"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-twilight",
+   "patch": {
+    "yaw": 92,
+    "pitch": 4,
+    "fov": 72.8,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-east",
+    "pano": "pano/sphinx-back-first-time-equinox-twilight.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-back-first-time-equinox-twilight-ch2-east.png",
+   "for": "ch2-east"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-twilight",
+   "patch": {
+    "yaw": 106,
+    "pitch": 10,
+    "fov": 80.6,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch2-leo",
+    "pano": "pano/sphinx-back-first-time-equinox-twilight.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-back-first-time-equinox-twilight-ch2-leo.png",
+   "for": "ch2-leo"
+  },
+  {
+   "state": "first-time",
+   "station": "sphinx-face",
+   "moment": "equinox-dawn",
+   "patch": {
+    "yaw": 260,
+    "pitch": 10,
+    "fov": 78.0,
+    "aspect": 1.7777777777777777,
+    "leaf": "ch7-schoch",
+    "pano": "pano/sphinx-face-first-time.jpg"
+   },
+   "size": "2560x1440",
+   "samples": 96,
+   "out": "build/render/patch-exhibit/sphinx-face-first-time-equinox-dawn-ch7-schoch.png",
+   "for": "ch7-schoch"
   }
  ]
 }

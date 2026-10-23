@@ -88,6 +88,24 @@ any can be reversed.
    only carve a smaller shape out of a larger one", and ambient sound. Those change the script or add a new layer,
    and wait for Stewart.
 
+## 0c. The outstanding-items session (23 October, evening)
+
+1. **Deployed** everything to 23 October's Labyrinth (Stewart asked to review on the live site).
+2. **Pillar 43 faces west**, radial in the wall, as the DAI's own post describes it (read through the Wayback Machine:
+   dainst.blog itself is down, but its archived pages load, which may also unblock Pillars 20, 30 and 38).
+3. **The Labyrinth plan is not Kircher's**: his Turris Babel plate is a different design. The captions now say the
+   plan's original is not yet traced; `docs/to-source.md` has where to look next.
+4. **Göbekli Tepe is in chapter 7** (Stewart: "still not in the exhibit"): `ch7-built` cues four cards before the
+   sky card, the excavation today, Enclosure D about 9500 BCE, Pillar 43 and the central pair
+   (`scripts/exhibit_gobekli.py`).
+5. **The head-size shot shows the face** (Stewart: it "still shows the back right side"): `ch2-nemes` moves to a new
+   station, `sphinx-quarter`, south-east of the head, the three-quarter view of the face with the body behind it.
+   `ch2-small` cuts from it until a flight between the two stations is rendered.
+6. **Figure cards stop above the caption band**: a tall drawing and a long caption ran under the place line
+   (Stewart's screenshot of the Pillar 43 sky card); the card's drawing now gives up height instead.
+7. **Still open from section 2**: the green-era flood water against the Valley Temple's wall (item 7), the static
+   holds in chapter 1, the temple blocks' weathering, the green-era grass; and the Sphinx work in section 1.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of

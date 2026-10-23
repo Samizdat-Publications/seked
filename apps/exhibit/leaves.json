@@ -337,15 +337,15 @@
   {
    "id": "ch2-nemes",
    "chapter": 2,
-   "station": "sphinx-flank",
+   "station": "sphinx-quarter",
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 10,
-    "pitch": 25,
-    "fov": 70
+    "yaw": 304,
+    "pitch": 15,
+    "fov": 50
    },
-   "arrive": "turn",
+   "arrive": "cut",
    "say": "It wears a pyramid-age king's headcloth, it is better kept than the body, and it is too small for it.",
    "draw": [],
    "hold": 1,
@@ -364,7 +364,7 @@
     "pitch": 8,
     "fov": 66
    },
-   "arrive": "flight",
+   "arrive": "cut",
    "say": "Nobody disputes that.",
    "draw": [],
    "hold": 1,
@@ -1071,7 +1071,11 @@
    "arrive": "turn",
    "say": "And in south-east Turkey stands Göbekli Tepe: rings of carved T-shaped pillars, some over five metres tall, raised about 9500 BCE, seven thousand years before the Great Pyramid, by people the excavators say had no farms, no pottery and no metal.",
    "draw": [
-    "vulture-sky"
+    "gobekli-today@Tepe",
+    "gobekli-pair@five",
+    "gobekli-ring@raised",
+    "gobekli-p43@thousand",
+    "vulture-sky@excavators"
    ],
    "hold": 1,
    "interact": "look",

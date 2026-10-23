@@ -18,7 +18,13 @@ recorded where it is used, and moved to **Done** here with the date.
   describes Pillar 20; post https://www.dainst.blog/the-tepe-telegrams/?p=2654. The definitive source is Dietrich and
   Schmidt, *Göbekli Tepe: The Imagery of the Pillars in the Monumental Buildings A–D, F and H* (Archaeologica
   Euphratica), which has drawings of every pillar.
-- **Why waiting**: the DAI's website is down (23 October 2026). Two unnumbered candidates are in the Commons replica
+- **Found, Pillar 20 (23 October 2026)**: the DAI's labelled photograph of its front, the aurochs and the snake
+  (N. Becker, DAI; in "Why did it have to be snakes?", The Tepe Telegrams, 23 April 2016), read through the Wayback
+  Machine and saved as `build/gobekli/references/dai-wayback/p20-front-becker-dai.jpg` (3060 by 4134). The relief is
+  on the pillar's narrow front, between the wall's stretches. Still to make: its height map and its carving.
+- **Why waiting** (Pillars 30 and 38): the DAI's website is down (23 October 2026); its archived pages load through the
+  Wayback Machine (https://web.archive.org/web/2025/https://www.dainst.blog/the-tepe-telegrams/...), which is the next
+  place to look. Two unnumbered candidates are in the Commons replica
   photographs (`build/gobekli/commons-d/`): a pillar with a large crane-like bird on its broad side, and one with a
   bundle of snakes under a U-shaped sign on its front.
 

@@ -23,7 +23,7 @@ reserved, so they are looked at, not republished). Sources:
 
 | Pillar | Face | Reference | Source |
 |---|---|---|---|
-| 43, the Vulture Stone | front (south-east) | excavators' line drawing, beside a photograph | via Andrew Collins, https://www.andrewcollins.com/page/news/P43.htm |
+| 43, the Vulture Stone | western broad side (the face drawn; called "front" in the files) | excavators' line drawing, beside a photograph | via Andrew Collins, https://www.andrewcollins.com/page/news/P43.htm |
 | 43 | front | photograph with scale bar, early excavation | same page |
 | 43 | front | photograph today, under the shelter | same page |
 | 43 | front, the vulture | close-up | same page |

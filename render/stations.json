@@ -313,6 +313,25 @@
       "note": "For the exhibit's chapter 2 ('Beside that long body it is too small'): the side elevation the head-and-body argument is seen in, which the flank, 6 m from the body, is too close to give. 25 m from the body's south side and 35 m from its axis, so the rump (x 288) and the head (x 342) both stand inside a wide screen's 92-degree field. North of the causeway, whose corridor as built is 6 m tall and would hide the body from further south; the eye 1.7 m over the rock, from which the ditch's south rim hides only the lowest half metre of the body (the terrain sampled with the scene's own cut and rim, render/giza/sphinx.py). Chosen from those numbers, not from a render: the laptop's preview is the check."
     },
     {
+      "id": "sphinx-quarter",
+      "name": "The Sphinx from the south-east",
+      "where": "On the open ground between the forepaws, the Sphinx Temple and the Valley Temple, looking north-west at the face with the body running back behind it",
+      "x": 362.0,
+      "y": -460.0,
+      "eye": 1.7,
+      "moment": "equinox-dawn",
+      "view": {
+        "yaw": 312,
+        "pitch": 10,
+        "fov": 62
+      },
+      "neighbours": [
+        "sphinx-face",
+        "sphinx-side"
+      ],
+      "note": "For the exhibit's chapter 2 ('it is too small for it'): the three-quarter view in which the head and the length of the body are seen together with the face, as the classic photographs take it. About 36 m from the face and 48 degrees off its axis to the south; the forepaws' tips at bearing about 2, the head at about 318, the rump at about 290, inside a 72-degree field. Clear of the Sphinx Temple (west face x 369) and the Valley Temple (north face y -470) by the OSM footprints. Chosen from those numbers, not from a render: the render is the check."
+    },
+    {
       "id": "sphinx-back",
       "name": "Behind the Sphinx",
       "where": "On the rock west of the ditch, behind the rump, looking east along the back to the head and the sunrise",

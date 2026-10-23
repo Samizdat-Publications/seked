@@ -260,6 +260,35 @@ function hawaraLabyrinthFigure(lower: boolean): string {
       plan shows.</figcaption>`;
 }
 
+/**
+ * Göbekli Tepe in chapter 7 (render/gobekli.py; scripts/exhibit_gobekli.py writes the pictures into objects/): the
+ * excavation today as its photogrammetry scan, and Enclosure D about 9500 BCE as built from its plan, the ring, Pillar
+ * 43 and the central pair. Excavated, so dug and dated; the pictures are reconstructions and say which parts are ours.
+ */
+function gobekliFigure(id: string, ground: Record<string, number> | null): string {
+  const tier = `<span class="tier excavated">Excavated: ${TIER_WORDS.excavated}</span>`;
+  const h = ground?.['gobekli.enclosure_d.pillars.central.height'];
+  const cards: Record<string, [string, string]> = {
+    'gobekli-today': ['A hill with a long excavation in it, the pillars of the enclosures showing in the trench',
+      `Göbekli Tepe today, from the air: the main excavation as a photogrammetry scan (rmark, CC BY 4.0), set on its
+      hill. The scan's form is a visual stand-in, not a survey; the land round it is ours.`],
+    'gobekli-ring': ['A ring of T-shaped stone pillars set in a curving stone wall, two taller pillars in the middle, on a green hillside',
+      `Enclosure D about 9500 BCE, built here from its excavated plan (Haklay and Gopher 2020): eleven pillars set in a
+      stone wall round a central pair. Where the pillars stand is the plan's; the wall pillars' height, the stone, the
+      carving and the land are our choices.`],
+    'gobekli-p43': ['A T-shaped pillar carved with a vulture, a disc above its wing and other animals, set into a stone wall',
+      `Pillar 43, the "Vulture Stone", carved from the excavators' drawing: a vulture with a disc above its wing, birds, a
+      scorpion, on the pillar's western broad side. Part of the face runs into the wall, as the excavators describe it.
+      How deep the carving stands is our choice.`],
+    'gobekli-pair': ['Two tall T-shaped pillars seen from between them, carved with arms and belts, the ring wall behind',
+      `The central pair, Pillars 18 and 31, ${h ? `${formatValue(h, 'm')} tall` : 'over five metres tall'} on their
+      bedrock pedestals, carved with arms, hands and belts: figures, the excavators say, not posts. The carving is
+      after the excavators' drawings; its depth is ours.`],
+  };
+  const [alt, caption] = cards[id]!;
+  return `${tier}<img class="wide" src="objects/${id}.jpg" alt="${alt}"><figcaption>${caption}</figcaption>`;
+}
+
 type StructureNote = { id: string; evidence?: string; if_it_held?: string };
 
 /** What reported structures would change if they held, from data/structures.json, as one sentence each. */
@@ -483,7 +512,19 @@ async function start(): Promise<void> {
       void objectView().then((v) => { if (player.leaf === L) v.showPyramid(pyramidObject(g)!, pyramidCaption(g)); });
     } else hideObject();
   };
-  player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); objectFor(L); };
+  // a leaf's rendered cards are fetched as it starts, so each picture is there when its word comes (a card came up
+  // with its caption and no picture the first time through)
+  const cardPictures: Record<string, string[]> = {
+    'hawara-labyrinth': ['hawara-labyrinth'], 'hawara-lower': ['hawara-labyrinth-under'],
+    'khafre-cutaway': ['khafre-cutaway', 'khafre-cutaway-top'],
+  };
+  const preloadCards = (L: { draw: readonly string[] }) => {
+    for (const entry of L.draw) {
+      const id = entry.split('@')[0]!;
+      for (const name of cardPictures[id] ?? (id.startsWith('gobekli-') ? [id] : [])) new Image().src = `objects/${name}.jpg`;
+    }
+  };
+  player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L); };
   const figure = $('figure');
   player.onFigure = (id) => {
     if (id === 'ditch-plan') {
@@ -505,6 +546,7 @@ async function start(): Promise<void> {
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (id === 'khafre-cutaway') figure.innerHTML = khafreCutawayFigure(ground, bundle?.structures);
     if (id === 'hawara-labyrinth' || id === 'hawara-lower') figure.innerHTML = hawaraLabyrinthFigure(id === 'hawara-lower');
+    if (id?.startsWith('gobekli-')) figure.innerHTML = gobekliFigure(id, ground);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (id === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);
@@ -519,8 +561,19 @@ async function start(): Promise<void> {
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
     shownFigure = id;
     figure.hidden = !id;
+    fitFigure();
     stage.request();   // the scene's labels step off the panel, or back
   };
+  // the card ends above the band's place line, however many lines the narration takes (a long caption ran under it)
+  const where = document.querySelector('.band .where') as HTMLElement;
+  function fitFigure(): void {
+    if (figure.hidden) return;
+    figure.style.removeProperty('--room');
+    const room = where.getBoundingClientRect().top - figure.getBoundingClientRect().top - 14;
+    figure.style.setProperty('--room', `${Math.max(160, Math.floor(room))}px`);
+  }
+  new ResizeObserver(fitFigure).observe(document.querySelector('.band') as HTMLElement);
+  addEventListener('resize', fitFigure);
   stage.keepOut = () => {
     if (figure.hidden) return [];
     const f = figure.getBoundingClientRect(), s = $('stage').getBoundingClientRect();
