@@ -240,6 +240,26 @@ function khafreCutawayFigure(ground: Record<string, number> | null, structures?:
     choices, after the team's own rendering. ${ifItHeld(structures, ['g2.sar-shafts'])}</figcaption>`;
 }
 
+/**
+ * The Labyrinth at Hawara as one reconstruction draws it (render/hawara_labyrinth.py; scripts/exhibit_labyrinth.py
+ * writes the pictures into objects/), labelled with its tier: legendary, told and never found. `lower` shows the pit
+ * dug through its eastern courts to the underground half, ghosted.
+ */
+function hawaraLabyrinthFigure(lower: boolean): string {
+  const tier = `<span class="tier legendary">Legendary: ${TIER_WORDS.legendary}</span>`;
+  return lower
+    ? `${tier}<img class="wide" src="objects/hawara-labyrinth-under.jpg" alt="The reconstructed Labyrinth with a pit cut through its eastern courts, a pale ghost of its lower storey standing in it">
+      <figcaption>The underground half, ghosted: Herodotus's 1,500 rooms below the ground, which he was not shown and
+      reports from hearsay. They are drawn on the upper storey's plan at 8 to 12 m down, the depths the 2008 expedition's
+      organiser gives for walls it reports and has not published. The pit is a device to show them.</figcaption>`
+    : `${tier}<img class="wide" src="objects/hawara-labyrinth.jpg" alt="A reconstruction of the Labyrinth at Hawara from the air: twelve courts of rooms and columns inside a maze-walled enclosure, the pyramid beyond">
+      <figcaption>A reconstruction, not a find: Herodotus's twelve courts, six either side of an avenue, inside one wall
+      with a maze-like corridor, drawn after the plan on the 2008 expedition's report (which looks to be after Kircher's
+      17th-century reconstruction) and laid on the footprint Petrie measured, 1000 by 800 feet of quarried chips south of
+      Amenemhat III's pyramid. Heights are our choice; the roofs, which Herodotus says were stone, are left off so the
+      plan shows.</figcaption>`;
+}
+
 type StructureNote = { id: string; evidence?: string; if_it_held?: string };
 
 /** What reported structures would change if they held, from data/structures.json, as one sentence each. */
@@ -484,6 +504,7 @@ async function start(): Promise<void> {
     if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (id === 'khafre-cutaway') figure.innerHTML = khafreCutawayFigure(ground, bundle?.structures);
+    if (id === 'hawara-labyrinth' || id === 'hawara-lower') figure.innerHTML = hawaraLabyrinthFigure(id === 'hawara-lower');
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (id === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);

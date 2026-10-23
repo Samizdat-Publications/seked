@@ -34,6 +34,10 @@
  * `khafre-cutaway`: the same claim rendered sawn open (render/underground.py --style solid, written into objects/ by
  * scripts/exhibit_cutaway.py), with the retraction of the method's only paper beside it; its figures from the records.
  *
+ * `hawara-labyrinth`, `hawara-lower`: the Labyrinth as one reconstruction draws it, rendered on Petrie's chip bed
+ * (render/hawara_labyrinth.py, written into objects/ by scripts/exhibit_labyrinth.py), from the air and in a pit dug
+ * to show its legendary lower storey; labelled with the legendary tier.
+ *
  * `corridor`: the model answer, the Great Pyramid's north-face corridor in section to scale, every dimension with
  * its error bar (data/measurements/g1-voids.json).
  *
@@ -66,7 +70,7 @@ import { degreesToSeked, formatDms } from '@seked/units';
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'seismic-section', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
+export const FIGURES = ['ditch-plan', 'seismic-section', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 

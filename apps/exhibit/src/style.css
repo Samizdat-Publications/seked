@@ -92,6 +92,12 @@ p { margin: 0; }
   background: rgba(240, 150, 70, 0.1); font-size: 14px; line-height: 1.45; }
 .figure .retracted strong { display: block; margin-bottom: 4px; color: rgba(246, 176, 108, 1); font-size: 12px;
   letter-spacing: 0.12em; text-transform: uppercase; }
+/* a rendered picture across the card, and the tier it is drawn at, above it */
+.figure img.wide { display: block; width: 100%; height: auto; max-height: 52vh; object-fit: contain; border-radius: 8px; }
+.figure .tier { display: inline-block; margin-bottom: 8px; padding: 3px 9px; border-radius: 999px; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase; }
+.figure .tier.legendary { color: rgba(255, 226, 170, 1); border: 1px dashed rgba(255, 214, 150, 0.8); background: rgba(255, 214, 150, 0.08); }
+@media (max-width: 600px) { .figure img.wide { max-height: 26vh; } .figure:has(img.wide) figcaption { font-size: 12px; } }
 /* on a phone the card must clear the narration: a shorter picture, the retraction kept, the long caption left out */
 @media (max-width: 600px) {
   .figure .cutaway { grid-template-columns: 1fr; gap: 8px; }

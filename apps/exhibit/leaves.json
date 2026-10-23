@@ -1174,7 +1174,10 @@
    },
    "arrive": "turn",
    "say": "At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half of them underground.",
-   "draw": [],
+   "draw": [
+    "hawara-labyrinth@Labyrinth",
+    "hawara-lower@underground"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],
