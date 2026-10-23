@@ -69,10 +69,14 @@ any can be reversed.
 8. **Version 5's critic** (`build/critic/ch0-2-v5-critique.md`): 5.0 overall, against 5.5 for version 4; within the
    critic's swing of about half a point. It still wants faster narration, no on-screen captions duplicating the
    voice, a tighter cold open without Gobekli Tepe, and the seismic numbers out of the voice: all Stewart's calls.
-9. **Version 6 is captured but not scored** (`build/critic/ch0-2-v6.mp4`, 3:02: no crowds at the Sphinx, every reply
+9. **Version 6 scored 5.5 and is deployed** (seked.pages.dev, 22 October, 21:11): pacing 4, narration 7, camera 5,
+   pictures 6, clarity 7, hook 5 (`build/critic/ch0-2-v6-critique.md`). Its top asks: shorter pauses in the narration,
+   continuous camera drift on the long holds, the seismic zones lit as they are spoken, the green-era grass, the
+   cold open cut down, ambient sound, the scaffolding out of the ditch shots.
+   (Before Stewart topped up the Gemini credit, version 6 was captured but not scored: (`build/critic/ch0-2-v6.mp4`, 3:02: no crowds at the Sphinx, every reply
    with its callouts, the loading gap gone). Gemini refused the upload with 402 Payment Required: the account's
    prepaid credit has run out, and topping it up is Stewart's to do. Then: `python scripts/video_critic.py
-   build/critic/ch0-2-v6.mp4 --brief build/critic/brief-exhibit.md --out build/critic/ch0-2-v6-critique.md`.
+   build/critic/ch0-2-v6.mp4 --brief build/critic/brief-exhibit.md --out build/critic/ch0-2-v6-critique.md`.)
 10. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
    only carve a smaller shape out of a larger one", and ambient sound. Those change the script or add a new layer,
    and wait for Stewart.
