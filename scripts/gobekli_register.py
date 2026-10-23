@@ -126,17 +126,17 @@ def fit(Z, PX, names, B):
     return m, t, n, -neg_rms, float(res.max())
 
 
-def shelter_centre():
-    """The main shelter's centre in the site frame (east, north of the UNESCO origin), from OpenStreetMap."""
-    import requests
+def outline(way):
+    """An OpenStreetMap way's outline in the site frame (east, north of the UNESCO origin), metres, as an (n, 2) array."""
     sites = json.load(open(os.path.join(ROOT, "data", "sites.json"), encoding="utf-8"))
     sites = sites["sites"] if isinstance(sites, dict) else sites
     o = next(s for s in sites if s["id"] == "gobekli-tepe")["origin"]
     cache = os.path.join(ROOT, "build", "gobekli", "osm-around.json")   # an Overpass answer kept from an earlier run
     els = json.load(open(cache, encoding="utf-8"))["elements"] if os.path.exists(cache) else []
-    g = next((e["geometry"] for e in els if e.get("id") == SHELTER_WAY), None)
+    g = next((e["geometry"] for e in els if e.get("id") == way), None)
     if g is None:
-        q = f"[out:json][timeout:60];way({SHELTER_WAY});out geom;"
+        import requests
+        q = f"[out:json][timeout:60];way({way});out geom;"
         g = requests.post("https://overpass-api.de/api/interpreter", data={"data": q},
                           headers={"User-Agent": "seked"}, timeout=120).json()["elements"][0]["geometry"]
     # the heightfield's own local tangent plane (data/terrain/gobekli-glo30.json `projection`), from WGS84's a and 1/f
@@ -147,8 +147,12 @@ def shelter_centre():
     w = 1 - e2 * np.sin(lat) ** 2
     mn = np.radians(1) * a * (1 - e2) / w ** 1.5
     me = np.radians(1) * np.cos(lat) * a / np.sqrt(w)
-    xs = [(p["lon"] - o["longitude"]) * me for p in g]
-    ys = [(p["lat"] - o["latitude"]) * mn for p in g]
+    return np.array([[(p["lon"] - o["longitude"]) * me, (p["lat"] - o["latitude"]) * mn] for p in g])
+
+
+def shelter_centre():
+    """The main shelter's centre in the site frame, from OpenStreetMap."""
+    xs, ys = outline(SHELTER_WAY).T
     return float(np.mean(xs)), float(np.mean(ys))
 
 
