@@ -32,8 +32,10 @@ STATE = os.path.join(LAB, "takes.json")
 NARRATION = os.path.join(ROOT, "assets", "narration")
 FIRST = "a3de4f0"   # the first recording, all ten chapters
 PORT = 5197
-# Stewart's choice by ear, 22 October 2026: pauses cut to 0.45 s and the read 15% faster, its pitch kept
-TIGHTEN = {"pause": 0.45, "tempo": 1.15}
+# Stewart's choice by ear, 22 October 2026: the read 15% faster, its pitch kept. Pauses cut to 0.45 s then, and to
+# 0.30 s the same evening after the critic's fourth review called the cadence slow (Stewart asked for the pauses
+# tightened; the tempo stays his choice). Measured on the takes, 0.30 saves about 5 s in 166.
+TIGHTEN = {"pause": 0.30, "tempo": 1.15}
 
 
 def key():

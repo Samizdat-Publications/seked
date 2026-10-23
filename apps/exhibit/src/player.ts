@@ -15,8 +15,8 @@ import type { Other, Shot, Stage } from './stage';
 /** How long play waits for a leaf's panorama before speaking over the blank anyway. */
 const READY_WAIT_MS = 8000;
 /** How far into a turn or a wipe the words begin, and the longest pause after a leaf's words (critic, 21 October). */
-const LEAD_MS = 350;
-const MAX_HOLD_S = 0.35;
+const LEAD_MS = 200;
+const MAX_HOLD_S = 0.15;   // with the lead, about 0.35 s between leaves (0.7 s until the critic's fourth review)
 /** Seconds the words back up when play takes up where it stopped. */
 const REWIND_S = 1;
 
