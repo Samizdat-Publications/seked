@@ -23,8 +23,10 @@ PREFER = ("lehner-1997", "maragioglio-rinaldi-1966", "petrie-1883", "khafre-proj
 LOOK = dict(
     row_offset=50.0,      # each row's distance east or west of the axis, from the authors' 3D rendering
     well_spacing=22.0,    # north-south, between neighbouring wells in a row, about the centre
-    spiral_pitch=24.0,    # metres the path drops in one turn
-    spiral_gap=3.0,       # the path's clear distance outside the well's wall
+    # the spiral hugs its well and winds about once per well's width, as the authors' own 3D rendering of the wells
+    # draws it (the Khafre Project's figure, shown to us on 23 October 2026; it has no scale): read by eye
+    spiral_pitch=12.0,    # metres the path drops in one turn
+    spiral_gap=-0.3,      # the path's inner edge, from the well's wall: just into it, so the two read as one shaft
     spiral_width=2.0,     # the path's own width
     cube_under="row",     # each row of four falls into its own cube ("each with four shafts", TBS)
     zed_size=(10.0, 4.0),  # east-west, north-south footprint of one Zed

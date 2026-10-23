@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { WELLS_SPREAD, khafreWells } from './wells';
+import { ROW_OFFSET_M, WELL_SPACING_M, khafreWells } from './wells';
 
 const env: Record<string, number> = {
   'g2.centre.offset.west': 334.41, 'g2.centre.offset.south': 353.86, 'g2.base.elevation.relative': 10,
@@ -9,16 +9,18 @@ const env: Record<string, number> = {
 describe("the claimed wells in the scene", () => {
   const o = khafreWells(env)!;
   const wells = o.lines.filter((l) => l.style === 'dash') as { from: number[]; to: number[] }[];
-  it('draws each well from the base down to the claimed depth, in rows under the centre', () => {
+  it('draws each well from the base down to the claimed depth, in two north-south rows under the centre', () => {
     expect(wells).toHaveLength(8);
     for (const w of wells) {
       expect(w.from[2]).toBe(10);
       expect(w.to[2]).toBe(10 - 648);
       expect(w.to[0]).toBe(w.from[0]);
-      expect(Math.abs(w.from[0]! + 334.41)).toBeLessThanOrEqual(WELLS_SPREAD * 215.25 / 2 + 1e-9);
-      expect(Math.abs(w.from[1]! + 353.86)).toBeLessThan(215.25 / 2);
+      expect(Math.abs(Math.abs(w.from[0]! + 334.41) - ROW_OFFSET_M)).toBeLessThan(1e-9);
+      expect(Math.abs(w.from[1]! + 353.86)).toBeLessThanOrEqual(1.5 * WELL_SPACING_M + 1e-9);
     }
-    expect(new Set(wells.map((w) => w.from[1])).size).toBe(2);
+    // two rows, each running north to south
+    expect(new Set(wells.map((w) => w.from[0])).size).toBe(2);
+    expect(new Set(wells.map((w) => w.from[1])).size).toBe(4);
   });
   it("outlines Khafre's base faintly and says the wells are a claim placed by choice", () => {
     expect(o.lines.filter((l) => l.style === 'faint')).toHaveLength(4);

@@ -10,12 +10,12 @@ import type { Overlay } from './manifest';
 export const SCENE_OVERLAYS = ['khafre-wells'] as const;
 
 /**
- * Where the wells stand under the base, a look choice (the team publishes no plan with a scale, as the depth figure
- * says): the rows run east to west across this share of the side, this share of the half side north and south of
- * the centre.
+ * Where the wells stand under the base, look choices (the team publishes no plan with a scale), the same as the
+ * cutaway's in render/giza/underground.py LOOK: the claim's two rows run north to south, ROW_OFFSET_M east and west of
+ * the centre, their wells WELL_SPACING_M apart.
  */
-export const WELLS_SPREAD = 0.7;
-export const WELLS_ROW_OFFSET = 0.25;
+export const ROW_OFFSET_M = 50;
+export const WELL_SPACING_M = 22;
 
 /** The wells as an overlay, from the records; null until every one is in the environment. */
 export function khafreWells(env: Record<string, number>): Overlay | null {
@@ -34,9 +34,9 @@ export function khafreWells(env: Record<string, number>): Overlay | null {
   square.forEach((p, i) => lines.push({ from: p, to: square[(i + 1) % 4]!, style: 'faint' }));
   const tops: [number, number, number][] = [];
   for (let r = 0; r < rows; r++) {
-    const y = cy + (rows === 1 ? 0 : (r / (rows - 1) - 0.5) * 2 * WELLS_ROW_OFFSET * half);
+    const x = cx + (rows === 1 ? 0 : ROW_OFFSET_M * (2 * r - (rows - 1)) / (rows - 1));
     for (let i = 0; i < perRow; i++) {
-      const x = cx - WELLS_SPREAD * half + (perRow === 1 ? WELLS_SPREAD * half : (i * 2 * WELLS_SPREAD * half) / (perRow - 1));
+      const y = cy + WELL_SPACING_M * (i - (perRow - 1) / 2);
       tops.push([x, y, z]);
       lines.push({ from: [x, y, z], to: [x, y, z + bottom], style: 'dash' });
     }
