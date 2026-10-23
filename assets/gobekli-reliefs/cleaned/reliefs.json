@@ -1,0 +1,56 @@
+{
+ "note": "Look reconstruction from drawings and photographs (docs/gobekli-reliefs.md); not measurements. crop is the stone in the source, in its pixels; step and shaft its outline as drawn, read by eye.",
+ "reliefs": {
+  "p43-front": {
+   "src": "p43-front.png",
+   "crop": [
+    88,
+    150,
+    1375,
+    2360
+   ],
+   "step": 0.61,
+   "shaft": [
+    0.0,
+    0.77
+   ],
+   "shape": [
+    1105,
+    644
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
+  },
+  "p18-side": {
+   "src": "p18-side.png",
+   "crop": [
+    405,
+    120,
+    1140,
+    2640
+   ],
+   "shape": [
+    1260,
+    368
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
+  },
+  "p18-front": {
+   "src": "p18-front.png",
+   "crop": [
+    0,
+    0,
+    1536,
+    2752
+   ],
+   "margins": "white",
+   "shape": [
+    1376,
+    768
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
+  }
+ }
+}

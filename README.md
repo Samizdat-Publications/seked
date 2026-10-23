@@ -98,6 +98,12 @@ docs/            plan, dossier, shafts, progress snapshots, history, design spec
 How the model got here, stage by stage, is in [`docs/history.md`](docs/history.md)
 and the milestone renders in [`docs/progress/`](docs/progress/README.md).
 
+## For other modellers
+
+[`assets/gobekli-reliefs/`](assets/gobekli-reliefs/README.md) holds height maps of the carved reliefs on Göbekli
+Tepe's Enclosure D pillars (the Vulture Stone, Pillar 18's arms, belt, fox and pelt), ready to use as displacement
+maps, with how they were made and whom they are owed to.
+
 ## Licence
 
 Code: [MIT](LICENSE). The project's renders, films, images and writing: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Imported data keeps its own licence; see [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md).

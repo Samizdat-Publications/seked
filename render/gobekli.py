@@ -135,14 +135,14 @@ def scan_raster(pts, centre):
     return lo, hi, have | fill
 
 
-def glue(Z, lo, hi, have):
-    """The near ground under and round the scan: under it, UNDER below its lowest point; outside, eased over GLUE
+def glue(Z, lo, hi, have, reach=GLUE):
+    """The near ground under and round the scan: under it, UNDER below its lowest point; outside, eased over `reach`
     metres onto the height of the scan's nearest rim, so no cliff or gap stands at its edge."""
     Z = Z.copy()
     Z[have] = np.minimum(Z[have], lo[have] - UNDER)
     cur, val = have.copy(), np.where(have, hi, 0.0)
     dist = np.where(have, 0.0, np.inf)
-    for k in range(1, int(GLUE / CELL) + 1):
+    for k in range(1, int(reach / CELL) + 1):
         acc, cnt = np.zeros_like(Z), np.zeros_like(Z)
         for dj, di in EIGHT:
             c = shift(cur, dj, di)
@@ -157,7 +157,7 @@ def glue(Z, lo, hi, have):
         sm = sum(np.where(shift(cur, dj, di), shift(val, dj, di), 0.0) for dj, di in EIGHT) + 4 * val
         n = sum(shift(cur, dj, di).astype(float) for dj, di in EIGHT) + 4
         val = np.where(cur & ~have, sm / n, val)
-    w = np.clip(1 - dist / GLUE, 0.0, 1.0)
+    w = np.clip(1 - dist / reach, 0.0, 1.0)
     w = w * w * (3 - 2 * w)
     out = ~have & (w > 0)
     Z[out] = Z[out] * (1 - w[out]) + (val[out] - 0.1) * w[out]
@@ -533,6 +533,55 @@ def world_and_sun(sc):
     sc.collection.objects.link(sun)
 
 
+def inside(poly, X, Y):
+    """Which points lie inside a closed polygon (even-odd rule)."""
+    res = np.zeros(np.shape(X), dtype=bool)
+    for k in range(len(poly)):
+        (x0, y0), (x1, y1) = poly[k - 1], poly[k]
+        cross = ((y0 > Y) != (y1 > Y)) & (X < x0 + (Y - y0) * (x1 - x0) / (y1 - y0 + 1e-12))
+        res ^= cross
+    return res
+
+
+def enclosure_9500(sc, dense, scan_objects, d, hdr, z, cs):
+    """Enclosure D about 9500 BCE in place of the scan: built from the plan (render/gobekli_built.py) where the
+    registration puts it, its floor at the scan's floor there (the lowest tenth of the scan within 3 m of D's middle),
+    and the hill round it raised to the wall's top and eased back onto the heightfield over 40 m: the enclosure sunk
+    into the slope, as the excavators think the Layer III rings were. How the ground stood round it is a look choice."""
+    sys.path.insert(0, HERE)
+    import gobekli_built as G
+    from giza import materials as S
+    dx, dy = d
+    near = dense[np.hypot(dense[:, 0] - dx, dense[:, 1] - dy) < 3.0]
+    fd = float(np.percentile(near[:, 2], 10))
+    for o in scan_objects:
+        bpy.data.objects.remove(o, do_unlink=True)
+    coll = bpy.data.collections.new("Enclosure D about 9500 BCE (stand-in)")
+    sc.collection.children.link(coll)
+    mats = dict(
+        stone=S.stone("limestone pillars (stand-in)", "tura_dressed", tex_role="casing", instanced=False, sand_tops=0.1,
+                      bump=0.2),
+        wall=S.stone("rubble wall (stand-in)", "mastaba_core", tex_role="core", instanced=False, sand_tops=0.3, bump=0.1),
+        floor=S.stone("bedrock floor", "core", tex_role="bedrock", instanced=False, sand_tops=0.4, bump=0.1))
+    ring = [p for p in G.pillars() if not p["name"].startswith("central")]
+    centre = np.array([np.mean([p["x"] for p in ring]), np.mean([p["y"] for p in ring])])
+    made = G.build(coll, mats, centre)
+    w = G.walls_and_floor(coll, mats)
+    root = bpy.data.objects.new("Enclosure D (plan frame)", None)
+    sc.collection.objects.link(root)
+    root.location = (dx, dy, fd)
+    for o in coll.objects:
+        o.parent = root
+    half = NEAR[0]
+    n = int(round(2 * half / CELL)) + 1
+    X, Y = np.meshgrid(cs[0] - half + CELL * np.arange(n), cs[1] - half + CELL * np.arange(n))
+    have = inside(np.array(w["outer"]) + (dx, dy), X, Y)
+    terrain_mesh(hdr, z, lambda Z: glue(Z, np.full(Z.shape, fd), np.full(Z.shape, fd + w["height"]), have, 40.0),
+                 sc.collection, cs)
+    return dict(floor=fd, wall_height=w["height"], pillars=made, stand_in=True,
+                note="Enclosure D from its plan (Haklay & Gopher 2020); carving and ground are look choices")
+
+
 def main():
     a = args()
     out = os.path.abspath(a.get("--out", os.path.join(REPO, "build", "gobekli", "render")))
@@ -567,9 +616,14 @@ def main():
     # the near ground set under the scan and eased onto its rim, from a denser sample of its vertices
     dense = footprint(meshes, 400000)             # read after the lift, so already on the rim
     cs = np.round(c / hdr["spacing"]) * hdr["spacing"]     # the near grid on the 10 m grid's lines
-    lo, hi, have = scan_raster(dense, cs)
-    terrain_mesh(hdr, z, lambda Z: glue(Z, lo, hi, have), sc.collection, cs)
+    dx, dy = fit["enclosure_d_in_site"]
+    era = a.get("--era", "today")
     built = {}
+    if era == "today":
+        lo, hi, have = scan_raster(dense, cs)
+        terrain_mesh(hdr, z, lambda Z: glue(Z, lo, hi, have), sc.collection, cs)
+    else:
+        built = enclosure_9500(sc, dense, meshes + [root], (dx, dy), hdr, z, cs)
     if a.get("--roof", "off") == "on":
         sys.path.insert(0, os.path.join(REPO, "scripts"))
         from gobekli_register import outline
@@ -596,7 +650,6 @@ def main():
     sc.collection.objects.link(cam)
     sc.camera = cam
     cam.data.clip_end = 2 * SKIRT
-    dx, dy = fit["enclosure_d_in_site"]
     dground = float(sample(hdr, z, dx, dy))
     sx, sy = fit["shelter_centre_in_site"]
     views = {
@@ -610,18 +663,30 @@ def main():
         "shelter": (Vector((sx - 48.0, sy - 46.0, float(sample(hdr, z, sx - 48.0, sy - 46.0)) + 1.7)),
                     Vector((sx, sy, dground + 4.0)), 24),
     }
-    which = list(views) if a.get("--view", "all") == "all" else [a["--view"]]
+    if era != "today":
+        fd = built["floor"]
+        p43 = built["pillars"]["43"]
+        n43 = (math.sin(math.radians(210.0)), math.cos(math.radians(210.0)))
+        views.pop("shelter")
+        views.update({
+            # on the floor south of the central pair, at eye height, looking north between them
+            "inside": (Vector((dx, dy - 5.2, fd + 1.6)), Vector((dx, dy, fd + 2.6)), 24),
+            # Pillar 43, the Vulture Stone, from in front of its carved face
+            "p43": (Vector((dx + p43["x"] + 3.2 * n43[0], dy + p43["y"] + 3.2 * n43[1], fd + 1.7)),
+                    Vector((dx + p43["x"], dy + p43["y"], fd + 1.9)), 30),
+        })
+    which = list(views) if a.get("--view", "all") == "all" else a["--view"].split(",")
     for name in which:
         pos, tgt, lens = views[name]
         cam.location = pos
         cam.rotation_euler = (tgt - pos).to_track_quat("-Z", "Y").to_euler()
         cam.data.lens = lens
-        sc.render.filepath = os.path.join(out, f"gobekli-today-{name}.png")
+        sc.render.filepath = os.path.join(out, f"gobekli-{era}-{name}.png")
         bpy.ops.render.render(write_still=True)
         print("wrote", sc.render.filepath, flush=True)
-    json.dump({"fit": fit, "rim_dz": dz, "sun": SUN, "shelters": built, "views": {k: [list(v[0]), list(v[1]), v[2]] for k, v in views.items()},
+    json.dump({"fit": fit, "era": era, "rim_dz": dz, "sun": SUN, "built": built, "views": {k: [list(v[0]), list(v[1]), v[2]] for k, v in views.items()},
                "stand_in": True, "note": "the scan is a visual stand-in (rmark, CC BY 4.0); placement and look are choices"},
-              open(os.path.join(out, "gobekli-today.json"), "w"), indent=1)
+              open(os.path.join(out, f"gobekli-{era}.json"), "w"), indent=1)
 
 
 if __name__ == "__main__":
