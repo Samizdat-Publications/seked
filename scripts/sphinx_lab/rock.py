@@ -98,6 +98,16 @@ PARAMS = {
     "fore_blend": 1.5,      # m over which the head's treatment gives way to the body's       # m, the facets a hard bed's face breaks into
     "faces": 1400000,       # the written mesh's faces
     "seed": 7,
+    # 23 October (Stewart: the First Time's flank read soft and draped close up): the body's section squared towards a
+    # cut block's, which the real Sphinx's flanks and rump are, and kept for both eras so the statue is one statue
+    "square": 0.9,          # how far the body's section goes from round towards a cut block's (0 leaves it round)
+    "square_n": 4.0,        # the superellipse it goes towards
+    "square_u0": 0.08,      # along the body, from here (the rump's end stays round)
+    "square_z0": 0.4,       # m: below this the floor's rolls and the tail are left alone
+    "square_fore_fade": 0.16,   # of the length: how gradually the squaring gives way to the chest and forelegs
+    "crisp": 0.0,           # how hard the form's edges are sharpened (0 leaves them as the rebuild has them)
+    "crisp_iters": 12,      # one-rings in the smoothing it is sharpened against: wider takes bigger forms
+    "crisp_max": 0.12,      # m, the most any point moves
 }
 
 
@@ -108,7 +118,8 @@ ERA_PARAMS = {
     "first-time": {"soft": 0.07, "edge": 0.05, "hard": 0.02, "neck": 0.02, "head": 0.0, "member_i": 0.0,
                    "lamina": 0.015, "along_var": 0.15, "joint_depth": 0.12, "joint_width": (0.04, 0.07),
                    "spall": 0.0, "fracture": 0.0, "lip_break": 0.0, "chips": 0.0, "foot_wave": 0.0,
-                   "grain": 0.008, "back_drop": 0.0, "head_lines": 0.012},
+                   "grain": 0.008, "back_drop": 0.0, "head_lines": 0.012,
+                   "crisp": 2.0, "crisp_max": 0.2},       # fresh-cut edges (23 October)
 }
 
 
@@ -210,6 +221,55 @@ def proportion(mesh, P):
     mesh.vertices.foreach_set("co", co.ravel())
     mesh.update()
     print(f"proportioned: back {back:.2f} -> {P['back_to']} m, crown {crown:.2f} -> {crown + P['head_rise']:.2f} m, widened {P['widen']}", flush=True)
+
+
+def square(mesh, P):
+    """The body's section squared towards a cut block's: the master's body is a soft round tube, which close up reads
+    as draped, not carved. Slice by slice along the body, each point's place in the section (x across from the
+    slice's middle, z up from the section's middle) is pushed out from an ellipse towards a superellipse of
+    exponent P["square_n"], by P["square"] of the way: the sides stand flatter and the back's shoulders firmer. Only
+    the upper half of the section moves up; the lower half only outwards, so the floor line holds. The head, neck,
+    forelegs and the floor's rolls are left alone (look choices)."""
+    if not P.get("square"):
+        return
+    co = np.empty(len(mesh.vertices) * 3)
+    mesh.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    along = -co[:, 1]
+    u = (along - along.min()) / np.ptp(along)
+    z = co[:, 2]
+    lo, hi = P["square_z0"], P["back_to"]
+    band = (u > P["square_u0"]) & (u < P["fore_u"]) & (z > lo) & (z < hi + 0.6)
+    # per slice: the section's middle and half-width at mid-height
+    nb = 60
+    edges = np.linspace(P["square_u0"], P["fore_u"], nb + 1)
+    xc = np.zeros(nb)
+    a = np.zeros(nb)
+    for i in range(nb):
+        s = band & (u >= edges[i]) & (u < edges[i + 1]) & (z > lo + 0.25 * (hi - lo)) & (z < lo + 0.75 * (hi - lo))
+        if s.sum() < 20:
+            continue
+        xc[i] = (np.percentile(co[s, 0], 98) + np.percentile(co[s, 0], 2)) / 2
+        a[i] = (np.percentile(co[s, 0], 98) - np.percentile(co[s, 0], 2)) / 2
+    ok = a > 0
+    mids = (edges[:-1] + edges[1:]) / 2
+    xc_u = np.interp(u, mids[ok], xc[ok])
+    a_u = np.interp(u, mids[ok], a[ok])
+    zc, b = (lo + hi) / 2, (hi - lo) / 2
+    px, pz = (co[:, 0] - xc_u) / a_u, (z - zc) / b
+    th = np.arctan2(pz, px)
+    n = P["square_n"]
+    r_s = (np.abs(np.cos(th)) ** n + np.abs(np.sin(th)) ** n) ** (-1.0 / n)       # the superellipse over the circle
+    # fade in from the ends of the band, so the change has no edge
+    fade = (np.clip((u - P["square_u0"]) / 0.06, 0, 1) * np.clip((P["fore_u"] - u) / P["square_fore_fade"], 0, 1)
+            * np.clip((z - lo) / 0.8, 0, 1) * np.clip((hi + 0.6 - z) / 0.8, 0, 1))
+    f = 1.0 + (r_s - 1.0) * P["square"] * fade * band
+    co[:, 0] = xc_u + (co[:, 0] - xc_u) * f
+    up = pz > 0                                       # the upper half also rises into its corners, never over the back
+    co[up, 2] = np.where(z[up] <= hi, np.minimum(zc + (z[up] - zc) * f[up], hi + 0.2), z[up])
+    mesh.vertices.foreach_set("co", co.ravel())
+    mesh.update()
+    print(f"squared: {int((band & (fade > 0)).sum())} points, n {n}, by {P['square']}", flush=True)
 
 
 def rebuild(mesh, P):
@@ -364,6 +424,32 @@ def neighbours_mean(vals, edges, n, iters=1):
             np.add.at(acc, b, out[a])
             out = acc / deg[:, None]
     return out
+
+
+def crisp(obj, P):
+    """Fresh-cut edges: each point pushed away from where a smoothing of the surface would put it, by P["crisp"]
+    times the difference, along its normal (an unsharp mask on the form). The rebuilt master's edges, the ruff's,
+    the paws', the tail's on the floor, are rounded like clay; a carver's are not (look choices)."""
+    if not P.get("crisp"):
+        return
+    me = obj.data
+    n = len(me.vertices)
+    co = np.empty(n * 3)
+    me.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    nr = np.empty(n * 3)
+    me.vertices.foreach_get("normal", nr)
+    nr = nr.reshape(-1, 3)
+    ed = np.empty(len(me.edges) * 2, np.int64)
+    me.edges.foreach_get("vertices", ed)
+    ed = ed.reshape(-1, 2)
+    sm = neighbours_mean(co, ed, n, P["crisp_iters"])
+    d = np.einsum("ij,ij->i", co - sm, nr)                 # how far the point stands out of its smoothed surface
+    d = np.clip(d, -P["crisp_max"], P["crisp_max"])
+    co += nr * (P["crisp"] * d)[:, None]
+    me.vertices.foreach_set("co", co.ravel())
+    me.update()
+    print(f"crisped: by {P['crisp']} over {P['crisp_iters']} rings, the largest push {np.abs(P['crisp'] * d).max():.3f} m", flush=True)
 
 
 def beds(P, length, height, rng):
@@ -542,8 +628,10 @@ def main(argv):
     mesh, scale, shift = first_time()
     print(f"first time: {len(mesh.vertices)} vertices", flush=True)
     proportion(mesh, P)
+    square(mesh, P)
     obj = rebuild(mesh, P)
     print(f"rebuilt as rock: {len(obj.data.vertices)} vertices, {len(obj.data.polygons)} faces", flush=True)
+    crisp(obj, P)
     rec = wear(obj, P, height)
     print(f"worn: {rec}", flush=True)
     rec["faces"] = decimate(obj, P["faces"])

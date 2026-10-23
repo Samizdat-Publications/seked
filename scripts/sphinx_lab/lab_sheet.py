@@ -2,7 +2,7 @@
 The Sphinx lab's fixed views of one era's statue, for the modeller critic (scripts/sphinx_lab/critic.py):
 
     blender -b --factory-startup -P scripts/sphinx_lab/lab_sheet.py -- --state lion --out DIR [--finish lion-c03]
-        [--size 1024x640] [--samples 64] [--clay-only]
+        [--size 1024x640] [--samples 64] [--clay-only] [--model ID]
 
 The statue is placed and finished by the renderer's own code (render/giza/sphinx.py `statue`), so what the
 critic sees is what the films show; `--finish` swaps in a candidate written to build/models/<master>-<finish>/
@@ -31,6 +31,8 @@ out = os.path.abspath(args["--out"])
 w, h = (int(v) for v in args.get("--size", "1024x640").split("x"))
 os.makedirs(out, exist_ok=True)
 
+if args.get("--model"):      # another stand-in for this era's statue, not yet installed (blender/models.json id)
+    sphinx.MODEL_FOR[states.spec(state)["sphinx"]] = (args["--model"], None)
 if args.get("--finish"):
     variant = states.spec(state)["sphinx"]
     model_id, _ = sphinx.MODEL_FOR[variant]
