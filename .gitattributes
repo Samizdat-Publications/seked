@@ -6,3 +6,4 @@ assets/sequences/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 assets/narration/*.mp3 filter=lfs diff=lfs merge=lfs -text
 apps/exhibit/objects/*.glb filter=lfs diff=lfs merge=lfs -text
 assets/gobekli-reliefs/**/*.png filter=lfs diff=lfs merge=lfs -text
+apps/exhibit/objects/*.jpg filter=lfs diff=lfs merge=lfs -text

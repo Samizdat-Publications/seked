@@ -329,6 +329,8 @@ SHOTS = {
     # the solid cutaway's close shots: the wells' tops under Khafre, and the chamber they fall into (look choices)
     "top": dict(target=(50.0, 0.0, -45.0), location=(-150.0, -170.0, 30.0), lens=35.0),
     "bottom": dict(target=(50.0, 0.0, -690.0), location=(-120.0, -150.0, -600.0), lens=35.0),
+    # the exhibit's card (chapter 8): the whole sawn block, framed tight for a portrait picture
+    "card": dict(target=(70.0, 40.0, -330.0), location=(-1500.0, -760.0, 160.0), lens=50.0),
 }
 
 

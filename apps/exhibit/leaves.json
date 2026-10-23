@@ -1152,7 +1152,10 @@
    },
    "arrive": "turn",
    "say": "In 2025 a team including the radar engineer Filippo Biondi said satellites had found eight wells under Khafre's pyramid, falling 648 metres, four and a half pyramid heights, to two great chambers.",
-   "draw": [],
+   "draw": [
+    "khafre-wells",
+    "khafre-cutaway@wells"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],
@@ -1171,10 +1174,7 @@
    },
    "arrive": "turn",
    "say": "At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half of them underground.",
-   "draw": [
-    "khafre-wells",
-    "khafre-depths"
-   ],
+   "draw": [],
    "hold": 1,
    "interact": "look",
    "receipts": [],

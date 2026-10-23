@@ -215,6 +215,31 @@ function khafreDepthsFigure(ground: Record<string, number> | null, structures?: 
     under the paws, never dug, about ${d.paw} m; neither figure yet checked against its page.` : ''} ${ifItHeld(structures, ['g2.sar-shafts'])}</figcaption>`;
 }
 
+/**
+ * The claim sawn open, as rendered (render/underground.py --style solid; scripts/exhibit_cutaway.py writes the two
+ * pictures into objects/), and beside it the retraction of the method's only peer-reviewed paper. The figures in the
+ * words come from the records, so a changed record changes the caption, never a picture alone.
+ */
+function khafreCutawayFigure(ground: Record<string, number> | null, structures?: StructureNote[]): string {
+  const d = ground && khafreDepths(ground);
+  const claim = d
+    ? `${d.wells} wells in ${d.rows} rows, wound by spirals, falling ${-d.bottom} m, ${(-d.bottom / d.height).toFixed(2)} times the
+      pyramid's height (the white triangles), to ${d.cubes} chambers ${formatValue(d.cube, 'm')} on a side`
+    : 'Eight wells wound by spirals, falling to two great chambers';
+  return `<div class="cutaway">
+    <img class="cutaway-main" src="objects/khafre-cutaway.jpg" alt="The plateau under Khafre's pyramid sawn open: the claimed wells and a chamber as hollows in the rock, outlined in orange">
+    <div class="cutaway-side">
+      <img src="objects/khafre-cutaway-top.jpg" alt="Close under the pyramid: four half-wells, each wound by a spiral groove">
+      <aside class="retracted"><strong>Retracted</strong>The method's only peer-reviewed paper (Biondi and Malanga 2022,
+        <i>Remote Sensing</i>, on Khufu's pyramid) was retracted on 10 August 2026 for "serious methodological flaws and
+        statistical errors". The authors disagree. The Khafre wells were never in a paper: they come from the team's
+        conference abstract of March 2025.</aside>
+    </div>
+  </div><figcaption>The claim, sawn open to scale: ${claim}, as the Khafre Project describes them. The cut runs through
+    one row; every claimed hollow is outlined in orange. Where the wells stand and how the spirals wind are our look
+    choices, after the team's own rendering. ${ifItHeld(structures, ['g2.sar-shafts'])}</figcaption>`;
+}
+
 type StructureNote = { id: string; evidence?: string; if_it_held?: string };
 
 /** What reported structures would change if they held, from data/structures.json, as one sentence each. */
@@ -405,6 +430,7 @@ async function start(): Promise<void> {
     if (shownFigure === 'phi-triangle') figure.innerHTML = phiTriangleFigure(ground);
     if (shownFigure === 'earth-scale') figure.innerHTML = earthScaleFigure(bundle, ground);
     if (shownFigure === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
+    if (shownFigure === 'khafre-cutaway') figure.innerHTML = khafreCutawayFigure(ground, bundle?.structures);
     if (shownFigure === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (shownFigure === 'rhind-56') figure.innerHTML = rhindFigure(bundle);
     if (shownFigure === 'north-drift') figure.innerHTML = northDriftFigure(ground);
@@ -457,6 +483,7 @@ async function start(): Promise<void> {
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'corridor') figure.innerHTML = corridorFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
+    if (id === 'khafre-cutaway') figure.innerHTML = khafreCutawayFigure(ground, bundle?.structures);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (id === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);
