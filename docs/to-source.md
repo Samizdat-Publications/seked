@@ -37,6 +37,14 @@ recorded where it is used, and moved to **Done** here with the date.
 - **Need**: the scan (Hochschule Karlsruhe for the DAI); only renders of it are published.
 - **Where**: a request to the DAI (Göbekli Tepe Research Project). Stewart's to send.
 
+### Hawara: the Labyrinth plan's origin (added 23 October 2026)
+
+- **For**: crediting the reconstruction the Labyrinth model follows (`render/giza/labyrinth.py`).
+- **Need**: the original of the plan on the Mataha report's cover (Hawara 2008, version VII 08.2010): it looks like
+  Athanasius Kircher's reconstruction (around 1670-1679), but which plate, in which book, is unconfirmed.
+- **Where**: digitised Kircher volumes (*Turris Babel*, *Oedipus Aegyptiacus*, *Sphinx Mystagoga*) on archive.org
+  or the ETH/Stanford Kircher collections; or ask Louis De Cordier which source the cover used.
+
 ## Done
 
 (nothing yet)
