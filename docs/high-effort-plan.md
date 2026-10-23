@@ -77,7 +77,13 @@ any can be reversed.
    with its callouts, the loading gap gone). Gemini refused the upload with 402 Payment Required: the account's
    prepaid credit has run out, and topping it up is Stewart's to do. Then: `python scripts/video_critic.py
    build/critic/ch0-2-v6.mp4 --brief build/critic/brief-exhibit.md --out build/critic/ch0-2-v6-critique.md`.)
-10. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
+10. **Pauses tightened, version 7 scored 5.2** (not deployed): the takes' pauses 0.45 to 0.30 s (18 s off the whole
+    narration) and the gap between leaves 0.7 to 0.35 s; chapters 0 to 2 run 2:55 against 3:02. The critic's
+    narration score went 7 to 5 on the same voice and words, so the pauses are not what it hears: it is the rate.
+    Samples at tempo 1.15 and 1.25 (pause 0.30) are in the voice lab's samples for Stewart's ear
+    (`python scripts/voice_lab.py`, http://localhost:5197). Its standing asks: no subtitles mirroring the voice,
+    chapter 1's ditch shortened, the callouts projected onto the stone, the cold open without Gobekli Tepe.
+11. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
    only carve a smaller shape out of a larger one", and ambient sound. Those change the script or add a new layer,
    and wait for Stewart.
 
