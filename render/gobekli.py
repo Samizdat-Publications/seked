@@ -650,7 +650,8 @@ def enclosure_9500(sc, dense, scan_objects, d, hdr, z, cs, filled=False):
     have &= np.logical_and.reduce([shift(have, dj, di) for dj, di in EIGHT])
     land = terrain_mesh(hdr, z, lambda Z: glue(Z, np.full(Z.shape, fd), np.full(Z.shape, fd + w["height"]), have, 40.0),
                         sc.collection, cs, have)
-    return dict(floor=fd, wall_height=w["height"], tell_removed_m=max(0.0, excess), pillars=made, stand_in=True,
+    return dict(floor=fd, wall_height=w["height"], tell_removed_m=max(0.0, excess), pillars=made,
+                centre=[float(v) for v in centre], stand_in=True,
                 fill_level=(w["height"] - FILL_BELOW_TOP) if filled else 0.0, land=land,
                 note="Enclosure D from its plan (Haklay & Gopher 2020); carving and ground are look choices")
 
@@ -749,13 +750,18 @@ def main():
     if era != "today":
         fd = built["floor"] + built.get("fill_level", 0.0)     # the eye stands on the fill once there is one
         p43 = built["pillars"]["43"]
-        n43 = p43["face"]                                                        # its carved face's normal
+        n43 = np.array(p43["face"])                                              # its carved face's normal
+        # radial, its face looks along the wall: stand off the face and in towards the ring's middle, or the eye is
+        # in the wall
+        in43 = np.array(built["centre"]) - (p43["x"], p43["y"])
+        in43 /= np.linalg.norm(in43)
+        e43 = np.array((p43["x"], p43["y"])) + 3.6 * n43 + 1.4 * in43
         views.pop("shelter")
         views.update({
             # on the floor south of the central pair, at eye height, looking north between them
             "inside": (Vector((dx, dy - 5.2, fd + 1.6)), Vector((dx, dy, fd + 2.6)), 24),
             # Pillar 43, the Vulture Stone, from in front of its carved face
-            "p43": (Vector((dx + p43["x"] + 4.6 * n43[0], dy + p43["y"] + 4.6 * n43[1], fd + 1.7)),
+            "p43": (Vector((dx + e43[0], dy + e43[1], fd + 1.7)),
                     Vector((dx + p43["x"], dy + p43["y"], fd + 1.9)), 32),
         })
         p33 = built["pillars"]["33"]

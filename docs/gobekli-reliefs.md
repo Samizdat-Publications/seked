@@ -67,7 +67,11 @@ claim, its free choices and the reply.
 - Not made: Pillars 20, 30 and 38. Their motifs are listed in the TEDI dictionary, but no reachable photograph was
   labelled with the number, and the DAI blog would not load from here. Candidate replica photographs are noted in
   the shared folder's README.
-- Note on Pillar 43: the DAI describes its relief on the pillar's "western broadside", wrapping onto both narrow
-  sides. Seked's stand-in turns it along the wall with the carved face into the ring; which way it truly faces is
-  worth checking against the plan.
+- Pillar 43's facing, settled 23 October from the DAI's own account (Dietrich, "Of animals and a headless man",
+  The Tepe Telegrams, 14 October 2016, read through the Wayback Machine while dainst.blog was down): the relief is on
+  the "western broad side", and "some more reliefs to the left of the scorpion and the bird are hidden by the
+  perimeter wall". That is a radial pillar in the ring's north-west seen from the south-west, its outer end (the
+  viewer's left) in the wall. Seked's Pillar 43 is now radial like its neighbours, carved on its west-looking broad
+  face, and set forward so a fifth of its length is in the wall rather than the plan's half (look choice: the vulture
+  and the scorpion stand clear in photographs). The `p43` view stands off that face and in towards the ring.
 

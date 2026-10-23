@@ -28,8 +28,6 @@ recorded where it is used, and moved to **Done** here with the date.
 - **Need**: a straight-on photograph or drawing of Pillar 31's front at the top of the shaft (the bull's skull on
   its neck), and of Pillar 43's two narrow sides (its relief wraps onto them).
 - **Where**: the same DAI sources; for Pillar 43, Andrew Collins's page (https://www.andrewcollins.com/page/news/P43.htm).
-- **Also**: which way Pillar 43's carved face truly faces. The DAI calls it the "western broadside"; Seked's stand-in
-  turns it along the wall facing into the ring. A plan or photograph that settles it.
 
 ### Göbekli Tepe, the DAI's 3D scan of Pillar 18 (noted 21 October 2026)
 
@@ -47,4 +45,6 @@ recorded where it is used, and moved to **Done** here with the date.
 
 ## Done
 
-(nothing yet)
+- **Which way Pillar 43's carved face faces** (23 October 2026): the DAI's post on Pillar 43, read through the
+  Wayback Machine, puts the relief on the western broad side with its left end hidden by the perimeter wall: a radial
+  pillar, face to the west. Applied in `render/gobekli_built.py`; see `docs/gobekli-reliefs.md`.

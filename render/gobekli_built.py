@@ -27,16 +27,24 @@ REPO = os.path.dirname(HERE)
 RELIEFS = os.path.join(REPO, "assets", "gobekli-reliefs", "cleaned")
 NUMBERS = ["30", "22", "21", "20", "19", "32", "33", "38", "41", "42", "43"]   # the plan's ring_01 to ring_11
 CENTRAL = {"central west": "31", "central east": "18"}
-# Pillar 43 stands along the wall with its carved face to the ring's middle, as photographs of it in place show, not
-# radially as the schematic plan's bar suggests: turned a quarter and set against the wall's inner face (look choice)
-ALONG_WALL = {"43", "33"}           # Pillar 33's excavation photograph shows it the same way
+# Pillar 33 stands along the wall with its carved face to the ring's middle, as its excavation photograph shows, not
+# radially as the schematic plan's bar suggests: turned a quarter and set against the wall's inner face (look choice).
+# Pillar 43 stays radial like its neighbours: the DAI puts its relief on the "western broad side", with the reliefs
+# on its left "hidden by the perimeter wall" (Dietrich, The Tepe Telegrams, 14 October 2016), which is the outer end
+# of a radial pillar in the ring's north-west, seen from the south-west.
+ALONG_WALL = {"33"}
+# The plan centres every wall pillar on the wall's inner face, burying half its length. Pillar 43's vulture and
+# scorpion stand clear of the wall in photographs, only "some more reliefs to the left" hidden: set forward along its
+# axis to leave this fraction of its length in the wall (look choice)
+SET_IN = {"43": 0.2}
 RELIEF = 0.04            # m: the carving's greatest raise (Göbekli's reliefs are mostly low, a few centimetres)
 GRID = 0.01              # m: the carved sheet's spacing
-# what is carved where: `broad` the broad face towards the ring's middle, or `sides` both broad faces, or `front` the
+# what is carved where: `broad` one broad face (`facing` "inner": the one towards the ring's middle; "west": the one
+# with the westward normal), or `sides` both broad faces, or `front` the
 # narrow end the pillar's axis points to; `right` what the drawing has on its right, the pillar's "front" (the end
 # its axis points to), or nothing for the viewer's own right
 CARVED = {
-    "43": [dict(relief="p43-front", face="broad", facing="inner", outline=True)],
+    "43": [dict(relief="p43-front", face="broad", facing="west", outline=True)],
     "18": [dict(relief="p18-side", face="sides", right="front"), dict(relief="p18-front", face="front")],
     "31": [dict(relief="p31-side", face="sides", right="front"), dict(relief="p31-front", face="front")],
     "33": [dict(relief="p33-broad", face="broad", facing="inner", outline=True)],
@@ -55,6 +63,12 @@ def pillars():
     inner = np.array(E.wall()["inner"])
     mid = inner.mean(axis=0)
     for p in out:
+        if p["number"] in SET_IN:
+            c = np.array([p["x"], p["y"]])
+            f = unit(p["bearing"])
+            f = f if np.dot(f, mid - c) > 0 else -f        # along its axis, into the ring
+            c = c + f * p["width"] * (0.5 - SET_IN[p["number"]])
+            p["x"], p["y"] = float(c[0]), float(c[1])
         if p["number"] in ALONG_WALL:
             # on the wall's inner face where it passes the pillar, its back against it, its broad face along it
             k = int(np.argmin(np.hypot(inner[:, 0] - p["x"], inner[:, 1] - p["y"])))
@@ -141,7 +155,10 @@ def build(coll, mats, ring_centre):
         shape = next((k for k in carves if k.get("outline")), None)
         if shape:
             h, spec = relief(shape["relief"])
-            n = n_side if np.dot(n_side, ring_centre - c) > 0 else -n_side
+            if shape["facing"] == "west":
+                n = n_side if n_side[0] < 0 else -n_side
+            else:
+                n = n_side if np.dot(n_side, ring_centre - c) > 0 else -n_side
             ru = np.array([-n[1], n[0]])             # the viewer's right, facing the face
             split = top - spec["step"] * H
             s0, s1 = spec["shaft"]
