@@ -81,7 +81,8 @@ any can be reversed.
     narration) and the gap between leaves 0.7 to 0.35 s; chapters 0 to 2 run 2:55 against 3:02. The critic's
     narration score went 7 to 5 on the same voice and words, so the pauses are not what it hears: it is the rate.
     Samples at tempo 1.15 and 1.25 (pause 0.30) are in the voice lab's samples for Stewart's ear
-    (`python scripts/voice_lab.py`, http://localhost:5197). Its standing asks: no subtitles mirroring the voice,
+    (`python scripts/voice_lab.py`, http://localhost:5197). Stewart listened and kept **1.15**: 1.25 is "a bit too
+    fast". The tempo is settled; pace is to come from words and leaves, not the read. Its standing asks: no subtitles mirroring the voice,
     chapter 1's ditch shortened, the callouts projected onto the stone, the cold open without Gobekli Tepe.
 11. **Not done, on purpose:** cutting Gobekli Tepe from the trailer, cutting "Nobody disputes that" and "You can
    only carve a smaller shape out of a larger one", and ambient sound. Those change the script or add a new layer,
