@@ -36,12 +36,15 @@ def upload(path, k):
         "X-Goog-Upload-Protocol": "resumable", "X-Goog-Upload-Command": "start",
         "X-Goog-Upload-Header-Content-Length": str(size), "X-Goog-Upload-Header-Content-Type": mime,
         "Content-Type": "application/json"}, json={"file": {"display_name": os.path.basename(path)}}, timeout=60)
-    start.raise_for_status()
+    if not start.ok:   # said without the url, which carries the key
+        raise SystemExit(f"the upload was refused: {start.status_code} {start.reason}"
+                         + (" (the Gemini account's prepaid credit has run out)" if start.status_code == 402 else ""))
     url = start.headers["X-Goog-Upload-URL"]
     with open(path, "rb") as f:
         done = requests.post(url, headers={"X-Goog-Upload-Offset": "0", "X-Goog-Upload-Command": "upload, finalize"},
                              data=f, timeout=600)
-    done.raise_for_status()
+    if not done.ok:
+        raise SystemExit(f"the upload failed: {done.status_code} {done.reason}")
     info = done.json()["file"]
     # A video is processed before it can be used.
     while info.get("state") == "PROCESSING":
