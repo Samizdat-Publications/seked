@@ -26,6 +26,7 @@ from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
+sys.path.insert(0, HERE)                        # giza/, gobekli_land, gobekli_built
 MODEL = os.path.join(REPO, "build", "models", "gobekli-site-rmark")
 TERRAIN = os.path.join(REPO, "data", "terrain", "gobekli-glo30")
 FAR = os.path.join(REPO, "data", "terrain", "gobekli-glo30-far")
@@ -35,6 +36,17 @@ SUN_9500 = {"altitude": 14.0, "azimuth": 120.0}   # before the tell: a low morni
 SKY = 0.12                                      # the physical sky's strength beside the sun lamp (look choice)
 EXPOSURE = -0.5
 GROUND = (0.20, 0.135, 0.085, 1.0)             # the Harran plain's dry red-brown soil after the harvest (look choice)
+ERA = ["today"]                                 # set by main: which era's land the shader draws
+GRASS = {"today": ((0.56, 0.38, 0.12, 1.0), (0.42, 0.28, 0.09, 1.0)),      # straw, after the summer (look choice)
+         "9500": ((0.42, 0.37, 0.14, 1.0), (0.30, 0.29, 0.11, 1.0))}       # an early Holocene spring steppe, greener
+GRASS["8000"] = GRASS["9500"]
+FIELDS = {"today": [(0.0, (0.46, 0.39, 0.27)), (0.30, (0.52, 0.45, 0.32)), (0.55, (0.33, 0.25, 0.17)),
+                    (0.75, (0.44, 0.37, 0.26)), (0.93, (0.16, 0.19, 0.08))],
+          # no fields before farming: the plain's own steppe, a little greener in its hollows
+          "9500": [(0.0, (0.30, 0.31, 0.14)), (0.4, (0.36, 0.34, 0.17)), (0.75, (0.26, 0.28, 0.12))]}
+FIELDS["8000"] = FIELDS["9500"]
+HAZE = ((0.66, 0.70, 0.76, 1.0), 0.55)         # the haze's colour and light (look choice, from photographs)
+HAZE_M = 15000.0                                # m over which the land fades about two thirds of the way into it
 CELL = 0.5                                      # m: the scan's footprint is rastered at this, and the near ground too
 UNDER = 0.5                                     # m the ground drops below the scan's lowest point in each cell it covers
 GLUE = 20.0                                     # m outside the scan over which the ground eases onto the scan's rim
@@ -189,13 +201,17 @@ def grid_object(name, X, Y, Z, hole, m, coll):
     return ob
 
 
-def terrain_mesh(hdr, z, near, coll, centre):
+def terrain_mesh(hdr, z, near, coll, centre, have):
     """The land as four nested grids, each with a hole where the next finer one lies: a flat skirt at the plain's
     height out to SKIRT metres, the 60 m heightfield (GLO-30, data/terrain/gobekli-glo30-far) out to 15 km, the 10 m
     one out to 1.5 km, and a CELL grid round the excavation, set under and round the scan by `near`. The three
     inner grids meet edge to edge on shared grid lines (`centre` is a whole number of 10 m steps), each finer one
     eased onto the coarser one's surface at its border, so no seam or step opens between them; the skirt is the
-    one overlap, tucked SKIRT_HIDE metres under."""
+    one overlap, tucked SKIRT_HIDE metres under. Over the 10 m and the near grids lies the land's rolling relief, its
+    fine part only on the near grid and faded out at its border, and each grid carries the land's masks
+    (render/gobekli_land.py). Returns the ground's height and its ledge mask as functions of x, y, and which points
+    the excavation or the enclosure covers (`have` on the near grid), for the stones and trees."""
+    import gobekli_land as LAND
     half, step = NEAR
     m = soil()
     fh = json.load(open(FAR + ".json", encoding="utf-8"))
@@ -207,7 +223,8 @@ def terrain_mesh(hdr, z, near, coll, centre):
     inner = (abs(FX) <= r) & (abs(FY) <= r)
     FZ = fz.astype(float)
     FZ[inner] = sample(hdr, z, FX[inner], FY[inner])
-    grid_object("land (GLO-30, 60 m)", FX, FY, FZ, lambda x, y: (abs(x) <= r + 1e-6) & (abs(y) <= r + 1e-6), m, coll)
+    ob = grid_object("land (GLO-30, 60 m)", FX, FY, FZ, lambda x, y: (abs(x) <= r + 1e-6) & (abs(y) <= r + 1e-6), m, coll)
+    LAND.paint(ob, FX, FY, FZ, fsp)
     # beyond it, its own edge carried outwards and eased to the edge's median height: a stand-in plain to the horizon
     edge = np.r_[fz[0], fz[-1], fz[:, 0], fz[:, -1]]
     R = fh["x0"] + (fh["nx"] - 1) * fsp
@@ -215,18 +232,37 @@ def terrain_mesh(hdr, z, near, coll, centre):
     out = np.maximum(abs(SX), abs(SY)) - R
     w = np.clip(out / (0.5 * SKIRT), 0.0, 1.0)
     SZ = sample(fh, fz, np.clip(SX, -R, R), np.clip(SY, -R, R)) * (1 - w) + float(np.median(edge)) * w
-    grid_object("land beyond (look choice)", SX, SY, SZ - SKIRT_HIDE,
-                lambda x, y: (abs(x) < R - SKIRT / 100) & (abs(y) < R - SKIRT / 100), m, coll)
+    ob = grid_object("land beyond (look choice)", SX, SY, SZ - SKIRT_HIDE,
+                     lambda x, y: (abs(x) < R - SKIRT / 100) & (abs(y) < R - SKIRT / 100), m, coll)
+    LAND.paint(ob, SX, SY, SZ, SKIRT / 100)
     nx, ny, sp = hdr["nx"], hdr["ny"], hdr["spacing"]
     X, Y = grid(hdr["x0"], hdr["x0"] + (nx - 1) * sp, hdr["y0"], hdr["y0"] + (ny - 1) * sp, sp)
     fhb = dict(fh, ny=FZ.shape[0], nx=FZ.shape[1])
     w = np.clip(1 - (r - np.maximum(abs(X), abs(Y))) / (2 * fsp), 0.0, 1.0)
     w = w * w * (3 - 2 * w)
-    Z = z * (1 - w) + sample(fhb, FZ, X, Y) * w
-    grid_object("hill (GLO-30, 10 m)", X, Y, Z,
-                lambda x, y: (abs(x - centre[0]) <= half + 1e-6) & (abs(y - centre[1]) <= half + 1e-6), m, coll)
+    Z = (z + LAND.relief(X, Y, 0.0)) * (1 - w) + sample(fhb, FZ, X, Y) * w
+    ob = grid_object("hill (GLO-30, 10 m)", X, Y, Z,
+                     lambda x, y: (abs(x - centre[0]) <= half + 1e-6) & (abs(y - centre[1]) <= half + 1e-6), m, coll)
+    O = LAND.paint(ob, X, Y, Z, sp)
     X2, Y2 = grid(centre[0] - half, centre[0] + half, centre[1] - half, centre[1] + half, step)
-    grid_object("hill round the excavation", X2, Y2, near(sample(hdr, z, X2, Y2)), None, m, coll)
+    fine = np.clip((half - np.maximum(abs(X2 - centre[0]), abs(Y2 - centre[1]))) / 10.0, 0.0, 1.0)
+    Z2 = near(sample(hdr, z, X2, Y2) + LAND.relief(X2, Y2, fine))
+    ob = grid_object("hill round the excavation", X2, Y2, Z2, None, m, coll)
+    O2 = LAND.paint(ob, X2, Y2, Z2, step)
+    g10 = dict(x0=hdr["x0"], y0=hdr["y0"], spacing=sp, nx=nx, ny=ny)
+    g2 = dict(x0=centre[0] - half, y0=centre[1] - half, spacing=step, nx=X2.shape[1], ny=X2.shape[0])
+    def on_near(x, y):
+        return (abs(x - centre[0]) < half - step) & (abs(y - centre[1]) < half - step)
+    def surface(x, y):
+        return np.where(on_near(x, y), sample(g2, Z2, x, y), sample(g10, Z, x, y))
+    def outcrop(x, y):
+        return np.where(on_near(x, y), sample(g2, O2, x, y), sample(g10, O, x, y))
+    def covered(x, y):
+        i = np.clip(np.round((x - g2["x0"]) / step).astype(int), 0, g2["nx"] - 1)
+        j = np.clip(np.round((y - g2["y0"]) / step).astype(int), 0, g2["ny"] - 1)
+        grown = have | np.logical_or.reduce([shift(have, dj * 2, di * 2) for dj, di in EIGHT])
+        return on_near(x, y) & grown[j, i]
+    return surface, outcrop, covered
 
 
 def soil():
@@ -244,6 +280,7 @@ def soil():
     N, L = nt.nodes, nt.links
     b = N["Principled BSDF"]
     b.inputs["Roughness"].default_value = 0.95
+    b.inputs["Specular IOR Level"].default_value = 0.12   # dry ground: no sky sheen at grazing angles
 
     def put(sock, v):
         if isinstance(v, (int, float, tuple)):
@@ -303,40 +340,55 @@ def soil():
     lum = N.new("ShaderNodeRGBToBW"); L.new(gravel, lum.inputs[0])
     soil_near = mix(1.0, gravel, (GROUND[0] * 3.2, GROUND[1] * 3.2, GROUND[2] * 3.2, 1.0), "MULTIPLY")
     soil_col = mix(near, GROUND, soil_near)
-    # dry golden grass in slow patches on gentle ground, varied at two scales, grained by the gravel near the camera
-    gm = mul(rng(noise(0.025, 5.0), 0.40, 0.58), rng(nz.outputs["Z"], 0.90, 0.985))
-    gcol = mix(noise(0.6, 2.0), (0.46, 0.30, 0.11, 1.0), (0.30, 0.19, 0.08, 1.0))
-    gcol = mix(noise(0.01, 2.0), gcol, (0.36, 0.24, 0.12, 1.0))
+    # the masks painted on the ground (render/gobekli_land.py): R the limestone's ledges, G thick grass, B a slow tone
+    land = N.new("ShaderNodeAttribute"); land.attribute_name = "land"
+    lsep = N.new("ShaderNodeSeparateColor"); L.new(land.outputs["Color"], lsep.inputs[0])
+    gm, om, tone = lsep.outputs[1], lsep.outputs[0], lsep.outputs[2]
+    # the grass: golden and dry today, greener in an early Holocene spring; varied at two scales, grained by the
+    # gravel near the camera; thin grass lets the soil through
+    g0, g1 = GRASS[ERA[0]]
+    gcol = mix(tone, g0, g1)
+    gcol = mix(noise(0.6, 2.0), gcol, mix(1.0, gcol, (0.8, 0.8, 0.8, 1.0), "MULTIPLY"))
     grain = grey(rng(lum.outputs[0], 0.0, 0.5, 0.55, 1.3))
     grass = mix(1.0, gcol, mix(near, (1.0, 1.0, 1.0, 1.0), grain), "MULTIPLY")
-    c1 = mix(gm, soil_col, grass)
-    # pale limestone where the ground steepens, broken up by noise
-    om = mul(rng(noise(0.3, 6.0), 0.60, 0.68), rng(nz.outputs["Z"], 0.96, 0.86))
-    lime = mix(near, (0.36, 0.32, 0.26, 1.0), mix(1.0, tex(4.0, 0.3, "core"), (0.95, 0.85, 0.7, 1.0), "MULTIPLY"))
-    c2 = mix(om, c1, lime)
-    # fields on the low plain: Voronoi cells about 260 m across, each one crop or none
+    thin = mix(0.55, soil_col, grass)
+    c1 = mix(gm, thin, grass)
+    # the limestone's grey ledges
+    lime = mix(near, (0.42, 0.38, 0.31, 1.0), mix(1.0, tex(4.0, 0.3, "core"), (1.05, 1.0, 0.92, 1.0), "MULTIPLY"))
+    # broken into rocky fragments, not smooth patches
+    c2 = mix(mul(om, rng(noise(0.45, 4.0), 0.38, 0.62)), c1, lime)
+    # fields on the low plain: Voronoi cells about 260 m across, most pale and harvested, some ploughed, few green
     flat = N.new("ShaderNodeCombineXYZ")
     L.new(sep.outputs["X"], flat.inputs["X"]); L.new(sep.outputs["Y"], flat.inputs["Y"])
     vo = N.new("ShaderNodeTexVoronoi"); vo.inputs["Scale"].default_value = 1 / 260.0
     L.new(flat.outputs[0], vo.inputs["Vector"])
     ramp = N.new("ShaderNodeValToRGB"); ramp.color_ramp.interpolation = "CONSTANT"
-    crops = [(0.0, (0.21, 0.13, 0.08)), (0.28, (0.40, 0.33, 0.20)), (0.52, (0.11, 0.15, 0.06)),
-             (0.66, (0.27, 0.19, 0.11)), (0.82, (0.08, 0.12, 0.05))]
+    crops = FIELDS[ERA[0]]
     el = ramp.color_ramp.elements
-    for k, (p, cc) in enumerate(crops):
-        e = el[k] if k < 2 else el.new(p)
-        e.position, e.color = p, (*cc, 1.0)
+    for k, (pp, cc) in enumerate(crops):
+        e = el[k] if k < 2 else el.new(pp)
+        e.position, e.color = pp, (*cc, 1.0)
     cr = N.new("ShaderNodeSeparateColor"); L.new(vo.outputs["Color"], cr.inputs[0])
     L.new(cr.outputs[0], ramp.inputs[0])
-    field = mix(noise(0.05, 2.0), ramp.outputs[0], mix(1.0, ramp.outputs[0], (0.8, 0.8, 0.8, 1.0), "MULTIPLY"))
+    field = mix(noise(0.05, 2.0), ramp.outputs[0], mix(1.0, ramp.outputs[0], (0.85, 0.85, 0.85, 1.0), "MULTIPLY"))
     fm = mul(rng(sep.outputs["Z"], 640.0, 600.0), rng(nz.outputs["Z"], 0.96, 0.99))
     c3 = mix(fm, c2, field)
     # a slow mottle over everything, so no stretch of land is one colour
-    L.new(mix(1.0, c3, grey(rng(noise(0.004, 3.0), 0.35, 0.65, 0.82, 1.12)), "MULTIPLY"), b.inputs["Base Color"])
+    L.new(mix(1.0, c3, grey(rng(noise(0.004, 3.0), 0.35, 0.65, 0.85, 1.1)), "MULTIPLY"), b.inputs["Base Color"])
     bump = N.new("ShaderNodeBump"); bump.inputs["Distance"].default_value = 0.05
     L.new(mul(near, 0.6), bump.inputs["Strength"])
     L.new(tex(t, 0.0, "gravel", "Displacement", True), bump.inputs["Height"])
     L.new(bump.outputs["Normal"], b.inputs["Normal"])
+    # the haze: the land fades towards the haze's own light with distance, 1 - exp(-d / HAZE_M)
+    d = N.new("ShaderNodeCameraData").outputs["View Distance"]
+    k = N.new("ShaderNodeMath"); k.operation = "MULTIPLY"; k.inputs[1].default_value = -1.0 / HAZE_M
+    L.new(d, k.inputs[0])
+    e = N.new("ShaderNodeMath"); e.operation = "EXPONENT"; L.new(k.outputs[0], e.inputs[0])
+    f = N.new("ShaderNodeMath"); f.operation = "SUBTRACT"; f.inputs[0].default_value = 1.0; L.new(e.outputs[0], f.inputs[1])
+    em = N.new("ShaderNodeEmission"); em.inputs["Color"].default_value = HAZE[0]; em.inputs["Strength"].default_value = HAZE[1]
+    ms = N.new("ShaderNodeMixShader")
+    L.new(f.outputs[0], ms.inputs[0]); L.new(b.outputs[0], ms.inputs[1]); L.new(em.outputs[0], ms.inputs[2])
+    L.new(ms.outputs[0], N["Material Output"].inputs["Surface"])
     return m
 
 
@@ -596,10 +648,10 @@ def enclosure_9500(sc, dense, scan_objects, d, hdr, z, cs, filled=False):
     # one cell in from the wall's outer face, so the ground's step down to the floor falls inside the wall's body
     have = inside(np.array(w["outer"]) + (dx, dy), X, Y)
     have &= np.logical_and.reduce([shift(have, dj, di) for dj, di in EIGHT])
-    terrain_mesh(hdr, z, lambda Z: glue(Z, np.full(Z.shape, fd), np.full(Z.shape, fd + w["height"]), have, 40.0),
-                 sc.collection, cs)
+    land = terrain_mesh(hdr, z, lambda Z: glue(Z, np.full(Z.shape, fd), np.full(Z.shape, fd + w["height"]), have, 40.0),
+                        sc.collection, cs, have)
     return dict(floor=fd, wall_height=w["height"], tell_removed_m=max(0.0, excess), pillars=made, stand_in=True,
-                fill_level=(w["height"] - FILL_BELOW_TOP) if filled else 0.0,
+                fill_level=(w["height"] - FILL_BELOW_TOP) if filled else 0.0, land=land,
                 note="Enclosure D from its plan (Haklay & Gopher 2020); carving and ground are look choices")
 
 
@@ -639,12 +691,22 @@ def main():
     cs = np.round(c / hdr["spacing"]) * hdr["spacing"]     # the near grid on the 10 m grid's lines
     dx, dy = fit["enclosure_d_in_site"]
     era = a.get("--era", "today")
+    ERA[0] = era
     built = {}
     if era == "today":
         lo, hi, have = scan_raster(dense, cs)
-        terrain_mesh(hdr, z, lambda Z: glue(Z, lo, hi, have), sc.collection, cs)
+        land = terrain_mesh(hdr, z, lambda Z: glue(Z, lo, hi, have), sc.collection, cs, have)
     else:
         built = enclosure_9500(sc, dense, meshes + [root], (dx, dy), hdr, z, cs, filled=(era == "8000"))
+        land = built.pop("land")
+    # the stones and the trees on the hill (render/gobekli_land.py)
+    import gobekli_land as LAND
+    surface, outcrop, covered = land
+    rng = np.random.default_rng(1)
+    LAND.rocks(surface, outcrop, covered, sc.collection, cs, rng)
+    LAND.shrubs(surface, outcrop, covered, sc.collection, cs, rng, era)
+    LAND.trees(surface, "today" if era == "today" else "9500", covered, sc.collection, cs, rng,
+               float(surface(np.array([dx]), np.array([dy]))[0]))
     if a.get("--roof", "off") == "on":
         sys.path.insert(0, os.path.join(REPO, "scripts"))
         from gobekli_register import outline
@@ -654,7 +716,7 @@ def main():
                 principled("walkway deck", (0.30, 0.29, 0.27, 1.0), 0.7, metal=0.3))
         for way, name in SHELTERS.items():
             built[name] = shelter(name, outline(way), hdr, z, sc.collection, mats)
-    world_and_sun(sc, *((SUN_9500, (1.0, 0.86, 0.68)) if era != "today" else ()))
+    world_and_sun(sc, *((SUN_9500, (1.0, 0.86, 0.68)) if era != "today" else (SUN, (1.0, 0.9, 0.78))))
     sc.render.engine = "CYCLES"
     sc.cycles.device = "GPU"
     prefs = bpy.context.preferences.addons["cycles"].preferences
