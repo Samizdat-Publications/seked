@@ -30,16 +30,20 @@ MODEL = os.path.join(REPO, "build", "models", "gobekli-site-rmark")
 TERRAIN = os.path.join(REPO, "data", "terrain", "gobekli-glo30")
 FAR = os.path.join(REPO, "data", "terrain", "gobekli-glo30-far")
 SUN = {"altitude": 32.0, "azimuth": 235.0}      # a late October afternoon (look choice)
+SUN_9500 = {"altitude": 14.0, "azimuth": 120.0}   # before the tell: a low morning sun from the south-east, raking across
+                                                # the central pillars' fronts and the Vulture Stone (look choice)
 SKY = 0.12                                      # the physical sky's strength beside the sun lamp (look choice)
 EXPOSURE = -0.5
 GROUND = (0.20, 0.135, 0.085, 1.0)             # the Harran plain's dry red-brown soil after the harvest (look choice)
-CELL = 1.0                                      # m: the scan's footprint is rastered at this, and the near ground too
+CELL = 0.5                                      # m: the scan's footprint is rastered at this, and the near ground too
 UNDER = 0.5                                     # m the ground drops below the scan's lowest point in each cell it covers
 GLUE = 20.0                                     # m outside the scan over which the ground eases onto the scan's rim
 SKIRT_HIDE = 5.0                                # m the land beyond sits under the 15 km heightfield where they overlap
 SKIRT = 60000.0                                 # m: the flat plain beyond the 15 km heightfield, to the horizon
-FIT_R = (40.0, 150.0)                           # m from the excavation over which the heightfield is bent to its rim
-NEAR = (160.0, CELL)                            # half-width and spacing of the finer ground round the excavation
+FIT_R = (40.0, 150.0)
+FILL_BELOW_TOP = 0.25                           # m: the 8000 BCE fill stands this far under the wall's top (look choice)
+TELL = (40.0, 160.0)                            # m from Enclosure D: the later mound taken off within, eased out to                           # m from the excavation over which the heightfield is bent to its rim
+NEAR = (80.0, CELL)                            # half-width and spacing of the finer ground round the excavation
 # The two shelters (2016 to 2018, EiSat GmbH with kleyer.koblitz.letzel.freivogel; steel and membrane). Their outlines
 # are OpenStreetMap's (traced from Maxar imagery, so the canopy edge as seen from above); their heights and the
 # spacing of their legs are read by eye from photographs on Wikimedia Commons: look choices, not measurements.
@@ -513,7 +517,7 @@ def shelter(name, poly, hdr, z, coll, mats):
     return {"base": base, "eave": eave, "legs": len(k_heads) * 2, "perimeter_m": float(per)}
 
 
-def world_and_sun(sc):
+def world_and_sun(sc, SUN=SUN, warm=(1.0, 1.0, 1.0)):
     w = bpy.data.worlds.new("sky")
     w.use_nodes = True
     nt = w.node_tree
@@ -526,7 +530,7 @@ def world_and_sun(sc):
     nt.nodes["Background"].inputs[1].default_value = SKY
     sc.world = w
     sun = bpy.data.objects.new("sun", bpy.data.lights.new("sun", "SUN"))
-    sun.data.energy, sun.data.angle = 3.2, math.radians(0.53)
+    sun.data.energy, sun.data.angle, sun.data.color = 3.2, math.radians(0.53), warm
     e, a = math.radians(SUN["altitude"]), math.radians(SUN["azimuth"])
     to_sun = Vector((math.cos(e) * math.sin(a), math.cos(e) * math.cos(a), math.sin(e)))
     sun.rotation_euler = (-to_sun).to_track_quat("-Z", "Y").to_euler()
@@ -543,14 +547,14 @@ def inside(poly, X, Y):
     return res
 
 
-def enclosure_9500(sc, dense, scan_objects, d, hdr, z, cs):
+def enclosure_9500(sc, dense, scan_objects, d, hdr, z, cs, filled=False):
     """Enclosure D about 9500 BCE in place of the scan: built from the plan (render/gobekli_built.py) where the
     registration puts it, its floor at the scan's floor there (the lowest tenth of the scan within 3 m of D's middle),
     and the hill round it raised to the wall's top and eased back onto the heightfield over 40 m: the enclosure sunk
     into the slope, as the excavators think the Layer III rings were. How the ground stood round it is a look choice."""
     sys.path.insert(0, HERE)
     import gobekli_built as G
-    from giza import materials as S
+    from giza import enclosure_d as E
     dx, dy = d
     near = dense[np.hypot(dense[:, 0] - dx, dense[:, 1] - dy) < 3.0]
     fd = float(np.percentile(near[:, 2], 10))
@@ -558,27 +562,44 @@ def enclosure_9500(sc, dense, scan_objects, d, hdr, z, cs):
         bpy.data.objects.remove(o, do_unlink=True)
     coll = bpy.data.collections.new("Enclosure D about 9500 BCE (stand-in)")
     sc.collection.children.link(coll)
-    mats = dict(
-        stone=S.stone("limestone pillars (stand-in)", "tura_dressed", tex_role="casing", instanced=False, sand_tops=0.1,
-                      bump=0.2),
-        wall=S.stone("rubble wall (stand-in)", "mastaba_core", tex_role="core", instanced=False, sand_tops=0.3, bump=0.1),
-        floor=S.stone("bedrock floor", "core", tex_role="bedrock", instanced=False, sand_tops=0.4, bump=0.1))
+    mats = G.materials()
     ring = [p for p in G.pillars() if not p["name"].startswith("central")]
     centre = np.array([np.mean([p["x"] for p in ring]), np.mean([p["y"] for p in ring])])
     made = G.build(coll, mats, centre)
     w = G.walls_and_floor(coll, mats)
+    if filled:
+        # about 8000 BCE: filled in, nearly to the wall's top, the pillars' heads still showing. A level fill is
+        # Schmidt's deliberate backfill; Clare's slope slides would tilt it (render/giza/enclosure_d.py fill_mesh)
+        vs, fs = E.fill_mesh(w, w["height"] - FILL_BELOW_TOP, "level")
+        me = bpy.data.meshes.new("Enclosure D's fill, about 8000 BCE")
+        me.from_pydata(vs, [], fs)
+        me.materials.append(soil())
+        coll.objects.link(bpy.data.objects.new(me.name, me))
     root = bpy.data.objects.new("Enclosure D (plan frame)", None)
     sc.collection.objects.link(root)
     root.location = (dx, dy, fd)
     for o in coll.objects:
         o.parent = root
+    # the tell's later debris taken off: the hill round D lowered to the wall's top within TELL[0] metres, eased back
+    # to the present surface by TELL[1] (the mound is about 300 m across; how high the ground stood is a look choice)
+    gx = hdr["x0"] + hdr["spacing"] * np.arange(hdr["nx"])
+    gy = hdr["y0"] + hdr["spacing"] * np.arange(hdr["ny"])
+    GX, GY = np.meshgrid(gx - dx, gy - dy)
+    R = np.hypot(GX, GY)
+    excess = float(np.median(z[(R > 20) & (R < 40)])) - (fd + w["height"])
+    if excess > 0:
+        f = np.clip((TELL[1] - R) / (TELL[1] - TELL[0]), 0.0, 1.0)
+        z -= (excess * f * f * (3 - 2 * f)).astype(z.dtype)
     half = NEAR[0]
     n = int(round(2 * half / CELL)) + 1
     X, Y = np.meshgrid(cs[0] - half + CELL * np.arange(n), cs[1] - half + CELL * np.arange(n))
+    # one cell in from the wall's outer face, so the ground's step down to the floor falls inside the wall's body
     have = inside(np.array(w["outer"]) + (dx, dy), X, Y)
+    have &= np.logical_and.reduce([shift(have, dj, di) for dj, di in EIGHT])
     terrain_mesh(hdr, z, lambda Z: glue(Z, np.full(Z.shape, fd), np.full(Z.shape, fd + w["height"]), have, 40.0),
                  sc.collection, cs)
-    return dict(floor=fd, wall_height=w["height"], pillars=made, stand_in=True,
+    return dict(floor=fd, wall_height=w["height"], tell_removed_m=max(0.0, excess), pillars=made, stand_in=True,
+                fill_level=(w["height"] - FILL_BELOW_TOP) if filled else 0.0,
                 note="Enclosure D from its plan (Haklay & Gopher 2020); carving and ground are look choices")
 
 
@@ -623,7 +644,7 @@ def main():
         lo, hi, have = scan_raster(dense, cs)
         terrain_mesh(hdr, z, lambda Z: glue(Z, lo, hi, have), sc.collection, cs)
     else:
-        built = enclosure_9500(sc, dense, meshes + [root], (dx, dy), hdr, z, cs)
+        built = enclosure_9500(sc, dense, meshes + [root], (dx, dy), hdr, z, cs, filled=(era == "8000"))
     if a.get("--roof", "off") == "on":
         sys.path.insert(0, os.path.join(REPO, "scripts"))
         from gobekli_register import outline
@@ -633,7 +654,7 @@ def main():
                 principled("walkway deck", (0.30, 0.29, 0.27, 1.0), 0.7, metal=0.3))
         for way, name in SHELTERS.items():
             built[name] = shelter(name, outline(way), hdr, z, sc.collection, mats)
-    world_and_sun(sc)
+    world_and_sun(sc, *((SUN_9500, (1.0, 0.86, 0.68)) if era != "today" else ()))
     sc.render.engine = "CYCLES"
     sc.cycles.device = "GPU"
     prefs = bpy.context.preferences.addons["cycles"].preferences
@@ -664,16 +685,16 @@ def main():
                     Vector((sx, sy, dground + 4.0)), 24),
     }
     if era != "today":
-        fd = built["floor"]
+        fd = built["floor"] + built.get("fill_level", 0.0)     # the eye stands on the fill once there is one
         p43 = built["pillars"]["43"]
-        n43 = (math.sin(math.radians(210.0)), math.cos(math.radians(210.0)))
+        n43 = p43["face"]                                                        # its carved face's normal
         views.pop("shelter")
         views.update({
             # on the floor south of the central pair, at eye height, looking north between them
             "inside": (Vector((dx, dy - 5.2, fd + 1.6)), Vector((dx, dy, fd + 2.6)), 24),
             # Pillar 43, the Vulture Stone, from in front of its carved face
-            "p43": (Vector((dx + p43["x"] + 3.2 * n43[0], dy + p43["y"] + 3.2 * n43[1], fd + 1.7)),
-                    Vector((dx + p43["x"], dy + p43["y"], fd + 1.9)), 30),
+            "p43": (Vector((dx + p43["x"] + 4.6 * n43[0], dy + p43["y"] + 4.6 * n43[1], fd + 1.7)),
+                    Vector((dx + p43["x"], dy + p43["y"], fd + 1.9)), 32),
         })
     which = list(views) if a.get("--view", "all") == "all" else a["--view"].split(",")
     for name in which:

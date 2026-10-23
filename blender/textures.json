@@ -52,6 +52,11 @@
       "id": "rock_face_03",
       "role": "sphinx-ledge",
       "why": "A cracked, chipped rock face: the harder beds' ledges and the head (render/giza/limestone.py)."
+    },
+    {
+      "id": "broken_wall",
+      "role": "rubble-wall",
+      "why": "Dry-stone walling of flat stones in rough courses: the nearest CC0 surface to the rubble walls of Göbekli Tepe's enclosures (render/gobekli_built.py)."
     }
   ]
 }
