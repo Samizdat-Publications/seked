@@ -1,7 +1,7 @@
 """
 The Labyrinth at Hawara as one reconstruction draws it: the plan on the cover of the Mataha Expedition's report
-(Hawara 2008, version VII, 08.2010), which looks to be after Athanasius Kircher's 17th-century reconstruction from
-Herodotus (unconfirmed; docs/to-source.md). bpy-free.
+(Hawara 2008, version VII, 08.2010), an older reconstruction from Herodotus whose original is not yet traced: not
+Kircher's Turris Babel plate (1679, p. 78), which is a different design (docs/to-source.md). bpy-free.
 
 Nobody has found the Labyrinth. Herodotus (II.148) describes twelve roofed courts with their doors facing one
 another, six to the north and six to the south, 3,000 rooms, half of them underground, all inside one wall; Petrie

@@ -38,10 +38,16 @@ recorded where it is used, and moved to **Done** here with the date.
 ### Hawara: the Labyrinth plan's origin (added 23 October 2026)
 
 - **For**: crediting the reconstruction the Labyrinth model follows (`render/giza/labyrinth.py`).
-- **Need**: the original of the plan on the Mataha report's cover (Hawara 2008, version VII 08.2010): it looks like
-  Athanasius Kircher's reconstruction (around 1670-1679), but which plate, in which book, is unconfirmed.
-- **Where**: digitised Kircher volumes (*Turris Babel*, *Oedipus Aegyptiacus*, *Sphinx Mystagoga*) on archive.org
-  or the ETH/Stanford Kircher collections; or ask Louis De Cordier which source the cover used.
+- **Need**: the original of the plan on the Mataha report's cover (Hawara 2008, version VII 08.2010): a square
+  enclosure with a Greek-key corridor all round, a gate on each side, a north-south avenue and six colonnaded courts
+  either side of it, each with a dark chapel at its outer end. Who drew it, in which book, which plate.
+- **Ruled out (23 October 2026)**: Kircher's Labyrinth plate in *Turris Babel* (1679, p. 78; the one Wikipedia
+  dates 1670). It is a different design: twelve nome panels round a central maze, with a frieze of figures
+  (`build/hawara/reference/kircher/commons-labyrinth-960.jpg`, from Wikimedia Commons). The Mataha substack
+  credits the cover to Louis De Cordier and names no source.
+- **Where next**: Luigi Canina's *L'architettura antica* (Egyptian volume, 1830s-40s) and other 19th-century
+  reconstructions; the Pococke-derived Dutch plate of 1776 (plate XXIII) is a plan of the ruins, worth ruling out; or
+  ask Louis De Cordier which source the cover used.
 
 ## Done
 
