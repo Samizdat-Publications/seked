@@ -11,6 +11,10 @@ by hand, as described below.
 | Pillar 43, the "Vulture Stone", carved broad face | `source/p43-front.png` | `cleaned/p43-front.png` | three bag-like objects across the top, the zigzag bands, the vulture with its disc, the birds, the scorpion, the lower bird; the stone's outline as the excavators drew it |
 | Pillar 18 (central pair, east), a broad side of the shaft | `source/p18-side.png` | `cleaned/p18-side.png` | the arm bent at the elbow running down to the hand at the front edge, the fox inside the arm, the belt of H and crescent signs, the start of the fox-pelt loincloth |
 | Pillar 18, the narrow front of the shaft | `source/p18-front.png` | `cleaned/p18-front.png` | the two signs at the top (an H and a ring), the two bands of the "stola", the hands meeting, the belt with its U-shaped buckle, the hanging pelt |
+| Pillar 31 (central pair, west), a broad side of the shaft | `source/p18-side.png`, fox erased | `cleaned/p31-side.png` | the same arm and belt as Pillar 18's, and no fox, as photographs of its replica show; made from Pillar 18's map with the fox taken out |
+| Pillar 31, the narrow front of the shaft | `source/p31-front.png` | `cleaned/p31-front.png` | the stola's two bands, the hands meeting, the belt's U buckle, the hanging pelt (the bull's skull on its neck is above the photograph's frame and is not in the map) |
+| Pillar 33, carved broad face | `source/p33-broad.png` | `cleaned/p33-broad.png` | the excavators' numbered drawing: cranes, snakes, a fox and other animals packed over the head and shaft; the T outline as drawn |
+| Pillar 27 (Enclosure C, not D), broad face | `source/p27-broad-depth.png` | `cleaned/p27-broad.png` | the predator carved almost in the round, head down, and the wild boar in low relief below it; a depth map of a photograph, not a redrawing (see below) |
 
 ## How to read them
 
@@ -24,7 +28,8 @@ by hand, as described below.
 - **Orientation**: each map is the face seen straight on. On the Pillar 18 side, the front of the pillar (the end
   with the hands and the belt's buckle) is on the right; use it mirrored for the other broad side. On Pillar 43, the
   right is the end towards the enclosure's middle, where the T's head overhangs.
-- **Depth**: the reliefs at Göbekli Tepe are mostly low, a few centimetres. Seked uses 4 cm for white.
+- **Depth**: the reliefs at Göbekli Tepe are mostly low, a few centimetres. Seked uses 4 cm for white, and 25 cm for
+  Pillar 27, whose predator stands far out from the face (`raise_m` in `reliefs.json`).
 
 In Blender: a plane subdivided to about 1 cm, the cleaned map on a Displace modifier (texture coordinates UV, colour
 space Non-Color, strength 0.04 m, midlevel 0). Or sample the PNG yourself, as `render/gobekli_built.py` does.
@@ -51,7 +56,12 @@ space Non-Color, strength 0.04 m, midlevel 0). Or sample the PNG yourself, as `r
    > drawing shows nothing. Where the stone is broken (dashed lines at the bottom), leave the surface plain mid
    > grey. No shading, no lighting, no texture, no text, no border: only depth.
 
-3. **Checked by eye** side by side against the drawing, motif by motif.
+3. **Checked by eye** side by side against the drawing, motif by motif. Not every attempt passes: for Pillar 27 the
+   model twice "tidied" the stylised predator into a naturalistic lion and invented a realistic boar, so that face
+   was made differently, by asking the model for a pixel-aligned depth map of the photograph itself (which keeps the
+   carving's own shapes); the cleaning script then fits the stone's tilted face as a plane and takes it off. For
+   Pillar 31's side the model drew the arm on the wrong path, so its map is Pillar 18's with the fox erased, which
+   is what the photographs of Pillar 31 show.
 4. **Cleaned in code**: `python scripts/gobekli_reliefs.py` reads `source/` and writes `cleaned/` and `reliefs.json`
    (Python with numpy, Pillow and SciPy). The crops are read off the sources by hand and live in the script.
 
@@ -66,12 +76,26 @@ closely, and those people are owed the credit:
   (https://www.dainst.blog/the-tepe-telegrams/2016/10/14/of-animals-and-a-headless-man-gobekli-tepe-pillar-43/).
 - **Pillar 18**: the DAI's 3D-scan renders (Hochschule Karlsruhe, © DAI, on the Tepe Telegrams blog) and
   photographs of the pillar at night.
+- **Pillar 31**: photographs of the full-size replica of Enclosure D in the Şanlıurfa Archaeology Museum by
+  Zeynel Cebeci on Wikimedia Commons (CC BY-SA 4.0), "Urfa museum Gobeklitepe Temple D replica sept 2019 4824" and
+  "4831".
+- **Pillar 33**: the excavators' numbered line drawing and a photograph of the face (DAI), as reproduced in the
+  reference set gathered for Seked.
+- **Pillar 27**: photograph "Göbeklitepe Building C sept 2019 5373crop" by Zeynel Cebeci on Wikimedia Commons
+  (CC BY-SA 4.0).
 
 The drawings, scans and photographs themselves are not in this folder and are not ours to share. If you hold rights
 in one of them and want a map taken down or credited differently, open an issue.
 
 ## Still to make
 
-Pillar 31 (the other central pillar; Seked uses Pillar 18's maps for it for now, which is a stand-in), Pillars 33,
-38, 27 (the predator carved in the round), 30 and 20. The DAI's Tepe Telegrams blog has photographs and drawings
-of every Enclosure D pillar. Contributions welcome, made the same way.
+- **Pillars 20, 30 and 38** in Enclosure D. The motifs are known in outline (Pillar 20's front: a snake moving
+  towards an aurochs; Pillar 30: a snake and an H sign; Pillar 38: a bird, a bull's skull and a wild boar, by the
+  TEDI dictionary of Göbekli Tepe), but no photograph we could reach was labelled with the pillar's number, and a map
+  is not made from a description alone. The replica photographs on Commons include a pillar with a large crane-like
+  bird on its broad side and chevron and "ladder" bands on its front, and a pillar whose front carries a bundle of
+  snakes under a U-shaped sign; once each is matched to its number (the DAI's Tepe Telegrams blog has every
+  Enclosure D pillar), they can be made the same way.
+- Pillar 31's neck, with its bull's skull, and the narrow sides of Pillar 43 (its relief wraps onto them).
+
+Contributions welcome, made the same way.

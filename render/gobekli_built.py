@@ -7,8 +7,8 @@ site frame where the scan's registration puts Enclosure D (build/models/gobekli-
 the scan's floor there. The plan's wall pillars carry the excavators' numbers, matched by angle to their numbered
 plan (docs/gobekli-reliefs.md): a look choice.
 
-Three faces are carved from the cleaned height maps (assets/gobekli-reliefs, scripts/gobekli_reliefs.py): Pillar 43's broad face, and
-Pillar 18's broad sides and narrow front, which stand in for Pillar 31's as well until its own are drawn. Each is a
+Six faces are carved from the cleaned height maps (assets/gobekli-reliefs, scripts/gobekli_reliefs.py): Pillar 43's and
+Pillar 33's broad faces, and the central pair's broad sides and narrow fronts (Pillar 18 with its fox, Pillar 31 without). Each is a
 fine sheet laid on the stone's face and raised where the drawing raises it, RELIEF metres at most; the stone's
 outline for Pillar 43 follows its drawing. The other pillars are plain T's for now, and say so. All of it is a look
 reconstruction; nothing about the carving is a measurement.
@@ -29,7 +29,7 @@ NUMBERS = ["30", "22", "21", "20", "19", "32", "33", "38", "41", "42", "43"]   #
 CENTRAL = {"central west": "31", "central east": "18"}
 # Pillar 43 stands along the wall with its carved face to the ring's middle, as photographs of it in place show, not
 # radially as the schematic plan's bar suggests: turned a quarter and set against the wall's inner face (look choice)
-ALONG_WALL = {"43"}
+ALONG_WALL = {"43", "33"}           # Pillar 33's excavation photograph shows it the same way
 RELIEF = 0.04            # m: the carving's greatest raise (Göbekli's reliefs are mostly low, a few centimetres)
 GRID = 0.01              # m: the carved sheet's spacing
 # what is carved where: `broad` the broad face towards the ring's middle, or `sides` both broad faces, or `front` the
@@ -38,7 +38,8 @@ GRID = 0.01              # m: the carved sheet's spacing
 CARVED = {
     "43": [dict(relief="p43-front", face="broad", facing="inner", outline=True)],
     "18": [dict(relief="p18-side", face="sides", right="front"), dict(relief="p18-front", face="front")],
-    "31": [dict(relief="p18-side", face="sides", right="front"), dict(relief="p18-front", face="front")],
+    "31": [dict(relief="p31-side", face="sides", right="front"), dict(relief="p31-front", face="front")],
+    "33": [dict(relief="p33-broad", face="broad", facing="inner", outline=True)],
 }
 
 
@@ -93,7 +94,7 @@ def lookup(h, u, v):
             + h[j0 + 1, i0] * (1 - tx) * ty + h[j0 + 1, i0 + 1] * tx * ty)
 
 
-def sheet(name, h, corner, ru, width, z_top, z_bottom, normal, keep, mat, coll):
+def sheet(name, h, corner, ru, width, z_top, z_bottom, normal, keep, mat, coll, depth=RELIEF):
     """A carved face: a GRID-spaced sheet from `corner` (its top left, in plan x, y) `width` metres along `ru` and down
     from z_top to z_bottom, standing out along `normal` by the relief's height. Only the quads that carry relief (and
     a cell round them) are kept, and only those `keep(u, v)` allows."""
@@ -101,7 +102,7 @@ def sheet(name, h, corner, ru, width, z_top, z_bottom, normal, keep, mat, coll):
     nv = max(2, int(round((z_top - z_bottom) / GRID)) + 1)
     u, v = np.meshgrid(np.linspace(0, 1, nu), np.linspace(0, 1, nv))
     hh = lookup(h, u, v)
-    off = 0.003 + RELIEF * hh
+    off = 0.003 + depth * hh
     X = corner[0] + ru[0] * u * width + normal[0] * off
     Y = corner[1] + ru[1] * u * width + normal[1] * off
     Z = z_top - v * (z_top - z_bottom)
@@ -171,7 +172,7 @@ def build(coll, mats, ring_centre):
                         keep = lambda u, v: np.ones(np.shape(u), dtype=bool)
                     corner = c - ru * span / 2 + nn * T / 2
                     sheet(f"pillar {p['number']}: {k['relief']}", h, corner, ru, span, z0, z1, nn, keep,
-                          mats["stone"], coll)
+                          mats["stone"], coll, spec.get("raise_m", RELIEF))
             else:   # the narrow front of the shaft, below the head
                 nn = f
                 ru = np.array([-nn[1], nn[0]])

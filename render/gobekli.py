@@ -758,6 +758,10 @@ def main():
             "p43": (Vector((dx + p43["x"] + 4.6 * n43[0], dy + p43["y"] + 4.6 * n43[1], fd + 1.7)),
                     Vector((dx + p43["x"], dy + p43["y"], fd + 1.9)), 32),
         })
+        p33 = built["pillars"]["33"]
+        n33 = p33["face"]
+        views["p33"] = (Vector((dx + p33["x"] + 4.6 * n33[0], dy + p33["y"] + 4.6 * n33[1], fd + 1.7)),
+                        Vector((dx + p33["x"], dy + p33["y"], fd + 1.9)), 32)
     which = list(views) if a.get("--view", "all") == "all" else a["--view"].split(",")
     for name in which:
         pos, tgt, lens = views[name]

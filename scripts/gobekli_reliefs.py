@@ -43,6 +43,19 @@ SOURCES = {
     # its narrow front (south) below the head, drawn inside white margins: the signs, the stola, the hands, the belt
     # with its buckle and the hanging pelt
     "p18-front": dict(src="p18-front.png", crop=(0, 0, 1536, 2752), margins="white"),
+    # Pillar 31's broad side: the same arm and belt as Pillar 18's in the photographs of its full-size replica in the
+    # Sanliurfa museum (Wikimedia Commons, CC BY-SA 4.0), but no fox, so it is Pillar 18's map with the fox erased
+    "p31-side": dict(src="p18-side.png", crop=(405, 120, 1140, 2640), erase=[(522, 860, 1030, 1090)]),
+    # its narrow front from a photograph of the replica: the stola's two bands, the hands, the belt's U buckle, the
+    # hanging pelt (the bucranium on its neck lies above the photograph's frame and is not drawn)
+    "p31-front": dict(src="p31-front.png", crop=(520, 0, 1010, 2752)),
+    # Pillar 33's carved broad face from the excavators' numbered drawing: snakes, cranes, a fox and other animals,
+    # the head running down 40 per cent of the height, the shaft spanning 20 to 74 per cent of the width
+    "p33-broad": dict(src="p33-broad.png", crop=(115, 100, 1690, 2330), step=0.40, shaft=(0.20, 0.74)),
+    # Pillar 27 (Enclosure C): the predator carved almost in the round, head down, and the boar in low relief below,
+    # as a depth map of a photograph (Commons, CC BY-SA 4.0) rather than a redrawing, which tidied both into
+    # naturalistic animals; its tilted face is fitted and taken off. Its greatest raise is about 25 cm, not 4
+    "p27-broad": dict(src="p27-broad-depth.png", crop=(250, 0, 1180, 2450), mode="depth", raise_m=0.25),
 }
 STROKE = 0.30        # darker than this is a drawn stroke, not the stone
 BEVEL = 1.6          # px: the blur that rounds the cut edges
@@ -59,6 +72,20 @@ def margins(v):
     fl, fh = np.polyfit(ys, lo, 1), np.polyfit(ys, hi, 1)
     Y, X = np.mgrid[0:v.shape[0], 0:v.shape[1]]
     return (X >= np.polyval(fl, Y) + 4) & (X <= np.polyval(fh, Y) - 4)
+
+
+def depth(v):
+    """A depth map of a photograph as heights above the carved face: a plane fitted to the face (iteratively, leaving
+    out what stands proud of it) is taken off, and the rest scaled so the highest point is 1."""
+    Y, X = np.mgrid[0:v.shape[0], 0:v.shape[1]]
+    A = np.c_[X.ravel(), Y.ravel(), np.ones(v.size)]
+    keep = np.ones(v.size, dtype=bool)
+    for _ in range(6):
+        c, *_ = np.linalg.lstsq(A[keep], v.ravel()[keep], rcond=None)
+        r = v.ravel() - A @ c
+        keep = r < np.percentile(r[keep], 70)
+    h = np.clip((v - (A @ c).reshape(v.shape)) - np.percentile(r[keep], 50), 0, None)
+    return nd.gaussian_filter(h / np.percentile(h, 99.7), 1.0)
 
 
 def heights(v, stone):
@@ -78,9 +105,12 @@ def main():
     for name, spec in SOURCES.items():
         v = np.asarray(Image.open(os.path.join(SRC, spec["src"])).convert("L"), dtype=float) / 255.0
         x0, y0, x1, y1 = spec["crop"]
+        for ex0, ey0, ex1, ey1 in spec.get("erase", []):
+            ring = np.r_[v[ey0 - 20:ey0, ex0:ex1].ravel(), v[ey1:ey1 + 20, ex0:ex1].ravel()]
+            v[ey0:ey1, ex0:ex1] = np.median(ring)   # back to the stone's surface round it
         v = v[y0:y1, x0:x1]
         stone = margins(v) if spec.get("margins") == "white" else np.ones(v.shape, dtype=bool)
-        h = heights(v, stone)[::2, ::2]
+        h = (depth(v) if spec.get("mode") == "depth" else heights(v, stone))[::2, ::2]
         Image.fromarray((np.clip(h, 0, 1) * 65535).astype(np.uint16)).save(os.path.join(OUT, name + ".png"))
         report[name] = dict(spec, shape=list(h.shape), stroke=STROKE, bevel_px=BEVEL)
         print(name, h.shape)

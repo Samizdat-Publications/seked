@@ -55,3 +55,19 @@ The Vulture Stone is a claim in its own right: Sweatman and Tsikritsis read it a
 the vulture as Sagittarius and the scorpion as Scorpius (Cygnus is Collins's reading; corrected 21 October from the paper). `@seked/sky` can draw the sky over Göbekli Tepe for any date,
 so the exhibit can lay the relief over the computed sky in chapter 7, as chapter 5 does with Orion, with the
 claim, its free choices and the reply.
+
+## 23 October
+
+- Made and checked: Pillar 31's side (Pillar 18's map with the fox erased, as the replica photographs show) and
+  front, Pillar 33's broad face (from the excavators' numbered drawing), Pillar 27's broad face (a depth map of a
+  photograph; Pillar 27 is in Enclosure C, not D, and is in the shared folder but not in Seked's Enclosure D).
+  All in `assets/gobekli-reliefs/` with their provenance. Pillars 31 and 33 are carved in `--era 9500`.
+- Pillar 33 is set along the wall with its carved face into the ring, like Pillar 43 (look choice: its excavation
+  photograph shows it flush between wall stretches).
+- Not made: Pillars 20, 30 and 38. Their motifs are listed in the TEDI dictionary, but no reachable photograph was
+  labelled with the number, and the DAI blog would not load from here. Candidate replica photographs are noted in
+  the shared folder's README.
+- Note on Pillar 43: the DAI describes its relief on the pillar's "western broadside", wrapping onto both narrow
+  sides. Seked's stand-in turns it along the wall with the carved face into the ring; which way it truly faces is
+  worth checking against the plan.
+

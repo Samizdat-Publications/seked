@@ -51,6 +51,81 @@
    ],
    "stroke": 0.3,
    "bevel_px": 1.6
+  },
+  "p31-side": {
+   "src": "p18-side.png",
+   "crop": [
+    405,
+    120,
+    1140,
+    2640
+   ],
+   "erase": [
+    [
+     522,
+     860,
+     1030,
+     1090
+    ]
+   ],
+   "shape": [
+    1260,
+    368
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
+  },
+  "p31-front": {
+   "src": "p31-front.png",
+   "crop": [
+    520,
+    0,
+    1010,
+    2752
+   ],
+   "shape": [
+    1376,
+    245
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
+  },
+  "p33-broad": {
+   "src": "p33-broad.png",
+   "crop": [
+    115,
+    100,
+    1690,
+    2330
+   ],
+   "step": 0.4,
+   "shaft": [
+    0.2,
+    0.74
+   ],
+   "shape": [
+    1115,
+    788
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
+  },
+  "p27-broad": {
+   "src": "p27-broad-depth.png",
+   "crop": [
+    250,
+    0,
+    1180,
+    2450
+   ],
+   "mode": "depth",
+   "raise_m": 0.25,
+   "shape": [
+    1225,
+    465
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
   }
  }
 }
