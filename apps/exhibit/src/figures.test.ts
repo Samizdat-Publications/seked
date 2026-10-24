@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadDatabase } from '@seked/data';
-import { allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
+import { seismicSectionSvg, allanRankData, allanRankSvg, beltPlan, beltPlanSvg, ditchPlan, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceData, luminescenceSvg, radiocarbonData, radiocarbonSvg, corridorData, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, yearText, isFigure, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine, rankP, sphinxPlanData } from './figures';
 import { groundEnvironment } from './receipts';
 import { skyEnvironment } from '@seked/sky';
 import { loadClaims } from '@seked/claims';
@@ -309,5 +309,17 @@ describe("West and Schoch's joint", () => {
     const gaps = xs(paths[0]!).map((x, i) => x - xs(paths[1]!)[i]!);
     expect(Math.max(...gaps) - Math.min(...gaps)).toBeLessThan(0.11);   // one profile, shifted: they fit
     expect(isFigure('joint-claim')).toBe(true);
+  });
+});
+
+describe('seismicSectionSvg lit', () => {
+  const d = { front: [1.8, 2.5] as [number, number], rear: 1.2 };
+  it('lights the named zone and dims the other', () => {
+    const svg = seismicSectionSvg(d, 640, 'front');
+    expect(svg).toMatch(/class="weathered lit" data-zone="front"/);
+    expect(svg).toMatch(/class="weathered dimmed" data-zone="rear"/);
+  });
+  it('lights nothing when no zone is named', () => {
+    expect(seismicSectionSvg(d)).not.toMatch(/ lit"| dimmed"/);
   });
 });

@@ -142,6 +142,11 @@ p { margin: 0; }
 .figure .weathered-range { fill: rgba(196, 132, 70, 0.22); stroke: rgba(214, 160, 100, 0.6); stroke-width: 1; stroke-dasharray: 4 3; }
 .figure .sec-lab { font: 600 20px var(--mono); fill: rgba(248, 214, 140, 1); }
 .figure .sec-sub { font: 500 12px var(--mono); fill: var(--muted); letter-spacing: 0.06em; }
+/* the zone being named, lit; the other, set back (the critic: light the zones as they are spoken) */
+.figure .weathered, .figure .weathered-range, .figure .sec-lab, .figure .sec-sub { transition: fill 0.5s ease, opacity 0.5s ease; }
+.figure .weathered.lit { fill: rgba(232, 160, 80, 0.95); }
+.figure .weathered-range.lit { fill: rgba(232, 160, 80, 0.45); }
+.figure .dimmed { opacity: 0.3; }
 
 /* the receipt and the reply: a tab at the right edge, a quiet panel when open */
 .tab {

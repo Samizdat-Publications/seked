@@ -122,6 +122,13 @@ scaffolding (finish `clean`, `scripts/sphinx_lab/descaffold.py` c10), its panora
 `ch2-nemes--ch2-small` flight rendered again. Left: a faint painted ghost of the lattice on the south flank and the
 back, and one small hole at the top of the rump; Karahan Tepe, last.
 
+Stewart, the same evening: scaffolding on today's Sphinx would have been fine; keep the scaffold-free one as it
+is and stop work on the scaffold. The pole and flat ladder frame still faint in `ch1-rolls` stay. Do not reopen.
+
+Then, from section 2: the seismic section lights its zones as they are named (`ch1-depth`: `seismic-front@front`,
+`seismic-rear@behind`, relit in place); chapter 1's static holds (item 2.1) are gone with version 3 of the script,
+its longest leaf now 11 s under the slow drift, so nothing was cut.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of

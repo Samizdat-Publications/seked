@@ -74,7 +74,7 @@ import { degreesToSeked, formatDms } from '@seked/units';
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'seismic-section', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'gobekli-today', 'gobekli-ring', 'gobekli-p43', 'gobekli-pair', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
+export const FIGURES = ['ditch-plan', 'seismic-section', 'seismic-front', 'seismic-rear', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'gobekli-today', 'gobekli-ring', 'gobekli-p43', 'gobekli-pair', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 
@@ -560,7 +560,18 @@ export function seismicSection(env: Record<string, number>): SeismicSection | nu
  * scale: shallow behind the rump, deeper in front and along the sides, the range drawn as a paler band. Above the floor
  * the statue is a sign for where the lines run, not to scale; below it the depths are.
  */
-export function seismicSectionSvg(d: SeismicSection, width = 640): string {
+/** Light one zone of a drawn seismic section in place (the card stays; style.css moves the light), or none. */
+export function relightSeismic(svg: Element, lit: 'front' | 'rear' | null): void {
+  for (const el of svg.querySelectorAll('[data-zone]')) {
+    const mine = el.getAttribute('data-zone') === lit;
+    el.classList.toggle('lit', lit !== null && mine && /weathered/.test(el.getAttribute('class') ?? ''));
+    el.classList.toggle('dimmed', lit !== null && !mine);
+  }
+}
+
+export function seismicSectionSvg(d: SeismicSection, width = 640, lit: 'front' | 'rear' | null = null): string {
+  // the zone the narration is naming is lit and the other dimmed (`seismic-front`, `seismic-rear`, cued at their words)
+  const z = (which: 'front' | 'rear') => `${lit === null ? '' : lit === which ? ' lit' : ' dimmed'}" data-zone="${which}`;
   const floor = 132, k = 44, H = floor + k * Math.ceil(d.front[1] + 0.6) + 34, f = (z: number) => z.toFixed(1);
   const Y = (m: number) => floor + m * k, split = 168, right = width - 70;
   const sphinx = `M 150 ${floor} L 150 102 Q 152 90 172 88 L 368 86 Q 380 84 386 74 L 392 46 Q 396 36 410 34 L 432 34
@@ -569,15 +580,15 @@ export function seismicSectionSvg(d: SeismicSection, width = 640): string {
   return `<svg viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="img" aria-label="Under the Sphinx's ditch: weathered ${d.rear} metres deep behind the rump, ${d.front[0]} to ${d.front[1]} in front and along the sides">
   <path class="statue" d="${sphinx}"/>
   <text class="north" x="260" y="${floor - 54}" text-anchor="middle">the Sphinx, on the ditch floor</text>
-  <rect class="weathered" x="24" y="${f(floor)}" width="${split - 24}" height="${f(d.rear * k)}"/>
-  <rect class="weathered" x="${split}" y="${f(floor)}" width="${right - split}" height="${f(d.front[0] * k)}"/>
-  <rect class="weathered-range" x="${split}" y="${f(Y(d.front[0]))}" width="${right - split}" height="${f((d.front[1] - d.front[0]) * k)}"/>
+  <rect class="weathered${z('rear')}" x="24" y="${f(floor)}" width="${split - 24}" height="${f(d.rear * k)}"/>
+  <rect class="weathered${z('front')}" x="${split}" y="${f(floor)}" width="${right - split}" height="${f(d.front[0] * k)}"/>
+  <rect class="weathered-range${z('front')}" x="${split}" y="${f(Y(d.front[0]))}" width="${right - split}" height="${f((d.front[1] - d.front[0]) * k)}"/>
   <line class="wall" x1="16" y1="${floor}" x2="${right + 8}" y2="${floor}"/>
   <line class="dim" x1="${split}" y1="${floor - 4}" x2="${split}" y2="${f(Y(d.front[1]) + 10)}"/>
-  <text class="sec-lab" x="${(24 + split) / 2}" y="${f(Y(d.rear) + 26)}" text-anchor="middle">${d.rear} m</text>
-  <text class="sec-sub" x="${(24 + split) / 2}" y="${f(Y(d.rear) + 44)}" text-anchor="middle">behind the rump</text>
-  <text class="sec-lab" x="${(split + right) / 2}" y="${f(Y(d.front[1]) + 26)}" text-anchor="middle">${d.front[0]} to ${d.front[1]} m</text>
-  <text class="sec-sub" x="${(split + right) / 2}" y="${f(Y(d.front[1]) + 44)}" text-anchor="middle">in front and along the sides</text>
+  <text class="sec-lab${z('rear')}" x="${(24 + split) / 2}" y="${f(Y(d.rear) + 26)}" text-anchor="middle">${d.rear} m</text>
+  <text class="sec-sub${z('rear')}" x="${(24 + split) / 2}" y="${f(Y(d.rear) + 44)}" text-anchor="middle">behind the rump</text>
+  <text class="sec-lab${z('front')}" x="${(split + right) / 2}" y="${f(Y(d.front[1]) + 26)}" text-anchor="middle">${d.front[0]} to ${d.front[1]} m</text>
+  <text class="sec-sub${z('front')}" x="${(split + right) / 2}" y="${f(Y(d.front[1]) + 44)}" text-anchor="middle">in front and along the sides</text>
   ${ticks.map((m) => `<line class="dim" x1="${right + 14}" y1="${f(Y(m))}" x2="${right + 22}" y2="${f(Y(m))}" style="stroke-dasharray: none"/><text class="here-lab" x="${right + 26}" y="${f(Y(m) + 4)}">${m} m</text>`).join('\n  ')}
   <line class="dim" x1="${right + 18}" y1="${floor}" x2="${right + 18}" y2="${f(Y(ticks[ticks.length - 1]!))}" style="stroke-dasharray: none"/>
 </svg>`;
