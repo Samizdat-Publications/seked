@@ -71,9 +71,29 @@ def main(src, dst, params):
     big = np.nonzero(size >= P["min_piece"] / h ** 3)[0]
     big = big[big > 0]
     print("pieces taken off", n, "kept as scaffold", len(big), sorted((size[big] * h ** 3).round(2))[::-1][:10], flush=True)
-    lost = ndimage.distance_transform_edt(~np.isin(pieces, big), sampling=h) <= P["reach"]
-    thin &= np.isin(pieces, big)[ci[:, 0], ci[:, 1], ci[:, 2]] | (ndimage.distance_transform_edt(
-        ~np.isin(pieces, big), sampling=h) <= 2 * h)[ci[:, 0], ci[:, 1], ci[:, 2]]
+    scaffold = np.isin(pieces, big)
+    del pieces
+    if P.get("open2"):
+        # a second pass inside the scaffold's zones only: struts lying within a few tenths of a metre of the body
+        # survive the first opening, so round where the scaffold was found the solid is opened far harder
+        zone = ndimage.distance_transform_edt(~scaffold, sampling=h) <= P["zone_pad"]
+        core2 = ndimage.distance_transform_edt(solid & zone, sampling=h) > P["open2"]
+        opened2 = ndimage.distance_transform_edt(~core2, sampling=h) <= P["open2"]
+        del core2
+        opened = np.where(zone, opened2, opened)
+        del opened2
+        cut = solid & ~opened & zone
+        pieces2, n2 = ndimage.label(cut)
+        size2 = np.bincount(pieces2.ravel())
+        keep2 = np.nonzero(size2 >= P["min_piece2"] / h ** 3)[0]
+        keep2 = keep2[keep2 > 0]
+        scaffold |= np.isin(pieces2, keep2)
+        del pieces2, cut
+        near = ndimage.distance_transform_edt(~opened, sampling=h) <= P["thin"]
+        thin = ~near[ci[:, 0], ci[:, 1], ci[:, 2]]
+        print("second pass: zones", int(zone.sum() * h ** 3), "m3; pieces", n2, "kept", len(keep2), flush=True)
+    lost = ndimage.distance_transform_edt(~scaffold, sampling=h) <= P["reach"]
+    thin &= (ndimage.distance_transform_edt(~scaffold, sampling=h) <= 2 * h)[ci[:, 0], ci[:, 1], ci[:, 2]]
     print("thin faces on the scaffold", int(thin.sum()), flush=True)
     box = tuple(slice(max(0, i.min() - 3), i.max() + 4) for i in np.nonzero(lost))
     field = ndimage.gaussian_filter(opened[box].astype(np.float32), 0.8)
@@ -81,7 +101,18 @@ def main(src, dst, params):
     pv, pt, _, _ = measure.marching_cubes(field, 0.5, spacing=(h, h, h))
     pv += lo + h * np.array([s.start for s in box])
     print("stand-in", len(pt), "triangles", flush=True)
-    np.savez(dst, thin=thin, pverts=pv.astype(np.float32), ptris=pt.astype(np.int32))
+    # a core: the solid shrunk a little inside the stone, so that through any hole the shell is left with (a crack, a
+    # cavity the second pass dug) one sees recessed stone, lit through the opening, not the hollow's black inside
+    cv, ct = np.zeros((0, 3), np.float32), np.zeros((0, 3), np.int32)
+    if P.get("core"):
+        inside = ndimage.distance_transform_edt(solid, sampling=h) > P["core"]
+        cf = ndimage.gaussian_filter(inside.astype(np.float32), 0.8)
+        del inside
+        cv, ct, _, _ = measure.marching_cubes(cf, 0.5, spacing=(h, h, h), step_size=2)
+        cv += lo
+        print("core", len(ct), "triangles", flush=True)
+    np.savez(dst, thin=thin, pverts=pv.astype(np.float32), ptris=pt.astype(np.int32),
+             cverts=cv.astype(np.float32), ctris=ct.astype(np.int32))
 
 
 if __name__ == "__main__":

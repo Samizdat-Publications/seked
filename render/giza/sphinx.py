@@ -35,7 +35,9 @@ if BLENDER_DIR not in sys.path:
 DERIVED = {"sphinx-master"}      # whose finishes are eras, not surfaces: a missing one is no statue, not the master
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion-rock"),
              "lion-fresh": ("sphinx-master", "first-time-rock"), "carved": ("sphinx-built", None),
-             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
+             "buried": ("sphinx-meshy", "clean"), "excavated": ("sphinx-meshy", "clean")}
+# Today's Sphinx without the restorers' scaffolding its photographs carried (24 October, Stewart): the finish `clean`
+# is scripts/sphinx_lab/descaffold.py's candidate c10 (two openings round the scaffold, the holes capped in place).
 # The two claim eras are the master cut as rock (scripts/sphinx_lab/rock.py, 22 October: the modeller critic's
 # loop in build/sphinx-lab/): rebuilt as a solid, reproportioned towards ARCE's height and width, the beds cut in
 # the geometry and carried to the limestone material (render/giza/limestone.py). rock.py reads the master's
@@ -43,6 +45,9 @@ MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx
 # The real eras keep the Meshy models (sphinx-built, and sphinx-meshy from photographs); the master serves the
 # two claim eras only. Carving and wearing the master into the as-built and today states was dropped on
 # 20 October (docs/laptop-2026-10-20.md, decision 8): the carved chest and the worn body never read.
+# Models whose finishes keep every piece: scripts/sphinx_lab/descaffold.py gives today's Sphinx a stand-in surface and a
+# core as pieces of their own, and takes off the loose block the raw model carries itself
+FINISHES_WHOLE = {"sphinx-meshy"}
 TINTED = {"sphinx-meshy", "sphinx-lion", "sphinx-lion-fresh"}      # generated textures with a pink cast
 # The carved Sphinx's generated texture leaves the body paper white under a painted head: the body is
 # taken down to the bedrock's warm limestone (a look choice; traces of red ochre survive on it).
@@ -135,7 +140,8 @@ def statue(state, coll, log=print):
     # attribute: it keeps its density, and the limestone material replaces the generated texture.
     rock = limestone.has_strata(mesh)
     faces = max(model.get("faces", 300000), 2000000) if rock else model.get("faces", 300000)
-    obj = rs.cut_and_reduce(mesh, model.get("cut_z"), faces, model.get("largest_part_only", False) and not rock)
+    whole = bool(finish) and model["id"] in FINISHES_WHOLE and path.endswith(f"-{finish}{os.sep}model.glb")
+    obj = rs.cut_and_reduce(mesh, model.get("cut_z"), faces, model.get("largest_part_only", False) and not rock and not whole)
     done = rs.fit(obj, model, data.FOOTPRINTS)
     # The statue is cut from the bedrock it stands on: set its lowest point on the ditch's floor, where
     # the fit leaves the paws hanging a few tenths of a metre over it (the floor sits under the lowest footprint base).
