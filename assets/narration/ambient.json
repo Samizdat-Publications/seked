@@ -1,0 +1,12 @@
+{
+ "made_by": "scripts/ambient.py",
+ "model": "eleven_text_to_sound_v2",
+ "beds": {
+  "today": "Clearly audible outdoor ambience recorded on an open desert plateau beside a big city: steady gusting wind over sand and stone, a continuous distant city murmur of traffic below, an occasional far-off horn. No voices nearby, no music.",
+  "built": "Clearly audible outdoor ambience of an ancient building site on a desert plateau above a river: steady dry wind, river birds calling below, and in the distance many copper chisels tapping on limestone. No modern sounds, no voices nearby, no music.",
+  "green": "Ambience of a lush green savanna by a river: a gentle breeze through tall grass, scattered birdsong, insects, distant water. Peaceful, no voices, no music.",
+  "night": "Clearly audible night ambience outdoors in a warm desert: a steady chorus of crickets and night insects, a soft breeze, a distant owl calling once. No voices, no music.",
+  "inside": "Ambience inside a huge sealed granite chamber deep in a pyramid: a deep low room tone, faint air moving, the stillness of heavy stone. Very quiet, no voices, no music."
+ },
+ "note": "generated ambience, not recordings; a look choice like the skies"
+}

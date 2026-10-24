@@ -106,6 +106,16 @@ any can be reversed.
 7. **Still open from section 2**: the green-era flood water against the Valley Temple's wall (item 7), the static
    holds in chapter 1, the temple blocks' weathering, the green-era grass; and the Sphinx work in section 1.
 
+## 0d. Stewart's calls, 24 October
+
+- **Göbekli Tepe stays in the trailer**, shown off: its shot (`ch0-t06`) now shows Enclosure D as built (the
+  `gobekli-ring` card) instead of the Pillar 43 sky diagram over the green grass, which is what the critic was
+  reacting to. Do not cut it.
+- **"Nobody disputes that" and "You can only carve a smaller shape out of a larger one" stay.**
+- **Ambient sound: yes**, ElevenLabs or Gemini as works best, credits approved.
+- **Karahan Tepe comes last** (models are hard to find).
+- **Today's Sphinx loses its scaffolding** (finish the descaffold work in `scripts/sphinx_lab/`).
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of

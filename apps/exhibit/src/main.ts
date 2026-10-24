@@ -27,6 +27,7 @@ import corridor from 'virtual:corridor';
 import { allanRankSvg, seismicSection, seismicSectionSvg, beltPlan, beltPlanSvg, ditchPlanSvg, earthScale, earthScaleSvg, jointClaimSvg, luminescenceSvg, radiocarbonSvg, corridorSvg, hawaraDepths, hawaraDepthsSvg, lookedDepths, lookedSvg, sekedRule, sekedRuleSvg, northDrift, northDriftSvg, driftExaggeration, claimSort, claimSortSvg, khafreDepths, khafreDepthsSvg, shortCite, northSquare, northSquareSvg, phiTriangle, phiTriangleSvg, piCircle, piCircleSvg, rankLine } from './figures';
 import { Panel, loadBundle } from './panel';
 import { TIER_WORDS, groundEnvironment, leafReceipts } from './receipts';
+import { Ambient, bedFor } from './ambient';
 import { Player } from './player';
 import { poleStars, poleStarsSvg } from './polestars';
 import { type Moment, comparisonsAt, epochOf, skyEnv, yearLabel } from './sky';
@@ -524,7 +525,11 @@ async function start(): Promise<void> {
       for (const name of cardPictures[id] ?? (id.startsWith('gobekli-') ? [id] : [])) new Image().src = `objects/${name}.jpg`;
     }
   };
-  player.onLeaf = (L) => { panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L); };
+  const ambient = new Ambient();
+  player.onLeaf = (L) => {
+    panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L);
+    if (player.playing) ambient.play(bedFor(L));
+  };
   const figure = $('figure');
   player.onFigure = (id) => {
     if (id === 'ditch-plan') {
@@ -580,7 +585,8 @@ async function start(): Promise<void> {
     return [{ x: f.left - s.left, y: f.top - s.top, w: f.width, h: f.height }];
   };
   panel.onOpen = () => { if (player.playing) player.pause(); };
-  player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); };
+  player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); ambient.play(bedFor(player.leaf)); };
+  player.onPause = () => ambient.stop();
   // for capture and test scripts, as the story page had
   (window as unknown as { seked: unknown }).seked = { player, stage, sky };
   $('controls').hidden = false;

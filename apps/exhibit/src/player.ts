@@ -53,6 +53,7 @@ export class Player {
   onWord: (i: number) => void = () => {};
   /** Called when play starts, before the first word. */
   onPlay: () => void = () => {};
+  onPause: () => void = () => {};
   /** Called when a leaf is put on the stage. */
   onLeaf: (leaf: Leaf) => void = () => {};
   /** Show one of the exhibit's own figures (src/figures.ts), or put it away with null. */
@@ -195,6 +196,7 @@ export class Player {
     // a second back, so the sentence picks up with its sense
     this.resumeAt = s && !s.audio.paused ? { leaf: s.leaf, part: s.part, t: Math.max(0, s.audio.currentTime - REWIND_S) } : null;
     this.playing = false;
+    this.onPause();
     this.stage.drift = false;
     this.ui.play.setAttribute('aria-pressed', 'false');
     this.ui.play.setAttribute('aria-label', 'Play');
