@@ -1,4 +1,68 @@
 {
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a flight into each leaf that arrives by flight, from the last leaf's station camera and view to this one's, in the arriving leaf's era and moment, so its last frame is the leaf's panorama at the leaf's view. Render with render/build.py --films render/films-exhibit.json --film ID (try --preview 0,45,89 first), encode with render/film.py into `out`.",
- "films": []
+ "films": [
+  {
+   "id": "ch2-nemes--ch2-small",
+   "name": "Flight into ch2-small from ch2-nemes",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    21.71,
+    15.59
+   ],
+   "centre": [
+    340.0,
+    -464.0
+   ],
+   "path": [
+    [
+     362.0,
+     -460.0,
+     -40.47
+    ],
+    [
+     356.72,
+     -460.96,
+     -31.01
+    ],
+    [
+     340.0,
+     -464.0,
+     -23.27
+    ],
+    [
+     322.4,
+     -467.2,
+     -27.74
+    ],
+    [
+     318.0,
+     -468.0,
+     -34.45
+    ]
+   ],
+   "look": [
+    [
+     313.95,
+     -427.59,
+     -24.94
+    ],
+    [
+     313.9,
+     -418.16,
+     -25.52
+    ],
+    [
+     313.86,
+     -408.73,
+     -26.1
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch2-nemes--ch2-small.mp4"
+  }
+ ]
 }

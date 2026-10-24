@@ -2,6 +2,15 @@
  "about": "Written by render/publish.py: the exhibit's detail patches (scripts/exhibit_queue.py), each with the panorama it registers with. Degrees; the field is vertical.",
  "patches": [
   {
+   "src": "pano/patch/menkaure-today-winter-afternoon-ch0-t07.jpg",
+   "pano": "pano/menkaure-today.jpg",
+   "leaf": "ch0-t07",
+   "yaw": 8,
+   "pitch": 0,
+   "fov": 52.0,
+   "aspect": 1.777778
+  },
+  {
    "src": "pano/patch/menkaure-today-winter-afternoon-ch8-biondi.jpg",
    "pano": "pano/menkaure-today.jpg",
    "leaf": "ch8-biondi",
@@ -227,24 +236,6 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-fissures.jpg",
-   "pano": "pano/sphinx-flank-today-equinox-dawn.jpg",
-   "leaf": "ch1-fissures",
-   "yaw": 235,
-   "pitch": 11,
-   "fov": 72.8,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-rain.jpg",
-   "pano": "pano/sphinx-flank-today-equinox-dawn.jpg",
-   "leaf": "ch1-rain",
-   "yaw": 235,
-   "pitch": 7,
-   "fov": 80.6,
-   "aspect": 1.777778
-  },
-  {
    "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-rolls.jpg",
    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg",
    "leaf": "ch1-rolls",
@@ -257,45 +248,18 @@
    "src": "pano/patch/sphinx-quarter-today-equinox-dawn-ch2-nemes.jpg",
    "pano": "pano/sphinx-quarter-today.jpg",
    "leaf": "ch2-nemes",
-   "yaw": 308,
-   "pitch": 12,
-   "fov": 80.6,
+   "yaw": 304,
+   "pitch": 15,
+   "fov": 65.0,
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/sphinx-today-equinox-dawn-ch0-sunrise.jpg",
+   "src": "pano/patch/sphinx-today-equinox-dawn-ch0-t01.jpg",
    "pano": "pano/sphinx-today-equinox-dawn.jpg",
-   "leaf": "ch0-sunrise",
-   "yaw": 277,
-   "pitch": 0,
-   "fov": 44.2,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/sphinx-today-equinox-dawn-ch0-textbooks.jpg",
-   "pano": "pano/sphinx-today-equinox-dawn.jpg",
-   "leaf": "ch0-textbooks",
+   "leaf": "ch0-t01",
    "yaw": 280,
    "pitch": -2,
    "fov": 57.2,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/sphinx-today-equinox-dawn-ch3-core.jpg",
-   "pano": "pano/sphinx-today-equinox-dawn.jpg",
-   "leaf": "ch3-core",
-   "yaw": 235,
-   "pitch": -22,
-   "fov": 58.5,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/sphinx-today-equinox-dawn-ch3-ditch.jpg",
-   "pano": "pano/sphinx-today-equinox-dawn.jpg",
-   "leaf": "ch3-ditch",
-   "yaw": 275,
-   "pitch": -4,
-   "fov": 78.0,
    "aspect": 1.777778
   },
   {
@@ -305,6 +269,15 @@
    "yaw": 277,
    "pitch": 0,
    "fov": 44.2,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/valley-temple-built-temple-morning-ch0-t04.jpg",
+   "pano": "pano/valley-temple-built.jpg",
+   "leaf": "ch0-t04",
+   "yaw": 22,
+   "pitch": -15,
+   "fov": 78.0,
    "aspect": 1.777778
   },
   {

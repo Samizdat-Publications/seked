@@ -364,7 +364,7 @@
     "pitch": 8,
     "fov": 66
    },
-   "arrive": "cut",
+   "arrive": "flight",
    "say": "Nobody disputes that.",
    "draw": [],
    "hold": 1,

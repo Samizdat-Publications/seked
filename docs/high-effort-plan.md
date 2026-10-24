@@ -116,6 +116,12 @@ any can be reversed.
 - **Karahan Tepe comes last** (models are hard to find).
 - **Today's Sphinx loses its scaffolding** (finish the descaffold work in `scripts/sphinx_lab/`).
 
+Done the same day: the trailer's Göbekli shot shows Enclosure D as built; ambient sound under the narration (five
+ElevenLabs beds by place and hour, `scripts/ambient.py`, `apps/exhibit/src/ambient.ts`); today's Sphinx without its
+scaffolding (finish `clean`, `scripts/sphinx_lab/descaffold.py` c10), its panoramas, patches and the
+`ch2-nemes--ch2-small` flight rendered again. Left: a faint painted ghost of the lattice on the south flank and the
+back, and one small hole at the top of the rump; Karahan Tepe, last.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of
