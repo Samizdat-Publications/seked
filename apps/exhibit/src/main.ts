@@ -290,6 +290,25 @@ function gobekliFigure(id: string, ground: Record<string, number> | null): strin
   return `${tier}<img class="wide" src="objects/${id}.jpg" alt="${alt}"><figcaption>${caption}</figcaption>`;
 }
 
+/**
+ * Karahan Tepe in chapter 7 (render/karahan.py renders the two scans in blender/models.json): the site and Structure
+ * AB. Excavated; the scans are other people's, credited, and their form is a stand-in, not a survey.
+ */
+function karahanFigure(id: string): string {
+  const tier = `<span class="tier excavated">Excavated: ${TIER_WORDS.excavated}</span>`;
+  const cards: Record<string, [string, string]> = {
+    'karahan-site': ['An excavated hilltop seen from the air: a round sunken enclosure, trenches and a rock-cut room beside it',
+      `Karahan Tepe today, 37 km from Göbekli Tepe: the excavation as a scan made from drone video (333DDD, CC BY 4.0).
+      The scan's form is a visual stand-in, not a survey.`],
+    'karahan-ab': ['A room cut down into the bedrock, a dozen stone pillars rising from its floor and a carved head jutting from its wall',
+      `Structure AB, cut into the bedrock: pillars left standing from the rock of its floor, and a head looking out of
+      its wall, about the same age as Göbekli Tepe's enclosures (Karul 2021). A photogrammetry scan (Megalithomania,
+      CC BY-NC-SA 4.0); its form is a stand-in, not a survey.`],
+  };
+  const [alt, caption] = cards[id]!;
+  return `${tier}<img class="wide" src="objects/${id}.jpg" alt="${alt}"><figcaption>${caption}</figcaption>`;
+}
+
 type StructureNote = { id: string; evidence?: string; if_it_held?: string };
 
 /** What reported structures would change if they held, from data/structures.json, as one sentence each. */
@@ -522,7 +541,7 @@ async function start(): Promise<void> {
   const preloadCards = (L: { draw: readonly string[] }) => {
     for (const entry of L.draw) {
       const id = entry.split('@')[0]!;
-      for (const name of cardPictures[id] ?? (id.startsWith('gobekli-') ? [id] : [])) new Image().src = `objects/${name}.jpg`;
+      for (const name of cardPictures[id] ?? (id.startsWith('gobekli-') || id.startsWith('karahan-') ? [id] : [])) new Image().src = `objects/${name}.jpg`;
     }
   };
   const ambient = new Ambient();
@@ -559,6 +578,7 @@ async function start(): Promise<void> {
     if (id === 'khafre-cutaway') figure.innerHTML = khafreCutawayFigure(ground, bundle?.structures);
     if (id === 'hawara-labyrinth' || id === 'hawara-lower') figure.innerHTML = hawaraLabyrinthFigure(id === 'hawara-lower');
     if (id?.startsWith('gobekli-')) figure.innerHTML = gobekliFigure(id, ground);
+    if (id?.startsWith('karahan-')) figure.innerHTML = karahanFigure(id);
     if (id === 'seked-rule') figure.innerHTML = sekedRuleFigure(bundle, ground);
     if (id === 'north-drift') figure.innerHTML = northDriftFigure(ground);
     if (id === 'pole-stars') figure.innerHTML = poleStarsFigure(ground);

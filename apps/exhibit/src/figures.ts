@@ -38,6 +38,10 @@
  * Enclosure D about 9500 BCE built from its plan (render/gobekli.py, written into objects/ by scripts/exhibit_gobekli.py);
  * labelled with the excavated tier.
  *
+ * `karahan-site`, `karahan-ab`: Karahan Tepe, 37 km from Göbekli: the excavated site from drone video (333DDD, CC BY)
+ * and Structure AB, the room cut into the bedrock with its pillars and the head in its wall (Megalithomania, CC BY-NC-SA),
+ * framed as objects by render/karahan.py; labelled with the excavated tier.
+ *
  * `hawara-labyrinth`, `hawara-lower`: the Labyrinth as one reconstruction draws it, rendered on Petrie's chip bed
  * (render/hawara_labyrinth.py, written into objects/ by scripts/exhibit_labyrinth.py), from the air and in a pit dug
  * to show its legendary lower storey; labelled with the legendary tier.
@@ -74,7 +78,7 @@ import { degreesToSeked, formatDms } from '@seked/units';
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'seismic-section', 'seismic-front', 'seismic-rear', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'gobekli-today', 'gobekli-ring', 'gobekli-p43', 'gobekli-pair', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
+export const FIGURES = ['ditch-plan', 'seismic-section', 'seismic-front', 'seismic-rear', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'gobekli-today', 'gobekli-ring', 'gobekli-p43', 'gobekli-pair', 'karahan-site', 'karahan-ab', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 

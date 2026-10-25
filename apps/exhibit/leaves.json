@@ -1077,6 +1077,28 @@
     "gobekli-p43@thousand",
     "vulture-sky@excavators"
    ],
+   "hold": 0.3,
+   "interact": "look",
+   "receipts": [],
+   "reply": "ch7"
+  },
+  {
+   "id": "ch7-karahan",
+   "chapter": 7,
+   "station": "panorama",
+   "era": "first-time",
+   "moment": "summer-evening",
+   "view": {
+    "yaw": 40,
+    "pitch": 0,
+    "fov": 50
+   },
+   "arrive": "turn",
+   "say": "Thirty-seven kilometres away, at Karahan Tepe, the same people cut a room into the bedrock, with pillars rising from the floor and a head looking out of the wall.",
+   "draw": [
+    "karahan-site@Karahan",
+    "karahan-ab@room"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],

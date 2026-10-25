@@ -363,14 +363,15 @@ Egyptian builders gave a slope as a seked: so many palms of run for a rise of on
 
 ## 7. Before the flood
 
-**Narration** (99 words)
+**Narration** (128 words)
 
 About 12,900 years ago the world's warming suddenly stopped, and the north fell back into cold for over a thousand
 years. Hancock cites about a hundred peer-reviewed studies blaming a comet.
 
 And in south-east Turkey stands Göbekli Tepe: rings of carved T-shaped pillars, some over five metres tall, raised
 about 9500 BCE, seven thousand years before the Great Pyramid, by people the excavators say had no farms, no
-pottery and no metal.
+pottery and no metal. Thirty-seven kilometres away, at Karahan Tepe, the same people cut a room into the bedrock,
+with pillars rising from the floor and a head looking out of the wall.
 
 Schoch points to it when asked where the older civilisation was. If hunters could raise this, a plan at Giza in the
 Ice Age is not absurd.
