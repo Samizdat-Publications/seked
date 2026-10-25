@@ -139,8 +139,8 @@ its longest leaf now 11 s under the slow drift, so nothing was cut.
    `ch9-answer`, 80 m off, where they read as people for scale. That leaf also showed a flat grey shape in the sand:
    a car park drawn as one flat polygon at its corners' heights, sunk under the ground between them. Car parks are
    now cut into small triangles draped on the ground and lifted clear of the ripples, and each road edge takes the
-   ground's height under it (`render/giza/roads.py`). A faint outline is still painted in the sand there, from the
-   ground's material rather than any object (to trace: `_tracks` in `render/giza/materials.py`).
+   ground's height under it (`render/giza/roads.py`). The faint outline left in the sand there is OpenStreetMap's
+   footpaths, painted as trodden tracks (`_tracks` in `render/giza/materials.py`), as intended.
 4. **The Labyrinth plan is Canina's** (Tav. CXXII, 1839-44): credited in the captions, see `docs/to-source.md`.
 5. **The trailer's money shot** (section 3): `ch0-t03` now wipes in place from the long rains' lion (`ch0-t02`, the
    flank at 340/15/60) to the First Time's at the same view, instead of cutting to the side station; the words are
