@@ -191,6 +191,15 @@
    "aspect": 1.777778
   },
   {
+   "src": "pano/patch/sphinx-flank-first-time-equinox-dawn-ch0-t03.jpg",
+   "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg",
+   "leaf": "ch0-t03",
+   "yaw": 340,
+   "pitch": 15,
+   "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
    "src": "pano/patch/sphinx-flank-first-time-equinox-dawn-ch4-stela.jpg",
    "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg",
    "leaf": "ch4-stela",

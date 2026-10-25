@@ -42,15 +42,15 @@
   {
    "id": "ch0-t03",
    "chapter": 0,
-   "station": "sphinx-side",
+   "station": "sphinx-flank",
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 356,
-    "pitch": 8,
-    "fov": 66
+    "yaw": 340,
+    "pitch": 15,
+    "fov": 60
    },
-   "arrive": "cut",
+   "arrive": "wipe",
    "say": "Graham Hancock says it was a lion first, watching its own constellation rise.",
    "draw": [],
    "hold": 0.3,

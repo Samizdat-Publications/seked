@@ -3,7 +3,8 @@ Open water by era. The Nile runs about eight kilometres east of the plateau in e
 era (its surface in GLO-30 sits near -46.5 m in this frame, stage 6's reading). As
 built, the inundation fills the valley in front of the valley temples to a harbour
 (its level a look choice, kept below the temples' platforms); in the claim's green
-eras the flood plain reaches the plateau's foot. Where the ground stands above a
+eras the flood plain reaches the plateau's foot, 0.4 m under the temples' platforms, which
+stand on a quay there (quay.py, a look choice). Where the ground stands above a
 plane, the ground hides it, so each shoreline is the terrain's own.
 """
 import bpy

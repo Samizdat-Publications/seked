@@ -222,7 +222,7 @@ STATES = {
     # stands, lone giant figs; palms, figs and broadleaf trees thicker in the low ground, papyrus on
     # the shore and a few lilies in the shallows. Thinner and drier than the First Time throughout.
     "lion": dict(
-        cover=dict(plateau=0.85, lowland=0.95, bare=0.18, wavelength=55.0),
+        cover=dict(plateau=0.75, lowland=0.95, bare=0.18, wavelength=55.0),
         tint=dict(grass=("56703a", "6c8246"), strength=0.85, soil=("7d6d52", "8e7d60"), mottle=(0.06, 0.35)),
         near=dict(per_m2=14.0, falloff=30.0, dry=(0.05, 0.4), clump=(3.5, 0.6)),
         plants=[
@@ -408,6 +408,10 @@ def shapes(state, terrain=None):
         else:
             continue
         out.append(("ring", f["ring"], APRON[key]))
+    from . import quay            # the claim eras' paved quay round the temples: nothing grows through it
+    q = quay.outline(state)
+    if q is not None:
+        out.append(("ring", q[0], APRON["sphinx"]))
     return out
 
 

@@ -12,7 +12,7 @@ covers the grid beneath it and needs no hole cut per view.
 import numpy as np
 import bpy
 
-from . import data, states
+from . import data, quay, states
 from .noise import ValueNoise, smoothstep
 
 # Look choice: how much sand has drifted against the big pyramids' feet in each era.
@@ -63,6 +63,7 @@ class Terrain:
         self.noise = ValueNoise(11, 2400.0)
         self.drift = DRIFT.get(state, 0.0)
         self.sand = sand
+        self.quay = quay.outline(state)
 
     def _calm_distance(self, X, Y):
         d = np.full(np.shape(X), 1e9, dtype=np.float64)
@@ -136,6 +137,18 @@ class Terrain:
             Z = np.where(inside > 0.0, level, Z)
             east = (X >= x1) & (X < x1 + 3.0) & (Y > y0) & (Y < y1)
             Z = np.where(east, np.maximum(Z, level), Z)
+        if self.quay is not None and not far:
+            # The claim eras' quay (quay.py): the ground under its paving cut down below the paving's fill.
+            ring, top, _ = self.quay
+            under = _inside(ring, X, Y)
+            Z = np.where(under, np.minimum(Z, top - 0.45), Z)
+            # and off its east edge, where the flood is, the bank dug down to the edge's foot so the edge stands
+            # in the water, back to the ground's own level ten metres out
+            xs, ys = [p[0] for p in ring], [p[1] for p in ring]
+            d = np.maximum(X - max(xs), np.maximum(min(ys) - Y, Y - max(ys)))
+            east = (~under) & (X > max(xs) - 1.0) & (d < 10.0)
+            foot = top - quay.QUAY["below"]
+            Z = np.where(east, np.minimum(Z, foot + (Z - foot) * smoothstep(2.0, 10.0, d)), Z)
         if self.sand is not None and not far:
             s = self.sand
             t = smoothstep(s["x_top"], s["x_bottom"], X)
@@ -231,3 +244,16 @@ def grid_object(name, xs, ys, zfun, coll, hole=None):
     ob = bpy.data.objects.new(name, me)
     coll.objects.link(ob)
     return ob
+
+
+def _inside(ring, X, Y):
+    """Whether each point lies inside a ring (even-odd rule), vectorised."""
+    hit = np.zeros(np.shape(X), bool)
+    n = len(ring)
+    for i in range(n):
+        (x0, y0), (x1, y1) = ring[i], ring[(i + 1) % n]
+        if y0 == y1:
+            continue
+        cross = (y0 > Y) != (y1 > Y)
+        hit ^= cross & (X < x0 + (Y - y0) * (x1 - x0) / (y1 - y0))
+    return hit

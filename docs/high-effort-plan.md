@@ -94,7 +94,7 @@ any can be reversed.
 2. **Pillar 43 faces west**, radial in the wall, as the DAI's own post describes it (read through the Wayback Machine:
    dainst.blog itself is down, but its archived pages load, which may also unblock Pillars 20, 30 and 38).
 3. **The Labyrinth plan is not Kircher's**: his Turris Babel plate is a different design. The captions now say the
-   plan's original is not yet traced; `docs/to-source.md` has where to look next.
+   plan's original is not yet traced (found 25 October: Canina, 1839-44, Tav. CXXII; see `docs/to-source.md`).
 4. **Göbekli Tepe is in chapter 7** (Stewart: "still not in the exhibit"): `ch7-built` cues four cards before the
    sky card, the excavation today, Enclosure D about 9500 BCE, Pillar 43 and the central pair
    (`scripts/exhibit_gobekli.py`).
@@ -103,8 +103,8 @@ any can be reversed.
    `ch2-small` cuts from it until a flight between the two stations is rendered.
 6. **Figure cards stop above the caption band**: a tall drawing and a long caption ran under the place line
    (Stewart's screenshot of the Pillar 43 sky card); the card's drawing now gives up height instead.
-7. **Still open from section 2**: the green-era flood water against the Valley Temple's wall (item 7), the static
-   holds in chapter 1, the temple blocks' weathering, the green-era grass; and the Sphinx work in section 1.
+7. **Still open from section 2**: the static holds in chapter 1. (Done since: the temple blocks' weathering, the
+   green-era grass, the Sphinx clean-up, and the flood at the temples, item 7 there.)
 
 ## 0d. Stewart's calls, 24 October
 
@@ -128,6 +128,32 @@ is and stop work on the scaffold. The pole and flat ladder frame still faint in 
 Then, from section 2: the seismic section lights its zones as they are named (`ch1-depth`: `seismic-front@front`,
 `seismic-rear@behind`, relit in place); chapter 1's static holds (item 2.1) are gone with version 3 of the script,
 its longest leaf now 11 s under the slow drift, so nothing was cut.
+
+## 0e. Overnight, 25 October (Stewart asleep: "continue working through all the remaining items")
+
+1. **The flood at the temples** (2.7): a quay round the claim eras' two temples, see 2.7.
+2. **The First Time's temple walls** (2.8): laid as stepped megalithic core work (`lay_masonry` in fresh limestone,
+   blocks 1 to 3 m high and up to 8 m long, beds stepping along the wall) instead of even courses that read as a
+   clean brick wall. The long rains' walls already read as weathered rubble work and are unchanged.
+3. **The tourists** (2.8): closed. The crowds at the Sphinx went on 22 October; the only leaf that faces a crowd now is
+   `ch9-answer`, 80 m off, where they read as people for scale. Noted in passing: a flat grey polygon on the sand in
+   front of the north station sits at the bottom edge of that leaf's frame.
+4. **The Labyrinth plan is Canina's** (Tav. CXXII, 1839-44): credited in the captions, see `docs/to-source.md`.
+5. **The trailer's money shot** (section 3): `ch0-t03` now wipes in place from the long rains' lion (`ch0-t02`, the
+   flank at 340/15/60) to the First Time's at the same view, instead of cutting to the side station; the words are
+   unchanged. Tried first and dropped: wiping all three at the opening view over the temples, where the First Time's
+   whole 12 m walls hide all but the lion's head (the critic's "garden ornament"). To undo: give `ch0-t03` back
+   `sphinx-side` (356/8/66) and `arrive: cut`.
+6. **Pillars 30 and 38**: still not found labelled; left on `docs/to-source.md`.
+7. **Karahan Tepe, for Stewart to decide.** Two scans fetched and registered in `blender/models.json`: the site
+   from drone video (333DDD, CC BY) and Structure AB, the rock-cut room of pillars with the head in its wall
+   (Megalithomania, CC BY-NC-SA), rendered as cards by `render/karahan.py` into `build/karahan/`. Not in the
+   exhibit, because the narration does not name the site and adding it means recording chapter 7 again, whose takes
+   Stewart chose by ear. A draft line to follow `ch7-built`, if wanted: "Thirty-seven kilometres away, at Karahan
+   Tepe, the same people cut a room into the bedrock, with pillars rising from the floor and a head looking out of
+   the wall." (37 km is the straight line from Enclosure D to the AB pit, from the scans' coordinates; the
+   description is Karul 2021, `karul-2021`, unchecked.) Then the two cards as `karahan-site@Karahan` and
+   `karahan-ab@room`.
 
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
@@ -168,7 +194,14 @@ wrong), and the recarved today's Sphinx where it is ours rather than the scan.
 6. The green Sahara vegetation: Stewart would accept it as is if it had to stay; improve if time allows.
 7. The water at the temples in the green eras (`render/giza/water.py`, `LEVELS["flood"]`, -42.6 m, a look choice):
    it laps the Valley Temple's bare wall. Drop it below the temple platforms or give it a stone quay, and label it.
-8. The First Time temple blocks, the long-rains weathering, the tourist figures in today's panoramas.
+   **Done 25 October:** a quay (`render/giza/quay.py`, labelled a look choice there and in the render log): the
+   two temples stand on a paved terrace 7 m wide at their platform's level, its north, east and south edges laid
+   in the same megaliths 1.8 m down into the water, the bank off its east edge dug away so the edge stands in the
+   flood. The ground under it is cut below the paving and nothing grows on it. The long rains' plateau grass was
+   thinned at the same time (cover 0.85 to 0.75), so it stays barer than the First Time's after the wild-grass pass.
+8. The First Time temple blocks, the long-rains weathering, the tourist figures in today's panoramas. **Done 25 October**
+   (0e.2 and 0e.3): the First Time's walls laid as stepped megalithic work; the long rains' already read weathered; the
+   tourists closed.
 
 ## 2b. The critic on version 3 (`build/critic/ch0-2-v3-critique.md`, 22 October, trailer to chapter 2, 3:01)
 

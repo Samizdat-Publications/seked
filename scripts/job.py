@@ -168,7 +168,9 @@ def status(args):
         if not record:
             print(f"{name}: no record")
             continue
-        if record["exit"] is not None:
+        if "command" not in record:      # a render queue kept beside the jobs (build/jobs/q-*.json), not a job
+            continue
+        if record.get("exit") is not None:
             state = f"ended {record['ended']} with exit {record['exit']}"
         elif alive(record.get("runner_pid")):
             state = f"running since {record['started']}"
