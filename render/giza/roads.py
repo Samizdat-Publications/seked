@@ -24,6 +24,8 @@ WIDTH = {"trunk": 14.0, "trunk_link": 8.0, "primary": 12.0, "primary_link": 7.0,
          "tertiary": 7.0, "tertiary_link": 6.0, "unclassified": 6.0, "residential": 5.0, "service": 4.5, "pedestrian": 5.0,
          "construction": 6.0}
 LIFT = 0.18          # proud of the displaced ground patch near the camera, which rises to 0.17 m
+PARK_EDGE = 3.0      # m: a car park's triangles, draped point by point
+PARK_LIFT = 0.3      # a car park clear of the patch's ripples: at LIFT only its edges showed through them
 EARTH_RADIUS_MEAN = 6371008.8
 
 
@@ -112,26 +114,43 @@ def build(state, terrain, coll, log=print):
         d = np.gradient(line, axis=0)
         d /= np.linalg.norm(d, axis=1, keepdims=True) + 1e-9
         nrm = np.stack([-d[:, 1], d[:, 0]], 1)
-        z = terrain.surface(line[:, 0], line[:, 1])
-        rows = []
-        for i in range(len(line)):
-            row = []
-            for off, dz in ((-width / 2 - 0.4, -0.3), (-width / 2, LIFT), (width / 2, LIFT), (width / 2 + 0.4, -0.3)):
-                row.append(bm.verts.new((line[i, 0] + nrm[i, 0] * off, line[i, 1] + nrm[i, 1] * off, z[i] + dz)))
-            rows.append(row)
+        rows = [[] for _ in range(len(line))]
+        # each edge draped on the ground under it: one height at the centre line buried the upper side on a slope
+        for off, dz in ((-width / 2 - 0.4, -0.3), (-width / 2, LIFT), (width / 2, LIFT), (width / 2 + 0.4, -0.3)):
+            ex, ey = line[:, 0] + nrm[:, 0] * off, line[:, 1] + nrm[:, 1] * off
+            ez = terrain.surface(ex, ey)
+            for i in range(len(line)):
+                rows[i].append(bm.verts.new((float(ex[i]), float(ey[i]), float(ez[i]) + dz)))
         for i in range(len(line) - 1):
             for j in range(3):
                 bm.faces.new((rows[i][j], rows[i][j + 1], rows[i + 1][j + 1], rows[i + 1][j]))
         total += float(np.sum(np.linalg.norm(np.diff(line, axis=0), axis=1)))
+    # A car park as one flat polygon at its corners' heights sank under every rise of the ground between them, and
+    # showed as a stray grey shape in the sand (ch9-answer): each is cut into triangles under PARK_EDGE metres and
+    # every point draped on the ground.
     for ring in parks:
-        xs = np.array([p[0] for p in ring])
-        ys = np.array([p[1] for p in ring])
-        zs = terrain.surface(xs, ys)
-        vs = [bm.verts.new((x, y, float(zz) + LIFT)) for x, y, zz in zip(xs, ys, zs)]
+        pk = bmesh.new()
         try:
-            bm.faces.new(vs)
+            pk.faces.new([pk.verts.new((float(p[0]), float(p[1]), 0.0)) for p in ring])
         except ValueError:
-            pass
+            pk.free()
+            continue
+        bmesh.ops.triangulate(pk, faces=pk.faces[:])
+        for _ in range(10):
+            long = [e for e in pk.edges if e.calc_length() > PARK_EDGE]
+            if not long:
+                break
+            bmesh.ops.subdivide_edges(pk, edges=long, cuts=1, use_grid_fill=False)
+            bmesh.ops.triangulate(pk, faces=pk.faces[:])
+        co = np.array([v.co[:2] for v in pk.verts])
+        zs = terrain.surface(co[:, 0], co[:, 1])
+        new = {v: bm.verts.new((v.co.x, v.co.y, float(z) + PARK_LIFT)) for v, z in zip(pk.verts, zs)}
+        for f in pk.faces:
+            try:
+                bm.faces.new([new[v] for v in f.verts])
+            except ValueError:
+                pass
+        pk.free()
     me = bpy.data.meshes.new("roads")
     bm.to_mesh(me)
     bm.free()
