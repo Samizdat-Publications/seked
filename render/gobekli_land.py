@@ -151,7 +151,12 @@ def rocks(surface, outcrop_at, exclude, coll, centre, rng, near=(80.0, 60000), f
     `centre`, larger ones out to far[0]. `surface` gives the ground's height, `outcrop_at` the ledge mask there."""
     from giza.instancing import field
     mat = _material("limestone stones", (0.36, 0.33, 0.28, 1.0))
-    lib = variants("stone variants", 10, lambda k: _blob(f"stone {k}", 2, rng, rng.uniform(0.45, 0.8), 0.5), mat)
+    # faceted and broken, not smooth: rounded they read as eggs on a lawn (the critic, 25 October)
+    def stone(k):
+        me = _blob(f"stone {k}", 1, rng, rng.uniform(0.45, 0.8), 0.9)
+        me.shade_flat()
+        return me
+    lib = variants("stone variants", 10, stone, mat)
     pos, scl, rot = [], [], []
     for radius, count, size in ((near[0], near[1], (np.log(0.12), 0.7, 0.03, 0.9)),
                                 (far[0], far[1], (np.log(0.3), 0.5, 0.12, 1.0))):
@@ -213,15 +218,34 @@ def trees(surface, era, exclude, coll, centre, rng, z_site):
         size = rng.uniform(6.0, 9.0, len(p))
         slim = 0.55
     else:
-        mat = _material("oak and pistachio crowns", (0.06, 0.09, 0.035, 1.0), 0.95)
-        bark = _material("bark", (0.10, 0.08, 0.06, 1.0))
-        lib = variants("tree variants", 4, lambda k: _tree(f"tree {k}", rng, mat, bark, 0.0), None)
         x = centre[0] + rng.uniform(-900, 900, 20000)
         y = centre[1] + rng.uniform(-900, 900, 20000)
         keep = value_noise(x, y, 120.0, 51) > 0.55
         p = np.c_[x[keep], y[keep]][:1800]
         size = rng.uniform(4.0, 7.0, len(p))
         slim = 1.0
+        # The Giza scenes' broadleaf trees (render/giza/vegetation.py's library) where it is on disk: the procedural
+        # crowns read as lollipops on a lawn (the critic, 25 October). Oak and pistachio are what the pollen gives;
+        # these stand in for them, a look choice.
+        try:
+            from giza import vegetation
+            vcoll, heights = vegetation.library(coll, kinds=["broadleaf"])["broadleaf"]
+        except Exception as e:                       # no library: the procedural crowns
+            print(f"gobekli trees: no vegetation library ({e}); procedural crowns", flush=True)
+            vcoll = None
+        if vcoll is not None:
+            p = p[~exclude(p[:, 0], p[:, 1])]
+            size = size[:len(p)]
+            n = len(p)
+            var = rng.integers(0, len(heights), n)
+            s = size / np.array(heights)[var]
+            pos = np.c_[p, surface(p[:, 0], p[:, 1]) - 0.2]
+            scl = np.c_[s * rng.uniform(0.85, 1.2, n), s * rng.uniform(0.85, 1.2, n), s]
+            rot = np.c_[rng.normal(0, 0.03, n), rng.normal(0, 0.03, n), rng.uniform(0, 6.3, n)]
+            return field("trees", vcoll, pos, rot, scl, var, rng.random(n), np.zeros(n), coll)
+        mat = _material("oak and pistachio crowns", (0.06, 0.09, 0.035, 1.0), 0.95)
+        bark = _material("bark", (0.10, 0.08, 0.06, 1.0))
+        lib = variants("tree variants", 4, lambda k: _tree(f"tree {k}", rng, mat, bark, 0.0), None)
     p = p[~exclude(p[:, 0], p[:, 1])]
     size = size[:len(p)]
     n = len(p)
@@ -229,3 +253,36 @@ def trees(surface, era, exclude, coll, centre, rng, z_site):
     scl = np.c_[size * slim * rng.uniform(0.8, 1.1, n), size * slim * rng.uniform(0.8, 1.1, n), size]
     rot = np.c_[np.zeros(n), np.zeros(n), rng.uniform(0, 6.3, n)]
     return field("trees", lib, pos, rot, scl, rng.integers(0, 4, n), rng.random(n), np.zeros(n), coll)
+
+
+def grass(surface, exclude, coll, centre, rng, radius=160.0, count=420000):
+    """About 9500 BCE, tufts of the Giza scenes' grass (render/giza/vegetation.py's library) thick round the enclosure
+    and thinning out to `radius`: the painted ground alone read as a lawn close to the camera. A look choice."""
+    from giza.instancing import field
+    try:
+        from giza import vegetation
+        got = vegetation.library(coll, kinds=["grass", "tussock"])
+    except Exception as e:
+        print(f"gobekli grass: no vegetation library ({e})", flush=True)
+        return None
+    out = []
+    for kind, share, (h0, h1) in (("grass", 0.85, (0.25, 0.6)), ("tussock", 0.15, (0.35, 0.8))):
+        if kind not in got:
+            continue
+        vcoll, heights = got[kind]
+        m = int(count * share)
+        r = radius * np.sqrt(rng.random(m * 2)) ** 1.6          # thicker towards the middle
+        a = rng.uniform(0, 2 * np.pi, m * 2)
+        x, y = centre[0] + r * np.cos(a), centre[1] + r * np.sin(a)
+        # patchy, but never bare: the thin patches keep a third of the tufts
+        keep = (rng.random(len(x)) < 0.35 + 0.65 * smooth(0.25, 0.6, value_noise(x, y, 6.0, 71))) & ~exclude(x, y)
+        x, y = x[keep][:m], y[keep][:m]
+        n = len(x)
+        var = rng.integers(0, len(heights), n)
+        sz = rng.uniform(h0, h1, n) / np.array(heights)[var]
+        pos = np.c_[x, y, surface(x, y) - 0.02]
+        scl = np.c_[sz * rng.uniform(0.8, 1.3, n), sz * rng.uniform(0.8, 1.3, n), sz]
+        rot = np.c_[rng.normal(0, 0.12, n), rng.normal(0, 0.12, n), rng.uniform(0, 6.3, n)]
+        out.append(field(f"{kind} round the enclosure", vcoll, pos, rot, scl, var, rng.random(n),
+                         rng.uniform(0.15, 0.5, n), coll))
+    return out

@@ -708,6 +708,8 @@ def main():
     LAND.shrubs(surface, outcrop, covered, sc.collection, cs, rng, era)
     LAND.trees(surface, "today" if era == "today" else "9500", covered, sc.collection, cs, rng,
                float(surface(np.array([dx]), np.array([dy]))[0]))
+    if era != "today":
+        LAND.grass(surface, covered, sc.collection, (dx, dy), rng)
     if a.get("--roof", "off") == "on":
         sys.path.insert(0, os.path.join(REPO, "scripts"))
         from gobekli_register import outline
