@@ -908,6 +908,30 @@
    "stone_recolour": false
   },
   {
+   "id": "karahan-site-333ddd",
+   "sketchfab": "116f3fe9b4834f3c928ab3d258b0ca61",
+   "name": "Karahan Tepe",
+   "author": "333DDD",
+   "url": "https://sketchfab.com/3d-models/karahan-tepe-116f3fe9b4834f3c928ab3d258b0ca61",
+   "license": "CC BY 4.0",
+   "attribution": "\"Karahan Tepe\" by 333DDD (https://sketchfab.com/333DDD-oficial), CC BY 4.0: a scan of the excavated site reconstructed from 4K drone footage, marked experimental by its author.",
+   "replaces": [],
+   "faces": 417071,
+   "why": "Karahan Tepe today for a chapter 7 card (fetched 25 October 2026 for Stewart to decide on; the narration does not name the site yet). A visual stand-in from drone video: nothing of its form is a measurement."
+  },
+  {
+   "id": "karahan-ab-pit-megalithomania",
+   "sketchfab": "7c9456ee20de491bb9ff0038e87f7f2d",
+   "name": "Karahan Tepe AB Pit",
+   "author": "Megalithomania",
+   "url": "https://sketchfab.com/3d-models/karahan-tepe-ab-pit-7c9456ee20de491bb9ff0038e87f7f2d",
+   "license": "CC BY-NC-SA 4.0",
+   "attribution": "\"Karahan Tepe AB Pit\" by Megalithomania (https://sketchfab.com/megalithomania1), CC BY-NC-SA 4.0: a photogrammetry scan of Structure AB, the room cut into the bedrock with its pillars and the carved head.",
+   "replaces": [],
+   "faces": 317504,
+   "why": "Karahan Tepe's pillar room for a chapter 7 card (fetched 25 October 2026 for Stewart to decide on). Share-alike: a render of it we publish carries the same licence. A visual stand-in: nothing of its form is a measurement."
+  },
+  {
    "id": "gobekli-site-rmark",
    "sketchfab": "5a4d25c355ff48d59ab76c36812b9cf3",
    "name": "Gobekli Tepe",
