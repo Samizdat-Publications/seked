@@ -146,8 +146,11 @@ def build(state, rng, terrain, coll, mats, lib, log=print):
             log(f"{t['id']}: {laid} megalithic blocks ({mode})")
         elif mode in ("ruin", "buried"):
             lo, hi = HEIGHT_TODAY[t["id"]]
-            laid = lay_ring(ring, base, HEIGHT_BUILT * hi, rng, core_blocks, course=1.15, length=2.4, depth=2.0,
-                            ruin=(lo / hi, 1.0), miss=0.05, seed=rng.random() * 100, openings=doors)
+            # the core blocks run from about one metre high to three and their lengths as much; laid alike they
+            # read as "uniformly tiled modular blocks" (the critic, 24 October), so courses and lengths vary
+            laid = lay_ring(ring, base, HEIGHT_BUILT * hi, rng, core_blocks, course=1.4, length=3.0, depth=2.2,
+                            ruin=(lo / hi, 1.0), miss=0.05, seed=rng.random() * 100, openings=doors,
+                            course_spread=0.38, length_spread=0.6)
             _slab(inset_ring(ring, 1.8), base - 0.3, base + HEIGHT_BUILT * lo * 0.8, coll, t["id"] + " core", mats["core behind"])
             log(f"{t['id']}: {laid} blocks, ruined to {lo * HEIGHT_BUILT:.1f}-{hi * HEIGHT_BUILT:.1f} m")
         else:

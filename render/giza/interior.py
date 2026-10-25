@@ -58,13 +58,16 @@ def floor_z(r, y):
 
 
 def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, joint=0.35, speckle=None, mortar=0.004,
-            quartz="7f7a75"):
+            quartz="7f7a75", weather=0.0):
     """
     Fine stone laid in courses, the joints drawn as hairlines. `frame(t, geo)` returns the
     (along, up, height-above-floor) sockets the courses are laid in, so the same material
     serves the sloping gallery and the level chamber. Soot darkens it towards the roof.
     With `speckle` (the mica's colour) it is granite, its crystals feldspar in the two
-    `colours`, `quartz` and mica.
+    `colours`, `quartz` and mica. `weather` (0 to 1) ages it as stone open to the sky for
+    millennia: blocks of differing lengths row to row, each face a little proud or sunk,
+    chipped and irregular joints, dark streaks run down from the top, a dusty foot, the polish
+    patchy (24 October, after the critic's "CAD boxes" for the valley temple's hall today).
     """
     mat = bpy.data.materials.new(name)
     t = Tree(mat)
@@ -86,6 +89,9 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
     br.inputs["Row Height"].default_value = course
     br.inputs["Color1"].default_value = (0.0, 0.0, 0.0, 1.0)
     br.inputs["Color2"].default_value = (1.0, 1.0, 1.0, 1.0)
+    if weather:
+        br.squash = 0.72             # every third course's blocks shorter: not one block size throughout
+        br.squash_frequency = 3
     t.link(uv.outputs[0], br.inputs["Vector"])
     tone = t.node("ShaderNodeRGBToBW")
     t.link(br.outputs["Color"], tone.inputs[0])
@@ -138,9 +144,45 @@ def masonry(name, colours, rough, course, width, frame, soot=0.0, height=6.0, jo
             foot = t.math("MULTIPLY", t.math("SUBTRACT", 1.0, t.band(up, 0.02, 0.35)), t.band(t.noise(geo.outputs["Position"], 3.0, 3.0), 0.3, 0.65))
             wear = t.math("ADD", t.math("MULTIPLY", hands, 0.6 * soot), t.math("MULTIPLY", foot, 0.45 * soot), clamp=True)
             col = t.mix(wear, col, hexlin("241c18"))
+    chips = None
+    if weather:
+        pos = geo.outputs["Position"]
+        # streaks: noise stretched downwards, so stains run down the face from the top
+        stretch = t.node("ShaderNodeVectorMath", operation="MULTIPLY")
+        t.link(pos, stretch.inputs[0])
+        stretch.inputs[1].default_value = (1.0, 1.0, 0.12)
+        streak = t.band(t.noise(stretch.outputs[0], 3.0, 4.0), 0.45, 0.8)
+        col = t.mix(1.0, col, t.grey(t.math("SUBTRACT", 1.0, t.math("MULTIPLY", streak, 0.3 * weather))), "MULTIPLY")
+        # the foot: darker and dusted with the sand that drifts against it
+        foot = t.math("SUBTRACT", 1.0, t.band(up, 0.0, 1.4))
+        col = t.mix(t.math("MULTIPLY", foot, 0.55 * weather), col, hexlin("8a7558"))
+        # chips along the arrises: a wider, broken joint where the noise eats into the edges
+        wide = t.node("ShaderNodeTexBrick")
+        for k in ("offset", "offset_frequency", "squash", "squash_frequency"):
+            setattr(wide, k, getattr(br, k))
+        for k in ("Scale", "Brick Width", "Row Height", "Mortar Smooth"):
+            wide.inputs[k].default_value = br.inputs[k].default_value
+        wide.inputs["Mortar Size"].default_value = 0.05
+        t.link(uv.outputs[0], wide.inputs["Vector"])
+        chips = t.math("MULTIPLY", wide.outputs["Fac"], t.band(t.noise(pos, 4.0, 5.0), 0.5, 0.62))
+        col = t.mix(t.math("MULTIPLY", chips, 0.85 * weather), col, hexlin("2a211c"))
     col = t.mix(t.math("MULTIPLY", br.outputs["Fac"], joint), col, hexlin("3a322a"))
     t.link(col, bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = rough
+    if weather:
+        # each block's face a little proud or sunk (its own random tone), the joints and chips cut back
+        relief = t.math("SUBTRACT", t.math("MULTIPLY", tone.outputs[0], 0.6), t.math("ADD", br.outputs["Fac"], chips))
+        if bump_h is not None:
+            relief = t.math("ADD", relief, t.math("MULTIPLY", bump_h, 0.05))
+        bump = t.node("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = 0.5
+        bump.inputs["Distance"].default_value = 0.02
+        t.link(relief, bump.inputs["Height"])
+        t.link(bump.outputs["Normal"], bsdf.inputs["Normal"])
+        # the polish worn off in patches
+        rgh = t.math("ADD", rough * 0.8, t.math("MULTIPLY", t.band(t.noise(geo.outputs["Position"], 1.2, 3.0), 0.4, 0.7), 0.35 * weather))
+        t.link(rgh, bsdf.inputs["Roughness"])
+        bump_h = None
     if bump_h is not None:
         bsdf.inputs["Roughness"].default_value = rough * 0.75
         bump = t.node("ShaderNodeBump")

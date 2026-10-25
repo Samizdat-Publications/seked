@@ -149,7 +149,7 @@ def build(state, coll, mats, log=print):
     p = plan()
     fz, t_ceil, l_ceil = p["floor"], p["floor"] + p["ceiling_t"], p["floor"] + p["ceiling_l"]
     granite = masonry("hall granite", ("6b4c44", "82605a"), 0.3, 1.18, 2.6, room_frame(fz), joint=0.7,
-                      speckle="1c1715", mortar=0.006, quartz="8e8984")
+                      speckle="1c1715", mortar=0.006, quartz="8e8984", weather=0.0 if built else 1.0)
     made = []
     x_lw, x_w, x_e, y_s, y_n, y_ls, y_ln = (p[k] for k in ("x_lw", "x_w", "x_e", "y_s", "y_n", "y_ls", "y_ln"))
     x_end = x_e + PASSAGE
