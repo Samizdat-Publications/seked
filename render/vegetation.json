@@ -3,7 +3,7 @@
   "library": {
     "file": "build/vegetation/plants.blend",
     "made_by": "render/giza/vegetation.py prepare()",
-    "prepared_in_s": 73
+    "prepared_in_s": 39
   },
   "assets": [
     {
@@ -310,7 +310,7 @@
       "id": "lush-grass",
       "name": "Lush grass tuft",
       "made": "generated: vegetation.grass_tuft()",
-      "source": "Generated here: 50 to 70 wider blade strips, few dead; four short, four medium and two tall with seed stalks, as the grass tuft's set is, in a saturated green varied blade by blade (veg lush grass).",
+      "source": "Generated here: 50 to 70 wider blade strips, about a fifth of them dead; four short, four medium and two tall with seed stalks, as the grass tuft's set is, in an olive to yellow green varied blade by blade (veg lush grass).",
       "author": "this project",
       "license": "the project's own",
       "height_range_m": [0.25, 1.3],

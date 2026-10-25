@@ -154,10 +154,10 @@ STATES = {
     # forest stands to the pyramids' pavement (the kinds' small margins); every view of the
     # pyramids from a station or shot is kept open through it (VIEWS_OPEN).
     "first-time": dict(
-        cover=dict(plateau=1.0, lowland=1.0, bare=0.04, wavelength=60.0),
-        tint=dict(grass=("4b6327", "637733"), strength=0.9, soil=("4a3a27", "5d4a32"), mottle=(0.06, 0.5),
+        cover=dict(plateau=1.0, lowland=1.0, bare=0.15, wavelength=60.0),
+        tint=dict(grass=("55622e", "6d7439"), strength=0.35, soil=("5a4630", "6e573a"), mottle=(0.06, 0.5),
                   far=("2c4220", 3200.0, 5200.0)),
-        near=dict(kind="lush-grass", per_m2=24.0, falloff=36.0, dry=(0.0, 0.1)),
+        near=dict(kind="lush-grass", per_m2=14.0, falloff=36.0, dry=(0.1, 0.4), clump=(4.0, 0.7)),
         wear=(0.0, 0.12),
         fade=True,
         plants=[
@@ -224,7 +224,7 @@ STATES = {
     "lion": dict(
         cover=dict(plateau=0.85, lowland=0.95, bare=0.18, wavelength=55.0),
         tint=dict(grass=("56703a", "6c8246"), strength=0.85, soil=("7d6d52", "8e7d60"), mottle=(0.06, 0.35)),
-        near=dict(per_m2=14.0, falloff=30.0, dry=(0.05, 0.4)),
+        near=dict(per_m2=14.0, falloff=30.0, dry=(0.05, 0.4), clump=(3.5, 0.6)),
         plants=[
             dict(kind="fig", zone="plateau", per_ha=7.0, height=(12.0, 20.0), clump=WOODS, patch=(80.0, 0.6), far=True),
             dict(kind="broadleaf", zone="plateau", per_ha=11.0, height=(6.0, 12.0), clump=WOODS, far=True),
@@ -1167,6 +1167,13 @@ def near_plan(state, grid, camera_xy, grass_heights, seed=0):
     r = np.hypot(X - cx, Y - cy)
     d = N["per_m2"] * np.exp(-r / N["falloff"]) * smoothstep(NEAR_RADIUS, 0.6 * NEAR_RADIUS, r)
     d = d * grid.at(grid.cover, X, Y) * grid.inside(X, Y)
+    if N.get("clump"):
+        # in clumps a few metres across with bare soil between, as wild grass grows: `share` of the ground grows,
+        # at the density that keeps the era's average (24 October; a look choice)
+        w, share = N["clump"]
+        f = 0.5 + _noise(61, 2400.0).fbm(X, Y, w, 3, key=7)
+        t = float(np.quantile(f, 1.0 - share))
+        d = d * smoothstep(t - 0.05, t + 0.05, f) / share
     n = rng.poisson(d)
     j, i = np.nonzero(n)
     k = n[j, i]
@@ -2639,7 +2646,9 @@ def _materials():
         "twig": _plain_material("veg twig", ("4f4236", "625244", "574a3e")),
         "doum bark": _doum_bark(),
         # the First Time's forest
-        "lush grass": _grass_material("veg lush grass", ("3d6b20", "4f7f28", "679334"), ("93864f", "aa9b62", "857548"), per_blade=True),
+        # olive to yellow-green, not a lawn's saturated green (24 October: every critic review called the First
+        # Time's grass "golf-course turf")
+        "lush grass": _grass_material("veg lush grass", ("4d6326", "62722f", "7e7f3c"), ("93864f", "aa9b62", "857548"), per_blade=True),
         "cane": _foliage_material("veg cane", ("5c7d30", "6b8a38"), ("8a7c52", "a0906a"), rough=0.45, translucent=0.1),
         "lush grass leaf": _foliage_material("veg lush grass leaf", ("3f6f22", "4f8029", "639236"), ("a0905e", "b7a574"),
                                              rough=0.5, translucent=0.32, tips="8fa54a"),
@@ -3061,9 +3070,10 @@ def _forest(sets, M, templates, log=print):
     sets["aroid"] = [aroid(340 + i, n, h).mesh(f"aroid {i}", [M["aroid stem"], M["aroid leaf"]]) for i, (n, h) in enumerate(((5, 1.2), (7, 1.5), (9, 1.8)))]
     sets["lily"] = [lily(350 + i, n, s, f, blue).mesh(f"lily {i}", [M["lily pad"], M["lily petal"], M["lily stamen"]])
                     for i, (n, s, f, blue) in enumerate(((10, 0.6, 1, False), (14, 0.8, 2, True), (18, 1.0, 3, False)))]
-    g = [grass_tuft(360 + i, 50, 0.32 + 0.02 * i, 0.07, 0.3, 0.5, dead=0.03, width=(0.006, 0.012)) for i in range(4)]
-    g += [grass_tuft(370 + i, 70, 0.58 + 0.04 * i, 0.09, 0.28, 0.7, dead=0.04, width=(0.007, 0.014)) for i in range(4)]
-    g += [grass_tuft(380 + i, 60, 0.85 + 0.1 * i, 0.1, 0.28, 0.85, stalks=6, dead=0.05, width=(0.008, 0.015)) for i in range(2)]
+    # about a fifth of each tuft's blades dead and straw-coloured, as wild grass is, not a lawn's few
+    g = [grass_tuft(360 + i, 50, 0.32 + 0.02 * i, 0.07, 0.3, 0.5, dead=0.18, width=(0.006, 0.012)) for i in range(4)]
+    g += [grass_tuft(370 + i, 70, 0.58 + 0.04 * i, 0.09, 0.28, 0.7, dead=0.2, width=(0.007, 0.014)) for i in range(4)]
+    g += [grass_tuft(380 + i, 60, 0.85 + 0.1 * i, 0.1, 0.28, 0.85, stalks=6, dead=0.24, width=(0.008, 0.015)) for i in range(2)]
     sets["lush-grass"] = [x.mesh(f"lush grass {i}", [M["lush grass"]]) for i, x in enumerate(g)]
     sets["lush-tussock"] = [grass_tuft(390 + i, 220 + 20 * i, 0.72 + 0.08 * i, 0.3 + 0.04 * i, 0.4, 1.0, stalks=i % 2, dead=0.05,
                                        width=(0.007, 0.015)).mesh(f"lush tussock {i}", [M["lush grass"]]) for i in range(4)]
