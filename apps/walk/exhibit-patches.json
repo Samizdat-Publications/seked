@@ -38,38 +38,11 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-height.jpg",
-   "pano": "pano/menkaure-today.jpg",
-   "leaf": "ch8-height",
-   "yaw": 8,
-   "pitch": 8,
-   "fov": 67.6,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-rooms.jpg",
-   "pano": "pano/menkaure-today.jpg",
-   "leaf": "ch8-rooms",
-   "yaw": 8,
-   "pitch": 0,
-   "fov": 52.0,
-   "aspect": 1.777778
-  },
-  {
    "src": "pano/patch/menkaure-today-winter-afternoon-ch8-surface.jpg",
    "pano": "pano/menkaure-today.jpg",
    "leaf": "ch8-surface",
    "yaw": 8,
    "pitch": 10,
-   "fov": 78.0,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/menkaure-today-winter-afternoon-ch8-wells.jpg",
-   "pano": "pano/menkaure-today.jpg",
-   "leaf": "ch8-wells",
-   "yaw": 8,
-   "pitch": -14,
    "fov": 78.0,
    "aspect": 1.777778
   },

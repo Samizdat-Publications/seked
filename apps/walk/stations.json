@@ -943,15 +943,6 @@
       "fov": 26.88,
       "aspect": 2.0
      }
-    ],
-    "today": [
-     {
-      "src": "pano/patch/panorama-today-intro.jpg",
-      "yaw": 18.6,
-      "pitch": 1,
-      "fov": 26.88,
-      "aspect": 2.0
-     }
     ]
    }
   },
