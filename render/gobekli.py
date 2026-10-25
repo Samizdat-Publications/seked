@@ -764,6 +764,12 @@ def main():
             "p43": (Vector((dx + e43[0], dy + e43[1], fd + 1.7)),
                     Vector((dx + p43["x"], dy + p43["y"], fd + 1.9)), 32),
         })
+        # Pillar 20's carved narrow end, from in the ring in front of it
+        p20 = built["pillars"]["20"]
+        in20 = np.array(built["centre"]) - (p20["x"], p20["y"])
+        in20 /= np.linalg.norm(in20)
+        e20 = np.array((p20["x"], p20["y"])) + 3.4 * in20
+        views["p20"] = (Vector((dx + e20[0], dy + e20[1], fd + 1.5)), Vector((dx + p20["x"], dy + p20["y"], fd + 1.7)), 30)
         p33 = built["pillars"]["33"]
         n33 = p33["face"]
         views["p33"] = (Vector((dx + p33["x"] + 4.6 * n33[0], dy + p33["y"] + 4.6 * n33[1], fd + 1.7)),

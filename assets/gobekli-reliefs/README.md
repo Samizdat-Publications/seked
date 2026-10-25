@@ -14,6 +14,7 @@ by hand, as described below.
 | Pillar 31 (central pair, west), a broad side of the shaft | `source/p18-side.png`, fox erased | `cleaned/p31-side.png` | the same arm and belt as Pillar 18's, and no fox, as photographs of its replica show; made from Pillar 18's map with the fox taken out |
 | Pillar 31, the narrow front of the shaft | `source/p31-front.png` | `cleaned/p31-front.png` | the stola's two bands, the hands meeting, the belt's U buckle, the hanging pelt (the bull's skull on its neck is above the photograph's frame and is not in the map) |
 | Pillar 33, carved broad face | `source/p33-broad.png` | `cleaned/p33-broad.png` | the excavators' numbered drawing: cranes, snakes, a fox and other animals packed over the head and shaft; the T outline as drawn |
+| Pillar 20, narrow front | `source/p20-front-depth.png` (from `source/p20-front-photo.png`) | `cleaned/p20-front.png` | the aurochs and the snake running down beside it; a depth map of the DAI's photograph, its flat face read at grey 0.62 |
 | Pillar 27 (Enclosure C, not D), broad face | `source/p27-broad-depth.png` | `cleaned/p27-broad.png` | the predator carved almost in the round, head down, and the wild boar in low relief below it; a depth map of a photograph, not a redrawing (see below) |
 
 ## How to read them
@@ -76,6 +77,9 @@ closely, and those people are owed the credit:
   (https://www.dainst.blog/the-tepe-telegrams/2016/10/14/of-animals-and-a-headless-man-gobekli-tepe-pillar-43/).
 - **Pillar 18**: the DAI's 3D-scan renders (Hochschule Karlsruhe, © DAI, on the Tepe Telegrams blog) and
   photographs of the pillar at night.
+- **Pillar 20**: the DAI's photograph of its front (N. Becker, © DAI), in Oliver Dietrich's "Why did it have to be
+  snakes?" (The Tepe Telegrams, 23 April 2016), read through the Wayback Machine
+  (https://web.archive.org/web/20250910152729/https://www.dainst.blog/the-tepe-telegrams/2016/04/23/why-did-it-have-to-be-snakes/).
 - **Pillar 31**: photographs of the full-size replica of Enclosure D in the Şanlıurfa Archaeology Museum by
   Dosseman on Wikimedia Commons (CC BY-SA 4.0), "Urfa museum Gobeklitepe Temple D replica sept 2019 4824" and
   "Urfa museum Gobeklitepe Temple D replica 4831".

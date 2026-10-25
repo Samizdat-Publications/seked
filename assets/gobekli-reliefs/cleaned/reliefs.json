@@ -126,6 +126,22 @@
    ],
    "stroke": 0.3,
    "bevel_px": 1.6
+  },
+  "p20-front": {
+   "src": "p20-front-depth.png",
+   "crop": [
+    330,
+    570,
+    1040,
+    2752
+   ],
+   "surface": 0.62,
+   "shape": [
+    1091,
+    355
+   ],
+   "stroke": 0.3,
+   "bevel_px": 1.6
   }
  }
 }

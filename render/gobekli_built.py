@@ -37,6 +37,9 @@ ALONG_WALL = {"33"}
 # scorpion stand clear of the wall in photographs, only "some more reliefs to the left" hidden: set forward along its
 # axis to leave this fraction of its length in the wall (look choice)
 SET_IN = {"43": 0.2}
+# Pillar 20's carved narrow face is about a third as wide as its shaft is tall in the DAI's photograph; at the stand-in's
+# 0.35 m the aurochs is squeezed to half its width, so this one is drawn thicker (look choice)
+THICKNESS = {"20": 0.6}
 RELIEF = 0.04            # m: the carving's greatest raise (Göbekli's reliefs are mostly low, a few centimetres)
 GRID = 0.01              # m: the carved sheet's spacing
 # what is carved where: `broad` one broad face (`facing` "inner": the one towards the ring's middle; "west": the one
@@ -48,6 +51,8 @@ CARVED = {
     "18": [dict(relief="p18-side", face="sides", right="front"), dict(relief="p18-front", face="front")],
     "31": [dict(relief="p31-side", face="sides", right="front"), dict(relief="p31-front", face="front")],
     "33": [dict(relief="p33-broad", face="broad", facing="inner", outline=True)],
+    # the narrow end facing into the ring, as the DAI's photograph of it between the wall's stretches shows
+    "20": [dict(relief="p20-front", face="front", inner=True)],
 }
 
 
@@ -63,6 +68,7 @@ def pillars():
     inner = np.array(E.wall()["inner"])
     mid = inner.mean(axis=0)
     for p in out:
+        p["thickness"] = THICKNESS.get(p["number"], p["thickness"])
         if p["number"] in SET_IN:
             c = np.array([p["x"], p["y"]])
             f = unit(p["bearing"])
@@ -190,10 +196,10 @@ def build(coll, mats, ring_centre):
                     corner = c - ru * span / 2 + nn * T / 2
                     sheet(f"pillar {p['number']}: {k['relief']}", h, corner, ru, span, z0, z1, nn, keep,
                           mats["stone"], coll, spec.get("raise_m", RELIEF))
-            else:   # the narrow front of the shaft, below the head
-                nn = f
+            else:   # the narrow front of the shaft, below the head (`inner`: the end facing into the ring)
+                nn = -f if k.get("inner") and np.dot(f, ring_centre - c) < 0 else f
                 ru = np.array([-nn[1], nn[0]])
-                corner = c + f * W * E.LOOK["shaft"] / 2 - ru * T / 2
+                corner = c + nn * W * E.LOOK["shaft"] / 2 - ru * T / 2
                 sheet(f"pillar {p['number']}: {k['relief']}", h, corner, ru, T, split, base, nn,
                       lambda u, v: np.ones(np.shape(u), dtype=bool), mats["stone"], coll)
         made[p["number"]] = dict(x=p["x"], y=p["y"], carved=[k["relief"] for k in carves],

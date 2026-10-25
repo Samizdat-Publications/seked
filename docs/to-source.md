@@ -6,7 +6,7 @@ recorded where it is used, and moved to **Done** here with the date.
 
 ## Open
 
-### Göbekli Tepe, Enclosure D: Pillars 20, 30 and 38 (added 23 October 2026)
+### Göbekli Tepe, Enclosure D: Pillars 30 and 38 (added 23 October 2026; Pillar 20 done 25 October)
 
 - **For**: their relief height maps in `assets/gobekli-reliefs/` and carving them in the 9500 BCE ring
   (`render/gobekli_built.py`).
@@ -18,13 +18,12 @@ recorded where it is used, and moved to **Done** here with the date.
   describes Pillar 20; post https://www.dainst.blog/the-tepe-telegrams/?p=2654. The definitive source is Dietrich and
   Schmidt, *Göbekli Tepe: The Imagery of the Pillars in the Monumental Buildings A–D, F and H* (Archaeologica
   Euphratica), which has drawings of every pillar.
-- **Found, Pillar 20 (23 October 2026)**: the DAI's labelled photograph of its front, the aurochs and the snake
-  (N. Becker, DAI; in "Why did it have to be snakes?", The Tepe Telegrams, 23 April 2016), read through the Wayback
-  Machine and saved as `build/gobekli/references/dai-wayback/p20-front-becker-dai.jpg` (3060 by 4134). The relief is
-  on the pillar's narrow front, between the wall's stretches. Still to make: its height map and its carving.
 - **Why waiting** (Pillars 30 and 38): the DAI's website is down (23 October 2026); its archived pages load through the
-  Wayback Machine (https://web.archive.org/web/2025/https://www.dainst.blog/the-tepe-telegrams/...), which is the next
-  place to look. Two unnumbered candidates are in the Commons replica
+  Wayback Machine. Searched 25 October: no archived post or photograph names either pillar (post `?p=2654` was never
+  archived). One lead: the slide "The pillars of Enclosure D" (O. Dietrich, 10th ICAANE, Vienna; © DAI) in the archived
+  "Emblematic signs?" post, saved as `build/gobekli/references/dai-wayback/anlage-d.jpg`, shows every Enclosure D
+  pillar round a photograph of the ring, but unlabelled and small: matching its photographs to numbers would be a guess.
+  The definitive source is still Dietrich and Schmidt's catalogue of the pillars' imagery. Two unnumbered candidates are in the Commons replica
   photographs (`build/gobekli/commons-d/`): a pillar with a large crane-like bird on its broad side, and one with a
   bundle of snakes under a U-shaped sign on its front.
 
@@ -57,6 +56,10 @@ recorded where it is used, and moved to **Done** here with the date.
 
 ## Done
 
+- **Göbekli Tepe, Pillar 20** (25 October 2026): the DAI's labelled photograph of its front, the aurochs and the snake
+  (N. Becker, DAI; "Why did it have to be snakes?", The Tepe Telegrams, 23 April 2016, through the Wayback Machine).
+  Made into a height map and carved on the pillar's inner narrow face in the 9500 BCE ring (`render/gobekli_built.py`);
+  credited in `assets/gobekli-reliefs/README.md`.
 - **Which way Pillar 43's carved face faces** (23 October 2026): the DAI's post on Pillar 43, read through the
   Wayback Machine, puts the relief on the western broad side with its left end hidden by the perimeter wall: a radial
   pillar, face to the west. Applied in `render/gobekli_built.py`; see `docs/gobekli-reliefs.md`.

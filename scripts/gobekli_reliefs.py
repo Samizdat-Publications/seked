@@ -33,6 +33,8 @@ OUT = os.path.join(HOME, "cleaned")
 # name: source, crop box in source pixels (x0, y0, x1, y1), and what the drawing shows of the stone's shape: `step`
 # the share of the height down to where its broad top ends, `shaft` its shaft's span across the width (0 to 1, from
 # the crop's left), `margins` "white" where the face is drawn inside white margins. Read off the sources by eye.
+# Pillar 20's map gives the flat face of the shaft this grey, not the usual mid grey (read off it: its commonest value)
+SURFACE_P20 = 0.62
 SOURCES = {
     # the Vulture Stone's broad face: the step down to the shaft on the right at 61 per cent, the shaft below it
     # spanning the left 77 per cent (its lower left corner is the excavators' dashed, unexcavated part)
@@ -56,6 +58,10 @@ SOURCES = {
     # as a depth map of a photograph (Commons, CC BY-SA 4.0) rather than a redrawing, which tidied both into
     # naturalistic animals; its tilted face is fitted and taken off. Its greatest raise is about 25 cm, not 4
     "p27-broad": dict(src="p27-broad-depth.png", crop=(250, 0, 1180, 2450), mode="depth", raise_m=0.25),
+    # Pillar 20's narrow front, between the wall's stretches: the aurochs and the snake running down beside it, as a
+    # depth map of the DAI's photograph (N. Becker, DAI, via the Tepe Telegrams in the Wayback Machine), padded to the
+    # image model's frame; the crop is the shaft below the head block, to the photograph's foot
+    "p20-front": dict(src="p20-front-depth.png", crop=(330, 570, 1040, 2752), surface=SURFACE_P20),
 }
 STROKE = 0.30        # darker than this is a drawn stroke, not the stone
 BEVEL = 1.6          # px: the blur that rounds the cut edges
@@ -88,9 +94,9 @@ def depth(v):
     return nd.gaussian_filter(h / np.percentile(h, 99.7), 1.0)
 
 
-def heights(v, stone):
+def heights(v, stone, surface=0.5):
     stroke = (v < STROKE) & stone
-    raise_ = np.clip((v - 0.5) / 0.5, 0.0, 1.0)
+    raise_ = np.clip((v - surface) / (1.0 - surface), 0.0, 1.0)
     # every stroke pixel takes its nearest clean neighbour's raise, then is cut half of it down
     _, (iy, ix) = nd.distance_transform_edt(stroke, return_indices=True)
     near = raise_[iy, ix]
@@ -110,7 +116,7 @@ def main():
             v[ey0:ey1, ex0:ex1] = np.median(ring)   # back to the stone's surface round it
         v = v[y0:y1, x0:x1]
         stone = margins(v) if spec.get("margins") == "white" else np.ones(v.shape, dtype=bool)
-        h = (depth(v) if spec.get("mode") == "depth" else heights(v, stone))[::2, ::2]
+        h = (depth(v) if spec.get("mode") == "depth" else heights(v, stone, spec.get("surface", 0.5)))[::2, ::2]
         Image.fromarray((np.clip(h, 0, 1) * 65535).astype(np.uint16)).save(os.path.join(OUT, name + ".png"))
         report[name] = dict(spec, shape=list(h.shape), stroke=STROKE, bevel_px=BEVEL)
         print(name, h.shape)
