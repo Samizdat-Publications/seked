@@ -1,7 +1,8 @@
 """
 The Labyrinth at Hawara as one reconstruction draws it: the plan on the cover of the Mataha Expedition's report
-(Hawara 2008, version VII, 08.2010), an older reconstruction from Herodotus whose original is not yet traced: not
-Kircher's Turris Babel plate (1679, p. 78), which is a different design (docs/to-source.md). bpy-free.
+(Hawara 2008, version VII, 08.2010), which is Luigi Canina's restored plan from Herodotus (L'architettura antica,
+Sezione I, Architettura egiziana, Rome 1839-44, Tav. CXXII), most likely by way of W. H. Matthews's redrawing (Mazes
+and Labyrinths, 1922, fig. 3), whose chapels are black as the cover's are (docs/to-source.md). bpy-free.
 
 Nobody has found the Labyrinth. Herodotus (II.148) describes twelve roofed courts with their doors facing one
 another, six to the north and six to the south, 3,000 rooms, half of them underground, all inside one wall; Petrie

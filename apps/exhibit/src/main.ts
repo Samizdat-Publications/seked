@@ -255,8 +255,8 @@ function hawaraLabyrinthFigure(lower: boolean): string {
       organiser gives for walls it reports and has not published. The pit is a device to show them.</figcaption>`
     : `${tier}<img class="wide" src="objects/hawara-labyrinth.jpg" alt="A reconstruction of the Labyrinth at Hawara from the air: twelve courts of rooms and columns inside a maze-walled enclosure, the pyramid beyond">
       <figcaption>A reconstruction, not a find: Herodotus's twelve courts, six either side of an avenue, inside one wall
-      with a maze-like corridor, drawn after the plan on the 2008 expedition's report (an older reconstruction whose author
-      we have not yet traced) and laid on the footprint Petrie measured, 1000 by 800 feet of quarried chips south of
+      with a maze-like corridor, drawn after Luigi Canina's restored plan of 1839-44, the plan on the 2008 expedition's
+      report, and laid on the footprint Petrie measured, 1000 by 800 feet of quarried chips south of
       Amenemhat III's pyramid. Heights are our choice; the roofs, which Herodotus says were stone, are left off so the
       plan shows.</figcaption>`;
 }

@@ -299,7 +299,7 @@ def main():
             print("wrote", sc.render.filepath, flush=True)
         built = dict(courts=len(P["courts"]), rooms=sum(c["rooms"] for c in P["courts"]), columns=len(P["columns"]))
     json.dump(dict(built=built, look=LB.LOOK, sun=SUN, tier="legendary", stand_in=True,
-                   note="A reconstruction after the Mataha report's cover plan (its original not yet traced), stretched "
+                   note="A reconstruction after Luigi Canina's restored plan (L'architettura antica, 1839-44, Tav. CXXII), as on the Mataha report's cover, stretched "
                         "onto Petrie's chip bed. Nobody has found the Labyrinth; nothing of its form is a measurement."),
               open(os.path.join(out, "labyrinth.json"), "w"), indent=1)
 

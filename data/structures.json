@@ -232,7 +232,7 @@
     "name": "The Labyrinth as built (a reconstruction)",
     "evidence": "legendary",
     "source": "herodotus-2-148",
-    "note": "Herodotus's twelve roofed courts, six facing north and six south, inside one wall, drawn after the plan on the cover of the Mataha Expedition's report (2010), an older reconstruction whose original is not yet traced (not Kircher's Turris Babel plate), stretched onto Petrie's chip bed (render/giza/labyrinth.py). Nothing of its form has been found."
+    "note": "Herodotus's twelve roofed courts, six facing north and six south, inside one wall, drawn after Luigi Canina's restored plan (L'architettura antica, Sezione I, Rome 1839-44, Tav. CXXII), the plan on the cover of the Mataha Expedition's report (2010), stretched onto Petrie's chip bed (render/giza/labyrinth.py). Nothing of its form has been found."
   },
   {
     "id": "giza.groundwater",

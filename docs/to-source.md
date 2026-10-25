@@ -40,7 +40,7 @@ recorded where it is used, and moved to **Done** here with the date.
 - **Need**: the scan (Hochschule Karlsruhe for the DAI); only renders of it are published.
 - **Where**: a request to the DAI (Göbekli Tepe Research Project). Stewart's to send.
 
-### Hawara: the Labyrinth plan's origin (added 23 October 2026)
+### Hawara: the Labyrinth plan's origin (added 23 October 2026; found 25 October, see Done)
 
 - **For**: crediting the reconstruction the Labyrinth model follows (`render/giza/labyrinth.py`).
 - **Need**: the original of the plan on the Mataha report's cover (Hawara 2008, version VII 08.2010): a square
@@ -55,6 +55,15 @@ recorded where it is used, and moved to **Done** here with the date.
   ask Louis De Cordier which source the cover used.
 
 ## Done
+
+- **The Labyrinth plan's origin** (25 October 2026): Luigi Canina, *L'architettura antica descritta e dimostrata coi
+  monumenti*, Sezione I, Architettura egiziana (Rome, 1839-44), Tav. CXXII, "Laberinto del nomo Arsinoite composto da
+  dodici grandi case regie": the plan below a cross-section and an elevation. Getty scan:
+  https://archive.org/details/gri_33125009333556/page/n268/mode/1up (`build/hawara/reference/canina/`). Every feature
+  of the Mataha cover matches (meander corridor, a gate in each side, the avenue, six courts either side, a chapel at
+  each court's outer end). The cover's chapels are black, as in W. H. Matthews's redrawing (*Mazes and Labyrinths*,
+  1922, fig. 3, "Restored Plan (Canina)"), which is likely the copy it used; Canina's own are grey. Credited in
+  `render/giza/labyrinth.py`, `data/structures.json` and the exhibit's caption.
 
 - **Göbekli Tepe, Pillar 20** (25 October 2026): the DAI's labelled photograph of its front, the aurochs and the snake
   (N. Becker, DAI; "Why did it have to be snakes?", The Tepe Telegrams, 23 April 2016, through the Wayback Machine).
