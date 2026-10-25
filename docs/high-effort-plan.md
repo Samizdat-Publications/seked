@@ -155,6 +155,14 @@ its longest leaf now 11 s under the slow drift, so nothing was cut.
    description is Karul 2021, `karul-2021`, unchecked.) Then the two cards as `karahan-site@Karahan` and
    `karahan-ab@room`.
 
+8. **The critic on version 8** (`build/critic/ch0-2-v8-critique.md`, chapters 0 to 2, 2:51, after all of the above):
+   4.8 overall against version 7's 5.2 and version 6's 5.5, inside its swing; pacing 4, narration 6, camera 5,
+   pictures 6, clarity 5, hook 3. It called the lion wipe and the head the strongest sequence, and the trailer's
+   Göbekli card (the ring from above) "an untextured grey box model": the trailer now shows the central pair
+   (`gobekli-pair`) instead. Its other asks are the standing ones that are Stewart's calls (a faster read, no
+   captions mirroring the voice, a shorter cold open without Göbekli Tepe, the replies louder in the piece) or larger
+   work (a 3D sky dome in motion, push-ins on the ditch's coves, the seismic depths projected onto the floor).
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of
