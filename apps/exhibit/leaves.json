@@ -1417,7 +1417,7 @@
  ],
   "replies": {
     "ch1": {"station": "sphinx-face", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 90, "pitch": -13, "fov": 46}, "draw": ["reply-ch1"], "why": "The Sphinx Temple's core blocks, cut from the ditch itself: the archaeologists' quarry."},
-    "ch2": {"station": "sphinx-side", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 20, "pitch": 14, "fov": 36}, "draw": ["reply-ch2"], "why": "The head today, above the body: cut from a harder bed of the rock than the body below it."},
+    "ch2": {"station": "sphinx-quarter", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 304, "pitch": 15, "fov": 50}, "draw": ["reply-ch2"], "why": "The head today, its face in three-quarter view above the body: cut from a harder bed of the rock than the body below it."},
     "ch3": {"station": "menkaure", "era": "today", "moment": "winter-afternoon", "view": {"yaw": 309, "pitch": 3, "fov": 52}, "draw": ["reply-ch3"], "why": "Menkaure's mortuary temple and pyramid, both left unfinished, where core and casing went up together."},
     "ch4": {"station": "panorama", "era": "today", "moment": "summer-evening", "view": {"yaw": 24, "pitch": -2, "fov": 30}, "draw": ["reply-ch4"], "why": "The plateau in its own century: the date radiocarbon gives, not the texts."},
     "ch5": {"station": "east", "era": "built", "moment": "sphinx-morning", "view": {"yaw": 270, "pitch": 8, "fov": 60}, "draw": ["reply-ch5"], "why": "The Great Pyramid as built: the shafts date the building, in Khufu's century."},

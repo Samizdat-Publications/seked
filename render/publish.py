@@ -162,8 +162,9 @@ def reply_callouts():
             label([106, -9, 16], "The same beds as the ditch walls", "harder and softer layers, which can wear unevenly without rain"),
         ]},
         "reply-ch2": {"lines": [], "labels": [
-            label([27, 24, 60], "The head: a harder band of rock", "it has kept its shape; the softer body wore back", "above"),
-            label([6, 13, 60], "The body: softer beds", "worn back into coves, the band the head stands on"),
+            # from sphinx-quarter, the three-quarter view of the face (Stewart, 25 October: not from behind the shoulder)
+            label([291, 32, 41], "The head: a harder band of rock", "it has kept its shape; the softer body wore back"),
+            label([300, 8, 54], "The body: softer beds", "worn back into coves, the band the head stands on"),
         ]},
         "reply-ch3": {"lines": [], "labels": [
             label([318, 0, 99], "Menkaure's temple, left unfinished", "its core and its casing were going up together", "below"),
