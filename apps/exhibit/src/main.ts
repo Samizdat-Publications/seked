@@ -592,6 +592,9 @@ async function start(): Promise<void> {
     if (id === 'vulture-sky') figure.innerHTML = vultureFigure();
     if (id === 'great-circle') figure.innerHTML = greatCircleFigure(ground);
     figure.classList.toggle('beside-sky', !!player.leaf.sky);
+    // a card that is one picture (Göbekli, Karahan, the Labyrinth) fills the stage instead of floating as a panel
+    // (the critic on chapters 3 to 9, 26 October: "trapped inside floating popup cards")
+    figure.classList.toggle('photo', !!figure.querySelector(':scope > img.wide'));
     shownFigure = id;
     figure.hidden = !id;
     fitFigure();

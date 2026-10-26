@@ -93,12 +93,26 @@ p { margin: 0; }
 .figure svg { display: block; width: 100%; height: auto; max-height: 58vh; margin: 0 auto; }
 /* chapter 8's cutaway: the render at the left, the close shot and the retraction beside it */
 .figure .cutaway { display: grid; grid-template-columns: 1.05fr 1fr; gap: 16px; align-items: start; }
-.figure .cutaway img { display: block; width: 100%; height: auto; border-radius: 8px; }
-.figure .cutaway-main { max-height: 56vh; object-fit: contain; }
-.figure .retracted { margin-top: 12px; padding: 10px 12px; border: 1px solid rgba(240, 150, 70, 0.85); border-radius: 8px;
-  background: rgba(240, 150, 70, 0.1); font-size: 14px; line-height: 1.45; }
+.figure .cutaway img { display: block; width: auto; max-width: 100%; height: auto; border-radius: 8px; }
+/* the pictures take what the card's room leaves after the caption, so nothing spills over it (at 1280 by 720 the
+   retraction ran over the caption and out of the card, 26 October); the grid itself does not shrink */
+.figure > .cutaway { flex: none; }
+.figure .cutaway-main { max-height: min(56vh, calc(var(--room, 80vh) - 210px)); object-fit: contain; }
+.figure .cutaway-side img { max-height: min(26vh, calc((var(--room, 80vh) - 210px) * 0.4)); object-fit: contain; }
+.figure .retracted { margin-top: 8px; padding: 8px 10px; border: 1px solid rgba(240, 150, 70, 0.85); border-radius: 8px;
+  background: rgba(240, 150, 70, 0.1); font-size: 12.5px; line-height: 1.38; }
 .figure .retracted strong { display: block; margin-bottom: 4px; color: rgba(246, 176, 108, 1); font-size: 12px;
   letter-spacing: 0.12em; text-transform: uppercase; }
+/* a card that is one picture fills the stage: the picture edge to edge under the narration band, its caption on a
+   shade just above the band's place line (--room), its tier in the corner */
+.figure.photo { inset: 0; width: 100%; height: 100%; max-height: none; padding: 0; transform: none; border: 0;
+  border-radius: 0; background: #0d0c0a; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.figure.photo > img.wide { flex: 1 1 auto; width: 100%; height: 100%; max-height: none; object-fit: cover; border-radius: 0; }
+.figure.photo > .tier { position: absolute; top: max(5vh, var(--g), env(safe-area-inset-top)); left: var(--g); z-index: 1;
+  margin: 0; background: rgba(10, 10, 12, 0.6); }
+.figure.photo > figcaption { position: absolute; left: 0; right: 0; bottom: calc(100% - var(--room, 70%));
+  max-width: none; margin: 0; padding: 36px 14% 8px; font-size: 13px; line-height: 1.4; color: rgba(239, 232, 220, 0.88);
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7)); }
 /* a rendered picture across the card, and the tier it is drawn at, above it */
 .figure img.wide { display: block; width: 100%; height: auto; max-height: 52vh; object-fit: contain; border-radius: 8px; }
 .figure .tier { display: inline-block; margin-bottom: 8px; padding: 3px 9px; border-radius: 999px; font-size: 12px;

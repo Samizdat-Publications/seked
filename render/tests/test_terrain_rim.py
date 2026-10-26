@@ -14,7 +14,7 @@ for _n in _stubbed:
     sys.modules[_n] = mock.MagicMock()
 try:
     from giza import causeway, sphinx  # noqa: E402
-    from giza.terrain import Terrain  # noqa: E402
+    from giza.terrain import CUT_BEHIND, Terrain  # noqa: E402
 finally:
     for _n in _stubbed:
         del sys.modules[_n]
@@ -40,7 +40,8 @@ class RimTests(unittest.TestCase):
 
     def test_the_west_wall_stands_over_the_statues_rump(self):
         (x0, x1, y0, y1, floor), _, rim = grounds("today")
-        top = rim.z(np.full(9, x0 - 1.5), np.linspace(y0, y1, 9))
+        # where sphinx.walls reads the brink: beyond the floor's run behind the face
+        top = rim.z(np.full(9, x0 - CUT_BEHIND - 1.5), np.linspace(y0, y1, 9))
         self.assertGreater(top.min() - floor, 9.0)
 
     def test_the_causeway_and_amenhotep_temple_keep_their_ground(self):

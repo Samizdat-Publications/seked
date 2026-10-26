@@ -190,13 +190,16 @@
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 340,
-    "pitch": 15,
-    "fov": 60
+    "yaw": 282,
+    "pitch": 8,
+    "fov": 52
    },
    "arrive": "turn",
    "say": "The geologist Robert Schoch read those walls as cut by rain: soft beds worn back into deep coves, cracks widest at the top, where water ran in.",
-   "draw": [],
+   "draw": [
+    "ch1-coves@coves",
+    "ch1-cracks@cracks"
+   ],
    "hold": 1,
    "interact": "look",
    "receipts": [],
@@ -346,7 +349,7 @@
     "pitch": 15,
     "fov": 50
    },
-   "arrive": "cut",
+   "arrive": "flight",
    "say": "It wears a pyramid-age king's headcloth, it is better kept than the body, and it is too small for it.",
    "draw": [],
    "hold": 1,
@@ -1238,13 +1241,13 @@
   {
    "id": "ch8-paws",
    "chapter": 8,
-   "station": "sphinx-face",
+   "station": "sphinx-quarter",
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 272,
-    "pitch": -6,
-    "fov": 70
+    "yaw": 330,
+    "pitch": 2,
+    "fov": 56
    },
    "arrive": "cut",
    "say": "And under the Sphinx's paws, Schoch's survey found a hollow no one has opened, where the psychic Edgar Cayce placed a Hall of Records.",
@@ -1257,13 +1260,13 @@
   {
    "id": "ch8-dug",
    "chapter": 8,
-   "station": "sphinx-face",
+   "station": "sphinx-quarter",
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 272,
-    "pitch": 4,
-    "fov": 74
+    "yaw": 318,
+    "pitch": 6,
+    "fov": 66
    },
    "arrive": "turn",
    "say": "Nobody has dug for any of it.",
@@ -1286,7 +1289,7 @@
     "pitch": 0,
     "fov": 34
    },
-   "arrive": "cut",
+   "arrive": "flight",
    "say": "Much of this can be tested.",
    "draw": [],
    "hold": 1,
@@ -1305,7 +1308,7 @@
     "pitch": -30,
     "fov": 70
    },
-   "arrive": "cut",
+   "arrive": "flight",
    "say": "The one measured support for the early date is the weathering under the Sphinx's floor, deeper in front than behind.",
    "draw": [],
    "hold": 1,
@@ -1343,7 +1346,7 @@
     "pitch": -6,
     "fov": 70
    },
-   "arrive": "cut",
+   "arrive": "flight",
    "say": "Underneath, the cavity at the paws could be opened, the radar data released, Hawara dug.",
    "draw": [
     "looked-tests@underneath"
@@ -1406,7 +1409,7 @@
     "pitch": 10,
     "fov": 70
    },
-   "arrive": "cut",
+   "arrive": "flight",
    "say": "The ditch floor has not been tested. That is where to look.",
    "draw": [],
    "hold": 3,
@@ -1419,10 +1422,10 @@
     "ch1": {"station": "sphinx-face", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 90, "pitch": -13, "fov": 46}, "draw": ["reply-ch1"], "why": "The Sphinx Temple's core blocks, cut from the ditch itself: the archaeologists' quarry."},
     "ch2": {"station": "sphinx-quarter", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 304, "pitch": 15, "fov": 50}, "draw": ["reply-ch2"], "why": "The head today, its face in three-quarter view above the body: cut from a harder bed of the rock than the body below it."},
     "ch3": {"station": "menkaure-temple", "era": "today", "moment": "winter-afternoon", "view": {"yaw": 272, "pitch": 4, "fov": 56}, "draw": ["reply-ch3"], "why": "Menkaure's mortuary temple and pyramid, both left unfinished, where core and casing went up together."},
-    "ch4": {"station": "panorama", "era": "today", "moment": "summer-evening", "view": {"yaw": 24, "pitch": -2, "fov": 30}, "draw": ["reply-ch4"], "why": "The plateau in its own century: the date radiocarbon gives, not the texts."},
+    "ch4": {"station": "east", "era": "today", "moment": "sphinx-morning", "view": {"yaw": 262, "pitch": 12, "fov": 58}, "draw": ["reply-ch4"], "why": "The plateau in its own century: the date radiocarbon gives, not the texts."},
     "ch5": {"station": "east", "era": "built", "moment": "sphinx-morning", "view": {"yaw": 270, "pitch": 8, "fov": 60}, "draw": ["reply-ch5"], "why": "The Great Pyramid as built: the shafts date the building, in Khufu's century."},
     "ch6": {"station": "south", "era": "built", "moment": "golden-south", "view": {"yaw": 15, "pitch": 18, "fov": 42}, "draw": ["reply-ch6"], "why": "The Great Pyramid's slope, side on: one builders' rule, five and a half palms in seven."},
-    "ch7": {"station": "panorama", "era": "today", "moment": "summer-evening", "view": {"yaw": 30, "pitch": -2, "fov": 60}, "draw": ["reply-ch7"], "why": "The same plateau today: nothing found at Göbekli Tepe links it to Egypt."},
+    "ch7": {"station": "south", "era": "today", "moment": "golden-south", "view": {"yaw": 311, "pitch": 10, "fov": 62}, "draw": ["reply-ch7"], "why": "The same plateau today: nothing found at Göbekli Tepe links it to Egypt."},
     "ch8": {"station": "menkaure", "era": "today", "moment": "winter-afternoon", "view": {"yaw": 7, "pitch": 6, "fov": 44}, "draw": ["reply-ch8"], "why": "Khafre's pyramid, where the radar claim put its wells: the method's only peer-reviewed paper was retracted."},
     "ch9": {"station": "sphinx", "era": "today", "moment": "equinox-dawn", "view": {"yaw": 280, "pitch": -2, "fov": 44}, "draw": ["reply-ch9"], "why": "Back where the film began: no physical date from Giza near 10,500 BCE."}
   }

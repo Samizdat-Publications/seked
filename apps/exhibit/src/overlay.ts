@@ -163,6 +163,9 @@ function tag(ctx: CanvasRenderingContext2D, text: string, sub: string | undefine
   const top = clamp(y - h / 2, 6, H - h - 6);
   const x0 = sideStep({ x: clamp(align === 'left' ? x : align === 'right' ? x - w : x - w / 2, 6, W - w - 6), y: top, w, h }, keepOut, W).x;
   const y0 = nudge({ x: x0, y: top, w, h }, placed, H).y;
+  // with no room beside a card the plate would sit half under it, cut off (ch6-phi, ch8-biondi, 26 October): left out
+  // until the card goes
+  if (keepOut.some((k) => x0 < k.x + k.w && k.x < x0 + w && y0 < k.y + k.h && k.y < y0 + h)) return { x: -1e4, y: -1e4, w: 0, h: 0 };
   ctx.fillStyle = 'rgba(17, 15, 12, 0.78)';
   ctx.strokeStyle = 'rgba(242, 181, 68, 0.6)';
   ctx.lineWidth = 1;

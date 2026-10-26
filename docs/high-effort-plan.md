@@ -200,6 +200,29 @@ its longest leaf now 11 s under the slow drift, so nothing was cut.
    panorama (`build.py`'s `mask`: the plants are not laid out the same in two runs). Stars, figures, the meridian and
    their labels are drawn only where the mask is open; the horizon's ticks and the sun are not masked.
 
+## 0h. Chapter 1's geology, the critic on chapters 3 to 9, flights (26 October)
+
+1. **Chapter 1 points at the geology** (the critic's "fails to push in or highlight the exact fissures"): `ch1-rolls`
+   turns in along the corridor between the body and the south wall (282/8/52), and its words draw two labels as they
+   are spoken: "Soft beds, worn back into coves" on the body's flank at "coves", "Cracks widest at the top" on the ditch
+   wall at "cracks", the second saying the wall's fissures are modelled as Schoch describes them
+   (`render/publish.py` `leaf_callouts`).
+2. **A dark crease along the ditch walls' foot, at low sun, gone.** The ground's 1 m patch made a ramp from floor to
+   rim in front of the wall face. The floor now runs 2.5 m behind the faces (`terrain.CUT_BEHIND`), the walls read
+   their brink beyond that and carry a cap from the brink down onto the ground behind, and the coarse grid is sunk
+   under each camera's patch. A road along the rim no longer hangs an edge into the ditch (`roads.EDGE_DROP`). Every
+   panorama and patch round the Sphinx, in every era, rendered again.
+3. **The critic on chapters 3 to 9** (`build/critic/ch3-9-v1-critique.md`, the first review of them): 4.5 overall;
+   pacing 4, narration 5, camera 5, pictures 6, clarity 5, ending 3. Done from it: picture cards (Göbekli, Karahan,
+   the Labyrinth) fill the stage instead of floating as panels; five cuts round the Sphinx are flights
+   (`ch2-look--ch2-nemes`, `ch8-dug--ch9-tested`, `ch9-tested--ch9-floor`, `ch9-cores--ch9-underneath`,
+   `ch9-story--ch9-look`). Left for Stewart: cut chapter 6 (the numbers), a second voice for the replies, chapter 9
+   narrowed to the drill cores, a map between Egypt and Turkey.
+4. **From my own sweep of chapters 3 to 9:** scene labels with no room beside a card are left out instead of half
+   under it; the Khafre cutaway card fits its room (its retraction ran over the caption); `ch8-paws` and `ch8-dug`
+   look from the face's three-quarter view (a paw blurred against the lens); chapters 4 and 7's replies look from the
+   east and south stations instead of specks on the horizon from the panorama stand.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of

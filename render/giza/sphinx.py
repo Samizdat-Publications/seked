@@ -22,6 +22,7 @@ import numpy as np
 
 from . import data, limestone, states
 from .nodes import Tree, hexlin
+from .terrain import CUT_BEHIND
 
 BLENDER_DIR = os.path.join(data.REPO, "blender")
 if BLENDER_DIR not in sys.path:
@@ -449,7 +450,8 @@ def walls(terrain, coll, material, state="today"):
         # The ground just outside the cut, 1.5 m beyond the edge.
         dx, dy = by - ay, -(bx - ax)
         nl = np.hypot(dx, dy)
-        ox, oy = -dx / nl * 1.5, -dy / nl * 1.5
+        # beyond the floor's run behind the face (terrain.CUT_BEHIND), so the brink is the ground's own height
+        ox, oy = -dx / nl * (CUT_BEHIND + 1.5), -dy / nl * (CUT_BEHIND + 1.5)
         ux, uy = -dx / nl, -dy / nl                  # into the rock
         top = terrain.z(px + ox, py + oy)
         along = np.convolve(rng.uniform(-1.0, 1.0, n + 30), np.ones(30) / 30.0 * 1.8, mode="valid")[:n + 1]
@@ -466,10 +468,19 @@ def walls(terrain, coll, material, state="today"):
                 if 0 < r < rows:
                     d += fissure * cut[i] * (0.35 + 0.65 * f) * min(1.0, (rows - r) / 2.0)
                 verts.append((px[i] + ux * d, py[i] + uy * d, z))
+        # the cap: the brink carried back over the floor's run behind the face, so the slot it leaves is never seen
+        # (from the brink down onto the ground behind it: held level, it hung in the air where the rim falls away)
+        cap = len(verts)
+        cx_, cy_ = px + ux * (CUT_BEHIND + 1.0), py + uy * (CUT_BEHIND + 1.0)
+        ground = terrain.z(cx_, cy_)
+        for i in range(n + 1):
+            verts.append((cx_[i], cy_[i], float(ground[i]) + 0.05))
         for i in range(n):
             for r in range(rows):
                 a = base + (rows + 1) * i + r
                 faces.append((a, a + rows + 1, a + rows + 2, a + 1))
+            t0, t1 = base + (rows + 1) * i + rows, base + (rows + 1) * (i + 1) + rows
+            faces.append((t0, t1, cap + i + 1, cap + i))
     me = bpy.data.meshes.new("sphinx enclosure walls")
     me.from_pydata(verts, [], faces)
     me.shade_smooth()

@@ -2,6 +2,69 @@
  "about": "Written by scripts/exhibit_queue.py from apps/exhibit/leaves.json: a flight into each leaf that arrives by flight, from the last leaf's station camera and view to this one's, in the arriving leaf's era and moment, so its last frame is the leaf's panorama at the leaf's view. Render with render/build.py --films render/films-exhibit.json --film ID (try --preview 0,45,89 first), encode with render/film.py into `out`.",
  "films": [
   {
+   "id": "ch2-look--ch2-nemes",
+   "name": "Flight into ch2-nemes from ch2-look",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    14.46,
+    21.71
+   ],
+   "centre": [
+    346.0,
+    -454.5
+   ],
+   "path": [
+    [
+     330.0,
+     -449.0,
+     -38.41
+    ],
+    [
+     333.84,
+     -450.32,
+     -33.76
+    ],
+    [
+     346.0,
+     -454.5,
+     -29.96
+    ],
+    [
+     358.8,
+     -458.9,
+     -34.16
+    ],
+    [
+     362.0,
+     -460.0,
+     -40.47
+    ]
+   ],
+   "look": [
+    [
+     345.37,
+     -401.69,
+     -4.86
+    ],
+    [
+     329.66,
+     -414.64,
+     -14.9
+    ],
+    [
+     313.95,
+     -427.59,
+     -24.94
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch2-look--ch2-nemes.mp4"
+  },
+  {
    "id": "ch2-nemes--ch2-small",
    "name": "Flight into ch2-small from ch2-nemes",
    "state": "today",
@@ -63,6 +126,258 @@
     ]
    ],
    "out": "apps/exhibit/flights/ch2-nemes--ch2-small.mp4"
+  },
+  {
+   "id": "ch8-dug--ch9-tested",
+   "name": "Flight into ch9-tested from ch8-dug",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    15.59,
+    33.12
+   ],
+   "centre": [
+    400.5,
+    -452.5
+   ],
+   "path": [
+    [
+     362.0,
+     -460.0,
+     -40.47
+    ],
+    [
+     371.24,
+     -458.2,
+     -23.65
+    ],
+    [
+     400.5,
+     -452.5,
+     -9.89
+    ],
+    [
+     431.3,
+     -446.5,
+     -17.73
+    ],
+    [
+     439.0,
+     -445.0,
+     -29.5
+    ]
+   ],
+   "look": [
+    [
+     322.07,
+     -415.66,
+     -34.2
+    ],
+    [
+     350.76,
+     -426.67,
+     -31.85
+    ],
+    [
+     379.45,
+     -437.69,
+     -29.5
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch8-dug--ch9-tested.mp4"
+  },
+  {
+   "id": "ch9-tested--ch9-floor",
+   "name": "Flight into ch9-floor from ch9-tested",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    33.12,
+    14.46
+   ],
+   "centre": [
+    384.5,
+    -447.0
+   ],
+   "path": [
+    [
+     439.0,
+     -445.0,
+     -29.5
+    ],
+    [
+     425.92,
+     -445.48,
+     -14.5
+    ],
+    [
+     384.5,
+     -447.0,
+     -2.23
+    ],
+    [
+     340.9,
+     -448.6,
+     -16.7
+    ],
+    [
+     330.0,
+     -449.0,
+     -38.41
+    ]
+   ],
+   "look": [
+    [
+     379.45,
+     -437.69,
+     -29.5
+    ],
+    [
+     329.63,
+     -436.62,
+     -48.96
+    ],
+    [
+     279.81,
+     -435.55,
+     -68.41
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch9-tested--ch9-floor.mp4"
+  },
+  {
+   "id": "ch9-cores--ch9-underneath",
+   "name": "Flight into ch9-underneath from ch9-cores",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    12.96,
+    14.46
+   ],
+   "centre": [
+    347.8,
+    -441.0
+   ],
+   "path": [
+    [
+     330.0,
+     -449.0,
+     -38.41
+    ],
+    [
+     334.26,
+     -447.08,
+     -33.05
+    ],
+    [
+     347.75,
+     -441.0,
+     -28.66
+    ],
+    [
+     361.95,
+     -434.6,
+     -32.55
+    ],
+    [
+     365.5,
+     -433.0,
+     -38.4
+    ]
+   ],
+   "look": [
+    [
+     388.69,
+     -449.0,
+     -50.89
+    ],
+    [
+     347.28,
+     -439.96,
+     -47.78
+    ],
+    [
+     305.87,
+     -430.92,
+     -44.67
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch9-cores--ch9-underneath.mp4"
+  },
+  {
+   "id": "ch9-story--ch9-look",
+   "name": "Flight into ch9-look from ch9-story",
+   "state": "today",
+   "moment": "equinox-dawn",
+   "fps": 30,
+   "seconds": 3,
+   "size": "1920x1080",
+   "samples": 64,
+   "lens": [
+    25.06,
+    14.46
+   ],
+   "centre": [
+    402.2,
+    -439.0
+   ],
+   "path": [
+    [
+     439.0,
+     -445.0,
+     -29.5
+    ],
+    [
+     430.18,
+     -443.56,
+     -19.26
+    ],
+    [
+     402.25,
+     -439.0,
+     -10.88
+    ],
+    [
+     372.85,
+     -434.2,
+     -21.89
+    ],
+    [
+     365.5,
+     -433.0,
+     -38.4
+    ]
+   ],
+   "look": [
+    [
+     379.95,
+     -434.59,
+     -31.59
+    ],
+    [
+     345.73,
+     -445.81,
+     -29.79
+    ],
+    [
+     311.52,
+     -457.03,
+     -27.98
+    ]
+   ],
+   "out": "apps/exhibit/flights/ch9-story--ch9-look.mp4"
   }
  ]
 }

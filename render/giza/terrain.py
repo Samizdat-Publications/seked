@@ -35,6 +35,7 @@ ROOFLESS_FROM = (750.0, 5000.0)    # between these x the valley floor is all pla
 
 NEAR_BOX = (-1950.0, 1750.0, -2150.0, 1750.0)
 NEAR_STEP = 4.0
+CUT_BEHIND = 2.5        # m the ditch's floor runs on behind its cut faces, under sphinx.walls' cap
 FAR_HALF = 11500.0
 FAR_STEP = 60.0
 HORIZON = 150000.0         # how far the plain beyond the far grid runs (look choice); the haze covers 30 km of it
@@ -132,7 +133,11 @@ class Terrain:
             # and filled where GLO-30's 30 m cells sag below it (by two metres round the Sphinx's paws,
             # which left the statue standing on air), and carried three metres on past its open east
             # side so it meets the temple's floor without a step.
-            inside = np.minimum(np.minimum(X - x0, x1 - X), np.minimum(Y - y0, y1 - Y))
+            # The floor runs on CUT_BEHIND metres behind the cut faces (not past the open east side), so the ground's
+            # climb from floor to rim lies behind sphinx.walls' face, whose top edge caps it: in front of the face, the
+            # patch's 1 m cells made a ramp there that showed as a dark crease along the wall's foot (26 October).
+            b = CUT_BEHIND
+            inside = np.minimum(np.minimum(X - x0 + b, x1 - X), np.minimum(Y - y0 + b, y1 - Y + b))
             level = floor + 0.02 * self.noise.fbm(X, Y, 8.0, 2, key=4)
             Z = np.where(inside > 0.0, level, Z)
             east = (X >= x1) & (X < x1 + 3.0) & (Y > y0) & (Y < y1)
@@ -171,6 +176,7 @@ class Terrain:
         ys = np.arange(NEAR_BOX[2], NEAR_BOX[3] + 0.1, NEAR_STEP, dtype=np.float32)
         near = grid_object("ground near", xs, ys, self.z, coll)
         near.data.materials.append(material)
+        self.near_ob, self.near_co = near, None
         f = np.arange(-FAR_HALF, FAR_HALF + 0.1, FAR_STEP, dtype=np.float32)
         far = grid_object("ground far", f, f, lambda X, Y: self.z(X, Y, far=True) - 0.8, coll,
                           hole=(NEAR_BOX[0] + 60, NEAR_BOX[1] - 60, NEAR_BOX[2] + 60, NEAR_BOX[3] - 60))
@@ -203,11 +209,32 @@ class Terrain:
         coll.objects.link(ring)
         return near, far
 
+    def _sink_near(self, cx, cy, depth=30.0):
+        """
+        The coarse grid sunk under the patch round this camera (and back where the last one was): its 4 m facets
+        rose through the patch where the ground bends sharply: those bridging the Sphinx ditch's floor and rim made
+        a slanting plane through the wall face, which a low sun drew as a dark band along it (26 October). Sunk
+        below the ditch floor; the patch, which has no holes, covers everything inside its square.
+        """
+        near = getattr(self, "near_ob", None)
+        if near is None:
+            return
+        me = near.data
+        if self.near_co is None:
+            self.near_co = np.empty(len(me.vertices) * 3, np.float32)
+            me.vertices.foreach_get("co", self.near_co)
+        co = self.near_co.reshape(-1, 3).copy()
+        inside = (np.abs(co[:, 0] - cx) < PATCH_HALF - NEAR_STEP) & (np.abs(co[:, 1] - cy) < PATCH_HALF - NEAR_STEP)
+        co[inside, 2] -= depth
+        me.vertices.foreach_set("co", co.ravel())
+        me.update()
+
     def patch(self, centre, coll, material):
         """A displaced square of ground round `centre`, adaptive to 2 px."""
         cx, cy = centre
         xs = np.arange(cx - PATCH_HALF, cx + PATCH_HALF + 0.01, 1.0, dtype=np.float32)
         ys = np.arange(cy - PATCH_HALF, cy + PATCH_HALF + 0.01, 1.0, dtype=np.float32)
+        self._sink_near(cx, cy)
         ob = grid_object("ground patch", xs, ys, lambda X, Y: self.z(X, Y) + PATCH_LIFT, coll)
         ob.data.materials.append(material)
         sub = ob.modifiers.new("adaptive", "SUBSURF")

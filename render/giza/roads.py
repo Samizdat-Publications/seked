@@ -26,6 +26,7 @@ WIDTH = {"trunk": 14.0, "trunk_link": 8.0, "primary": 12.0, "primary_link": 7.0,
 LIFT = 0.18          # proud of the displaced ground patch near the camera, which rises to 0.17 m
 PARK_EDGE = 3.0      # m: a car park's triangles, draped point by point
 PARK_LIFT = 0.3      # a car park clear of the patch's ripples: at LIFT only its edges showed through them
+EDGE_DROP = 1.0      # m: how far a road's edge may sit from its centre line's height
 EARTH_RADIUS_MEAN = 6371008.8
 
 
@@ -115,10 +116,13 @@ def build(state, terrain, coll, log=print):
         d /= np.linalg.norm(d, axis=1, keepdims=True) + 1e-9
         nrm = np.stack([-d[:, 1], d[:, 0]], 1)
         rows = [[] for _ in range(len(line))]
-        # each edge draped on the ground under it: one height at the centre line buried the upper side on a slope
+        zc = terrain.surface(line[:, 0], line[:, 1])
+        # each edge draped on the ground under it: one height at the centre line buried the upper side on a slope;
+        # but held within EDGE_DROP of the centre line, or a road along the Sphinx ditch's rim hung one edge down
+        # its wall onto the floor (a black strip in the ditch, 26 October)
         for off, dz in ((-width / 2 - 0.4, -0.3), (-width / 2, LIFT), (width / 2, LIFT), (width / 2 + 0.4, -0.3)):
             ex, ey = line[:, 0] + nrm[:, 0] * off, line[:, 1] + nrm[:, 1] * off
-            ez = terrain.surface(ex, ey)
+            ez = np.clip(terrain.surface(ex, ey), zc - EDGE_DROP, zc + EDGE_DROP)
             for i in range(len(line)):
                 rows[i].append(bm.verts.new((float(ex[i]), float(ey[i]), float(ez[i]) + dz)))
         for i in range(len(line) - 1):

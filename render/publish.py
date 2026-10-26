@@ -172,10 +172,12 @@ def reply_callouts():
             label([300, 6, 110], "Menkaure's granite casing", "laid as the pyramid rose, and never dressed"),
         ]},
         "reply-ch4": {"lines": [], "labels": [
-            label([24, 1, 2000], "Giza in its own century", "radiocarbon puts Egypt's first king about 3100 BCE", "above"),
+            # from the east station (26 October: from the panorama stand the pyramids were specks on the horizon)
+            label([240, 26, 600], "Giza in its own century", "radiocarbon puts Egypt's first king about 3100 BCE"),
         ]},
         "reply-ch7": {"lines": [], "labels": [
-            label([30, 1, 2000], "The same plateau today", "nothing found at Göbekli Tepe links it to Egypt", "above"),
+            # from the south station, Khafre's pyramid against the sun and Khufu's (26 October, as for chapter 4)
+            label([311, 30, 500], "The same plateau today", "nothing found at Göbekli Tepe links it to Egypt"),
         ]},
         "reply-ch8": {"lines": [], "labels": [
             label([7, 9, 550], "Khafre's pyramid", "the radar method's only peer-reviewed paper was retracted in 2026", "above"),
@@ -188,6 +190,23 @@ def reply_callouts():
         ]},
         "reply-ch6": {"lines": [], "labels": [
             label([18, 22, 200], "One builders' rule", "a slope of five and a half palms in seven gives both pi and the golden ratio", "above"),
+        ]},
+    }
+
+
+def leaf_callouts():
+    """
+    Callouts drawn on as a leaf's words name what they point at (the critic on version 8: "the camera fails to push in
+    or highlight the exact fissures mentioned"), as directions from the station's camera like reply_callouts.
+    """
+    label = lambda d, text, sub, place="center": {"at": {"dir": d}, "text": text, "sub": sub, "place": place}
+    return {
+        # ch1-rolls, from sphinx-flank looking west along the corridor between the body and the ditch's south wall
+        "ch1-coves": {"lines": [], "labels": [
+            label([298, 14, 15], "Soft beds, worn back into coves", "between the harder ledges of the body's flank"),
+        ]},
+        "ch1-cracks": {"lines": [], "labels": [
+            label([258, 17, 20], "Cracks widest at the top", "the ditch wall's fissures, modelled as Schoch describes them", "above"),
         ]},
     }
 
@@ -250,6 +269,7 @@ def overlays():
     # placed as directions from the station's camera, as the hall's are (the critic on version 4: a reply over
     # "anonymous pavement stones" says nothing). The words are the replies' own, from docs/script.md.
     out.update(reply_callouts())
+    out.update(leaf_callouts())
     # The rest needs the claims engine's own values: `pnpm tsx scripts/tour-values.ts` writes them.
     path = os.path.join(data.REPO, "build", "tour-values.json")
     if not os.path.exists(path):
