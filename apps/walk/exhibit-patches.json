@@ -155,15 +155,6 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/sphinx-back-today-equinox-dawn-ch2-equinox.jpg",
-   "pano": "pano/sphinx-back-today.jpg",
-   "leaf": "ch2-equinox",
-   "yaw": 90,
-   "pitch": 6,
-   "fov": 78.0,
-   "aspect": 1.777778
-  },
-  {
    "src": "pano/patch/sphinx-face-first-time-equinox-dawn-ch7-schoch.jpg",
    "pano": "pano/sphinx-face-first-time.jpg",
    "leaf": "ch7-schoch",
@@ -182,15 +173,6 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/sphinx-flank-first-time-equinox-dawn-ch4-stela.jpg",
-   "pano": "pano/sphinx-flank-first-time-equinox-dawn.jpg",
-   "leaf": "ch4-stela",
-   "yaw": 340,
-   "pitch": 15,
-   "fov": 78.0,
-   "aspect": 1.777778
-  },
-  {
    "src": "pano/patch/sphinx-flank-lion-equinox-dawn-ch0-t02.jpg",
    "pano": "pano/sphinx-flank-lion-equinox-dawn.jpg",
    "leaf": "ch0-t02",
@@ -200,12 +182,21 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-rolls.jpg",
+   "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-depth.jpg",
    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg",
-   "leaf": "ch1-rolls",
+   "leaf": "ch1-depth",
    "yaw": 340,
    "pitch": 15,
    "fov": 78.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-rolls.jpg",
+   "pano": "pano/sphinx-flank-today-equinox-dawn.jpg",
+   "leaf": "ch1-rolls",
+   "yaw": 282,
+   "pitch": 8,
+   "fov": 67.6,
    "aspect": 1.777778
   },
   {
@@ -215,6 +206,24 @@
    "yaw": 304,
    "pitch": 15,
    "fov": 65.0,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-quarter-today-equinox-dawn-ch8-paws.jpg",
+   "pano": "pano/sphinx-quarter-today.jpg",
+   "leaf": "ch8-paws",
+   "yaw": 330,
+   "pitch": 2,
+   "fov": 72.8,
+   "aspect": 1.777778
+  },
+  {
+   "src": "pano/patch/sphinx-side-built-equinox-dawn-ch2-inside.jpg",
+   "pano": "pano/sphinx-side-built.jpg",
+   "leaf": "ch2-inside",
+   "yaw": 29,
+   "pitch": 15,
+   "fov": 44.2,
    "aspect": 1.777778
   },
   {

@@ -429,14 +429,14 @@
    {
     "at": {
      "dir": [
-      24,
-      1,
-      2000
+      240,
+      26,
+      600
      ]
     },
     "text": "Giza in its own century",
     "sub": "radiocarbon puts Egypt's first king about 3100 BCE",
-    "place": "above"
+    "place": "center"
    }
   ]
  },
@@ -446,14 +446,14 @@
    {
     "at": {
      "dir": [
+      311,
       30,
-      1,
-      2000
+      500
      ]
     },
     "text": "The same plateau today",
     "sub": "nothing found at Göbekli Tepe links it to Egypt",
-    "place": "above"
+    "place": "center"
    }
   ]
  },
@@ -521,6 +521,40 @@
     },
     "text": "One builders' rule",
     "sub": "a slope of five and a half palms in seven gives both pi and the golden ratio",
+    "place": "above"
+   }
+  ]
+ },
+ "ch1-coves": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      298,
+      14,
+      15
+     ]
+    },
+    "text": "Soft beds, worn back into coves",
+    "sub": "between the harder ledges of the body's flank",
+    "place": "center"
+   }
+  ]
+ },
+ "ch1-cracks": {
+  "lines": [],
+  "labels": [
+   {
+    "at": {
+     "dir": [
+      258,
+      17,
+      20
+     ]
+    },
+    "text": "Cracks widest at the top",
+    "sub": "the ditch wall's fissures, modelled as Schoch describes them",
     "place": "above"
    }
   ]
