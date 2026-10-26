@@ -41,25 +41,38 @@ def outlines(terrain_z=None):
         if f["id"] not in TEMPLES:
             continue
         ring = simplify(f["ring"])
-        base = f.get("base")
-        if (base is None or base == 0) and terrain_z is not None:
-            xs = np.array([p[0] for p in ring])
-            ys = np.array([p[1] for p in ring])
-            base = float(np.median(terrain_z(xs, ys)))
+        base = f.get("base") or _unset_base(f)      # the level flats() cuts the ground to
         out.append(dict(id=f["id"], ring=ring, base=base))
     return out
 
 
+def _unset_base(f):
+    """
+    The base of a temple whose footprint has none (an import's 0 means none: Menkaure's mortuary temple carries 0 on
+    ground that runs from 5 to 17 m): the lowest ground at its ring's corners, as scripts/footprints.ts sets every
+    base, so the court is cut into the slope rather than raised over it (levelled at the median, it stood on a mound
+    that hid the ruin from below).
+    """
+    xs = np.array([p[0] for p in f["ring"]])
+    ys = np.array([p[1] for p in f["ring"]])
+    return float(np.min(data.NEAR.sample(xs, ys) + data.TERRAIN_SHIFT))
+
+
 def flats(state="today"):
-    """Platforms the terrain levels to: (cx, cy, half-x, half-y, z) per temple the state has, with a registered base."""
+    """
+    Platforms the terrain levels to: (cx, cy, half-x, half-y, z) per temple the state has. A temple without a
+    registered base is levelled at the ground's median under it, the level its walls are laid at: left out, its walls
+    stood on the sloping ground and hung in the air on the low side (Menkaure's, Stewart's screenshot, 25 October).
+    """
     S = states.spec(state)
     lift = 2.5 if S["temple_mode"] == "buried" else 0.0     # look choice: the sand in the courts by 1800
     res = []
     for f in data.FOOTPRINTS:
-        if f["id"] in S["temples"] and f.get("base"):
+        if f["id"] in S["temples"]:
+            base = f.get("base") or _unset_base(f)
             xs = [p[0] for p in f["ring"]]
             ys = [p[1] for p in f["ring"]]
-            res.append(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, (max(xs) - min(xs)) / 2, (max(ys) - min(ys)) / 2, f["base"] + lift))
+            res.append(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, (max(xs) - min(xs)) / 2, (max(ys) - min(ys)) / 2, base + lift))
     return res
 
 

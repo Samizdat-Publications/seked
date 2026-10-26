@@ -400,9 +400,9 @@
    {
     "at": {
      "dir": [
-      318,
-      0,
-      99
+      262,
+      -3,
+      14
      ]
     },
     "text": "Menkaure's temple, left unfinished",
@@ -414,12 +414,12 @@
      "dir": [
       300,
       6,
-      200
+      110
      ]
     },
     "text": "Menkaure's granite casing",
     "sub": "laid as the pyramid rose, and never dressed",
-    "place": "above"
+    "place": "center"
    }
   ]
  },

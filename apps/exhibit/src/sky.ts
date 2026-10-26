@@ -205,7 +205,11 @@ const GOLD = 'rgba(255, 220, 160, 0.95)';
  * drawing on.
  */
 export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, since: number, still: boolean, font: string,
-  named: ReadonlySet<string> = new Set(['Regulus'])): boolean {
+  named: ReadonlySet<string> = new Set(['Regulus']), open?: (altDeg: number, azDeg: number) => boolean): boolean {
+  // the sky's own things (stars, figures, the meridian, a claim's lines) only where the picture shows open sky: drawn
+  // over trees and the statue they read as a layer laid on the picture (Stewart, 25 October); the horizon's ticks
+  // and the sun keep `at`, since they mark the horizon itself
+  const atSky: SkyAt = open ? (alt, az) => (open(alt, az) ? at(alt, az) : null) : at;
   const k = still ? 1 : Math.min(1, since / STAR_IN_MS);
   // the figures draw on once the stars are in
   const g = still ? 1 : Math.min(1, Math.max(0, (since - STAR_IN_MS) / LINES_MS));
@@ -220,7 +224,7 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     let pen = false;
     const n = Math.max(1, Math.round((pts.length - 1) * upTo));
     for (const [alt, az] of pts.slice(0, n + 1)) {
-      const p = at(alt, az);
+      const p = atSky(alt, az);
       if (!p) { pen = false; continue; }
       if (pen) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]);
       pen = true;
@@ -240,12 +244,10 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     for (const run of sky.figure?.lines ?? []) {
       for (let i = 1; i < run.length; i++) {
         const a = byId.get(run[i - 1]!), b = byId.get(run[i]!);
-        const pa = a && at(a.altDeg, a.azDeg), pb = b && at(b.altDeg, b.azDeg);
-        if (!pa || !pb) continue;
-        ctx.beginPath();
-        ctx.moveTo(pa[0], pa[1]);
-        ctx.lineTo(pa[0] + (pb[0] - pa[0]) * g, pa[1] + (pb[1] - pa[1]) * g);
-        ctx.stroke();
+        if (!a || !b) continue;
+        // sampled along its length, so a line that passes behind a tree breaks there instead of crossing it
+        const daz = ((b.azDeg - a.azDeg + 540) % 360) - 180;
+        along(Array.from({ length: 13 }, (_, j) => [a.altDeg + (b.altDeg - a.altDeg) * j / 12, a.azDeg + daz * j / 12] as [number, number]), g);
       }
     }
     // a claim's lines across the meridian, drawn on from the meridian outwards
@@ -256,7 +258,7 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     ctx.setLineDash([]);
   }
   for (const s of shown) {
-    const p = at(s.altDeg, s.azDeg);
+    const p = atSky(s.altDeg, s.azDeg);
     if (!p) continue;
     const r = Math.max(0.7, 2.6 - 0.45 * s.mag) * (s.hi ? 1.25 : 1);
     ctx.fillStyle = s.hi ? 'rgba(255, 214, 140, 0.95)' : 'rgba(235, 240, 255, 0.78)';
@@ -307,11 +309,11 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     });
     for (const s of sky.stars) {
       if (!s.hi || !s.name || !named.has(s.name) || s.name === sky.meridian?.name) continue;
-      const p = at(s.altDeg, s.azDeg);
+      const p = atSky(s.altDeg, s.azDeg);
       if (p) label(s.name, p, GOLD, 9, 0, true);
     }
     const fig = sky.stars.filter((s) => s.hi && s.mag < 4);
-    const pts = fig.map((s) => at(s.altDeg, s.azDeg)).filter((p): p is [number, number] => !!p);
+    const pts = fig.map((s) => atSky(s.altDeg, s.azDeg)).filter((p): p is [number, number] => !!p);
     if (sky.figure && pts.length >= 3) {
       const top = pts.reduce((a, b) => (b[1] < a[1] ? b : a));
       const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length;

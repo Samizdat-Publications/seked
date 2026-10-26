@@ -547,6 +547,7 @@ async function start(): Promise<void> {
   const ambient = new Ambient();
   player.onLeaf = (L) => {
     panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L);
+    sky.setMask(L.sky ? new URL(leafPanorama(L, RENDER).replace(/^pano\//, 'pano/mask/').replace(/\.jpg$/, '.png'), WALK).href : null);
     if (player.playing) ambient.play(bedFor(L));
   };
   const figure = $('figure');

@@ -167,8 +167,9 @@ def reply_callouts():
             label([300, 8, 54], "The body: softer beds", "worn back into coves, the band the head stands on"),
         ]},
         "reply-ch3": {"lines": [], "labels": [
-            label([318, 0, 99], "Menkaure's temple, left unfinished", "its core and its casing were going up together", "below"),
-            label([300, 6, 200], "Menkaure's granite casing", "laid as the pyramid rose, and never dressed", "above"),
+            # from menkaure-temple (25 October): the temple's ruin in front, the pyramid's granite casing behind
+            label([262, -3, 14], "Menkaure's temple, left unfinished", "its core and its casing were going up together", "below"),
+            label([300, 6, 110], "Menkaure's granite casing", "laid as the pyramid rose, and never dressed"),
         ]},
         "reply-ch4": {"lines": [], "labels": [
             label([24, 1, 2000], "Giza in its own century", "radiocarbon puts Egypt's first king about 3100 BCE", "above"),

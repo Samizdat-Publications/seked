@@ -77,6 +77,43 @@ export class SkyFigure {
     else this.stage.setSky((ctx, at, since, still, font) => this.draw(ctx, at, since, still, font));
   }
 
+  private mask: { w: number; h: number; alpha: Uint8ClampedArray } | null = null;
+  private maskUrl: string | null = null;
+
+  /**
+   * The open sky of the leaf's panorama (render/sky_masks.py: alpha 0 where the picture is sky), so the stars and
+   * figures are not drawn over trees and the statue. Without one (not rendered, or still loading) all is open.
+   */
+  setMask(url: string | null): void {
+    if (url === this.maskUrl) return;
+    this.maskUrl = url;
+    this.mask = null;
+    if (!url) return;
+    const img = new Image();
+    img.onload = () => {
+      if (this.maskUrl !== url) return;
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      if (!g) return;
+      g.drawImage(img, 0, 0);
+      this.mask = { w: c.width, h: c.height, alpha: g.getImageData(0, 0, c.width, c.height).data };
+      this.stage.request();
+    };
+    img.src = url;
+  }
+
+  /** Whether a direction is open sky in the panorama (u = 0.5 + az / 360, v = 0.5 - alt / 180, as projection.ts). */
+  private open = (altDeg: number, azDeg: number): boolean => {
+    const m = this.mask;
+    if (!m) return true;
+    const az = ((((azDeg + 180) % 360) + 360) % 360) - 180;
+    const x = Math.min(m.w - 1, Math.max(0, Math.floor((0.5 + az / 360) * m.w)));
+    const y = Math.min(m.h - 1, Math.max(0, Math.floor((0.5 - altDeg / 180) * m.h)));
+    return m.alpha[(y * m.w + x) * 4 + 3]! < 128;
+  };
+
   /** The year on show now. */
   epoch(): number {
     const r = this.run;
@@ -125,6 +162,6 @@ export class SkyFigure {
     this.year.textContent = yearLabel(e);
     if (this.manual === null) this.input.value = String(e);
     const winding = this.manual === null && r.from !== null && (performance.now() - r.t0) / 1000 < SKY_RUN;
-    return drawSky(ctx, this.cached.view, at, since, still, font, this.named) || winding;
+    return drawSky(ctx, this.cached.view, at, since, still, font, this.named, this.open) || winding;
   }
 }

@@ -307,6 +307,19 @@ def main():
             if r.get("transparent") and plateau.night is not None and plateau.night.dome is not None:
                 plateau.night.dome.hide_render = True   # the stars are a dome of geometry, not the world
             plateau.render(os.path.abspath(out), w, h, samples, view_id=r[kind], kind=kind, moment=m)
+            if r.get("mask"):
+                # the panorama's open sky, rendered in the same scene straight after it (render/sky_masks.py): the
+                # plants are not laid out the same in two runs, so a mask from another run missed the trees
+                sc = plateau.scene
+                dome = plateau.night.dome if plateau.night is not None else None
+                shown = dome is not None and not dome.hide_render
+                sc.render.film_transparent = True
+                if shown:
+                    dome.hide_render = True
+                plateau.render(os.path.abspath(r["mask"]), 1024, 512, 4, view_id=f"{r[kind]} mask", kind=kind, moment=m)
+                sc.render.film_transparent = False
+                if shown:
+                    dome.hide_render = False
             if "patch" in r or r.get("transparent"):
                 side = os.path.splitext(os.path.abspath(out))[0] + ".json"
                 with open(side, encoding="utf-8") as f:

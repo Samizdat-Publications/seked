@@ -183,6 +183,23 @@ its longest leaf now 11 s under the slow drift, so nothing was cut.
    10,500 BCE) and `ch4-sky` (10,500 BCE forward to 2450 BCE), as `ch5-sinks` already did. The sky's note is one line
    now, keeping the catalogue's and the figures' credit, and the brightest stars bloom more.
 
+## 0g. Stewart's fixes, 25 October (evening)
+
+1. **Today's Sphinx keeps its full scaffold again** (Stewart: "the scaffold looked better when it was just a full
+   scaffold"). `render/giza/sphinx.py` gives `buried` and `excavated` the raw sphinx-meshy again; the `clean` finish
+   stays on disk. The six panoramas round it, their patches and the `ch2-nemes--ch2-small` flight rendered again.
+   This replaces 0d's "do not reopen": the scaffold is back by Stewart's choice.
+2. **Menkaure's temple stood in the air.** Its footprint's base is an import's 0 on ground running 5 to 17 m, and the
+   renderer treated 0 as unset for the walls but skipped the temple's levelled court, so the walls hung over the low
+   side. Now a temple without a base is levelled at its lowest corner (`temples._unset_base`, as
+   `scripts/footprints.ts` sets bases). Grounded, the low ruin was hidden behind the rise from the menkaure station,
+   so chapter 3's reply looks from a new station, `menkaure-temple`, on the slope east of the court: the ruin in front,
+   the pyramid's granite casing behind.
+3. **The live sky no longer shows through trees and the statue.** Each panorama with a live sky has a mask of its
+   open sky (`render/sky_masks.py`, `apps/walk/pano/mask/`), rendered in the same Blender session straight after the
+   panorama (`build.py`'s `mask`: the plants are not laid out the same in two runs). Stars, figures, the meridian and
+   their labels are drawn only where the mask is open; the horizon's ticks and the sun are not masked.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of

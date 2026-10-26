@@ -351,6 +351,24 @@
       "note": "For the exhibit's chapter 2 ('At the spring equinox the sun rises close to due east'): the lion's own eastward gaze, with the eastern horizon and the sky the stars are drawn on. On the Sphinx's axis (the body's footprint is centred on y -433), 3.7 m behind the ditch's west wall (x 283.7, from the west margin), the eye 1.7 m over the rim, about a metre over the top of the rump. Chosen from those numbers, not from a render: the laptop's preview is the check."
     },
     {
+      "id": "menkaure-temple",
+      "name": "Menkaure's temple",
+      "where": "On the slope just east of Menkaure's mortuary temple, looking west across its ruin to the pyramid and its granite casing",
+      "x": -412.0,
+      "y": -740.0,
+      "eye": 1.7,
+      "moment": "winter-afternoon",
+      "view": {
+        "yaw": 272,
+        "pitch": 4,
+        "fov": 56
+      },
+      "neighbours": [
+        "menkaure"
+      ],
+      "note": "For chapter 3's reply (Stewart, 25 October): from the menkaure station the ground rises five metres to the temple, and its low ruin, once it stood on its ground, was hidden behind the crest. About 13 m east of the temple's court, which is cut into the slope at its lowest corner (render/giza/temples.py). Chosen from the heightfield, not a render: the render is the check."
+    },
+    {
       "id": "menkaure",
       "name": "Menkaure",
       "where": "South-east of his mortuary temple, his three queens to the left",

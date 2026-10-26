@@ -35,9 +35,10 @@ if BLENDER_DIR not in sys.path:
 DERIVED = {"sphinx-master"}      # whose finishes are eras, not surfaces: a missing one is no statue, not the master
 MODEL_FOR = {"anubis": ("sphinx-anubis-fresh", "paint-black2"), "lion": ("sphinx-master", "lion-rock"),
              "lion-fresh": ("sphinx-master", "first-time-rock"), "carved": ("sphinx-built", None),
-             "buried": ("sphinx-meshy", "clean"), "excavated": ("sphinx-meshy", "clean")}
-# Today's Sphinx without the restorers' scaffolding its photographs carried (24 October, Stewart): the finish `clean`
-# is scripts/sphinx_lab/descaffold.py's candidate c10 (two openings round the scaffold, the holes capped in place).
+             "buried": ("sphinx-meshy", None), "excavated": ("sphinx-meshy", None)}
+# Today's Sphinx keeps the restorers' scaffolding its photographs carried (Stewart, 25 October: "the scaffold looked
+# better when it was just a full scaffold"). The scaffold-free finish `clean` (scripts/sphinx_lab/descaffold.py,
+# candidate c10, 24 October) stays on disk; to use it again, put "clean" back as the finish here.
 # The two claim eras are the master cut as rock (scripts/sphinx_lab/rock.py, 22 October: the modeller critic's
 # loop in build/sphinx-lab/): rebuilt as a solid, reproportioned towards ARCE's height and width, the beds cut in
 # the geometry and carried to the limestone material (render/giza/limestone.py). rock.py reads the master's
