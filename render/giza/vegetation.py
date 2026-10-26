@@ -2902,7 +2902,7 @@ def _leaf_draw(me, seed, per=6):
 
 # The Poly Haven models the First Time's forest adds, each into build/props/<id>/ as scripts/props.py
 # lays a Poly Haven prop (the 2k glTF with its .bin and textures, every file md5-checked).
-POLYHAVEN = {"island-tree-2": "island_tree_02"}
+POLYHAVEN = {"island-tree-2": "island_tree_02", "grass-medium-1": "grass_medium_01", "grass-medium-2": "grass_medium_02"}
 
 
 def _fetch_polyhaven(pid, log=print):
@@ -2925,6 +2925,25 @@ def _fetch_polyhaven(pid, log=print):
             f.write(blob)
         log(f"{pid}: {name} {len(blob) / 1e6:.1f} MB from Poly Haven")
     return root
+
+
+def _fetch_polyhaven_map(pid, kind, log=print, res="2k"):
+    """One of a Poly Haven model's own maps (`kind` as its API names it: "Alpha", "dry_diff"), PNG, md5-checked."""
+    import hashlib
+    import urllib.request
+    path = os.path.join(PROPS, pid, "textures", f"{POLYHAVEN[pid]}_{kind.lower()}_{res}.png")
+    if os.path.exists(path):
+        return path
+    get = lambda url: urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "seked-vegetation"}), timeout=600).read()
+    spec = json.loads(get(f"https://api.polyhaven.com/files/{POLYHAVEN[pid]}"))[kind][res]["png"]
+    blob = get(spec["url"])
+    if hashlib.md5(blob).hexdigest() != spec["md5"]:
+        raise SystemExit(f"{pid}: its {kind} map does not match the md5 Poly Haven publishes")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
+        f.write(blob)
+    log(f"{pid}: {kind} {len(blob) / 1e6:.1f} MB from Poly Haven")
+    return path
 
 
 def _load_tree(pid, log=print):
@@ -2967,6 +2986,63 @@ def _island_tree_2(M, log=print):
         bpy.data.objects.remove(o)
     log(f"island tree 2 reduced in {time.time() - t:.0f}s")
     return tree
+
+
+SCANNED_GRASS_LIFT = (2.6, 2.7, 2.0, 1.0)      # the scanned blades' colour multiplied up to a living green (a look choice)
+
+
+def _scanned_grass(log=print):
+    """
+    Poly Haven's two scanned grasses (grass_medium_01, its LOD0 clumps, and grass_medium_02), each clump stood on its
+    own foot with its own material: the green eras' close grass, generated tufts having read as "game engine assets"
+    (the critic, 22 and 26 October). The clumps stand 0.1 to 0.4 m; the plans scale them to their heights.
+    """
+    from mathutils import Matrix
+    out = []
+    for pid in ("grass-medium-1", "grass-medium-2"):
+        obs = _import(_fetch_polyhaven(pid, log))
+        # Poly Haven's glTF gives the blades' colour as a JPEG with no alpha, so every card drew as an opaque black
+        # rectangle: its alpha map, published apart, is wired in here
+        alpha = _image(_fetch_polyhaven_map(pid, "Alpha", log), 2048, True)
+        for m in {s for o in obs if o.type == "MESH" for s in o.data.materials if s}:
+            nt = m.node_tree
+            bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+            tex = nt.nodes.new("ShaderNodeTexImage")
+            tex.image = alpha
+            uv = next(n for n in nt.nodes if n.type == "TEX_IMAGE" and n is not tex)
+            if uv.inputs["Vector"].is_linked:
+                nt.links.new(uv.inputs["Vector"].links[0].from_socket, tex.inputs["Vector"])
+            nt.links.new(tex.outputs["Color"], bsdf.inputs["Alpha"])
+            # the scan's colour is dim olive (a 90th percentile near 75 of 255): lifted to a living blade's brightness,
+            # a look choice, and a little light let through, as a blade lit from behind glows
+            base = bsdf.inputs["Base Color"].links[0].from_socket
+            lift = nt.nodes.new("ShaderNodeMix")
+            lift.data_type = "RGBA"
+            lift.blend_type = "MULTIPLY"
+            lift.inputs["Factor"].default_value = 1.0
+            lift.inputs["B"].default_value = SCANNED_GRASS_LIFT
+            nt.links.new(base, lift.inputs["A"])
+            nt.links.new(lift.outputs["Result"], bsdf.inputs["Base Color"])
+            if "Subsurface Weight" in bsdf.inputs:
+                bsdf.inputs["Subsurface Weight"].default_value = 0.0
+            if "Transmission Weight" in bsdf.inputs:
+                bsdf.inputs["Transmission Weight"].default_value = 0.15
+        for o in sorted((o for o in obs if o.type == "MESH" and ("LOD" not in o.name or o.name.endswith("LOD0"))), key=lambda o: o.name):
+            me = o.data.copy()
+            me.transform(o.matrix_world)
+            out.append(_grounded(me))
+        for o in obs:
+            bpy.data.objects.remove(o)
+    # scaled, each as a whole, to the heights of the generated tufts they replace (near_plan scales them only by
+    # 0.8 to 1.3): from 0.35 m for the lowest clump to 1.0 m for the tallest, a look choice
+    order = np.argsort([max(v.co.z for v in me.vertices) for me in out])
+    for rank, k in enumerate(order):
+        me = out[k]
+        h = max(v.co.z for v in me.vertices)
+        want = 0.35 + 0.65 * rank / max(1, len(out) - 1)
+        me.transform(Matrix.Scale(want / h, 4))
+    log(f"scanned grass: {len(out)} clumps from Poly Haven, scaled to 0.35 to 1.0 m")
+    return out
 
 
 def _shrubs():
@@ -3074,11 +3150,8 @@ def _forest(sets, M, templates, log=print):
     sets["aroid"] = [aroid(340 + i, n, h).mesh(f"aroid {i}", [M["aroid stem"], M["aroid leaf"]]) for i, (n, h) in enumerate(((5, 1.2), (7, 1.5), (9, 1.8)))]
     sets["lily"] = [lily(350 + i, n, s, f, blue).mesh(f"lily {i}", [M["lily pad"], M["lily petal"], M["lily stamen"]])
                     for i, (n, s, f, blue) in enumerate(((10, 0.6, 1, False), (14, 0.8, 2, True), (18, 1.0, 3, False)))]
-    # about a fifth of each tuft's blades dead and straw-coloured, as wild grass is, not a lawn's few
-    g = [grass_tuft(360 + i, 50, 0.32 + 0.02 * i, 0.07, 0.3, 0.5, dead=0.18, width=(0.006, 0.012)) for i in range(4)]
-    g += [grass_tuft(370 + i, 70, 0.58 + 0.04 * i, 0.09, 0.28, 0.7, dead=0.2, width=(0.007, 0.014)) for i in range(4)]
-    g += [grass_tuft(380 + i, 60, 0.85 + 0.1 * i, 0.1, 0.28, 0.85, stalks=6, dead=0.24, width=(0.008, 0.015)) for i in range(2)]
-    sets["lush-grass"] = [x.mesh(f"lush grass {i}", [M["lush grass"]]) for i, x in enumerate(g)]
+    # the close grass is scanned (26 October): the generated tufts read as "game engine assets"
+    sets["lush-grass"] = _scanned_grass(log)
     sets["lush-tussock"] = [grass_tuft(390 + i, 220 + 20 * i, 0.72 + 0.08 * i, 0.3 + 0.04 * i, 0.4, 1.0, stalks=i % 2, dead=0.05,
                                        width=(0.007, 0.015)).mesh(f"lush tussock {i}", [M["lush grass"]]) for i in range(4)]
     log(f"the First Time's forest prepared in {time.time() - t:.0f}s")

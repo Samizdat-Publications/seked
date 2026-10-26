@@ -3,7 +3,7 @@
   "library": {
     "file": "build/vegetation/plants.blend",
     "made_by": "render/giza/vegetation.py prepare()",
-    "prepared_in_s": 39
+    "prepared_in_s": 44
   },
   "assets": [
     {
@@ -308,24 +308,36 @@
     },
     {
       "id": "lush-grass",
-      "name": "Lush grass tuft",
-      "made": "generated: vegetation.grass_tuft()",
-      "source": "Generated here: 50 to 70 wider blade strips, about a fifth of them dead; four short, four medium and two tall with seed stalks, as the grass tuft's set is, in an olive to yellow green varied blade by blade (veg lush grass).",
-      "author": "this project",
-      "license": "the project's own",
-      "height_range_m": [0.25, 1.3],
-      "note": "The tufts near_camera lays round a camera in the First Time (its recipe's near `kind`).",
+      "name": "Lush grass (scanned)",
+      "made": "Poly Haven's grass_medium_01 (its LOD0 clumps) and grass_medium_02, each clump grounded and scaled as a whole to 0.35 to 1.0 m; their colour lifted to a living green and their alpha map, which the glTF leaves out, wired in (vegetation._scanned_grass)",
+      "source": "https://polyhaven.com/a/grass_medium_01 and https://polyhaven.com/a/grass_medium_02",
+      "author": "Poly Haven",
+      "license": "CC0",
+      "height_range_m": [0.35, 1.0],
+      "note": "The clumps near_camera lays round a camera in the First Time (its recipe's near `kind`). The colour lift and the scale are look choices.",
       "variants": [
-        {"height_m": 0.29, "triangles": 450},
-        {"height_m": 0.31, "triangles": 450},
-        {"height_m": 0.34, "triangles": 450},
-        {"height_m": 0.33, "triangles": 450},
-        {"height_m": 0.53, "triangles": 630},
-        {"height_m": 0.57, "triangles": 630},
-        {"height_m": 0.64, "triangles": 630},
-        {"height_m": 0.65, "triangles": 630},
-        {"height_m": 1.18, "triangles": 786},
-        {"height_m": 1.26, "triangles": 786}
+        {"height_m": 0.66, "triangles": 6422},
+        {"height_m": 0.72, "triangles": 4626},
+        {"height_m": 0.6, "triangles": 5945},
+        {"height_m": 0.81, "triangles": 2287},
+        {"height_m": 0.75, "triangles": 1257},
+        {"height_m": 0.63, "triangles": 1466},
+        {"height_m": 0.57, "triangles": 833},
+        {"height_m": 0.5, "triangles": 653},
+        {"height_m": 0.97, "triangles": 290},
+        {"height_m": 0.94, "triangles": 310},
+        {"height_m": 0.88, "triangles": 340},
+        {"height_m": 0.54, "triangles": 79},
+        {"height_m": 0.44, "triangles": 28},
+        {"height_m": 0.47, "triangles": 40},
+        {"height_m": 0.38, "triangles": 32},
+        {"height_m": 0.41, "triangles": 62},
+        {"height_m": 0.35, "triangles": 60},
+        {"height_m": 0.69, "triangles": 714},
+        {"height_m": 0.78, "triangles": 1760},
+        {"height_m": 0.85, "triangles": 1215},
+        {"height_m": 0.91, "triangles": 2489},
+        {"height_m": 1.0, "triangles": 1664}
       ]
     },
     {
