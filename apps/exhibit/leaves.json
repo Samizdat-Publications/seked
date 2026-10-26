@@ -96,6 +96,7 @@
    "receipts": [],
    "reply": "ch0",
    "sky": {
+    "from": "today",
     "at": "C2",
     "figure": "Ori"
    }
@@ -504,6 +505,7 @@
     "fov": 62
    },
    "arrive": "turn",
+   "film": "ch2-leo-sky",
    "say": "About 10,500 BCE, Hancock and Bauval calculate, the constellation Leo, the lion, rose there just before the equinox sun.",
    "draw": [],
    "hold": 1,
@@ -521,6 +523,7 @@
     }
    },
    "sky": {
+    "from": "today",
     "at": "C5",
     "figure": "Leo",
     "bearings": "C5"
@@ -611,6 +614,7 @@
    "receipts": [],
    "reply": "ch4",
    "sky": {
+    "from": "today",
     "at": "C5",
     "figure": "Ori"
    }
@@ -678,6 +682,7 @@
    "receipts": [],
    "reply": "ch4",
    "sky": {
+    "from": "C5",
     "at": "C2",
     "figure": "Ori"
    }

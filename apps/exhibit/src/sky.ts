@@ -261,7 +261,7 @@ export function drawSky(ctx: CanvasRenderingContext2D, sky: SkyView, at: SkyAt, 
     const r = Math.max(0.7, 2.6 - 0.45 * s.mag) * (s.hi ? 1.25 : 1);
     ctx.fillStyle = s.hi ? 'rgba(255, 214, 140, 0.95)' : 'rgba(235, 240, 255, 0.78)';
     ctx.shadowColor = s.hi ? 'rgba(255, 190, 90, 0.9)' : 'rgba(180, 200, 255, 0.6)';
-    ctx.shadowBlur = s.hi ? 8 : 4;
+    ctx.shadowBlur = (s.hi ? 8 : 4) + Math.max(0, 2 - s.mag) * 4;   // the brightest bloom, as they do to the eye
     ctx.beginPath();
     ctx.arc(p[0], p[1], r, 0, 2 * Math.PI);
     ctx.fill();

@@ -46,6 +46,12 @@ export const LeafSchema = z.object({
    */
   until: z.object({ station: z.string().min(1), view: View }).strict().optional(),
   /**
+   * A rendered film played full screen over the leaf's panorama as it arrives, under its words rather than before
+   * them (flights/<film>.mp4; render/films-sky.json): chapter 2's sky winding back over the lion. Its last frame is
+   * the leaf's own view, which the panorama and its live sky take over from. Narrated play only.
+   */
+  film: z.string().regex(/^[\w-]+$/).optional(),
+  /**
    * A live sky drawn over the panorama at the leaf's moment (src/sky.ts): `at` the year, `today` or a claim id whose
    * epoch it takes; `from` a year it winds from in play; `figure` the constellation picked out in gold (as
    * data/stars/figures.json keys it); `bearings` a claim whose sun-ribbon bearings stand on the horizon; `marks` a
@@ -90,7 +96,7 @@ export function readReplyShots(raw: unknown): Record<string, ReplyShot> {
 /** A reply shot as a leaf of its chapter's last leaf, so the stage, the panel and the sky can take it as one. */
 export function replyLeaf(last: Leaf, shot: ReplyShot): Leaf {
   return { ...last, id: `${last.reply}-reply`, station: shot.station, era: shot.era, moment: shot.moment, view: shot.view,
-    draw: shot.draw ?? [], receipts: [], interact: 'look', sky: undefined, until: undefined };
+    draw: shot.draw ?? [], receipts: [], interact: 'look', sky: undefined, until: undefined, film: undefined };
 }
 
 /**

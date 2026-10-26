@@ -1,0 +1,36 @@
+{
+ "about": "Sky films: a station's scene with each frame's stars from a frame-by-frame bake, rendered by render/build.py --sky-film ID, frames in build/films/ID/frames, encoded to `out`. The camera eases from `from` to `to`, the arriving leaf's own view, so the last frame hands over to its panorama. Composition (the views, the length) is a look choice; every star's place is the bake's.",
+ "films": [
+  {
+   "id": "ch2-leo",
+   "name": "Leo winds back over the First Time lion, from today's sky to 10,500 BCE, at the spring equinox's nautical twilight",
+   "bake": "build/sky-leo.json",
+   "state": "first-time",
+   "station": "sphinx-back",
+   "moment": "equinox-twilight",
+   "from": {
+    "yaw": 100,
+    "pitch": 8,
+    "fov": 66
+   },
+   "to": {
+    "yaw": 106,
+    "pitch": 10,
+    "fov": 62
+   },
+   "size": "1920x1080",
+   "samples": 64,
+   "fps": 30,
+   "out": "apps/exhibit/flights/ch2-leo-sky.mp4",
+   "line": {
+    "radius_m": 3.0,
+    "colour": [
+     1.0,
+     0.7,
+     0.28
+    ],
+    "strength": 0.22
+   }
+  }
+ ]
+}

@@ -166,6 +166,23 @@ its longest leaf now 11 s under the slow drift, so nothing was cut.
    captions mirroring the voice, a shorter cold open without Göbekli Tepe, the replies louder in the piece) or larger
    work (a 3D sky dome in motion, push-ins on the ditch's coves, the seismic depths projected onto the floor).
 
+## 0f. Karahan Tepe and the sky in motion (25 October, Stewart's calls)
+
+1. **Karahan Tepe is in chapter 7** (Stewart: yes to the drafted line). `ch7-karahan` follows `ch7-built`: "Thirty-seven
+   kilometres away, at Karahan Tepe, the same people cut a room into the bedrock, with pillars rising from the floor and
+   a head looking out of the wall." Chapter 7 recorded again (take ch7-narration-091, tightened as the rest), the two
+   scans as cards (`karahan-site@Karahan`, `karahan-ab@room`).
+2. **Leo winds back over the lion, rendered** (Stewart: "Do both: render the Leo film over the lion first"). A 9 s
+   film, `apps/exhibit/flights/ch2-leo-sky.mp4`, plays over `ch2-leo` under its words (the leaf's new `film`): the First
+   Time lion from behind at the equinox's nautical twilight, the sky winding from today to C5's 10,500 BCE until Leo
+   stands over the lion's head, its figure drawn in gold. Every star of every frame is `scripts/sky-leo.ts`'s bake,
+   on the exhibit's own wind and sidereal time, so the last frame is the live sky the panorama hands over to and the
+   panel's year runs with it. Rendered by `render/build.py --sky-film ch2-leo` (`render/films-sky.json`), about ten
+   seconds a frame.
+3. **The live sky winds on more leaves**: `ch0-t05` (today to 2450 BCE, the trailer's Orion), `ch4-turin` (today to
+   10,500 BCE) and `ch4-sky` (10,500 BCE forward to 2450 BCE), as `ch5-sinks` already did. The sky's note is one line
+   now, keeping the catalogue's and the figures' credit, and the brightest stars bloom more.
+
 ## 1. The Sphinx models, first and above all (a focused session of their own)
 
 Stewart: the Sphinx models are the main thing to get right before this is finished, and the older one needs a lot of

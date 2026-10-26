@@ -152,6 +152,7 @@ export class Player {
     else if (samePlace) { this.stage.wipe(this.shot(L), this.otherFor(from), () => {}); lead(); }
     else if (from && L.arrive === 'flight' && from === this.leaves[i - 1] && this.playing) this.fly(from, L, token, begin);
     else { this.stage.show(this.shot(L)); begin(); }
+    if (L.film && this.playing) this.film(L, token);
     this.offerCompare();
     void this.recording(L.chapter);
     void this.replyRecording(L.chapter);
@@ -273,6 +274,32 @@ export class Player {
   }
 
   private landing: (() => void) | null = null;
+
+  /**
+   * A leaf's own film (`film`), full screen over its panorama while its words go on: it hides on its last frame,
+   * which is the leaf's view, so the panorama and its live sky take over in place. One that will not play is
+   * skipped, and the leaf is as it would be without it.
+   */
+  private film(L: Leaf, token: number): void {
+    const v = this.ui.flight;
+    const done = () => {
+      v.onended = v.onerror = v.oncanplay = null;
+      v.hidden = true;
+      v.removeAttribute('src');
+      v.load();
+    };
+    if (this.stage.still) return;
+    v.onerror = done;
+    v.onended = done;
+    v.oncanplay = () => {
+      v.oncanplay = null;
+      if (token !== this.token) return done();
+      v.hidden = false;
+      v.play().catch(done);
+    };
+    v.src = new URL(`flights/${L.film}.mp4`, location.href).href;
+    this.landing = done;
+  }
 
   /** A chapter's recording (narration/chN.json and its mp3), with each of its leaves' spans; null without one. */
   private recording(chapter: number): Promise<{ url: string; file: string; spans: Map<string, Span> } | null> {

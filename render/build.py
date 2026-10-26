@@ -155,8 +155,118 @@ def night_film(film_id, opts):
     print(f"night film {film_id}: {len(log)} frames in {frames}")
 
 
+def _figure_lines(scene, figure, eye, look):
+    """A constellation's figure as gold lines on the star dome, one two-point spline a segment; None without one."""
+    if not figure or not figure.get("segments"):
+        return None
+    import bpy
+    cu = bpy.data.curves.new("figure " + figure["name"], "CURVE")
+    cu.dimensions = "3D"
+    cu.bevel_depth = float(look.get("radius_m", 3.0))      # about a pixel and a half wide at the dome's distance
+    for _ in figure["segments"]:
+        sp = cu.splines.new("POLY")
+        sp.points.add(1)
+    mat = bpy.data.materials.new("figure gold")
+    mat.use_nodes = True
+    nt = mat.node_tree
+    nt.nodes.clear()
+    em = nt.nodes.new("ShaderNodeEmission")
+    em.inputs["Color"].default_value = tuple(look.get("colour", (1.0, 0.74, 0.32))) + (1.0,)
+    em.inputs["Strength"].default_value = float(look.get("strength", 0.6))
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    nt.links.new(em.outputs[0], out.inputs["Surface"])
+    cu.materials.append(mat)
+    ob = bpy.data.objects.new("figure " + figure["name"], cu)
+    ob.location = eye
+    ob.visible_shadow = False
+    scene.collection.objects.link(ob)
+    return ob, figure["segments"]
+
+
+def _place_figure(lines, bake, k, radius):
+    """Each segment between its two stars at frame k, shortened at both ends; one with a star under 0.5 deg is hidden."""
+    import math
+    ob, segments = lines
+    header, values = bake
+    count = header["catalogue"]["count"]
+    base = k * count * 2
+
+    def at(i):
+        az, alt = math.radians(values[base + 2 * i]), math.radians(values[base + 2 * i + 1])
+        return (radius * math.cos(alt) * math.sin(az), radius * math.cos(alt) * math.cos(az), radius * math.sin(alt)), values[base + 2 * i + 1]
+    for sp, (i, j) in zip(ob.data.splines, segments):
+        (p, ap), (q, aq) = at(i), at(j)
+        show = ap > 0.5 and aq > 0.5
+        gap = 0.12                                           # a little short of each star, so the dot stays its own
+        p2 = tuple(p[c] + (q[c] - p[c]) * gap for c in range(3))
+        q2 = tuple(q[c] + (p[c] - q[c]) * gap for c in range(3))
+        for pt, co in zip(sp.points, (p2, q2)):
+            pt.co = co + (1.0,)
+            pt.radius = 1.0 if show else 0.0
+
+
+def sky_film(film_id, opts):
+    """
+    A sky film from a frame-by-frame bake (render/films-sky.json names it; scripts/sky-leo.ts writes chapter 2's):
+    the station's own scene in its era and moment, the light fixed, every star moved to each frame's baked place,
+    the camera easing from `from` to `to` (yaw, pitch, vertical field), so the last frame is the leaf's own view.
+    The stars are put up by `star_gain` (by default what the moment's exposure takes off the night's), since a
+    twilight's exposure would leave all but the brightest unseen in a film meant to show them.
+    """
+    import io
+    import math
+    from giza import cameras, night
+    path = opts.get("films") or os.path.join(HERE, "films-sky.json")
+    with io.open(path, encoding="utf-8") as f:
+        spec = next(x for x in json.load(f)["films"] if x["id"] == film_id)
+    render_sky = night._render_sky()
+    bake = render_sky.load_rollback(os.path.join(data.REPO, spec["bake"]))
+    stations, _ = data.views()
+    st = next(s for s in stations["stations"] if s["id"] == spec["station"])
+    st = dict(st, **st.get("by_state", {}).get(spec["state"], {}))
+    plateau = Plateau(spec["state"], aerosol=float(opts.get("aerosol", 1.1)), haze=float(opts.get("haze", 1.0)))
+    plateau.view(st, "station")
+    moment = stations["moments"][spec["moment"]]
+    plateau.moment(moment)
+    plateau.scene.render.use_persistent_data = True
+    if plateau.night is None:
+        plateau.night = night.Night(plateau.scene, plateau.scene.world.node_tree, plateau.log)
+    eye = tuple(plateau.camera.location)
+    gain = float(spec.get("star_gain", 2.0 ** (night.EXPOSURE - moment.get("exposure", night.EXPOSURE))))
+    w, h = (int(n) for n in spec["size"].split("x"))
+    frames = os.path.join(data.REPO, "build", "films", film_id, "frames")
+    os.makedirs(frames, exist_ok=True)
+    n = len(bake[0]["frames"])
+    only = {int(k) for k in opts["frames"].split(",")} if "frames" in opts else None
+    a, b = spec["from"], spec["to"]
+    lines = _figure_lines(plateau.scene, bake[0].get("figure"), eye, spec.get("line", {}))
+    for k in range(n):
+        if only is not None and k not in only:
+            continue
+        out = os.path.join(frames, f"frame_{k:04d}.png")
+        if os.path.exists(out):
+            continue
+        plateau.night.show_frame(bake, k, eye)
+        if gain != 1.0 and not plateau.night.dome.get("seked_gain"):
+            flux = plateau.night.dome.data.attributes[render_sky.STAR_FLUX_ATTRIBUTE].data
+            vals = [d.value * gain for d in flux]
+            flux.foreach_set("value", vals)
+            plateau.night.dome["seked_gain"] = gain
+        if lines is not None:
+            _place_figure(lines, bake, k, render_sky.DOME_RADIUS_M * 0.98)
+        t = k / (n - 1)
+        e = t * t * (3 - 2 * t)
+        cameras.aim(plateau.camera, eye, a["yaw"] + (b["yaw"] - a["yaw"]) * e, a["pitch"] + (b["pitch"] - a["pitch"]) * e,
+                    a["fov"] + (b["fov"] - a["fov"]) * e, w / h)
+        plateau.render(out, w, h, int(spec["samples"]), view_id=f"{film_id} {k}", kind="film", moment=spec["moment"])
+    print(f"sky film {film_id}: {n} frames in {frames}")
+
+
 def main():
     opts = parse(sys.argv)
+    if "sky-film" in opts:
+        sky_film(opts["sky-film"], opts)
+        return
     if "film" in opts:
         film(opts["film"], opts)
         return
