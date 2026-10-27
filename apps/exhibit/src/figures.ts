@@ -46,6 +46,8 @@
  * (render/hawara_labyrinth.py, written into objects/ by scripts/exhibit_labyrinth.py), from the air and in a pit dug
  * to show its legendary lower storey; labelled with the legendary tier.
  *
+ * `khufu-section`: where that answer is, the Great Pyramid as an x-ray with its known rooms, the Big Void's band and
+ * the corridor in gold (render/khufu_section.py, written into objects/ by scripts/exhibit_section.py).
  * `corridor`: the model answer, the Great Pyramid's north-face corridor in section to scale, every dimension with
  * its error bar (data/measurements/g1-voids.json).
  *
@@ -78,7 +80,7 @@ import { degreesToSeked, formatDms } from '@seked/units';
 /** A small angle in arc minutes and seconds: −0.065 is "−3′54″". */
 const arc = (deg: number) => formatDms(deg).replace(/^(−?)0°0?/, '$1');
 
-export const FIGURES = ['ditch-plan', 'seismic-section', 'seismic-front', 'seismic-rear', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'gobekli-today', 'gobekli-ring', 'gobekli-p43', 'gobekli-pair', 'karahan-site', 'karahan-ab', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
+export const FIGURES = ['ditch-plan', 'seismic-section', 'seismic-front', 'seismic-rear', 'belt-plan', 'pi-circle', 'north-square', 'phi-triangle', 'earth-scale', 'luminescence', 'radiocarbon', 'corridor', 'khufu-section', 'khafre-depths', 'khafre-cutaway', 'hawara-labyrinth', 'hawara-lower', 'gobekli-today', 'gobekli-ring', 'gobekli-p43', 'gobekli-pair', 'karahan-site', 'karahan-ab', 'hawara-depths', 'looked', 'looked-tests', 'seked-rule', 'north-drift', 'pole-stars', 'claim-sort', 'joint-claim', 'allan-rank', 'king-lists', 'rhind-56', 'vulture-sky', 'great-circle'] as const;
 export type FigureId = (typeof FIGURES)[number];
 export const isFigure = (id: string): id is FigureId => (FIGURES as readonly string[]).includes(id);
 

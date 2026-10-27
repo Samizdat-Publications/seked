@@ -477,7 +477,7 @@ export class Player {
     const end = () => {
       if (ended || token !== this.token) return;
       ended = true;
-      this.later(Math.min(L.hold, MAX_HOLD_S) * 1000, () => {
+      this.later((L.dwell ?? Math.min(L.hold, MAX_HOLD_S)) * 1000, () => {
         if (token !== this.token || !this.playing) return;
         const onward = () => this.onward(token);
         // the chapter's last leaf: the archaeologists' reply is spoken before the next chapter, so narrated play is

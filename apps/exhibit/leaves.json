@@ -1209,10 +1209,11 @@
    "arrive": "turn",
    "say": "At Hawara, Herodotus saw a Labyrinth of three thousand rooms, half of them underground.",
    "draw": [
-    "hawara-labyrinth@Labyrinth",
+    "hawara-labyrinth@Hawara",
     "hawara-lower@underground"
    ],
    "hold": 1,
+   "dwell": 4,
    "interact": "look",
    "receipts": [],
    "reply": "ch8"
@@ -1370,9 +1371,11 @@
    "arrive": "cut",
    "say": "That is what an answer looks like: muon detectors found a hidden corridor inside the Great Pyramid, with error bars, and in 2023 a camera went in and saw it.",
    "draw": [
+    "khufu-section",
     "corridor@error"
    ],
    "hold": 1.5,
+   "dwell": 3,
    "interact": "look",
    "receipts": [],
    "reply": "ch9"

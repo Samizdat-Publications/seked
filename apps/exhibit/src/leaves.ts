@@ -33,8 +33,13 @@ export const LeafSchema = z.object({
    * the first word starting with `word` is spoken, so a line draws itself as its word is said.
    */
   draw: z.array(z.string().regex(/^[\w-]+(@[\w'-]+)?$/)),
-  /** Seconds held after the words end. */
+  /** Seconds held after the words end (narrated play caps it short, player.ts MAX_HOLD_S). */
   hold: z.number().min(0),
+  /**
+   * Seconds narrated play stays on the leaf after its words, past the cap: for the few pictures that need time to be
+   * taken in, like the Labyrinth (Stewart, 26 October: "they can simmer on it").
+   */
+  dwell: z.number().min(0).max(8).optional(),
   interact: Interact,
   /** Claim ids in data/claims/ whose receipts this leaf shows. */
   receipts: z.array(z.string()),

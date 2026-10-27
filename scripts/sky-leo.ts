@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+// the exhibit's sky module it borrows draws on a canvas, so its types are the browser's
 /**
  * Bake chapter 2's Leo film: every bright star, frame by frame, at the spring equinox's nautical twilight as the
  * epoch winds from today back to claim C5's 10,500 BCE, over the First Time lion. The ground's light is the same in

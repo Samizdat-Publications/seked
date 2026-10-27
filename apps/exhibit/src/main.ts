@@ -186,6 +186,17 @@ function radiocarbonFigure(): string {
     reign lengths, not dated directly.${unchecked ? " Not yet checked against the papers' tables." : ''}</figcaption>`;
 }
 
+/**
+ * Where the answer is: the Great Pyramid as an x-ray with its known rooms, the 2017 Big Void's band and the 2023
+ * corridor in gold (render/khufu_section.py; scripts/exhibit_section.py writes the labelled picture into objects/).
+ */
+function khufuSectionFigure(): string {
+  return `<span class="tier instrumented">Instrumented: ${TIER_WORDS.instrumented}</span><img class="wide" src="objects/khufu-section.jpg" alt="The Great Pyramid drawn see-through from the west: its passages and chambers, a pale blue band for the Big Void above the Grand Gallery, and a small gold box behind the north face for the corridor">
+    <figcaption>Drawn see-through: the rooms as Petrie surveyed them; in gold the corridor, 20 m up behind the chevron
+    stones (Procureur and others 2023); in blue the band the Big Void lies in, its shape unknown (Morishima and others
+    2017). How far across the pyramid the corridor sits is our drawing choice.</figcaption>`;
+}
+
 /** The model answer: the north-face corridor as its paper measured it, every figure with its error bar. */
 function corridorFigure(): string {
   const d = corridor;
@@ -536,7 +547,7 @@ async function start(): Promise<void> {
   // with its caption and no picture the first time through)
   const cardPictures: Record<string, string[]> = {
     'hawara-labyrinth': ['hawara-labyrinth'], 'hawara-lower': ['hawara-labyrinth-under'],
-    'khafre-cutaway': ['khafre-cutaway', 'khafre-cutaway-top'],
+    'khafre-cutaway': ['khafre-cutaway', 'khafre-cutaway-top'], 'khufu-section': ['khufu-section'],
   };
   const preloadCards = (L: { draw: readonly string[] }) => {
     for (const entry of L.draw) {
@@ -575,6 +586,7 @@ async function start(): Promise<void> {
     if (id === 'luminescence') figure.innerHTML = luminescenceFigure();
     if (id === 'radiocarbon') figure.innerHTML = radiocarbonFigure();
     if (id === 'corridor') figure.innerHTML = corridorFigure();
+    if (id === 'khufu-section') figure.innerHTML = khufuSectionFigure();
     if (id === 'khafre-depths') figure.innerHTML = khafreDepthsFigure(ground, bundle?.structures);
     if (id === 'khafre-cutaway') figure.innerHTML = khafreCutawayFigure(ground, bundle?.structures);
     if (id === 'hawara-labyrinth' || id === 'hawara-lower') figure.innerHTML = hawaraLabyrinthFigure(id === 'hawara-lower');

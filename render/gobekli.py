@@ -741,8 +741,9 @@ def main():
     views = {
         # standing on the rim south of Enclosure D, looking north into it
         "rim": (Vector((dx + 3.0, dy - 16.0, floor + 10.0)), Vector((dx, dy, floor + 1.5)), 20),
-        # from the air, south-west, the whole excavation
-        "air": (Vector((dx - 45.0, dy - 55.0, dground + 45.0)), Vector((c[0], c[1], floor)), 35),
+        # from the air, south-west, the whole excavation filling the frame: at 35 mm the plain round it took half the
+        # picture and its ground does not hold up that close, so the excavation alone fills it (Stewart, 26 October)
+        "air": (Vector((dx - 40.0, dy - 50.0, dground + 48.0)), Vector((c[0] + 9.0, c[1] + 9.0, floor)), 95),
         # the hill from the plain to the south-west, the excavation on its slope
         "hill": (Vector((dx - 420.0, dy - 520.0, dground - 10.0)), Vector((dx, dy, dground)), 85),
         # the main shelter from the ground to its south-west, as the visitor first sees it
