@@ -52,6 +52,14 @@ export class SkyFigure {
     this.stage.request();
   }
 
+  /** Take the sky down. */
+  hide(): void {
+    this.run = null;
+    this.manual = null;
+    this.stage.setSky(null);
+    this.bar.hidden = true;
+  }
+
   /** Put a leaf's sky up (or take it down). Playing, a sky with a `from` winds from it again. */
   show(L: Leaf, playing: boolean): void {
     if (!L.sky) {

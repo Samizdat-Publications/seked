@@ -74,7 +74,7 @@ export class Stage {
   drift = false;
   private driftSign = 1;
 
-  constructor(private root: HTMLElement, private canvas: HTMLCanvasElement, private ink: HTMLCanvasElement,
+  constructor(readonly root: HTMLElement, private canvas: HTMLCanvasElement, private ink: HTMLCanvasElement,
     private flat: HTMLElement, private manifest: Manifest, private overlays: Record<string, Overlay>, private base: URL) {
     this.ctx = ink.getContext('2d')!;
     this.handle = this.makeHandle();

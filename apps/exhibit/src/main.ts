@@ -37,6 +37,7 @@ import type { HeadsManifest, ObjectView } from './objectview';
 import { DEG } from './projection';
 import { pyramidObject } from './pyramidobject';
 import { Stage } from './stage';
+import { Explore, type ExploreBundle } from './explore';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -272,7 +273,7 @@ const FINALE: [string, string][] = [
 const FINALE_EACH_MS = 3200;
 
 /** After the last leaf and its reply: the strongest shots in turn, then the title and the ways on. */
-function finale(again: () => void): void {
+function finale(again: () => void, explore: () => void): void {
   const root = $('finale'), pics = $('finale-pics');
   const src = (ref: string) => {
     const [where, file] = ref.split(':') as [string, string];
@@ -293,6 +294,7 @@ function finale(again: () => void): void {
   const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
   document.addEventListener('keydown', onKey);
   $('finale-again').onclick = () => { close(); again(); };
+  $('finale-explore').onclick = () => { close(); explore(); };
 }
 
 /**
@@ -607,7 +609,7 @@ async function start(): Promise<void> {
     // this leaf's pictures and the next one's, so a card that opens a leaf is loaded before the leaf arrives
     const next = leaves[leaves.indexOf(L) + 1];
     panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L); if (next) preloadCards(next);
-    sky.setMask(L.sky ? new URL(leafPanorama(L, RENDER).replace(/^pano\//, 'pano/mask/').replace(/\.jpg$/, '.png'), WALK).href : null);
+    sky.setMask(maskFor(L));
     if (player.playing) ambient.play(bedFor(L));
   };
   const figure = $('figure');
@@ -679,12 +681,23 @@ async function start(): Promise<void> {
   panel.onOpen = () => { if (player.playing) player.pause(); };
   player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); ambient.play(bedFor(player.leaf)); };
   player.onPause = () => ambient.stop();
-  player.onEnd = () => finale(() => { player.go(0); player.play(); });
-  if (new URLSearchParams(location.search).has('finale')) player.onEnd();   // ?finale: straight to the end
+  const maskFor = (L: Leaf) => (L.sky ? new URL(leafPanorama(L, RENDER).replace(/^pano\//, 'pano/mask/').replace(/\.jpg$/, '.png'), WALK).href : null);
+  const explore = new Explore({
+    stage, manifest, sky, leaves, walk: WALK, panoramas: panoramasFor(manifest), mask: maskFor,
+    bundle: () => bundle as ExploreBundle | null,
+    back: () => { explore.hide(); player.go(leaves.indexOf(player.leaf)); },
+  });
+  const openExplore = () => { if (player.playing) player.pause(); explore.show(); };
+  player.onEnd = () => finale(() => { player.go(0); player.play(); }, openExplore);
+
   // for capture and test scripts, as the story page had
   (window as unknown as { seked: unknown }).seked = { player, stage, sky };
   $('controls').hidden = false;
   player.go(leafFromSearch(location.search, leaves));
+  // after the first leaf, which would otherwise take the stage back
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('finale')) player.onEnd();   // ?finale: straight to the end
+  if (qs.has('explore')) openExplore();   // ?explore: straight to Explore
 }
 
 void start();
