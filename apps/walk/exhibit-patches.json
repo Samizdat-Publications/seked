@@ -74,36 +74,9 @@
    "aspect": 1.777778
   },
   {
-   "src": "pano/patch/orion-built-night-dark-ch5-numbers.jpg",
-   "pano": "pano/orion-built-night-dark.jpg",
-   "leaf": "ch5-numbers",
-   "yaw": 184,
-   "pitch": 8,
-   "fov": 65.0,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/orion-built-night-dark-ch5-sah.jpg",
-   "pano": "pano/orion-built-night-dark.jpg",
-   "leaf": "ch5-sah",
-   "yaw": 180,
-   "pitch": 44,
-   "fov": 78.0,
-   "aspect": 1.777778
-  },
-  {
    "src": "pano/patch/panorama-built-summer-evening-ch6-hancock.jpg",
    "pano": "pano/panorama-built.jpg",
    "leaf": "ch6-hancock",
-   "yaw": 24,
-   "pitch": -2,
-   "fov": 39.0,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/panorama-built-summer-evening-ch6-smyth.jpg",
-   "pano": "pano/panorama-built.jpg",
-   "leaf": "ch6-smyth",
    "yaw": 24,
    "pitch": -2,
    "fov": 39.0,
@@ -248,15 +221,6 @@
    "src": "pano/patch/valley-temple-built-temple-morning-ch0-t04.jpg",
    "pano": "pano/valley-temple-built.jpg",
    "leaf": "ch0-t04",
-   "yaw": 22,
-   "pitch": -15,
-   "fov": 78.0,
-   "aspect": 1.777778
-  },
-  {
-   "src": "pano/patch/valley-temple-built-temple-morning-ch3-statues.jpg",
-   "pano": "pano/valley-temple-built.jpg",
-   "leaf": "ch3-statues",
    "yaw": 22,
    "pitch": -15,
    "fov": 78.0,
