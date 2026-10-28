@@ -107,6 +107,8 @@ KINDS = {
     "lily": dict(sink=0.0, tilt=0.0, xy=(0.8, 1.3), margin=0.0, crown=1.0),
     "lush-grass": dict(sink=0.02, tilt=0.14, xy=(0.8, 1.3), margin=0.0, crown=0.5),
     "lush-tussock": dict(sink=0.05, tilt=0.1, xy=(0.8, 1.25), margin=1.0, crown=0.5),
+    # Göbekli Tepe's open woodland about 9500 BCE (render/gobekli_land.py): small trees, PlantCatalog's only
+    "woodland": dict(sink=0.15, tilt=0.03, xy=(0.85, 1.2), margin=2.0, crown=0.5),
 }
 
 # Bare ground kept round each kind of monument before any plant's own margin: a pavement's
@@ -3117,6 +3119,115 @@ FOREST_TREES = {
 }
 
 
+# PlantCatalog's plants (e-on software, exported from PlantFactory 2024 as FBX with its Blender preset by
+# build/plantcatalog/export_all.py), each kind's: the species, and whether they replace the kind's generated variants
+# or join them. Which species stands for which kind is a look choice; the exports live in build/ (PlantCatalog's
+# licence lets the meshes be used in any project but not sold), so a machine without them keeps the generated plants.
+PLANTCATALOG_DIR = os.path.join(data.REPO, "build", "plantcatalog")
+PLANTCATALOG = {
+    # a candelabra tree among the acacias, one to every two (`slug:n` takes a species' first n exports)
+    "acacia": (["vachellia-tortilis", "euphorbia-candelabrum:1"], True),
+    "date-palm": (["phoenix-dactylifera"], True),
+    "papyrus": (["cyperus-papyrus"], True),
+    "reed": (["phragmites-australis", "typha-latifolia"], True),
+    "lily": (["nymphaea-alba"], True),
+    "fern": (["dryopteris-filix-mas"], True),
+    "elephant-grass": (["phalaris-arundinacea"], False),
+    "tussock": (["festuca-arundinacea"], False),
+    "lush-tussock": (["festuca-arundinacea"], False),
+    "shrub": (["tamarix-gallica"], False),
+    # the English oak as it grows in a wood, and the northern red oak, beside the generated broadleaf trees (the lone
+    # oak never exported: PlantFactory's export fails now and then on the big trees with VEOX2080, and on it every time)
+    "broadleaf": (["quercus-robur-forest", "quercus-rubra"], False),
+    # the olive and the common fig stand under 5 m: as broadleaf trees (11 to 12.5 m) the plans would blow them up two
+    # and a half times, leaves and all, so they are Göbekli's woodland of 4 to 7 m trees instead, standing in for the
+    # oak and pistachio its pollen gives
+    "woodland": (["olea-europaea", "ficus-carica"], True),
+}
+PLANTCATALOG_GLOW = 0.15      # light through a leaf, frond, floret or petal, as the scanned grass's (a look choice)
+_THIN = ("leaf", "leaves", "frond", "floret", "petal", "needle", "blade", "pad", "flower", "spike", "bract", "pinna")
+
+
+def _plantcatalog_meshes(slug, log=print):
+    """Each export of one PlantCatalog species (build/plantcatalog/<slug>/<slug>-s<seed>.fbx), one grounded mesh apiece."""
+    import glob
+    out = []
+    for path in sorted(glob.glob(os.path.join(PLANTCATALOG_DIR, slug, f"{slug}-s*.fbx"))):
+        before = set(bpy.data.objects)
+        bpy.ops.import_scene.fbx(filepath=path)
+        obs = [o for o in bpy.data.objects if o not in before]
+        parts = []
+        for o in (o for o in obs if o.type == "MESH"):
+            me = o.data.copy()
+            me.transform(o.matrix_world)
+            parts.append(me)
+        if not parts:
+            log(f"{slug}: {os.path.basename(path)} holds no mesh")
+            continue
+        me = parts[0]
+        if len(parts) > 1:                 # PlantFactory's Blender preset gives one mesh; a few objects are joined
+            import bmesh
+            mats = [m for p in parts for m in p.materials]
+            bm = bmesh.new()
+            offset = 0
+            for p in parts:
+                n = len(bm.faces)
+                bm.from_mesh(p)
+                bm.faces.ensure_lookup_table()
+                for f in bm.faces[n:]:
+                    f.material_index += offset
+                offset += len(p.materials)
+            me = bpy.data.meshes.new(slug)
+            bm.to_mesh(me)
+            bm.free()
+            for m in mats:
+                me.materials.append(m)
+        for m in me.materials:
+            if not (m and m.node_tree):
+                continue
+            bsdf = next((n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+            if bsdf and any(t in m.name.lower() for t in _THIN) and "Transmission Weight" in bsdf.inputs:
+                bsdf.inputs["Transmission Weight"].default_value = PLANTCATALOG_GLOW
+        for img in {n.image for m in me.materials if m and m.node_tree for n in m.node_tree.nodes if n.type == "TEX_IMAGE" and n.image}:
+            if img.packed_file is None:
+                img.pack()                 # the library carries its own pictures, wherever build/plantcatalog is
+        me.name = os.path.splitext(os.path.basename(path))[0]
+        # PlantFactory stands a plant on its own ground at z = 0, roots below it, and floats a water lily's pads on
+        # z = 0 with the stalks hanging under: that line is kept (where _grounded would lift the lowest root to it and
+        # hold the pads up in the air), and the plant is only centred over its foot
+        co = np.empty(len(me.vertices) * 3, np.float32)
+        me.vertices.foreach_get("co", co)
+        co = co.reshape(-1, 3)
+        foot = co[np.abs(co[:, 2]) < 0.05 * max(0.1, float(co[:, 2].max()))]
+        foot = foot if len(foot) else co
+        co[:, :2] -= foot[:, :2].mean(axis=0)
+        me.vertices.foreach_set("co", co.ravel())
+        me.update()
+        out.append(me)
+        for o in obs:
+            bpy.data.objects.remove(o)
+    return out
+
+
+def _plantcatalog(sets, log=print):
+    """PlantCatalog's species into `sets` (PLANTCATALOG), where their exports are in build/plantcatalog/."""
+    t = time.time()
+    read = {}                      # a species two kinds share is read once and its meshes shared
+    for kind, (slugs, replace) in PLANTCATALOG.items():
+        got = []
+        for entry in slugs:
+            slug, _, n = entry.partition(":")
+            if slug not in read:
+                read[slug] = _plantcatalog_meshes(slug, log)
+            got += read[slug][:int(n) if n else None]
+        if not got:
+            log(f"{kind}: no PlantCatalog export in {PLANTCATALOG_DIR}, the generated plants stay")
+            continue
+        sets[kind] = got if replace else sets.get(kind, []) + got
+        log(f"{kind}: {len(got)} PlantCatalog plants {'in place of' if replace else 'beside'} the generated ones")
+    log(f"PlantCatalog's plants in {time.time() - t:.0f}s")
+
+
 def _forest(sets, M, templates, log=print):
     """The First Time's kinds into `sets`: the forest trees, oil palms, bananas, elephant grass, ferns, aroids, lilies, lush grass."""
     t = time.time()
@@ -3191,6 +3302,7 @@ def prepare(log=print):
     sets["acacia"] = acacias
     sets["shrub"] = _shrubs()
     _forest(sets, M, templates, log)
+    _plantcatalog(sets, log)
     colls, info = set(), {}
     for kind, meshes in sets.items():
         c = bpy.data.collections.new(f"veg {kind}")

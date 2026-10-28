@@ -227,12 +227,17 @@ def trees(surface, era, exclude, coll, centre, rng, z_site):
         # The Giza scenes' broadleaf trees (render/giza/vegetation.py's library) where it is on disk: the procedural
         # crowns read as lollipops on a lawn (the critic, 25 October). Oak and pistachio are what the pollen gives;
         # these stand in for them, a look choice.
+        # PlantCatalog's olive and fig (the library's `woodland`) where they were exported, else its broadleaf trees
+        vcoll = None
         try:
             from giza import vegetation
-            vcoll, heights = vegetation.library(coll, kinds=["broadleaf"])["broadleaf"]
+            for kind in ("woodland", "broadleaf"):
+                got = vegetation.library(coll, kinds=[kind])
+                if kind in got:
+                    vcoll, heights = got[kind]
+                    break
         except Exception as e:                       # no library: the procedural crowns
             print(f"gobekli trees: no vegetation library ({e}); procedural crowns", flush=True)
-            vcoll = None
         if vcoll is not None:
             p = p[~exclude(p[:, 0], p[:, 1])]
             size = size[:len(p)]

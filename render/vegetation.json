@@ -3,7 +3,7 @@
   "library": {
     "file": "build/vegetation/plants.blend",
     "made_by": "render/giza/vegetation.py prepare()",
-    "prepared_in_s": 44
+    "prepared_in_s": 60
   },
   "assets": [
     {
@@ -17,11 +17,15 @@
       "height_range_m": [10, 20],
       "note": "Four variants, built for 10, 13, 16 and 19 m of trunk and crown and measuring 11.6 to 20.5 m to the tips of the youngest fronds (`variants`), so a tall palm is a longer trunk and not a bigger crown; two carry a skirt of dead fronds, two are clean as a tended grove's are. Every leaflet is geometry (110 a frond, 58 to 72 fronds): the Sketchfab palm's fronds are alpha-tested cards, and a crown of cards seen from under it runs through more transparent layers than the renderer's four transparent bounces allow, which draws black. Proportions, frond count and droop are look choices.",
       "variants": [
-        {"height_m": 11.7, "triangles": 26556},
-        {"height_m": 14.6, "triangles": 21740},
-        {"height_m": 17.32, "triangles": 28606},
-        {"height_m": 20.6, "triangles": 24832}
-      ]
+        {"height_m": 18.21, "triangles": 532945},
+        {"height_m": 18.09, "triangles": 587047}
+      ],
+      "plantcatalog": {
+        "species": ["Phoenix dactylifera HD (two seeds)"],
+        "role": "in place of the generated palms",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "doum-palm",
@@ -49,9 +53,16 @@
       "height_range_m": [4, 10],
       "note": "A stand-in, and the reshaping is a look choice: the island tree is an olive-like tree, and flattening its crown is what makes it read as the flat-topped acacia of a savanna from across the plateau.",
       "variants": [
-        {"height_m": 3.71, "triangles": 284888},
-        {"height_m": 3.31, "triangles": 284888}
-      ]
+        {"height_m": 8.4, "triangles": 1420480},
+        {"height_m": 9.53, "triangles": 1237833},
+        {"height_m": 4.48, "triangles": 1206470}
+      ],
+      "plantcatalog": {
+        "species": ["Vachellia tortilis HD (two seeds)", "Euphorbia candelabrum HD (one seed)"],
+        "role": "in place of the reshaped Poly Haven trees",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "tree",
@@ -81,8 +92,16 @@
         {"height_m": 1.71, "triangles": 7590},
         {"height_m": 1.19, "triangles": 5242},
         {"height_m": 1.17, "triangles": 9234},
-        {"height_m": 1.24, "triangles": 5188}
-      ]
+        {"height_m": 1.24, "triangles": 5188},
+        {"height_m": 3.85, "triangles": 175915},
+        {"height_m": 3.92, "triangles": 197350}
+      ],
+      "plantcatalog": {
+        "species": ["Tamarix gallica HD (two seeds)"],
+        "role": "beside the Poly Haven shrubs",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "bush",
@@ -109,10 +128,14 @@
       "height_range_m": [2, 3.8],
       "note": "On the era's shorelines, from 0.45 m under the water plane to 0.8 m above it.",
       "variants": [
-        {"height_m": 3.18, "triangles": 10015},
-        {"height_m": 3.43, "triangles": 11930},
-        {"height_m": 3.38, "triangles": 14485}
-      ]
+        {"height_m": 3.0, "triangles": 548905}
+      ],
+      "plantcatalog": {
+        "species": ["Cyperus papyrus HD"],
+        "role": "in place of the generated papyrus",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "reed",
@@ -124,10 +147,15 @@
       "height_range_m": [1.8, 2.9],
       "note": "On the shorelines with the papyrus.",
       "variants": [
-        {"height_m": 2.63, "triangles": 4561},
-        {"height_m": 2.61, "triangles": 5469},
-        {"height_m": 2.63, "triangles": 6426}
-      ]
+        {"height_m": 2.77, "triangles": 35096},
+        {"height_m": 1.87, "triangles": 61822}
+      ],
+      "plantcatalog": {
+        "species": ["Phragmites australis HD", "Typha latifolia HD"],
+        "role": "in place of the generated reeds",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "tussock",
@@ -142,8 +170,15 @@
         {"height_m": 0.78, "triangles": 1244},
         {"height_m": 0.95, "triangles": 1334},
         {"height_m": 1.11, "triangles": 1424},
-        {"height_m": 1.2, "triangles": 1514}
-      ]
+        {"height_m": 1.2, "triangles": 1514},
+        {"height_m": 1.05, "triangles": 80347}
+      ],
+      "plantcatalog": {
+        "species": ["Festuca arundinacea HD"],
+        "role": "beside the generated tufts",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "grass",
@@ -211,8 +246,17 @@
       "variants": [
         {"height_m": 11.31, "triangles": 63856},
         {"height_m": 12.27, "triangles": 65180},
-        {"height_m": 3.41, "triangles": 192202}
-      ]
+        {"height_m": 3.41, "triangles": 192202},
+        {"height_m": 12.68, "triangles": 342523},
+        {"height_m": 12.94, "triangles": 564272},
+        {"height_m": 10.09, "triangles": 289147}
+      ],
+      "plantcatalog": {
+        "species": ["Quercus robur forest (one HD seed, one LD)", "Quercus rubra HD"],
+        "role": "beside the generated trees",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "oil-palm",
@@ -258,8 +302,15 @@
         {"height_m": 3.33, "triangles": 10235},
         {"height_m": 3.62, "triangles": 12806},
         {"height_m": 3.99, "triangles": 15230},
-        {"height_m": 2.96, "triangles": 8507}
-      ]
+        {"height_m": 2.96, "triangles": 8507},
+        {"height_m": 1.8, "triangles": 14296}
+      ],
+      "plantcatalog": {
+        "species": ["Phalaris arundinacea HD"],
+        "role": "beside the generated clumps",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "fern",
@@ -271,10 +322,14 @@
       "height_range_m": [0.6, 1.6],
       "note": "The First Time's forest floor, within GRASS_REACH of Khufu.",
       "variants": [
-        {"height_m": 0.59, "triangles": 908},
-        {"height_m": 0.73, "triangles": 1228},
-        {"height_m": 0.87, "triangles": 1480}
-      ]
+        {"height_m": 0.95, "triangles": 140020}
+      ],
+      "plantcatalog": {
+        "species": ["Dryopteris filix-mas HD"],
+        "role": "in place of the generated ferns",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "aroid",
@@ -301,10 +356,14 @@
       "height_range_m": [0.1, 0.14],
       "note": "Afloat on the era's water where it is 0.3 to 2.5 m deep (the `pond` zone, POND), at the water's level.",
       "variants": [
-        {"height_m": 0.12, "triangles": 192},
-        {"height_m": 0.12, "triangles": 300},
-        {"height_m": 0.12, "triangles": 356}
-      ]
+        {"height_m": 0.09, "triangles": 224832}
+      ],
+      "plantcatalog": {
+        "species": ["Nymphaea alba HD"],
+        "role": "in place of the generated lilies, floating on its pads at the water line",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
     },
     {
       "id": "lush-grass",
@@ -353,7 +412,30 @@
         {"height_m": 0.64, "triangles": 1980},
         {"height_m": 1.13, "triangles": 2201},
         {"height_m": 0.83, "triangles": 2340},
-        {"height_m": 1.36, "triangles": 2561}
+        {"height_m": 1.36, "triangles": 2561},
+        {"height_m": 1.05, "triangles": 80347}
+      ],
+      "plantcatalog": {
+        "species": ["Festuca arundinacea HD"],
+        "role": "beside the generated tufts",
+        "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+        "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants"
+      }
+    },
+    {
+      "id": "woodland",
+      "name": "Göbekli Tepe's woodland about 9500 BCE (olive and common fig)",
+      "made": "PlantCatalog: vegetation._plantcatalog()",
+      "source": "PlantCatalog (e-on software, a Bentley company), exported from PlantFactory 2024 as FBX with its Blender preset by build/plantcatalog/export_all.py",
+      "author": "e-on software (PlantCatalog)",
+      "license": "PlantCatalog's licence: the meshes may be used in any project, never sold on as meshes; the exports stay in build/, so a machine without them keeps the generated plants",
+      "height_range_m": [4, 7],
+      "note": "Olea europaea HD and Ficus carica HD, two seeds each, standing 4.7 to 4.9 m, in place of the Giza broadleaf trees render/gobekli_land.py used: small trees standing in for the oak and pistachio the pollen gives, a look choice. They are not the broadleaf kind's, whose 11 to 12.5 m would blow them up two and a half times.",
+      "variants": [
+        {"height_m": 4.69, "triangles": 1031636},
+        {"height_m": 4.72, "triangles": 1042834},
+        {"height_m": 4.89, "triangles": 554059},
+        {"height_m": 4.87, "triangles": 530594}
       ]
     }
   ],
