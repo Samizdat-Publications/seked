@@ -42,15 +42,15 @@
   {
    "id": "ch0-t03",
    "chapter": 0,
-   "station": "sphinx-flank",
+   "station": "sphinx-side",
    "era": "first-time",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 340,
-    "pitch": 15,
-    "fov": 60
+    "yaw": 356,
+    "pitch": 8,
+    "fov": 66
    },
-   "arrive": "wipe",
+   "arrive": "flight",
    "say": "Graham Hancock says it was a lion first, watching its own constellation rise.",
    "draw": [],
    "hold": 0.3,
@@ -115,7 +115,7 @@
    "arrive": "cut",
    "say": "That Göbekli Tepe proves someone was building long before we thought possible.",
    "draw": [
-    "gobekli-pair"
+    "gobekli-scan"
    ],
    "hold": 0.3,
    "interact": "look",
@@ -190,9 +190,9 @@
    "era": "today",
    "moment": "equinox-dawn",
    "view": {
-    "yaw": 282,
-    "pitch": 8,
-    "fov": 52
+    "yaw": 278,
+    "pitch": 12,
+    "fov": 32
    },
    "arrive": "turn",
    "say": "The geologist Robert Schoch read those walls as cut by rain: soft beds worn back into deep coves, cracks widest at the top, where water ran in.",

@@ -19,7 +19,7 @@ BLENDER = r"C:\Program Files\Blender Foundation\Blender 5.1\blender.exe"
 OUT = os.path.join(ROOT, "apps", "exhibit", "objects")
 WORK = os.path.join(ROOT, "build", "gobekli", "exhibit")
 # card: (era, view)
-SHOTS = {"gobekli-today": ("today", "air"), "gobekli-ring": ("9500", "rim"), "gobekli-p43": ("9500", "p43"),
+SHOTS = {"gobekli-today": ("today", "air"), "gobekli-scan": ("today", "pair"), "gobekli-ring": ("9500", "rim"), "gobekli-p43": ("9500", "p43"),
          "gobekli-pair": ("9500", "inside")}
 
 

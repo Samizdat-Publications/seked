@@ -130,9 +130,9 @@ describe('joinProblems', () => {
   it('wants the first leaf to arrive by cut', () => {
     expect(joinProblems([{ ...base, arrive: 'turn' }])).toHaveLength(1);
   });
-  it('wants a flight to keep its era and moment and to go somewhere', () => {
+  it('wants a flight to keep its moment and to go somewhere; into another era it dissolves in', () => {
     expect(joinProblems([base, next({ arrive: 'flight', station: 'sphinx-face' })])).toEqual([]);
-    expect(joinProblems([base, next({ arrive: 'flight', station: 'sphinx-face', era: 'lion' })])).toHaveLength(1);
+    expect(joinProblems([base, next({ arrive: 'flight', station: 'sphinx-face', era: 'lion' })])).toEqual([]);
     expect(joinProblems([base, next({ arrive: 'flight', station: 'sphinx-face', moment: 'june-dawn' })])).toHaveLength(1);
     expect(joinProblems([base, next({ arrive: 'flight' })])).toHaveLength(1);
   });

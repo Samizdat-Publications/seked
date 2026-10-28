@@ -17,6 +17,9 @@ const READY_WAIT_MS = 8000;
 /** How far into a turn or a wipe the words begin, and the longest pause after a leaf's words (critic, 21 October). */
 const LEAD_MS = 200;
 const MAX_HOLD_S = 0.15;   // with the lead, about 0.35 s between leaves (0.7 s until the critic's fourth review)
+/** A flight's last frame: how long it may wait for the panorama and patch it hands over to, and its fade. */
+const SETTLE_MS = 1500;
+const FADE_OUT_MS = 250;
 /** Seconds the words back up when play takes up where it stopped. */
 const REWIND_S = 1;
 
@@ -54,6 +57,8 @@ export class Player {
   /** Called when play starts, before the first word. */
   onPlay: () => void = () => {};
   onPause: () => void = () => {};
+  /** Narrated play has reached the end of the last leaf and its reply: the finale's cue. */
+  onEnd: () => void = () => {};
   /** Called when a leaf is put on the stage. */
   onLeaf: (leaf: Leaf) => void = () => {};
   /** Show one of the exhibit's own figures (src/figures.ts), or put it away with null. */
@@ -252,21 +257,44 @@ export class Player {
    */
   private fly(from: Leaf, to: Leaf, token: number, then: () => void): void {
     const v = this.ui.flight;
+    let shown = false;
+    // the leaf's panorama goes up behind the film only once the film covers the screen: set first, it showed the
+    // destination for a moment before the film's first frame took the eye back to where it started
+    const behind = () => { if (!shown) { shown = true; this.stage.show(this.shot(to)); } };
     const land = () => {
-      v.onended = v.onerror = v.oncanplay = null;
+      v.onended = v.onerror = v.oncanplay = v.onplaying = null;
+      behind();
+      v.classList.remove('leaving');
       v.hidden = true;
       v.removeAttribute('src');
       v.load();
       if (token === this.token) then();
     };
-    this.stage.show(this.shot(to));   // behind the film, so the last frame hands over to the same view
+    // the last frame is held until the panorama and its patch are in, then fades, so nothing changes after it
+    const settle = () => {
+      if (token !== this.token) return land();
+      behind();
+      const t0 = performance.now();
+      const wait = () => {
+        if (token !== this.token) return land();
+        if (!this.stage.settled && performance.now() - t0 < SETTLE_MS) { this.later(60, wait); return; }
+        v.classList.add('leaving');
+        this.later(FADE_OUT_MS, land);
+      };
+      wait();
+    };
     if (this.stage.still) { land(); return; }
     v.onerror = land;
-    v.onended = land;
+    v.onended = settle;
+    v.onplaying = () => { v.onplaying = null; if (token === this.token) behind(); };
     v.oncanplay = () => {
       v.oncanplay = null;
       if (token !== this.token) return land();
+      // into another era the film is the arriving one's from its first frame: it dissolves in over the last leaf's
+      // picture, so the era changes in place before the camera moves
+      v.classList.toggle('arriving', from.era !== to.era);
       v.hidden = false;
+      if (from.era !== to.era) requestAnimationFrame(() => requestAnimationFrame(() => v.classList.remove('arriving')));
       v.play().catch(land);
     };
     v.src = new URL(flightFile(from, to), location.href).href;
@@ -454,7 +482,7 @@ export class Player {
   private onward(token: number): void {
     if (token !== this.token || !this.playing) return;
     if (this.index + 1 < this.leaves.length) this.go(this.index + 1);
-    else this.pause();
+    else { this.pause(); this.onEnd(); }
   }
 
   private later(ms: number, f: () => void): void { this.timers.push(window.setTimeout(f, ms)); }

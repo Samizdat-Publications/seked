@@ -167,9 +167,9 @@
    "src": "pano/patch/sphinx-flank-today-equinox-dawn-ch1-rolls.jpg",
    "pano": "pano/sphinx-flank-today-equinox-dawn.jpg",
    "leaf": "ch1-rolls",
-   "yaw": 282,
-   "pitch": 8,
-   "fov": 67.6,
+   "yaw": 278,
+   "pitch": 12,
+   "fov": 41.6,
    "aspect": 1.777778
   },
   {

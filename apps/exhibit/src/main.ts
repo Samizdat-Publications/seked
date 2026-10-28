@@ -253,6 +253,49 @@ function khafreCutawayFigure(ground: Record<string, number> | null, structures?:
 }
 
 /**
+ * The finale's pictures, in order: the exhibit's strongest shots from the Sphinx today, back through its eras and out
+ * to the other sites, and home to the Sphinx. Detail patches are the walkthrough's (pano/patch/), cards the exhibit's
+ * own objects/. A look choice, after "the ending is kind of abrupt" (Stewart, 28 October).
+ */
+const FINALE: [string, string][] = [
+  ['patch:sphinx-today-equinox-dawn-ch0-t01.jpg', 'The Sphinx today'],
+  ['patch:sphinx-flank-lion-equinox-dawn-ch0-t02.jpg', 'Worn, as Schoch reads it, by rain'],
+  ['patch:sphinx-face-first-time-equinox-dawn-ch7-schoch.jpg', 'A lion first, as Hancock tells it'],
+  ['patch:panorama-first-time-summer-evening-ch7-cold.jpg', 'The First Time, c. 10,500 BCE'],
+  ['patch:south-built-golden-south-ch6-measure.jpg', 'Khufu cased, c. 2560 BCE'],
+  ['patch:valley-temple-built-temple-morning-ch0-t04.jpg', 'The Valley Temple'],
+  ['objects:hawara-labyrinth.jpg', 'The Labyrinth, as Herodotus told it'],
+  ['objects:gobekli-today.jpg', 'Göbekli Tepe'],
+  ['objects:khufu-section.jpg', 'The corridor: an answer'],
+  ['patch:sphinx-quarter-today-equinox-dawn-ch2-nemes.jpg', 'The ditch floor: where to look'],
+];
+const FINALE_EACH_MS = 3200;
+
+/** After the last leaf and its reply: the strongest shots in turn, then the title and the ways on. */
+function finale(again: () => void): void {
+  const root = $('finale'), pics = $('finale-pics');
+  const src = (ref: string) => {
+    const [where, file] = ref.split(':') as [string, string];
+    return where === 'patch' ? new URL(`pano/patch/${file}`, WALK).href : `objects/${file}`;
+  };
+  pics.innerHTML = FINALE.map(([ref, words]) => `<figure><img src="${src(ref)}" alt=""><figcaption>${words}</figcaption></figure>`).join('');
+  const frames = [...pics.querySelectorAll('figure')];
+  root.classList.remove('done');
+  root.hidden = false;
+  let k = 0, timer = 0;
+  const step = () => {
+    frames.forEach((f, i) => f.classList.toggle('on', i === k));
+    if (k < frames.length - 1) { k++; timer = window.setTimeout(step, FINALE_EACH_MS); }
+    else timer = window.setTimeout(() => root.classList.add('done'), FINALE_EACH_MS * 0.6);
+  };
+  step();
+  const close = () => { clearTimeout(timer); root.hidden = true; document.removeEventListener('keydown', onKey); };
+  const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  $('finale-again').onclick = () => { close(); again(); };
+}
+
+/**
  * The Labyrinth at Hawara as one reconstruction draws it (render/hawara_labyrinth.py; scripts/exhibit_labyrinth.py
  * writes the pictures into objects/), labelled with its tier: legendary, told and never found. `lower` shows the pit
  * dug through its eastern courts to the underground half, ghosted.
@@ -284,6 +327,10 @@ function gobekliFigure(id: string, ground: Record<string, number> | null): strin
     'gobekli-today': ['A hill with a long excavation in it, the pillars of the enclosures showing in the trench',
       `Göbekli Tepe today, from the air: the main excavation as a photogrammetry scan (rmark, CC BY 4.0), set on its
       hill. The scan's form is a visual stand-in, not a survey; the land round it is ours.`],
+    'gobekli-scan': ['An excavated enclosure of T-shaped stone pillars in a dug-out trench, two braced with timber in the middle, a dry plain beyond',
+      `Enclosure D as it stands today, from the rim to its south: the photogrammetry scan of the excavation (rmark, CC BY
+      4.0), its central pair braced with timber, the ring of pillars round them in their stone wall. The scan's form is a
+      visual stand-in, not a survey; the land round it is ours.`],
     'gobekli-ring': ['A ring of T-shaped stone pillars set in a curving stone wall, two taller pillars in the middle, on a green hillside',
       `Enclosure D about 9500 BCE, built here from its excavated plan (Haklay and Gopher 2020): eleven pillars set in a
       stone wall round a central pair. Where the pillars stand is the plan's; the wall pillars' height, the stone, the
@@ -557,7 +604,9 @@ async function start(): Promise<void> {
   };
   const ambient = new Ambient();
   player.onLeaf = (L) => {
-    panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L);
+    // this leaf's pictures and the next one's, so a card that opens a leaf is loaded before the leaf arrives
+    const next = leaves[leaves.indexOf(L) + 1];
+    panel.show(L); sky.show(L, player.playing); objectFor(L); preloadCards(L); if (next) preloadCards(next);
     sky.setMask(L.sky ? new URL(leafPanorama(L, RENDER).replace(/^pano\//, 'pano/mask/').replace(/\.jpg$/, '.png'), WALK).href : null);
     if (player.playing) ambient.play(bedFor(L));
   };
@@ -630,6 +679,8 @@ async function start(): Promise<void> {
   panel.onOpen = () => { if (player.playing) player.pause(); };
   player.onPlay = () => { panel.quiet(); sky.show(player.leaf, true); ambient.play(bedFor(player.leaf)); };
   player.onPause = () => ambient.stop();
+  player.onEnd = () => finale(() => { player.go(0); player.play(); });
+  if (new URLSearchParams(location.search).has('finale')) player.onEnd();   // ?finale: straight to the end
   // for capture and test scripts, as the story page had
   (window as unknown as { seked: unknown }).seked = { player, stage, sky };
   $('controls').hidden = false;

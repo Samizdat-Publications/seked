@@ -295,6 +295,18 @@ export class Stage {
   /** Whether the panorama on stage is on screen (always, for the flat picture, which reports its own status). */
   get ready(): boolean { return !this.cache || this.cache.status(this.current()) === 'ready'; }
 
+  /**
+   * Whether the panorama on stage and the detail patch its view wants are both loaded: what a flight's last frame
+   * waits for, so the picture it hands over to does not sharpen or change a moment after (Stewart, 28 October).
+   */
+  get settled(): boolean {
+    if (!this.ready || !this.cache) return this.ready;
+    const url = this.current();
+    if (!wantsPatch(this.fov(), this.canvas.height)) return true;
+    const q = nearestPatch(this.patches[url], this.view);
+    return !q || this.cache.status(this.url(q.src)) === 'ready';
+  }
+
   request(): void {
     if (!this.frame) this.frame = requestAnimationFrame((t) => this.tick(t));
   }

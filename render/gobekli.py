@@ -741,6 +741,9 @@ def main():
     views = {
         # standing on the rim south of Enclosure D, looking north into it
         "rim": (Vector((dx + 3.0, dy - 16.0, floor + 10.0)), Vector((dx, dy, floor + 1.5)), 20),
+        # from the same rim, a little closer in: the scan's own central pair and ring, braced as they stand today (a
+        # longer lens than this goes past what the scan resolves)
+        "pair": (Vector((dx + 3.0, dy - 15.0, floor + 9.5)), Vector((dx, dy + 2.0, floor + 3.2)), 27),
         # from the air, south-west, the whole excavation filling the frame: at 35 mm the plain round it took half the
         # picture and its ground does not hold up that close, so the excavation alone fills it (Stewart, 26 October)
         "air": (Vector((dx - 40.0, dy - 50.0, dground + 48.0)), Vector((c[0] + 9.0, c[1] + 9.0, floor)), 95),

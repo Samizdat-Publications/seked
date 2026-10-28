@@ -8,7 +8,9 @@ import { z } from 'zod';
 /**
  * How a leaf arrives from the one before:
  * - `cut` straight to it (the first leaf, or until a flight is rendered);
- * - `flight` a rendered camera move from the last leaf's view, so the two must share an era and a moment;
+ * - `flight` a rendered camera move from the last leaf's view, so the two must share a moment; a flight into another
+ *   era is rendered in the arriving one and dissolves in over the last leaf's picture before it moves (the trailer's
+ *   worn Sphinx into the lion, then backing out to show all of it: Stewart, 28 October);
  * - `wipe` the same station and moment in another era, the new era swept in behind a hard edge;
  * - `turn` the same panorama, the view swinging to the new one.
  */
@@ -128,7 +130,7 @@ export function joinProblems(leaves: readonly Leaf[]): string[] {
     const same = L.station === prev.station;
     if (L.arrive === 'flight') {
       if (same) out.push(`${L.id}: a flight goes somewhere; the station is ${L.station} on both sides`);
-      if (L.era !== prev.era || L.moment !== prev.moment) out.push(`${L.id}: two leaves joined by a flight share an era and a moment`);
+      if (L.moment !== prev.moment) out.push(`${L.id}: two leaves joined by a flight share a moment`);
     }
     if (L.arrive === 'wipe' && (!same || L.moment !== prev.moment || L.era === prev.era)) {
       out.push(`${L.id}: a wipe changes the era in place, at the same station and moment`);
