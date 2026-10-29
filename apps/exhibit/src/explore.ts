@@ -63,7 +63,12 @@ export interface ExploreDeps {
   back: () => void;
 }
 
-type Mode = 'time' | 'sky' | 'claim';
+type Mode = 'time' | 'sky' | 'claim' | 'splat';
+
+/** The walkable splats (render/splat_views.py, Brush, scripts/splat_pack.py into splats/), where the camera starts. */
+const SPLATS = [
+  { file: 'splats/sphinx-today.splat', title: 'The Sphinx enclosure today', from: [372, -480, -26], at: [322, -433, -32] },
+];
 
 export class Explore {
   private root: HTMLElement;
@@ -76,6 +81,8 @@ export class Explore {
   private claimId: string | null = null;
   private preset = 'canonical';
   private tolerance = 2;   // index into TOLERANCE_STEPS: as filed
+  private splatBox: HTMLElement;
+  private splatViewer: { dispose: () => Promise<void> | void } | null = null;
 
   constructor(private d: ExploreDeps) {
     this.root = document.createElement('div');
@@ -88,14 +95,17 @@ export class Explore {
           <button type="button" class="ex-mode" data-mode="time">Time Machine</button>
           <button type="button" class="ex-mode" data-mode="sky">Sky Machine</button>
           <button type="button" class="ex-mode" data-mode="claim">Test a Claim</button>
+          <button type="button" class="ex-mode" data-mode="splat">Walk the Sphinx</button>
           <a class="ex-mode" id="ex-walk" href="${d.walk.href}">Free Walk</a>
         </nav>
         <button type="button" class="ex-close" id="ex-close">Back to the exhibit</button>
       </header>
       <section class="ex-panel" aria-live="polite"></section>
-      <section class="ex-sheet" hidden></section>`;
+      <section class="ex-sheet" hidden></section>
+      <div class="ex-splat" hidden></div>`;
     this.panel = this.root.querySelector('.ex-panel')!;
     this.sheet = this.root.querySelector('.ex-sheet')!;
+    this.splatBox = this.root.querySelector('.ex-splat')!;
     this.root.querySelectorAll<HTMLButtonElement>('button.ex-mode').forEach((b) => {
       b.onclick = () => this.setMode(b.dataset.mode as Mode);
     });
@@ -112,6 +122,7 @@ export class Explore {
   }
 
   hide(): void {
+    this.closeSplat();
     this.root.hidden = true;
     document.body.classList.remove('exploring');
     this.d.stage.compare(null);
@@ -124,10 +135,40 @@ export class Explore {
     this.panel.hidden = mode === 'claim';
     document.body.classList.toggle('exploring-sky', mode === 'sky');
     if (mode !== 'sky') this.d.sky.hide();
+    if (mode !== 'splat') this.closeSplat();
+    this.splatBox.hidden = mode !== 'splat';
     this.d.stage.compare(null);
     if (mode === 'time') this.showView(this.view, true);
     if (mode === 'sky') this.showSky(this.skyIndex);
     if (mode === 'claim') this.showClaims();
+    if (mode === 'splat') void this.showSplat(0);
+  }
+
+  // ---- Walk the Sphinx: a Gaussian splat, moved through in real time --------------------------------------
+
+  private async showSplat(k: number): Promise<void> {
+    const S = SPLATS[k]!;
+    this.panel.innerHTML = `<div class="ex-what"><p class="ex-name">${S.title}</p>
+      <p class="ex-sub">Drag to turn round it, right-drag to slide, scroll to move in. A Gaussian splat learned from 272
+      path-traced renders of the plateau: it moves in real time, and is softer than the panoramas close up.</p></div>`;
+    this.closeSplat();
+    const G = await import('@mkkellogg/gaussian-splats-3d');
+    if (this.mode !== 'splat') return;
+    // a splat learns surfaces, not the sky, so what is not ground draws dark (a transparent canvas over a sky is to try)
+    const viewer = new G.Viewer({
+      rootElement: this.splatBox, cameraUp: [0, 0, 1], initialCameraPosition: S.from, initialCameraLookAt: S.at,
+      sharedMemoryForWorkers: false, selfDrivenMode: true, dynamicScene: false,
+    });
+    this.splatViewer = viewer;
+    await viewer.addSplatScene(S.file, { format: G.SceneFormat.Splat, showLoadingUI: true, progressiveLoad: true });
+    if (this.splatViewer === viewer) viewer.start();
+  }
+
+  private closeSplat(): void {
+    const v = this.splatViewer;
+    this.splatViewer = null;
+    if (v) void v.dispose();
+    this.splatBox.replaceChildren();
   }
 
   // ---- Time Machine ----------------------------------------------------------------------------------

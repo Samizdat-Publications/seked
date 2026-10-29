@@ -60,6 +60,8 @@ build/city/
 apps/walk/pano/
 # the exhibit's flights, rendered on the laptop from render/films-exhibit.json
 apps/exhibit/flights/
+# its Gaussian splats, trained on the laptop (render/splat_views.py), copied by pnpm site
+apps/exhibit/splats/
 apps/walk/img/
 apps/walk/films/
 apps/films/films/

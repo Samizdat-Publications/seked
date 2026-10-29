@@ -41,6 +41,7 @@ def main():
     ap.add_argument("--centre", default="0,0,0")
     ap.add_argument("--radius", type=float, default=1e9)
     ap.add_argument("--min-opacity", type=float, default=0.04)
+    ap.add_argument("--max-mb", type=float, default=0.0, help="keep only the most visible splats that fit (0: no cap)")
     a = ap.parse_args()
     p = read_ply(a.src)
     xyz = np.stack([p["x"], p["y"], p["z"]], 1)
@@ -54,6 +55,8 @@ def main():
     # the most visible first, so a viewer that streams shows the shape early
     order = np.argsort(-(scale.prod(1) ** (1 / 3) * opacity)[keep])
     idx = np.nonzero(keep)[0][order]
+    if a.max_mb:
+        idx = idx[: int(a.max_mb * 1e6 // 32)]
     n = len(idx)
     rec = np.zeros(n, dtype=[("pos", "<f4", 3), ("scale", "<f4", 3), ("rgba", "u1", 4), ("rot", "u1", 4)])
     rec["pos"] = xyz[idx]

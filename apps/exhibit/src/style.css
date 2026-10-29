@@ -412,3 +412,9 @@ body.exploring-sky #skybar { top: 64px; }
   .ex-list { border-right: 0; border-bottom: 1px solid var(--rule); max-height: 30vh; }
   .ex-close { margin-left: 0; }
 }
+
+/* Walk the Sphinx: the splat's own canvas over the stage, under the mode bar and the panel */
+.ex-splat { position: absolute; inset: 0; z-index: 1; background: #0d0c0a; }
+.ex-splat canvas { display: block; }
+.ex-splat[hidden] { display: none; }
+.explore .ex-panel { z-index: 2; }

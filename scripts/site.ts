@@ -51,6 +51,9 @@ if (existsSync(join(exhibit, 'index.html'))) {
   // its flights are rendered on the laptop (render/films-exhibit.json); a leaf without one cuts
   const flights = join(apps, 'exhibit', 'flights');
   if (existsSync(flights)) cpSync(flights, join(site, 'exhibit', 'flights'), { recursive: true });
+  // and its Gaussian splats, trained on the laptop (render/splat_views.py, Brush, scripts/splat_pack.py)
+  const splats = join(apps, 'exhibit', 'splats');
+  if (existsSync(splats)) cpSync(splats, join(site, 'exhibit', 'splats'), { recursive: true });
   // the objects in the hand (render/export_heads.py); a leaf without its object shows the panorama
   const objects = join(apps, 'exhibit', 'objects');
   if (existsSync(objects)) cpSync(objects, join(site, 'exhibit', 'objects'), { recursive: true });
