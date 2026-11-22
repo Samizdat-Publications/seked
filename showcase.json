@@ -2,17 +2,18 @@
   "name": "Seked",
   "repo": "seked",
   "pitch": "The Giza plateau rebuilt from the survey in five eras, with every encoded-mathematics claim computed from the same measurements.",
-  "status": "v1",
+  "status": "in-development",
   "version": "1.0.0",
   "kind": "reconstruction",
   "started": "2026-09-13",
-  "updated": "2026-10-02",
+  "updated": "2026-11-21",
   "tech": [
     "TypeScript",
     "React Three Fiber",
     "Blender Cycles",
     "glTF"
   ],
+  "models": [],
   "links": {
     "landing": "https://seked.pages.dev",
     "play": "https://seked.pages.dev/walk/",
@@ -49,5 +50,9 @@
       "who": "Poly Haven",
       "licence": "CC0"
     }
-  ]
+  ],
+  "media": {
+    "film": "showcase/film.mp4",
+    "poster": "showcase/poster.png"
+  }
 }
