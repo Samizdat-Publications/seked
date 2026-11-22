@@ -991,10 +991,13 @@ def eyes(state, terrain, water=()):
             own += _feet(float(v["x"]), float(v["y"]))
         lit = _towards_sun(mm, state, float(v["x"]), float(v["y"]), float(z))
         out.append((float(v["x"]), float(v["y"]), float(z), own + ([lit] if lit else [])))
-    try:
-        films = data.load_json(data.RENDER, "films.json")["films"]
-    except (OSError, KeyError, ValueError):
-        films = []
+    films = []
+    # the flights of render/films.json and the showcase film's (render/films-showcase.json)
+    for name in ("films.json", "films-showcase.json"):
+        try:
+            films += data.load_json(data.RENDER, name)["films"]
+        except (OSError, KeyError, ValueError):
+            pass
     for f in films:
         if f.get("state") != state or f.get("inside"):
             continue

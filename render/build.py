@@ -94,6 +94,28 @@ def film(film_id, opts):
     plateau.view(where, "shot")
     if not spec.get("inside"):
         plateau.moment(stations["moments"][spec["moment"]])
+    if spec.get("stars"):
+        # A twilight flight with one frame of a sky bake's stars over it (render/films-showcase.json): the sky fixed,
+        # the dome round the first eye, the stars put up as sky_film does so a twilight's exposure leaves them seen.
+        from giza import night
+        st = spec["stars"]
+        render_sky = night._render_sky()
+        bake = render_sky.load_rollback(os.path.join(data.REPO, st["bake"]))
+        if plateau.night is None:
+            plateau.night = night.Night(plateau.scene, plateau.scene.world.node_tree, plateau.log)
+        k = int(st.get("frame", -1)) % len(bake[0]["frames"])
+        plateau.night.show_frame(bake, k, tuple(spec["path"][0]))
+        moment = stations["moments"][spec["moment"]]
+        gain = float(st.get("gain", 2.0 ** (night.EXPOSURE - moment.get("exposure", night.EXPOSURE))))
+        flux = plateau.night.dome.data.attributes[render_sky.STAR_FLUX_ATTRIBUTE].data
+        flux.foreach_set("value", [d.value * gain for d in flux])
+    if "exposure" in spec:
+        plateau.scene.view_settings.exposure = float(spec["exposure"])   # this flight's own exposure (a look choice)
+    if spec.get("tile"):
+        # a big frame in tiles, denoised on the CPU: at 2560 x 1440 the GPU ran out of memory with the plateau loaded
+        plateau.scene.cycles.use_auto_tile = True
+        plateau.scene.cycles.tile_size = int(spec["tile"])
+        plateau.scene.cycles.denoising_use_gpu = False
     # The camera alone moves, so Cycles keeps the scene between frames instead of rebuilding it for each.
     plateau.scene.render.use_persistent_data = True
     w, h = (int(n) for n in opts.get("size", spec["size"]).split("x"))
